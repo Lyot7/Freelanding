@@ -56,12 +56,111 @@
 	});
 </script>
 
+<style>
+	.slider-wrapper {
+		position: relative;
+		height: 20px;
+		display: flex;
+		align-items: center;
+	}
+
+	.slider-wrapper::before {
+		content: '';
+		position: absolute;
+		left: 0;
+		top: 4px;
+		height: 12px;
+		width: var(--progress, 0%);
+		background: rgba(111, 240, 211, 0.4);
+		border-radius: 6px 0 0 6px;
+		pointer-events: none;
+		z-index: 1;
+	}
+
+	input[type="range"] {
+		-webkit-appearance: none;
+		appearance: none;
+		height: 20px;
+		background: transparent;
+		border-radius: 4px;
+		outline: none;
+		padding: 0;
+		margin: 0;
+		position: relative;
+		z-index: 2;
+	}
+
+	input[type="range"]::-webkit-slider-thumb {
+		-webkit-appearance: none;
+		appearance: none;
+		width: 20px;
+		height: 20px;
+		background: #6ff0d3;
+		border-radius: 50%;
+		cursor: pointer;
+		border: none;
+		box-shadow: 0 0 8px rgba(111, 240, 211, 0.8), 0 0 12px rgba(111, 240, 211, 0.5);
+		margin-top: -4px;
+	}
+
+	input[type="range"]::-moz-range-thumb {
+		width: 20px;
+		height: 20px;
+		background: #6ff0d3;
+		border-radius: 50%;
+		cursor: pointer;
+		border: none;
+		box-shadow: 0 0 8px rgba(111, 240, 211, 0.8), 0 0 12px rgba(111, 240, 211, 0.5);
+	}
+
+	input[type="range"]::-webkit-slider-track {
+		height: 12px;
+		border-radius: 6px;
+		background: rgba(255, 255, 255, 0.1);
+		margin-top: 4px;
+	}
+
+	input[type="range"]::-webkit-slider-runnable-track {
+		height: 12px;
+		border-radius: 6px;
+		background: rgba(255, 255, 255, 0.1);
+	}
+
+	input[type="range"]::-moz-range-track {
+		height: 12px;
+		border-radius: 6px;
+		background: rgba(255, 255, 255, 0.1);
+	}
+	
+	input[type="range"]::-moz-range-progress {
+		height: 12px;
+		border-radius: 6px 0 0 6px;
+		background: rgba(111, 240, 211, 0.4);
+	}
+</style>
+
 <svelte:head>
-	<title>Eliott B. - Developpeur Freelance IA</title>
+	<title>Eliott B. - Développeur Freelance IA</title>
 	<meta
 		name="description"
-		content="Transformez l'IA en levier de croissance. Developpeur freelance senior specialise en integration IA et automatisation."
+		content="Transformez l'IA en levier de croissance. Développeur freelance senior spécialisé en intégration IA et automatisation."
 	/>
+	
+	<!-- Favicons -->
+	<link rel="icon" type="image/png" href="/logo.png" />
+	<link rel="apple-touch-icon" href="/logo.png" />
+	<link rel="icon" type="image/png" sizes="32x32" href="/logo.png" />
+	<link rel="icon" type="image/png" sizes="16x16" href="/logo.png" />
+	
+	<!-- Mobile Icons -->
+	<link rel="apple-touch-icon" sizes="180x180" href="/logo.png" />
+	<link rel="icon" type="image/png" sizes="192x192" href="/logo.png" />
+	<link rel="icon" type="image/png" sizes="512x512" href="/logo.png" />
+	
+	<!-- Theme Color -->
+	<meta name="theme-color" content="#0F1A18" />
+	<meta name="msapplication-TileColor" content="#0F1A18" />
+	<meta name="msapplication-TileImage" content="/logo.png" />
 </svelte:head>
 
 <div class="relative overflow-x-hidden">
@@ -80,9 +179,9 @@
 		>
 			<a
 				href="#top"
-				class="text-xl font-serif font-semibold tracking-tight text-white flex items-center gap-2"
+				class="text-xl font-serif font-semibold tracking-tight text-white flex items-center gap-3"
 			>
-				<span class="w-2 h-2 rounded-full bg-aura-accent"></span>
+				<img src="/logo.png" alt="Eliott B." class="w-8 h-8 object-contain" />
 				Eliott B.
 			</a>
 
@@ -124,7 +223,7 @@
 				>
 					<span class="material-symbols-outlined text-[16px] text-aura-accent">verified</span>
 					<span class="text-xs uppercase tracking-widest text-aura-muted"
-						>Developpeur Freelance Senior</span
+						>Expert en transition IA</span
 					>
 				</div>
 
@@ -134,8 +233,8 @@
 				</h1>
 
 				<p class="text-lg md:text-xl text-aura-muted font-light max-w-2xl leading-relaxed">
-					Je transforme vos goulots d'etranglement en leviers de croissance. Une approche
-					chirurgicale de la transition numerique pour un ROI mesurable des le premier mois.
+					Je transforme vos goulots d'étranglement en leviers de croissance. Une approche
+					chirurgicale de la transition numérique pour un ROI mesurable dès le premier mois.
 				</p>
 
 				<div class="flex flex-col sm:flex-row gap-5 pt-4">
@@ -147,7 +246,7 @@
 							Simuler mes gains
 							<span
 								class="material-symbols-outlined ml-2 text-sm transition-transform group-hover:translate-x-1"
-								>calculate</span
+								>payments</span
 							>
 						</span>
 					</a>
@@ -166,30 +265,30 @@
 				<div class="flex items-center gap-4 pt-6 border-t border-aura-surface/50">
 					<div class="flex -space-x-3">
 						<img
-							src="https://lh3.googleusercontent.com/gg-dl/ABS2GSk66asWewYGhkoljKdirGzBf6FJIaKDk4PRaUACxsKd6oHohj2ydY_xNUHIVIidra9J84m83v8xHL_VQQfwnRASlF87FufNQlcX3tricveNoqhfGa9s9bE7_BV1Q1a-9kybb3cFk7wKIz1deV456VLbz5L7kPBWYv5jhHyACPCs6Kzq"
+							src="/jerome-davy.png"
 							class="w-10 h-10 rounded-full border-2 border-aura-bg object-cover"
-							alt="Client"
+							alt="Jérôme DAVY"
 						/>
 						<img
-							src="https://lh3.googleusercontent.com/gg-dl/ABS2GSlaeH6j2egQ0H33RLQnVyr1t-M_O_0ufM3tgHHOgnF1v4rdZwJc_7Q1Jpmj6YUxqrvH_1UafhLHor68xWl4vmWirre1jjSyC9TGPhl2QPuVLlcPJCeBKyA4ZJ4OF2M5sp3-R20d2SCNgE52RDoTlnTPhwM5jTVZDfuhcFSsAlTHmenW"
+							src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=faces"
 							class="w-10 h-10 rounded-full border-2 border-aura-bg object-cover"
-							alt="Client"
+							alt="Leader tech"
 						/>
 						<img
-							src="https://lh3.googleusercontent.com/gg-dl/ABS2GSlgt80jQv784n6rhkPx6jsTFkYAc84wv556IO3NY3n75DQl8XAqpWwO6HbmiyO1R1dM3yk502jDk6aiC44Nayu8ZvOhYMrOGHVKqn2YdJ45YM7fSGmY0_kccjjaTucOnfFGgTtb_GGxEU8Y_NZjcgDYx_54G7Aw2av1f7GeBqseB0-2"
+							src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=faces"
 							class="w-10 h-10 rounded-full border-2 border-aura-bg object-cover"
-							alt="Client"
+							alt="Leader tech"
 						/>
 					</div>
 					<div class="text-sm">
 						<div class="flex text-aura-gold text-[12px]">
-							<span class="material-symbols-outlined text-[16px] fill-current">star</span>
-							<span class="material-symbols-outlined text-[16px] fill-current">star</span>
-							<span class="material-symbols-outlined text-[16px] fill-current">star</span>
-							<span class="material-symbols-outlined text-[16px] fill-current">star</span>
-							<span class="material-symbols-outlined text-[16px] fill-current">star</span>
+							<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+							<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+							<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+							<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+							<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
 						</div>
-						<span class="text-aura-muted">Approuve par +20 leaders tech</span>
+						<span class="text-aura-muted">Approuvé par +20 leaders tech</span>
 					</div>
 				</div>
 			</div>
@@ -197,13 +296,13 @@
 			<!-- Right Visual (Hero Image) -->
 			<div class="lg:col-span-5 relative animate-fade-up delay-200">
 				<div
-					class="relative w-full aspect-[3/4] rounded-t-[100px] rounded-b-[30px] overflow-hidden border border-aura-surface group"
+					class="relative w-full aspect-[3/4] rounded-t-[100px] rounded-b-[30px] overflow-hidden border border-aura-surface"
 				>
 					<!-- Image Placeholder for Eliott -->
 					<img
 						src="/my-pic.png"
 						alt="Eliott Bouquerel"
-						class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+						class="w-full h-full object-cover"
 					/>
 
 					<!-- Floating Card -->
@@ -213,7 +312,7 @@
 						<div class="flex justify-between items-start">
 							<div>
 								<p class="text-xs text-aura-accent uppercase tracking-wider mb-1">
-									Derniere Mission
+									Dernière Mission
 								</p>
 								<p class="font-serif text-lg leading-tight">Optimisation Flux Logistique</p>
 							</div>
@@ -223,7 +322,7 @@
 						</div>
 						<div class="mt-3 flex items-center gap-2 text-sm text-aura-muted">
 							<span class="flex items-center text-aura-accent"
-								><span class="material-symbols-outlined text-[16px] mr-1">bolt</span> -40% couts</span
+								><span class="material-symbols-outlined text-[16px] mr-1">bolt</span> -40% coûts</span
 							>
 							<span class="w-1 h-1 rounded-full bg-aura-surface"></span>
 							<span>IA Agent</span>
@@ -247,21 +346,21 @@
 				class="aura-card bg-aura-card p-10 rounded-[32px] border border-aura-surface relative overflow-hidden group"
 			>
 				<div
-					class="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity"
+					class="absolute top-0 right-0 opacity-10 group-hover:opacity-15 transition-opacity pointer-events-none"
 				>
-					<span class="material-symbols-outlined text-8xl">architecture</span>
+					<span class="material-symbols-outlined" style="font-size: 200px; line-height: 1;">architecture</span>
 				</div>
 				<h3 class="text-2xl font-serif mb-4">Architecture & Refonte</h3>
 				<p class="text-aura-muted leading-relaxed mb-8">
-					Je ne fais pas que coder, je repense la structure meme de vos outils. Obsede par la
-					performance et la scalabilite de votre infrastructure.
+					Je ne fais pas que coder, je repense la structure même de vos outils. Obsédé par la
+					performance et la scalabilité de votre infrastructure.
 				</p>
 				<ul class="space-y-3 text-sm text-aura-muted border-t border-aura-surface pt-6">
 					<li class="flex items-center gap-2">
 						<span class="w-1.5 h-1.5 rounded-full bg-aura-accent"></span>Modernisation Legacy
 					</li>
 					<li class="flex items-center gap-2">
-						<span class="w-1.5 h-1.5 rounded-full bg-aura-accent"></span>Micro-services
+						<span class="w-1.5 h-1.5 rounded-full bg-aura-accent"></span>Architecture hexagonale
 					</li>
 				</ul>
 			</div>
@@ -271,18 +370,18 @@
 				class="aura-card bg-aura-card p-10 rounded-[32px] border border-aura-accent/30 relative overflow-hidden group shadow-[0_0_30px_rgba(111,240,211,0.05)]"
 			>
 				<div
-					class="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity"
+					class="absolute top-0 right-0 opacity-10 group-hover:opacity-15 transition-opacity pointer-events-none"
 				>
-					<span class="material-symbols-outlined text-8xl text-aura-accent">psychology</span>
+					<span class="material-symbols-outlined text-aura-accent" style="font-size: 200px; line-height: 1;">psychology</span>
 				</div>
-				<h3 class="text-2xl font-serif mb-4 text-white">Integration IA</h3>
+				<h3 class="text-2xl font-serif mb-4 text-white">Intégration IA</h3>
 				<p class="text-aura-muted leading-relaxed mb-8">
-					Le coeur de mon offre. Deploiement d'agents autonomes qui travaillent pour vous pendant
-					que vous dormez. Support, analyse, redaction.
+					Le cœur de mon offre. Déploiement d'agents autonomes qui travaillent pour vous pendant
+					que vous dormez. Support, analyse, rédaction.
 				</p>
 				<ul class="space-y-3 text-sm text-aura-muted border-t border-aura-surface pt-6">
 					<li class="flex items-center gap-2">
-						<span class="w-1.5 h-1.5 rounded-full bg-aura-accent"></span>Agents GPT-4 Custom
+						<span class="w-1.5 h-1.5 rounded-full bg-aura-accent"></span>Agents personnalisés
 					</li>
 					<li class="flex items-center gap-2">
 						<span class="w-1.5 h-1.5 rounded-full bg-aura-accent"></span>Automatisation N8N
@@ -295,14 +394,14 @@
 				class="aura-card bg-aura-card p-10 rounded-[32px] border border-aura-surface relative overflow-hidden group"
 			>
 				<div
-					class="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity"
+					class="absolute top-0 right-0 opacity-10 group-hover:opacity-15 transition-opacity pointer-events-none"
 				>
-					<span class="material-symbols-outlined text-8xl">speed</span>
+					<span class="material-symbols-outlined" style="font-size: 200px; line-height: 1;">speed</span>
 				</div>
-				<h3 class="text-2xl font-serif mb-4">Audit de Productivite</h3>
+				<h3 class="text-2xl font-serif mb-4">Audit de Productivité</h3>
 				<p class="text-aura-muted leading-relaxed mb-8">
-					Avant toute ligne de code, une analyse profonde de vos processus. J'identifie ou vous
-					perdez de l'argent et comment le recuperer.
+					Avant toute ligne de code, une analyse profonde de vos processus. J'identifie où vous
+					perdez de l'argent et comment le récupérer.
 				</p>
 				<ul class="space-y-3 text-sm text-aura-muted border-t border-aura-surface pt-6">
 					<li class="flex items-center gap-2">
@@ -323,19 +422,19 @@
 				<!-- Text Area -->
 				<div class="lg:col-span-4">
 					<span class="text-aura-accent text-sm font-semibold tracking-widest uppercase mb-2 block"
-						>Projection Reelle</span
+						>Projection Réelle</span
 					>
 					<h2 class="text-4xl font-serif mb-6">
-						Combien vous coute <br /> <span class="text-aura-muted italic">l'immobilisme ?</span>
+						Combien vous coûte <br /> <span class="text-aura-muted italic">l'immobilisme ?</span>
 					</h2>
 					<p class="text-aura-muted mb-8 text-sm leading-relaxed">
-						Ce simulateur n'est pas un gadget. Il se base sur les metriques moyennes observees chez
-						mes clients post-transition IA. Visualisez le capital que vous pourriez reinvestir.
+						Ce simulateur n'est pas un gadget. Il se base sur les métriques moyennes observées chez
+						mes clients post-transition IA. Visualisez le capital que vous pourriez réinvestir.
 					</p>
 
 					<!-- Presets -->
 					<div class="space-y-3">
-						<p class="text-xs text-aura-muted uppercase tracking-wider">Scenarios types :</p>
+						<p class="text-xs text-aura-muted uppercase tracking-wider">Scénarios types :</p>
 						<div class="flex gap-2 flex-wrap">
 							<button
 								onclick={() => setPreset('startup')}
@@ -362,19 +461,37 @@
 						<div class="grid md:grid-cols-2 gap-x-12 gap-y-10 mb-12">
 							<div class="space-y-4">
 								<div class="flex justify-between items-baseline">
-									<label class="text-sm font-medium text-aura-muted">Effectif concerne</label>
+									<label class="text-sm font-medium text-aura-muted">Effectif concerné</label>
 									<span class="text-2xl font-serif text-white">{employees}</span>
 								</div>
-								<input type="range" bind:value={employees} min="1" max="100" step="1" />
+								<div class="slider-wrapper" style="--progress: {(employees - 1) / (100 - 1) * 100}%">
+									<input 
+										type="range" 
+										bind:value={employees} 
+										min="1" 
+										max="100" 
+										step="1" 
+										class="w-full"
+									/>
+								</div>
 							</div>
 
 							<div class="space-y-4">
 								<div class="flex justify-between items-baseline">
 									<label class="text-sm font-medium text-aura-muted">Salaire moyen charge /mois</label
 									>
-									<span class="text-2xl font-serif text-white">{salary} EUR</span>
+									<span class="text-2xl font-serif text-white">{salary} €</span>
 								</div>
-								<input type="range" bind:value={salary} min="2000" max="10000" step="100" />
+								<div class="slider-wrapper" style="--progress: {(salary - 2000) / (10000 - 2000) * 100}%">
+									<input 
+										type="range" 
+										bind:value={salary} 
+										min="2000" 
+										max="10000" 
+										step="100" 
+										class="w-full"
+									/>
+								</div>
 							</div>
 
 							<div class="space-y-4 md:col-span-2">
@@ -384,7 +501,16 @@
 									>
 									<span class="text-2xl font-serif text-white text-aura-accent">{hours} h</span>
 								</div>
-								<input type="range" bind:value={hours} min="1" max="20" step="0.5" />
+								<div class="slider-wrapper" style="--progress: {(hours - 1) / (20 - 1) * 100}%">
+									<input 
+										type="range" 
+										bind:value={hours} 
+										min="1" 
+										max="20" 
+										step="0.5" 
+										class="w-full"
+									/>
+								</div>
 								<p class="text-xs text-aura-muted mt-1">
 									Saisie, reporting, tri d'emails, recherche documentaire...
 								</p>
@@ -401,7 +527,7 @@
 
 							<div>
 								<p class="text-xs text-aura-muted uppercase tracking-widest mb-1">
-									Gain Annuel Estime
+									Gain Annuel Estimé
 								</p>
 								<div
 									class="text-5xl md:text-6xl font-serif text-transparent bg-clip-text bg-gradient-to-r from-white to-aura-accent"
@@ -417,12 +543,12 @@
 									<span class="block text-2xl font-bold text-white"
 										>{formatNumber(annualHours())} h</span
 									>
-									<span class="text-xs text-aura-muted">regagnees / an</span>
+									<span class="text-xs text-aura-muted">regagnées / an</span>
 								</div>
 								<p class="text-xs text-aura-accent italic mt-2">
-									Soit l'equivalent de <span class="font-bold text-white"
+									Soit l'équivalent de <span class="font-bold text-white"
 										>{fullTimeEquivalent()}</span
-									> employes a temps plein "gagnes".
+									> employés à temps plein "gagnés".
 								</p>
 							</div>
 						</div>
@@ -437,10 +563,10 @@
 		<div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-4">
 			<div>
 				<h2 class="text-4xl font-serif mb-4">
-					Realisations <span class="italic-accent">Selectionnees</span>
+					Réalisations <span class="italic-accent">Sélectionnées</span>
 				</h2>
 				<p class="text-aura-muted max-w-md">
-					Des solutions sur mesure qui allient esthetisme et performance brute.
+					Des solutions sur mesure qui allient esthétisme et performance brute.
 				</p>
 			</div>
 			<a
@@ -461,9 +587,9 @@
 					class="relative rounded-3xl overflow-hidden aspect-[4/3] border border-aura-surface group-hover:border-aura-accent/50 transition-colors"
 				>
 					<img
-						src="https://lh3.googleusercontent.com/gg-dl/ABS2GSl0-lD_LC_59y__kC-r75MMrYSaLlrA1VE11cnBJWnBZoNuY-dLOZI4lcYRkdja5O1GLAwo6gTFo6-5ZOihsyr8KDXKWElM7DWWNmgRKCk4oBL7Yz3GLPn0v0PNuYB9RYSke_McaUzkcZEEyJ9AtQzJMX_A-q9_uhYY0Du39bp5HBVW"
+						src="/mockup-mecaservices.png"
 						class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-						alt="E-commerce"
+						alt="Dashboard e-commerce MECA SERVICES"
 					/>
 					<div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors">
 					</div>
@@ -472,27 +598,27 @@
 					<div class="flex gap-3">
 						<span
 							class="px-3 py-1 rounded-full border border-aura-surface text-xs text-aura-muted uppercase tracking-wider"
-							>E-commerce</span
+							>Infrastructure e-commerce</span
 						>
 						<span
 							class="px-3 py-1 rounded-full border border-aura-surface text-xs text-aura-accent uppercase tracking-wider"
 							>Refonte Totale</span
 						>
 					</div>
-					<h3 class="text-3xl font-serif">Maison Lumiere</h3>
+					<h3 class="text-3xl font-serif">MECA SERVICES</h3>
 					<p class="text-aura-muted leading-relaxed">
-						Transformation complete d'une infrastructure Magento vieillissante vers une stack
-						Headless (Shopify Plus + React). Integration d'un moteur de recommandation par IA qui a
-						augmente le panier moyen de 15%.
+						Migration d'une boutique e-commerce vieillissante vers une solution moderne et évolutive.
+						Transformation complète de l'expérience client et des outils de gestion avec une interface
+						simplifiée et intuitive.
 					</p>
 					<div class="grid grid-cols-2 gap-4 border-t border-aura-surface pt-6">
 						<div>
-							<span class="block text-2xl font-serif text-white">-60%</span>
-							<span class="text-xs text-aura-muted">Temps de chargement</span>
+							<span class="block text-2xl font-serif text-white">-80%</span>
+							<span class="text-xs text-aura-muted">Temps de gestion du site</span>
 						</div>
 						<div>
-							<span class="block text-2xl font-serif text-white">+22%</span>
-							<span class="text-xs text-aura-muted">Taux de conversion</span>
+							<span class="block text-2xl font-serif text-white">x3</span>
+							<span class="text-xs text-aura-muted">Satisfaction client</span>
 						</div>
 					</div>
 				</div>
@@ -504,36 +630,232 @@
 					class="md:order-2 relative rounded-3xl overflow-hidden aspect-[4/3] border border-aura-surface group-hover:border-aura-accent/50 transition-colors"
 				>
 					<img
-						src="https://lh3.googleusercontent.com/gg-dl/ABS2GSlbGUI2OKaoU2uUHcAJulFz1YwVdrMzcNmyXBUaLJcPT_2D1q9_zUfOthxnDbjWcRGuVonjZKgY5wtpf3EJbuA0bEFu2ZFSkO2CeHwooeZx2AjhfD8bPnuznSPGMSzHiuJMsLO7mP1jUBhetJJpE_F9WLzeSczMSUPm5ChdESWVrnI"
+						src="/mockup-kpsull.png"
 						class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-						alt="SaaS Logistics"
+						alt="KPSULL Marketplace"
 					/>
 				</div>
 				<div class="md:order-1 space-y-6 md:text-right">
 					<div class="flex gap-3 md:justify-end">
 						<span
 							class="px-3 py-1 rounded-full border border-aura-surface text-xs text-aura-muted uppercase tracking-wider"
-							>SaaS B2B</span
+							>Marketplace</span
 						>
 						<span
 							class="px-3 py-1 rounded-full border border-aura-surface text-xs text-aura-accent uppercase tracking-wider"
-							>Automatisation</span
+							>Cofondateur</span
 						>
 					</div>
-					<h3 class="text-3xl font-serif">LogiFlux AI</h3>
+					<h3 class="text-3xl font-serif">KPSULL</h3>
 					<p class="text-aura-muted leading-relaxed">
-						Creation d'un middleware intelligent connectant ERP, CRM et transporteurs. L'IA analyse
-						les commandes entrantes et route automatiquement vers le transporteur le plus economique
-						et rapide.
+						Création d'une marketplace dédiée aux créateurs de mode pour simplifier la mise en vente
+						de leurs pièces. Plateforme complète permettant aux créateurs de gérer leurs collections,
+						leurs ventes et leur visibilité en ligne.
 					</p>
 					<div class="grid grid-cols-2 gap-4 border-t border-aura-surface pt-6 md:justify-items-end">
 						<div>
-							<span class="block text-2xl font-serif text-white">40h</span>
-							<span class="text-xs text-aura-muted">Economisees / semaine</span>
+							<span class="block text-2xl font-serif text-white">100%</span>
+							<span class="text-xs text-aura-muted">Autonome</span>
 						</div>
 						<div>
-							<span class="block text-2xl font-serif text-white">0%</span>
-							<span class="text-xs text-aura-muted">Erreur de saisie</span>
+							<span class="block text-2xl font-serif text-white">0</span>
+							<span class="text-xs text-aura-muted">Frais cachés</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Parcours & Compétences -->
+	<section class="py-24 max-w-7xl mx-auto px-6" id="skills">
+		<div class="text-center mb-16 animate-fade-up">
+			<h2 class="text-4xl md:text-5xl font-serif mb-6">
+				Parcours & <span class="italic-accent">Compétences</span>
+			</h2>
+			<div class="w-24 h-1 bg-aura-accent mx-auto rounded-full opacity-50"></div>
+		</div>
+
+		<div class="grid md:grid-cols-2 gap-12 items-start">
+			<!-- Formation -->
+			<div class="space-y-8">
+				<div class="flex items-start gap-4">
+					<div
+						class="flex-shrink-0 w-12 h-12 rounded-full bg-aura-accent/20 flex items-center justify-center"
+					>
+						<span class="material-symbols-outlined text-aura-accent">school</span>
+					</div>
+					<div>
+						<h3 class="text-xl font-serif mb-2">Master Développeur & Chef de Projet Web</h3>
+						<p class="text-aura-muted text-sm leading-relaxed">
+							Formation complète alliant expertise technique et management de projet. Une double
+							compétence qui me permet de concevoir, développer et piloter des projets web de A à Z.
+						</p>
+					</div>
+				</div>
+				<div class="flex items-start gap-4">
+					<div
+						class="flex-shrink-0 w-12 h-12 rounded-full bg-aura-accent/10 flex items-center justify-center border border-aura-accent/20"
+					>
+						<span class="material-symbols-outlined text-aura-accent">code</span>
+					</div>
+					<div>
+						<h3 class="text-xl font-serif mb-2">
+							Bachelor Métiers du Multimédia et d'Internet
+							<span class="text-aura-accent text-base font-normal"> - Option Développement Web</span>
+						</h3>
+						<p class="text-aura-muted text-sm leading-relaxed">
+							Formation spécialisée en <span class="text-white">développement web</span> avec une approche
+							polyvalente couvrant également le design et la communication numérique. Fondations
+							solides pour une vision globale des projets digitaux.
+						</p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Compétences & Outils -->
+			<div class="space-y-8">
+				<div>
+					<h3 class="text-xl font-serif mb-6">Stack Technique</h3>
+					<div class="space-y-4">
+						<!-- Frontend & Frameworks -->
+						<div>
+							<p class="text-sm text-aura-muted mb-3 uppercase tracking-wider">Frontend & Frameworks</p>
+							<div class="flex flex-wrap gap-2">
+								<span
+									class="px-3 py-1.5 rounded-full border border-aura-surface bg-aura-card text-sm text-aura-muted hover:border-aura-accent hover:text-white transition-colors flex items-center gap-2"
+									><img
+										src="https://cdn.simpleicons.org/nextdotjs/white"
+										alt="Next.js"
+										class="w-4 h-4"
+									/>Next.js</span
+								>
+								<span
+									class="px-3 py-1.5 rounded-full border border-aura-surface bg-aura-card text-sm text-aura-muted hover:border-aura-accent hover:text-white transition-colors flex items-center gap-2"
+									><img
+										src="https://cdn.simpleicons.org/react/white"
+										alt="React"
+										class="w-4 h-4"
+									/>React</span
+								>
+								<span
+									class="px-3 py-1.5 rounded-full border border-aura-surface bg-aura-card text-sm text-aura-muted hover:border-aura-accent hover:text-white transition-colors flex items-center gap-2"
+									><img
+										src="https://cdn.simpleicons.org/svelte/white"
+										alt="Svelte"
+										class="w-4 h-4"
+									/>Svelte</span
+								>
+								<span
+									class="px-3 py-1.5 rounded-full border border-aura-surface bg-aura-card text-sm text-aura-muted hover:border-aura-accent hover:text-white transition-colors flex items-center gap-2"
+									><img
+										src="https://cdn.simpleicons.org/typescript/white"
+										alt="TypeScript"
+										class="w-4 h-4"
+									/>TypeScript</span
+								>
+								<span
+									class="px-3 py-1.5 rounded-full border border-aura-surface bg-aura-card text-sm text-aura-muted hover:border-aura-accent hover:text-white transition-colors flex items-center gap-2"
+									><img
+										src="https://cdn.simpleicons.org/tailwindcss/white"
+										alt="Tailwind"
+										class="w-4 h-4"
+									/>Tailwind</span
+								>
+							</div>
+						</div>
+
+						<!-- Backend & Base de données -->
+						<div>
+							<p class="text-sm text-aura-muted mb-3 uppercase tracking-wider">Backend & Base de données</p>
+							<div class="flex flex-wrap gap-2">
+								<span
+									class="px-3 py-1.5 rounded-full border border-aura-surface bg-aura-card text-sm text-aura-muted hover:border-aura-accent hover:text-white transition-colors flex items-center gap-2"
+									><img
+										src="https://cdn.simpleicons.org/bun/white"
+										alt="Bun"
+										class="w-4 h-4"
+									/>Bun</span
+								>
+								<span
+									class="px-3 py-1.5 rounded-full border border-aura-surface bg-aura-card text-sm text-aura-muted hover:border-aura-accent hover:text-white transition-colors flex items-center gap-2"
+									><img
+										src="https://cdn.simpleicons.org/prisma/white"
+										alt="Prisma"
+										class="w-4 h-4"
+									/>Prisma</span
+								>
+								<span
+									class="px-3 py-1.5 rounded-full border border-aura-surface bg-aura-card text-sm text-aura-muted hover:border-aura-accent hover:text-white transition-colors flex items-center gap-2"
+									><img
+										src="https://cdn.simpleicons.org/postgresql/white"
+										alt="PostgreSQL"
+										class="w-4 h-4"
+									/>PostgreSQL</span
+								>
+							</div>
+						</div>
+
+						<!-- Infrastructure & DevOps -->
+						<div>
+							<p class="text-sm text-aura-muted mb-3 uppercase tracking-wider">Infrastructure & DevOps</p>
+							<div class="flex flex-wrap gap-2">
+								<span
+									class="px-3 py-1.5 rounded-full border border-aura-surface bg-aura-card text-sm text-aura-muted hover:border-aura-accent hover:text-white transition-colors flex items-center gap-2"
+									><img
+										src="https://cdn.simpleicons.org/docker/white"
+										alt="Docker"
+										class="w-4 h-4"
+									/>Docker</span
+								>
+								<span
+									class="px-3 py-1.5 rounded-full border border-aura-surface bg-aura-card text-sm text-aura-muted hover:border-aura-accent hover:text-white transition-colors flex items-center gap-2"
+									><img
+										src="https://cdn.simpleicons.org/coolify/white"
+										alt="Coolify"
+										class="w-4 h-4"
+									/>Coolify</span
+								>
+								<span
+									class="px-3 py-1.5 rounded-full border border-aura-surface bg-aura-card text-sm text-aura-muted hover:border-aura-accent hover:text-white transition-colors flex items-center gap-2"
+									><img
+										src="https://cdn.simpleicons.org/git/white"
+										alt="Git"
+										class="w-4 h-4"
+									/>Git</span
+								>
+							</div>
+						</div>
+
+						<!-- IA & Automatisation -->
+						<div>
+							<p class="text-sm text-aura-muted mb-3 uppercase tracking-wider">IA & Automatisation</p>
+							<div class="flex flex-wrap gap-2">
+								<span
+									class="px-3 py-1.5 rounded-full border border-aura-accent/30 bg-aura-card text-sm text-aura-accent hover:border-aura-accent hover:bg-aura-accent/10 transition-colors flex items-center gap-2"
+									><img
+										src="https://cdn.simpleicons.org/n8n/white"
+										alt="N8N"
+										class="w-4 h-4"
+									/>N8N</span
+								>
+								<span
+									class="px-3 py-1.5 rounded-full border border-aura-accent/30 bg-aura-card text-sm text-aura-accent hover:border-aura-accent hover:bg-aura-accent/10 transition-colors flex items-center gap-2"
+									><img
+										src="https://cdn.simpleicons.org/anthropic/white"
+										alt="Claude Code"
+										class="w-4 h-4"
+									/>Claude Code</span
+								>
+								<span
+									class="px-3 py-1.5 rounded-full border border-aura-accent/30 bg-aura-card text-sm text-aura-accent hover:border-aura-accent hover:bg-aura-accent/10 transition-colors flex items-center gap-2"
+									><img
+										src="https://cdn.simpleicons.org/google/white"
+										alt="Gemini"
+										class="w-4 h-4"
+									/>Gemini</span
+								>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -548,21 +870,21 @@
 				>format_quote</span
 			>
 			<blockquote class="text-2xl md:text-4xl font-serif leading-tight mb-10 text-white">
-				"Ce n'etait pas juste une refonte technique, c'etait une refonte business. L'automatisation
-				mise en place par Eliott gere aujourd'hui <span class="text-aura-accent italic"
-					>80% de notre flux administratif</span
-				>. C'est le meilleur investissement de l'annee."
+				"Eliott a repensé notre infrastructure e-commerce et nos outils internes. En seulement un an
+				d'alternance, il a transformé notre dette technique en une infrastructure scalable et
+				performante, <span class="text-aura-accent italic">posant les bases d'une croissance
+					durable</span>."
 			</blockquote>
 
 			<div class="flex flex-col items-center justify-center gap-4">
 				<img
-					src="https://lh3.googleusercontent.com/gg-dl/ABS2GSmZKGm0S0JDQS6A600_49m_zq3772NSVQ5OCPAVSRYsQG4gjQ3TBrqlIHpMr2pyQsaVtcSU7uVJJhMWpeOG2KNaL3lg_TpQJlWH0rKeRsbMDu1o1F4JSwmMmSVKtAVnsnij_Bf5mqGDI_uWfgfvGx2xkAbJYdBO37YhsFWHgMJaSMPH"
+					src="/jerome-davy.png"
 					class="w-16 h-16 rounded-full object-cover border-2 border-aura-accent p-1"
-					alt="CEO"
+					alt="Jérôme DAVY"
 				/>
 				<div>
-					<div class="font-bold text-lg">Marc D.</div>
-					<div class="text-sm text-aura-muted">PDG, Groupe Retail France</div>
+					<div class="font-bold text-lg">Jérôme DAVY</div>
+					<div class="text-sm text-aura-muted">PDG de MECA SERVICES</div>
 				</div>
 			</div>
 		</div>
@@ -580,8 +902,8 @@
 				Votre transformation <br />commence <span class="italic-accent">ici</span>.
 			</h2>
 			<p class="text-aura-muted text-lg">
-				Je limite mon accompagnement a 2 entreprises par trimestre pour garantir un niveau
-				d'excellence absolu. Verifions si nous sommes compatibles.
+				Je limite mon accompagnement à 2 entreprises par trimestre pour garantir un niveau
+				d'excellence absolu. Vérifions si nous sommes compatibles.
 			</p>
 			<div class="flex flex-col sm:flex-row justify-center gap-4 pt-4">
 				<a
@@ -590,7 +912,7 @@
 					rel="noopener noreferrer"
 					class="px-10 py-5 bg-aura-accent text-aura-bg rounded-full font-bold text-lg hover:bg-white transition-all transform hover:scale-105 shadow-[0_0_40px_rgba(111,240,211,0.3)]"
 				>
-					Reserver un audit gratuit
+					Réserver un audit gratuit
 				</a>
 				<a
 					href="mailto:hello@eliott.com"
@@ -601,11 +923,11 @@
 			</div>
 
 			<div
-				class="pt-20 text-xs text-aura-surface flex flex-col md:flex-row justify-center gap-8 opacity-50"
+				class="pt-20 text-xs text-aura-muted flex flex-col md:flex-row justify-center gap-8"
 			>
 				<span>&copy; 2025 Eliott Bouquerel</span>
-				<a href="#" class="hover:text-white">Mentions Legales</a>
-				<a href="#" class="hover:text-white">CGV</a>
+				<a href="/mentions-legales" class="hover:text-white transition-colors">Mentions Légales</a>
+				<a href="/cgv" class="hover:text-white transition-colors">CGV</a>
 			</div>
 		</div>
 	</footer>
