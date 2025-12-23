@@ -1,0 +1,164 @@
+@import "tailwindcss";
+
+/* Custom Theme */
+@theme {
+	/* Colors */
+	--color-aura-bg: #0F1A18;
+	--color-aura-card: #182622;
+	--color-aura-surface: #223530;
+	--color-aura-text: #F0F7F5;
+	--color-aura-muted: #9CAFA9;
+	--color-aura-accent: #6FF0D3;
+	--color-aura-accent-hover: #4FE0C0;
+	--color-aura-gold: #D4B86A;
+
+	/* Fonts */
+	--font-serif: 'Playfair Display', serif;
+	--font-sans: 'Instrument Sans', sans-serif;
+}
+
+/* Base Styles */
+body {
+	background-color: #0F1A18;
+	color: #F0F7F5;
+	-webkit-font-smoothing: antialiased;
+	font-family: 'Instrument Sans', sans-serif;
+}
+
+html {
+	scroll-behavior: smooth;
+}
+
+/* Subtle Grain Overlay */
+.noise-bg {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+	pointer-events: none;
+	z-index: 50;
+}
+
+/* Text Gradients & Effects */
+.text-gradient {
+	background: linear-gradient(135deg, #F0F7F5 0%, #6FF0D3 100%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+
+.italic-accent {
+	font-family: 'Playfair Display', serif;
+	font-style: italic;
+	color: #6FF0D3;
+}
+
+/* Modern Range Slider */
+input[type='range'] {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 100%;
+	background: transparent;
+}
+
+input[type='range']::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	height: 24px;
+	width: 24px;
+	border-radius: 50%;
+	background: #6FF0D3;
+	cursor: pointer;
+	margin-top: -10px;
+	box-shadow: 0 0 15px rgba(111, 240, 211, 0.4);
+	border: 2px solid #0F1A18;
+	transition: transform 0.1s;
+}
+
+input[type='range']::-webkit-slider-thumb:hover {
+	transform: scale(1.1);
+}
+
+input[type='range']::-webkit-slider-runnable-track {
+	width: 100%;
+	height: 4px;
+	cursor: pointer;
+	background: #223530;
+	border-radius: 2px;
+}
+
+input[type='range']::-moz-range-thumb {
+	height: 24px;
+	width: 24px;
+	border-radius: 50%;
+	background: #6FF0D3;
+	cursor: pointer;
+	box-shadow: 0 0 15px rgba(111, 240, 211, 0.4);
+	border: 2px solid #0F1A18;
+	transition: transform 0.1s;
+}
+
+input[type='range']::-moz-range-track {
+	width: 100%;
+	height: 4px;
+	cursor: pointer;
+	background: #223530;
+	border-radius: 2px;
+}
+
+/* Card Hover Effects */
+.aura-card {
+	transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.aura-card:hover {
+	transform: translateY(-5px);
+	border-color: rgba(111, 240, 211, 0.3);
+	box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+}
+
+/* Animations */
+@keyframes fadeUp {
+	from {
+		opacity: 0;
+		transform: translateY(30px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.animate-fade-up {
+	animation: fadeUp 0.8s ease-out forwards;
+	opacity: 0;
+}
+
+.delay-100 {
+	animation-delay: 0.1s;
+}
+.delay-200 {
+	animation-delay: 0.2s;
+}
+.delay-300 {
+	animation-delay: 0.3s;
+}
+
+/* Material Symbols */
+.material-symbols-outlined {
+	font-family: 'Material Symbols Outlined';
+	font-weight: normal;
+	font-style: normal;
+	font-size: 24px;
+	line-height: 1;
+	letter-spacing: normal;
+	text-transform: none;
+	display: inline-block;
+	white-space: nowrap;
+	word-wrap: normal;
+	direction: ltr;
+	-webkit-font-feature-settings: 'liga';
+	-webkit-font-smoothing: antialiased;
+}
