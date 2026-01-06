@@ -1,16 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-
-	// Navbar scroll effect
-	let navScrolled = $state(false);
-
-	onMount(() => {
-		const handleScroll = () => {
-			navScrolled = window.scrollY > 50;
-		};
-		window.addEventListener('scroll', handleScroll);
-		return () => window.removeEventListener('scroll', handleScroll);
-	});
 </script>
 
 <svelte:head>
@@ -20,63 +8,9 @@
 		content="Conditions générales de vente des prestations de développement freelance d'Eliott Bouquerel."
 	/>
 	
-	<!-- Favicons -->
-	<link rel="icon" type="image/png" href="/logo.png" />
-	<link rel="apple-touch-icon" href="/logo.png" />
-	<link rel="icon" type="image/png" sizes="32x32" href="/logo.png" />
-	<link rel="icon" type="image/png" sizes="16x16" href="/logo.png" />
-	
-	<!-- Mobile Icons -->
-	<link rel="apple-touch-icon" sizes="180x180" href="/logo.png" />
-	<link rel="icon" type="image/png" sizes="192x192" href="/logo.png" />
-	<link rel="icon" type="image/png" sizes="512x512" href="/logo.png" />
-	
-	<!-- Theme Color -->
-	<meta name="theme-color" content="#0F1A18" />
-	<meta name="msapplication-TileColor" content="#0F1A18" />
-	<meta name="msapplication-TileImage" content="/logo.png" />
 </svelte:head>
 
-<div class="relative overflow-x-hidden">
-	<!-- Noise Texture Overlay -->
-	<div class="noise-bg"></div>
-
-	<!-- Navigation -->
-	<nav
-		id="navbar"
-		class="fixed w-full z-40 transition-all duration-300 px-6 md:px-12"
-		class:pt-8={!navScrolled}
-		class:py-4={navScrolled}
-	>
-		<div
-			class="max-w-7xl mx-auto flex justify-between items-center bg-aura-bg/80 backdrop-blur-md rounded-full px-6 py-3 border border-aura-surface/50"
-		>
-			<a
-				href="/"
-				class="text-xl font-serif font-semibold tracking-tight text-white flex items-center gap-3"
-			>
-				<img src="/logo.png" alt="Eliott B." class="w-8 h-8 object-contain" />
-				Eliott B.
-			</a>
-
-			<div class="hidden md:flex items-center space-x-8 text-sm font-medium text-aura-muted">
-				<a href="/#expertise" class="hover:text-white transition-colors">Expertise</a>
-				<a href="/#simulator" class="hover:text-white transition-colors">Calculateur ROI</a>
-				<a href="/#projects" class="hover:text-white transition-colors">Projets</a>
-			</div>
-
-			<a
-				href="https://calendly.com"
-				target="_blank"
-				rel="noopener noreferrer"
-				class="bg-aura-accent text-aura-bg px-6 py-2 rounded-full font-semibold text-sm hover:bg-white transition-colors"
-			>
-				Prendre RDV
-			</a>
-		</div>
-	</nav>
-
-	<!-- Main Content -->
+<!-- Main Content -->
 	<main class="pt-32 pb-24 min-h-screen px-6">
 		<div class="max-w-4xl mx-auto">
 			<h1 class="text-4xl md:text-5xl font-serif mb-8">Conditions Générales de Vente</h1>
@@ -201,5 +135,4 @@
 			</div>
 		</div>
 	</main>
-</div>
 

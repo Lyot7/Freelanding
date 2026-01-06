@@ -23,10 +23,12 @@ body {
 	color: #F0F7F5;
 	-webkit-font-smoothing: antialiased;
 	font-family: 'Instrument Sans', sans-serif;
+    overflow-x: hidden;
 }
 
 html {
 	scroll-behavior: smooth;
+    overflow-x: hidden;
 }
 
 /* Subtle Grain Overlay */

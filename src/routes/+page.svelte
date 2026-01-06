@@ -1,10 +1,14 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import Button from '$lib/components/Button.svelte';
+	import SectionTitle from '$lib/components/SectionTitle.svelte';
 
 	// Simulator state
 	let employees = $state(10);
 	let salary = $state(4000);
 	let hours = $state(5);
+    // ... rest of simulator state
+
 
 	// Computed values
 	let annualSaving = $derived(() => {
@@ -43,17 +47,6 @@
 			hours = 4;
 		}
 	}
-
-	// Navbar scroll effect
-	let navScrolled = $state(false);
-
-	onMount(() => {
-		const handleScroll = () => {
-			navScrolled = window.scrollY > 50;
-		};
-		window.addEventListener('scroll', handleScroll);
-		return () => window.removeEventListener('scroll', handleScroll);
-	});
 </script>
 
 <style>
@@ -147,65 +140,12 @@
 	/>
 	
 	<!-- Favicons -->
-	<link rel="icon" type="image/png" href="/logo.png" />
-	<link rel="apple-touch-icon" href="/logo.png" />
-	<link rel="icon" type="image/png" sizes="32x32" href="/logo.png" />
-	<link rel="icon" type="image/png" sizes="16x16" href="/logo.png" />
-	
-	<!-- Mobile Icons -->
-	<link rel="apple-touch-icon" sizes="180x180" href="/logo.png" />
-	<link rel="icon" type="image/png" sizes="192x192" href="/logo.png" />
-	<link rel="icon" type="image/png" sizes="512x512" href="/logo.png" />
-	
-	<!-- Theme Color -->
-	<meta name="theme-color" content="#0F1A18" />
-	<meta name="msapplication-TileColor" content="#0F1A18" />
-	<meta name="msapplication-TileImage" content="/logo.png" />
 </svelte:head>
 
-<div class="relative overflow-x-hidden">
-	<!-- Noise Texture Overlay -->
-	<div class="noise-bg"></div>
-
-	<!-- Navigation -->
-	<nav
-		id="navbar"
-		class="fixed w-full z-40 transition-all duration-300 px-6 md:px-12"
-		class:pt-8={!navScrolled}
-		class:py-4={navScrolled}
-	>
-		<div
-			class="max-w-7xl mx-auto flex justify-between items-center bg-aura-bg/80 backdrop-blur-md rounded-full px-6 py-3 border border-aura-surface/50"
-		>
-			<a
-				href="#top"
-				class="text-xl font-serif font-semibold tracking-tight text-white flex items-center gap-3"
-			>
-				<img src="/logo.png" alt="Eliott B." class="w-8 h-8 object-contain" />
-				Eliott B.
-			</a>
-
-			<div class="hidden md:flex items-center space-x-8 text-sm font-medium text-aura-muted">
-				<a href="#expertise" class="hover:text-white transition-colors">Expertise</a>
-				<a href="#simulator" class="hover:text-white transition-colors">Calculateur ROI</a>
-				<a href="#projects" class="hover:text-white transition-colors">Projets</a>
-			</div>
-
-			<a
-				href="https://calendly.com"
-				target="_blank"
-				rel="noopener noreferrer"
-				class="bg-aura-accent text-aura-bg px-6 py-2 rounded-full font-semibold text-sm hover:bg-white transition-colors"
-			>
-				Prendre RDV
-			</a>
-		</div>
-	</nav>
-
-	<!-- Hero Section -->
+<!-- Hero Section -->
 	<header
 		id="top"
-		class="relative min-h-screen pt-32 pb-20 flex flex-col justify-center overflow-hidden px-6"
+		class="relative min-h-screen pt-20 pb-12 md:pt-32 md:pb-20 flex flex-col justify-center px-6"
 	>
 		<!-- Abstract Background Glows -->
 		<div
@@ -215,15 +155,15 @@
 			class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-aura-gold/5 rounded-full blur-[100px] pointer-events-none"
 		></div>
 
-		<div class="max-w-7xl mx-auto w-full grid lg:grid-cols-12 gap-16 items-center z-10">
+		<div class="max-w-7xl mx-auto w-full grid lg:grid-cols-12 gap-10 lg:gap-16 items-center z-10">
 			<!-- Left Content -->
-			<div class="lg:col-span-7 space-y-10 animate-fade-up">
+			<div class="lg:col-span-7 space-y-8 md:space-y-10 animate-fade-up">
 				<div
-					class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-aura-surface bg-aura-card/50"
+					class="hidden md:inline-flex items-center gap-2 px-3 py-1 rounded-full border border-aura-surface bg-aura-card/50"
 				>
 					<span class="material-symbols-outlined text-[16px] text-aura-accent">verified</span>
 					<span class="text-xs uppercase tracking-widest text-aura-muted"
-						>Expert en transition IA</span
+						>Développeur et CDP Freelance</span
 					>
 				</div>
 
@@ -237,28 +177,15 @@
 					chirurgicale de la transition numérique pour un ROI mesurable dès le premier mois.
 				</p>
 
-				<div class="flex flex-col sm:flex-row gap-5 pt-4">
-					<a
-						href="#simulator"
-						class="group relative px-8 py-4 bg-aura-accent text-aura-bg rounded-full font-medium overflow-hidden transition-all hover:scale-[1.02]"
-					>
-						<span class="relative z-10 flex items-center justify-center">
-							Simuler mes gains
-							<span
-								class="material-symbols-outlined ml-2 text-sm transition-transform group-hover:translate-x-1"
-								>payments</span
-							>
-						</span>
-					</a>
-					<a
-						href="https://calendly.com"
-						target="_blank"
-						rel="noopener noreferrer"
-						class="px-8 py-4 border border-aura-surface text-white rounded-full font-medium hover:bg-aura-surface transition-all flex items-center justify-center gap-2"
-					>
+				<div class="flex flex-col sm:flex-row gap-4 md:gap-5 pt-4">
+					<Button href="#simulator" variant="primary">
+						Simuler mes gains
+						<span class="material-symbols-outlined ml-2 text-sm transition-transform group-hover:translate-x-1">payments</span>
+					</Button>
+					<Button href="/rendez-vous" variant="secondary">
 						Prendre rendez-vous
 						<span class="material-symbols-outlined text-sm">calendar_today</span>
-					</a>
+					</Button>
 				</div>
 
 				<!-- Social Proof Mini -->
@@ -294,8 +221,16 @@
 			</div>
 
 			<!-- Right Visual (Hero Image) -->
-			<div class="lg:col-span-5 relative animate-fade-up delay-200">
+			<div class="lg:col-span-5 relative animate-fade-up delay-200 max-w-xs md:max-w-md mx-auto lg:max-w-none w-full">
 				<div
+					class="md:hidden inline-flex items-center gap-2 px-3 py-1 rounded-full border border-aura-surface bg-aura-card/50 mb-6"
+				>
+					<span class="material-symbols-outlined text-[16px] text-aura-accent">verified</span>
+					<span class="text-xs uppercase tracking-widest text-aura-muted"
+						>Développeur et CDP Freelance</span
+					>
+				</div>
+                <div
 					class="relative w-full aspect-[3/4] rounded-t-[100px] rounded-b-[30px] overflow-hidden border border-aura-surface"
 				>
 					<!-- Image Placeholder for Eliott -->
@@ -314,18 +249,18 @@
 								<p class="text-xs text-aura-accent uppercase tracking-wider mb-1">
 									Dernière Mission
 								</p>
-								<p class="font-serif text-lg leading-tight">Optimisation Flux Logistique</p>
+								<p class="font-serif text-lg leading-tight">Infrastructure E-commerce</p>
 							</div>
 							<span class="bg-aura-surface p-2 rounded-full text-aura-accent">
-								<span class="material-symbols-outlined">trending_up</span>
+								<span class="material-symbols-outlined">store</span>
 							</span>
 						</div>
 						<div class="mt-3 flex items-center gap-2 text-sm text-aura-muted">
 							<span class="flex items-center text-aura-accent"
-								><span class="material-symbols-outlined text-[16px] mr-1">bolt</span> -40% coûts</span
+								><span class="material-symbols-outlined text-[16px] mr-1">speed</span> -80% Temps gestion</span
 							>
 							<span class="w-1 h-1 rounded-full bg-aura-surface"></span>
-							<span>IA Agent</span>
+							<span>Refonte Totale</span>
 						</div>
 					</div>
 				</div>
@@ -334,11 +269,8 @@
 	</header>
 
 	<!-- Value Proposition -->
-	<section class="py-24 max-w-7xl mx-auto px-6" id="expertise">
-		<div class="text-center mb-16 animate-fade-up">
-			<h2 class="text-4xl md:text-5xl font-serif mb-6">Expertise <span class="italic-accent">Premium</span></h2>
-			<div class="w-24 h-1 bg-aura-accent mx-auto rounded-full opacity-50"></div>
-		</div>
+	<section class="py-14 md:py-24 max-w-7xl mx-auto px-6 scroll-mt-32" id="expertise">
+		<SectionTitle title="Expertise" subtitle="Premium" />
 
 		<div class="grid md:grid-cols-3 gap-6">
 			<!-- Card 1 -->
@@ -416,7 +348,7 @@
 	</section>
 
 	<!-- Interactive Simulator -->
-	<section class="py-24 bg-[#121E1C] relative overflow-hidden" id="simulator">
+	<section class="py-14 md:py-24 bg-[#121E1C] relative overflow-hidden scroll-mt-32" id="simulator">
 		<div class="max-w-6xl mx-auto px-6 relative z-10">
 			<div class="grid lg:grid-cols-12 gap-12 items-center">
 				<!-- Text Area -->
@@ -424,9 +356,7 @@
 					<span class="text-aura-accent text-sm font-semibold tracking-widest uppercase mb-2 block"
 						>Projection Réelle</span
 					>
-					<h2 class="text-4xl font-serif mb-6">
-						Combien vous coûte <br /> <span class="text-aura-muted italic">l'immobilisme ?</span>
-					</h2>
+					<SectionTitle title="Combien vous coûte" subtitle="l'immobilisme ?" align="left" />
 					<p class="text-aura-muted mb-8 text-sm leading-relaxed">
 						Ce simulateur n'est pas un gadget. Il se base sur les métriques moyennes observées chez
 						mes clients post-transition IA. Visualisez le capital que vous pourriez réinvestir.
@@ -519,18 +449,18 @@
 
 						<!-- Results Dashboard -->
 						<div
-							class="bg-[#0A110F] rounded-3xl p-8 border border-aura-surface/50 grid md:grid-cols-2 gap-8 items-center relative overflow-hidden"
+							class="bg-[#0A110F] rounded-3xl p-6 md:p-8 border border-aura-surface/50 grid md:grid-cols-2 gap-8 items-center relative overflow-hidden"
 						>
 							<div
 								class="absolute top-0 right-0 w-32 h-32 bg-aura-accent/10 blur-[50px] rounded-full pointer-events-none"
 							></div>
 
 							<div>
-								<p class="text-xs text-aura-muted uppercase tracking-widest mb-1">
+								<p class="text-[10px] md:text-xs text-aura-muted uppercase tracking-widest mb-1">
 									Gain Annuel Estimé
 								</p>
 								<div
-									class="text-5xl md:text-6xl font-serif text-transparent bg-clip-text bg-gradient-to-r from-white to-aura-accent"
+									class="text-4xl md:text-6xl font-serif text-transparent bg-clip-text bg-gradient-to-r from-white to-aura-accent"
 								>
 									{formatCurrency(annualSaving())}
 								</div>
@@ -558,26 +488,14 @@
 		</div>
 	</section>
 
-	<!-- Projects Gallery -->
-	<section class="py-24 max-w-7xl mx-auto px-6" id="projects">
+	<section class="py-14 md:py-24 max-w-7xl mx-auto px-6 scroll-mt-32" id="projects">
 		<div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-4">
 			<div>
-				<h2 class="text-4xl font-serif mb-4">
-					Réalisations <span class="italic-accent">Sélectionnées</span>
-				</h2>
-				<p class="text-aura-muted max-w-md">
+                <SectionTitle title="Réalisations" subtitle="Sélectionnées" align="left" />
+				<p class="text-aura-muted max-w-md mt-[-3rem]">
 					Des solutions sur mesure qui allient esthétisme et performance brute.
 				</p>
 			</div>
-			<a
-				href="#"
-				class="group flex items-center gap-2 text-aura-accent hover:text-white transition-colors"
-			>
-				Voir tout le portfolio
-				<span class="material-symbols-outlined group-hover:translate-x-1 transition-transform"
-					>arrow_forward</span
-				>
-			</a>
 		</div>
 
 		<div class="space-y-24">
@@ -588,7 +506,7 @@
 				>
 					<img
 						src="/mockup-mecaservices.png"
-						class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+						class="w-full h-full object-cover transition-transform duration-700"
 						alt="Dashboard e-commerce MECA SERVICES"
 					/>
 					<div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors">
@@ -631,9 +549,11 @@
 				>
 					<img
 						src="/mockup-kpsull.png"
-						class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+						class="w-full h-full object-cover transition-transform duration-700"
 						alt="KPSULL Marketplace"
 					/>
+					<div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors">
+					</div>
 				</div>
 				<div class="md:order-1 space-y-6 md:text-right">
 					<div class="flex gap-3 md:justify-end">
@@ -668,13 +588,8 @@
 	</section>
 
 	<!-- Parcours & Compétences -->
-	<section class="py-24 max-w-7xl mx-auto px-6" id="skills">
-		<div class="text-center mb-16 animate-fade-up">
-			<h2 class="text-4xl md:text-5xl font-serif mb-6">
-				Parcours & <span class="italic-accent">Compétences</span>
-			</h2>
-			<div class="w-24 h-1 bg-aura-accent mx-auto rounded-full opacity-50"></div>
-		</div>
+	<section class="py-16 md:py-24 max-w-7xl mx-auto px-6 scroll-mt-32" id="skills">
+		<SectionTitle title="Parcours &" subtitle="Compétences" />
 
 		<div class="grid md:grid-cols-2 gap-12 items-start">
 			<!-- Formation -->
@@ -824,6 +739,14 @@
 										class="w-4 h-4"
 									/>Git</span
 								>
+								<span
+									class="px-3 py-1.5 rounded-full border border-aura-surface bg-aura-card text-sm text-aura-muted hover:border-aura-accent hover:text-white transition-colors flex items-center gap-2"
+									><img
+										src="https://cdn.simpleicons.org/hostinger/white"
+										alt="Hostinger"
+										class="w-4 h-4"
+									/>Hostinger</span
+								>
 							</div>
 						</div>
 
@@ -842,15 +765,15 @@
 								<span
 									class="px-3 py-1.5 rounded-full border border-aura-accent/30 bg-aura-card text-sm text-aura-accent hover:border-aura-accent hover:bg-aura-accent/10 transition-colors flex items-center gap-2"
 									><img
-										src="https://cdn.simpleicons.org/anthropic/white"
-										alt="Claude Code"
+										src="https://cdn.simpleicons.org/claude/white"
+										alt="Claude"
 										class="w-4 h-4"
 									/>Claude Code</span
 								>
 								<span
 									class="px-3 py-1.5 rounded-full border border-aura-accent/30 bg-aura-card text-sm text-aura-accent hover:border-aura-accent hover:bg-aura-accent/10 transition-colors flex items-center gap-2"
 									><img
-										src="https://cdn.simpleicons.org/google/white"
+										src="https://cdn.simpleicons.org/googlegemini/white"
 										alt="Gemini"
 										class="w-4 h-4"
 									/>Gemini</span
@@ -864,7 +787,7 @@
 	</section>
 
 	<!-- Testimonial -->
-	<section class="py-24 bg-aura-card border-y border-aura-surface relative">
+	<section class="py-16 md:py-24 bg-aura-card border-y border-aura-surface relative">
 		<div class="max-w-4xl mx-auto px-6 text-center relative z-10">
 			<span class="material-symbols-outlined text-6xl text-aura-accent mb-8 opacity-50"
 				>format_quote</span
@@ -895,40 +818,31 @@
 	</section>
 
 	<!-- CTA / Contact -->
-	<footer class="py-24 relative overflow-hidden text-center">
+	<footer class="py-14 md:py-24 relative overflow-hidden text-center">
 		<div class="absolute inset-0 bg-gradient-to-b from-aura-bg to-[#080d0c]"></div>
 		<div class="max-w-3xl mx-auto px-6 relative z-10 space-y-8">
 			<h2 class="text-5xl md:text-6xl font-serif">
 				Votre transformation <br />commence <span class="italic-accent">ici</span>.
 			</h2>
 			<p class="text-aura-muted text-lg">
-				Je limite mon accompagnement à 2 entreprises par trimestre pour garantir un niveau
-				d'excellence absolu. Vérifions si nous sommes compatibles.
+				Mon accompagnement est conçu pour garantir un niveau d'excellence absolu dans chaque projet. 
+				Vérifions ensemble si nous sommes faits pour collaborer.
 			</p>
 			<div class="flex flex-col sm:flex-row justify-center gap-4 pt-4">
-				<a
-					href="https://calendly.com"
-					target="_blank"
-					rel="noopener noreferrer"
-					class="px-10 py-5 bg-aura-accent text-aura-bg rounded-full font-bold text-lg hover:bg-white transition-all transform hover:scale-105 shadow-[0_0_40px_rgba(111,240,211,0.3)]"
-				>
+				<Button href="/rendez-vous" variant="primary">
 					Réserver un audit gratuit
-				</a>
-				<a
-					href="mailto:hello@eliott.com"
-					class="px-10 py-5 border border-aura-surface text-white rounded-full font-medium hover:bg-aura-surface transition-all"
-				>
+				</Button>
+				<Button href="mailto:eliott.bouquerel@gmail.com" variant="secondary">
 					Me contacter par email
-				</a>
+				</Button>
 			</div>
 
 			<div
 				class="pt-20 text-xs text-aura-muted flex flex-col md:flex-row justify-center gap-8"
 			>
-				<span>&copy; 2025 Eliott Bouquerel</span>
+				<span>&copy; {new Date().getFullYear()} Eliott Bouquerel</span>
 				<a href="/mentions-legales" class="hover:text-white transition-colors">Mentions Légales</a>
 				<a href="/cgv" class="hover:text-white transition-colors">CGV</a>
 			</div>
 		</div>
 	</footer>
-</div>
