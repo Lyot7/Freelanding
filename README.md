@@ -58,4 +58,6 @@ docker compose up -d --build
 
 L'application sera disponible sur le port **3000**.
 Le `Dockerfile` est multi-stage et optimisé pour Bun, garantissant une image de production légère.
+Le fichier de configuration est nommé `docker-compose.yaml` (format attendu par Coolify).
+
 
