@@ -1,38 +1,48 @@
-# sv
+# Freelanding (eliottbouquerel.fr)
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+Site personnel et portfolio d'Eliott Bouquerel, Développeur Freelance.
+Ce projet est développé avec **SvelteKit**, **TailwindCSS** et fonctionne avec l'environnement **Bun**.
 
-## Creating a project
+## 🛠️ Stack Technique
 
-If you're seeing this, you've probably already done this step. Congrats!
+- **Framework** : [SvelteKit](https://kit.svelte.dev/)
+- **Langage** : TypeScript
+- **Styles** : [TailwindCSS v4](https://tailwindcss.com/)
+- **Runtime & Manager** : [Bun](https://bun.sh/)
+- **Déploiement** : VPS via [Coolify](https://coolify.io/) (Docker/Nixpacks)
 
-```sh
-# create a new project in the current directory
-npx sv create
+## 🚀 Installation & Développement
 
-# create a new project in my-app
-npx sv create my-app
+Assurez-vous d'avoir [Bun](https://bun.sh/) installé sur votre machine.
+
+```bash
+# Installer les dépendances
+bun i
+
+# Lancer le serveur de développement
+bun dev
 ```
 
-## Developing
+L'application sera accessible sur `http://localhost:5173`.
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+## 📦 Build & Production
 
-```sh
-npm run dev
+Pour créer une version de production locale :
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+```bash
+bun build
+bun start
 ```
 
-## Building
+## ☁️ Déploiement (Coolify)
 
-To create a production version of your app:
+Ce projet est configuré pour être déployé automatiquement sur Coolify via **Nixpacks**.
 
-```sh
-npm run build
-```
+### Configuration spécifique
+- **Adapter** : `@sveltejs/adapter-node` est utilisé pour la compatibilité VPS.
+- **Nixpacks** : Un fichier `nixpacks.toml` est présent pour forcer l'usage de Bun lors du build sur le serveur.
+- **Dépendances Linux** : `@rollup/rollup-linux-x64-gnu` est inclus dans les `optionalDependencies` pour assurer le build sur Linux.
 
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+### Mise en ligne
+Le déploiement est automatique à chaque **Push** sur la branche `main`.
+Si le déploiement ne se déclenche pas, vérifiez les Webhooks dans Coolify et GitHub.
