@@ -133,11 +133,11 @@
 </style>
 
 <svelte:head>
-	<title>Eliott B. - Développeur Freelance IA</title>
+	<title>Eliott B. - Développeur Freelance | Code & IA</title>
 	<meta
 		name="description"
-		content="Transformez l'IA en levier de croissance. Développeur freelance senior spécialisé en intégration IA et automatisation."
-	/>
+		content="Maximisez votre productivité par le Web & l'IA. Développeur freelance pour vos leviers de performance : visibilité, automatisation et outils sur-mesure."
+	>
 	
 	<!-- Favicons -->
 </svelte:head>
@@ -163,18 +163,17 @@
 				>
 					<span class="material-symbols-outlined text-[16px] text-aura-accent">verified</span>
 					<span class="text-xs uppercase tracking-widest text-aura-muted"
-						>Développeur et CDP Freelance</span
+						>Développeur Freelance</span
 					>
 				</div>
 
 				<h1 class="text-5xl md:text-7xl font-serif leading-[1.05]">
-					Transformez l'IA en <br />
-					<span class="italic-accent">Levier de croissance</span>
+					Maximisez votre Productivité <br />
+					<span class="italic-accent">par le Web & l'IA</span>
 				</h1>
 
 				<p class="text-lg md:text-xl text-aura-muted font-light max-w-2xl leading-relaxed">
-					Je transforme vos goulots d'étranglement en leviers de croissance. Une approche
-					chirurgicale de la transition numérique pour un ROI mesurable dès le premier mois.
+					Je développe les solutions qui vous propulsent : sites web pour votre visibilité, applications métiers pour votre productivité et intégrations IA intelligentes pour éliminer le superflu.
 				</p>
 
 				<div class="flex flex-col sm:flex-row gap-4 md:gap-5 pt-4">
@@ -227,7 +226,7 @@
 				>
 					<span class="material-symbols-outlined text-[16px] text-aura-accent">verified</span>
 					<span class="text-xs uppercase tracking-widest text-aura-muted"
-						>Développeur et CDP Freelance</span
+						>Développeur Freelance</span
 					>
 				</div>
                 <div

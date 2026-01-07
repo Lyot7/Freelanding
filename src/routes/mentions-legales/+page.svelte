@@ -5,7 +5,7 @@
 	<title>Mentions Légales - Eliott B.</title>
 	<meta
 		name="description"
-		content="Mentions légales du site d'Eliott Bouquerel, développeur freelance spécialisé en intégration IA."
+		content="Mentions légales du site d'Eliott Bouquerel, développeur freelance."
 	/>
 	
 </svelte:head>
@@ -20,11 +20,11 @@
 				<section>
 					<h2 class="text-2xl font-serif text-white mb-4">1. Éditeur du site</h2>
 					<p>
-						Le site <strong class="text-white">freelanding-v2</strong> est édité par :
+						Le site <strong class="text-white">eliottbouquerel.fr</strong> est édité par :
 					</p>
 					<div class="mt-4 pl-4 border-l-2 border-aura-surface">
 						<p class="text-white font-medium">Eliott Bouquerel</p>
-						<p>Développeur et CDP Freelance</p>
+						<p>Développeur Freelance</p>
 					</div>
 				</section>
 
