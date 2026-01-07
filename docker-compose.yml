@@ -1,0 +1,10 @@
+services:
+  app:
+    build: .
+    container_name: freelanding-app
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      # - HOST=0.0.0.0 # Sometimes needed depending on the internal network

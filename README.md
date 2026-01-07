@@ -46,3 +46,16 @@ Ce projet est configuré pour être déployé automatiquement sur Coolify via **
 ### Mise en ligne
 Le déploiement est automatique à chaque **Push** sur la branche `main`.
 Si le déploiement ne se déclenche pas, vérifiez les Webhooks dans Coolify et GitHub.
+
+## 🐳 Docker Compose (Optionnel)
+
+Si vous préférez héberger l'application via Docker Compose directement :
+
+```bash
+# Construire et lancer le conteneur
+docker compose up -d --build
+```
+
+L'application sera disponible sur le port **3000**.
+Le `Dockerfile` est multi-stage et optimisé pour Bun, garantissant une image de production légère.
+
