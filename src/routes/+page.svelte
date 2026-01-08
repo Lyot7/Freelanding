@@ -184,13 +184,12 @@
 					{/if}
 				</div>
 
-				<h1 class="text-5xl md:text-7xl font-serif leading-[1.05]">
-					Maximisez votre Productivité <br />
-					<span class="italic-accent">par le Web & l'IA</span>
+				<h1 class="text-4xl md:text-6xl font-serif leading-[1.05]">
+					Ne construisez pas juste un site, <span class="text-aura-accent">bâtissez votre <span class="italic">avantage compétitif</span></span>.
 				</h1>
 
 				<p class="text-lg md:text-xl text-aura-muted font-light max-w-2xl leading-relaxed">
-					Je développe les solutions qui vous propulsent : sites web pour votre visibilité, applications métiers pour votre productivité et intégrations IA intelligentes pour éliminer le superflu.
+					Je conçois l'infrastructure numérique invisible qui porte votre croissance. Du code épuré pour la performance, de l'IA pour l’efficience, et une stratégie web pour dominer votre marché.
 				</p>
 
 				<div class="flex flex-col sm:flex-row gap-4 md:gap-5 pt-4">
