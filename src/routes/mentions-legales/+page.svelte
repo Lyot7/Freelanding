@@ -5,7 +5,7 @@
 	<title>Mentions Légales - Eliott B.</title>
 	<meta
 		name="description"
-		content="Mentions légales du site d'Eliott Bouquerel, développeur freelance."
+		content="Mentions légales du site d'Eliott Bouquerel, Manager de projet Web."
 	/>
 	
 </svelte:head>
@@ -24,7 +24,7 @@
 					</p>
 					<div class="mt-4 pl-4 border-l-2 border-aura-surface">
 						<p class="text-white font-medium">Eliott Bouquerel</p>
-						<p>Développeur Freelance</p>
+						<p>Manager de projet Web</p>
 					</div>
 				</section>
 

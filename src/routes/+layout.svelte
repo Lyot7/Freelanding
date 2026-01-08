@@ -1,6 +1,7 @@
 <script lang="ts">
 	import '../app.css';
     import Navbar from '$lib/components/Navbar.svelte';
+	import Footer from '$lib/components/Footer.svelte';
 
 	let { children } = $props();
 </script>
@@ -20,9 +21,13 @@
 
 <Navbar />
 
-<div class="relative min-h-screen overflow-x-hidden">
+<div class="relative min-h-screen">
     <!-- Noise Texture Overlay -->
     <div class="noise-bg"></div>
     
-    {@render children()}
+    <main>
+        {@render children()}
+    </main>
+
+    <Footer />
 </div>

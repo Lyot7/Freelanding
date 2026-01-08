@@ -133,10 +133,9 @@
 </style>
 
 <svelte:head>
-	<title>Eliott B. - Développeur Freelance | Code & IA</title>
+	<title>Eliott B. - Manager de projet Web | Code & IA</title>
 	<meta
-		name="description"
-		content="Maximisez votre productivité par le Web & l'IA. Développeur freelance pour vos leviers de performance : visibilité, automatisation et outils sur-mesure."
+		content="Maximisez votre productivité par le Web & l'IA. Manager de projet Web pour vos leviers de performance : visibilité, automatisation et outils sur-mesure."
 	>
 	
 	<!-- Favicons -->
@@ -163,7 +162,7 @@
 				>
 					<span class="material-symbols-outlined text-[16px] text-aura-accent">verified</span>
 					<span class="text-xs uppercase tracking-widest text-aura-muted"
-						>Développeur Freelance</span
+						>Manager de projet Web</span
 					>
 				</div>
 
@@ -226,7 +225,7 @@
 				>
 					<span class="material-symbols-outlined text-[16px] text-aura-accent">verified</span>
 					<span class="text-xs uppercase tracking-widest text-aura-muted"
-						>Développeur Freelance</span
+						>Manager de projet Web</span
 					>
 				</div>
                 <div
@@ -600,7 +599,7 @@
 						<span class="material-symbols-outlined text-aura-accent">school</span>
 					</div>
 					<div>
-						<h3 class="text-xl font-serif mb-2">Master Développeur & Chef de Projet Web</h3>
+						<h3 class="text-xl font-serif mb-2">Master Développeur & Manager de projet Web</h3>
 						<p class="text-aura-muted text-sm leading-relaxed">
 							Formation complète alliant expertise technique et management de projet. Une double
 							compétence qui me permet de concevoir, développer et piloter des projets web de A à Z.
@@ -815,33 +814,3 @@
 			<span class="material-symbols-outlined text-[200px]">verified</span>
 		</div>
 	</section>
-
-	<!-- CTA / Contact -->
-	<footer class="py-14 md:py-24 relative overflow-hidden text-center">
-		<div class="absolute inset-0 bg-gradient-to-b from-aura-bg to-[#080d0c]"></div>
-		<div class="max-w-3xl mx-auto px-6 relative z-10 space-y-8">
-			<h2 class="text-5xl md:text-6xl font-serif">
-				Votre transformation <br />commence <span class="italic-accent">ici</span>.
-			</h2>
-			<p class="text-aura-muted text-lg">
-				Mon accompagnement est conçu pour garantir un niveau d'excellence absolu dans chaque projet. 
-				Vérifions ensemble si nous sommes faits pour collaborer.
-			</p>
-			<div class="flex flex-col sm:flex-row justify-center gap-4 pt-4">
-				<Button href="/rendez-vous" variant="primary">
-					Réserver un audit gratuit
-				</Button>
-				<Button href="mailto:eliott.bouquerel@gmail.com" variant="secondary">
-					Me contacter par email
-				</Button>
-			</div>
-
-			<div
-				class="pt-20 text-xs text-aura-muted flex flex-col md:flex-row justify-center gap-8"
-			>
-				<span>&copy; {new Date().getFullYear()} Eliott Bouquerel</span>
-				<a href="/mentions-legales" class="hover:text-white transition-colors">Mentions Légales</a>
-				<a href="/cgv" class="hover:text-white transition-colors">CGV</a>
-			</div>
-		</div>
-	</footer>

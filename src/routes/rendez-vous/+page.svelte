@@ -9,7 +9,7 @@
 </svelte:head>
 
 <div
-	class="relative min-h-screen w-full bg-[#0F1A18] flex flex-col items-center pt-32 pb-12 px-4 md:px-6"
+	class="relative w-full flex flex-col items-center pt-32 pb-0 px-4 md:px-6"
 	in:fade={{ duration: 300 }}
 >
 	<!-- Background Elements -->
@@ -50,7 +50,7 @@
 	</div>
 
 	<!-- Main Content: Calendar -->
-	<div class="relative z-10 w-full max-w-4xl min-h-[700px]">
+	<div class="relative z-10 w-full max-w-4xl">
 		<BookingCalendar calLink="eliott-bouquerel/30min" />
 	</div>
 </div>

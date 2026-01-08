@@ -56,7 +56,10 @@
 			config: config
 		});
 
-		Cal.ns['30min']('ui', config);
+		Cal.ns['30min']('ui', {
+			...config,
+			theme: 'dark'
+		});
 
         // Robustly force scrolling="no" on the iframe
         const interval = setInterval(() => {

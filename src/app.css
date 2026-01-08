@@ -23,12 +23,12 @@ body {
 	color: #F0F7F5;
 	-webkit-font-smoothing: antialiased;
 	font-family: 'Instrument Sans', sans-serif;
-    overflow-x: hidden;
 }
 
 html {
 	scroll-behavior: smooth;
-    overflow-x: hidden;
+	overflow-x: hidden;
+	overflow-y: auto;
 }
 
 /* Subtle Grain Overlay */
@@ -127,6 +127,7 @@ input[type='range']::-moz-range-track {
 		opacity: 0;
 		transform: translateY(30px);
 	}
+
 	to {
 		opacity: 1;
 		transform: translateY(0);
@@ -141,9 +142,11 @@ input[type='range']::-moz-range-track {
 .delay-100 {
 	animation-delay: 0.1s;
 }
+
 .delay-200 {
 	animation-delay: 0.2s;
 }
+
 .delay-300 {
 	animation-delay: 0.3s;
 }
