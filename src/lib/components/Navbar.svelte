@@ -3,10 +3,31 @@
     import { page } from '$app/stores';
 
 	let navScrolled = false;
+	let isHidden = false;
+	let lastScrollY = 0;
 
 	onMount(() => {
 		const handleScroll = () => {
-			navScrolled = window.scrollY > 50;
+			const currentScrollY = window.scrollY;
+			
+			// Handle background blur on scroll
+			navScrolled = currentScrollY > 50;
+
+			// Handle scroll hide/show for mobile/tablet (< 1024px)
+			if (window.innerWidth < 1024) {
+				if (currentScrollY > lastScrollY && currentScrollY > 100) {
+					// Scrolling down & past threshold
+					isHidden = true;
+				} else {
+					// Scrolling up
+					isHidden = false;
+				}
+			} else {
+				// Always show on desktop
+				isHidden = false;
+			}
+			
+			lastScrollY = currentScrollY;
 		};
 		window.addEventListener('scroll', handleScroll);
 		return () => window.removeEventListener('scroll', handleScroll);
@@ -23,10 +44,11 @@
 
 <nav
     id="navbar"
-    class="fixed top-0 left-0 right-0 w-full z-50 transition-all duration-300 px-6 md:px-12"
+    class="fixed top-0 left-0 right-0 w-full z-50 transition-all duration-500 px-6 md:px-12"
     class:pt-4={!navScrolled}
     class:md:pt-8={!navScrolled}
     class:py-4={navScrolled}
+    class:-translate-y-full={isHidden}
 >
     <div
         class="max-w-7xl mx-auto flex justify-between items-center bg-aura-bg/80 backdrop-blur-md rounded-full px-4 md:px-6 py-2.5 md:py-3 border border-aura-surface/50"
