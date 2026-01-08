@@ -5,19 +5,21 @@
 		variant?: 'primary' | 'secondary' | 'link';
 		class?: string;
 		children?: import('svelte').Snippet;
-        target?: string;
-        onclick?: () => void;
+		target?: string;
+		onclick?: () => void;
+		fullWidth?: boolean;
 	}
 
-	let { 
-        href, 
-        type = 'button', 
-        variant = 'primary', 
-        class: className = '', 
-        children,
-        target,
-        onclick
-    }: Props = $props();
+	let {
+		href,
+		type = 'button',
+		variant = 'primary',
+		class: className = '',
+		children,
+		target,
+		onclick,
+		fullWidth = false
+	}: Props = $props();
 
 	const baseClasses = "transition-all duration-300 font-medium rounded-full inline-flex items-center justify-center gap-2";
 	
@@ -29,11 +31,11 @@
 </script>
 
 {#if href}
-	<a {href} class="{baseClasses} {variantClasses[variant]} {className}" {target} {onclick}>
+	<a {href} class="{baseClasses} {variantClasses[variant]} {fullWidth ? 'w-full' : ''} {className}" {target} {onclick}>
 		{@render children?.()}
 	</a>
 {:else}
-	<button {type} class="{baseClasses} {variantClasses[variant]} {className}" {onclick}>
+	<button {type} class="{baseClasses} {variantClasses[variant]} {fullWidth ? 'w-full' : ''} {className}" {onclick}>
 		{@render children?.()}
 	</button>
 {/if}
