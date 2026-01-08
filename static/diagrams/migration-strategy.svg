@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 380" aria-labelledby="mig-title mig-desc">
+  <title id="mig-title">Strategie de Migration Big Bang</title>
+  <desc id="mig-desc">Diagramme illustrant la migration Big Bang avec developpement parallele et bascule complete</desc>
+
+  <defs>
+    <linearGradient id="legacyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#3a2a2a"/>
+      <stop offset="100%" style="stop-color:#2a1a1a"/>
+    </linearGradient>
+    <linearGradient id="newGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a3a35"/>
+      <stop offset="100%" style="stop-color:#0F1A18"/>
+    </linearGradient>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#6FF0D3"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="380" fill="#0F1A18"/>
+
+  <!-- Titre -->
+  <text x="400" y="35" fill="#F0F7F5" font-family="system-ui" font-size="20" font-weight="600" text-anchor="middle">Migration Big Bang</text>
+  <text x="400" y="55" fill="#9CAFA9" font-family="system-ui" font-size="12" text-anchor="middle">Developpement parallele + ETL + Bascule complete</text>
+
+  <!-- Phase 1: Developpement Parallele -->
+  <g transform="translate(50, 75)">
+    <text x="140" y="0" fill="#D4B86A" font-family="system-ui" font-size="14" font-weight="500" text-anchor="middle">Phase 1 : Developpement</text>
+    <text x="140" y="16" fill="#9CAFA9" font-family="system-ui" font-size="10" text-anchor="middle">Systemes en parallele</text>
+
+    <!-- Legacy en production -->
+    <g transform="translate(0, 30)">
+      <rect x="0" y="0" width="130" height="140" rx="10" fill="url(#legacyGrad)" stroke="#5a3a3a" stroke-width="2"/>
+      <text x="65" y="25" fill="#e8a0a0" font-family="system-ui" font-size="11" text-anchor="middle" font-weight="500">PrestaShop</text>
+      <text x="65" y="42" fill="#9CAFA9" font-family="system-ui" font-size="9" text-anchor="middle">EN PRODUCTION</text>
+
+      <rect x="15" y="55" width="100" height="22" rx="4" fill="#4a3030"/>
+      <text x="65" y="70" fill="#c08080" font-family="system-ui" font-size="9" text-anchor="middle">MySQL</text>
+
+      <rect x="15" y="85" width="100" height="22" rx="4" fill="#4a3030"/>
+      <text x="65" y="100" fill="#c08080" font-family="system-ui" font-size="9" text-anchor="middle">1.3M produits</text>
+
+      <circle cx="115" cy="130" r="6" fill="#50c080"/>
+      <text x="95" y="133" fill="#50c080" font-family="system-ui" font-size="8" text-anchor="end">Live</text>
+    </g>
+
+    <!-- Nouveau en dev -->
+    <g transform="translate(150, 30)">
+      <rect x="0" y="0" width="130" height="140" rx="10" fill="url(#newGrad)" stroke="#6FF0D3" stroke-width="2" stroke-dasharray="5,3"/>
+      <text x="65" y="25" fill="#6FF0D3" font-family="system-ui" font-size="11" text-anchor="middle" font-weight="500">SvelteKit</text>
+      <text x="65" y="42" fill="#9CAFA9" font-family="system-ui" font-size="9" text-anchor="middle">EN DEVELOPPEMENT</text>
+
+      <rect x="15" y="55" width="100" height="22" rx="4" fill="#1a3530" stroke="#6FF0D3" stroke-width="1"/>
+      <text x="65" y="70" fill="#6FF0D3" font-family="system-ui" font-size="9" text-anchor="middle">PostgreSQL</text>
+
+      <rect x="15" y="85" width="100" height="22" rx="4" fill="#1a3530" stroke="#6FF0D3" stroke-width="1"/>
+      <text x="65" y="100" fill="#6FF0D3" font-family="system-ui" font-size="9" text-anchor="middle">Archi Hexagonale</text>
+
+      <circle cx="115" cy="130" r="6" fill="#D4B86A"/>
+      <text x="95" y="133" fill="#D4B86A" font-family="system-ui" font-size="8" text-anchor="end">Dev</text>
+    </g>
+  </g>
+
+  <!-- Fleche 1-2 -->
+  <path d="M340,155 L380,155" stroke="#6FF0D3" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- Phase 2: ETL & Tests -->
+  <g transform="translate(400, 75)">
+    <text x="90" y="0" fill="#D4B86A" font-family="system-ui" font-size="14" font-weight="500" text-anchor="middle">Phase 2 : ETL &amp; Tests</text>
+    <text x="90" y="16" fill="#9CAFA9" font-family="system-ui" font-size="10" text-anchor="middle">Migration des donnees</text>
+
+    <g transform="translate(0, 30)">
+      <rect x="0" y="0" width="180" height="140" rx="10" fill="#182622" stroke="#D4B86A" stroke-width="2"/>
+
+      <!-- ETL Process -->
+      <text x="90" y="25" fill="#D4B86A" font-family="system-ui" font-size="11" text-anchor="middle" font-weight="500">Scripts ETL</text>
+
+      <rect x="15" y="40" width="150" height="28" rx="4" fill="#223530"/>
+      <text x="90" y="58" fill="#F0F7F5" font-family="system-ui" font-size="9" text-anchor="middle">MySQL → PostgreSQL</text>
+
+      <rect x="15" y="75" width="70" height="22" rx="4" fill="#223530"/>
+      <text x="50" y="90" fill="#9CAFA9" font-family="system-ui" font-size="8" text-anchor="middle">Produits</text>
+
+      <rect x="95" y="75" width="70" height="22" rx="4" fill="#223530"/>
+      <text x="130" y="90" fill="#9CAFA9" font-family="system-ui" font-size="8" text-anchor="middle">Clients</text>
+
+      <rect x="15" y="105" width="150" height="22" rx="4" fill="#1a3530" stroke="#50c080"/>
+      <text x="90" y="120" fill="#50c080" font-family="system-ui" font-size="9" text-anchor="middle">Tests + Validation</text>
+    </g>
+  </g>
+
+  <!-- Fleche 2-3 -->
+  <path d="M600,155 L640,155" stroke="#6FF0D3" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- Phase 3: Bascule -->
+  <g transform="translate(660, 75)">
+    <text x="60" y="0" fill="#6FF0D3" font-family="system-ui" font-size="14" font-weight="500" text-anchor="middle">Phase 3</text>
+    <text x="60" y="16" fill="#9CAFA9" font-family="system-ui" font-size="10" text-anchor="middle">Bascule</text>
+
+    <g transform="translate(0, 30)">
+      <rect x="0" y="0" width="120" height="140" rx="10" fill="url(#newGrad)" stroke="#6FF0D3" stroke-width="2"/>
+      <text x="60" y="25" fill="#6FF0D3" font-family="system-ui" font-size="11" text-anchor="middle" font-weight="500">SvelteKit</text>
+      <text x="60" y="42" fill="#50c080" font-family="system-ui" font-size="9" text-anchor="middle">EN PRODUCTION</text>
+
+      <rect x="10" y="55" width="100" height="22" rx="4" fill="#1a3530" stroke="#50c080"/>
+      <text x="60" y="70" fill="#50c080" font-family="system-ui" font-size="9" text-anchor="middle">PostgreSQL</text>
+
+      <rect x="10" y="85" width="100" height="22" rx="4" fill="#1a3530" stroke="#50c080"/>
+      <text x="60" y="100" fill="#50c080" font-family="system-ui" font-size="9" text-anchor="middle">1.3M+ produits</text>
+
+      <circle cx="105" cy="130" r="6" fill="#50c080"/>
+      <text x="85" y="133" fill="#50c080" font-family="system-ui" font-size="8" text-anchor="end">Live</text>
+    </g>
+  </g>
+
+  <!-- Timeline -->
+  <g transform="translate(0, 280)">
+    <line x1="80" y1="30" x2="720" y2="30" stroke="#223530" stroke-width="2"/>
+
+    <!-- Points -->
+    <circle cx="140" cy="30" r="6" fill="#D4B86A"/>
+    <circle cx="400" cy="30" r="6" fill="#D4B86A"/>
+    <circle cx="660" cy="30" r="6" fill="#6FF0D3"/>
+
+    <!-- Labels -->
+    <text x="140" y="50" fill="#9CAFA9" font-family="system-ui" font-size="10" text-anchor="middle">T0</text>
+    <text x="140" y="65" fill="#9CAFA9" font-family="system-ui" font-size="8" text-anchor="middle">Debut dev</text>
+
+    <text x="400" y="50" fill="#9CAFA9" font-family="system-ui" font-size="10" text-anchor="middle">T+6 mois</text>
+    <text x="400" y="65" fill="#9CAFA9" font-family="system-ui" font-size="8" text-anchor="middle">Migration donnees</text>
+
+    <text x="660" y="50" fill="#9CAFA9" font-family="system-ui" font-size="10" text-anchor="middle">T+8 mois</text>
+    <text x="660" y="65" fill="#9CAFA9" font-family="system-ui" font-size="8" text-anchor="middle">Go Live</text>
+  </g>
+
+  <!-- Note bas -->
+  <text x="400" y="365" fill="#D4B86A" font-family="system-ui" font-size="11" text-anchor="middle">BDD incompatibles (MySQL ≠ PostgreSQL) → Migration ETL obligatoire</text>
+</svg>

@@ -185,7 +185,7 @@
 				</div>
 
 				<h1 class="text-4xl md:text-6xl font-serif leading-[1.05]">
-					Ne construisez pas juste un site, <span class="text-aura-accent">bâtissez votre <span class="italic">avantage compétitif</span></span>.
+					Ne construisez pas juste un site, <span class="text-aura-accent italic">bâtissez votre avantage compétitif</span>.
 				</h1>
 
 				<p class="text-lg md:text-xl text-aura-muted font-light max-w-2xl leading-relaxed">
@@ -545,17 +545,18 @@
 		<div class="space-y-24">
 			<!-- Project 1 (Left Aligned) -->
 			<div class="grid md:grid-cols-2 gap-12 items-center group reveal-on-scroll" use:reveal>
-				<div
-					class="relative rounded-3xl overflow-hidden aspect-[4/3] border border-aura-surface group-hover:border-aura-accent/50 transition-colors"
+				<a
+					href="/projects/meca-services"
+					class="relative rounded-3xl overflow-hidden aspect-[4/3] border border-aura-surface group-hover:border-aura-accent/50 transition-colors block"
 				>
 					<img
 						src="/mockup-mecaservices.png"
-						class="w-full h-full object-cover transition-transform duration-700"
+						class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
 						alt="Dashboard e-commerce MECA SERVICES"
 					/>
 					<div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors">
 					</div>
-				</div>
+				</a>
 				<div class="space-y-6">
 					<div class="flex gap-3">
 						<span
@@ -583,6 +584,13 @@
 							<span class="text-xs text-aura-muted">Satisfaction client</span>
 						</div>
 					</div>
+					<a
+						href="/projects/meca-services"
+						class="inline-flex items-center gap-2 text-aura-accent hover:text-white transition-colors text-sm font-medium"
+					>
+						Voir le projet
+						<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+					</a>
 				</div>
 			</div>
 
