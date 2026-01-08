@@ -31,7 +31,7 @@ export const projects: Project[] = [
         slug: 'meca-services',
         title: 'MECA SERVICES',
         subtitle: 'Infrastructure E-commerce & Intégration ERP',
-        tags: ['Infrastructure', 'Refonte Totale', 'E-commerce'],
+        tags: ['Infrastructure e-commerce', 'Refonte Totale'],
         thumbnail: '/mockup-mecaservices.png',
         heroImage: '/mockup-mecaservices.png', // Ideally a wider hero shot
         description:
@@ -64,7 +64,7 @@ export const projects: Project[] = [
         slug: 'kpsull',
         title: 'KPSULL',
         subtitle: 'Marketplace Mode & Créateurs',
-        tags: ['Marketplace', 'Cofondateur', 'Start-up'],
+        tags: ['Cofondateur'],
         thumbnail: '/mockup-kpsull.png',
         heroImage: '/mockup-kpsull.png',
         description:
@@ -82,8 +82,9 @@ export const projects: Project[] = [
         ],
         stack: [
             { name: 'Next.js', icon: 'https://cdn.simpleicons.org/nextdotjs/white' },
-            { name: 'Stripe', icon: 'https://cdn.simpleicons.org/stripe/white' },
-            { name: 'Supabase', icon: 'https://cdn.simpleicons.org/supabase/white' }
+            { name: 'PostgreSQL', icon: 'https://cdn.simpleicons.org/postgresql/white' },
+            { name: 'Tailwind', icon: 'https://cdn.simpleicons.org/tailwindcss/white' },
+            { name: 'Stripe', icon: 'https://cdn.simpleicons.org/stripe/white' }
         ]
     }
 ];
