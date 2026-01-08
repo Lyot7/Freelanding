@@ -7,4 +7,6 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-      # - HOST=0.0.0.0 # Sometimes needed depending on the internal network
+      - HOST=0.0.0.0
+    labels:
+      - "traefik.http.services.app.loadbalancer.server.port=3000"
