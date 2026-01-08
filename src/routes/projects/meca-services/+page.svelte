@@ -289,26 +289,26 @@
 			<div class="space-y-6 reveal-on-scroll" use:reveal>
 				<h3 class="text-2xl font-serif">Pourquoi SvelteKit ?</h3>
 				<p class="text-aura-muted leading-relaxed">
-					Apres une analyse comparative rigoureuse entre Next.js, Nuxt.js et Remix, le choix s'est
-					porte sur <strong class="text-aura-accent">SvelteKit</strong> pour plusieurs raisons
-					decisives dans le contexte d'une PME.
+					Face a Next.js, Nuxt ou Remix, <strong class="text-aura-accent">SvelteKit</strong> s'impose
+					par sa philosophie unique : <strong class="text-white">compiler plutot qu'interpreter</strong>.
+					Pour un developpeur solo gerant un projet complexe, c'est un avantage decisif.
 				</p>
 				<ul class="space-y-3 text-aura-muted">
 					<li class="flex items-start gap-3">
 						<span class="w-1.5 h-1.5 rounded-full bg-aura-accent mt-2 flex-shrink-0"></span>
-						<span><strong class="text-white">Bundles JavaScript minimaux</strong> : Compilation optimisee, pas de runtime lourd</span>
+						<span><strong class="text-white">Complexite cognitive minimale</strong> : Syntaxe intuitive proche du HTML/CSS/JS natif. Pas de JSX, pas de hooks complexes, pas de magie cachee. Le code fait exactement ce qu'il dit.</span>
 					</li>
 					<li class="flex items-start gap-3">
 						<span class="w-1.5 h-1.5 rounded-full bg-aura-accent mt-2 flex-shrink-0"></span>
-						<span><strong class="text-white">Courbe d'apprentissage douce</strong> : Syntaxe proche du HTML natif</span>
+						<span><strong class="text-white">Maintenabilite exceptionnelle</strong> : Un composant = un fichier. La reactivite est declarative, pas imperative. Reprendre le code apres 6 mois reste simple.</span>
 					</li>
 					<li class="flex items-start gap-3">
 						<span class="w-1.5 h-1.5 rounded-full bg-aura-accent mt-2 flex-shrink-0"></span>
-						<span><strong class="text-white">SSR + SPA hybride</strong> : Meilleur des deux mondes pour le SEO et l'UX</span>
+						<span><strong class="text-white">Bundle size ridicule</strong> : Svelte compile en JavaScript vanilla. Pas de runtime de 40Ko+ comme React. Le bundle final est 2 a 5x plus leger.</span>
 					</li>
 					<li class="flex items-start gap-3">
 						<span class="w-1.5 h-1.5 rounded-full bg-aura-accent mt-2 flex-shrink-0"></span>
-						<span><strong class="text-white">Productivite developpeur</strong> : Moins de boilerplate, plus de valeur</span>
+						<span><strong class="text-white">Performance native</strong> : Sans Virtual DOM, les mises a jour sont chirurgicales. Le navigateur travaille moins, l'utilisateur percoit plus de fluidite.</span>
 					</li>
 				</ul>
 			</div>
@@ -332,33 +332,33 @@
 							<tbody class="divide-y divide-aura-surface">
 								<tr>
 									<td class="px-4 py-3 text-aura-muted">Bundle size</td>
-									<td class="px-4 py-3 text-center text-green-400">Minimal</td>
-									<td class="px-4 py-3 text-center text-orange-400">Moyen</td>
-									<td class="px-4 py-3 text-center text-orange-400">Moyen</td>
+									<td class="px-4 py-3 text-center text-green-400">~5 Ko</td>
+									<td class="px-4 py-3 text-center text-orange-400">~80 Ko</td>
+									<td class="px-4 py-3 text-center text-orange-400">~60 Ko</td>
 								</tr>
 								<tr>
-									<td class="px-4 py-3 text-aura-muted">Courbe apprentissage</td>
-									<td class="px-4 py-3 text-center text-green-400">Douce</td>
+									<td class="px-4 py-3 text-aura-muted">Complexite cognitive</td>
+									<td class="px-4 py-3 text-center text-green-400">Faible</td>
+									<td class="px-4 py-3 text-center text-orange-400">Elevee</td>
 									<td class="px-4 py-3 text-center text-orange-400">Moyenne</td>
-									<td class="px-4 py-3 text-center text-orange-400">Moyenne</td>
 								</tr>
 								<tr>
-									<td class="px-4 py-3 text-aura-muted">Ecosysteme</td>
-									<td class="px-4 py-3 text-center text-orange-400">Croissant</td>
-									<td class="px-4 py-3 text-center text-green-400">Mature</td>
-									<td class="px-4 py-3 text-center text-green-400">Mature</td>
-								</tr>
-								<tr>
-									<td class="px-4 py-3 text-aura-muted">Performance</td>
+									<td class="px-4 py-3 text-aura-muted">Developer Experience</td>
 									<td class="px-4 py-3 text-center text-green-400">Excellente</td>
-									<td class="px-4 py-3 text-center text-green-400">Bonne</td>
-									<td class="px-4 py-3 text-center text-green-400">Bonne</td>
+									<td class="px-4 py-3 text-center text-orange-400">Bonne</td>
+									<td class="px-4 py-3 text-center text-orange-400">Bonne</td>
+								</tr>
+								<tr>
+									<td class="px-4 py-3 text-aura-muted">Performance runtime</td>
+									<td class="px-4 py-3 text-center text-green-400">Native</td>
+									<td class="px-4 py-3 text-center text-orange-400">VDOM</td>
+									<td class="px-4 py-3 text-center text-orange-400">VDOM</td>
 								</tr>
 								<tr>
 									<td class="px-4 py-3 text-aura-muted">Maintenabilite solo</td>
 									<td class="px-4 py-3 text-center text-green-400">Ideale</td>
-									<td class="px-4 py-3 text-center text-orange-400">Correcte</td>
-									<td class="px-4 py-3 text-center text-orange-400">Correcte</td>
+									<td class="px-4 py-3 text-center text-orange-400">Difficile</td>
+									<td class="px-4 py-3 text-center text-orange-400">Moyenne</td>
 								</tr>
 							</tbody>
 						</table>
