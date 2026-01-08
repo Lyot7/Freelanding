@@ -55,13 +55,13 @@
 </svelte:head>
 
 <!-- Hero Section -->
-<header class="relative min-h-[70vh] pt-24 pb-16 md:pt-32 md:pb-24 flex flex-col justify-center px-6">
+<header class="relative min-h-[70vh] pt-24 pb-16 md:pt-32 md:pb-24 flex flex-col justify-center px-6 overflow-hidden">
 	<!-- Background Glows -->
 	<div
-		class="absolute top-0 right-0 w-[500px] h-[500px] bg-aura-accent/5 rounded-full blur-[120px] pointer-events-none"
+		class="absolute top-0 right-0 w-[250px] h-[250px] md:w-[500px] md:h-[500px] bg-aura-accent/5 rounded-full blur-[80px] md:blur-[120px] pointer-events-none"
 	></div>
 	<div
-		class="absolute bottom-0 left-0 w-[300px] h-[300px] bg-aura-gold/5 rounded-full blur-[100px] pointer-events-none"
+		class="absolute bottom-0 left-0 w-[150px] h-[150px] md:w-[300px] md:h-[300px] bg-aura-gold/5 rounded-full blur-[60px] md:blur-[100px] pointer-events-none"
 	></div>
 
 	<div class="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-12 lg:gap-16 items-center z-10">
@@ -281,7 +281,7 @@
 </section>
 
 <!-- Stack Technique -->
-<section class="py-16 md:py-24 bg-[#121E1C]">
+<section class="py-16 md:py-24 bg-[#121E1C] overflow-hidden">
 	<div class="max-w-7xl mx-auto px-6">
 		<SectionTitle title="Stack" subtitle="Technique" />
 
@@ -323,42 +323,42 @@
 						<table class="w-full text-sm">
 							<thead>
 								<tr class="border-b border-aura-surface">
-									<th class="px-4 py-3 text-left text-aura-muted font-normal">Critere</th>
-									<th class="px-4 py-3 text-center text-aura-accent font-medium">SvelteKit</th>
-									<th class="px-4 py-3 text-center text-aura-muted font-normal">Next.js</th>
-									<th class="px-4 py-3 text-center text-aura-muted font-normal">Nuxt</th>
+									<th class="px-2 md:px-4 py-3 text-left text-aura-muted font-normal text-xs md:text-sm">Critere</th>
+									<th class="px-2 md:px-4 py-3 text-center text-aura-accent font-medium text-xs md:text-sm">SvelteKit</th>
+									<th class="px-2 md:px-4 py-3 text-center text-aura-muted font-normal text-xs md:text-sm">Next.js</th>
+									<th class="px-2 md:px-4 py-3 text-center text-aura-muted font-normal text-xs md:text-sm">Nuxt</th>
 								</tr>
 							</thead>
-							<tbody class="divide-y divide-aura-surface">
+							<tbody class="divide-y divide-aura-surface text-xs md:text-sm">
 								<tr>
-									<td class="px-4 py-3 text-aura-muted">Bundle size</td>
-									<td class="px-4 py-3 text-center text-green-400">~5 Ko</td>
-									<td class="px-4 py-3 text-center text-orange-400">~80 Ko</td>
-									<td class="px-4 py-3 text-center text-orange-400">~60 Ko</td>
+									<td class="px-2 md:px-4 py-3 text-aura-muted">Bundle size</td>
+									<td class="px-2 md:px-4 py-3 text-center text-green-400">~5 Ko</td>
+									<td class="px-2 md:px-4 py-3 text-center text-orange-400">~80 Ko</td>
+									<td class="px-2 md:px-4 py-3 text-center text-orange-400">~60 Ko</td>
 								</tr>
 								<tr>
-									<td class="px-4 py-3 text-aura-muted">Complexite cognitive</td>
-									<td class="px-4 py-3 text-center text-green-400">Faible</td>
-									<td class="px-4 py-3 text-center text-orange-400">Elevee</td>
-									<td class="px-4 py-3 text-center text-orange-400">Moyenne</td>
+									<td class="px-2 md:px-4 py-3 text-aura-muted">Complexite cognitive</td>
+									<td class="px-2 md:px-4 py-3 text-center text-green-400">Faible</td>
+									<td class="px-2 md:px-4 py-3 text-center text-orange-400">Elevee</td>
+									<td class="px-2 md:px-4 py-3 text-center text-orange-400">Moyenne</td>
 								</tr>
 								<tr>
-									<td class="px-4 py-3 text-aura-muted">Developer Experience</td>
-									<td class="px-4 py-3 text-center text-green-400">Excellente</td>
-									<td class="px-4 py-3 text-center text-orange-400">Bonne</td>
-									<td class="px-4 py-3 text-center text-orange-400">Bonne</td>
+									<td class="px-2 md:px-4 py-3 text-aura-muted">Developer Experience</td>
+									<td class="px-2 md:px-4 py-3 text-center text-green-400">Excellente</td>
+									<td class="px-2 md:px-4 py-3 text-center text-orange-400">Bonne</td>
+									<td class="px-2 md:px-4 py-3 text-center text-orange-400">Bonne</td>
 								</tr>
 								<tr>
-									<td class="px-4 py-3 text-aura-muted">Performance runtime</td>
-									<td class="px-4 py-3 text-center text-green-400">Native</td>
-									<td class="px-4 py-3 text-center text-orange-400">VDOM</td>
-									<td class="px-4 py-3 text-center text-orange-400">VDOM</td>
+									<td class="px-2 md:px-4 py-3 text-aura-muted">Performance runtime</td>
+									<td class="px-2 md:px-4 py-3 text-center text-green-400">Native</td>
+									<td class="px-2 md:px-4 py-3 text-center text-orange-400">VDOM</td>
+									<td class="px-2 md:px-4 py-3 text-center text-orange-400">VDOM</td>
 								</tr>
 								<tr>
-									<td class="px-4 py-3 text-aura-muted">Maintenabilite solo</td>
-									<td class="px-4 py-3 text-center text-green-400">Ideale</td>
-									<td class="px-4 py-3 text-center text-orange-400">Difficile</td>
-									<td class="px-4 py-3 text-center text-orange-400">Moyenne</td>
+									<td class="px-2 md:px-4 py-3 text-aura-muted">Maintenabilite solo</td>
+									<td class="px-2 md:px-4 py-3 text-center text-green-400">Ideale</td>
+									<td class="px-2 md:px-4 py-3 text-center text-orange-400">Difficile</td>
+									<td class="px-2 md:px-4 py-3 text-center text-orange-400">Moyenne</td>
 								</tr>
 							</tbody>
 						</table>
@@ -496,7 +496,7 @@
 </section>
 
 <!-- Resultats & Impact -->
-<section class="py-16 md:py-24 bg-aura-card border-y border-aura-surface">
+<section class="py-16 md:py-24 bg-aura-card border-y border-aura-surface overflow-hidden">
 	<div class="max-w-7xl mx-auto px-6">
 		<SectionTitle title="Resultats &" subtitle="Impact" />
 
@@ -511,46 +511,46 @@
 						<table class="w-full text-sm">
 							<thead>
 								<tr class="border-b border-aura-surface">
-									<th class="px-4 py-3 text-left text-aura-muted font-normal">Metrique</th>
-									<th class="px-4 py-3 text-center text-red-400 font-normal">Avant</th>
-									<th class="px-4 py-3 text-center text-green-400 font-normal">Apres</th>
+									<th class="px-2 md:px-4 py-3 text-left text-aura-muted font-normal text-xs md:text-sm">Metrique</th>
+									<th class="px-2 md:px-4 py-3 text-center text-red-400 font-normal text-xs md:text-sm">Avant</th>
+									<th class="px-2 md:px-4 py-3 text-center text-green-400 font-normal text-xs md:text-sm">Apres</th>
 								</tr>
 							</thead>
-							<tbody class="divide-y divide-aura-surface">
+							<tbody class="divide-y divide-aura-surface text-xs md:text-sm">
 								<tr>
-									<td class="px-4 py-3 text-aura-muted">LCP (Largest Contentful Paint)</td>
-									<td class="px-4 py-3 text-center text-red-400 font-mono">4.2s</td>
-									<td class="px-4 py-3 text-center text-green-400 font-mono">1.1s</td>
+									<td class="px-2 md:px-4 py-3 text-aura-muted">LCP (Largest Contentful Paint)</td>
+									<td class="px-2 md:px-4 py-3 text-center text-red-400 font-mono">4.2s</td>
+									<td class="px-2 md:px-4 py-3 text-center text-green-400 font-mono">1.1s</td>
 								</tr>
 								<tr>
-									<td class="px-4 py-3 text-aura-muted">FID (First Input Delay)</td>
-									<td class="px-4 py-3 text-center text-red-400 font-mono">180ms</td>
-									<td class="px-4 py-3 text-center text-green-400 font-mono">12ms</td>
+									<td class="px-2 md:px-4 py-3 text-aura-muted">FID (First Input Delay)</td>
+									<td class="px-2 md:px-4 py-3 text-center text-red-400 font-mono">180ms</td>
+									<td class="px-2 md:px-4 py-3 text-center text-green-400 font-mono">12ms</td>
 								</tr>
 								<tr>
-									<td class="px-4 py-3 text-aura-muted">CLS (Cumulative Layout Shift)</td>
-									<td class="px-4 py-3 text-center text-orange-400 font-mono">0.18</td>
-									<td class="px-4 py-3 text-center text-green-400 font-mono">0.02</td>
+									<td class="px-2 md:px-4 py-3 text-aura-muted">CLS (Cumulative Layout Shift)</td>
+									<td class="px-2 md:px-4 py-3 text-center text-orange-400 font-mono">0.18</td>
+									<td class="px-2 md:px-4 py-3 text-center text-green-400 font-mono">0.02</td>
 								</tr>
 								<tr>
-									<td class="px-4 py-3 text-aura-muted">Score Lighthouse</td>
-									<td class="px-4 py-3 text-center text-red-400 font-mono">42</td>
-									<td class="px-4 py-3 text-center text-green-400 font-mono">95+</td>
+									<td class="px-2 md:px-4 py-3 text-aura-muted">Score Lighthouse</td>
+									<td class="px-2 md:px-4 py-3 text-center text-red-400 font-mono">42</td>
+									<td class="px-2 md:px-4 py-3 text-center text-green-400 font-mono">95+</td>
 								</tr>
 								<tr>
-									<td class="px-4 py-3 text-aura-muted">Accessibilite RGAA</td>
-									<td class="px-4 py-3 text-center text-red-400">Non conforme</td>
-									<td class="px-4 py-3 text-center text-green-400">Niveau AA</td>
+									<td class="px-2 md:px-4 py-3 text-aura-muted">Accessibilite RGAA</td>
+									<td class="px-2 md:px-4 py-3 text-center text-red-400">Non conforme</td>
+									<td class="px-2 md:px-4 py-3 text-center text-green-400">Niveau AA</td>
 								</tr>
 								<tr>
-									<td class="px-4 py-3 text-aura-muted">Empreinte carbone / page</td>
-									<td class="px-4 py-3 text-center text-red-400 font-mono">2.8g CO2</td>
-									<td class="px-4 py-3 text-center text-green-400 font-mono">0.4g CO2</td>
+									<td class="px-2 md:px-4 py-3 text-aura-muted">Empreinte carbone / page</td>
+									<td class="px-2 md:px-4 py-3 text-center text-red-400 font-mono">2.8g CO2</td>
+									<td class="px-2 md:px-4 py-3 text-center text-green-400 font-mono">0.4g CO2</td>
 								</tr>
 								<tr>
-									<td class="px-4 py-3 text-aura-muted">Temps maintenance / semaine</td>
-									<td class="px-4 py-3 text-center text-red-400 font-mono">15h</td>
-									<td class="px-4 py-3 text-center text-green-400 font-mono">3h</td>
+									<td class="px-2 md:px-4 py-3 text-aura-muted">Temps maintenance / semaine</td>
+									<td class="px-2 md:px-4 py-3 text-center text-red-400 font-mono">15h</td>
+									<td class="px-2 md:px-4 py-3 text-center text-green-400 font-mono">3h</td>
 								</tr>
 							</tbody>
 						</table>

@@ -23,7 +23,7 @@
 	{/if}
 	<div class="max-w-3xl mx-auto px-6 relative z-10 space-y-8">
 		{#if !isRendezVousPage}
-			<h2 class="text-5xl md:text-6xl font-serif">
+			<h2 class="text-4xl sm:text-5xl md:text-6xl font-serif">
 				{config.title} <br />commence <span class="italic-accent">{config.titleAccent}</span>.
 			</h2>
 			<p class="text-aura-muted text-lg">
