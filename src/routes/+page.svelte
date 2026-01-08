@@ -173,7 +173,7 @@
 <!-- Hero Section -->
 	<header
 		id="top"
-		class="relative min-h-screen pt-20 pb-12 md:pt-32 md:pb-20 flex flex-col justify-center px-6"
+		class="relative min-h-screen pt-32 pb-12 md:pt-32 md:pb-20 flex flex-col justify-center px-6"
 	>
 		<!-- Abstract Background Glows -->
 		<div
@@ -187,7 +187,7 @@
 			<!-- Left Content -->
 			<div class="lg:col-span-7 space-y-8 md:space-y-10 reveal-on-scroll" use:reveal>
 				<div
-					class="hidden md:inline-flex items-center gap-2 px-3 py-1 rounded-full border border-aura-surface bg-aura-card/50"
+					class="hidden lg:inline-flex items-center gap-2 px-3 py-1 rounded-full border border-aura-surface bg-aura-card/50"
 				>
 					{#if !loaded}
 						<Skeleton width="16px" height="16px" variant="circular" />
@@ -269,14 +269,6 @@
 
 			<!-- Right Visual (Hero Image) -->
 			<div class="lg:col-span-5 relative reveal-on-scroll delay-200 max-w-xs md:max-w-md mx-auto lg:max-w-none w-full" use:reveal={{ delay: 200 }}>
-				<div
-					class="md:hidden inline-flex items-center gap-2 px-3 py-1 rounded-full border border-aura-surface bg-aura-card/50 mb-6"
-				>
-					<span class="material-symbols-outlined text-[16px] text-aura-accent">verified</span>
-					<span class="text-xs uppercase tracking-widest text-aura-muted"
-						>Manager de projet Web</span
-					>
-				</div>
                 <div
 					class="relative w-full aspect-[3/4] rounded-t-[100px] rounded-b-[30px] overflow-hidden border border-aura-surface"
 				>
@@ -287,9 +279,24 @@
 						class="w-full h-full object-cover"
 					/>
 
-					<!-- Floating Card -->
+					<!-- Title Badge (Mobile/Tablet only) -->
 					<div
-						class="absolute bottom-8 left-8 right-8 bg-aura-bg/80 backdrop-blur-xl border border-aura-surface p-5 rounded-2xl shadow-2xl"
+						class="lg:hidden absolute bottom-6 left-1/2 -translate-x-1/2 inline-flex items-center gap-2 px-3 py-1 rounded-full border border-aura-surface bg-aura-card/50 backdrop-blur-xl shadow-2xl"
+					>
+						{#if !loaded}
+							<Skeleton width="16px" height="16px" variant="circular" />
+							<Skeleton width="150px" height="12px" />
+						{:else}
+							<span class="material-symbols-outlined text-[16px] text-aura-accent">verified</span>
+							<span class="text-xs uppercase tracking-widest text-aura-muted"
+								>Manager de projet Web</span
+							>
+						{/if}
+					</div>
+
+					<!-- Floating Card (Desktop only) -->
+					<div
+						class="hidden lg:block absolute bottom-8 left-8 right-8 bg-aura-bg/80 backdrop-blur-xl border border-aura-surface p-5 rounded-2xl shadow-2xl"
 					>
 						<div class="flex justify-between items-start">
 							<div>
@@ -509,33 +516,33 @@
 
 						<!-- Results Dashboard -->
 						<div
-							class="bg-[#0A110F] rounded-3xl p-6 md:p-8 border border-aura-surface/50 grid md:grid-cols-2 gap-8 items-center relative overflow-hidden"
+							class="bg-[#0A110F] rounded-3xl p-6 md:p-8 border border-aura-surface/50 space-y-6 md:space-y-0 md:grid md:grid-cols-2 md:gap-8 md:items-center relative overflow-hidden"
 						>
 							<div
 								class="absolute top-0 right-0 w-32 h-32 bg-aura-accent/10 blur-[50px] rounded-full pointer-events-none"
 							></div>
 
-							<div>
-								<p class="text-[10px] md:text-xs text-aura-muted uppercase tracking-widest mb-1">
+							<div class="pb-6 border-b border-aura-surface/50 md:border-b-0 md:pb-0 text-center md:text-left">
+								<p class="text-xs text-aura-muted uppercase tracking-widest mb-2">
 									Gain Annuel Estimé
 								</p>
 								<div
-									class="text-4xl md:text-6xl font-serif text-transparent bg-clip-text bg-gradient-to-r from-white to-aura-accent"
+									class="text-5xl md:text-6xl font-serif text-transparent bg-clip-text bg-gradient-to-r from-white to-aura-accent"
 								>
 									{formatCurrency(annualSaving())}
 								</div>
 							</div>
 
-							<div class="md:text-right space-y-2">
+							<div class="text-center md:text-right space-y-3">
 								<div
-									class="inline-block bg-aura-surface/50 px-4 py-2 rounded-xl border border-aura-surface"
+									class="inline-block bg-aura-surface/50 px-5 py-3 rounded-xl border border-aura-surface"
 								>
-									<span class="block text-2xl font-bold text-white"
+									<span class="block text-3xl md:text-2xl font-bold text-white"
 										>{formatNumber(annualHours())} h</span
 									>
 									<span class="text-xs text-aura-muted">regagnées / an</span>
 								</div>
-								<p class="text-xs text-aura-accent italic mt-2">
+								<p class="text-sm md:text-xs text-aura-accent italic">
 									Soit l'équivalent de <span class="font-bold text-white"
 										>{fullTimeEquivalent()}</span
 									> employés à temps plein "gagnés".
@@ -561,7 +568,7 @@
 			<div class="space-y-24">
             {#each projects as project, i}
                 <!-- Project Card (Alternating Layout) -->
-                <a href={project.slug === 'meca-services' ? '/projects/meca-services' : `/projets/${project.slug}`} class="block group">
+                <a href={`/projects/${project.slug}`} class="block group">
                     <div class="grid md:grid-cols-2 gap-12 items-center reveal-on-scroll" use:reveal>
 
                         <!-- Image Column -->
@@ -579,10 +586,10 @@
 
                         <!-- Text Column -->
                         <div class="space-y-6 {i % 2 !== 0 ? 'md:text-right md:order-1' : ''}">
-                            <div class="flex gap-3 {i % 2 !== 0 ? 'md:justify-end' : ''}">
+                            <div class="flex flex-wrap gap-3 {i % 2 !== 0 ? 'md:justify-end' : ''}">
                                 {#each project.tags as tag}
                                     <span
-                                        class="px-3 py-1 rounded-full border border-aura-surface text-xs text-aura-muted uppercase tracking-wider group-hover:text-white group-hover:border-aura-accent/30 transition-colors"
+                                        class="px-3 py-1 rounded-full border border-aura-surface text-xs uppercase tracking-wider transition-colors text-center whitespace-nowrap {tag === 'Refonte Totale' || tag === 'Cofondateur' ? 'text-aura-accent border-aura-accent/50' : 'text-aura-muted group-hover:text-white group-hover:border-aura-accent/30'}"
                                         >{tag}</span
                                     >
                                 {/each}

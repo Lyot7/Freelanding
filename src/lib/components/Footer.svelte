@@ -52,11 +52,13 @@
 		<div
 			class="{isRendezVousPage
 				? 'pt-8'
-				: 'pt-20'} text-xs text-aura-muted flex flex-col md:flex-row justify-center gap-8"
+				: 'pt-20'} text-xs text-aura-muted flex flex-col items-center gap-3 md:flex-row md:justify-center md:gap-8"
 		>
 			<span>&copy; {new Date().getFullYear()} Eliott Bouquerel</span>
-			<a href="/mentions-legales" class="hover:text-white transition-colors">Mentions Légales</a>
-			<a href="/cgv" class="hover:text-white transition-colors">CGV</a>
+			<div class="flex gap-6">
+				<a href="/mentions-legales" class="hover:text-white transition-colors">Mentions Légales</a>
+				<a href="/cgv" class="hover:text-white transition-colors">CGV</a>
+			</div>
 		</div>
 	</div>
 </footer>

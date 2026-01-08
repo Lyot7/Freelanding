@@ -27,6 +27,9 @@ vite.config.ts.timestamp-*
 # package-lock.json # Uncomment if you want to strictly enforce Bun and ignore npm lockfiles
 # yarn.lock
 
+# Playwright MCP
+.playwright-mcp
+
 # Editor directories and files
 .idea
 .vscode/*
