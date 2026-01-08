@@ -122,33 +122,40 @@ input[type='range']::-moz-range-track {
 }
 
 /* Animations */
-@keyframes fadeUp {
-	from {
+/* Animations */
+@media (min-width: 768px) {
+	.reveal-on-scroll {
 		opacity: 0;
 		transform: translateY(30px);
+		transition: all 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+		will-change: opacity, transform;
 	}
 
-	to {
+	.reveal-visible {
 		opacity: 1;
 		transform: translateY(0);
 	}
+
+	/* Optional stagger delays if not handled by JS */
+	.delay-100 {
+		transition-delay: 0.1s;
+	}
+
+	.delay-200 {
+		transition-delay: 0.2s;
+	}
+
+	.delay-300 {
+		transition-delay: 0.3s;
+	}
 }
 
-.animate-fade-up {
-	animation: fadeUp 0.8s ease-out forwards;
-	opacity: 0;
-}
-
-.delay-100 {
-	animation-delay: 0.1s;
-}
-
-.delay-200 {
-	animation-delay: 0.2s;
-}
-
-.delay-300 {
-	animation-delay: 0.3s;
+/* On mobile, ensure they are visible by default if the class is applied */
+@media (max-width: 767px) {
+	.reveal-on-scroll {
+		opacity: 1;
+		transform: none;
+	}
 }
 
 /* Material Symbols */

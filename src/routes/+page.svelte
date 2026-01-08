@@ -2,6 +2,19 @@
 	import { onMount } from 'svelte';
 	import Button from '$lib/components/Button.svelte';
 	import SectionTitle from '$lib/components/SectionTitle.svelte';
+	import Skeleton from '$lib/components/Skeleton.svelte';
+	import { reveal } from '$lib/actions/reveal';
+
+	// Loading state
+	let loaded = $state(false);
+
+	onMount(() => {
+		// Simulate resource loading for a smooth "pop" after initial render
+		// This ensures icons and fonts are ready before we show them
+		setTimeout(() => {
+			loaded = true;
+		}, 800);
+	});
 
 	// Simulator state
 	let employees = $state(10);
@@ -156,14 +169,19 @@
 
 		<div class="max-w-7xl mx-auto w-full grid lg:grid-cols-12 gap-10 lg:gap-16 items-center z-10">
 			<!-- Left Content -->
-			<div class="lg:col-span-7 space-y-8 md:space-y-10 animate-fade-up">
+			<div class="lg:col-span-7 space-y-8 md:space-y-10 reveal-on-scroll" use:reveal>
 				<div
 					class="hidden md:inline-flex items-center gap-2 px-3 py-1 rounded-full border border-aura-surface bg-aura-card/50"
 				>
-					<span class="material-symbols-outlined text-[16px] text-aura-accent">verified</span>
-					<span class="text-xs uppercase tracking-widest text-aura-muted"
-						>Manager de projet Web</span
-					>
+					{#if !loaded}
+						<Skeleton width="16px" height="16px" variant="circular" />
+						<Skeleton width="150px" height="12px" />
+					{:else}
+						<span class="material-symbols-outlined text-[16px] text-aura-accent">verified</span>
+						<span class="text-xs uppercase tracking-widest text-aura-muted"
+							>Manager de projet Web</span
+						>
+					{/if}
 				</div>
 
 				<h1 class="text-5xl md:text-7xl font-serif leading-[1.05]">
@@ -176,14 +194,19 @@
 				</p>
 
 				<div class="flex flex-col sm:flex-row gap-4 md:gap-5 pt-4">
-					<Button href="#simulator" variant="primary">
-						Simuler mes gains
-						<span class="material-symbols-outlined ml-2 text-sm transition-transform group-hover:translate-x-1">payments</span>
-					</Button>
-					<Button href="/rendez-vous" variant="secondary">
-						Prendre rendez-vous
-						<span class="material-symbols-outlined text-sm">calendar_today</span>
-					</Button>
+					{#if !loaded}
+						<Skeleton width="180px" height="48px" className="rounded-xl" />
+						<Skeleton width="220px" height="48px" className="rounded-xl" />
+					{:else}
+						<Button href="#simulator" variant="primary">
+							Simuler mes gains
+							<span class="material-symbols-outlined ml-2 text-sm transition-transform group-hover:translate-x-1">payments</span>
+						</Button>
+						<Button href="/rendez-vous" variant="secondary">
+							Prendre rendez-vous
+							<span class="material-symbols-outlined text-sm">calendar_today</span>
+						</Button>
+					{/if}
 				</div>
 
 				<!-- Social Proof Mini -->
@@ -206,20 +229,31 @@
 						/>
 					</div>
 					<div class="text-sm">
-						<div class="flex text-aura-gold text-[12px]">
-							<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
-							<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
-							<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
-							<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
-							<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
-						</div>
-						<span class="text-aura-muted">Approuvé par +20 leaders tech</span>
+						{#if !loaded}
+							<div class="flex gap-1 mb-1">
+								<Skeleton width="16px" height="16px" variant="circular" />
+								<Skeleton width="16px" height="16px" variant="circular" />
+								<Skeleton width="16px" height="16px" variant="circular" />
+								<Skeleton width="16px" height="16px" variant="circular" />
+								<Skeleton width="16px" height="16px" variant="circular" />
+							</div>
+							<Skeleton width="120px" height="12px" />
+						{:else}
+							<div class="flex text-aura-gold text-[12px]">
+								<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+								<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+								<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+								<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+								<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+							</div>
+							<span class="text-aura-muted">Approuvé par +20 leaders tech</span>
+						{/if}
 					</div>
 				</div>
 			</div>
 
 			<!-- Right Visual (Hero Image) -->
-			<div class="lg:col-span-5 relative animate-fade-up delay-200 max-w-xs md:max-w-md mx-auto lg:max-w-none w-full">
+			<div class="lg:col-span-5 relative reveal-on-scroll delay-200 max-w-xs md:max-w-md mx-auto lg:max-w-none w-full" use:reveal={{ delay: 200 }}>
 				<div
 					class="md:hidden inline-flex items-center gap-2 px-3 py-1 rounded-full border border-aura-surface bg-aura-card/50 mb-6"
 				>
@@ -250,15 +284,25 @@
 								<p class="font-serif text-lg leading-tight">Infrastructure E-commerce</p>
 							</div>
 							<span class="bg-aura-surface p-2 rounded-full text-aura-accent">
-								<span class="material-symbols-outlined">store</span>
+								{#if !loaded}
+									<Skeleton width="20px" height="20px" variant="circular" />
+								{:else}
+									<span class="material-symbols-outlined">store</span>
+								{/if}
 							</span>
 						</div>
 						<div class="mt-3 flex items-center gap-2 text-sm text-aura-muted">
-							<span class="flex items-center text-aura-accent"
-								><span class="material-symbols-outlined text-[16px] mr-1">speed</span> -80% Temps gestion</span
-							>
-							<span class="w-1 h-1 rounded-full bg-aura-surface"></span>
-							<span>Refonte Totale</span>
+							{#if !loaded}
+								<Skeleton width="100px" height="16px" />
+								<span class="w-1 h-1 rounded-full bg-aura-surface"></span>
+								<Skeleton width="80px" height="16px" />
+							{:else}
+								<span class="flex items-center text-aura-accent"
+									><span class="material-symbols-outlined text-[16px] mr-1">speed</span> -80% Temps gestion</span
+								>
+								<span class="w-1 h-1 rounded-full bg-aura-surface"></span>
+								<span>Refonte Totale</span>
+							{/if}
 						</div>
 					</div>
 				</div>
@@ -273,7 +317,8 @@
 		<div class="grid md:grid-cols-3 gap-6">
 			<!-- Card 1 -->
 			<div
-				class="aura-card bg-aura-card p-10 rounded-[32px] border border-aura-surface relative overflow-hidden group"
+				class="reveal-on-scroll aura-card bg-aura-card p-10 rounded-[32px] border border-aura-surface relative overflow-hidden group"
+				use:reveal={{ delay: 100 }}
 			>
 				<div
 					class="absolute top-0 right-0 opacity-10 group-hover:opacity-15 transition-opacity pointer-events-none"
@@ -297,7 +342,8 @@
 
 			<!-- Card 2 -->
 			<div
-				class="aura-card bg-aura-card p-10 rounded-[32px] border border-aura-accent/30 relative overflow-hidden group shadow-[0_0_30px_rgba(111,240,211,0.05)]"
+				class="reveal-on-scroll aura-card bg-aura-card p-10 rounded-[32px] border border-aura-accent/30 relative overflow-hidden group shadow-[0_0_30px_rgba(111,240,211,0.05)]"
+				use:reveal={{ delay: 200 }}
 			>
 				<div
 					class="absolute top-0 right-0 opacity-10 group-hover:opacity-15 transition-opacity pointer-events-none"
@@ -321,7 +367,8 @@
 
 			<!-- Card 3 -->
 			<div
-				class="aura-card bg-aura-card p-10 rounded-[32px] border border-aura-surface relative overflow-hidden group"
+				class="reveal-on-scroll aura-card bg-aura-card p-10 rounded-[32px] border border-aura-surface relative overflow-hidden group"
+				use:reveal={{ delay: 300 }}
 			>
 				<div
 					class="absolute top-0 right-0 opacity-10 group-hover:opacity-15 transition-opacity pointer-events-none"
@@ -350,7 +397,7 @@
 		<div class="max-w-6xl mx-auto px-6 relative z-10">
 			<div class="grid lg:grid-cols-12 gap-12 items-center">
 				<!-- Text Area -->
-				<div class="lg:col-span-4">
+				<div class="lg:col-span-4 reveal-on-scroll" use:reveal>
 					<span class="text-aura-accent text-sm font-semibold tracking-widest uppercase mb-2 block"
 						>Projection Réelle</span
 					>
@@ -381,7 +428,7 @@
 				</div>
 
 				<!-- Calculator Interface -->
-				<div class="lg:col-span-8">
+				<div class="lg:col-span-8 reveal-on-scroll" use:reveal={{ delay: 200 }}>
 					<div
 						class="bg-aura-card border border-aura-surface p-8 md:p-12 rounded-[40px] shadow-2xl backdrop-blur-sm"
 					>
@@ -498,7 +545,7 @@
 
 		<div class="space-y-24">
 			<!-- Project 1 (Left Aligned) -->
-			<div class="grid md:grid-cols-2 gap-12 items-center group">
+			<div class="grid md:grid-cols-2 gap-12 items-center group reveal-on-scroll" use:reveal>
 				<div
 					class="relative rounded-3xl overflow-hidden aspect-[4/3] border border-aura-surface group-hover:border-aura-accent/50 transition-colors"
 				>
@@ -541,7 +588,7 @@
 			</div>
 
 			<!-- Project 2 (Right Aligned) -->
-			<div class="grid md:grid-cols-2 gap-12 items-center group">
+			<div class="grid md:grid-cols-2 gap-12 items-center group reveal-on-scroll" use:reveal>
 				<div
 					class="md:order-2 relative rounded-3xl overflow-hidden aspect-[4/3] border border-aura-surface group-hover:border-aura-accent/50 transition-colors"
 				>
@@ -591,7 +638,7 @@
 
 		<div class="grid md:grid-cols-2 gap-12 items-start">
 			<!-- Formation -->
-			<div class="space-y-8">
+			<div class="space-y-8 reveal-on-scroll" use:reveal>
 				<div class="flex items-start gap-4">
 					<div
 						class="flex-shrink-0 w-12 h-12 rounded-full bg-aura-accent/20 flex items-center justify-center"
@@ -627,7 +674,7 @@
 			</div>
 
 			<!-- Compétences & Outils -->
-			<div class="space-y-8">
+			<div class="space-y-8 reveal-on-scroll" use:reveal={{ delay: 200 }}>
 				<div>
 					<h3 class="text-xl font-serif mb-6">Stack Technique</h3>
 					<div class="space-y-4">
@@ -786,7 +833,7 @@
 
 	<!-- Testimonial -->
 	<section class="py-16 md:py-24 bg-aura-card border-y border-aura-surface relative">
-		<div class="max-w-4xl mx-auto px-6 text-center relative z-10">
+		<div class="max-w-4xl mx-auto px-6 text-center relative z-10 reveal-on-scroll" use:reveal>
 			<span class="material-symbols-outlined text-6xl text-aura-accent mb-8 opacity-50"
 				>format_quote</span
 			>
