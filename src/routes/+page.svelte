@@ -4,6 +4,7 @@
 	import SectionTitle from '$lib/components/SectionTitle.svelte';
 	import Skeleton from '$lib/components/Skeleton.svelte';
 	import { reveal } from '$lib/actions/reveal';
+    import { projects } from '$lib/data/projects';
 
 	// Loading state
 	let loaded = $state(false);
@@ -146,12 +147,27 @@
 </style>
 
 <svelte:head>
-	<title>Eliott B. - Manager de projet Web | Code & IA</title>
-	<meta
-		content="Maximisez votre productivité par le Web & l'IA. Manager de projet Web pour vos leviers de performance : visibilité, automatisation et outils sur-mesure."
-	>
-	
-	<!-- Favicons -->
+	<title>Eliott B. - Architecture Web & Stratégie IA | Freelance</title>
+	<meta 
+		name="description" 
+		content="Ne construisez pas juste un site, bâtissez votre avantage compétitif. Expert en architecture web moderne et automatisation IA pour maximiser votre rentabilité et votre croissance." 
+	/>
+	<meta name="keywords" content="Freelance Web, SvelteKit, Intelligence Artificielle, Automatisation, Architecture Web, Performance, SEO, Rentabilité" />
+	<link rel="canonical" href="https://eliott-bouquerel.fr" />
+
+	<!-- Open Graph / Facebook -->
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://eliott-bouquerel.fr/" />
+	<meta property="og:title" content="Eliott B. - Architecture Web & Stratégie IA" />
+	<meta property="og:description" content="Développeur & Stratège. Je conçois l'infrastructure numérique invisible qui porte votre croissance. Web performant & Agents IA." />
+	<meta property="og:image" content="https://eliott-bouquerel.fr/og-image.jpg" />
+
+	<!-- Twitter -->
+	<meta property="twitter:card" content="summary_large_image" />
+	<meta property="twitter:url" content="https://eliott-bouquerel.fr/" />
+	<meta property="twitter:title" content="Eliott B. - Architecture Web & Stratégie IA" />
+	<meta property="twitter:description" content="Développeur & Stratège. Je conçois l'infrastructure numérique invisible qui porte votre croissance." />
+	<meta property="twitter:image" content="https://eliott-bouquerel.fr/og-image.jpg" />
 </svelte:head>
 
 <!-- Hero Section -->
@@ -543,91 +559,57 @@
 		</div>
 
 		<div class="space-y-24">
-			<!-- Project 1 (Left Aligned) -->
-			<div class="grid md:grid-cols-2 gap-12 items-center group reveal-on-scroll" use:reveal>
-				<div
-					class="relative rounded-3xl overflow-hidden aspect-[4/3] border border-aura-surface group-hover:border-aura-accent/50 transition-colors"
-				>
-					<img
-						src="/mockup-mecaservices.png"
-						class="w-full h-full object-cover transition-transform duration-700"
-						alt="Dashboard e-commerce MECA SERVICES"
-					/>
-					<div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors">
-					</div>
-				</div>
-				<div class="space-y-6">
-					<div class="flex gap-3">
-						<span
-							class="px-3 py-1 rounded-full border border-aura-surface text-xs text-aura-muted uppercase tracking-wider"
-							>Infrastructure e-commerce</span
-						>
-						<span
-							class="px-3 py-1 rounded-full border border-aura-surface text-xs text-aura-accent uppercase tracking-wider"
-							>Refonte Totale</span
-						>
-					</div>
-					<h3 class="text-3xl font-serif">MECA SERVICES</h3>
-					<p class="text-aura-muted leading-relaxed">
-						Migration d'une boutique e-commerce vieillissante vers une solution moderne et évolutive.
-						Transformation complète de l'expérience client et des outils de gestion avec une interface
-						simplifiée et intuitive.
-					</p>
-					<div class="grid grid-cols-2 gap-4 border-t border-aura-surface pt-6">
-						<div>
-							<span class="block text-2xl font-serif text-white">-80%</span>
-							<span class="text-xs text-aura-muted">Temps de gestion du site</span>
-						</div>
-						<div>
-							<span class="block text-2xl font-serif text-white">x3</span>
-							<span class="text-xs text-aura-muted">Satisfaction client</span>
-						</div>
-					</div>
-				</div>
-			</div>
+            {#each projects as project, i}
+                <!-- Project Card (Alternating Layout) -->
+                <a href="/projets/{project.slug}" class="block group">
+                    <div class="grid md:grid-cols-2 gap-12 items-center reveal-on-scroll" use:reveal>
+                        
+                        <!-- Image Column -->
+                        <div
+                            class="relative rounded-3xl overflow-hidden aspect-[4/3] border border-aura-surface group-hover:border-aura-accent/50 transition-all duration-500 group-hover:shadow-[0_0_30px_rgba(111,240,211,0.1)] {i % 2 !== 0 ? 'md:order-2' : ''}"
+                        >
+                            <img
+                                src={project.thumbnail}
+                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                alt={project.title}
+                            />
+                            <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors">
+                            </div>
+                        </div>
 
-			<!-- Project 2 (Right Aligned) -->
-			<div class="grid md:grid-cols-2 gap-12 items-center group reveal-on-scroll" use:reveal>
-				<div
-					class="md:order-2 relative rounded-3xl overflow-hidden aspect-[4/3] border border-aura-surface group-hover:border-aura-accent/50 transition-colors"
-				>
-					<img
-						src="/mockup-kpsull.png"
-						class="w-full h-full object-cover transition-transform duration-700"
-						alt="KPSULL Marketplace"
-					/>
-					<div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors">
-					</div>
-				</div>
-				<div class="md:order-1 space-y-6 md:text-right">
-					<div class="flex gap-3 md:justify-end">
-						<span
-							class="px-3 py-1 rounded-full border border-aura-surface text-xs text-aura-muted uppercase tracking-wider"
-							>Marketplace</span
-						>
-						<span
-							class="px-3 py-1 rounded-full border border-aura-surface text-xs text-aura-accent uppercase tracking-wider"
-							>Cofondateur</span
-						>
-					</div>
-					<h3 class="text-3xl font-serif">KPSULL</h3>
-					<p class="text-aura-muted leading-relaxed">
-						Création d'une marketplace dédiée aux créateurs de mode pour simplifier la mise en vente
-						de leurs pièces. Plateforme complète permettant aux créateurs de gérer leurs collections,
-						leurs ventes et leur visibilité en ligne.
-					</p>
-					<div class="grid grid-cols-2 gap-4 border-t border-aura-surface pt-6 md:justify-items-end">
-						<div>
-							<span class="block text-2xl font-serif text-white">100%</span>
-							<span class="text-xs text-aura-muted">Autonome</span>
-						</div>
-						<div>
-							<span class="block text-2xl font-serif text-white">0</span>
-							<span class="text-xs text-aura-muted">Frais cachés</span>
-						</div>
-					</div>
-				</div>
-			</div>
+                        <!-- Text Column -->
+                        <div class="space-y-6 {i % 2 !== 0 ? 'md:text-right md:order-1' : ''}">
+                            <div class="flex gap-3 {i % 2 !== 0 ? 'md:justify-end' : ''}">
+                                {#each project.tags as tag}
+                                    <span
+                                        class="px-3 py-1 rounded-full border border-aura-surface text-xs text-aura-muted uppercase tracking-wider group-hover:text-white group-hover:border-aura-accent/30 transition-colors"
+                                        >{tag}</span
+                                    >
+                                {/each}
+                            </div>
+                            
+                            <div>
+                                <h3 class="text-3xl font-serif mb-2 group-hover:text-aura-accent transition-colors duration-300">{project.title}</h3>
+                                <p class="text-xs text-aura-muted">{project.subtitle}</p>
+                            </div>
+
+                            <p class="text-aura-muted leading-relaxed">
+                                {project.description}
+                            </p>
+                            
+                            <!-- KPI Miniatures -->
+                            <div class="grid grid-cols-2 gap-4 border-t border-aura-surface pt-6 {i % 2 !== 0 ? 'md:justify-items-end' : ''}">
+                                {#each project.results.slice(0, 2) as result}
+                                    <div>
+                                        <span class="block text-2xl font-serif text-white">{result.value}</span>
+                                        <span class="text-xs text-aura-muted">{result.label}</span>
+                                    </div>
+                                {/each}
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            {/each}
 		</div>
 	</section>
 
