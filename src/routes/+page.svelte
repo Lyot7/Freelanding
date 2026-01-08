@@ -201,7 +201,7 @@
 				</div>
 
 				<h1 class="text-4xl md:text-6xl font-serif leading-[1.05]">
-					Ne construisez pas juste un site, <span class="text-aura-accent">bâtissez votre <span class="italic">avantage compétitif</span></span>.
+					Ne construisez pas juste un site, <span class="text-aura-accent italic">bâtissez votre avantage compétitif</span>.
 				</h1>
 
 				<p class="text-lg md:text-xl text-aura-muted font-light max-w-2xl leading-relaxed">
@@ -558,12 +558,12 @@
 			</div>
 		</div>
 
-		<div class="space-y-24">
+			<div class="space-y-24">
             {#each projects as project, i}
                 <!-- Project Card (Alternating Layout) -->
-                <a href="/projets/{project.slug}" class="block group">
+                <a href={project.slug === 'meca-services' ? '/projects/meca-services' : `/projets/${project.slug}`} class="block group">
                     <div class="grid md:grid-cols-2 gap-12 items-center reveal-on-scroll" use:reveal>
-                        
+
                         <!-- Image Column -->
                         <div
                             class="relative rounded-3xl overflow-hidden aspect-[4/3] border border-aura-surface group-hover:border-aura-accent/50 transition-all duration-500 group-hover:shadow-[0_0_30px_rgba(111,240,211,0.1)] {i % 2 !== 0 ? 'md:order-2' : ''}"
@@ -587,7 +587,7 @@
                                     >
                                 {/each}
                             </div>
-                            
+
                             <div>
                                 <h3 class="text-3xl font-serif mb-2 group-hover:text-aura-accent transition-colors duration-300">{project.title}</h3>
                                 <p class="text-xs text-aura-muted">{project.subtitle}</p>
@@ -596,7 +596,7 @@
                             <p class="text-aura-muted leading-relaxed">
                                 {project.description}
                             </p>
-                            
+
                             <!-- KPI Miniatures -->
                             <div class="grid grid-cols-2 gap-4 border-t border-aura-surface pt-6 {i % 2 !== 0 ? 'md:justify-items-end' : ''}">
                                 {#each project.results.slice(0, 2) as result}
