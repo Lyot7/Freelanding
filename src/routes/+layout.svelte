@@ -1,9 +1,16 @@
 <script lang="ts">
+	import { afterNavigate } from '$app/navigation';
+	import { tick } from 'svelte';
 	import '../app.css';
     import Navbar from '$lib/components/Navbar.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 
 	let { children } = $props();
+
+	afterNavigate(async () => {
+		await tick();
+		window.scrollTo({ top: 0, behavior: 'instant' });
+	});
 </script>
 
 <svelte:head>
