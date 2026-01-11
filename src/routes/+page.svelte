@@ -568,20 +568,23 @@
 			<div class="space-y-24">
             {#each projects as project, i}
                 <!-- Project Card (Alternating Layout) -->
-                <a href={`/projects/${project.slug}`} class="block group">
+                <div class="block group">
                     <div class="grid md:grid-cols-2 gap-12 items-center reveal-on-scroll" use:reveal>
 
                         <!-- Image Column -->
-                        <div
-                            class="relative rounded-3xl overflow-hidden aspect-[4/3] border border-aura-surface group-hover:border-aura-accent/50 transition-all duration-500 group-hover:shadow-[0_0_30px_rgba(111,240,211,0.1)] {i % 2 !== 0 ? 'md:order-2' : ''}"
-                        >
-                            <img
-                                src={project.thumbnail}
-                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                alt={project.title}
-                            />
-                            <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors">
-                            </div>
+                        <div class="{i % 2 !== 0 ? 'md:order-2' : ''}">
+                            <a 
+                                href={`/projects/${project.slug}`}
+                                class="block relative rounded-3xl overflow-hidden aspect-[4/3] border border-aura-surface"
+                            >
+                                <img
+                                    src={project.thumbnail}
+                                    class="w-full h-full object-cover"
+                                    alt={project.title}
+                                />
+                                <div class="absolute inset-0 bg-black/20">
+                                </div>
+                            </a>
                         </div>
 
                         <!-- Text Column -->
@@ -596,7 +599,9 @@
                             </div>
 
                             <div>
-                                <h3 class="text-3xl font-serif mb-2 group-hover:text-aura-accent transition-colors duration-300">{project.title}</h3>
+                                <a href={`/projects/${project.slug}`} class="inline-block hover:text-aura-accent transition-colors">
+                                    <h3 class="text-3xl font-serif mb-2 group-hover:text-aura-accent transition-colors duration-300">{project.title}</h3>
+                                </a>
                                 <p class="text-xs text-aura-muted">{project.subtitle}</p>
                             </div>
 
@@ -613,9 +618,17 @@
                                     </div>
                                 {/each}
                             </div>
+
+                            <!-- Action Button -->
+                            <div class="pt-2 {i % 2 !== 0 ? 'flex justify-end' : ''}">
+                                <Button href={`/projects/${project.slug}`} variant="primary">
+                                    Voir le projet
+                                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                                </Button>
+                            </div>
                         </div>
                     </div>
-                </a>
+                </div>
             {/each}
 		</div>
 	</section>
