@@ -43,9 +43,8 @@ export const projects: Project[] = [
         solution:
             "J'ai conçu une architecture **Headless** séparant le frontend (SvelteKit) du backend. Mise en place d'un pipeline de synchronisation automatisé pour les stocks. Refonte totale de l'UX pour simplifier le tunnel de commande B2B.",
         results: [
-            { label: 'Temps de gestion', value: '-80%', icon: 'speed' },
-            { label: 'Satisfaction client', value: 'x3', icon: 'thumb_up' },
-            { label: 'Vitesse de chargement', value: '0.8s', icon: 'timer' }
+            { label: 'Temps de gestion', value: '-70%', icon: 'speed' },
+            { label: 'Experience utilisateur', value: 'x10', icon: 'thumb_up' }
         ],
         stack: [
             { name: 'SvelteKit', icon: 'https://cdn.simpleicons.org/svelte/white' },

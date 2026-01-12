@@ -105,22 +105,14 @@
 			</p>
 
 			<!-- Key Metrics -->
-			<div class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-aura-surface">
+			<div class="grid grid-cols-2 gap-4 pt-4 border-t border-aura-surface">
 				<div>
-					<span class="block text-2xl md:text-3xl font-serif text-aura-accent">-80%</span>
+					<span class="block text-2xl md:text-3xl font-serif text-aura-accent">-70%</span>
 					<span class="text-xs text-aura-muted">Temps de gestion</span>
 				</div>
 				<div>
-					<span class="block text-2xl md:text-3xl font-serif text-white">1.3M+</span>
-					<span class="text-xs text-aura-muted">Produits geres</span>
-				</div>
-				<div>
-					<span class="block text-2xl md:text-3xl font-serif text-white">A</span>
-					<span class="text-xs text-aura-muted">Note RGAA</span>
-				</div>
-				<div>
-					<span class="block text-2xl md:text-3xl font-serif text-aura-gold">95+</span>
-					<span class="text-xs text-aura-muted">Score Lighthouse</span>
+					<span class="block text-2xl md:text-3xl font-serif text-white">x10</span>
+					<span class="text-xs text-aura-muted">Experience utilisateur</span>
 				</div>
 			</div>
 		</div>
