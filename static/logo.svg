@@ -1,5 +1,12 @@
-<svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="356 80 600 600" preserveAspectRatio="xMidYMid meet">
-<g transform="translate(0.000000,768.000000) scale(0.100000,-0.100000)" fill="#6FF0D3" stroke="none">
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
+ "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+ width="1024" height="621" viewBox="398 224 516 313"
+ preserveAspectRatio="xMidYMid meet">
+
+<g transform="translate(0.000000,768.000000) scale(0.100000,-0.100000)"
+ fill="#6FF0D3" stroke="none">
 <path d="m6710 5406 c0 -3 -16 -64 -36 -138 -19 -73 -49 -187 -65 -253 -55 -220
  -43 -195 -95 -195 -42 0 -45 2 -39 21 4 12 8 69 8 128 1 89 -2 113 -19 146
  -28 54 -85 92 -175 117 -67 20 -106 22 -436 26 l-361 4 -17 -59 c-28 -98 -43
@@ -41,9 +48,6 @@
  254 -54 483 -119 212 -61 355 -91 517 -112 313 -39 587 14 806 158 l76 49 -36
  -44 c-68 -83 -209 -187 -313 -231 -125 -52 -200 -68 -360 -73 -256 -9 -408 19
  -827 156 -394 129 -582 170 -786 172 -120 0 -114 8 30 39 107 23 283 25 410 5z
- 74 16 178 120 197 198 8 35 21 35 29 -2z"></path>
+ 74 16 178 120 197 198 8 35 21 35 29 -2z"/>
 </g>
-<style>@media (prefers-color-scheme: light) { :root { filter: contrast(1) brightness(0.8); } }
-@media (prefers-color-scheme: dark) { :root { filter: none; } }
-</style>
 </svg>
