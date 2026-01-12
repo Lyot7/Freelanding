@@ -592,7 +592,7 @@
                             <div class="flex flex-wrap gap-3 {i % 2 !== 0 ? 'md:justify-end' : ''}">
                                 {#each project.tags as tag}
                                     <span
-                                        class="px-3 py-1 rounded-full border border-aura-surface text-xs uppercase tracking-wider transition-colors text-center whitespace-nowrap {tag === 'Refonte Totale' || tag === 'Cofondateur' ? 'text-aura-accent border-aura-accent/50' : 'text-aura-muted group-hover:text-white group-hover:border-aura-accent/30'}"
+                                        class="px-3 py-1 rounded-full border border-aura-surface text-xs uppercase tracking-wider text-center whitespace-nowrap {tag === 'Refonte Totale' || tag === 'Cofondateur' ? 'text-aura-accent border-aura-accent/50' : 'text-aura-muted'}"
                                         >{tag}</span
                                     >
                                 {/each}
