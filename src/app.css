@@ -122,19 +122,16 @@ input[type='range']::-moz-range-track {
 	box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
 }
 
-/* Animations */
-/* Animations */
+/* Animations - Opacity only to avoid CLS (no transform) */
 @media (min-width: 768px) {
 	.reveal-on-scroll {
 		opacity: 0;
-		transform: translateY(30px);
-		transition: all 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
-		will-change: opacity, transform;
+		transition: opacity 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+		will-change: opacity;
 	}
 
 	.reveal-visible {
 		opacity: 1;
-		transform: translateY(0);
 	}
 
 	/* Optional stagger delays if not handled by JS */
@@ -155,11 +152,10 @@ input[type='range']::-moz-range-track {
 @media (max-width: 767px) {
 	.reveal-on-scroll {
 		opacity: 1;
-		transform: none;
 	}
 }
 
-/* Material Symbols */
+/* Material Symbols - Fixed dimensions to prevent CLS */
 .material-symbols-outlined {
 	font-family: 'Material Symbols Outlined';
 	font-weight: normal;
@@ -174,4 +170,8 @@ input[type='range']::-moz-range-track {
 	direction: ltr;
 	-webkit-font-feature-settings: 'liga';
 	-webkit-font-smoothing: antialiased;
+	/* Fixed dimensions to prevent CLS during font loading */
+	width: 1em;
+	height: 1em;
+	overflow: hidden;
 }

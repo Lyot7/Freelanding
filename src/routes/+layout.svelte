@@ -32,6 +32,15 @@
 		type="font/woff2"
 		crossorigin="anonymous"
 	/>
+	<!-- Preload Material Symbols to reduce CLS -->
+	<link
+		rel="preload"
+		href="https://fonts.gstatic.com/s/materialsymbolsoutlined/v236/kJF1BvYX7BgnkSrUwT8OhrdQw4oELdPIeeII9v6oDMzByHX9rA6RzaxHMPdY43zj-jCxv3fzvRNU22ZXGJpEpjC_1v-p_4MrImHCIJIZrDCvHeembd5zrTgt.woff2"
+		as="font"
+		type="font/woff2"
+		crossorigin="anonymous"
+	/>
+	<!-- Non-render-blocking font loading with fetchpriority="low" -->
 	<link
 		href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Instrument+Sans:wght@400;500;600;700&display=swap"
 		rel="stylesheet"
