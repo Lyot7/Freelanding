@@ -4,17 +4,28 @@
 	import SectionTitle from '$lib/components/SectionTitle.svelte';
 	import Skeleton from '$lib/components/Skeleton.svelte';
 	import { reveal } from '$lib/actions/reveal';
-    import { projects } from '$lib/data/projects';
+	import { projects } from '$lib/data/projects';
+
+	// Images optimisées
+	import myPic from '$lib/assets/images/my-pic.png?enhanced';
+	import jeromeDavy from '$lib/assets/images/jerome-davy.png?enhanced';
+	import mockupMeca from '$lib/assets/images/mockup-mecaservices.png?enhanced';
+	import mockupKpsull from '$lib/assets/images/mockup-kpsull.png?enhanced';
+
+	// Mapping des images de projets par slug
+	const projectImages: Record<string, typeof mockupMeca> = {
+		'meca-services': mockupMeca,
+		'kpsull': mockupKpsull
+	};
 
 	// Loading state
 	let loaded = $state(false);
 
 	onMount(() => {
-		// Simulate resource loading for a smooth "pop" after initial render
-		// This ensures icons and fonts are ready before we show them
+		// Short delay for fonts to load, optimized for LCP
 		setTimeout(() => {
 			loaded = true;
-		}, 800);
+		}, 100);
 	});
 
 	// Simulator state
@@ -227,10 +238,11 @@
 				<!-- Social Proof Mini -->
 				<div class="flex items-center gap-4 pt-6 border-t border-aura-surface/50">
 					<div class="flex -space-x-3">
-						<img
-							src="/jerome-davy.png"
+						<enhanced:img
+							src={jeromeDavy}
 							class="w-10 h-10 rounded-full border-2 border-aura-bg object-cover"
 							alt="Jérôme DAVY"
+							loading="lazy"
 						/>
 						<img
 							src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=faces"
@@ -267,16 +279,17 @@
 				</div>
 			</div>
 
-			<!-- Right Visual (Hero Image) -->
-			<div class="lg:col-span-5 relative reveal-on-scroll delay-200 max-w-xs md:max-w-md mx-auto lg:max-w-none w-full" use:reveal={{ delay: 200 }}>
+			<!-- Right Visual (Hero Image) - No animation delay for LCP optimization -->
+			<div class="lg:col-span-5 relative max-w-xs md:max-w-md mx-auto lg:max-w-none w-full">
                 <div
 					class="relative w-full aspect-[3/4] rounded-t-[100px] rounded-b-[30px] overflow-hidden border border-aura-surface"
 				>
 					<!-- Image Placeholder for Eliott -->
-					<img
-						src="/my-pic.png"
+					<enhanced:img
+						src={myPic}
 						alt="Eliott Bouquerel"
 						class="w-full h-full object-cover"
+						fetchpriority="high"
 					/>
 
 					<!-- Title Badge (Mobile/Tablet only) -->
@@ -458,54 +471,57 @@
 						<div class="grid md:grid-cols-2 gap-x-12 gap-y-10 mb-12">
 							<div class="space-y-4">
 								<div class="flex justify-between items-baseline">
-									<label class="text-sm font-medium text-aura-muted">Effectif concerné</label>
+									<label for="employees-slider" class="text-sm font-medium text-aura-muted">Effectif concerné</label>
 									<span class="text-2xl font-serif text-white">{employees}</span>
 								</div>
 								<div class="slider-wrapper" style="--progress: {(employees - 1) / (100 - 1) * 100}%">
-									<input 
-										type="range" 
-										bind:value={employees} 
-										min="1" 
-										max="100" 
-										step="1" 
+									<input
+										id="employees-slider"
+										type="range"
+										bind:value={employees}
+										min="1"
+										max="100"
+										step="1"
 										class="w-full"
+										aria-label="Effectif concerné"
 									/>
 								</div>
 							</div>
 
 							<div class="space-y-4">
 								<div class="flex justify-between items-baseline">
-									<label class="text-sm font-medium text-aura-muted">Salaire moyen charge /mois</label
-									>
-									<span class="text-2xl font-serif text-white">{salary} €</span>
+									<label for="salary-slider" class="text-sm font-medium text-aura-muted">Salaire moyen charge /mois</label>
+								<span class="text-2xl font-serif text-white">{salary} €</span>
 								</div>
 								<div class="slider-wrapper" style="--progress: {(salary - 2000) / (10000 - 2000) * 100}%">
-									<input 
-										type="range" 
-										bind:value={salary} 
-										min="2000" 
-										max="10000" 
-										step="100" 
+									<input
+										id="salary-slider"
+										type="range"
+										bind:value={salary}
+										min="2000"
+										max="10000"
+										step="100"
 										class="w-full"
+										aria-label="Salaire moyen chargé par mois"
 									/>
 								</div>
 							</div>
 
 							<div class="space-y-4 md:col-span-2">
 								<div class="flex justify-between items-baseline">
-									<label class="text-sm font-medium text-aura-muted"
-										>Heures automatisables /semaine /pers</label
-									>
+									<label for="hours-slider" class="text-sm font-medium text-aura-muted">Heures automatisables /semaine /pers</label>
 									<span class="text-2xl font-serif text-white text-aura-accent">{hours} h</span>
 								</div>
 								<div class="slider-wrapper" style="--progress: {(hours - 1) / (20 - 1) * 100}%">
-									<input 
-										type="range" 
-										bind:value={hours} 
-										min="1" 
-										max="20" 
-										step="0.5" 
+									<input
+										id="hours-slider"
+										type="range"
+										bind:value={hours}
+										min="1"
+										max="20"
+										step="0.5"
 										class="w-full"
+										aria-label="Heures automatisables par semaine par personne"
 									/>
 								</div>
 								<p class="text-xs text-aura-muted mt-1">
@@ -573,14 +589,16 @@
 
                         <!-- Image Column -->
                         <div class="{i % 2 !== 0 ? 'md:order-2' : ''}">
-                            <a 
+                            <a
                                 href={`/projects/${project.slug}`}
                                 class="block relative rounded-3xl overflow-hidden aspect-[4/3] border border-aura-surface"
+                                aria-label={`Voir le projet ${project.title}`}
                             >
-                                <img
-                                    src={project.thumbnail}
+                                <enhanced:img
+                                    src={projectImages[project.slug]}
                                     class="w-full h-full object-cover"
                                     alt={project.title}
+                                    loading="lazy"
                                 />
                                 <div class="absolute inset-0 bg-black/20">
                                 </div>
@@ -846,10 +864,11 @@
 			</blockquote>
 
 			<div class="flex flex-col items-center justify-center gap-4">
-				<img
-					src="/jerome-davy.png"
+				<enhanced:img
+					src={jeromeDavy}
 					class="w-16 h-16 rounded-full object-cover border-2 border-aura-accent p-1"
 					alt="Jérôme DAVY"
+					loading="lazy"
 				/>
 				<div>
 					<div class="font-bold text-lg">Jérôme DAVY</div>

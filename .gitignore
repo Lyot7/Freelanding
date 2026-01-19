@@ -30,6 +30,11 @@ vite.config.ts.timestamp-*
 # Playwright MCP
 .playwright-mcp
 
+# Lighthouse reports
+lighthouse-report.html
+lighthouse-mobile.html
+lighthouse.json
+
 # Editor directories and files
 .idea
 .vscode/*

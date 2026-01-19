@@ -5,6 +5,10 @@
 	import { reveal } from '$lib/actions/reveal';
 	import { footerConfig } from '$lib/stores/footer';
 
+	// Images optimisées
+	import mockupMeca from '$lib/assets/images/mockup-mecaservices.png?enhanced';
+	import jeromeDavy from '$lib/assets/images/jerome-davy.png?enhanced';
+
 	let loaded = $state(false);
 
 	onMount(() => {
@@ -122,10 +126,11 @@
 			<div
 				class="relative rounded-3xl overflow-hidden aspect-[4/3] border border-aura-surface shadow-2xl"
 			>
-				<img
-					src="/mockup-mecaservices.png"
+				<enhanced:img
+					src={mockupMeca}
 					alt="Dashboard e-commerce MECA SERVICES - Interface moderne de gestion"
 					class="w-full h-full object-cover"
+					fetchpriority="high"
 				/>
 			</div>
 		</div>
@@ -619,10 +624,11 @@
 		</blockquote>
 
 		<div class="flex flex-col items-center justify-center gap-4">
-			<img
-				src="/jerome-davy.png"
+			<enhanced:img
+				src={jeromeDavy}
 				class="w-16 h-16 rounded-full object-cover border-2 border-aura-accent p-1"
 				alt="Jerome DAVY, PDG de MECA SERVICES"
+				loading="lazy"
 			/>
 			<div>
 				<div class="font-bold text-lg">Jerome DAVY</div>

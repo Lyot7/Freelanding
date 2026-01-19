@@ -5,6 +5,9 @@
 	import { reveal } from '$lib/actions/reveal';
 	import { footerConfig } from '$lib/stores/footer';
 
+	// Image optimisée
+	import mockupKpsull from '$lib/assets/images/mockup-kpsull.png?enhanced';
+
 	let loaded = $state(false);
 
 	onMount(() => {
@@ -124,10 +127,11 @@
 			<div
 				class="relative rounded-3xl overflow-hidden border border-aura-surface shadow-2xl"
 			>
-				<img
-					src="/mockup-kpsull.png"
+				<enhanced:img
+					src={mockupKpsull}
 					alt="KPSULL Marketplace"
 					class="w-full h-auto"
+					fetchpriority="high"
 				/>
 			</div>
 		</div>
