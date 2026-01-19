@@ -30,10 +30,40 @@
 <svelte:head>
 	<title>{project.title} - Case Study | Eliott B.</title>
 	<meta name="description" content="Découvrez comment {project.title} a transformé son activité : {project.description}" />
+	<link rel="canonical" href="https://eliott-bouquerel.fr/projets/{project.slug}" />
+
     <!-- OG Tags for this specific project -->
-    <meta property="og:title" content="{project.title} - Case Study" />
+    <meta property="og:title" content="{project.title} - Case Study | Eliott B." />
     <meta property="og:description" content="{project.description}" />
     <meta property="og:image" content="https://eliott-bouquerel.fr{project.heroImage}" />
+	<meta property="og:url" content="https://eliott-bouquerel.fr/projets/{project.slug}" />
+
+	<!-- Twitter Tags -->
+	<meta name="twitter:title" content="{project.title} - Case Study | Eliott B." />
+	<meta name="twitter:description" content="{project.description}" />
+	<meta name="twitter:image" content="https://eliott-bouquerel.fr{project.heroImage}" />
+
+	<!-- Structured Data (JSON-LD) -->
+	<script type="application/ld+json">
+		{
+			"@context": "https://schema.org",
+			"@type": "BreadcrumbList",
+			"itemListElement": [
+				{
+					"@type": "ListItem",
+					"position": 1,
+					"name": "Accueil",
+					"item": "https://eliott-bouquerel.fr"
+				},
+				{
+					"@type": "ListItem",
+					"position": 2,
+					"name": "{project.title}",
+					"item": "https://eliott-bouquerel.fr/projets/{project.slug}"
+				}
+			]
+		}
+	</script>
 </svelte:head>
 
 <div class="pt-32 pb-20">

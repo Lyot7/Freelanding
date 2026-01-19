@@ -25,6 +25,43 @@
 		href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
 		rel="stylesheet"
 	/>
+
+	<!-- Structured Data (JSON-LD) -->
+	<script type="application/ld+json">
+		{
+			"@context": "https://schema.org",
+			"@type": "ProfessionalService",
+			"name": "Eliott Bouquerel - Freelance Web & IA",
+			"image": "https://eliott-bouquerel.fr/my-pic.png",
+			"url": "https://eliott-bouquerel.fr",
+			"telephone": "",
+			"address": {
+				"@type": "PostalAddress",
+				"addressLocality": "France",
+				"addressCountry": "FR"
+			},
+			"geo": {
+				"@type": "GeoCoordinates",
+				"latitude": 48.8566,
+				"longitude": 2.3522
+			},
+			"openingHoursSpecification": {
+				"@type": "OpeningHoursSpecification",
+				"dayOfWeek": [
+					"Monday",
+					"Tuesday",
+					"Wednesday",
+					"Thursday",
+					"Friday"
+				],
+				"opens": "09:00",
+				"closes": "18:00"
+			},
+			"sameAs": [
+				"https://github.com/Eliott-B"
+			]
+		}
+	</script>
 </svelte:head>
 
 <ClickSpark />
