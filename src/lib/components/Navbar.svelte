@@ -57,7 +57,7 @@
             href={getLink('#top')}
             class="text-lg md:text-xl font-serif font-semibold tracking-tight text-white flex items-center gap-2 md:gap-3 hover:opacity-80 transition-opacity whitespace-nowrap"
         >
-            <img src="/logo.svg" alt="Eliott Bouquerel" class="h-4 md:h-6 w-auto object-contain" />
+            <img src="/logo.svg" alt="Eliott Bouquerel" class="h-4 md:h-6 w-auto object-contain" width="41" height="24" />
             <span>Eliott <span class="italic-accent">BOUQUEREL</span></span>
         </a>
 

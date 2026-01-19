@@ -245,14 +245,20 @@
 							loading="lazy"
 						/>
 						<img
-							src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=faces"
+							src="/avatars/leader-1.jpg"
 							class="w-10 h-10 rounded-full border-2 border-aura-bg object-cover"
 							alt="Leader tech"
+							width="40"
+							height="40"
+							loading="lazy"
 						/>
 						<img
-							src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=faces"
+							src="/avatars/leader-2.jpg"
 							class="w-10 h-10 rounded-full border-2 border-aura-bg object-cover"
 							alt="Leader tech"
+							width="40"
+							height="40"
+							loading="lazy"
 						/>
 					</div>
 					<div class="text-sm">
