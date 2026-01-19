@@ -1,3 +1,6 @@
+/* Local fonts - imported first for performance */
+@import "./lib/styles/fonts.css";
+
 @import "tailwindcss";
 
 /* Custom Theme */

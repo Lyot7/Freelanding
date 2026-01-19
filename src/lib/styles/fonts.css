@@ -1,0 +1,36 @@
+/* Local Fonts - Variable fonts for optimal performance */
+
+/* Playfair Display - Variable font (weight 400-900) */
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url('/fonts/playfair-display/playfair-display-variable.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: italic;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url('/fonts/playfair-display/playfair-display-variable-italic.woff2') format('woff2');
+}
+
+/* Instrument Sans - Variable font (weight 400-700) */
+@font-face {
+  font-family: 'Instrument Sans';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/instrument-sans/instrument-sans-variable.woff2') format('woff2');
+}
+
+/* Material Symbols Outlined - Subset (32 icons, 5KB vs 3.5MB) */
+@font-face {
+  font-family: 'Material Symbols Outlined';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('/fonts/material-symbols/material-symbols-subset.woff2') format('woff2');
+}

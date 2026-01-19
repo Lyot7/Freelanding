@@ -15,40 +15,9 @@
 </script>
 
 <svelte:head>
-	<link rel="preconnect" href="https://fonts.googleapis.com" />
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
-	<!-- Preload critical fonts to reduce CLS -->
-	<link
-		rel="preload"
-		href="https://fonts.gstatic.com/s/playfairdisplay/v40/nuFiD-vYSZviVYUb_rj3ij__anPXDTzYgEM86xQ.woff2"
-		as="font"
-		type="font/woff2"
-		crossorigin="anonymous"
-	/>
-	<link
-		rel="preload"
-		href="https://fonts.gstatic.com/s/instrumentsans/v4/pxiTypc9vsFDm051Uf6KVwgkfoSxQ0GsQv8ToedPibnr0SZe1ZuWi3g.woff2"
-		as="font"
-		type="font/woff2"
-		crossorigin="anonymous"
-	/>
-	<!-- Preload Material Symbols to reduce CLS -->
-	<link
-		rel="preload"
-		href="https://fonts.gstatic.com/s/materialsymbolsoutlined/v236/kJF1BvYX7BgnkSrUwT8OhrdQw4oELdPIeeII9v6oDMzByHX9rA6RzaxHMPdY43zj-jCxv3fzvRNU22ZXGJpEpjC_1v-p_4MrImHCIJIZrDCvHeembd5zrTgt.woff2"
-		as="font"
-		type="font/woff2"
-		crossorigin="anonymous"
-	/>
-	<!-- Non-render-blocking font loading with fetchpriority="low" -->
-	<link
-		href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Instrument+Sans:wght@400;500;600;700&display=swap"
-		rel="stylesheet"
-	/>
-	<link
-		href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
-		rel="stylesheet"
-	/>
+	<!-- Preload critical local fonts for optimal performance -->
+	<link rel="preload" href="/fonts/instrument-sans/instrument-sans-variable.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+	<link rel="preload" href="/fonts/playfair-display/playfair-display-variable.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
 
 	<!-- Structured Data (JSON-LD) -->
 	<script type="application/ld+json">

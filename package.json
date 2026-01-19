@@ -30,5 +30,9 @@
 	},
 	"optionalDependencies": {
 		"@rollup/rollup-linux-x64-gnu": "*"
+	},
+	"dependencies": {
+		"@fontsource-variable/instrument-sans": "^5.2.8",
+		"@fontsource-variable/playfair-display": "^5.2.8"
 	}
 }
