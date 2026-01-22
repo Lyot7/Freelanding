@@ -30,18 +30,18 @@
 <svelte:head>
 	<title>{project.title} - Case Study | Eliott B.</title>
 	<meta name="description" content="Découvrez comment {project.title} a transformé son activité : {project.description}" />
-	<link rel="canonical" href="https://eliott-bouquerel.fr/projets/{project.slug}" />
+	<link rel="canonical" href="https://eliottbouquerel.fr/projets/{project.slug}" />
 
     <!-- OG Tags for this specific project -->
     <meta property="og:title" content="{project.title} - Case Study | Eliott B." />
     <meta property="og:description" content="{project.description}" />
-    <meta property="og:image" content="https://eliott-bouquerel.fr{project.heroImage}" />
-	<meta property="og:url" content="https://eliott-bouquerel.fr/projets/{project.slug}" />
+    <meta property="og:image" content="https://eliottbouquerel.fr{project.heroImage}" />
+	<meta property="og:url" content="https://eliottbouquerel.fr/projets/{project.slug}" />
 
 	<!-- Twitter Tags -->
 	<meta name="twitter:title" content="{project.title} - Case Study | Eliott B." />
 	<meta name="twitter:description" content="{project.description}" />
-	<meta name="twitter:image" content="https://eliott-bouquerel.fr{project.heroImage}" />
+	<meta name="twitter:image" content="https://eliottbouquerel.fr{project.heroImage}" />
 
 	<!-- Structured Data (JSON-LD) -->
 	<script type="application/ld+json">
@@ -53,13 +53,13 @@
 					"@type": "ListItem",
 					"position": 1,
 					"name": "Accueil",
-					"item": "https://eliott-bouquerel.fr"
+					"item": "https://eliottbouquerel.fr"
 				},
 				{
 					"@type": "ListItem",
 					"position": 2,
 					"name": "{project.title}",
-					"item": "https://eliott-bouquerel.fr/projets/{project.slug}"
+					"item": "https://eliottbouquerel.fr/projets/{project.slug}"
 				}
 			]
 		}

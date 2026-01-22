@@ -164,21 +164,21 @@
 		content="Ne construisez pas juste un site, bâtissez votre avantage compétitif. Expert en architecture web moderne et automatisation IA pour maximiser votre rentabilité et votre croissance." 
 	/>
 	<meta name="keywords" content="Freelance Web, SvelteKit, Intelligence Artificielle, Automatisation, Architecture Web, Performance, SEO, Rentabilité" />
-	<link rel="canonical" href="https://eliott-bouquerel.fr" />
+	<link rel="canonical" href="https://eliottbouquerel.fr" />
 
 	<!-- Open Graph / Facebook -->
 	<meta property="og:type" content="website" />
-	<meta property="og:url" content="https://eliott-bouquerel.fr/" />
+	<meta property="og:url" content="https://eliottbouquerel.fr/" />
 	<meta property="og:title" content="Eliott B. - Architecture Web & Stratégie IA" />
 	<meta property="og:description" content="Développeur & Stratège. Je conçois l'infrastructure numérique invisible qui porte votre croissance. Web performant & Agents IA." />
-	<meta property="og:image" content="https://eliott-bouquerel.fr/og-image.jpg" />
+	<meta property="og:image" content="https://eliottbouquerel.fr/og-image.jpg" />
 
 	<!-- Twitter -->
 	<meta property="twitter:card" content="summary_large_image" />
-	<meta property="twitter:url" content="https://eliott-bouquerel.fr/" />
+	<meta property="twitter:url" content="https://eliottbouquerel.fr/" />
 	<meta property="twitter:title" content="Eliott B. - Architecture Web & Stratégie IA" />
 	<meta property="twitter:description" content="Développeur & Stratège. Je conçois l'infrastructure numérique invisible qui porte votre croissance." />
-	<meta property="twitter:image" content="https://eliott-bouquerel.fr/og-image.jpg" />
+	<meta property="twitter:image" content="https://eliottbouquerel.fr/og-image.jpg" />
 </svelte:head>
 
 <!-- Hero Section -->
@@ -204,19 +204,19 @@
 						<Skeleton width="16px" height="16px" variant="circular" />
 						<Skeleton width="150px" height="12px" />
 					{:else}
-						<span class="material-symbols-outlined text-[16px] text-aura-accent">verified</span>
-						<span class="text-xs uppercase tracking-widest text-aura-muted"
-							>Manager de projet Web</span
+						<span class="material-symbols-outlined text-[16px] text-aura-accent shrink-0">verified</span>
+						<span class="text-xs uppercase tracking-widest text-aura-muted truncate"
+							>Développeur & Manager de projet Web</span
 						>
 					{/if}
 				</div>
 
 				<h1 class="text-4xl md:text-6xl font-serif leading-[1.05]">
-					Ne construisez pas juste un site, <span class="text-aura-accent italic">bâtissez votre avantage compétitif</span>.
+					Automatisez ce qui ralentit, <span class="text-aura-accent italic">accélérez ce qui rapporte</span>.
 				</h1>
 
 				<p class="text-lg md:text-xl text-aura-muted font-light max-w-2xl leading-relaxed">
-					Je conçois l'infrastructure numérique invisible qui porte votre croissance. Du code épuré pour la performance, de l'IA pour l’efficience, et une stratégie web pour dominer votre marché.
+					Vos équipes perdent des heures sur des tâches répétitives. Je crée des solutions web et IA qui les font à leur place, plus vite et sans erreur. Résultat : vos équipes se concentrent sur ce qui fait vraiment grandir votre business.
 				</p>
 
 				<div class="flex flex-col sm:flex-row gap-4 md:gap-5 pt-4">
@@ -235,55 +235,7 @@
 					{/if}
 				</div>
 
-				<!-- Social Proof Mini -->
-				<div class="flex items-center gap-4 pt-6 border-t border-aura-surface/50">
-					<div class="flex -space-x-3">
-						<enhanced:img
-							src={jeromeDavy}
-							class="w-10 h-10 rounded-full border-2 border-aura-bg object-cover"
-							alt="Jérôme DAVY"
-							loading="lazy"
-						/>
-						<img
-							src="/avatars/leader-1.jpg"
-							class="w-10 h-10 rounded-full border-2 border-aura-bg object-cover"
-							alt="Leader tech"
-							width="40"
-							height="40"
-							loading="lazy"
-						/>
-						<img
-							src="/avatars/leader-2.jpg"
-							class="w-10 h-10 rounded-full border-2 border-aura-bg object-cover"
-							alt="Leader tech"
-							width="40"
-							height="40"
-							loading="lazy"
-						/>
-					</div>
-					<div class="text-sm">
-						{#if !loaded}
-							<div class="flex gap-1 mb-1">
-								<Skeleton width="16px" height="16px" variant="circular" />
-								<Skeleton width="16px" height="16px" variant="circular" />
-								<Skeleton width="16px" height="16px" variant="circular" />
-								<Skeleton width="16px" height="16px" variant="circular" />
-								<Skeleton width="16px" height="16px" variant="circular" />
-							</div>
-							<Skeleton width="120px" height="12px" />
-						{:else}
-							<div class="flex text-aura-gold text-[12px]">
-								<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
-								<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
-								<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
-								<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
-								<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
-							</div>
-							<span class="text-aura-muted">Approuvé par +20 leaders tech</span>
-						{/if}
-					</div>
 				</div>
-			</div>
 
 			<!-- Right Visual (Hero Image) - No animation delay for LCP optimization -->
 			<div class="lg:col-span-5 relative max-w-xs md:max-w-md mx-auto lg:max-w-none w-full">
@@ -300,15 +252,15 @@
 
 					<!-- Title Badge (Mobile/Tablet only) -->
 					<div
-						class="lg:hidden absolute bottom-6 left-1/2 -translate-x-1/2 inline-flex items-center gap-2 px-3 py-1 rounded-full border border-aura-surface bg-aura-card/50 backdrop-blur-xl shadow-2xl"
+						class="lg:hidden absolute bottom-6 left-1/2 -translate-x-1/2 inline-flex items-center gap-3 px-5 py-3 rounded-2xl border border-aura-surface bg-aura-card/80 backdrop-blur-xl shadow-2xl w-[calc(100%-3rem)]"
 					>
 						{#if !loaded}
-							<Skeleton width="16px" height="16px" variant="circular" />
-							<Skeleton width="150px" height="12px" />
+							<Skeleton width="20px" height="20px" variant="circular" />
+							<Skeleton width="150px" height="14px" />
 						{:else}
-							<span class="material-symbols-outlined text-[16px] text-aura-accent">verified</span>
-							<span class="text-xs uppercase tracking-widest text-aura-muted"
-								>Manager de projet Web</span
+							<span class="material-symbols-outlined text-[20px] text-aura-accent shrink-0">verified</span>
+							<span class="text-xs sm:text-sm uppercase tracking-widest text-aura-muted text-center"
+								>Développeur & Manager de projet Web</span
 							>
 						{/if}
 					</div>
@@ -644,7 +596,7 @@
                             </div>
 
                             <!-- Action Button -->
-                            <div class="pt-2 {i % 2 !== 0 ? 'flex justify-end' : ''}">
+                            <div class="pt-2 {i % 2 !== 0 ? 'md:flex md:justify-end' : ''}">
                                 <Button href={`/projects/${project.slug}`} variant="primary">
                                     Voir le projet
                                     <span class="material-symbols-outlined text-sm">arrow_forward</span>
@@ -847,6 +799,10 @@
 										alt="Gemini"
 										class="w-4 h-4"
 									/>Gemini</span
+								>
+								<span
+									class="px-3 py-1.5 rounded-full border border-aura-accent/30 bg-aura-card text-sm text-aura-accent hover:border-aura-accent hover:bg-aura-accent/10 transition-colors flex items-center gap-2"
+									><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>BMAD</span
 								>
 							</div>
 						</div>

@@ -25,8 +25,8 @@
 			"@context": "https://schema.org",
 			"@type": "ProfessionalService",
 			"name": "Eliott Bouquerel - Freelance Web & IA",
-			"image": "https://eliott-bouquerel.fr/my-pic.png",
-			"url": "https://eliott-bouquerel.fr",
+			"image": "https://eliottbouquerel.fr/my-pic.png",
+			"url": "https://eliottbouquerel.fr",
 			"telephone": "",
 			"address": {
 				"@type": "PostalAddress",

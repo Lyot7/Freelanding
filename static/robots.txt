@@ -2,4 +2,4 @@
 User-agent: *
 Disallow:
 
-Sitemap: https://eliott-bouquerel.fr/sitemap.xml
+Sitemap: https://eliottbouquerel.fr/sitemap.xml

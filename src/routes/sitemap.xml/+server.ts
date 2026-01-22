@@ -14,7 +14,7 @@ export const GET = async () => {
         .map(
             (page) => `
     <url>
-        <loc>https://eliott-bouquerel.fr/${page}</loc>
+        <loc>https://eliottbouquerel.fr/${page}</loc>
         <changefreq>monthly</changefreq>
         <priority>${page === '' ? '1.0' : '0.8'}</priority>
     </url>`
@@ -24,7 +24,7 @@ export const GET = async () => {
         .map(
             (project) => `
     <url>
-        <loc>https://eliott-bouquerel.fr/projets/${project.slug}</loc>
+        <loc>https://eliottbouquerel.fr/projets/${project.slug}</loc>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>`
