@@ -21,6 +21,7 @@
 		if ($page.url.pathname === '/') {
 			e.preventDefault();
 			window.scrollTo({ top: 0, behavior: 'smooth' });
+			history.replaceState(null, '', '/');
 		}
 	}
 
