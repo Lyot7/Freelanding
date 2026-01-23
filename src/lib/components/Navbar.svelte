@@ -17,6 +17,13 @@
 		document.body.style.overflow = '';
 	}
 
+	function handleLogoClick(e: MouseEvent) {
+		if ($page.url.pathname === '/') {
+			e.preventDefault();
+			window.scrollTo({ top: 0, behavior: 'smooth' });
+		}
+	}
+
 	onMount(() => {
 		const handleScroll = () => {
 			const currentScrollY = window.scrollY;
@@ -65,6 +72,7 @@
     >
         <a
             href="/"
+            onclick={handleLogoClick}
             class="text-lg md:text-xl font-serif font-semibold tracking-tight text-white flex items-center gap-2 md:gap-3 hover:opacity-80 transition-opacity whitespace-nowrap"
         >
             <img src="/logo.svg" alt="Eliott Bouquerel" class="h-4 md:h-6 w-auto object-contain" width="41" height="24" />
