@@ -5,7 +5,7 @@
 	<title>Mentions Légales - Eliott B.</title>
 	<meta
 		name="description"
-		content="Mentions légales du site d'Eliott Bouquerel, Manager de projet Web."
+		content="Mentions légales du site d'Eliott Bouquerel, Développeur Web & Manager de Projet Freelance."
 	/>
 	
 </svelte:head>
@@ -24,7 +24,9 @@
 					</p>
 					<div class="mt-4 pl-4 border-l-2 border-aura-surface">
 						<p class="text-white font-medium">Eliott Bouquerel</p>
-						<p>Manager de projet Web</p>
+						<p>Développeur Web & Manager de Projet Freelance</p>
+						<p>Spécialités : Architecture Web, Intégration IA, Automatisation</p>
+						<p>Localisation : Caen, Normandie, France</p>
 					</div>
 				</section>
 

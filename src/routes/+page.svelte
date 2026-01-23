@@ -514,9 +514,9 @@
 						<!-- Sliders Grid -->
 						<div class="grid md:grid-cols-2 gap-x-12 gap-y-10 mb-12">
 							<div class="space-y-4">
-								<div class="flex justify-between items-baseline">
+								<div class="flex justify-between items-baseline gap-2">
 									<label for="employees-slider" class="text-sm font-medium text-aura-muted">Effectif concerné</label>
-									<span class="text-2xl font-serif text-white">{employees}</span>
+									<span class="text-2xl font-serif text-white shrink-0">{employees}</span>
 								</div>
 								<div class="slider-wrapper" style="--progress: {(employees - 1) / (100 - 1) * 100}%">
 									<input
@@ -533,9 +533,9 @@
 							</div>
 
 							<div class="space-y-4">
-								<div class="flex justify-between items-baseline">
+								<div class="flex justify-between items-baseline gap-2">
 									<label for="salary-slider" class="text-sm font-medium text-aura-muted">Salaire moyen charge /mois</label>
-								<span class="text-2xl font-serif text-white">{salary} €</span>
+									<span class="text-2xl font-serif text-white shrink-0">{salary} €</span>
 								</div>
 								<div class="slider-wrapper" style="--progress: {(salary - 2000) / (10000 - 2000) * 100}%">
 									<input
@@ -552,9 +552,9 @@
 							</div>
 
 							<div class="space-y-4 md:col-span-2">
-								<div class="flex justify-between items-baseline">
-									<label for="hours-slider" class="text-sm font-medium text-aura-muted">Heures automatisables /semaine /pers</label>
-									<span class="text-2xl font-serif text-white text-aura-accent">{hours} h</span>
+								<div class="flex justify-between items-baseline gap-3">
+									<label for="hours-slider" class="text-sm font-medium text-aura-muted"><span class="hidden md:inline">Heures automatisables /semaine /pers</span><span class="md:hidden">Heures auto. /sem. /pers</span></label>
+									<span class="text-2xl font-serif text-white shrink-0">{hours} h</span>
 								</div>
 								<div class="slider-wrapper" style="--progress: {(hours - 1) / (20 - 1) * 100}%">
 									<input
@@ -576,14 +576,14 @@
 
 						<!-- Results Dashboard -->
 						<div
-							class="bg-[#0A110F] rounded-3xl p-6 md:p-8 border border-aura-surface/50 space-y-6 md:space-y-0 md:grid md:grid-cols-2 md:gap-8 md:items-center relative overflow-hidden"
+							class="bg-[#0A110F] rounded-3xl md:rounded-3xl -mx-8 md:mx-0 -mb-8 md:mb-0 p-6 md:p-8 border-t md:border border-aura-surface/50 space-y-6 md:space-y-0 md:grid md:grid-cols-2 md:gap-8 md:items-center relative overflow-hidden rounded-b-[40px] md:rounded-b-3xl"
 						>
 							<div
 								class="absolute top-0 right-0 w-32 h-32 bg-aura-accent/10 blur-[50px] rounded-full pointer-events-none"
 							></div>
 
 							<div class="pb-6 border-b border-aura-surface/50 md:border-b-0 md:pb-0 text-center md:text-left">
-								<p class="text-xs text-aura-muted uppercase tracking-widest mb-2">
+								<p class="text-sm md:text-xs text-aura-muted uppercase tracking-widest mb-3">
 									Gain Annuel Estimé
 								</p>
 								<div
@@ -593,19 +593,19 @@
 								</div>
 							</div>
 
-							<div class="text-center md:text-right space-y-3">
+							<div class="text-center md:text-right space-y-4">
 								<div
-									class="inline-block bg-aura-surface/50 px-5 py-3 rounded-xl border border-aura-surface"
+									class="inline-block bg-aura-surface/50 px-6 py-4 rounded-xl border border-aura-surface"
 								>
 									<span class="block text-3xl md:text-2xl font-bold text-white"
 										>{formatNumber(annualHours())} h</span
 									>
-									<span class="text-xs text-aura-muted">regagnées / an</span>
+									<span class="text-sm md:text-xs text-aura-muted">regagnées / an</span>
 								</div>
-								<p class="text-sm md:text-xs text-aura-accent italic">
+								<p class="text-base md:text-xs text-aura-accent italic">
 									Soit l'équivalent de <span class="font-bold text-white"
 										>{fullTimeEquivalent()}</span
-									> employés à temps plein "gagnés".
+									> ETP "gagnés".
 								</p>
 							</div>
 						</div>

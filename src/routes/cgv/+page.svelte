@@ -5,7 +5,7 @@
 	<title>Conditions Générales de Vente - Eliott B.</title>
 	<meta
 		name="description"
-		content="Conditions générales de vente des prestations de développement freelance d'Eliott Bouquerel."
+		content="Conditions générales de vente des prestations de développement web et intégration IA d'Eliott Bouquerel, freelance."
 	/>
 	
 </svelte:head>
@@ -21,8 +21,9 @@
 					<h2 class="text-2xl font-serif text-white mb-4">1. Objet</h2>
 					<p>
 						Les présentes Conditions Générales de Vente (CGV) régissent les prestations de
-						développement et de conseil en intégration IA proposées par Eliott Bouquerel, développeur
-						freelance. Toute commande implique l'acceptation sans réserve des présentes CGV.
+						développement web, d'architecture, d'intégration IA et d'automatisation proposées par
+						Eliott Bouquerel, Développeur Web & Manager de Projet Freelance. Toute commande implique
+						l'acceptation sans réserve des présentes CGV.
 					</p>
 				</section>
 
@@ -32,11 +33,11 @@
 						Les prestations proposées incluent notamment :
 					</p>
 					<ul class="list-disc list-inside mt-4 space-y-2 pl-4">
-						<li>Développement et architecture de solutions web</li>
-						<li>Intégration d'intelligence artificielle et d'automatisation</li>
-						<li>Refonte et modernisation d'infrastructures existantes</li>
-						<li>Audit technique et conseil en productivité</li>
-						<li>Formation et accompagnement</li>
+						<li>Architecture et refonte d'infrastructures web (SvelteKit, Next.js, React)</li>
+						<li>Intégration IA et déploiement d'agents autonomes (N8N, Claude, Gemini)</li>
+						<li>Audit de productivité et roadmap ROI chiffrée</li>
+						<li>Développement backend (Node.js, PostgreSQL, Docker)</li>
+						<li>Formation et accompagnement technique</li>
 					</ul>
 				</section>
 

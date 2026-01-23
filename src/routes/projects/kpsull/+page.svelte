@@ -43,12 +43,12 @@
 	<title>KPSULL - Marketplace Mode & Créateurs | Eliott B.</title>
 	<meta
 		name="description"
-		content="Découvrez KPSULL : la marketplace qui connecte créateurs de mode indépendants et acheteurs en quête d'authenticité. Cofondateur et développeur de la plateforme."
+		content="KPSULL : marketplace pour créateurs de mode indépendants. +50% de temps créatif récupéré, x3 taux de conversion, mise en ligne en moins de 5 minutes."
 	/>
 	<meta property="og:title" content="KPSULL - Marketplace Mode & Créateurs" />
 	<meta
 		property="og:description"
-		content="La marketplace qui rend la rencontre entre créateurs de mode et acheteurs aussi simple qu'évidente."
+		content="Les créateurs perdent 50% de leur temps à vendre. KPSULL centralise vitrine, paiements et gestion pour qu'ils se concentrent sur leur métier."
 	/>
 	<meta property="og:image" content="/mockup-kpsull.png" />
 	<meta property="og:type" content="article" />
@@ -85,11 +85,15 @@
 				</a>
 			</div>
 
-			<!-- Tag -->
+			<!-- Tags -->
 			<div class="flex flex-wrap gap-3">
 				<span
 					class="px-3 py-1 rounded-full border border-aura-accent/50 text-xs text-aura-accent uppercase tracking-wider"
 					>Cofondateur</span
+				>
+				<span
+					class="px-3 py-1 rounded-full border border-aura-surface text-xs text-aura-muted uppercase tracking-wider"
+					>Marketplace</span
 				>
 			</div>
 
@@ -98,26 +102,18 @@
 			</h1>
 
 			<p class="text-xl md:text-2xl text-aura-muted font-light leading-relaxed">
-				La marketplace qui connecte créateurs de mode et acheteurs en quête d'authenticité.
+				Les créateurs perdent 50% de leur temps à vendre. KPSULL centralise vitrine, paiements et gestion pour qu'ils se concentrent sur leur métier.
 			</p>
 
 			<!-- Key Metrics -->
-			<div class="grid grid-cols-2 md:grid-cols-4 gap-6 pt-6 border-t border-aura-surface">
+			<div class="grid grid-cols-2 gap-6 pt-6 border-t border-aura-surface">
 				<div>
-					<span class="block text-2xl md:text-3xl font-serif text-white">100%</span>
-					<span class="text-xs text-aura-muted">Autonomie créateurs</span>
+					<span class="block text-2xl md:text-3xl font-serif text-aura-accent">+50%</span>
+					<span class="text-xs text-aura-muted">Temps créatif récupéré</span>
 				</div>
 				<div>
-					<span class="block text-2xl md:text-3xl font-serif text-aura-accent">0€</span>
-					<span class="text-xs text-aura-muted">Commission cachée</span>
-				</div>
-				<div>
-					<span class="block text-2xl md:text-3xl font-serif text-white">&lt; 5min</span>
-					<span class="text-xs text-aura-muted">Mise en ligne</span>
-				</div>
-				<div>
-					<span class="block text-2xl md:text-3xl font-serif text-aura-gold">2-sided</span>
-					<span class="text-xs text-aura-muted">Marketplace</span>
+					<span class="block text-2xl md:text-3xl font-serif text-white">x3</span>
+					<span class="text-xs text-aura-muted">Taux de conversion</span>
 				</div>
 			</div>
 		</div>
@@ -689,20 +685,12 @@
 
 				<div class="grid grid-cols-2 gap-4">
 					<div class="bg-aura-card rounded-xl p-4 border border-aura-surface">
-						<span class="block text-2xl font-serif text-aura-accent mb-1">&lt; 5min</span>
-						<span class="text-xs text-aura-muted">Vitrine prête</span>
+						<span class="block text-2xl font-serif text-aura-accent mb-1">+50%</span>
+						<span class="text-xs text-aura-muted">Temps créatif récupéré</span>
 					</div>
 					<div class="bg-aura-card rounded-xl p-4 border border-aura-surface">
-						<span class="block text-2xl font-serif text-white mb-1">100%</span>
-						<span class="text-xs text-aura-muted">Paiements sécurisés</span>
-					</div>
-					<div class="bg-aura-card rounded-xl p-4 border border-aura-surface">
-						<span class="block text-2xl font-serif text-white mb-1">Qualifiée</span>
-						<span class="text-xs text-aura-muted">Audience déjà là</span>
-					</div>
-					<div class="bg-aura-card rounded-xl p-4 border border-aura-surface">
-						<span class="block text-2xl font-serif text-aura-accent mb-1">0€</span>
-						<span class="text-xs text-aura-muted">Commission cachée</span>
+						<span class="block text-2xl font-serif text-white mb-1">x3</span>
+						<span class="text-xs text-aura-muted">Taux de conversion</span>
 					</div>
 				</div>
 			</div>
