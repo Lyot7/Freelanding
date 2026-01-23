@@ -64,7 +64,7 @@
         class="max-w-7xl mx-auto flex justify-between items-center bg-aura-bg/80 backdrop-blur-md rounded-full px-4 md:px-6 py-2.5 md:py-3 border border-aura-surface/50"
     >
         <a
-            href={getLink('#top')}
+            href="/"
             class="text-lg md:text-xl font-serif font-semibold tracking-tight text-white flex items-center gap-2 md:gap-3 hover:opacity-80 transition-opacity whitespace-nowrap"
         >
             <img src="/logo.svg" alt="Eliott Bouquerel" class="h-4 md:h-6 w-auto object-contain" width="41" height="24" />
