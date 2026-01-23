@@ -72,9 +72,45 @@
 			hours = 4;
 		}
 	}
+
+	// FAQ accordion: animate close by delaying removal of [open]
+	function handleFaqToggle(event: MouseEvent) {
+		const summary = event.currentTarget as HTMLElement;
+		const details = summary.parentElement as HTMLDetailsElement;
+
+		if (details.open) {
+			// Closing: add a class to trigger close animation, then remove open
+			event.preventDefault();
+			const content = details.querySelector('.faq-content') as HTMLElement;
+			content.style.gridTemplateRows = '0fr';
+			content.style.opacity = '0';
+			setTimeout(() => {
+				details.open = false;
+				content.style.removeProperty('grid-template-rows');
+				content.style.removeProperty('opacity');
+			}, 300);
+		}
+	}
 </script>
 
 <style>
+	/* FAQ accordion animation */
+	.faq-content {
+		display: grid;
+		grid-template-rows: 0fr;
+		transition: grid-template-rows 0.3s ease-out, opacity 0.3s ease-out;
+		opacity: 0;
+	}
+
+	.faq-content > div {
+		overflow: hidden;
+	}
+
+	details[open] > .faq-content {
+		grid-template-rows: 1fr;
+		opacity: 1;
+	}
+
 	.slider-wrapper {
 		position: relative;
 		height: 20px;
@@ -158,33 +194,83 @@
 </style>
 
 <svelte:head>
-	<title>Eliott B. - Architecture Web & Stratégie IA | Freelance</title>
-	<meta 
-		name="description" 
-		content="Ne construisez pas juste un site, bâtissez votre avantage compétitif. Expert en architecture web moderne et automatisation IA pour maximiser votre rentabilité et votre croissance." 
+	<title>Eliott B. - Automatisation Web & IA | Freelance Développeur & Manager de Projet</title>
+	<meta
+		name="description"
+		content="Automatisez ce qui ralentit, accélérez ce qui rapporte. Solutions web et IA sur mesure pour PME et startups. Architecture moderne, agents autonomes, audit de productivité."
 	/>
-	<meta name="keywords" content="Freelance Web, SvelteKit, Intelligence Artificielle, Automatisation, Architecture Web, Performance, SEO, Rentabilité" />
+	<meta name="keywords" content="Freelance Web, Automatisation IA, Agents Autonomes, SvelteKit, Next.js, Architecture Web, N8N, Productivité, PME, Startup" />
 	<link rel="canonical" href="https://eliottbouquerel.fr" />
 
 	<!-- Open Graph / Facebook -->
 	<meta property="og:type" content="website" />
 	<meta property="og:url" content="https://eliottbouquerel.fr/" />
-	<meta property="og:title" content="Eliott B. - Architecture Web & Stratégie IA" />
-	<meta property="og:description" content="Développeur & Stratège. Je conçois l'infrastructure numérique invisible qui porte votre croissance. Web performant & Agents IA." />
+	<meta property="og:title" content="Eliott B. - Automatisation Web & IA | Freelance" />
+	<meta property="og:description" content="Vos équipes perdent des heures sur des tâches répétitives. Je crée des solutions web et IA qui les font à leur place, plus vite et sans erreur." />
 	<meta property="og:image" content="https://eliottbouquerel.fr/og-image.jpg" />
 
 	<!-- Twitter -->
 	<meta property="twitter:card" content="summary_large_image" />
 	<meta property="twitter:url" content="https://eliottbouquerel.fr/" />
-	<meta property="twitter:title" content="Eliott B. - Architecture Web & Stratégie IA" />
-	<meta property="twitter:description" content="Développeur & Stratège. Je conçois l'infrastructure numérique invisible qui porte votre croissance." />
+	<meta property="twitter:title" content="Eliott B. - Automatisation Web & IA | Freelance" />
+	<meta property="twitter:description" content="Vos équipes perdent des heures sur des tâches répétitives. Je crée des solutions web et IA qui les font à leur place, plus vite et sans erreur." />
 	<meta property="twitter:image" content="https://eliottbouquerel.fr/og-image.jpg" />
+
+	<!-- Structured Data: FAQPage (JSON-LD) -->
+	<script type="application/ld+json">
+		{
+			"@context": "https://schema.org",
+			"@type": "FAQPage",
+			"mainEntity": [
+				{
+					"@type": "Question",
+					"name": "Quels types de projets acceptez-vous ?",
+					"acceptedAnswer": {
+						"@type": "Answer",
+						"text": "Je travaille principalement sur des projets d'architecture web complexe, des refontes d'applications existantes, et des integrations IA pour automatiser les processus metier des PME et startups. Mon expertise couvre le frontend (SvelteKit, Next.js, React), le backend (Node.js, PostgreSQL) et l'infrastructure (Docker, CI/CD)."
+					}
+				},
+				{
+					"@type": "Question",
+					"name": "Quelle est votre approche pour un nouveau projet ?",
+					"acceptedAnswer": {
+						"@type": "Answer",
+						"text": "Je commence toujours par un audit de productivite pour comprendre vos processus actuels, identifier les opportunites d'automatisation et etablir une roadmap ROI chiffree. Ensuite, je concois l'architecture technique avant d'ecrire la moindre ligne de code."
+					}
+				},
+				{
+					"@type": "Question",
+					"name": "Comment l'IA peut-elle aider mon entreprise concretement ?",
+					"acceptedAnswer": {
+						"@type": "Answer",
+						"text": "L'IA peut automatiser les taches repetitives qui consomment le temps de vos equipes : tri et reponse aux emails, generation de rapports, analyse de donnees, support client de premier niveau, redaction de contenus. En moyenne, mes clients recuperent entre 5 et 15 heures par semaine par personne concernee."
+					}
+				},
+				{
+					"@type": "Question",
+					"name": "Travaillez-vous en remote ou sur site ?",
+					"acceptedAnswer": {
+						"@type": "Answer",
+						"text": "Base en Normandie (Caen), je travaille principalement en remote avec des outils collaboratifs modernes (Discord, Notion, visio). Je peux me deplacer en Normandie et en region parisienne pour les reunions strategiques ou les ateliers de cadrage."
+					}
+				},
+				{
+					"@type": "Question",
+					"name": "Quel est le delai pour demarrer un projet ?",
+					"acceptedAnswer": {
+						"@type": "Answer",
+						"text": "Apres un premier echange de 30 minutes (gratuit), j'envoie une proposition sous 48h. Le demarrage effectif depend de ma disponibilite actuelle. Prenez rendez-vous sur le calendrier pour connaitre les creneaux disponibles."
+					}
+				}
+			]
+		}
+	</script>
 </svelte:head>
 
 <!-- Hero Section -->
 	<header
 		id="top"
-		class="relative min-h-screen pt-32 pb-12 md:pt-32 md:pb-20 flex flex-col justify-center px-6"
+		class="relative min-h-screen pt-32 pb-12 md:pt-32 md:pb-20 flex flex-col justify-center px-6 overflow-hidden"
 	>
 		<!-- Abstract Background Glows -->
 		<div
@@ -812,8 +898,75 @@
 		</div>
 	</section>
 
+	<!-- FAQ Section -->
+	<section class="py-14 md:py-24 max-w-7xl mx-auto px-6 scroll-mt-32" id="faq">
+		<SectionTitle title="Questions" subtitle="Fréquentes" />
+
+		<div class="max-w-3xl mx-auto space-y-4">
+			<details class="group bg-aura-card border border-aura-surface rounded-2xl reveal-on-scroll" use:reveal={{ delay: 0 }}>
+				<summary onclick={handleFaqToggle} class="flex items-center justify-between p-6 cursor-pointer hover:bg-aura-surface/30 transition-colors rounded-2xl">
+					<h3 class="text-lg font-serif pr-4">Quels types de projets acceptez-vous ?</h3>
+					<span class="material-symbols-outlined text-aura-accent shrink-0 transition-transform duration-300 group-open:rotate-180">expand_more</span>
+				</summary>
+				<div class="faq-content">
+					<div class="px-6 pb-6">
+						<p class="text-aura-muted leading-relaxed">Je travaille principalement sur des projets d'architecture web complexe, des refontes d'applications existantes, et des intégrations IA pour automatiser les processus métier des PME et startups. Mon expertise couvre aussi bien le frontend (SvelteKit, Next.js, React) que le backend (Node.js, PostgreSQL) et l'infrastructure (Docker, CI/CD).</p>
+					</div>
+				</div>
+			</details>
+
+			<details class="group bg-aura-card border border-aura-surface rounded-2xl reveal-on-scroll" use:reveal={{ delay: 100 }}>
+				<summary onclick={handleFaqToggle} class="flex items-center justify-between p-6 cursor-pointer hover:bg-aura-surface/30 transition-colors rounded-2xl">
+					<h3 class="text-lg font-serif pr-4">Quelle est votre approche pour un nouveau projet ?</h3>
+					<span class="material-symbols-outlined text-aura-accent shrink-0 transition-transform duration-300 group-open:rotate-180">expand_more</span>
+				</summary>
+				<div class="faq-content">
+					<div class="px-6 pb-6">
+						<p class="text-aura-muted leading-relaxed">Je commence toujours par un audit de productivité pour comprendre vos processus actuels, identifier les opportunités d'automatisation et établir une roadmap ROI chiffrée. Ensuite, je conçois l'architecture technique avant d'écrire la moindre ligne de code. Cette approche garantit des solutions durables et évolutives.</p>
+					</div>
+				</div>
+			</details>
+
+			<details class="group bg-aura-card border border-aura-surface rounded-2xl reveal-on-scroll" use:reveal={{ delay: 200 }}>
+				<summary onclick={handleFaqToggle} class="flex items-center justify-between p-6 cursor-pointer hover:bg-aura-surface/30 transition-colors rounded-2xl">
+					<h3 class="text-lg font-serif pr-4">Comment l'IA peut-elle aider mon entreprise concrètement ?</h3>
+					<span class="material-symbols-outlined text-aura-accent shrink-0 transition-transform duration-300 group-open:rotate-180">expand_more</span>
+				</summary>
+				<div class="faq-content">
+					<div class="px-6 pb-6">
+						<p class="text-aura-muted leading-relaxed">L'IA peut automatiser les tâches répétitives qui consomment le temps de vos équipes : tri et réponse aux emails, génération de rapports, analyse de données, support client de premier niveau, rédaction de contenus. En moyenne, mes clients récupèrent entre 5 et 15 heures par semaine par personne concernée.</p>
+					</div>
+				</div>
+			</details>
+
+			<details class="group bg-aura-card border border-aura-surface rounded-2xl reveal-on-scroll" use:reveal={{ delay: 300 }}>
+				<summary onclick={handleFaqToggle} class="flex items-center justify-between p-6 cursor-pointer hover:bg-aura-surface/30 transition-colors rounded-2xl">
+					<h3 class="text-lg font-serif pr-4">Travaillez-vous en remote ou sur site ?</h3>
+					<span class="material-symbols-outlined text-aura-accent shrink-0 transition-transform duration-300 group-open:rotate-180">expand_more</span>
+				</summary>
+				<div class="faq-content">
+					<div class="px-6 pb-6">
+						<p class="text-aura-muted leading-relaxed">Basé en Normandie (Caen), je travaille principalement en remote avec des outils collaboratifs modernes (Discord, Notion, visio). Je peux me déplacer en Normandie et en région parisienne pour les réunions stratégiques ou les ateliers de cadrage. Mon organisation garantit une communication fluide et une livraison régulière.</p>
+					</div>
+				</div>
+			</details>
+
+			<details class="group bg-aura-card border border-aura-surface rounded-2xl reveal-on-scroll" use:reveal={{ delay: 400 }}>
+				<summary onclick={handleFaqToggle} class="flex items-center justify-between p-6 cursor-pointer hover:bg-aura-surface/30 transition-colors rounded-2xl">
+					<h3 class="text-lg font-serif pr-4">Quel est le délai pour démarrer un projet ?</h3>
+					<span class="material-symbols-outlined text-aura-accent shrink-0 transition-transform duration-300 group-open:rotate-180">expand_more</span>
+				</summary>
+				<div class="faq-content">
+					<div class="px-6 pb-6">
+						<p class="text-aura-muted leading-relaxed">Après un premier échange de 30 minutes (gratuit), je vous envoie une proposition sous 48h. Le démarrage effectif dépend de ma disponibilité actuelle. Prenez rendez-vous sur mon calendrier pour connaître mes créneaux disponibles et discuter de votre projet.</p>
+					</div>
+				</div>
+			</details>
+		</div>
+	</section>
+
 	<!-- Testimonial -->
-	<section class="py-16 md:py-24 bg-aura-card border-y border-aura-surface relative">
+	<section class="py-16 md:py-24 bg-aura-card border-y border-aura-surface relative overflow-hidden">
 		<div class="max-w-4xl mx-auto px-6 text-center relative z-10 reveal-on-scroll" use:reveal>
 			<span class="material-symbols-outlined text-6xl text-aura-accent mb-8 opacity-50"
 				>format_quote</span

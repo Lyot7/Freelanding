@@ -1,0 +1,74 @@
+# Eliott Bouquerel - Freelance Web & IA
+
+> Developpeur web freelance et manager de projet specialise en architecture web moderne et integration IA. Base en France.
+
+## Identite
+
+- Nom : Eliott Bouquerel
+- Metier : Developpeur Web & Manager de Projet Freelance
+- Specialites : Architecture Web, Integration IA, Automatisation
+- Localisation : Caen, Normandie, France
+- Site : https://eliottbouquerel.fr
+- Contact : https://eliottbouquerel.fr/rendez-vous
+
+## Services
+
+### Architecture & Refonte Web
+Modernisation d'infrastructures web legacy vers des architectures modernes, performantes et scalables. Migration de systemes monolithiques vers des architectures headless. Optimisation des performances (Core Web Vitals, Lighthouse 100/100).
+
+### Integration IA & Agents Autonomes
+Deploiement d'agents IA personnalises pour automatiser les taches repetitives : support client, analyse de donnees, redaction, tri d'emails. Utilisation de N8N, Claude, Gemini et frameworks d'agents sur mesure.
+
+### Audit de Productivite
+Analyse approfondie des processus metier pour identifier les goulots d'etranglement et les opportunites d'automatisation. Livraison d'une roadmap ROI chiffree avec priorisation des actions.
+
+## Stack Technique
+
+- Frontend : SvelteKit, Next.js, React, TypeScript, TailwindCSS
+- Backend : Node.js, Bun, PostgreSQL, Prisma, Drizzle ORM
+- Infrastructure : Docker, Coolify, Git, CI/CD
+- IA & Automatisation : N8N, Claude Code, Gemini, BMAD Framework
+
+## Realisations
+
+### MECA SERVICES - Infrastructure E-commerce
+Migration d'une boutique e-commerce vieillissante vers une architecture headless SvelteKit. Synchronisation temps reel avec l'ERP existant. Gestion d'un catalogue de plus de 1000 references.
+- Resultats : -70% temps de gestion, experience utilisateur x10
+- Stack : SvelteKit, Node.js, PostgreSQL, Docker
+- Temoignage client : "Eliott a transforme notre dette technique en une infrastructure scalable et performante, posant les bases d'une croissance durable." - Jerome DAVY, PDG
+
+### KPSULL - Marketplace Mode Multi-Vendeurs
+Creation complete d'une marketplace dediee aux createurs de mode independants. Plateforme multi-vendeurs avec paiements Split via Stripe Connect.
+- Resultats : 100% autonomie createurs, 0 euros frais caches, mise en ligne < 5min
+- Stack : Next.js, PostgreSQL, TailwindCSS, Stripe Connect
+
+## Formation
+
+- Master Developpeur & Manager de Projet Web
+- Bachelor Metiers du Multimedia et d'Internet - Option Developpement Web
+
+## Pages du site
+
+- Accueil : https://eliottbouquerel.fr
+- Prendre rendez-vous : https://eliottbouquerel.fr/rendez-vous
+- Projet MECA SERVICES : https://eliottbouquerel.fr/projets/meca-services
+- Projet KPSULL : https://eliottbouquerel.fr/projets/kpsull
+- Mentions legales : https://eliottbouquerel.fr/mentions-legales
+- CGV : https://eliottbouquerel.fr/cgv
+
+## FAQ
+
+### Quels types de projets acceptez-vous ?
+Je travaille principalement sur des projets d'architecture web complexe, des refontes d'applications existantes, et des integrations IA pour automatiser les processus metier des PME et startups.
+
+### Quelle est votre approche pour un nouveau projet ?
+Je commence toujours par un audit de productivite pour comprendre vos processus actuels, identifier les opportunites d'automatisation et etablir une roadmap ROI chiffree avant de coder.
+
+### Combien coute une prestation ?
+Chaque projet est unique. Le simulateur sur mon site permet d'estimer les gains potentiels. Pour un devis precis, prenez rendez-vous pour un echange de 30 minutes gratuit.
+
+### Travaillez-vous en remote ?
+Base en Normandie (Caen), je travaille principalement en remote avec des outils collaboratifs modernes (Discord, Notion, visio). Je peux me deplacer en Normandie et en region parisienne pour les reunions importantes.
+
+### Quelles sont vos disponibilites ?
+Je suis disponible du lundi au vendredi, de 9h a 18h. Prenez rendez-vous directement sur mon calendrier en ligne pour trouver un creneau.

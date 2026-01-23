@@ -1,5 +1,33 @@
-# allow crawling everything by default
+# Autoriser tous les crawlers (y compris IA)
 User-agent: *
 Disallow:
+
+# Autorisation explicite des crawlers IA
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
 
 Sitemap: https://eliottbouquerel.fr/sitemap.xml

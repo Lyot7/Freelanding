@@ -19,40 +19,124 @@
 	<link rel="preload" href="/fonts/instrument-sans/instrument-sans-variable.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
 	<link rel="preload" href="/fonts/playfair-display/playfair-display-variable.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
 
-	<!-- Structured Data (JSON-LD) -->
+	<!-- Structured Data: Person (JSON-LD) -->
+	<script type="application/ld+json">
+		{
+			"@context": "https://schema.org",
+			"@type": "Person",
+			"name": "Eliott Bouquerel",
+			"jobTitle": "Developpeur & Manager de Projet Web Freelance",
+			"url": "https://eliottbouquerel.fr",
+			"image": "https://eliottbouquerel.fr/my-pic.png",
+			"description": "Automatisez ce qui ralentit, accelerez ce qui rapporte. Solutions web et IA sur mesure pour PME et startups. Architecture moderne, agents autonomes, audit de productivite.",
+			"address": {
+				"@type": "PostalAddress",
+				"addressLocality": "Caen",
+				"addressRegion": "Normandie",
+				"addressCountry": "FR"
+			},
+			"alumniOf": [
+				{
+					"@type": "EducationalOrganization",
+					"name": "Master Developpeur & Manager de Projet Web"
+				},
+				{
+					"@type": "EducationalOrganization",
+					"name": "Bachelor Metiers du Multimedia et d'Internet"
+				}
+			],
+			"knowsAbout": [
+				"Architecture Web",
+				"SvelteKit",
+				"Next.js",
+				"React",
+				"TypeScript",
+				"TailwindCSS",
+				"PostgreSQL",
+				"Docker",
+				"Intelligence Artificielle",
+				"Automatisation",
+				"N8N",
+				"E-commerce"
+			],
+			"sameAs": [
+				"https://github.com/Eliott-B"
+			]
+		}
+	</script>
+
+	<!-- Structured Data: WebSite (JSON-LD) -->
+	<script type="application/ld+json">
+		{
+			"@context": "https://schema.org",
+			"@type": "WebSite",
+			"name": "Eliott Bouquerel - Automatisation Web & IA",
+			"url": "https://eliottbouquerel.fr",
+			"description": "Automatisez ce qui ralentit, accelerez ce qui rapporte. Solutions web et IA sur mesure pour PME et startups.",
+			"inLanguage": "fr",
+			"author": {
+				"@type": "Person",
+				"name": "Eliott Bouquerel"
+			}
+		}
+	</script>
+
+	<!-- Structured Data: ProfessionalService (JSON-LD) -->
 	<script type="application/ld+json">
 		{
 			"@context": "https://schema.org",
 			"@type": "ProfessionalService",
-			"name": "Eliott Bouquerel - Freelance Web & IA",
+			"name": "Eliott Bouquerel - Automatisation Web & IA",
 			"image": "https://eliottbouquerel.fr/my-pic.png",
 			"url": "https://eliottbouquerel.fr",
-			"telephone": "",
 			"address": {
 				"@type": "PostalAddress",
-				"addressLocality": "France",
+				"addressLocality": "Caen",
+				"addressRegion": "Normandie",
 				"addressCountry": "FR"
 			},
 			"geo": {
 				"@type": "GeoCoordinates",
-				"latitude": 48.8566,
-				"longitude": 2.3522
+				"latitude": 49.1829,
+				"longitude": -0.3707
 			},
 			"openingHoursSpecification": {
 				"@type": "OpeningHoursSpecification",
-				"dayOfWeek": [
-					"Monday",
-					"Tuesday",
-					"Wednesday",
-					"Thursday",
-					"Friday"
-				],
+				"dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
 				"opens": "09:00",
 				"closes": "18:00"
 			},
-			"sameAs": [
-				"https://github.com/Eliott-B"
-			]
+			"hasOfferCatalog": {
+				"@type": "OfferCatalog",
+				"name": "Services Freelance Web & IA",
+				"itemListElement": [
+					{
+						"@type": "Offer",
+						"itemOffered": {
+							"@type": "Service",
+							"name": "Architecture & Refonte Web",
+							"description": "Modernisation d'infrastructures web legacy vers des architectures modernes, performantes et scalables. Migration vers des architectures headless."
+						}
+					},
+					{
+						"@type": "Offer",
+						"itemOffered": {
+							"@type": "Service",
+							"name": "Integration IA & Agents Autonomes",
+							"description": "Deploiement d'agents IA personnalises pour automatiser les taches repetitives : support client, analyse, redaction. Utilisation de N8N, Claude, Gemini."
+						}
+					},
+					{
+						"@type": "Offer",
+						"itemOffered": {
+							"@type": "Service",
+							"name": "Audit de Productivite",
+							"description": "Analyse approfondie des processus metier pour identifier les opportunites d'automatisation. Livraison d'une roadmap ROI chiffree."
+						}
+					}
+				]
+			},
+			"sameAs": ["https://github.com/Eliott-B"]
 		}
 	</script>
 </svelte:head>

@@ -76,6 +76,7 @@
             <a href={getLink('#simulator')} class="hover:text-white transition-colors px-3 py-1.5 rounded-full hover:bg-aura-surface/30">Calculateur ROI</a>
             <a href={getLink('#projects')} class="hover:text-white transition-colors px-3 py-1.5 rounded-full hover:bg-aura-surface/30">Projets</a>
             <a href={getLink('#skills')} class="hover:text-white transition-colors px-3 py-1.5 rounded-full hover:bg-aura-surface/30">Compétences</a>
+            <a href={getLink('#faq')} class="hover:text-white transition-colors px-3 py-1.5 rounded-full hover:bg-aura-surface/30">FAQ</a>
         </div>
 
         <div class="flex items-center gap-3">
@@ -110,6 +111,7 @@
 		<a href={getLink('#simulator')} onclick={closeMenu} class="text-2xl font-serif text-aura-muted hover:text-white transition-colors">Calculateur ROI</a>
 		<a href={getLink('#projects')} onclick={closeMenu} class="text-2xl font-serif text-aura-muted hover:text-white transition-colors">Projets</a>
 		<a href={getLink('#skills')} onclick={closeMenu} class="text-2xl font-serif text-aura-muted hover:text-white transition-colors">Compétences</a>
+		<a href={getLink('#faq')} onclick={closeMenu} class="text-2xl font-serif text-aura-muted hover:text-white transition-colors">FAQ</a>
 	</div>
 {/if}
 

@@ -27,6 +27,7 @@ body {
 	color: #F0F7F5;
 	-webkit-font-smoothing: antialiased;
 	font-family: 'Instrument Sans', sans-serif;
+	overflow-x: hidden;
 }
 
 html {
@@ -129,12 +130,14 @@ input[type='range']::-moz-range-track {
 @media (min-width: 768px) {
 	.reveal-on-scroll {
 		opacity: 0;
-		transition: opacity 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
-		will-change: opacity;
+		transform: translateY(20px);
+		transition: opacity 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+		will-change: opacity, transform;
 	}
 
 	.reveal-visible {
 		opacity: 1;
+		transform: translateY(0);
 	}
 
 	/* Optional stagger delays if not handled by JS */
