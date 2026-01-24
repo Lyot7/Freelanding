@@ -985,14 +985,13 @@
 					alt="Jérôme DAVY"
 					loading="lazy"
 				/>
-				<div>
-					<div class="font-bold text-lg">Jérôme DAVY</div>
+				<div class="flex flex-col items-center gap-1">
+					<div class="flex items-center gap-2">
+						<span class="font-bold text-lg">Jérôme DAVY</span>
+						<span class="material-symbols-outlined text-[18px] text-aura-accent">verified</span>
+					</div>
 					<div class="text-sm text-aura-muted">PDG de MECA SERVICES</div>
 				</div>
 			</div>
-		</div>
-		<!-- Decoration -->
-		<div class="absolute left-10 top-10 opacity-5 rotate-12">
-			<span class="material-symbols-outlined text-[200px]">verified</span>
 		</div>
 	</section>
