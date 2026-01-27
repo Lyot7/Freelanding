@@ -21,19 +21,41 @@
 	--font-sans: 'Instrument Sans', sans-serif;
 }
 
-/* Base Styles */
+/* Base Styles - Éviter double scrollbar */
+html {
+	scroll-behavior: smooth;
+	overflow-y: scroll; /* Toujours afficher la scrollbar sur html */
+	overflow-x: hidden;
+	/* Firefox scrollbar */
+	scrollbar-width: thin;
+	scrollbar-color: #6FF0D3 #0F1A18;
+}
+
+/* Webkit scrollbar (Chrome, Safari, Edge) */
+html::-webkit-scrollbar {
+	width: 10px;
+}
+
+html::-webkit-scrollbar-track {
+	background: #0F1A18;
+}
+
+html::-webkit-scrollbar-thumb {
+	background: #6FF0D3;
+	border-radius: 5px;
+}
+
+html::-webkit-scrollbar-thumb:hover {
+	background: #4FE0C0;
+}
+
 body {
 	background-color: #0F1A18;
 	color: #F0F7F5;
 	-webkit-font-smoothing: antialiased;
 	font-family: 'Instrument Sans', sans-serif;
-	overflow-x: hidden;
-}
-
-html {
-	scroll-behavior: smooth;
-	overflow-x: hidden;
-	overflow-y: auto;
+	overflow: visible; /* Body ne doit jamais scroller - déléguer à html */
+	min-height: 100%;
 }
 
 /* Subtle Grain Overlay */

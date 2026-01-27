@@ -61,45 +61,28 @@
 			theme: 'dark'
 		});
 
-        // Robustly force scrolling="no" on the iframe
-        const interval = setInterval(() => {
-            if (calElement) {
-                const iframe = calElement.querySelector('iframe');
-                if (iframe) {
-                    iframe.setAttribute('scrolling', 'no');
-                    iframe.style.overflow = 'hidden';
-                }
-            }
-        }, 500);
-
-        // Stop checking after 5 seconds to save resources
-        const timeout = setTimeout(() => {
-            clearInterval(interval);
-        }, 5000);
-
-        return () => {
-             window.removeEventListener('scroll', () => {}); 
-             clearInterval(interval);
-             clearTimeout(timeout);
-        };
+        // Pas de manipulation du scroll - laisser Cal.com gérer son iframe
 	});
 </script>
 
 <div class="calendar-container w-full">
-	<div bind:this={calElement} class="w-full"></div>
+	<div bind:this={calElement} class="w-full cal-embed"></div>
 </div>
 
 <style>
-    /* Custom scrollbar for the embed if needed */
+    .calendar-container {
+        min-height: 600px;
+    }
+
+    .cal-embed {
+        min-height: 600px;
+    }
+
+    /* Styling de l'iframe Cal.com */
     .calendar-container :global(iframe) {
         background-color: transparent !important;
         border: none !important;
         width: 100% !important;
-        scrollbar-width: none !important; /* Firefox */
-        -ms-overflow-style: none !important; /* IE/Edge */
-    }
-    
-    .calendar-container :global(iframe::-webkit-scrollbar) {
-        display: none !important; /* Chrome/Safari */
+        min-height: 600px !important;
     }
 </style>

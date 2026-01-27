@@ -3,9 +3,17 @@ import type { Handle } from '@sveltejs/kit';
 export const handle: Handle = async ({ event, resolve }) => {
 	const response = await resolve(event);
 
-	// Cache long pour fichiers statiques (fonts, images, avatars)
 	const path = event.url.pathname;
-	if (path.startsWith('/fonts/') || path.startsWith('/avatars/') || path === '/logo.svg') {
+
+	// Cache immutable (1 an) pour assets statiques versionnés
+	if (
+		path.startsWith('/fonts/') ||
+		path.startsWith('/avatars/') ||
+		path.startsWith('/diagrams/') ||
+		path.startsWith('/favicon/') ||
+		path === '/logo.svg' ||
+		path.includes('/_app/immutable/')
+	) {
 		response.headers.set('Cache-Control', 'public, max-age=31536000, immutable');
 	}
 
