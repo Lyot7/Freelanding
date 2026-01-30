@@ -2,9 +2,11 @@
 	import { afterNavigate } from '$app/navigation';
 	import { tick } from 'svelte';
 	import '../app.css';
-    import Navbar from '$lib/components/Navbar.svelte';
+	import Navbar from '$lib/components/Navbar.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import ClickSpark from '$lib/components/ClickSpark.svelte';
+	import CookieBanner from '$lib/components/CookieBanner.svelte';
+	import PostHogInit from '$lib/components/PostHogInit.svelte';
 
 	let { children } = $props();
 
@@ -147,10 +149,14 @@
 <div class="relative min-h-screen">
     <!-- Noise Texture Overlay -->
     <div class="noise-bg"></div>
-    
+
     <main>
         {@render children()}
     </main>
 
     <Footer />
 </div>
+
+<!-- Cookie Consent & Analytics -->
+<CookieBanner />
+<PostHogInit />
