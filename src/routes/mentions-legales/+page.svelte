@@ -1,4 +1,8 @@
 <script lang="ts">
+	function resetCookieConsent() {
+		localStorage.removeItem('cookie-consent');
+		location.reload();
+	}
 </script>
 
 <svelte:head>
@@ -57,11 +61,36 @@
 					</p>
 				</section>
 
-				<section>
+				<section id="cookies">
 					<h2 class="text-2xl font-serif text-white mb-4">5. Cookies</h2>
-					<p>
-						Ce site utilise des cookies pour améliorer l'expérience utilisateur. En continuant à
-						naviguer sur ce site, vous acceptez l'utilisation de cookies.
+					<p class="mb-4">
+						Ce site utilise des cookies d'analyse pour comprendre comment les visiteurs interagissent
+						avec le contenu. Vous pouvez accepter ou refuser ces cookies via la bannière de consentement.
+					</p>
+
+					<div class="mt-4 pl-4 border-l-2 border-aura-surface space-y-3">
+						<div>
+							<p class="text-white font-medium">Cookie d'analyse (PostHog)</p>
+							<p class="text-sm">
+								Nom : <code class="bg-aura-surface px-2 py-0.5 rounded">ph_*_posthog</code>
+							</p>
+							<p class="text-sm">Durée : 1 an</p>
+							<p class="text-sm">
+								Finalité : Mesure d'audience anonymisée (pages vues, durée de session)
+							</p>
+						</div>
+					</div>
+
+					<p class="mt-4">
+						<strong class="text-white">Modifier votre choix :</strong> Pour réinitialiser vos
+						préférences de cookies, vous pouvez
+						<button
+							onclick={resetCookieConsent}
+							class="text-aura-accent hover:underline"
+						>
+							cliquer ici
+						</button>
+						pour afficher à nouveau la bannière de consentement.
 					</p>
 				</section>
 
