@@ -1,5 +1,6 @@
 <script lang="ts">
 	import BookingCalendar from '$lib/components/BookingCalendar.svelte';
+	import ContactForm from '$lib/components/ContactForm.svelte';
 	import { fade } from 'svelte/transition';
 </script>
 
@@ -42,20 +43,12 @@
 		</p>
 	</div>
 
-	<!-- Options de contact -->
+	<!-- Formulaire de contact -->
 	<div class="relative z-10 w-full max-w-3xl mx-auto text-center mb-8">
-		<p class="text-sm text-aura-muted mb-4">
-			Réservez un créneau ci-dessous ou contactez-moi directement par email
+		<p class="text-sm text-aura-muted mb-6">
+			Réservez un créneau ci-dessous ou envoyez-moi un message
 		</p>
-		<a
-			href="mailto:eliott.bouquerel@gmail.com"
-			class="inline-flex items-center gap-3 px-5 py-2.5 rounded-xl border border-aura-surface bg-aura-card/50 hover:bg-aura-card hover:border-aura-accent/30 transition-all duration-300 group"
-		>
-			<svg class="w-5 h-5 text-aura-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-			</svg>
-			<span class="text-aura-text group-hover:text-aura-accent transition-colors">eliott.bouquerel@gmail.com</span>
-		</a>
+		<ContactForm />
 	</div>
 
 	<!-- Main Content: Calendar -->
