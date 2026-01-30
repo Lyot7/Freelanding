@@ -25,8 +25,8 @@ const defaultConfig: FooterConfig = {
 		href: '/rendez-vous'
 	},
 	secondaryButton: {
-		label: 'Me contacter par email',
-		href: 'mailto:eliott.bouquerel@gmail.com'
+		label: 'Me contacter',
+		href: '/rendez-vous#contact'
 	}
 };
 
