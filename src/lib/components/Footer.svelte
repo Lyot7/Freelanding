@@ -16,7 +16,7 @@
 </script>
 
 <footer
-	class="{isRendezVousPage ? 'pt-8 pb-16 md:pb-24' : 'py-14 md:py-24'} relative overflow-hidden text-center"
+	class="py-14 md:py-24 relative overflow-hidden text-center"
 >
 	{#if !isRendezVousPage}
 		<div class="absolute inset-0 bg-gradient-to-b from-transparent to-[#080d0c]/50"></div>
@@ -50,9 +50,7 @@
 		{/if}
 
 		<div
-			class="{isRendezVousPage
-				? 'pt-8'
-				: 'pt-20'} text-xs text-aura-muted flex flex-col items-center gap-3 md:flex-row md:justify-center md:gap-8"
+			class="{isRendezVousPage ? '' : 'pt-20'} text-xs text-aura-muted flex flex-col items-center gap-3 md:flex-row md:justify-center md:gap-8"
 		>
 			<span>&copy; {new Date().getFullYear()} Eliott Bouquerel</span>
 			<div class="flex gap-6">

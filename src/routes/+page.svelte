@@ -270,7 +270,7 @@
 <!-- Hero Section -->
 	<header
 		id="top"
-		class="relative min-h-screen pt-32 pb-12 md:pt-32 md:pb-20 flex flex-col justify-center px-6 overflow-hidden"
+		class="relative min-h-screen pt-32 pb-12 md:pt-32 md:pb-20 flex flex-col justify-center px-6"
 	>
 		<!-- Abstract Background Glows -->
 		<div
