@@ -61,7 +61,7 @@
 					</p>
 				</section>
 
-				<section id="cookies">
+				<section id="cookies" class="scroll-mt-32">
 					<h2 class="text-2xl font-serif text-white mb-4">5. Cookies</h2>
 					<p class="mb-4">
 						Ce site utilise des cookies d'analyse pour comprendre comment les visiteurs interagissent
