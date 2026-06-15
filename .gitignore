@@ -1,12 +1,20 @@
 node_modules
 
-# Output
-.output
+# Next.js
+/.next/
+/out/
+next-env.d.ts
 .vercel
-.netlify
-.wrangler
-/.svelte-kit
+
+# Production build
 /build
+
+# PWA generated
+/public/sw.js
+/public/workbox-*.js
+/public/worker-*.js
+/public/sw.js.map
+/public/workbox-*.js.map
 
 # OS
 .DS_Store
@@ -18,17 +26,8 @@ Thumbs.db
 !.env.example
 !.env.test
 
-# Vite
-vite.config.js.timestamp-*
-vite.config.ts.timestamp-*
-
 # Bun
 .bun
-# package-lock.json # Uncomment if you want to strictly enforce Bun and ignore npm lockfiles
-# yarn.lock
-
-# Playwright MCP
-.playwright-mcp
 
 # Lighthouse reports
 lighthouse-report.html
@@ -46,4 +45,3 @@ lighthouse.json
 *.njsproj
 *.sln
 *.sw?
-

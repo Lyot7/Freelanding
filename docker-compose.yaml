@@ -7,6 +7,9 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-      - HOST=0.0.0.0
+      - HOSTNAME=0.0.0.0
+      - PORT=3000
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - CONTACT_EMAIL=${CONTACT_EMAIL}
     labels:
       - "traefik.http.services.app.loadbalancer.server.port=3000"

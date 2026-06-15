@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["bun"]
+nixPkgs = ["bun", "nodejs_20"]
 
 [phases.install]
 cmds = ["bun install"]
@@ -7,5 +7,6 @@ cmds = ["bun install"]
 [phases.build]
 cmds = ["bun run build"]
 
+# Next.js standalone server output
 [start]
-cmd = "bun run start"
+cmd = "node .next/standalone/server.js"

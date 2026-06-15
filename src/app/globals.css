@@ -1,0 +1,325 @@
+@import 'tailwindcss';
+
+/* ------------------------------------------------------------------ */
+/* Local Fonts - Variable fonts for optimal performance                */
+/* ------------------------------------------------------------------ */
+@font-face {
+	font-family: 'Playfair Display';
+	font-style: normal;
+	font-weight: 400 900;
+	font-display: swap;
+	src: url('/fonts/playfair-display/playfair-display-variable.woff2') format('woff2');
+}
+@font-face {
+	font-family: 'Playfair Display';
+	font-style: italic;
+	font-weight: 400 900;
+	font-display: swap;
+	src: url('/fonts/playfair-display/playfair-display-variable-italic.woff2') format('woff2');
+}
+@font-face {
+	font-family: 'Instrument Sans';
+	font-style: normal;
+	font-weight: 400 700;
+	font-display: swap;
+	src: url('/fonts/instrument-sans/instrument-sans-variable.woff2') format('woff2');
+}
+@font-face {
+	font-family: 'Material Symbols Outlined';
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url('/fonts/material-symbols/material-symbols-subset.woff2') format('woff2');
+}
+
+/* ------------------------------------------------------------------ */
+/* Theme tokens (Tailwind v4)                                          */
+/* ------------------------------------------------------------------ */
+@theme {
+	--color-aura-bg: #0f1a18;
+	--color-aura-card: #182622;
+	--color-aura-surface: #223530;
+	--color-aura-text: #f0f7f5;
+	--color-aura-muted: #9cafa9;
+	--color-aura-accent: #6ff0d3;
+	--color-aura-accent-hover: #4fe0c0;
+	--color-aura-gold: #d4b86a;
+	--color-primary: #6ff0d3;
+
+	--font-serif: 'Playfair Display', serif;
+	--font-sans: 'Instrument Sans', sans-serif;
+}
+
+/* ------------------------------------------------------------------ */
+/* Base                                                                */
+/* ------------------------------------------------------------------ */
+html {
+	overflow-x: hidden;
+	scrollbar-width: thin;
+	scrollbar-color: #6ff0d3 #0f1a18;
+}
+/* Lenis handles smooth scrolling; disable native smooth scroll */
+html.lenis,
+html.lenis body {
+	height: auto;
+}
+.lenis.lenis-smooth {
+	scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+	overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+	overflow: hidden;
+}
+
+html::-webkit-scrollbar {
+	width: 10px;
+}
+html::-webkit-scrollbar-track {
+	background: #0f1a18;
+}
+html::-webkit-scrollbar-thumb {
+	background: #6ff0d3;
+	border-radius: 5px;
+}
+html::-webkit-scrollbar-thumb:hover {
+	background: #4fe0c0;
+}
+
+body {
+	background-color: #0f1a18;
+	color: #f0f7f5;
+	-webkit-font-smoothing: antialiased;
+	font-family: 'Instrument Sans', sans-serif;
+	min-height: 100%;
+}
+
+/* ------------------------------------------------------------------ */
+/* Subtle Grain Overlay                                                */
+/* ------------------------------------------------------------------ */
+.noise-bg {
+	position: fixed;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+	pointer-events: none;
+	z-index: 50;
+}
+
+/* ------------------------------------------------------------------ */
+/* Text Gradients & Effects                                            */
+/* ------------------------------------------------------------------ */
+.text-gradient {
+	background: linear-gradient(135deg, #f0f7f5 0%, #6ff0d3 100%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+.italic-accent {
+	font-family: 'Playfair Display', serif;
+	font-style: italic;
+	color: #6ff0d3;
+}
+
+/* ------------------------------------------------------------------ */
+/* Card hover                                                          */
+/* ------------------------------------------------------------------ */
+.aura-card {
+	transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.aura-card:hover {
+	transform: translateY(-5px);
+	border-color: rgba(111, 240, 211, 0.3);
+	box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+}
+
+/* ------------------------------------------------------------------ */
+/* Masked text reveal (GSAP SplitText / AnimatedText)                  */
+/* ------------------------------------------------------------------ */
+.split-line-mask {
+	overflow: hidden;
+	display: block;
+}
+.split-line {
+	display: block;
+	will-change: transform;
+}
+
+/* ------------------------------------------------------------------ */
+/* Range slider (ROI simulator)                                        */
+/* ------------------------------------------------------------------ */
+.slider-wrapper {
+	position: relative;
+	height: 20px;
+	display: flex;
+	align-items: center;
+}
+.slider-wrapper::before {
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 4px;
+	height: 12px;
+	width: var(--progress, 0%);
+	background: rgba(111, 240, 211, 0.4);
+	border-radius: 6px 0 0 6px;
+	pointer-events: none;
+	z-index: 1;
+}
+input[type='range'] {
+	-webkit-appearance: none;
+	appearance: none;
+	height: 20px;
+	width: 100%;
+	background: transparent;
+	border-radius: 4px;
+	outline: none;
+	margin: 0;
+	position: relative;
+	z-index: 2;
+}
+input[type='range']::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 20px;
+	height: 20px;
+	background: #6ff0d3;
+	border-radius: 50%;
+	cursor: pointer;
+	border: none;
+	box-shadow: 0 0 8px rgba(111, 240, 211, 0.8), 0 0 12px rgba(111, 240, 211, 0.5);
+	margin-top: -4px;
+}
+input[type='range']::-moz-range-thumb {
+	width: 20px;
+	height: 20px;
+	background: #6ff0d3;
+	border-radius: 50%;
+	cursor: pointer;
+	border: none;
+	box-shadow: 0 0 8px rgba(111, 240, 211, 0.8), 0 0 12px rgba(111, 240, 211, 0.5);
+}
+input[type='range']::-webkit-slider-runnable-track {
+	height: 12px;
+	border-radius: 6px;
+	background: rgba(255, 255, 255, 0.1);
+}
+input[type='range']::-moz-range-track {
+	height: 12px;
+	border-radius: 6px;
+	background: rgba(255, 255, 255, 0.1);
+}
+input[type='range']::-moz-range-progress {
+	height: 12px;
+	border-radius: 6px 0 0 6px;
+	background: rgba(111, 240, 211, 0.4);
+}
+
+/* ------------------------------------------------------------------ */
+/* FAQ accordion animation                                             */
+/* ------------------------------------------------------------------ */
+.faq-content {
+	display: grid;
+	grid-template-rows: 0fr;
+	transition: grid-template-rows 0.35s ease-out, opacity 0.35s ease-out;
+	opacity: 0;
+}
+.faq-content > div {
+	overflow: hidden;
+}
+.faq-content[data-open='true'] {
+	grid-template-rows: 1fr;
+	opacity: 1;
+}
+
+/* ------------------------------------------------------------------ */
+/* Material Symbols                                                    */
+/* ------------------------------------------------------------------ */
+.material-symbols-outlined {
+	font-family: 'Material Symbols Outlined';
+	font-weight: normal;
+	font-style: normal;
+	font-size: 24px;
+	line-height: 1;
+	letter-spacing: normal;
+	text-transform: none;
+	display: inline-block;
+	white-space: nowrap;
+	word-wrap: normal;
+	direction: ltr;
+	-webkit-font-feature-settings: 'liga';
+	-webkit-font-smoothing: antialiased;
+	width: 1em;
+	height: 1em;
+	overflow: hidden;
+}
+
+/* ------------------------------------------------------------------ */
+/* Custom cursor                                                       */
+/* ------------------------------------------------------------------ */
+.custom-cursor-active {
+	cursor: none;
+}
+.custom-cursor-active a,
+.custom-cursor-active button,
+.custom-cursor-active input,
+.custom-cursor-active textarea {
+	cursor: none;
+}
+
+/* ------------------------------------------------------------------ */
+/* Click spark                                                         */
+/* ------------------------------------------------------------------ */
+@keyframes spark-anim {
+	0% {
+		transform: rotate(var(--angle)) translateX(0) scale(1);
+		opacity: 1;
+	}
+	100% {
+		transform: rotate(var(--angle)) translateX(var(--radius)) scale(0);
+		opacity: 0;
+	}
+}
+.animate-spark {
+	animation: spark-anim 400ms ease-out forwards;
+}
+
+/* Skeleton */
+@keyframes skeleton-pulse {
+	0%,
+	100% {
+		opacity: 0.3;
+	}
+	50% {
+		opacity: 0.7;
+	}
+}
+.skeleton {
+	background-color: var(--color-aura-surface);
+	animation: skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+	opacity: 0.5;
+}
+
+/* Marquee */
+@keyframes marquee-scroll {
+	from {
+		transform: translateX(0);
+	}
+	to {
+		transform: translateX(-50%);
+	}
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.001ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.001ms !important;
+		scroll-behavior: auto !important;
+	}
+}
