@@ -8,13 +8,10 @@
 
 	// Images optimisées
 	import myPic from '$lib/assets/images/my-pic.png?enhanced';
-	import jeromeDavy from '$lib/assets/images/jerome-davy.png?enhanced';
-	import mockupMeca from '$lib/assets/images/mockup-mecaservices.png?enhanced';
 	import mockupKpsull from '$lib/assets/images/mockup-kpsull.png?enhanced';
 
 	// Mapping des images de projets par slug
-	const projectImages: Record<string, typeof mockupMeca> = {
-		'meca-services': mockupMeca,
+	const projectImages: Record<string, typeof mockupKpsull> = {
 		'kpsull': mockupKpsull
 	};
 
@@ -965,33 +962,3 @@
 		</div>
 	</section>
 
-	<!-- Testimonial -->
-	<section class="py-16 md:py-24 bg-aura-card border-y border-aura-surface relative overflow-hidden">
-		<div class="max-w-4xl mx-auto px-6 text-center relative z-10 reveal-on-scroll" use:reveal>
-			<span class="material-symbols-outlined text-6xl text-aura-accent mb-8 opacity-50"
-				>format_quote</span
-			>
-			<blockquote class="text-2xl md:text-4xl font-serif leading-tight mb-10 text-white">
-				"Eliott a repensé notre infrastructure e-commerce et nos outils internes. En seulement un an
-				d'alternance, il a transformé notre dette technique en une infrastructure scalable et
-				performante, <span class="text-aura-accent italic">posant les bases d'une croissance
-					durable</span>."
-			</blockquote>
-
-			<div class="flex flex-col items-center justify-center gap-4">
-				<enhanced:img
-					src={jeromeDavy}
-					class="w-16 h-16 rounded-full object-cover border-2 border-aura-accent p-1"
-					alt="Jérôme DAVY"
-					loading="lazy"
-				/>
-				<div class="flex flex-col items-center gap-1">
-					<div class="flex items-center gap-2">
-						<span class="font-bold text-lg">Jérôme DAVY</span>
-						<span class="material-symbols-outlined text-[18px] text-aura-accent">verified</span>
-					</div>
-					<div class="text-sm text-aura-muted">PDG de MECA SERVICES</div>
-				</div>
-			</div>
-		</div>
-	</section>
