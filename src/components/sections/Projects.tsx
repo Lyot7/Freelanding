@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/Button';
 import { projects } from '@/lib/data/projects';
 
 const projectImages: Record<string, string> = {
-	'meca-services': '/images/mockup-mecaservices.png',
 	kpsull: '/images/mockup-kpsull.png'
 };
 

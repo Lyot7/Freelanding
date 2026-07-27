@@ -4,7 +4,6 @@ import { RoiSimulator } from '@/components/sections/RoiSimulator';
 import { Projects } from '@/components/sections/Projects';
 import { Skills } from '@/components/sections/Skills';
 import { Faq } from '@/components/sections/Faq';
-import { Testimonial } from '@/components/sections/Testimonial';
 import { faqJsonLd, jsonLdScript } from '@/lib/seo/jsonld';
 
 export default function HomePage() {
@@ -17,7 +16,6 @@ export default function HomePage() {
 			<Projects />
 			<Skills />
 			<Faq />
-			<Testimonial />
 		</>
 	);
 }

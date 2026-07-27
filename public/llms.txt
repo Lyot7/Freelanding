@@ -31,12 +31,6 @@ Analyse approfondie des processus metier pour identifier les goulots d'etranglem
 
 ## Realisations
 
-### MECA SERVICES - Infrastructure E-commerce
-Migration d'une boutique e-commerce vieillissante vers une architecture headless SvelteKit. Synchronisation temps reel avec l'ERP existant. Gestion d'un catalogue de plus de 1000 references.
-- Resultats : -70% temps de gestion, experience utilisateur x10
-- Stack : SvelteKit, Node.js, PostgreSQL, Docker
-- Temoignage client : "Eliott a transforme notre dette technique en une infrastructure scalable et performante, posant les bases d'une croissance durable." - Jerome DAVY, PDG
-
 ### KPSULL - Marketplace Mode Multi-Vendeurs
 Creation complete d'une marketplace dediee aux createurs de mode independants. Plateforme multi-vendeurs avec paiements Split via Stripe Connect.
 - Resultats : 100% autonomie createurs, 0 euros frais caches, mise en ligne < 5min
@@ -51,7 +45,6 @@ Creation complete d'une marketplace dediee aux createurs de mode independants. P
 
 - Accueil : https://eliottbouquerel.fr
 - Prendre rendez-vous : https://eliottbouquerel.fr/rendez-vous
-- Projet MECA SERVICES : https://eliottbouquerel.fr/projets/meca-services
 - Projet KPSULL : https://eliottbouquerel.fr/projets/kpsull
 - Mentions legales : https://eliottbouquerel.fr/mentions-legales
 - CGV : https://eliottbouquerel.fr/cgv
