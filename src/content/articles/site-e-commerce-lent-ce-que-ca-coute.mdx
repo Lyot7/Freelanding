@@ -1,0 +1,161 @@
+Un site e-commerce lent coûte des commandes avant même d’être vu. Google publie
+des seuils précis pour ses signaux Web essentiels : l’affichage du plus grand
+élément visible doit se faire en moins de **2,5 secondes**, la réponse à une
+interaction rester sous **200 millisecondes**, et le décalage cumulé de mise en
+page sous **0,1**. Ce sont des valeurs publiées, et elles se mesurent sur ta
+boutique en dix minutes.
+
+Cet article explique ce que ces trois nombres veulent dire, comment les relever
+sans outil payant, et ce qui les dégrade réellement sur une boutique.
+
+## Les trois mesures, en français
+
+**LCP**, pour Largest Contentful Paint. Le temps au bout duquel le plus grand
+élément visible de la page est affiché : sur une fiche produit, c’est presque
+toujours la photo principale. Bon en dessous de 2,5 secondes.
+
+**INP**, pour Interaction to Next Paint. Le délai entre le moment où l’on touche
+quelque chose et le moment où l’écran réagit. Bon en dessous de 200
+millisecondes. C’est la mesure qui a remplacé l’ancien FID, et elle est plus
+sévère parce qu’elle regarde toutes les interactions, pas seulement la première.
+
+**CLS**, pour Cumulative Layout Shift. À quel point le contenu saute pendant le
+chargement. Bon en dessous de 0,1. C’est la mesure qui correspond au bouton
+qu’on rate parce qu’une bannière s’est insérée au-dessus au dernier moment.
+
+<Stat
+  value="2,5 s"
+  label="seuil publié par Google pour le LCP, au-delà duquel l’expérience n’est plus considérée comme bonne. Mesuré sur le terrain, pas en laboratoire."
+/>
+
+## Ce que la lenteur coûte, sans invoquer d’étude douteuse
+
+Je ne vais pas te servir un pourcentage de conversion perdue par seconde. Ces
+chiffres circulent, ils viennent d’échantillons très différents du tien, et je
+n’ai personnellement mesuré aucun résultat client sur ce point : je démarre mon
+activité.
+
+Ce que je peux affirmer sans risque tient en trois mécanismes.
+
+<Steps items={[
+  "Un visiteur qui attend part. C’est une évidence, elle se vérifie dans tes propres statistiques : compare le taux de rebond de tes pages les plus lentes et de tes pages les plus rapides, à trafic comparable.",
+  "Une publicité payée sur une page lente est payée deux fois. Tu paies le clic, et tu perds une partie du trafic avant l’affichage. C’est le seul poste où la lenteur se chiffre directement en euros.",
+  "La vitesse est un signal de classement documenté par Google, via l’expérience de page. Elle ne fait pas classer une mauvaise page devant une bonne, mais elle départage à qualité égale."
+]} />
+
+Le troisième point mérite une nuance qu’on entend rarement : la vitesse ne fera
+jamais d’un catalogue générique un site bien classé. Elle empêche seulement de
+perdre à cause d’elle.
+
+## Mesurer en dix minutes, gratuitement
+
+Trois relevés, dans cet ordre.
+
+**PageSpeed Insights**, l’outil public de Google. Entre l’adresse d’une fiche
+produit, pas ta page d’accueil : c’est là qu’atterrissent tes visiteurs. Regarde
+la section des données de terrain, celles qui viennent d’utilisateurs réels,
+avant la section de laboratoire.
+
+**La Search Console**, onglet des signaux Web essentiels. Elle regroupe tes
+pages par gabarit et te dit lesquels échouent. C’est le seul endroit qui donne
+une vue d’ensemble plutôt qu’une page à la fois.
+
+**Ton propre téléphone, en données mobiles, hors du wifi de ton bureau.** C’est
+le test le plus désagréable et le plus instructif. Ouvre ta boutique comme un
+inconnu, en partant d’une recherche, et va jusqu’au paiement.
+
+<Callout title="Le piège du score sur cent">
+Le score coloré de PageSpeed est une synthèse de laboratoire, calculée sur un
+appareil simulé. Il est utile pour comparer deux versions d’une même page, pas
+pour juger ta boutique. Les seuils qui comptent sont les trois mesures de
+terrain, celles qui viennent de tes vrais visiteurs.
+</Callout>
+
+## Ce qui ralentit réellement une boutique
+
+Dans l’ordre de fréquence.
+
+### Les images
+
+Presque toujours le premier poste. Des photos produit servies en pleine
+résolution, sans format moderne, sans dimensions déclarées. Trois corrections
+règlent l’essentiel : redimensionner à la taille réellement affichée, servir en
+AVIF ou WebP, et déclarer largeur et hauteur dans le code pour que la place soit
+réservée avant le chargement. Cette dernière corrige le CLS à elle seule.
+
+### Les scripts tiers
+
+C’est le poste qui grossit tout seul. Une boutique accumule au fil des ans un
+outil de statistiques, deux pixels publicitaires, un chat, un système d’avis, un
+gestionnaire de consentement, une bannière de promotion, un widget de fidélité.
+Chacun a été ajouté pour une bonne raison, aucun n’a jamais été retiré.
+
+Fais l’inventaire. Pour chaque script, pose deux questions : qu’est-ce qu’il
+apporte, et qui regarde ce qu’il produit. Les scripts dont personne ne lit les
+données sortent.
+
+### Les applications de plateforme
+
+Sur les boutiques Shopify ou WooCommerce, les extensions installent leur propre
+code sur toutes les pages, y compris là où elles ne servent à rien. Une
+application de compteur de stock chargée sur la page de contact est une
+situation banale. C’est un des arguments qui pèsent dans l’arbitrage entre
+[une plateforme et un site sur mesure](/blog/shopify-ou-site-sur-mesure).
+
+### Le rendu côté client
+
+Une page produit dont le contenu n’existe qu’après l’exécution du JavaScript
+est lente pour le visiteur et opaque pour les moteurs. C’est aussi ce qui
+empêche un assistant de la citer, sujet que je traite dans [comment être cité
+par ChatGPT, Perplexity et les Aperçus IA de
+Google](/blog/etre-cite-par-chatgpt-et-perplexity).
+
+### Les polices
+
+Une police chargée depuis un service externe ajoute une connexion réseau avant
+le premier texte affiché. Les héberger sur ton propre domaine et déclarer un
+repli visible pendant le chargement supprime le problème.
+
+## L’ordre dans lequel je prends les choses
+
+<Steps items={[
+  "Mesurer sur les gabarits qui rapportent : fiche produit, page de catégorie, panier, tunnel. Pas la page d’accueil, qui reçoit moins de monde qu’on ne le croit.",
+  "Traiter les images, parce que c’est le premier poste et le moins risqué.",
+  "Faire l’inventaire des scripts tiers et retirer ce que personne ne regarde. C’est gratuit et souvent spectaculaire.",
+  "Réserver la place des éléments qui arrivent en retard : images, bannières, encarts publicitaires. Le CLS se règle presque entièrement là.",
+  "Enfin seulement, regarder l’architecture : rendu serveur, mise en cache, hébergement. C’est le poste le plus coûteux, et il ne se justifie qu’après les quatre premiers."
+]} />
+
+Cet ordre surprend, parce que le premier soupçon tombe presque toujours sur
+l’hébergement. Il l’est rarement. Un hébergement médiocre ajoute quelques
+dizaines de millisecondes ; une photo de 4 Mo en ajoute plusieurs secondes.
+
+<Quote>
+La vitesse ne se gagne pas en achetant un serveur plus gros. Elle se gagne en
+envoyant moins de choses.
+</Quote>
+
+## Ce qu’il ne faut pas faire
+
+Ne poursuis pas le score de cent sur cent. Au-delà d’un certain point, les gains
+sont invisibles pour un visiteur et coûtent très cher en complexité.
+
+Ne retire pas un outil qui rapporte pour gagner deux dixièmes de seconde. Un
+système d’avis qui augmente vraiment la conversion vaut son poids ; c’est le
+widget de fidélité que personne n’a ouvert depuis dix-huit mois qui doit partir.
+
+Ne mesure pas une seule fois. La performance se dégrade toute seule, au rythme
+des ajouts. Un relevé trimestriel de tes quatre gabarits principaux suffit à
+tenir la ligne.
+
+## Ce que je retiens
+
+Un site lent perd des gens avant de leur avoir montré quoi que ce soit, et le
+diagnostic est gratuit. Les trois seuils de Google sont publics, les outils de
+mesure aussi, et les deux tiers des corrections consistent à retirer plutôt qu’à
+ajouter.
+
+Si tu veux que je mesure tes gabarits, que je te rende ce qui pèse et
+dans quel ordre le traiter, c’est le point de départ de mes
+[prestations de site et de refonte](/services/site-vitrine). Envoie-moi
+l’adresse de ta boutique depuis [la page de contact](/contact).

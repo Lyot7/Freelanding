@@ -1,0 +1,232 @@
+import type { FaqItem, HomeContent, SiteConfig, WorkItem } from "@/lib/content/types";
+import { prixPackHT, type Prestation } from "@/content/offre";
+import { absoluteUrl } from "@/lib/site-url";
+
+/**
+ * Données structurées schema.org.
+ *
+ * POURQUOI : un moteur, classique ou génératif, lit une page comme du texte. Il
+ * devine qui parle, ce qui est vendu et où. Le JSON-LD arrête de le faire
+ * deviner : il déclare l'identité, l'offre, la zone d'intervention et les
+ * questions-réponses dans un format que Google, Bing et les assistants
+ * consomment directement. C'est ce qui rend un site CITABLE, là où le bouton
+ * « source préférée » ne fait que servir ceux qui se sont déjà abonnés.
+ *
+ * RÈGLE TENUE ICI : tout vient de la donnée du site. Un balisage qui affirme
+ * autre chose que la page est une déclaration trompeuse pour les moteurs, et
+ * c'est sanctionné — recopier à la main des prix ou une zone d'intervention
+ * garantissait qu'ils divergeraient au premier changement.
+ */
+
+/** Retire les clés vides : schema.org préfère un champ absent à un champ nul. */
+function compact<T extends Record<string, unknown>>(value: T): T {
+  return Object.fromEntries(
+    Object.entries(value).filter(([, v]) => v !== undefined && v !== null && v !== ""),
+  ) as T;
+}
+
+const PERSON_ID = absoluteUrl("/#eliott");
+const BUSINESS_ID = absoluteUrl("/#service");
+
+/**
+ * Le numéro au format international E.164, tel que schema.org l'attend.
+ *
+ * La donnée est saisie une seule fois dans `site.ts`, au format français
+ * (« 06 32 21 37 11 »), parce que c'est ce format-là qui s'affiche sur le site.
+ * Republier tel quel un numéro national dans le balisage laisserait un moteur
+ * deviner le pays : sur un site en français hébergé n'importe où, ce n'est pas
+ * une garantie, et c'est exactement le genre d'ambiguïté qui empêche de
+ * rattacher l'entité à sa fiche d'établissement.
+ *
+ * Seul le `0` de tête d'un numéro français à dix chiffres est converti en
+ * `+33`. Un numéro déjà international passe inchangé, et toute autre forme est
+ * renvoyée telle quelle plutôt que transformée au hasard.
+ */
+function telephoneE164(phone: string): string | undefined {
+  const chiffres = phone.replace(/[^\d+]/g, "");
+  if (!chiffres) return undefined;
+  if (chiffres.startsWith("+")) return chiffres;
+  if (/^0\d{9}$/.test(chiffres)) return `+33${chiffres.slice(1)}`;
+  return chiffres;
+}
+
+/** La personne. C'est elle que cite un assistant quand on demande « qui ». */
+export function personSchema(site: SiteConfig) {
+  return compact({
+    "@type": "Person",
+    "@id": PERSON_ID,
+    name: site.contact.person?.name ?? site.brand.name,
+    jobTitle: site.contact.person?.role,
+    url: absoluteUrl("/about"),
+    email: site.contact.email ? `mailto:${site.contact.email}` : undefined,
+    image: site.credits?.createdByAvatar
+      ? absoluteUrl(site.credits.createdByAvatar.src)
+      : undefined,
+    sameAs: site.socials?.filter((s) => s.external).map((s) => s.href),
+    worksFor: { "@id": BUSINESS_ID },
+  });
+}
+
+/**
+ * L'activité, ses prestations et sa zone. `areaServed` est ce qui fait la
+ * différence sur une recherche locale : sans lui, rien ne relie le site à la
+ * Normandie autrement que par un mot dans un paragraphe.
+ */
+export function businessSchema(site: SiteConfig, home: HomeContent) {
+  const offres = home.services.items.map((service) =>
+    compact({
+      "@type": "Offer",
+      name: service.title,
+      description: service.body[0],
+      // Le prix affiché est un point d'entrée (« dès ») : `Offer` le dit
+      // avec `priceSpecification`, pas avec `price`, qui annoncerait un tarif
+      // ferme et deviendrait un prix trompeur.
+      priceCurrency: "EUR",
+      priceSpecification: service.price
+        ? {
+            "@type": "PriceSpecification",
+            priceCurrency: "EUR",
+            minPrice: Number.parseInt(service.price.replace(/[^\d]/g, ""), 10) || undefined,
+          }
+        : undefined,
+    }),
+  );
+
+  return compact({
+    "@type": "ProfessionalService",
+    "@id": BUSINESS_ID,
+    name: `${site.brand.name}${site.brand.mark}`,
+    description: site.meta.description,
+    url: absoluteUrl("/"),
+    email: site.contact.email ? `mailto:${site.contact.email}` : undefined,
+    telephone: telephoneE164(site.contact.phone),
+    founder: { "@id": PERSON_ID },
+    areaServed: site.contact.address
+      ? site.contact.address.split(/,\s*(?:et\s+)?/).map((zone) => ({
+          "@type": "AdministrativeArea",
+          name: zone.trim(),
+        }))
+      : undefined,
+    knowsLanguage: ["fr-FR"],
+    hasOfferCatalog: offres.length
+      ? { "@type": "OfferCatalog", name: "Prestations", itemListElement: offres }
+      : undefined,
+  });
+}
+
+/** Les questions-réponses. Format directement réutilisé par les moteurs. */
+export function faqSchema(items: readonly FaqItem[]) {
+  return {
+    "@type": "FAQPage",
+    mainEntity: items.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: { "@type": "Answer", text: item.answer },
+    })),
+  };
+}
+
+/**
+ * Le fil d'Ariane, sous la forme que Google consomme.
+ *
+ * UNE SEULE IMPLÉMENTATION POUR TOUT LE SITE. Elle était écrite en dur dans
+ * `workSchema` ; la recopier pour les pages de prestation aurait donné deux
+ * fils d'Ariane à faire évoluer ensemble, exactement la classe d'erreur que
+ * `offre.ts` a fermée sur les prix.
+ *
+ * LA DERNIÈRE MARCHE N'A PAS D'ADRESSE, et ce n'est pas un oubli : c'est la
+ * page courante. Lui donner un `item` la ferait se déclarer comme un lien vers
+ * elle-même. Le type `item?` le rend impossible à oublier autrement.
+ */
+export function breadcrumbSchema(
+  marches: readonly { name: string; item?: string }[],
+) {
+  return {
+    "@type": "BreadcrumbList",
+    itemListElement: marches.map((marche, index) =>
+      compact({
+        "@type": "ListItem",
+        position: index + 1,
+        name: marche.name,
+        item: marche.item,
+      }),
+    ),
+  };
+}
+
+/** Une étude de cas, et le fil d'Ariane qui la situe. */
+export function workSchema(work: WorkItem) {
+  return [
+    compact({
+      "@type": "CreativeWork",
+      name: work.title,
+      description: work.overview,
+      url: absoluteUrl(`/work/${work.slug}`),
+      image: absoluteUrl(work.cover.src),
+      dateCreated: work.year,
+      creator: { "@id": PERSON_ID },
+      keywords: work.categories.join(", "),
+    }),
+    breadcrumbSchema([
+      { name: "Accueil", item: absoluteUrl("/") },
+      { name: "Réalisations", item: absoluteUrl("/work") },
+      { name: work.title },
+    ]),
+  ];
+}
+
+/**
+ * UNE PRESTATION CHIFFRÉE, ET SES TROIS PÉRIMÈTRES.
+ *
+ * POURQUOI CE NŒUD EXISTE. La page d'accueil déclare cinq types de données
+ * structurées ; les trois pages qui portent réellement l'offre, ses périmètres
+ * et ses prix n'en déclaraient AUCUN. Un moteur y voyait trois pages de texte
+ * sans savoir qu'elles vendent quelque chose, ni à quel prix.
+ *
+ * `Service` PORTANT DES `Offer`, et non l'inverse : c'est le vocabulaire déjà
+ * employé par `businessSchema`, où chaque prestation de l'accueil est une
+ * `Offer` du catalogue de l'activité. Le `provider` pointe sur le même `@id`,
+ * donc les trois pages se rattachent à l'entité de l'accueil au lieu de
+ * décrire une quatrième activité anonyme.
+ *
+ * LES PRIX SONT CALCULÉS, JAMAIS ÉCRITS. `prixPackHT` descend du taux
+ * journalier comme tout le reste du site ; un montant recopié ici aurait
+ * divergé au premier changement de curseur, et cette fois SANS être visible à
+ * l'écran, donc sans que personne le voie jamais.
+ *
+ * `priceSpecification` PLUTÔT QUE `price` : le montant est un prix HORS TAXES.
+ * Le déclarer en `price` nu laisserait entendre un prix toutes taxes comprises,
+ * ce qui serait un prix trompeur pour un lecteur qui n'est pas assujetti.
+ */
+export function serviceSchema(prestation: Prestation, description: string) {
+  return compact({
+    "@type": "Service",
+    name: prestation.nom,
+    description,
+    url: absoluteUrl(`/services/${prestation.slug}`),
+    serviceType: prestation.nom,
+    provider: { "@id": BUSINESS_ID },
+    areaServed: { "@type": "Country", name: "France" },
+    offers: prestation.packs.map((pack) => ({
+      "@type": "Offer",
+      name: pack.nom,
+      description: pack.promesse,
+      priceCurrency: "EUR",
+      priceSpecification: {
+        "@type": "PriceSpecification",
+        priceCurrency: "EUR",
+        price: prixPackHT(pack),
+        valueAddedTaxIncluded: false,
+      },
+    })),
+  });
+}
+
+/**
+ * Assemble un graphe unique. Un seul bloc par page plutôt qu'un script par
+ * entité : les `@id` relient alors les nœuds entre eux (la personne travaille
+ * pour l'activité) au lieu de laisser trois objets sans rapport.
+ */
+export function graph(...nodes: unknown[]) {
+  return { "@context": "https://schema.org", "@graph": nodes.flat() };
+}

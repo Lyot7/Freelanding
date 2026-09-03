@@ -1,0 +1,169 @@
+Le taux d’abandon de panier moyen documenté par l’institut Baymard, à partir
+d’une cinquantaine d’études, est de **70,22 %**. Autrement dit : sept paniers
+sur dix n’aboutissent pas. La première cause identifiée par leurs travaux, ce
+sont les frais supplémentaires découverts trop tard, livraison et taxes
+comprises.
+
+Cet article détaille les causes réelles, dans l’ordre où elles se présentent, et
+ce qui les corrige. Aucun des chiffres cités ici ne vient de mes propres
+missions : je débute mon activité et je n’ai pas de résultat client à montrer.
+Ils viennent tous de sources publiques, nommées dans le texte.
+
+## Ce que le chiffre de 70 % veut dire, et ne veut pas dire
+
+Il ne veut pas dire que tu perds sept clients sur dix. Une partie considérable
+des paniers abandonnés n’a jamais été une intention d’achat : Baymard isole
+d’ailleurs le segment des gens qui regardent sans intention, et qui pèse autour
+de 42 % des abandons.
+
+Le panier sert aussi de liste d’envies, de comparateur de prix, de calculateur
+de frais de port. Un taux d’abandon de 70 % n’est donc pas un signal d’alarme en
+soi. Ce qui compte, c’est la part des abandons qui répondent à une raison que tu
+peux corriger.
+
+<Stat
+  value="70,22 %"
+  label="taux d’abandon de panier moyen documenté par l’institut Baymard, à partir d’une cinquantaine d’études. La part attribuable à un simple parcours de navigation en représente une bonne moitié."
+/>
+
+## Les causes documentées, par ordre de poids
+
+Les travaux de Baymard sur les acheteurs ayant une intention réelle font
+ressortir, dans l’ordre, ces motifs de renoncement pendant le tunnel de
+commande.
+
+<Steps items={[
+  "Les frais supplémentaires trop élevés : livraison, taxes, frais divers. C’est de loin le premier motif, autour de 40 % des abandons de ce segment.",
+  "La livraison trop lente, environ un abandon sur cinq.",
+  "Le manque de confiance pour confier ses données de carte bancaire, à un niveau comparable.",
+  "L’obligation de créer un compte pour commander.",
+  "Un tunnel de commande trop long ou trop compliqué.",
+  "Des erreurs ou des plantages du site pendant le paiement.",
+  "Une politique de retour insatisfaisante, ou impossible à trouver."
+]} />
+
+Regarde cette liste attentivement. Un seul de ces motifs concerne le prix du
+produit, et encore : il concerne le prix des frais, pas celui de l’article. Les
+six autres sont des problèmes de conception, d’information et de confiance,
+c’est-à-dire des choses qui se corrigent sans toucher à tes marges.
+
+## Le premier chantier : le coût total, le plus tôt possible
+
+Si tu ne fais qu’une chose, fais celle-là.
+
+Le mécanisme est simple : quelqu’un décide d’acheter à un prix, et découvre un
+autre prix à la fin. Ce qui fait partir, c’est l’écart. Une livraison à 6,90 €
+annoncée sur la fiche produit passe ; la même livraison découverte à l’étape
+trois du tunnel fait fermer l’onglet.
+
+Trois façons de traiter, par ordre de préférence.
+
+**Afficher le montant de la livraison sur la fiche produit**, calculé ou
+forfaitaire. C’est le plus efficace et le plus rare.
+
+**Afficher le seuil de gratuité**, et l’écart restant dans le panier. « Encore
+12 € pour la livraison offerte » est une des rares mécaniques qui augmente le
+panier moyen sans agacer.
+
+**Au minimum, calculer les frais dans le panier**, avant la moindre saisie
+d’adresse. Faire renseigner un code postal pour connaître le prix est une
+friction de plus, placée exactement au mauvais endroit.
+
+## Le deuxième : la commande sans compte
+
+L’obligation de créer un compte est le motif d’abandon le plus facile à retirer,
+et le plus fréquemment défendu en interne par de mauvaises raisons.
+
+L’argument habituel est qu’un compte permet de fidéliser. En pratique, il permet
+surtout de perdre la commande. Propose la commande en tant qu’invité, puis offre
+la création du compte **après le paiement**, en un clic, quand la personne a une
+raison concrète de le vouloir : suivre son colis, refaire la commande, gérer un
+retour.
+
+Tu récupères l’adresse e-mail de toute façon, puisqu’elle est nécessaire à la
+confirmation.
+
+## Le troisième : la confiance au moment de payer
+
+C’est le motif le plus mal compris, parce qu’il ne se corrige pas avec un badge.
+Ce qui produit la confiance, dans l’ordre :
+
+<Steps items={[
+  "Un site rapide et sans erreur. Un plantage à l’étape du paiement est une trahison au pire moment, et il figure dans les motifs documentés d’abandon.",
+  "Des mentions légales et une politique de retour réelles, trouvables en un clic depuis le panier.",
+  "Un moyen de paiement connu du client. Une passerelle inconnue augmente l’hésitation même quand elle est parfaitement sûre.",
+  "Un design cohérent de bout en bout. Un tunnel qui change brutalement d’apparence, parce qu’il est hébergé ailleurs, réveille la méfiance.",
+  "Un contact humain visible. Un numéro ou une adresse qui répond dit qu’il y a quelqu’un derrière."
+]} />
+
+Les cadenas dessinés et les logos de sécurité collés en bas de page ne font plus
+rien. Ils rassuraient il y a quinze ans.
+
+## Le quatrième : le formulaire lui-même
+
+Un tunnel de commande est une suite de formulaires, et un formulaire mal conçu
+fait échouer des gens qui voulaient acheter. C’est une question de dialogue : le
+formulaire attend quelque chose de précis et ne le dit pas avant qu’on se
+trompe.
+
+Le relevé des erreurs réellement commises, champ par champ, coûte une
+demi-journée et dit exactement où ça casse. J’ai raconté ce que ce relevé
+révèle sur un parcours de création de compte dans [le formulaire qui faisait
+fuir les clients](/blog/formulaire-inscription-erreurs-saisie).
+
+Trois règles suffisent à corriger l’essentiel : annoncer les contraintes avant
+la saisie, valider au fil de la frappe plutôt qu’à l’envoi, et écrire des
+messages d’erreur qui disent quoi faire au lieu de dire non.
+
+## Les relances, et leur limite
+
+Un e-mail de relance de panier abandonné fonctionne, et je ne vais pas prétendre
+le contraire. Mais il traite le symptôme.
+
+Si ta relance fonctionne parce qu’elle contient un code de réduction, tu es en
+train d’apprendre à tes clients à abandonner leur panier pour obtenir une
+remise. C’est un mécanisme qui s’auto-entretient et qui grignote la marge.
+
+Une relance utile rappelle le produit, lève l’objection identifiée, et donne un
+chemin direct vers le panier reconstitué. Sans remise, ou alors une seule fois,
+et pas systématiquement.
+
+<Callout title="L’ordre que je recommande">
+Corrige d’abord l’affichage du coût total, puis la commande sans compte, puis
+les erreurs du formulaire. Installe les relances en dernier. Automatiser la
+récupération d’un problème qu’on n’a pas corrigé revient à payer pour vivre
+avec.
+</Callout>
+
+## Mesurer chez toi plutôt que citer des moyennes
+
+Les chiffres de cet article servent à hiérarchiser, pas à diagnostiquer. Le vrai
+diagnostic tient dans un relevé de ton propre tunnel.
+
+Compte, pour un mois : combien de sessions voient une fiche produit, combien
+ajoutent au panier, combien ouvrent le tunnel, combien atteignent le paiement,
+combien paient. La marche la plus haute est ton chantier. Elle n’est presque
+jamais celle qu’on croit, et elle change quand tu la corriges.
+
+Ajoute-y une observation qu’aucun tableau de bord ne donne : commande chez toi,
+sur un téléphone, en 4G, comme un inconnu. La moitié des problèmes se voient à
+cette occasion.
+
+<Quote>
+Ce qui se corrige, ce sont les raisons d’abandonner, une par une. Elles sont peu
+nombreuses.
+</Quote>
+
+## Ce que je retiens
+
+Sept paniers sur dix n’aboutissent pas, et c’est normal. Ce qui n’est pas
+normal, c’est de perdre des gens qui avaient décidé d’acheter, pour un prix
+découvert trop tard, un compte imposé ou un champ qui refuse sans expliquer. Ces
+causes-là sont documentées, peu nombreuses, et corrigibles sans refonte.
+
+Si tu veux que je relève ton tunnel, que je te rende les marches dans
+l’ordre de ce qu’elles coûtent et que je corrige les premières, c’est ce que
+couvrent mes [prestations de site et de refonte](/services/site-vitrine). Pour
+la partie automatisation des commandes et des retours, ça relève plutôt de
+[l’outil métier](/services/outil-metier). Écris-moi depuis
+[la page de contact](/contact).

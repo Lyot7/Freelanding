@@ -1,0 +1,155 @@
+Un outil sur mesure se justifie quand ta façon de travailler est ce qui te
+distingue, et qu’aucun logiciel du marché ne l’épouse sans que tu te tordes pour
+rentrer dedans. Dans tous les autres cas, l’abonnement est la décision
+raisonnable, et je te le dirai. La question qui tranche : qu’est-ce qui, chez
+toi, ne rentre pas dans une case ?
+
+Cet article donne les critères de tri, le calcul de coût que personne ne fait,
+et les trois situations où le sur-mesure gagne nettement.
+
+## Ce que les deux options achètent réellement
+
+Un abonnement SaaS achète un **droit d’usage**. Tu paies tous les mois pour
+continuer à te servir d’un outil qui appartient à quelqu’un d’autre, dont les
+fonctions, le prix et la durée de vie ne dépendent pas de toi.
+
+Un outil sur mesure achète un **actif**. Le code est dans ton dépôt,
+l’hébergement est à ton nom, et l’outil continue de fonctionner que tu paies
+quelqu’un ou non.
+
+C’est une différence de nature. Louer un local n’est pas moins raisonnable que
+l’acheter ; c’est simplement une autre opération, avec un autre calcul.
+
+## Le calcul de coût que personne ne fait
+
+La comparaison honnête ne met pas « 5 000 € une fois » en face de « 49 € par
+mois ». Elle met tous les postes des deux côtés.
+
+Du côté SaaS, additionne : l’abonnement de chaque outil, les paliers de prix qui
+se déclenchent quand tu grandis, les commissions par transaction ou par
+commande, les connecteurs payants qui relient les outils entre eux, et le temps
+humain passé à recopier ce que les outils ne se transmettent pas.
+
+Du côté sur mesure, additionne : le développement initial, l’hébergement, et la
+part annuelle d’évolution et de maintenance. Cette dernière ligne est réelle et
+il faut la chiffrer : un outil qu’on ne fait pas évoluer devient un outil qu’on
+contourne.
+
+<Callout title="Le poste qu’on oublie toujours">
+Le temps humain. Une personne qui recopie chaque matin les commandes d’une
+plateforme vers un tableur, trente minutes par jour ouvré, c’est environ
+cent-vingt heures par an. Mets ton coût horaire chargé en face avant de décider
+que l’abonnement est moins cher.
+</Callout>
+
+## Quand l’abonnement est le bon choix
+
+Souvent, et je préfère l’écrire clairement.
+
+<Steps items={[
+  "Ton besoin est standard. Facturation, comptabilité, envoi d’e-mails, paiement : ce sont des problèmes résolus, complexes, réglementés, et les réécrire serait absurde.",
+  "Tu ne sais pas encore ce dont tu as besoin. Un abonnement est le moyen le moins cher de découvrir ton propre processus. Construis quand tu sauras.",
+  "Le volume est faible. Un outil qui sert trois fois par semaine ne mérite pas d’être construit.",
+  "L’outil du marché te convient tel quel. Si tu ne l’as pas tordu, il n’y a rien à corriger."
+]} />
+
+Le SaaS a une qualité qu’on sous-estime : il est immédiat, et il est
+abandonnable sans regret. Un outil qu’on peut arrêter en trois mois est un bon
+endroit pour essayer.
+
+## Quand ça bascule
+
+Trois signaux, et ils sont assez nets pour être reconnus sans expertise.
+
+### Tu paies pour ne pas utiliser
+
+Tu es sur un palier tarifaire à cause d’une seule fonction, et tu laisses
+quatre-vingts pour cent de l’outil en friche. C’est le cas classique des
+plateformes vendues par lot : tu achètes un ensemble pour un morceau.
+
+### Tes outils ne se parlent pas
+
+La boutique, la comptabilité, la logistique et le service client tiennent
+chacun une vérité, et personne ne sait laquelle gagne quand elles divergent.
+C’est le sujet de [pourquoi tes outils ne sont jamais d’accord sur le
+stock](/blog/synchroniser-catalogue-stock-et-commandes).
+
+### Ta différence est devenue une bidouille
+
+Ta règle de tarification, ta façon de composer les lots, ton processus de
+retour : ce qui fait ton métier existe dans un tableur à côté de l’outil, parce
+que l’outil ne sait pas le faire. Le jour où ton avantage commercial vit dans un
+fichier partagé que personne ne maintient, la question est tranchée.
+
+<Quote>
+Le sur-mesure ne se justifie pas par ce qui te manque. Il se justifie par ce que
+tu fais différemment, et qui te rapporte.
+</Quote>
+
+## Ce que le sur-mesure ne règle pas
+
+Il ne te rend pas indépendant de tout. Un outil construit pour toi dépend quand
+même d’un hébergeur, d’une passerelle de paiement, de l’interface de
+programmation de ta boutique. La dépendance change de nature, elle ne disparaît
+pas.
+
+Il n’est pas gratuit à entretenir. Compte une part annuelle pour les évolutions,
+les mises à jour et les corrections. Un devis qui n’en parle pas est un devis
+incomplet.
+
+Il ne va pas plus vite que la décision. Ce qui fait déraper un projet d’outil,
+c’est une règle de gestion à laquelle personne dans l’entreprise n’a répondu.
+Plus tes règles sont écrites, plus le chiffrage est bas.
+
+## La voie du milieu, qui est souvent la bonne
+
+On oppose les deux options alors que la plupart des cas réels sont mixtes.
+
+Tu gardes ta boutique, ta comptabilité et ta passerelle de paiement en
+abonnement. Tu fais construire la pièce qui te manque, celle qui porte ta
+différence, et tu la branches sur le reste. C’est ce que j’appelle un
+branchement : une fonction en production, raccordée aux outils qui portent déjà
+tes données, et rien de plus.
+
+C’est moins spectaculaire qu’un logiciel complet, et c’est souvent ce qui rend
+le plus vite. Un tableau de bord qui rassemble les commandes de trois canaux,
+une automatisation qui édite les bons de retour, une synchronisation qui
+maintient les stocks d’accord : chacune de ces briques se chiffre en jours, pas
+en mois.
+
+## Les quatre questions à poser avant de signer, des deux côtés
+
+Elles valent pour un éditeur de SaaS comme pour moi.
+
+**Comment j’exporte, et quoi exactement ?** Quels champs, dans quel format, et
+est-ce que je peux le faire seul sans passer par le support.
+
+**Qu’est-ce qui reste si j’arrête de payer ?** Lecture seule, coupure, ou rien
+du tout. C’est écrit quelque part, et ce n’est pas la même chose.
+
+**Y a-t-il une commission sur mon activité ?** Un abonnement fixe est un coût.
+Un pourcentage sur tes ventes est une part de ta marge, qui grandit exactement
+au rythme de ta réussite.
+
+**Qui apparaît devant mon client ?** Regarde l’e-mail de confirmation qu’il
+reçoit. S’il porte le nom de la plateforme et pas le tien, tu construis
+l’audience de quelqu’un d’autre.
+
+J’ai développé ces quatre questions dans [à qui appartient ton fichier
+client](/blog/a-qui-appartient-votre-fichier-client), qui les prend par l’angle
+des données.
+
+## Ce que je retiens
+
+La bonne question, c’est la propriété et l’ajustement. Paie un abonnement pour
+tout ce qui est standard, et fais construire uniquement ce qui porte ta
+différence. Un outil sur mesure qui refait ce qu’un abonnement fait déjà bien
+est un mauvais achat, quel que soit son prix.
+
+Si tu veux que je regarde ta pile d’outils et que je te dise
+honnêtement ce qui vaut le coup d’être construit et ce qui ne le vaut pas,
+c’est exactement le point de départ d’un [outil métier
+sur mesure](/services/outil-metier). Pour un besoin plus large, où les données
+naissent dans l’outil au lieu d’exister ailleurs, ça se traite du côté
+[logiciel métier](/services/logiciel-metier). Dans les deux cas, ça commence
+par [une conversation](/contact).

@@ -1,0 +1,176 @@
+Le SEO cherche une position dans une liste de liens. Le GEO cherche à être
+repris dans une réponse rédigée par une machine. Les deux se nourrissent du même
+travail de fond, mais ils ne récompensent pas les mêmes gestes : le SEO
+récompense l’autorité et la couverture, le GEO récompense la clarté et
+l’attribution. Il n’y a pas à choisir, il y a à faire les deux dans le bon
+ordre.
+
+Cet article dit ce qui change concrètement pour une boutique en ligne, et ce
+qu’il faut arrêter de faire.
+
+## Deux définitions, sans jargon
+
+**SEO**, ou Search Engine Optimization : le travail qui vise à faire apparaître
+une page haut dans les résultats d’un moteur de recherche. La récompense est un
+lien bleu, et un clic.
+
+**GEO**, ou Generative Engine Optimization : le travail qui vise à faire
+reprendre le contenu d’une page dans une réponse générée par un assistant ou par
+un Aperçu IA. La récompense est une citation, parfois un clic, parfois seulement
+une mention de ta marque.
+
+La deuxième récompense est plus faible en trafic et plus forte en confiance.
+Quelqu’un qui arrive après avoir lu « d’après cette boutique » a déjà franchi
+une étape que la liste de liens ne fait pas franchir.
+
+## Ce que les deux ont en commun
+
+Beaucoup, et c’est la partie qu’on oublie quand on vend le GEO comme une
+révolution.
+
+<Steps items={[
+  "Une page doit exister et être accessible. Un contenu chargé uniquement en JavaScript après trois secondes est mal lu par les deux familles de moteurs.",
+  "Une page doit être rapide. Les seuils publiés par Google pour les signaux Web essentiels valent toujours, et un site lent perd des visiteurs avant même la question du référencement.",
+  "Une page doit être trouvable. Liens entrants, plan de site, cohérence des informations : un assistant cite ce qu’il a rencontré, et il rencontre ce que le web pointe.",
+  "Une page doit dire quelque chose. Aucun balisage ne compense un texte qui n’apporte rien."
+]} />
+
+Autrement dit, quatre cinquièmes du travail sont communs. Si ton site est lent,
+mal structuré et sans contenu propre, la question SEO ou GEO ne se pose pas
+encore.
+
+## Ce qui change vraiment
+
+Trois écarts méritent d’être connus.
+
+### La granularité de ce qui est jugé
+
+Un moteur classique juge une page entière et lui attribue une place. Un moteur
+génératif prélève un passage. La conséquence est concrète : un article de 3 000
+mots bien classé peut ne rien donner en GEO si aucune de ses sections ne se
+tient toute seule, tandis qu’une page courte et nette peut être citée sans
+jamais être première nulle part.
+
+Écrire pour le GEO, c’est écrire des paragraphes qui survivent au copier-coller.
+
+### La valeur des chiffres et des sources
+
+En SEO, une statistique sans source ne pénalise rien. En GEO, elle est un
+handicap : les modèles reprennent plus volontiers ce qui est attribué, et le
+papier GEO présenté à KDD 2024 mesure justement l’effet positif de l’ajout de
+citations et de statistiques.
+
+C’est la raison pour laquelle je n’écris aucun chiffre sur ce site sans dire
+d’où il vient. Ce n’est pas seulement une question d’honnêteté, c’est aussi ce
+qui rend une page reprenable.
+
+### Le rôle du balisage
+
+Les données structurées existaient déjà pour le SEO, où elles servaient surtout
+à obtenir des résultats enrichis. En GEO elles changent de fonction : elles
+donnent à une machine des faits qu’elle peut vérifier plutôt qu’inférer. Un prix
+dans un `Offer`, une disponibilité, un délai de livraison, une note moyenne
+réelle. Pour une boutique, c’est le levier le plus rentable et le moins glamour.
+
+<Quote>
+Le SEO se gagne sur la page entière. Le GEO se gagne paragraphe par paragraphe.
+</Quote>
+
+## Ce qu’il faut arrêter
+
+Trois pratiques qui marchaient plus ou moins et qui ne marchent plus du tout.
+
+**Les pages écrites pour un mot-clé et pas pour une question.** Une page
+« chaussures de running femme pas cher » qui ne répond à rien ne sera ni bien
+classée ni citée. La requête existe, la réponse n’existe pas.
+
+**Le contenu produit en volume.** Publier trente articles vides pour occuper le
+terrain avait un effet quand le classement se jouait sur la couverture. Un
+moteur génératif n’a aucune raison de citer une page qui reformule ce que dix
+autres disent mieux.
+
+**Le chiffre sans source.** « 80 % des acheteurs abandonnent leur panier à cause
+du prix de livraison » sonne bien et ne veut rien dire tant qu’on ne sait pas
+qui l’a mesuré, sur quel échantillon, quand. C’est vérifiable pour de vrai :
+l’institut Baymard tient une moyenne documentée du taux d’abandon de panier,
+issue d’une cinquantaine d’études, et j’y reviens dans [l’article sur l’abandon
+de panier](/blog/abandon-de-panier-causes-et-remedes).
+
+## L’ordre dans lequel je prends les choses pour une boutique
+
+<Steps items={[
+  "La technique d’abord : vitesse, rendu du contenu sans JavaScript, plan de site, indexation vérifiée page par page. Ça sert aux deux.",
+  "Les pages qui rapportent ensuite : fiches produit, catégories, pages de livraison et de retour. Une réponse nette en haut, des sections autonomes, des faits attribués.",
+  "Le balisage après : Product, Offer, FAQPage, avec des valeurs réelles et tenues à jour. Un balisage qui ment est pire que pas de balisage.",
+  "Le llms.txt et la fiche d’identité du site en dernier. C’est utile, ce n’est pas ce qui décide.",
+  "La mesure en continu : positions classiques d’un côté, relevé manuel des citations et trafic de recommandation des assistants de l’autre."
+]} />
+
+## Comment mesurer chacun des deux
+
+C’est là que l’écart est le plus inconfortable, et il faut le dire tel quel.
+
+Le SEO se mesure bien. La Search Console donne les impressions, les clics, les
+positions moyennes et les requêtes, gratuitement, sur seize mois. Tes
+statistiques donnent le trafic organique et ce qu’il rapporte. Le circuit est
+complet, de la requête à la commande.
+
+Le GEO se mesure mal. Il n’existe aucune console des assistants, aucune liste
+des requêtes qui ont déclenché une citation, aucun historique. Ce qu’on peut
+faire aujourd’hui tient en trois relevés artisanaux.
+
+<Steps items={[
+  "Le relevé manuel. Une vingtaine de questions que tes clients posent vraiment, passées chaque mois dans ChatGPT, Perplexity et la recherche Google, en notant qui est cité. C’est fastidieux et c’est la seule mesure directe.",
+  "Le trafic de recommandation. Dans tes statistiques, isole les visites venues des domaines des assistants. Le volume est faible et il monte : ce qui compte est la pente, pas le niveau.",
+  "Les requêtes longues dans la Search Console. Les questions formulées en langage naturel, de dix mots et plus, sont le signal indirect que tes pages répondent à des questions plutôt qu’à des mots-clés."
+]} />
+
+Aucun de ces trois relevés ne vaut un tableau de bord. Quiconque te vend
+aujourd’hui un suivi de positionnement dans les assistants te vend une
+extrapolation. Mieux vaut le savoir avant de payer pour.
+
+## Ce que ça change pour une fiche produit
+
+Le cas concret, parce que c’est là que ça se joue pour une boutique.
+
+Pour le SEO, une bonne fiche produit a un titre unique, un texte propre et non
+recopié du fournisseur, un balisage `Product` correct, et des liens internes
+depuis ses catégories.
+
+Pour le GEO, elle a en plus une réponse directe en haut, du type « ce sac de 28
+litres est étanche et se porte à vélo, livré sous 48 heures, retour gratuit sous
+30 jours », et trois à cinq questions fréquentes avec leur réponse en clair.
+
+La deuxième liste n’annule pas la première : elle s’ajoute, et elle sert aussi
+les visiteurs humains, qui cherchent exactement les mêmes informations. La
+structure détaillée est dans [la fiche produit qui
+convertit](/blog/fiche-produit-qui-convertit).
+
+## Faut-il un budget séparé ?
+
+Non, et je le dis à contre-courant de ce qui se vend en ce moment. Le GEO est
+une manière d’écrire et de baliser, qui s’intègre au travail de contenu et au
+travail technique. Si quelqu’un te propose une ligne « GEO » sur un devis,
+demande ce qu’elle contient de différent des deux autres lignes. La réponse est
+souvent : rien.
+
+<Callout title="Ce qui mérite un budget, en revanche">
+Le rendu côté serveur de tes pages produit si elles s’affichent aujourd’hui en
+JavaScript seul, le balisage des prix et des stocks à partir de tes vraies
+données, et la vitesse. Trois chantiers techniques qui servent le référencement
+classique, les assistants, et tes clients en même temps.
+</Callout>
+
+## Ce que je retiens
+
+Le GEO est moins une nouveauté qu’un durcissement d’une exigence ancienne : dire
+quelque chose de précis, le dire tôt, et dire d’où on le tient. Les sites qui
+vont y perdre sont ceux qui vivaient de la couverture et du volume.
+
+Si tu veux les détails pratiques du côté citation, je les ai réunis dans
+[comment être cité par ChatGPT, Perplexity et les Aperçus IA de
+Google](/blog/etre-cite-par-chatgpt-et-perplexity). Et si tu veux que je
+regarde ta boutique et que je te dise lequel des deux chantiers te
+rapportera le plus, c’est ce que je fais dans un
+[diagnostic](/services/site-vitrine), qui commence par
+[un premier échange](/contact).

@@ -1,0 +1,80 @@
+Quand un artisan trace au crayon sur une planche avant de sortir le ciseau, il
+se donne le seul moment où l’erreur ne coûte qu’un coup de gomme. Je fais la
+même chose avec un outil métier, et pour exactement la même raison.
+
+## Le malentendu sur ce que coûte une interface
+
+Quand je dis que je dessine l’interface avant d’écrire le code, on entend
+souvent « il va passer du temps sur le joli ». C’est le contraire du sujet.
+
+Un outil de travail ne se juge pas sur son apparence. Il se juge sur une seule
+chose : est-ce que la personne qui s’en sert tous les jours sait quoi faire sans
+qu’on le lui explique. Cette question-là ne se règle pas au moment du code. Elle
+se règle au moment où on décide de l’ordre des écrans, de ce qui est visible
+sans cliquer, et de ce qu’on demande à quelqu’un de saisir.
+
+<Quote>
+Ce qui coûte cher dans un outil métier, c’est la fonctionnalité qu’on a
+construite avant d’avoir compris à quoi elle servait.
+</Quote>
+
+## Ce que le dessin fait apparaître
+
+Le dessin force des décisions pendant qu’elles sont encore gratuites, bien avant
+de ressembler à l’outil fini.
+
+<Steps items={[
+  "Il rend visible ce qui manque. Un écran de prise de rendez-vous dessiné révèle en cinq minutes qu’on n’a jamais tranché ce qui se passe quand deux clients demandent le même créneau.",
+  "Il oblige à hiérarchiser. Tout ne peut pas être au premier plan : dessiner impose de dire ce qu’on regarde en premier le matin, et ce qu’on va chercher une fois par mois.",
+  "Il donne quelque chose à contester. Un client sait dire « ce n’est pas comme ça que je travaille » devant un écran. Devant un cahier des charges, personne ne sait."
+]} />
+
+Ce dernier point est le vrai gain. Un document de spécification se lit en
+hochant la tête. Un écran se regarde, et on voit tout de suite qu’il manque le
+champ où l’on note pourquoi le client a annulé.
+
+## Pourquoi l’ordre inverse coûte plus
+
+Construire d’abord et ajuster ensuite paraît plus rapide, parce que le travail
+est visible tout de suite. Le problème tient à ce qu’on apprend, et au moment où
+on l’apprend.
+
+Quand une structure est écrite dans le code, la base de données et les écrans en
+dépendent. Changer d’avis après coup ne veut pas dire déplacer un bouton : ça
+veut dire défaire trois couches qui reposaient sur une hypothèse fausse. Le même
+changement, fait sur un dessin, prend une conversation.
+
+<Callout title="Ce que ça change pour toi, concrètement">
+Tu vois ton outil avant qu’il existe, tu peux dire non pendant que dire non ne
+coûte rien, et le devis ne bouge pas parce qu’on a découvert en cours de route
+qu’il manquait la moitié d’un parcours.
+</Callout>
+
+## Là où je ne dessine pas
+
+Cette étape n’est pas un dogme. Pour une page qui n’a qu’un seul chemin (une
+page de contact, une mention légale, un article), dessiner n’apprend rien qu’on
+ne sache déjà, et je code directement.
+
+Le critère est simple : est-ce qu’il y a plusieurs façons défendables
+d’organiser la chose ? Si oui, le choix mérite d’être fait devant toi, sur un
+dessin. Si non, le dessin serait une facture pour une décision déjà prise.
+
+## Ce que je retiens
+
+Le dessin déplace les décisions difficiles à l’endroit où se tromper est encore
+gratuit.
+
+Un outil qu’on découvre à la livraison est un outil qu’on va vouloir corriger à
+la livraison. C’est le pire moment pour le faire, et le plus cher.
+
+Cette étape pèse d’autant plus que l’outil est utilisé tous les jours par
+plusieurs personnes, et elle décide aussi de l’accessibilité, qu’on ne rattrape
+pas après coup : j’y reviens dans [l’accessibilité d’une boutique en
+ligne](/blog/accessibilite-boutique-en-ligne-obligation-et-levier).
+
+Si tu as une fonction qui te manque et que tu veux la voir avant
+qu’elle existe, c’est ainsi que commence un [outil
+métier](/services/outil-metier), et un [logiciel
+métier](/services/logiciel-metier) quand le périmètre est plus large. Dis-moi
+ce que tu refais à la main depuis [la page de contact](/contact).

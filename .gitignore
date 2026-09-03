@@ -1,0 +1,86 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+/.artifacts/
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files — jamais versionnés, à la seule exception du gabarit sans valeurs
+.env*
+!.env.example
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# Rapport genere par scripts/audit-live.mjs (mesures locales, pas du code)
+audit-report.json
+
+# Rapport genere par scripts/grain-audit.mjs --json (idem)
+grain-report.json
+
+# Rapport genere par scripts/breakpoint-bracket.mjs (idem : une mesure, pas du code)
+breakpoint-report.json
+
+# Un script a ecrit ses captures dans un chemin `undefined` faute de --out ;
+# 1,0 Mo de PNG s'etaient retrouves versionnes. Le repertoire reste ignore tant
+# qu'un script peut le recreer.
+/undefined/
+
+# Payload CMS — base SQLite locale et types generes a la volee
+.artifacts/
+
+# Documents de travail de la reconstruction, jamais publiés.
+# Le dépôt de déploiement est PUBLIC : ces fichiers nomment le gabarit
+# commercial dont ce site est la reconstruction, ainsi que les états
+# intermédiaires du chantier. Ils restent sur le disque, ils ne sortent pas.
+.claude/
+docs/copy-backup-*/
+PRODUCT.md
+
+# Outils de relevé du chantier de reconstruction, jamais publiés.
+tools/
+scripts/anim-inventory.mjs
+scripts/audit-live.mjs
+scripts/breakpoint-bracket.mjs
+scripts/fluid.mjs
+scripts/grain-audit.mjs
+scripts/interaction-audit.mjs
+scripts/motion-audit.mjs
+scripts/motion-sweep.mjs
+scripts/parallax-audit.mjs
+scripts/probe.mjs
+scripts/repeat-height.mjs
+scripts/reveal-threshold.mjs
+scripts/viewport-height.mjs
+scripts/mirror-framer-site*
+scripts/verify-framer-mirror*

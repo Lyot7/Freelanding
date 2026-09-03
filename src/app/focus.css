@@ -1,0 +1,223 @@
+/* ============================================================
+   FOCUS CLAVIER — SOURCE DE VÉRITÉ UNIQUE
+   ============================================================
+
+   DIVERGENCE ASSUMÉE, ET C'EST LA SEULE DU PROJET.
+   Le site source ne pose AUCUN style de focus : il laisse partout l'anneau par
+   défaut du navigateur (`outline: 1px auto rgb(0,95,204)`, sans décalage), qui
+   disparaît sur fond sombre et se confond avec les bords orange. C'est un vrai
+   défaut d'accessibilité de l'original. Le propriétaire a demandé explicitement
+   un indicateur nettement plus visible et mieux dessiné. Tout le reste du
+   projet vise la fidélité au pixel ; ce fichier est l'exception documentée.
+
+   POURQUOI UNE FEUILLE GLOBALE PLUTÔT QUE DES CLASSES PAR COMPOSANT.
+   L'état précédent était une dizaine d'anneaux orange recopiés au coup par coup
+   (`focus-visible:ring-2 focus-visible:ring-accent`) sur Button, FilterPill,
+   WorkExplorer, WorkNarrative, FloatingNav, et rien du tout ailleurs : liens du
+   header, liens du footer, cartes projet, cartes article, champs de formulaire,
+   accordéon FAQ. Un anneau posé composant par composant oublie forcément les
+   composants suivants. Ici, un seul sélecteur couvre TOUT ce qui peut recevoir
+   le focus, y compris ce qui n'est pas encore écrit.
+
+   PORTÉE DE LA CASCADE — POURQUOI CES RÈGLES GAGNENT SANS `!important`.
+   Tailwind v4 place l'intégralité de ses utilitaires dans de vraies couches CSS
+   (`@layer theme, base, components, utilities`). Or une déclaration HORS couche
+   l'emporte toujours sur une déclaration en couche, quelle que soit la
+   spécificité et l'ordre. Ce fichier n'est dans aucune couche : ses règles
+   battent donc `outline-none`, `focus-visible:outline-*` et tout anneau
+   résiduel qu'un composant porterait encore, sans le moindre `!important`.
+   C'est aussi ce qui garantit qu'on ne pourra pas re-diverger par accident. */
+
+:root {
+  /* Épaisseur de l'anneau clair. */
+  --focus-ring-width: 3px;
+  /* Écart entre l'élément et l'anneau clair — le « vrai espacement » demandé. */
+  --focus-ring-offset: 3px;
+  /* Rayon total du halo sombre : il déborde de 2px au-delà de l'anneau clair,
+     ce qui borde celui-ci des DEUX côtés (voir la note « double anneau »). */
+  --focus-ring-halo: 8px;
+
+  --focus-ring-light: #ffffff;
+  --focus-ring-dark: #0b0b0b;
+}
+
+/* ------------------------------------------------------------
+   L'anneau lui-même — DOUBLE ANNEAU CLAIR + SOMBRE
+
+   Un anneau d'UNE seule couleur ne peut pas tenir sur ce site : le fond
+   dominant est `#0b0b0b`, les pages `/contact` et les blocs `muted` sont
+   blancs, les CTA sont en `#ff4500`, et les cartes projet sont des photos.
+   Le blanc disparaît sur le blanc, le noir disparaît sur le noir, et l'orange
+   d'accent ne contraste ni avec l'orange ni avec le blanc.
+
+   Le dessin retenu superpose donc deux tons, du bord de l'élément vers
+   l'extérieur (mesures dans le rapport) :
+
+       0 → 3px   halo SOMBRE   (box-shadow)
+       3 → 6px   anneau CLAIR  (outline, peint PAR-DESSUS le box-shadow)
+       6 → 8px   halo SOMBRE   (box-shadow)
+
+   Sur `#0b0b0b` les deux bandes sombres se fondent dans le fond : on ne voit
+   qu'un anneau blanc franc, détaché de 3px. Sur blanc, sur `#e9e9e9` et sur
+   l'orange, c'est l'inverse : on voit deux filets sombres encadrant une bande
+   claire. Sur une photo, les deux tons sont présents, donc l'un des deux passe
+   toujours. Aucun fond ne peut mettre l'indicateur en défaut.
+
+   ZÉRO DÉCALAGE DE MISE EN PAGE. `outline` et `box-shadow` sont tous deux
+   peints hors flux : ils ne participent ni à la boîte, ni au calcul de la
+   ligne, ni à la hauteur du document. Ni `border`, ni `margin`, ni `padding`
+   n'apparaissent dans ce fichier — c'est vérifié par l'audit géométrique, qui
+   doit rendre des hauteurs de page rigoureusement identiques.
+
+   `:focus-visible` UNIQUEMENT, jamais `:focus` : un clic à la souris sur un
+   bouton ou un lien n'affiche rien. Seule exception, imposée par la
+   spécification et non par ce fichier : les champs de saisie de texte
+   satisfont `:focus-visible` même au clic (`input` supportant la saisie), car
+   un curseur d'insertion visible sans indicateur serait le pire des deux
+   mondes. Ce comportement est celui du navigateur, pas une règle d'ici.
+   ------------------------------------------------------------ */
+:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-light);
+  outline-offset: var(--focus-ring-offset);
+  /* `--focus-shadow-keep` : échappatoire pour les rares éléments dont l'ombre
+     PROPRE dessine une partie du composant (le filet interne de FilterPill).
+     Sans elle, le halo remplacerait cette ombre et le composant changerait
+     d'aspect au focus. Valeur par défaut = ombre nulle. */
+  box-shadow:
+    var(--focus-shadow-keep, 0 0 #0000),
+    0 0 0 var(--focus-ring-halo) var(--focus-ring-dark);
+}
+
+/* Garde-fou : aucune feuille d'agent utilisateur ne doit dessiner d'anneau sur
+   un focus non clavier. Le `box-shadow` n'est PAS remis à zéro ici, sinon le
+   filet interne des puces de filtre disparaîtrait au clic. */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ------------------------------------------------------------
+   VARIANTE INTÉRIEURE — pour les cibles qui occupent toute la fenêtre
+
+   DÉFAUT TROUVÉ SUR LES PLANCHES, pas dans le code : sur `/work` à 1440, les
+   cinq cartes projet épinglées et la carte « Next project » d'une page projet
+   mesurent exactement 1440 × 900, soit le viewport entier. Un anneau posé à
+   l'EXTÉRIEUR de ces boîtes tombe donc intégralement hors de l'écran : au
+   clavier, la totalité du contenu principal de `/work` n'avait aucun indicateur
+   visible. Mesuré : `worstBest = Infinity` dans l'audit, c'est-à-dire zéro pixel
+   de pourtour capturable.
+
+   Pour ces cibles-là, et elles seules, le même double anneau est dessiné vers
+   l'INTÉRIEUR. Il ne peut pas l'être avec `outline` + `box-shadow` comme
+   ailleurs : une ombre `inset` est peinte SOUS le contenu de l'élément, donc
+   invisible derrière la photo pleine boîte de la carte. On passe donc par un
+   `::after` en position absolue, qui se superpose au contenu. Comme il est
+   absolu, il n'occupe aucune place — la contrainte « zéro décalage » tient.
+
+   Géométrie, du bord de l'élément vers l'intérieur, identique en épaisseur à
+   la variante extérieure :
+       0 → 3px   sombre (outline du ::after, décalage 0)
+       3 → 6px   clair  (bordure du ::after, posé à `inset: 3px`)
+       6 → 8px   sombre (ombre interne du ::after)
+
+   `data-focus-ring="inset"` est le point d'entrée pour tout futur composant
+   pleine fenêtre ; `a[data-part="work-card-window"]` est la carte projet
+   existante, traitée ici pour ne pas disperser à nouveau le focus dans les
+   composants.
+   ------------------------------------------------------------ */
+[data-focus-ring="inset"]:focus-visible,
+a[data-part="work-card-window"]:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-shadow-keep, 0 0 #0000);
+}
+
+[data-focus-ring="inset"]:focus-visible::after,
+a[data-part="work-card-window"]:focus-visible::after {
+  content: "";
+  position: absolute;
+  inset: var(--focus-ring-offset);
+  /* Au-dessus de tout le contenu de la carte (fond en z-1, libellé en z-3). */
+  z-index: 10;
+  pointer-events: none;
+  border: var(--focus-ring-width) solid var(--focus-ring-light);
+  outline: var(--focus-ring-offset) solid var(--focus-ring-dark);
+  outline-offset: 0;
+  box-shadow: inset 0 0 0
+    calc(var(--focus-ring-halo) - var(--focus-ring-offset) - var(--focus-ring-width))
+    var(--focus-ring-dark);
+}
+
+/* L'anneau doit APPARAÎTRE, jamais se fondre : WCAG 2.4.13 attend un
+   indicateur immédiat. Or `transition-colors` de Tailwind v4 inclut bel et bien
+   `outline-color` dans sa liste de propriétés (vérifié dans le CSS compilé du
+   serveur de dev, ligne `.transition-colors`), et une trentaine d'éléments du
+   site portent cette classe. Sans précaution, l'anneau se teinterait depuis la
+   valeur précédente de `outline-color`, c'est-à-dire `currentColor` : blanc qui
+   apparaît franchement sur fond sombre, mais noir qui vire lentement au blanc
+   sur `/contact`.
+
+   Le correctif est de ne RIEN avoir à faire transiter : on fixe `outline-color`
+   partout et en permanence. Seul `outline-style` bascule au focus, et il n'est
+   pas animable. On évite ainsi de réécrire `transition-property` sur l'élément
+   focalisé, ce qui aurait amputé au passage ses propres transitions.
+   Rien n'étant animé, `prefers-reduced-motion` n'a rien à réduire sur l'anneau
+   (il s'applique en revanche au lien d'évitement, plus bas). */
+*,
+*::before,
+*::after {
+  outline-color: var(--focus-ring-light);
+}
+
+/* Cible du lien d'évitement : `<main tabindex="-1">` reçoit le focus pour que
+   la suite de la tabulation reparte du contenu (sans `tabindex`, Safari ignore
+   purement et simplement le saut). Pas d'anneau autour d'un bloc qui fait toute
+   la page : ce serait un cadre de 3px sur toute la fenêtre, illisible comme
+   indicateur. Le retour visuel du saut, c'est le défilement en haut du contenu. */
+main[tabindex="-1"]:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+/* ------------------------------------------------------------
+   LIEN D'ÉVITEMENT « Skip to content »
+
+   Premier élément focusable du document, invisible tant qu'il n'a pas le focus.
+   `transform: translateY(...)` et non `display:none` / `visibility:hidden` :
+   ces deux dernières le retireraient de l'ordre de tabulation, ce qui le rendrait
+   inatteignable — c'est l'erreur classique sur ce motif.
+
+   `:focus` et non `:focus-visible` pour la révélation : un lien ne peut être
+   focalisé qu'au clavier ou par un clic qui l'active dans la foulée ; se caler
+   sur `:focus` évite tout risque de lien focalisé mais toujours hors champ.
+   L'ANNEAU, lui, reste piloté par la règle globale `:focus-visible` ci-dessus.
+   ------------------------------------------------------------ */
+.skip-link {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  margin: 12px;
+  display: inline-flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 18px;
+  background: var(--focus-ring-light);
+  color: var(--focus-ring-dark);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  /* Hors champ vers le haut, mais toujours dans l'ordre de tabulation. */
+  transform: translateY(-200%);
+  transition: transform 140ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skip-link {
+    transition: none;
+  }
+}

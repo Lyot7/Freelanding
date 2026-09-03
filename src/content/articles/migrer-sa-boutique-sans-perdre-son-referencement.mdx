@@ -1,0 +1,165 @@
+Une migration de boutique se perd presque toujours au même endroit : le plan de
+redirection. Si chaque adresse de l’ancien site pointe vers son équivalent exact
+sur le nouveau, en redirection permanente, tu conserves l’essentiel de ton
+trafic. Si tu renvoies tout vers la page d’accueil, tu perds des mois de travail
+en une nuit.
+
+Cet article donne la marche à suivre, dans l’ordre, avec ce qui se prépare avant
+la bascule et ce qui se surveille après.
+
+## Ce qui se perd réellement dans une migration
+
+Trois choses, et elles ne se perdent pas au même rythme.
+
+**Les positions.** Elles se conservent si les adresses, le contenu et la
+structure sont préservés. Une baisse temporaire de quelques semaines est normale
+pendant que les moteurs recroisent l’ancien et le nouveau. Une baisse qui dure
+trois mois est un défaut.
+
+**Les liens entrants.** Ils pointent vers des adresses précises. Une redirection
+permanente transmet leur valeur ; une page d’erreur la jette.
+
+**Les données.** Historique de commandes, comptes clients, avis produits. C’est
+le poste qu’on découvre trop tard, parce qu’il ne se voit pas dans les outils de
+référencement.
+
+## Avant la bascule : l’inventaire
+
+C’est la seule étape qu’on ne peut pas rattraper après. Elle prend une journée
+et elle décide de tout le reste.
+
+<Steps items={[
+  "Exporter la liste complète des adresses de l’ancien site. Pas seulement les produits : les catégories, les filtres indexés, les pages de contenu, les anciennes promotions qui reçoivent encore des visites.",
+  "Croiser cette liste avec tes statistiques et ta Search Console sur douze mois. Tu obtiens les adresses qui reçoivent réellement du trafic et des liens, et elles sont toujours moins nombreuses qu’on ne le croit.",
+  "Relever les positions actuelles de tes cinquante requêtes principales. Sans cette photographie d’avant, tu ne sauras pas après si tu as perdu ou si le marché a bougé.",
+  "Exporter les données : produits, variantes, stocks, clients, commandes, avis. Vérifier que l’export contient vraiment tout, champ par champ, et pas seulement ce que la plateforme a prévu de rendre.",
+  "Décider de la structure d’adresses du nouveau site, et la figer. Toute hésitation à ce moment coûte une deuxième migration."
+]} />
+
+Le point le plus négligé est le deuxième. Une boutique de cinq mille références
+a rarement cinq mille pages qui comptent : elle en a deux cents qui font le
+trafic, et le plan de redirection doit être exact sur celles-là avant d’être
+approximatif sur le reste.
+
+<Callout title="La question à trancher avant tout le reste">
+Est-ce que tu changes les adresses ? Si tu peux garder exactement la même
+structure d’URL, la migration devient beaucoup plus simple et beaucoup moins
+risquée. Changer de plateforme n’oblige pas à changer d’adresses, même quand la
+nouvelle plateforme le propose par défaut.
+</Callout>
+
+## Le plan de redirection
+
+C’est le cœur du travail. Un tableau à deux colonnes : ancienne adresse,
+nouvelle adresse. Une ligne par page.
+
+Trois règles.
+
+**Redirection permanente, code 301.** Une redirection temporaire dit aux moteurs
+de garder l’ancienne adresse en mémoire, ce qui est exactement l’inverse de ce
+que tu veux.
+
+**Un pour un, jamais vers l’accueil.** Une page produit disparue doit pointer
+vers son remplaçant, ou à défaut vers sa catégorie. Renvoyer tout vers la page
+d’accueil est traité comme une page d’erreur déguisée, et la valeur du lien est
+perdue.
+
+**Pas de chaîne de redirections.** Si l’ancienne adresse pointe vers une adresse
+qui pointe vers une troisième, corrige la première. Les chaînes se multiplient
+au fil des migrations successives et finissent par tout ralentir.
+
+Pour les produits réellement supprimés, ne redirige pas artificiellement :
+renvoie vers la catégorie, ou sers une page qui explique et propose des
+équivalents. Une page d’erreur honnête vaut mieux qu’une redirection mensongère.
+
+## Ce qui doit être identique le jour de la bascule
+
+<Steps items={[
+  "Les titres et les descriptions de chaque page. Les repartir de zéro pendant une migration mélange deux causes de variation et rend le diagnostic impossible.",
+  "Les textes des fiches produit et des catégories. Si tu veux les réécrire, fais-le avant ou après, jamais pendant.",
+  "Les données structurées : Product, Offer, disponibilité, prix. Une migration qui perd le balisage perd aussi les résultats enrichis.",
+  "Le plan de site XML, régénéré et soumis le jour même.",
+  "Le fichier robots.txt. Le nombre de migrations où le nouveau site est parti en production avec le blocage complet hérité de la préproduction est considérable.",
+  "Les balises canoniques, qui doivent pointer vers les nouvelles adresses et non vers les anciennes."
+]} />
+
+Le cinquième point mérite qu’on s’y arrête. Bloquer l’indexation pendant la
+recette est la bonne pratique ; oublier de la débloquer à la mise en ligne est
+l’erreur la plus coûteuse et la plus banale de toutes. Vérifie-le en premier,
+puis vérifie-le encore.
+
+## Le jour J, dans l’ordre
+
+Bascule en début de semaine et en dehors d’une période de vente forte. Un lundi
+matin de mars, pas un vendredi de novembre.
+
+Teste immédiatement, sur le site en production : une dizaine d’anciennes
+adresses prises dans ta liste de trafic, en vérifiant qu’elles arrivent au bon
+endroit en une seule redirection. Puis un achat complet, de la recherche au
+paiement, sur un téléphone.
+
+Soumets le nouveau plan de site dans la Search Console, et laisse l’ancien
+domaine ou l’ancienne propriété en place : c’est là que tu verras les erreurs
+d’exploration remonter.
+
+## Les deux mois qui suivent
+
+Une migration ne se juge pas le lendemain.
+
+Surveille trois choses chaque semaine : les erreurs d’exploration dans la Search
+Console, l’évolution de tes cinquante requêtes de référence par rapport à la
+photographie prise avant, et le taux de conversion. Ce dernier est important :
+un site qui garde ses positions mais convertit moins a un problème d’expérience,
+pas de référencement, et ça se traite autrement.
+
+Attends-toi à une baisse pendant deux à six semaines. Ce qui doit t’alerter,
+c’est l’absence de remontée.
+
+<Quote>
+Une migration réussie ne se voit pas. C’est le seul projet où le meilleur
+résultat possible est que personne ne remarque rien.
+</Quote>
+
+## Les erreurs qui coûtent le plus cher
+
+**Tout changer en même temps.** Nouvelle plateforme, nouvelle structure
+d’adresses, nouveaux textes, nouveau design. Si quelque chose baisse, tu ne
+sauras jamais pourquoi. Sépare les changements dans le temps.
+
+**Oublier les images.** Elles ont leurs propres adresses, elles reçoivent du
+trafic, et une migration qui les renomme toutes perd la recherche d’images sans
+que personne le remarque avant six mois.
+
+**Négliger la vitesse du nouveau site.** Un site refait qui charge plus lentement
+que l’ancien perd sur les deux tableaux. Mesure avant de basculer, pas après :
+la méthode est dans [ce que coûte un site e-commerce
+lent](/blog/site-e-commerce-lent-ce-que-ca-coute).
+
+**Partir sans avoir vérifié l’export.** Le jour où tu découvres que
+l’historique des commandes n’était pas dans l’export, tu n’as plus accès à
+l’ancienne plateforme. Cette question se pose avant de signer, pas au moment de
+partir : j’en ai fait la liste dans [à qui appartient ton fichier
+client](/blog/a-qui-appartient-votre-fichier-client).
+
+## Faut-il migrer, d’ailleurs
+
+C’est la question qu’on saute. Une migration coûte cher, prend du temps, et
+comporte un risque réel de perte de trafic. Elle ne se justifie que si le
+problème que tu as ne se règle pas sur place.
+
+Beaucoup de motifs de migration se traitent en réalité par un branchement : un
+outil qui fait ce que la plateforme ne sait pas faire, connecté à ses données.
+J’ai posé les critères d’arbitrage dans [Shopify ou site sur
+mesure](/blog/shopify-ou-site-sur-mesure).
+
+## Ce que je retiens
+
+Une migration se gagne dans l’inventaire et dans le plan de redirection, faits
+avant la bascule. Le reste est de l’exécution. Le risque est méthodologique :
+changer trop de choses à la fois, et ne plus savoir ce qui a causé quoi.
+
+Si tu prépares une migration et que tu veux quelqu’un qui construise le
+plan de redirection et qui surveille les deux mois qui suivent, c’est ce que
+couvrent mes [prestations de site](/services/site-vitrine). Pour la reprise des
+données et des historiques, ça relève de l’[outil métier](/services/outil-metier).
+Parlons-en depuis [la page de contact](/contact).

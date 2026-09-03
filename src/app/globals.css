@@ -1,0 +1,687 @@
+@import "tailwindcss";
+@import "lenis/dist/lenis.css";
+/* @font-face copiés du live (générés par scripts/extract-fonts.mjs). */
+@import "./fonts.css";
+
+/* ============================================================
+   Design tokens — extraits fidèlement du site d'origine (Framer)
+   Source de vérité unique. Re-brandable : changer ces valeurs.
+   ============================================================ */
+:root {
+  /* Couleurs — tokens système Framer */
+  --background: #0b0b0b;
+  --foreground: #ffffff;
+  /* Accent — le volt de la marque d'Eliott. Le template posait ici l'orange
+     #ff4500 ; il n'a plus de raison d'être sur son site. */
+  --accent: #c8f24a;
+  /* Texte posé SUR l'accent. Le volt est clair : le blanc y tombe à 1,29:1,
+     donc illisible. L'encre du système d'identité donne 14,43:1. */
+  --accent-ink: #10140a;
+  /* Volt — l'accent unique de la marque d'Eliott, repris de son système
+     d'identité (`landing/public/_logos/DESIGN-SYSTEM.md`, palette « Signal »).
+     Première version posée à #d2ff37, la valeur lue dans la pastille de crédit
+     du pied de page du template : c'était la couleur de quelqu'un d'autre.
+     Règle d'or du système : le volt est un SIGNAL, jamais un aplat large. Il
+     ponctue (logo, sélection de texte, accents ponctuels). */
+  --volt: #c8f24a;
+  --muted: #e9e9e9;
+
+  /* Surfaces (dark alt) */
+  --surface-1: #0e0e0e;
+  --surface-2: #181818;
+
+  /* Bordures / texte secondaire */
+  --border: rgba(255, 255, 255, 0.1);
+  --text-secondary: #999999;
+
+  /* Opacités texte */
+  --foreground-60: rgba(255, 255, 255, 0.6);
+  --background-60: rgba(11, 11, 11, 0.6);
+}
+
+@theme inline {
+  /* Couleurs */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-volt: var(--volt);
+  --color-muted: var(--muted);
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-text-secondary: var(--text-secondary);
+  --color-foreground-60: var(--foreground-60);
+
+  /* Fonts — stack EXACTE du live (voir fonts.css). Le paquet npm `geist` sert
+     la variable font de Vercel, dont les métriques diffèrent des fichiers
+     statiques Google Fonts utilisés par la source : mêmes dessins, largeurs de
+     texte différentes, donc retours à la ligne différents. */
+  --font-sans: "Geist", "Geist Placeholder", sans-serif;
+  --font-mono: "Geist Mono", monospace;
+
+  /* Échelle typographique (px) */
+  --text-2xs: 11px;
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-lg: 18px;
+  --text-xl: 22px;
+  --text-2xl: 26px;
+  --text-3xl: 32px;
+  --text-4xl: 44px;
+  --text-5xl: 52px;
+  --text-6xl: 68px;
+  --text-7xl: 92px;
+  --text-8xl: 100px;
+
+  /* Line-height */
+  --leading-display: 0.82;
+  --leading-tight: 1.1;
+  --leading-normal: 1.2;
+  --leading-prose: 1.3;
+
+  /* Letter-spacing */
+  --tracking-tightest: -0.07em;
+  --tracking-tighter: -0.05em;
+  --tracking-tight: -0.02em;
+  --tracking-normal: -0.01em;
+
+  /* Radius (anguleux : 0, pilule 50px, rond) */
+  --radius-none: 0px;
+  --radius-pill: 50px;
+  --radius-full: 100%;
+
+  /* Breakpoints (min-width) */
+  --breakpoint-tablet: 810px;
+  --breakpoint-desktop: 1200px;
+}
+
+/* Police de base : la stack du live, servie par les woff2 rapatriés. `html body`
+   (0,0,2) l'emporte sur une éventuelle règle `body{font-family:...}` importée
+   après, sans dépendre de l'ordre d'import. */
+html body {
+  font-family: var(--font-sans);
+}
+
+/* Garde-fou horizontal. `clip` et NON `hidden` : `hidden` ferait de la racine
+   un conteneur de défilement et casserait les éléments en `position: sticky`
+   (il y en a trois sur les cartes projet).
+
+   MESURÉ : au repos, notre document fait exactement 1440px comme la source, et
+   `scrollX` reste bloqué à 0 — aucun défilement horizontal n'est possible.
+
+   Pendant la première seconde, la largeur de CONTENU monte jusqu'à ~1560px là
+   où la source reste à 1440. Origine identifiée, et ce n'est pas un défaut de
+   notre côté : le header entre en `scale(1.3)`, ce qui porte sa boîte à 1872px,
+   et la source fait EXACTEMENT la même chose (relevé image par image :
+   1.3/1872, 1.299/1871, 1.297/1867… des deux côtés).
+
+   Seul l'endroit où ce débordement est absorbé diffère. La source le contient
+   dans un conteneur positionné de son arbre ; chez nous il remonte jusqu'à la
+   fenêtre. La raison tient à une règle CSS peu intuitive : un descendant en
+   `position: absolute` n'est PAS retenu par le clip d'un ancêtre resté en
+   `position: static`, et c'est le cas de `body`. Le rendu est le même, seule la
+   valeur rapportée par `scrollWidth` change.
+
+   Ne PAS « corriger » en passant `body` en `position: relative` : cela ferait
+   de lui le bloc conteneur de tous les absolus qui visent aujourd'hui le bloc
+   conteneur initial, et la hauteur du body n'étant pas celle de la fenêtre,
+   tout ce qui se cale sur `bottom` ou `inset-y` se déplacerait. */
+html,
+body {
+  overflow-x: clip;
+}
+
+/* ============================================================
+   Place pour les accents des capitales — `.accent-room`
+
+   MESURÉ au canvas dans Geist : à 92 px de corps, un « É » monte à 83,7 px
+   d'encre au-dessus de la ligne de base quand un « E » s'arrête à 65,3, soit
+   +18,4 px. Or ce site reproduit un template ANGLAIS dont les titres emploient
+   des interlignages très serrés (jusqu'à 0,82em) sous un `overflow-hidden` qui
+   sert de masque aux animations de révélation. La boîte de ligne est alors plus
+   courte que la hauteur d'une capitale accentuée : l'accent dépasse par le haut
+   et le masque le coupe net. Le titre de l'accueil affichait « STRATEGIE ».
+
+   Rien ne le signale : le DOM contient bien « Stratégie », la police contient
+   bien le glyphe. Seule une mesure le voit — d'où `scripts/accent-clip-audit.mjs`.
+
+   Le remplissage agrandit la zone visible du masque vers le haut ; la marge
+   négative de même valeur annule son effet sur la mise en page. Aucune hauteur
+   ne bouge, l'accent réapparaît. En `em` : la compensation suit la taille du
+   texte, elle vaut donc pour un titre de 92 px comme pour un libellé de 12.
+
+   À NE PAS employer sur un masque de PERMUTATION (deux copies empilées, la
+   seconde garée hors cadre) : agrandir la zone visible y révélerait la copie
+   garée. Ces masques-là se règlent en hauteur, pas en remplissage.
+   ============================================================ */
+.accent-room {
+  /* PIÈGE : `em` se résout sur la police de l'élément QUI COUPE, pas sur celle
+     du texte coupé. Quand le masque est un conteneur de mise en page resté à
+     16 px alors qu'il contient un titre de 63, 0,32em ne vaut que 5 px et ne
+     suffit pas. Ces cas-là surchargent la variable avec une valeur en pixels :
+     `[--accent-room:22px]` en classe Tailwind.
+     0,32em couvre le cas courant, où le masque porte la même police que le
+     texte. Rien n'est jamais révélé : la zone gagnée est au-dessus du texte. */
+  padding-top: var(--accent-room, 0.32em);
+  margin-top: calc(-1 * var(--accent-room, 0.32em));
+}
+
+/* ============================================================
+   Place pour les DESCENDANTES et la PONCTUATION — `.descender-room`
+
+   LE SYMÉTRIQUE EXACT de `.accent-room`, par le bas, et il manquait.
+   `.accent-room` a été écrit le jour où le titre de l'accueil affichait
+   « STRATEGIE » : le masque coupait l'accent par le haut. Personne n'a regardé
+   l'autre bord. Or la même boîte de ligne trop courte coupe aussi par le BAS,
+   et ce qui vit sous la ligne de base en français est justement la ponctuation.
+
+   MESURÉ au canvas dans Geist, en fraction du corps (identique de 400 à 600) :
+
+     police       montée 1,01em · descente 0,29em   (somme 1,30em)
+     virgule      0,158em d'encre SOUS la ligne de base
+     point-virgule 0,158em · parenthèses 0,110em
+     « ç » et « Ç » 0,228em  ← la plus profonde du français
+     point, deux-points, « É », « À » : 0 (rien sous la ligne)
+
+   Ce que la boîte de ligne offre sous la ligne de base vaut
+   `(interligne - 1,30em) / 2 + 0,29em`. À `leading-[0.82]`, l'interlignage des
+   grands titres du site, cela fait 0,05em, soit 5,2 px à 92 px de corps. Une
+   virgule en demande 14,5. Il en manquait 9,3 : LES DEUX TIERS DE LA VIRGULE
+   ÉTAIENT COUPÉS. Relevé le 2026-09-01 sur le titre « Sites, outils,
+   logiciels. » de la section « à propos » de l'accueil, aux trois largeurs —
+   9,3 px manquants à 92, 6,9 à 68, 5,3 à 52. À l'écran, la virgule perdait sa
+   queue et se lisait comme un carré posé sur la ligne.
+
+   Rien ne le signalait : le DOM contient bien la virgule, la police contient
+   bien le glyphe, et `scripts/accent-clip-audit.mjs` ne regardait que le haut.
+   Il regarde désormais les deux bords.
+
+   0,24em par défaut : 0,228 pour un « Ç », plus la marge de 4 % du corps
+   qu'exige l'audit. Couvre donc tout le français à `leading-[0.82]` comme à
+   `leading-[1.2]`.
+
+   MÊME MÉCANIQUE, MÊMES PIÈGES que `.accent-room` :
+     - le remplissage agrandit la zone visible vers le bas, la marge négative de
+       même valeur annule son effet sur la mise en page ;
+     - `em` se résout sur la police de l'élément QUI COUPE : surcharger
+       `[--descender-room:22px]` quand le masque est resté à 16 px ;
+     - À NE PAS employer sur un masque de PERMUTATION dont la copie de survol
+       est garée EN DESSOUS : agrandir la zone visible vers le bas l'y
+       révélerait.
+   ============================================================ */
+.descender-room {
+  padding-bottom: var(--descender-room, 0.24em);
+  margin-bottom: calc(-1 * var(--descender-room, 0.24em));
+}
+
+/* ------------------------------------------------------------
+   `.clip-room` — élargir la zone de coupe d'un CONTENEUR, sans rien déplacer.
+
+   `.accent-room` et `.descender-room` compensent leur remplissage par une marge
+   négative. Cette annulation ne vaut que dans un flux de blocs : sur un élément
+   FLEX ou GRID, la marge négative déplace réellement l'élément. C'est le piège
+   déjà relevé le 2026-08-27 sur « BÂTI SUR LA PREUVE », consigné plus bas dans
+   l'en-tête de `.accent-clip-titre`.
+
+   Or les masques qui coupent une ponctuation ne sont pas tous des lignes de
+   texte : ce sont parfois des conteneurs de mise en page, la rangée
+   « site / outil / logiciel » du hero, la barre basse du hero, le cadre du titre
+   d'une page légale. `overflow-clip-margin` élargit leur région de coupe sans
+   toucher à la mise en page, ni la leur ni celle de leurs voisins. Il exige
+   `overflow: clip` — il reste sans effet sur `overflow: hidden`.
+
+   LA VALEUR SE RÈGLE AU CAS PAR CAS, et petit. Ces conteneurs sont aussi les
+   masques d'apparition de ce qu'ils contiennent : élargir la coupe y laisse voir
+   le contenu garé pendant sa course. Deux pixels suffisent à sauver la queue
+   d'une barre oblique, et deux pixels ne se voient pas passer. `.accent-clip-titre`
+   couvre le cas des grands titres, où la course est longue et l'encre haute.
+   ------------------------------------------------------------ */
+.clip-room {
+  overflow: clip;
+  overflow-clip-margin: var(--clip-room, 2px);
+}
+
+/* ------------------------------------------------------------
+   `.accent-clip-titre` — laisser sortir l'accent d'un grand titre.
+
+   LE DÉFAUT. Les grands titres du site (52 / 68 / 92 px) sont posés dans des
+   colonnes qui coupent, pour servir de masque aux apparitions. Leur interlignage
+   est de 0,82em : la boîte de ligne est PLUS COURTE qu'une capitale accentuée,
+   et l'accent, qui monte plus haut qu'un « E », se fait raser par le bord.
+   Mesuré à 92 px : l'encre d'un « Â » monte à 84,3 px au-dessus de la ligne de
+   base, la boîte de ligne n'en offre que 70,2.
+
+   POURQUOI PAS `.accent-room` ICI, alors qu'il est fait pour ça. `.accent-room`
+   ouvre la zone visible avec un `padding-top` et annule son effet avec un
+   `margin-top` négatif. Cette annulation ne vaut QUE dans un flux de blocs. Sur
+   un élément flex — et ces colonnes en sont —, la marge négative déplace
+   réellement l'élément dans sa ligne. Constaté le 2026-08-27 sur « BÂTI SUR LA
+   PREUVE » : les 22 px ouverts vers le haut remontaient le titre de 22 px, il
+   sortait du remplissage de sa section, et l'accent se dessinait alors SUR LE
+   FOND DE LA SECTION PRÉCÉDENTE — de l'encre presque noire sur du noir. Le
+   titre affichait « BATI ». La zone de coupe était pourtant assez large : le
+   défaut avait changé de nature sans changer d'apparence.
+
+   `overflow-clip-margin` ne touche à rien. Il élargit la région de coupe de
+   l'élément, sans déplacer quoi que ce soit, ni lui ni ses voisins. L'accent
+   reste donc là où la mise en page le met, à l'intérieur du fond de sa propre
+   section. Il exige `overflow: clip` (il est sans effet sur `overflow: hidden`),
+   d'où la bascule des masques concernés.
+
+   LES VALEURS. Il faut 14,1 px à 92, 10,4 à 68, 8,0 à 52. Les valeurs posées
+   sont VOLONTAIREMENT PLUS LARGES — 22 / 16 / 12 px, soit 8, 6 et 4 px d'air —
+   parce qu'un accent qui affleure le bord se lit comme un accident d'impression.
+   `scripts/accent-clip-audit.mjs` exige d'ailleurs cette marge : 4 % du corps.
+   ------------------------------------------------------------ */
+.accent-clip-titre {
+  overflow-clip-margin: 12px;
+}
+
+@media (min-width: 810px) {
+  .accent-clip-titre {
+    overflow-clip-margin: 16px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .accent-clip-titre {
+    overflow-clip-margin: 22px;
+  }
+}
+
+/* ============================================================
+   Sélection de texte — volt sur fond sombre, et son NÉGATIF sur les aplats
+   volt.
+
+   Sur le fond noir du site, le surlignage est un aplat volt à texte noir. Le
+   choix du noir n'est pas une préférence : c'est le seul lisible. Le volt est
+   une couleur claire, donc les rapports de contraste WCAG mesurés sur
+   `#c8f24a` sont sans appel :
+
+     texte `--background` (#0b0b0b) : 15,24:1  → AAA
+     texte `--accent-ink` (#10140a) : 14,43:1  → AAA
+     texte blanc          (#ffffff) :  1,29:1  → échec, illisible
+
+   On retient `--background` : c'est le noir du site, et 15,24:1 dépasse
+   largement le seuil AAA de 7:1.
+
+   MAIS ce raisonnement ne vaut que sur fond sombre, et la moitié du site ne
+   l'est pas : deux sections sont un aplat volt plein (« À propos » et les
+   chiffres), et une bonne vingtaine d'autres surfaces sont en `--muted`
+   (#e9e9e9). Le surlignage y disparaît, pour une raison purement
+   photométrique — sa luminance est presque exactement celle du fond :
+
+     volt sur `--accent` (#c8f24a) : 1,00:1  → strictement invisible
+     volt sur `--muted`   (#e9e9e9) : 1,06:1  → indiscernable en clarté
+
+   Sur le volt, seule la couleur du texte change et l'utilisateur ne voit plus
+   du tout ce qu'il a sélectionné. Sur le gris clair, seule la teinte distingue
+   encore le surlignage, ce qui tombe à néant pour un daltonien ou sur un écran
+   mal calibré.
+
+   La sélection passe donc en NÉGATIF sur toute surface claire : encre sombre
+   en fond, volt en texte. Même paire de couleurs, simplement retournée, et le
+   contraste redevient franc :
+
+     encre sur `--accent`  : 14,43:1  → AAA
+     encre sur `--muted`   : 15,56:1  → AAA
+
+   MÉCANIQUE — deux variables plutôt qu'une liste de sélecteurs `::selection`.
+   Les propriétés personnalisées HÉRITENT jusqu'au pseudo-élément : il suffit
+   donc de les redéfinir sur les utilitaires de FOND eux-mêmes. La sélection
+   suit alors automatiquement le fond déclaré le plus proche, y compris quand
+   un bloc sombre est imbriqué dans une section claire (`WhyUsSection` porte
+   les deux), et une future section n'a rien à annoter.
+
+   Ces règles vivent HORS de toute couche CSS, comme `focus.css` : elles
+   l'emportent donc sur les utilitaires Tailwind (tous en `@layer utilities`)
+   sans un seul `!important`. Les deux sélecteurs sont écrits séparément, et non
+   groupés : un navigateur qui ne connaît pas `::-moz-selection` invaliderait
+   la règle entière si elle était groupée avec.
+   ============================================================ */
+::selection {
+  background-color: var(--selection-bg, var(--volt));
+  color: var(--selection-ink, var(--background));
+}
+
+::-moz-selection {
+  background-color: var(--selection-bg, var(--volt));
+  color: var(--selection-ink, var(--background));
+}
+
+/* Surfaces CLAIRES : sélection en négatif.
+
+   `.surface-light` / `.surface-dark` sont la porte de sortie pour tout ce qui
+   ne passe pas par un utilitaire de fond : valeur arbitraire hors palette
+   (`bg-[#121212]`), style en ligne, ou surface qui n'est pas une couleur DU
+   TOUT — une photo sombre ne déclare aucun `background-color`, et son contenu
+   hériterait donc du réglage de la section, c'est-à-dire de l'inverse de ce
+   qu'il lui faut. */
+.bg-accent,
+.bg-muted,
+.bg-volt,
+.bg-foreground,
+.skip-link,
+.surface-light {
+  --selection-bg: var(--accent-ink);
+  --selection-ink: var(--accent);
+  /* Encre d'un tracé de marque posé sur cette surface (signature manuscrite).
+     Le volt sur le gris clair donne 1,06:1 : le tracé y est un fantôme. Sur une
+     surface claire, la marque passe donc à l'encre sombre, comme la sélection.
+     Même variable pour les deux familles : la couleur suit le fond, jamais la
+     page. */
+  --mark: var(--accent-ink);
+}
+
+/* Surfaces SOMBRES : sélection volt. Répété ici, et pas seulement laissé à la
+   valeur par défaut, parce qu'un bloc sombre imbriqué dans une section claire
+   hériterait sinon du négatif de son parent.
+
+   `bg-black` est volontairement absent : le site ne l'emploie qu'en VOILE
+   (`bg-black/[0.03]`, `bg-black/20`), c'est-à-dire par-dessus une surface qui
+   reste claire. L'y inscrire retournerait la sélection à contresens. */
+.bg-background,
+.bg-surface-1,
+.bg-surface-2,
+.surface-dark {
+  --selection-bg: var(--volt);
+  --selection-ink: var(--background);
+  --mark: var(--accent);
+}
+
+/* ============================================================
+   Meter "SLOTS" — pulse du slot actif (barre orange en cours de remplissage).
+   Le 5e segment est un composant Framer (smart component) dont l'anim runtime
+   n'a pas ete capturee par le miroir statique :8080 ; on la restaure ici.
+   Etat de REPOS (no-JS / reduced-motion) = orange plein visible (robuste).
+   ============================================================ */
+@keyframes slot-fill {
+  0%,
+  100% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scaleY(0.25);
+    opacity: 0.5;
+  }
+}
+
+.slot-fill-active {
+  transform-origin: bottom;
+  animation: slot-fill 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slot-fill-active {
+    animation: none;
+    transform: none;
+    opacity: 1;
+  }
+}
+
+/* ============================================================
+   Transition de page — API native View Transitions
+   Loi MESURÉE sur le live (7 trajets, comportement identique, fenêtre
+   d'animation systématiquement ~400 ms) :
+
+   - Page SORTANTE : visuellement INERTE. `opacity: 1 → 1`, transform identité.
+     Les keyframes existent mais ne font rien : elle reste totalement opaque
+     jusqu'à la fin. Ce sont donc les 400 ms de l'entrante qui portent l'effet.
+   - Page ENTRANTE : 400 ms, `cubic-bezier(0.75, 0.17, 0.3, 0.89)`, DEUX effets
+     simultanés : `opacity 0 → 1`, et un BALAYAGE vertical par `mask-image`
+     piloté par `--page-wipe`, dont la valeur est rigoureusement égale à
+     l'opacité à chaque instant (mêmes keyframes, même easing).
+   - Les deux démarrent au MÊME instant (même `startTime` relevé).
+   - `mix-blend-mode: normal` est un override explicite : le défaut du navigateur
+     est `plus-lighter`, ce qui délaverait la superposition.
+
+   Le dégradé fait une hauteur de viewport et balaie de haut en bas : à p=0 tout
+   est masqué, à p=1 tout est visible.
+   ============================================================ */
+@property --page-wipe {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+::view-transition-old(*),
+::view-transition-new(*) {
+  mix-blend-mode: normal;
+  backface-visibility: hidden;
+}
+
+@keyframes page-exit {
+  from,
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+::view-transition-old(root) {
+  animation: page-exit 0.2s cubic-bezier(0.27, 0, 0.51, 1) 0s both;
+}
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    --page-wipe: 0;
+  }
+  to {
+    opacity: 1;
+    --page-wipe: 1;
+  }
+}
+
+::view-transition-new(root) {
+  animation: page-enter 0.4s cubic-bezier(0.75, 0.17, 0.3, 0.89) 0s both;
+  mask-image: linear-gradient(
+    180deg,
+    black calc(-100% + 200% * var(--page-wipe)),
+    transparent calc(200% * var(--page-wipe))
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* ============================================================
+   Grain animé — dérive de la texture de bruit
+   MESURÉ sur le live : la couche de grain n'est pas statique, elle dérive par
+   PAS QUANTIFIÉS (et non de façon continue) d'environ -28,5 px en x et -36 px en
+   y, à peu près 10 pas par seconde, soit de l'ordre de -326 px/s en x et
+   -411 px/s en y. Les mêmes valeurs sont relevées simultanément sur les trois
+   cartes projet, c'est donc une horloge partagée et non un effet par carte.
+
+   INSTRUMENTATION du live, image par image, page immobile (une rampe de 0,7 s
+   sur un carreau de 256 px ne rendait pas ce qui se passe réellement) :
+
+   1. Le déplacement est PROPORTIONNEL à la taille du calque, pas en pixels
+      fixes : au même instant, une couche de 5760 px se décale de -691 px et une
+      de 1368 px de -166 px, soit le même -12 % des deux côtés. Une translation
+      en pixels est donc juste sur une petite carte et très insuffisante sur un
+      grand aplat. C'est pourquoi les valeurs ci-dessous sont en pourcentage.
+   2. Le mouvement n'est pas une rampe unique mais une SUITE DE SEGMENTS
+      linéaires d'environ 900 ms, chacun avec sa propre pente, dans une plage de
+      ±15 % en x et 0 à 35 % en y. Les points ci-dessous sont les extrémités
+      relevées, dans l'ordre.
+   3. La quantification est de 100 ms par pas, dix pas par seconde. Avec des
+      intervalles réguliers de 20 % sur 4,5 s, `steps(9)` redonne exactement ces
+      100 ms.
+   4. Le cycle dure de l'ordre de 4,5 s, pas 0,7 : la boucle courte se voyait.
+
+   La dernière image reprend la première, ce qui est invisible puisque la texture
+   est répétée à l'infini.
+
+   TAILLE DU CALQUE — 400 % × 400 %, COMME LA SOURCE, ET PAS MOINS.
+   Le débord n'a besoin que de couvrir la course : 15 % d'un calque à 400 % vaut
+   0,6 cadre en x, 35 % en vaut 1,4 en y. Un calque de 240 % × 260 % suffirait
+   donc, avec les pourcentages remis à l'échelle, pour EXACTEMENT le même
+   déplacement en pixels — et 53 % de surface de texture en moins (93 → 44 Mpx
+   mesurés sur la home à 1440). Cette piste a été essayée puis ABANDONNÉE :
+   `audit-live` mesure la hauteur de page par la boîte la plus basse, calque de
+   grain compris. Rétrécir le nôtre pendant que la source garde ses 400 % faisait
+   sortir les neuf routes à -1052 px de hauteur, soit exactement le débord perdu
+   sous le grain plein footer (1169 × (2 - 1,1)). Le gain était réel mais il
+   dégradait la mesure de non-régression : on garde donc la géométrie de la
+   source, et le gain de performance vient de la mise en pause hors champ.
+
+   PAS DE `content-visibility` non plus : la propriété saute le rendu d'un
+   sous-arbre hors écran mais impose une hauteur intrinsèque de substitution, ce
+   qui déplacerait les sections et casserait les mêmes hauteurs de page. La mise
+   en pause hors champ est faite par l'observateur d'intersection de
+   `effects/Grain.tsx`, qui n'a lui aucun effet sur la mise en page.
+   ============================================================ */
+@keyframes grain-drift {
+  0% {
+    transform: translate(-6%, 23%);
+  }
+  20% {
+    transform: translate(-15%, 10%);
+  }
+  40% {
+    transform: translate(15%, 0%);
+  }
+  60% {
+    transform: translate(0%, 15%);
+  }
+  80% {
+    transform: translate(3%, 35%);
+  }
+  100% {
+    transform: translate(-6%, 23%);
+  }
+}
+
+/**
+ * Géométrie du calque, déclarée une seule fois : elle était recopiée à la main
+ * dans six composants, avec des valeurs qui avaient déjà divergé.
+ */
+.grain-layer {
+  position: absolute;
+  inset: -200%;
+  width: 400%;
+  height: 400%;
+  background-repeat: repeat;
+  /* La source laisse `background-size: auto`, donc la taille naturelle du png,
+     qui fait 256 × 256. On la déclare pour ne pas dépendre du décodage. */
+  background-size: 256px 256px;
+}
+
+.grain-drift {
+  animation: grain-drift 4.5s steps(9) infinite;
+  /* `will-change` est POSÉ ici et RETIRÉ par `effects/Grain.tsx` dès que le
+     calque sort du champ : le laisser en permanence sur les vingt calques de la
+     home garde autant de textures promues pour rien. */
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grain-drift {
+    animation: none;
+    will-change: auto;
+  }
+}
+
+/* ============================================================
+   Ticker — bandeau à VITESSE CONSTANTE (composant Ticker.tsx)
+   Contrairement au Marquee ci-dessous (durée fixe, donc vitesse variable
+   selon la largeur du contenu), la période est ici la largeur d'UNE copie
+   plus la gouttière, et la durée en découle : période / 110 px/s. C'est la
+   loi mesurée sur le live, où la vitesse vaut -110 px/s quel que soit le
+   texte. Le décalage est fourni par le composant via `--ticker-shift`.
+   ============================================================ */
+@keyframes ticker-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(var(--ticker-shift) * -1));
+  }
+}
+
+/* ============================================================
+   Marquee — bandeau défilant (composant Marquee.tsx)
+   Le contenu est dupliqué 2× → translateX(-50%) boucle sans couture.
+   ============================================================ */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-track {
+  animation: marquee var(--marquee-duration, 20s) linear infinite;
+}
+
+.marquee-track[data-reverse="true"] {
+  animation-direction: reverse;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
+}
+
+/* ============================================================
+   Champ « select » du footer
+   Structure RELEVÉE sur le live (`.framer-form-select-wrapper`) : le
+   `<select>` lui-même n'a NI bordure NI chrome natif, tout est porté par le
+   wrapper.
+   - `::after` dessine le contour, en `1px 1px 1px 0` : PAS de bord gauche
+     (le champ s'ouvre sur l'axe central de la grille du footer).
+   - `::before` dessine le chevron : un aplat de la couleur d'icône découpé par
+     un masque SVG. En `content-box`, sa boîte fait 10 + 16 + 16 = 42px de large
+     et 16 + 18 + 16 = 50px de haut, soit toute la hauteur du champ ; le masque
+     de 16px posé à 10px du bord gauche aligne donc le chevron exactement sur le
+     bord droit du `<select>`.
+   - Le wrapper réserve ces 16px via `padding-right`, d'où un `<select>` à
+     666,5px pour un champ à 682,5px.
+   ============================================================ */
+.footer-select-wrapper {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  padding-right: 16px;
+}
+
+.footer-select-wrapper::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+  pointer-events: none;
+  border-style: solid;
+  border-width: 1px 1px 1px 0;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.footer-select-wrapper::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  box-sizing: content-box;
+  width: 16px;
+  height: 18px;
+  padding: 16px 16px 16px 10px;
+  pointer-events: none;
+  background-color: #fff;
+  mask-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16'><path d='M 3.5 6 L 8 10.5 L 12.5 6' fill='transparent' stroke-width='1.5' stroke='rgb(153,153,153)' stroke-linecap='round' stroke-linejoin='round'></path></svg>");
+  mask-repeat: no-repeat;
+  mask-position: 10px 50%;
+  mask-size: 16px;
+}

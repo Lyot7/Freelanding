@@ -1,0 +1,162 @@
+Tes outils ne sont jamais d’accord sur le stock parce qu’aucun d’eux n’a été
+désigné comme la source de vérité. Chacun tient sa version, chacun a raison de
+son point de vue, et personne n’a écrit la règle qui tranche quand ils
+divergent. C’est une décision de gestion qui n’a pas été prise, et qu’aucun
+connecteur ne prendra à ta place.
+
+Cet article explique pourquoi les synchronisations cassent, ce qu’il faut
+décider avant de connecter quoi que ce soit, et comment reconnaître le moment où
+un branchement sur mesure devient moins cher qu’une pile d’abonnements.
+
+## Le problème, énoncé proprement
+
+Une boutique en ligne moderne fait dialoguer quatre à sept systèmes : la
+boutique, la gestion commerciale ou l’ERP, la logistique, la comptabilité, le
+service client, parfois une ou deux places de marché.
+
+Chacun peut modifier la même donnée. Une vente sur une place de marché diminue
+le stock ; une réception de marchandise l’augmente dans la gestion ; un retour
+le remet en circulation ; un inventaire physique le corrige. Quatre sources,
+quatre horloges, et aucune ne connaît les autres.
+
+Le résultat est toujours le même : une survente. Tu encaisses une commande pour
+un produit que tu n’as pas, et tu découvres l’écart au moment de préparer le
+colis. C’est le coût le plus visible ; ce n’est pas le plus élevé.
+
+<Callout title="Ce que coûte vraiment une divergence">
+La survente coûte un remboursement et un client. L’invendu coûte du stock
+immobilisé sur un produit affiché en rupture alors qu’il est en rayon. Et le
+temps humain de rapprochement, une heure ici, deux heures là, coûte tous les
+mois sans jamais apparaître nulle part.
+</Callout>
+
+## Pourquoi les connecteurs du marché finissent par casser
+
+Ils font bien ce qu’ils annoncent et mal ce qu’on leur demande vraiment.
+
+<Steps items={[
+  "Ils synchronisent dans un seul sens. La plupart des connecteurs poussent la gestion vers la boutique. Le retour, les corrections d’inventaire et les ventes hors ligne ne remontent pas.",
+  "Ils travaillent par lots, pas en continu. Une synchronisation toutes les heures signifie une heure pendant laquelle deux systèmes affirment deux choses différentes, et c’est largement suffisant pour vendre ce qui n’existe plus.",
+  "Ils ignorent les cas particuliers de ton métier. Les lots, les produits composés, les variantes qui partagent un stock physique, les précommandes : chaque métier a ses règles, et un connecteur générique n’en connaît aucune.",
+  "Ils échouent en silence. Un appel qui n’aboutit pas, un produit refusé pour un champ manquant, et rien ne te prévient. Tu découvres le décalage trois jours plus tard, par un client mécontent.",
+  "Ils ne gardent pas de trace. Quand deux systèmes ne disent pas la même chose, personne ne peut reconstituer qui a écrit quoi et quand."
+]} />
+
+Le quatrième point est celui qui fait le plus de dégâts. Un système qui tombe en
+panne bruyamment se répare le jour même. Un système qui échoue en silence
+produit une divergence qui grandit pendant des semaines.
+
+## Les trois décisions à prendre avant de connecter quoi que ce soit
+
+Aucune n’est technique, et aucune ne peut être déléguée à un prestataire.
+
+### Qui détient la vérité, donnée par donnée
+
+La question se pose donnée par donnée. Pour le stock, qui gagne ? Pour le prix ?
+Pour la fiche produit ? Pour l’adresse client ?
+
+Les réponses sont souvent différentes. Le stock appartient en général à la
+gestion ou à la logistique, le prix à la gestion commerciale, le texte de la
+fiche à la boutique, l’adresse de livraison à la commande. Écris cette table.
+Elle tient sur une page et elle résout la moitié des conflits futurs.
+
+### Ce qui se passe quand deux sources divergent
+
+Il n’y a que trois réponses possibles : l’une écrase l’autre, on bloque et on
+alerte un humain, ou on prend la plus récente. Chacune est défendable, aucune
+n’est bonne partout, et la pire des situations est de ne pas avoir tranché.
+
+Pour le stock, je recommande presque toujours la plus prudente : la valeur la
+plus basse gagne, et une alerte part. Vendre moins coûte moins cher que
+survendre.
+
+### Le délai acceptable
+
+Certaines données supportent un décalage d’une heure. Le stock d’un produit qui
+part vite n’en supporte aucun. Décide la fréquence par donnée, pas par système :
+synchroniser tout en continu coûte cher pour rien, tout synchroniser la nuit
+coûte des ventes.
+
+<Quote>
+Une synchronisation, c’est une règle de gestion écrite, à laquelle on a ensuite
+donné une forme technique.
+</Quote>
+
+## Ce que doit contenir une synchronisation qui tient
+
+Six éléments. Ce sont les mêmes quel que soit le nombre de systèmes.
+
+<Steps items={[
+  "Une source de vérité déclarée par donnée, et écrite quelque part que tout le monde peut lire.",
+  "Une règle d’arbitrage explicite pour les conflits, appliquée toujours de la même façon.",
+  "Un journal des échanges : ce qui est entré, ce qui est sorti, quand, et avec quel résultat. Sans journal, un écart est indiagnosticable.",
+  "Une alerte quand une opération échoue, envoyée à quelqu’un qui la lit. Une alerte qui part dans une boîte que personne n’ouvre n’existe pas.",
+  "La reprise sur erreur : une opération qui échoue doit pouvoir être rejouée, sans créer de doublon.",
+  "Un tableau de contrôle qui montre les écarts en cours, pas seulement les opérations réussies."
+]} />
+
+Le sixième point est celui qui change la vie au quotidien. Un écran qui affiche
+« douze références en écart entre la boutique et la gestion » transforme un
+problème invisible en une tâche de dix minutes.
+
+## Quand un branchement sur mesure devient le bon choix
+
+Trois signaux, assez francs pour être reconnus sans expertise technique.
+
+**Tu paies plusieurs connecteurs qui font chacun la moitié du travail.**
+Additionne leurs abonnements sur un an, et compare au coût d’un branchement qui
+fait exactement ce dont tu as besoin. La comparaison surprend souvent.
+
+**Quelqu’un fait le rapprochement à la main.** Trente minutes par jour ouvré,
+c’est environ cent-vingt heures par an. Mets ton coût horaire chargé en face
+avant de décider que l’abonnement est moins cher.
+
+**Tes règles métier ne rentrent nulle part.** Produits composés, stock partagé
+entre variantes, précommandes, réservation par client professionnel : si ta
+façon de gérer le stock est ce qui te distingue, aucun connecteur générique ne
+l’épousera.
+
+J’ai développé l’arbitrage complet entre construire et s’abonner dans
+[outil sur mesure ou abonnements SaaS](/blog/outil-sur-mesure-ou-abonnements-saas).
+
+## Ce qu’un branchement coûte, honnêtement
+
+Il ne remplace pas tes outils, il les relie. Ce qui se construit, c’est la règle
+d’arbitrage, le journal, les alertes et l’écran de contrôle. Le reste continue
+de vivre là où il vit.
+
+Ce type de travail se chiffre en jours, pas en mois, à une condition : que tes
+règles soient écrites avant qu’on commence. Ce qui fait déraper ce genre de
+projet, c’est une question de gestion à laquelle personne n’a répondu, et le
+temps passé à attendre la réponse.
+
+Et il faut prévoir une part annuelle d’entretien. Les interfaces de
+programmation des plateformes changent, les formats évoluent, et une
+synchronisation qu’on n’entretient pas se dégrade toute seule.
+
+## Par où commencer, cette semaine
+
+Avant tout appel à un prestataire, fais trois choses.
+
+Dessine sur une feuille les systèmes que tu as et les flèches entre eux. Le
+dessin est souvent plus révélateur que la conversation : il montre les boucles
+et les allers-retours dont personne n’avait conscience.
+
+Écris la table des sources de vérité, donnée par donnée. Une page suffit.
+
+Compte le temps humain réellement passé chaque semaine à corriger des écarts.
+C’est ce nombre qui décide de la suite, pas l’agacement.
+
+## Ce que je retiens
+
+Tes outils ne sont pas d’accord parce que personne n’a écrit qui a raison. La
+technique ne résout pas ce problème, elle applique la décision une fois qu’elle
+est prise, et elle la rend visible avec un journal, des alertes et un écran
+d’écarts.
+
+Si tu veux que je regarde tes flux et que je te rende la table des
+sources de vérité et le chiffrage du branchement, c’est exactement le périmètre
+d’un [outil métier](/services/outil-metier). Quand plusieurs systèmes doivent
+rester d’accord en permanence et que la divergence te coûte de l’argent, ça
+relève plutôt du [logiciel métier](/services/logiciel-metier). Écris-moi
+depuis [la page de contact](/contact) en me disant quels outils tu as.
