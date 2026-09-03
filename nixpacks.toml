@@ -1,0 +1,36 @@
+# Construction et démarrage du site sur Coolify, via Nixpacks.
+#
+# POURQUOI CE FICHIER PLUTÔT QU'UN Dockerfile. Nixpacks détecte seul un projet
+# Next.js, mais il choisit npm dès qu'il trouve un `package.json`, et npm
+# réinstalle tout à chaque déploiement là où Bun lit `bun.lock` et va
+# nettement plus vite. Huit lignes de configuration explicite coûtent moins
+# cher à maintenir qu'un Dockerfile multi-étages, et disent exactement ce qui
+# tourne.
+#
+# LES VARIABLES `NEXT_PUBLIC_*` DOIVENT EXISTER AVANT LA PHASE DE BUILD. Next
+# les fige dans le JavaScript envoyé au navigateur au moment de `next build`,
+# elles ne sont pas relues au démarrage. Dans Coolify, il faut donc cocher
+# « Build variable » sur `NEXT_PUBLIC_TURNSTILE_SITE_KEY`,
+# `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_POSTHOG_KEY` et
+# `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION`. Sans ça, le formulaire se déploie
+# désactivé et la mesure d'audience reste muette, sans aucune erreur visible.
+#
+# `AUTORISER_BUILD_AVEC_DEV` : `bun run build` refuse de démarrer si un serveur
+# de développement occupe le port, garde-fou local qui n'a pas de sens sur le
+# serveur de déploiement.
+
+[phases.setup]
+nixPkgs = ["bun"]
+
+[phases.install]
+cmds = ["bun install --frozen-lockfile"]
+
+[phases.build]
+cmds = ["AUTORISER_BUILD_AVEC_DEV=1 bun run build"]
+
+[start]
+cmd = "bun run start"
+
+[variables]
+NODE_ENV = "production"
+NEXT_TELEMETRY_DISABLED = "1"
