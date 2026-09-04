@@ -84,3 +84,14 @@ scripts/reveal-threshold.mjs
 scripts/viewport-height.mjs
 scripts/mirror-framer-site*
 scripts/verify-framer-mirror*
+
+# Documents stratégiques et juridiques, JAMAIS publiés.
+# Le dépôt de déploiement est public. Ces fichiers portent l'analyse
+# commerciale, les arbitrages de positionnement, et l'état des demandes
+# d'autorisation d'image, y compris ce qui n'a pas encore été accordé.
+# Les publier revient à donner à un concurrent la carte des faiblesses, et à
+# un ayant droit la preuve écrite d'une publication sans son accord.
+docs/AUDIT-*.md
+docs/AUTORISATIONS-LOGOS.md
+docs/COPY-PROPOSITION*.md
+docs/EMAIL-WURTH-AUTORISATION.md
