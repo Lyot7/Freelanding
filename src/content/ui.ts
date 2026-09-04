@@ -152,6 +152,9 @@ export const uiLabels: UiLabels = {
     scopeSeparator: "/",
     timelineLabel: "Durée",
     clientLabel: "Client",
+    /* Employé à la place de `clientLabel` quand la mission a été menée DANS une
+       entreprise plutôt que commandée par elle (`WorkItem.clientKind`). */
+    employerLabel: "Employeur",
     yearLabel: "Année",
     problemTitleLines: ["Le", "problème."],
     resultsLabel: "Les résultats",
@@ -165,5 +168,11 @@ export const uiLabels: UiLabels = {
     quoteOpen: "« ",
     quoteClose: " »",
     nextProjectLabel: "Projet suivant",
+    /* Comparateur avant / après des pages projet. Le libellé du curseur n'est
+       jamais peint : il est lu par les lecteurs d'écran, et c'est la seule
+       chose qui dit à quoi sert la poignée quand on ne voit pas les images.
+       `%1` et `%2` reçoivent les deux libellés d'état, `%n` le pourcentage. */
+    compareSliderLabel: "Comparer les deux états : %1 et %2",
+    compareSliderValueText: "%n % de « %1 », le reste en « %2 »",
   },
 };

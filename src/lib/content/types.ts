@@ -23,6 +23,25 @@ export interface ImageAsset {
    * passent de commentaire, et une légende creuse vaut moins que rien.
    */
   caption?: string;
+  /**
+   * Numéro d'étape affiché AU-DESSUS du cadre, « 01 », « 02 »…
+   *
+   * Il n'est PAS l'index du tableau, et c'est tout l'intérêt : une séquence
+   * d'écrans se lit dans l'ordre du visiteur, pas dans celui du dépôt des
+   * fichiers, et deux de ses étapes peuvent être posées ailleurs dans la page
+   * que le reste de la suite. Écrire le numéro dans la donnée garde la
+   * numérotation continue quel que soit l'emplacement de rendu.
+   *
+   * Réservé aux captures qui forment un PARCOURS. Une capture d'ambiance n'a
+   * pas de rang, et lui en donner un ferait croire à une étape.
+   */
+  step?: string;
+  /**
+   * Titre court de l'étape, rendu à droite du numéro. Il nomme ce que l'écran
+   * FAIT, en trois ou quatre mots ; la démonstration, elle, reste dans
+   * `caption`.
+   */
+  stepTitle?: string;
 }
 
 export interface VideoAsset {
@@ -266,6 +285,31 @@ export interface Metric {
 export interface WorkItem extends SluggedContent {
   title: string;
   client?: string;
+  /**
+   * Libellé de la ligne `client` de la fiche.
+   *
+   * « CLIENT » est juste quand quelqu'un a commandé le travail. Il ne l'est pas
+   * pour une mission menée DANS une entreprise : sur un site de freelance, la
+   * ligne « CLIENT : WÜRTH FRANCE » se lit comme une prestation facturée en
+   * indépendant, ce que ce projet n'était pas. « EMPLOYEUR » nomme la relation
+   * pour ce qu'elle est, sans avoir à écrire la forme du contrat dans un texte
+   * public.
+   *
+   * Absent, la fiche affiche « CLIENT », ce qui convient aux deux autres
+   * projets.
+   */
+  clientKind?: "client" | "employer";
+  /**
+   * Contenu de la ligne « Périmètre de la mission », quand les catégories ne
+   * le disent pas.
+   *
+   * La fiche y rendait `categories`, qui sert AUSSI au filtre de `/work` : ses
+   * valeurs sont donc des familles de métier (« Développement », « Web
+   * design »), pas des périmètres. Sur Würth, la fiche annonçait « Périmètre de
+   * la mission : Développement », ce qui ne dit rien de ce qui a été fait.
+   * Absent, le comportement d'origine est conservé.
+   */
+  scope?: string;
   year?: string;
   role?: string; // rôle du studio sur le projet
   categories: string[]; // WEB DESIGN | DEVELOPMENT | BRANDING | SEO
@@ -321,6 +365,51 @@ export interface WorkItem extends SluggedContent {
   testimonial?: Testimonial;
   testimonialFollowUp?: string;
   gallery: readonly ImageAsset[];
+  /**
+   * En-tête de la suite d'écrans de fin de page.
+   *
+   * POURQUOI CE CHAMP EXISTE. Le gabarit de page projet vient d'un template de
+   * studio : trois visuels d'AMBIANCE répartis dans le récit, puis une pile
+   * pour le reste. Sur Kpsull et NSLysium, trois images suffisent et la pile
+   * reste vide. Sur Würth, la galerie est d'une autre nature : sept captures
+   * du MÊME formulaire, qui ne se distinguent qu'au détail et ne valent que
+   * dans leur ordre. Empilées sans en-tête, elles se lisaient comme sept
+   * versions de la même page, et le lecteur n'avait aucun moyen de savoir
+   * laquelle vient avant l'autre ni pourquoi elle existe.
+   *
+   * Présent, il pose un titre et une phrase d'introduction au-dessus des
+   * images restantes, qui deviennent une séquence annoncée. Absent, la pile se
+   * comporte comme avant : aucun projet n'est cassé par son absence.
+   */
+  walkthrough?: {
+    label: string;
+    title: string;
+    intro: string;
+  };
+  /**
+   * Comparateur avant / après, inséré DANS la suite d'écrans à son rang.
+   *
+   * POURQUOI IL N'EST PAS DEUX IMAGES DE PLUS. Certaines paires de captures ne
+   * se distinguent que par un état : sur Würth, la liste des contraintes du mot
+   * de passe est la MÊME image à deux instants, rouge puis verte. Posées l'une
+   * sous l'autre, elles obligent le lecteur à faire l'aller-retour de l'œil
+   * entre deux cadres séparés de 900px, et la moitié de la démonstration se
+   * perd dans le trajet. Superposées sous un curseur, la différence est le
+   * mouvement lui-même.
+   *
+   * `step` le range dans la séquence : le comparateur est trié avec les images
+   * qui l'entourent, il n'est pas collé en fin de liste.
+   */
+  comparison?: {
+    step: string;
+    stepTitle: string;
+    caption: string;
+    before: ImageAsset;
+    after: ImageAsset;
+    /** Libellés des deux états, rendus de part et d'autre du curseur. */
+    beforeLabel: string;
+    afterLabel: string;
+  };
   /** Démonstration vidéo liée au premier média narratif. */
   projectVideoUrl?: string;
   /** Vignette de la vidéo projet (elle diffère d'un projet à l'autre). */
@@ -860,7 +949,9 @@ export interface UiLabels {
     scopeLabel: string; // « Scope of work »
     scopeSeparator: string; // « / » entre deux prestations
     timelineLabel: string; // « Timeline »
-    clientLabel: string; // « Client »
+    clientLabel: string;
+    /** Variante employée quand la mission a été menée dans l'entreprise. */
+    employerLabel: string; // « Client »
     yearLabel: string; // « Year »
     problemTitleLines: readonly string[]; // « The » / « problem. »
     resultsLabel: string; // « The results »
@@ -874,6 +965,10 @@ export interface UiLabels {
     quoteOpen: string;
     quoteClose: string;
     nextProjectLabel: string; // « Next project »
+    /** Libellé du curseur d'un comparateur avant / après (`%1`, `%2`). */
+    compareSliderLabel: string;
+    /** Valeur annoncée par ce curseur (`%n` en plus de `%1` et `%2`). */
+    compareSliderValueText: string;
   };
 }
 

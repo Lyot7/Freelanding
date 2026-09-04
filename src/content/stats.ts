@@ -39,15 +39,18 @@ export const howWeDoItStats: Stat[] = [
    * dans aucun des mots d'Eliott : c'était une cible inventée, et « visé » ne
    * suffit pas à protéger un nombre affiché en 58 px sur la page d'accueil.
    *
-   * CE QUI LE REMPLACE EST LE SEUL RÉSULTAT MESURÉ QU'IL POSSÈDE, et il est
-   * daté : le parcours de création de compte refait chez Würth France, en stage,
-   * de mars à juin 2024. La forme du contrat est écrite dans le libellé, comme
-   * elle l'est sur la fiche projet : « chez Würth » tout court se lirait, sur un
-   * site de freelance, comme une mission facturée.
+   * CE QUI LE REMPLACE EST LE SEUL RÉSULTAT MESURÉ QU'IL POSSÈDE : le parcours
+   * de création de compte refait chez Würth France en 2024.
+   *
+   * LA FORME DU CONTRAT A QUITTÉ LE LIBELLÉ le 2026-09-04, sur consigne
+   * d'Eliott. Elle y était écrite (« refait en stage chez Würth ») pour qu'on ne
+   * lise pas une mission facturée en indépendant ; c'était résoudre un problème
+   * de lecture en publiant une justification. Un chiffre de page d'accueil dit
+   * ce qui a été fait et où, pas sous quel contrat.
    */
   {
     value: "92",
-    label: "D’erreurs en moins sur un parcours d’inscription refait en stage chez Würth",
+    label: "D’erreurs en moins sur un parcours d’inscription refait chez Würth France",
     suffix: "%",
     format: "integer",
     highlights: ["D’erreurs en moins"],

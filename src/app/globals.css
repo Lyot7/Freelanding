@@ -685,3 +685,49 @@ body {
   mask-position: 10px 50%;
   mask-size: 16px;
 }
+
+/*
+ * Rail du comparateur avant / après (`ComparateurAvantApres`).
+ *
+ * Le curseur est un `<input type="range">` natif : c'est ce qui lui donne le
+ * clavier, le tactile et l'annonce par un lecteur d'écran sans une ligne de
+ * gestion de geste. Son apparence par défaut, elle, est celle du système et
+ * n'appartient à aucune charte — d'où ce style, qui ne touche que la piste et
+ * le pouce.
+ *
+ * Les sélecteurs WebKit et Firefox ne peuvent PAS être groupés : un navigateur
+ * qui ne connaît pas l'un des deux jette la règle entière.
+ */
+.comparateur-rail::-webkit-slider-runnable-track {
+  height: 2px;
+  border-radius: 1px;
+  background: color-mix(in srgb, var(--color-background) 20%, transparent);
+}
+
+.comparateur-rail::-moz-range-track {
+  height: 2px;
+  border-radius: 1px;
+  background: color-mix(in srgb, var(--color-background) 20%, transparent);
+}
+
+/* `margin-top` recentre le pouce sur une piste de 2px : WebKit l'aligne sur le
+   bord haut de la piste, pas sur son axe. */
+.comparateur-rail::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  margin-top: -9px;
+  border: none;
+  border-radius: 50%;
+  background: var(--color-background);
+  cursor: ew-resize;
+}
+
+.comparateur-rail::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: 50%;
+  background: var(--color-background);
+  cursor: ew-resize;
+}

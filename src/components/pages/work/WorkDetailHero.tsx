@@ -57,9 +57,35 @@ export function WorkDetailHero({ work }: { work: WorkItem }) {
           Un dégradé plutôt qu'un aplat plus dense : il assombrit le bas, là où
           vivent le titre et le résumé, et laisse la moitié haute de l'image
           intacte. Assombrir toute la photo pour deux lignes de texte aurait
-          coûté l'image entière. */}
+          coûté l'image entière.
+
+          RENFORCÉ LE 2026-09-04, PARCE QUE LE FOND DE WÜRTH A CHANGÉ. Sa page
+          porte désormais un plateau 3D dont la DALLE EST BLANC PUR, et cette
+          dalle tombe exactement sous le titre : le dégradé précédent (62 %,
+          70/35) laissait le H1 blanc à 1,82:1, sous le plancher de 3:1 que WCAG
+          demande pour du grand texte. Les deux autres pages tenaient, elles,
+          sans marge confortable.
+
+          Relevé par `bun run audit:contraste-hero`, qui masque le texte du H1,
+          capture sa boîte sur la page rendue et cherche le pixel le plus clair
+          qu'elle recouvre. Pire rapport des trois largeurs auditées :
+
+            page        62 % · 70/35     78 % · 85/60
+            kpsull          3,85             8,23
+            nslysium        4,29             8,79
+            wurth           1,82             3,70
+
+          78 % / 85 / 60 est le premier jeu essayé qui passe partout : 72/80/50 a
+          été mesuré avant lui et laissait Würth à 2,67. Le haut de l'image reste
+          intact sur 22 % de sa hauteur au lieu de 38 : c'est ce que coûte la
+          mise à niveau, et elle se paie sur du décor. Sur le plateau de Würth
+          elle transforme l'écran en source lumineuse plutôt qu'en capture
+          lisible, ce qui est le bon registre pour un fond de hero.
+
+          À REJOUER dès qu'un `heroBackground` change : un fond clair sous le
+          titre ne casse rien de visible et ne se voit qu'à l'œil. */}
       <div className="absolute inset-0 bg-black/15" />
-      <div className="absolute inset-x-0 bottom-0 h-[62%] bg-gradient-to-t from-black/70 via-black/35 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-[78%] bg-gradient-to-t from-black/85 via-black/60 to-transparent" />
       {/* MANQUANT jusqu'ici : `/work/box-mode` n'avait aucun grain de section.
           RELEVÉ sur le live : hôte 1440 × 810, z-1, opacité 0,08. */}
       <Grain opacity={0.08} className="z-[1]" />

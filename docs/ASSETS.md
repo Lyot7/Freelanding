@@ -128,8 +128,9 @@ repli, lui, est un tracé local, sans marque.
 | --- | --- | --- |
 | `work/kpsull/hero-fond.jpg` | Fichier ORIGINAL servi par le site : `kpsull.eliottbouquerel.fr/images/hero-skater.jpg` | Rien à retirer, le fichier ne contenait aucune interface |
 | `work/nslysium/hero-fond.jpg` | Capture de `nslysium.eliottbouquerel.fr` à deux fois la densité, interface masquée par CSS, `<canvas>` 3D conservé | En-tête, accroche, paragraphe et boutons |
+| `work/wurth/mockup.jpg` | Plateau 3D généré par `scripts/mockup-projets.mjs`, dalle incrustée avec la vraie étape 1 du formulaire | Rien : aucun champ saisi, rien envoyé |
 | `work/wurth/formulaire-etape-1.jpg` | Capture de l'étape 1 de `eshop.wurth.fr`, page PUBLIQUE, cookies refusés, formulaire vide | Rien : aucun champ n'a été saisi, rien n'a été envoyé |
-| `work/wurth/resultat-92.jpg` | Carte typographique « −92 % », composée pour ce site | — |
+| `work/wurth/resultat-92.jpg` | Carte typographique « −92 % », composée pour ce site. **PLUS RENDUE NULLE PART depuis le 2026-09-04** : le chiffre vit en texte dans le bloc « résultats », le republier en image l'écrivait deux fois | — |
 
 **Sur la capture Würth.** Elle a été relevée le 2026-08-27 sur la page
 d'inscription publique, atteignable sans compte. Le bandeau de consentement a
@@ -144,14 +145,31 @@ Sept captures du parcours de création de compte de l'eShop français, prises pa
 Eliott sur l'interface publique. Les originaux sont conservés dans
 `docs/sources/wurth/`, les fichiers servis sont dans `public/work/wurth/`.
 
+**Les numéros de fichier ne sont PAS les rangs du parcours.** Ils suivent l'ordre
+dans lequel les captures ont été prises ; le rang réel est porté par `step` dans
+`work.ts` et relevé auprès d'Eliott le 2026-09-04 : le mot de passe OUVRE le
+formulaire, il ne le termine pas.
+
+| Rang | Fichier | Ce qu'il montre | Donnée sensible |
+| --- | --- | --- | --- |
+| 01 | `05` + `06` | Les contraintes du mot de passe, puis leur validation (comparateur) | Mot de passe masqué, jamais envoyé |
+| 02 | `01-deja-client.png` | L'aiguillage, deux tuiles « déjà cliente » / « pas encore cliente » | Aucune, écran vierge |
+| 03 | `02-siren-non-reconnu.png` | Un SIREN refusé et le message de correction | Numéro inexistant, saisi pour la démonstration |
+| 04 | `03-siret-adresse-remplie.png` | Un SIRET reconnu qui remplit nom, rue, code postal et ville | SIRET d'une société cotée, publié au registre public |
+| 05 | `04-adresse-autocompletion.png` | Le repli : cinq propositions d'adresse au fil de la frappe | Adresses publiques de la Base Adresse Nationale |
+| 06 | `07-certification.png` | La case de certification décochée, bouton « Continuer » inactif | Aucune |
+
+Détail par fichier :
+
 | Fichier | Ce qu'il montre | Donnée sensible |
 | --- | --- | --- |
 | `01-deja-client.png` | L'aiguillage d'entrée, deux tuiles « déjà cliente » / « pas encore cliente » | Aucune, écran vierge |
+| `01-deja-client-cover.png` | La même, sur le canevas commun 1600 × 1000, pour la vignette et l'image de partage | Aucune |
 | `02-siren-non-reconnu.png` | Un SIREN refusé et le message de correction | Numéro inexistant, saisi pour la démonstration |
 | `03-siret-adresse-remplie.png` | Un SIRET reconnu qui remplit nom, rue, code postal et ville | SIRET d'une société cotée, publié au registre public |
 | `04-adresse-autocompletion.png` | Cinq propositions d'adresse au fil de la frappe | Adresses publiques de la Base Adresse Nationale |
-| `05-mot-de-passe-vide.png` | Les trois contraintes de mot de passe au repos | Aucune, champ vide |
-| `06-mot-de-passe-valide.png` | Les mêmes contraintes satisfaites, jauge « Fort » | Mot de passe masqué, jamais envoyé, compte jamais créé |
+| `05-mot-de-passe-vide.png` | Les trois contraintes de mot de passe au repos. Rendue par le comparateur avant / après, pas par la galerie | Aucune, champ vide |
+| `06-mot-de-passe-valide.png` | Les mêmes contraintes satisfaites, jauge « Fort ». Rendue par le comparateur avant / après, pas par la galerie | Mot de passe masqué, jamais envoyé, compte jamais créé |
 | `07-certification.png` | La case de certification décochée, bouton « Continuer » inactif | Aucune |
 
 **Aucune de ces sept captures ne reproduit le logo de Würth.** La marque n'y
@@ -159,10 +177,18 @@ apparaît qu'en toutes lettres, dans le texte de l'interface. C'est la condition
 posée par la règle 4 de `src/content/work.ts`, et la raison pour laquelle
 `formulaire-etape-1.jpg` reste hors de la galerie.
 
-**Canevas commun : 1600 × 1000, soit le rapport 1,6 de tous les visuels du
-site.** Les originaux arrivaient en sept rapports différents, de 1,069 à 2,494.
-Le contenu n'est ni étiré ni rogné, il est centré sur le blanc du formulaire.
-Recette, à rejouer à l'identique si une capture est remplacée :
+**Deux familles de cadrage depuis le 2026-09-04**, parce que les captures ne
+servent plus au même endroit.
+
+*Famille 1, la couverture seule* (`01-deja-client-cover.png`) : canevas commun de
+1600 × 1000, le rapport 1,6 de tous les visuels du site. Elle sert de vignette sur `/work` et
+d'image de partage, cadres qui la rognent : la carte, en 1,73678, prend 4,3 % en
+haut et en bas, sur de la marge blanche. La variante recadrée au contenu, en
+2,169, y perdrait 20 % de chaque côté, donc les deux tuiles. Le contenu n'est ni étiré ni rogné, il est
+centré sur le blanc du formulaire, dans une zone utile de 1270 × 780. Relevé à
+1440 sur la page rendue : le calque rogne jusqu'à 10,1 % de la largeur de chaque
+côté sur ces deux cadres, et de 7,8 % à 8,9 % en hauteur, cadre poussé en haut
+puis en bas du viewport.
 
 ```
 sips -z <h_ajustée> <l_ajustée> capture.png    # seulement si la capture dépasse
@@ -170,13 +196,72 @@ sips -p 1000 1600 --padColor FFFFFF capture.png
 ```
 
 L'ajustement vaut `min(1270 / l, 780 / h, 1)`, plafonné à 1 pour ne jamais
-agrandir. La zone utile de 1270 × 780 laisse la marge que le calque de parallaxe
-consomme au défilement. Relevé à 1440 sur la page rendue : le calque rogne
-jusqu'à 10,1 % de la largeur de chaque côté sur les deux premiers cadres et
-8,3 % sur les cinq autres, et de 7,8 % à 8,9 % en hauteur, cadre poussé en haut
-puis en bas du viewport. La plus étroite des sept marges vaut 10,75 % en largeur
-et 11,6 % en hauteur : aucune information utile n'est perdue, à aucune position
-de défilement.
+agrandir.
+
+*Famille 2, tous les écrans de la séquence* (`01` à `07`) : recadrés SUR LEUR
+CONTENU, à leur rapport naturel, avec 3 % de marge blanche. Ils sont rendus par
+`BlocEtape` sur la moitié gauche de la page et SANS parallaxe, donc sans marge
+de sécurité à réserver. Le canevas commun leur coûtait cher à cette taille : le
+contenu d'une capture n'occupe que 70 % de la largeur du fichier, soit 30 % d'un
+cadre déjà réduit de moitié, perdus en blanc.
+
+```
+python3 -c "from PIL import Image, ImageChops; \
+  im=Image.open('src.png').convert('RGB'); \
+  b=ImageChops.difference(im, Image.new('RGB', im.size, (255,255,255))).getbbox(); \
+  m=round((b[2]-b[0])*0.03); \
+  im.crop((b[0]-m, b[1]-m, b[2]+m, b[3]+m)).save('dst.png')"
+```
+
+*Exception dans la famille 2* : `05` et `06` alimentent le comparateur
+avant / après, et leur cadrage est contraint par une chose que ni le recadrage
+ni le choix de la source ne corrigent.
+
+**Les deux états n'ont pas la même mise en page.** Quand le mot de passe est
+accepté, « Force du mot de passe : Fort » passe sur deux lignes et pousse ce qui
+suit. Mesuré au profil des lignes de contenu : l'étiquette et le champ sont
+alignés au pixel, la barre de force descend de 24 px, le bloc des trois
+contraintes de 48. C'est le formulaire qui bouge, pas la capture.
+
+Le cadre garde donc l'ensemble — étiquette, champ, barre, contraintes — dans une
+boîte identique, `(30, 450) → (1210, 958)`, soit 1180 × 508. Le rideau du
+comparateur ne montre jamais qu'un seul état à un endroit donné : le décalage y
+se lit comme du contenu qui glisse quand l'état change. Un fondu croisé a été
+essayé pour supprimer la couture ; il est pire, les deux jeux de textes décalés
+se lisant en même temps à mi-course.
+
+**La source reste celle du dépôt** (1240 px de large), et non les captures
+d'écran de navigateur du 2026-09-04 : leur bloc de contraintes ne porte que
+188 px de contenu utile contre 376 pour l'original, elles ne réglaient pas le
+désalignement — il vient du site — et coûtaient la moitié de la définition.
+
+Contrôle d'alignement, à rejouer si l'une des deux est remplacée : le profil des
+lignes de contenu doit être identique sur les deux jusqu'au champ du mot de
+passe, et les écarts sous la barre doivent rester ceux mesurés ici.
+
+**Les captures sont affichées en `object-contain`, jamais en `object-cover`.**
+Le cadre porte déjà le rapport de l'image, donc les deux rendent pareil tant que
+`width` et `height` sont justes. Mais `cover` rogne en silence dès qu'ils se
+périment, et ce qu'il rogne sur une capture d'interface est un libellé de champ
+ou un message d'erreur. `contain` laisse au pire une bande de fond : un défaut
+visible se corrige, une information perdue ne se remarque pas.
+
+`width` et `height` des entrées de galerie de `work.ts` doivent suivre le
+fichier : ils fixent le rapport du cadre, et un rapport faux rogne l'image.
+Contrôle de la marge blanche réelle :
+
+```
+python3 -c "from PIL import Image, ImageChops; im=Image.open('f.png').convert('RGB'); \
+  print(ImageChops.difference(im, Image.new('RGB', im.size, (255,255,255))).getbbox())"
+```
+
+**Le cache d'images du serveur de développement ment après un remplacement.**
+Next garde les versions optimisées dans `.next/dev/cache/images`, indexées sur
+l'URL et non sur le contenu du fichier : un asset remplacé continue d'être servi
+dans son ancienne version au navigateur, alors qu'un `curl` sans en-tête
+`Accept` renvoie déjà la bonne. Relevé le 2026-09-04, trois vérifications
+visuelles de suite passées à côté. Après toute substitution d'image :
+`trash .next/dev/cache/images`.
 
 **Pourquoi ils existent.** Les `cover.jpg` sont des captures de page d'accueil,
 barre de navigation comprise. En vignette c'est ce qu'il faut, on reconnaît un

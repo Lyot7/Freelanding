@@ -13,7 +13,8 @@
     "audit:fichiers": "bun scripts/assets-audit.mjs",
     "audit:accents": "bun scripts/accent-clip-audit.mjs",
     "audit:typo": "bun scripts/typo-fr.mjs",
-    "audit:textes": "bun scripts/hardcoded-text-audit.mjs"
+    "audit:textes": "bun scripts/hardcoded-text-audit.mjs",
+    "audit:contraste-hero": "bun scripts/hero-contraste.mjs"
   },
   "dependencies": {
     "@mdx-js/loader": "^3.1.1",

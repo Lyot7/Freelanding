@@ -1,4 +1,6 @@
+import Image from "next/image";
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { ParallaxImage } from "@/components/motion/ParallaxImage";
 import { ParallaxBackdrop } from "@/components/motion/ParallaxBackdrop";
 import { Reveal } from "@/components/motion/Reveal";
@@ -6,6 +8,7 @@ import { Icon, SwapText } from "@/components/ui";
 import type { ImageAsset, WorkItem } from "@/lib/content";
 import type { WorkDetailContent } from "./work-detail-content";
 import { uiLabels } from "@/content/ui";
+import { ComparateurAvantApres } from "./ComparateurAvantApres";
 
 const LABEL =
   "text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/60";
@@ -248,6 +251,99 @@ function GalleryImage({
 }
 
 /*
+ * BLOC D'ÉTAPE : le visuel à GAUCHE, son commentaire à DROITE.
+ *
+ * CE QU'IL CORRIGE, relevé le 2026-09-04 sur la page Würth. La suite d'écrans
+ * était rendue comme le reste de la galerie : sept cadres pleine largeur de
+ * 1024 px de haut, empilés sur plus de cinq mille pixels, chacun suivi d'une
+ * légende. Trois défauts à la fois. Les captures y étaient énormes SANS être
+ * plus lisibles — le contenu utile d'une capture Würth occupe 78 % de son
+ * canevas et son texte fait déjà 26 px à 1600, donc un cadre de 1380 px ne
+ * montre rien qu'un cadre de 690 ne montre pas. La page devenait un couloir
+ * qu'on parcourt sans lire. Et la légende, posée sous un cadre haut d'un écran
+ * entier, n'était jamais visible en même temps que ce qu'elle commente.
+ *
+ * À partir de `desktop` (1200), le visuel prend donc la MOITIÉ GAUCHE et son
+ * commentaire la moitié droite, de part et d'autre du filet central que la
+ * section trace déjà. Le cadre passe de 1380 à 690 px à 1440 : le texte des
+ * captures y descend de 22 à 11 px, ce qui reste au-dessus de ce que la page
+ * elle-même emploie pour son corps de texte. En dessous de 1200, la moitié
+ * tomberait à 570 px puis 381 : le bloc reste empilé, visuel pleine largeur et
+ * commentaire dessous.
+ *
+ * PAS DE PARALLAXE ICI, et c'est délibéré : `ParallaxImage` agrandit son calque
+ * de 10 % pour le faire dériver, ce qui rogne 8,3 % de chaque côté du cadre. Sur
+ * une photographie c'est de la texture ; sur une capture d'interface, ce sont
+ * des libellés de champ coupés. Le cadre rend donc l'image entière, au repos.
+ */
+function BlocEtape({
+  step,
+  stepTitle,
+  caption,
+  className = "",
+  /**
+   * Visuel à DROITE et commentaire à gauche, au lieu de l'inverse.
+   *
+   * Une étape sur deux le porte. Six blocs identiques empilés donnent une page
+   * qui se parcourt sans se lire : l'œil apprend en deux blocs où trouver le
+   * visuel et où trouver le texte, et cesse de regarder. L'alternance rompt
+   * cette cadence sans changer la grille — c'est la même moitié, l'ordre des
+   * deux colonnes est simplement échangé.
+   *
+   * SOUS 1200 le bloc est empilé et l'inversion N'A PAS LIEU : le visuel doit
+   * rester au-dessus de son commentaire, sans quoi la légende précède ce
+   * qu'elle légende. D'où `desktop:order-*` plutôt qu'un `order-*` inconditionnel.
+   */
+  inverse = false,
+  children,
+}: {
+  step?: string;
+  stepTitle?: string;
+  caption?: string;
+  className?: string;
+  inverse?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <figure className={`m-0 grid grid-cols-1 desktop:grid-cols-2 ${className}`}>
+      <div
+        className={
+          inverse
+            ? "desktop:order-2 desktop:pl-[30px]"
+            : "desktop:order-1 desktop:pr-[30px]"
+        }
+      >
+        {children}
+      </div>
+      <div
+        className={`mt-[20px] desktop:mt-0 ${
+          inverse
+            ? "desktop:order-1 desktop:pr-[30px]"
+            : "desktop:order-2 desktop:pl-[30px]"
+        }`}
+      >
+        <div className="flex items-center gap-[12px]">
+          {step ? (
+            <span className="text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/40">
+              {step}
+            </span>
+          ) : null}
+          <span aria-hidden className="h-px flex-1 bg-background/[0.12]" />
+        </div>
+        {stepTitle ? (
+          <p className={`${TITLE} mt-[10px] max-w-[570px]`}>{stepTitle}</p>
+        ) : null}
+        {caption ? (
+          <figcaption className={`${BODY} mt-[12px] max-w-[520px] tablet:mt-[20px]`}>
+            {caption}
+          </figcaption>
+        ) : null}
+      </div>
+    </figure>
+  );
+}
+
+/*
  * La grille du récit est un simple 50/50 SANS gouttière : le libellé occupe la
  * moitié gauche, le contenu la moitié droite. Une grille de 12 colonnes avec
  * 4px de gouttière plaçait la colonne 7 à 722px au lieu de 720 à 1440, soit 2px
@@ -260,8 +356,56 @@ export function WorkNarrative({
   detail: WorkDetailContent;
   work: WorkItem;
 }) {
-  const [problemImage, resultImage, approachImage, ...remainingImages] =
-    detail.gallery;
+  /*
+   * RÉPARTITION DE LA GALERIE : le RANG décide, pas la position dans le tableau.
+   *
+   * Le gabarit réserve trois emplacements narratifs (avant le bloc « problème »,
+   * avant le bloc « résultats », après le titre de conclusion) puis empile le
+   * reste. Découper le tableau par index suffisait tant qu'une galerie ne
+   * portait que des visuels d'ambiance. Depuis qu'une page peut décrire un
+   * PARCOURS, l'index ment : sur Würth, les cinq entrées sont cinq étapes, et
+   * les emplacements narratifs en sortaient deux de la séquence pour les poser
+   * pleine largeur, hors de leur rang et hors de l'en-tête qui les annonce.
+   *
+   * Une entrée NUMÉROTÉE va donc toujours dans la séquence, quelle que soit sa
+   * position. Les emplacements narratifs se servent dans ce qui reste, les
+   * visuels d'ambiance. Kpsull et NSLysium n'ont aucun numéro : leur galerie se
+   * répartit exactement comme avant.
+   */
+  const ambiance = detail.gallery.filter((image) => !image.step);
+  const [problemImage, resultImage, approachImage, ...remainingImages] = ambiance;
+
+  /*
+   * SÉQUENCE : les écrans numérotés, plus le comparateur s'il y en a un, rangés
+   * par leur NUMÉRO D'ÉTAPE et non par leur ordre d'écriture. Le tri est
+   * lexicographique sur des numéros écrits à deux chiffres : il donne le bon
+   * ordre sans convertir en nombre, ce qu'un rang composé ne permettrait pas.
+   */
+  const sequence: readonly (
+    | { kind: "image"; step: string; image: ImageAsset }
+    | {
+        kind: "comparaison";
+        step: string;
+        comparison: NonNullable<WorkItem["comparison"]>;
+      }
+  )[] = [
+    ...detail.gallery
+      .filter((image) => image.step)
+      .map((image) => ({
+        kind: "image" as const,
+        step: image.step ?? "",
+        image,
+      })),
+    ...(work.comparison
+      ? [
+          {
+            kind: "comparaison" as const,
+            step: work.comparison.step,
+            comparison: work.comparison,
+          },
+        ]
+      : []),
+  ].sort((a, b) => a.step.localeCompare(b.step, "fr"));
 
   return (
     /* Retraits verticaux de la section : PALIER unique à 810, relevé sur la
@@ -360,24 +504,43 @@ export function WorkNarrative({
                 totale 241,63 puis 271,63 pour 4 × 50,40625 de lignes). Le
                 retrait BAS manquait entièrement des deux côtés de la bascule. */}
             <dl className="mt-[30px] pb-[10px] tablet:mt-[40px] tablet:pb-[30px]">
+              {/* PÉRIMÈTRE : `scope` s'il existe, sinon les catégories.
+                  Les catégories servent au FILTRE de `/work` : ce sont des
+                  familles de métier, pas des périmètres, et « Périmètre de la
+                  mission : Développement » ne disait rien de ce qui a été
+                  fait. */}
               <FactRow label={uiLabels.work.scopeLabel}>
-                {/* Pas de repli : la source pose la liste des catégories dans
-                    un seul `<p>` en `white-space: pre`. */}
-                <span className="flex flex-nowrap justify-end gap-x-[10px]">
-                  {work.categories.map((category, index) => (
-                    <span key={category}>
-                      {category}
-                      {index < work.categories.length - 1 ? (
-                        <span className="ml-[10px] text-background/20">/</span>
-                      ) : null}
-                    </span>
-                  ))}
-                </span>
+                {work.scope ? (
+                  <span className="whitespace-pre">{work.scope}</span>
+                ) : (
+                  /* Pas de repli : la source pose la liste des catégories dans
+                     un seul `<p>` en `white-space: pre`. */
+                  <span className="flex flex-nowrap justify-end gap-x-[10px]">
+                    {work.categories.map((category, index) => (
+                      <span key={category}>
+                        {category}
+                        {index < work.categories.length - 1 ? (
+                          <span className="ml-[10px] text-background/20">/</span>
+                        ) : null}
+                      </span>
+                    ))}
+                  </span>
+                )}
               </FactRow>
               {work.launched ? (
                 <FactRow label={uiLabels.work.timelineLabel}>{work.launched}</FactRow>
               ) : null}
-              {work.client ? <FactRow label={uiLabels.work.clientLabel}>{work.client}</FactRow> : null}
+              {work.client ? (
+                <FactRow
+                  label={
+                    work.clientKind === "employer"
+                      ? uiLabels.work.employerLabel
+                      : uiLabels.work.clientLabel
+                  }
+                >
+                  {work.client}
+                </FactRow>
+              ) : null}
               {work.year ? <FactRow label={uiLabels.work.yearLabel}>{work.year}</FactRow> : null}
             </dl>
             {/* AUCUNE marge au-dessus du bouton : sur la source il suit la fiche
@@ -623,13 +786,99 @@ export function WorkNarrative({
           />
         ) : null}
 
-        {/* Écart de la pile de fin : 20/30 sans légende, comme la source, mais
-            40/60 dès qu'une légende s'intercale. Sans cela le texte d'une
-            figure se retrouve à 20px du cadre suivant et à 12px du sien : il se
-            lit comme le titre de l'image du dessous, pas comme la légende de
-            celle du dessus. Les deux autres projets n'ont que trois visuels,
-            donc aucune image dans cette pile : le changement ne les touche
-            pas. */}
+        {/* EN-TÊTE DE LA PILE DE FIN, quand elle forme un parcours.
+            Ajouté le 2026-09-04. La pile n'annonçait rien : sur Würth, cinq
+            captures du même formulaire blanc s'enchaînaient sur plus de 5000px
+            sans un mot pour dire ce qu'on regardait ni dans quel ordre. Le bloc
+            reprend la structure du bloc « approche » — libellé pleine ligne,
+            contenu dans la moitié droite — parce que c'est un bloc de récit de
+            plus, pas une galerie décorée.
+            Rendu SEULEMENT si la donnée le porte (`walkthrough`) ET si la
+            séquence n'est pas vide : les deux autres projets n'ont aucun écran
+            numéroté, donc aucune séquence, et rien ne change chez eux. */}
+        {work.walkthrough && sequence.length > 0 ? (
+          <div className="mt-[40px] tablet:mt-[80px]">
+            <p className={`${LABEL}`}>{work.walkthrough.label}</p>
+            <div className="mt-[20px] tablet:ml-auto tablet:mt-[30px] tablet:w-1/2">
+              <Reveal initialOpacity={0.001} initialY={22}>
+                <h2 className={`${TITLE} max-w-[570px]`}>{work.walkthrough.title}</h2>
+                <p className={`${BODY} mt-[12px] max-w-[520px] tablet:mt-[20px]`}>
+                  {work.walkthrough.intro}
+                </p>
+              </Reveal>
+            </div>
+          </div>
+        ) : null}
+
+        {/* LA SUITE D'ÉCRANS, images et comparateur RANGÉS PAR LEUR NUMÉRO.
+            Le comparateur n'est pas une pièce rapportée en fin de liste : il
+            occupe le rang « 05 · 06 » du parcours, entre l'écran 04 et l'écran
+            07, et le tri le remet à sa place quel que soit l'ordre d'écriture
+            dans la donnée.
+            Écart entre blocs : 60/100, contre 20/30 pour une pile d'images
+            nues. Chaque bloc porte maintenant un titre et un commentaire ; sans
+            cet air, le titre d'une étape se lit comme la suite du commentaire de
+            la précédente. */}
+        {sequence.map((entree, rang) =>
+          entree.kind === "comparaison" ? (
+            <BlocEtape
+              key="comparaison"
+              step={entree.comparison.step}
+              stepTitle={entree.comparison.stepTitle}
+              caption={entree.comparison.caption}
+              inverse={rang % 2 === 1}
+              className="mt-[60px] tablet:mt-[100px]"
+            >
+              <ComparateurAvantApres
+                avant={entree.comparison.before}
+                apres={entree.comparison.after}
+                libelleAvant={entree.comparison.beforeLabel}
+                libelleApres={entree.comparison.afterLabel}
+                sizes="(min-width: 1200px) 50vw, calc(100vw - 40px)"
+              />
+            </BlocEtape>
+          ) : entree.image.step || entree.image.stepTitle ? (
+            <BlocEtape
+              key={entree.image.src}
+              step={entree.image.step}
+              stepTitle={entree.image.stepTitle}
+              caption={entree.image.caption}
+              inverse={rang % 2 === 1}
+              className="mt-[60px] tablet:mt-[100px]"
+            >
+              {/* Cadre au repos, sans parallaxe : voir la note de `BlocEtape`. */}
+              <div
+                className="relative w-full overflow-hidden"
+                style={{
+                  aspectRatio:
+                    entree.image.width && entree.image.height
+                      ? `${entree.image.width} / ${entree.image.height}`
+                      : "16 / 10",
+                }}
+              >
+                <Image
+                  src={entree.image.src}
+                  alt={entree.image.alt}
+                  fill
+                  sizes="(min-width: 1200px) 50vw, calc(100vw - 40px)"
+                  /* `contain` et non `cover` : le cadre porte déjà le rapport de
+                     l'image, mais `cover` rognerait en silence si `width` et
+                     `height` se périmaient — et ce qu'il rogne sur une capture
+                     d'interface, c'est un libellé de champ ou un message
+                     d'erreur. */
+                  className="object-contain object-center"
+                />
+              </div>
+            </BlocEtape>
+          ) : null,
+        )}
+
+        {/* Visuels d'ambiance restants : aucun rang, donc aucune place dans le
+            parcours. Ils gardent le rendu et les écarts d'origine (20/30, ou
+            40/60 dès qu'une légende s'intercale, faute de quoi le texte d'une
+            figure se lit comme le titre de l'image du dessous). Vide sur les
+            trois projets actuels ; le chemin existe pour une galerie à plus de
+            trois visuels non numérotés. */}
         {remainingImages.map((image) => (
           <GalleryImage
             key={image.src}
