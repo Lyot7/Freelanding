@@ -30,7 +30,7 @@ export async function generateMetadata({
   // exactement ce qu'attend un extrait de résultat de recherche.
   return pageMetadata(
     { title: work.title, description: work.overview },
-    `/work/${work.slug}`,
+    `/realisations/${work.slug}`,
     { ogType: "article", ogImage: work.cover },
   );
 }

@@ -189,7 +189,7 @@ export const homeContent: HomeContent = {
      * n'avait aucun gestionnaire et venait du template, où le studio d'origine
      * avait une bande démo à ouvrir. `playLabel` a disparu avec lui.
      */
-    cta: { label: "VOIR LES RÉALISATIONS", href: "/work" },
+    cta: { label: "VOIR LES RÉALISATIONS", href: "/realisations" },
     ctaPrefix: "↓ ",
     /*
      * AFFICHE DE LA SECTION.
@@ -334,7 +334,7 @@ export const homeContent: HomeContent = {
       value: "1",
       caption: "Interlocuteur : tu parles à celui qui écrit le code",
     },
-    cta: { label: "À propos", href: "/about" },
+    cta: { label: "À propos", href: "/a-propos" },
     // PHOTO PLEINE CADRE depuis le 2026-08-27. Ce cadre portait le portrait
     // DÉTOURÉ sur aplat accent, alors que la source y met une photographie qui
     // remplit le cadre bord à bord. Sur un aplat, deux défauts se cumulaient :
@@ -389,7 +389,7 @@ export const homeContent: HomeContent = {
     title: "Ce qui est vérifiable.",
     stats: reputationStats,
     ctas: [
-      { label: "Voir les réalisations", href: "/work" },
+      { label: "Voir les réalisations", href: "/realisations" },
       { label: "Démarrer un projet", href: "/contact" },
     ],
   },

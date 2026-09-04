@@ -461,7 +461,7 @@ export function WorkNarrative({
               Nous n'avions qu'UNE pastille translatée de -4 px, sans fondu, sans
               mise à l'échelle et sans resserrement de l'écart. */}
           <Link
-            href="/work"
+            href="/realisations"
             className={`group flex h-[20px] w-fit items-center gap-[10px] self-start text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background ${DOT_SWAP} hover:gap-[7px]`}
           >
             <span className="relative block h-[20px] w-[20px] flex-none">

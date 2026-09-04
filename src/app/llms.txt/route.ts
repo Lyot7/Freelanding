@@ -37,7 +37,7 @@ export async function GET(): Promise<Response> {
   );
 
   const realisations = works.map((work) =>
-    ligne(work.title, `/work/${work.slug}`, work.excerpt ?? work.overview),
+    ligne(work.title, `/realisations/${work.slug}`, work.excerpt ?? work.overview),
   );
 
   const questions = (home.faq ?? []).map(
@@ -79,8 +79,8 @@ export async function GET(): Promise<Response> {
         `trois périmètres chiffrés, ${fourchette(p.id)} HT`,
       ),
     ),
-    ligne("À propos", "/about", "parcours et façon de travailler"),
-    ligne("Réalisations", "/work", "les projets en détail"),
+    ligne("À propos", "/a-propos", "parcours et façon de travailler"),
+    ligne("Réalisations", "/realisations", "les projets en détail"),
     ligne("Contact", "/contact", "formulaire et coordonnées"),
     "",
     ...(questions.length ? ["## Questions fréquentes", "", ...questions] : []),

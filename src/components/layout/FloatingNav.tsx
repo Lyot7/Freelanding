@@ -90,8 +90,8 @@ const REVEAL_Y = 70;
  */
 const MENU_LINKS_FALLBACK: readonly Link[] = [
   { label: "Home", href: "/" },
-  { label: "Works", href: "/work" },
-  { label: "About", href: "/about" },
+  { label: "Works", href: "/realisations" },
+  { label: "About", href: "/a-propos" },
   { label: "Blog", href: "/blog" },
   { label: "Contact", href: "/contact" },
 ];

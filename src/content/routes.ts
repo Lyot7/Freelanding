@@ -23,9 +23,9 @@ const derniereDateArticle: string | undefined = blogPosts
 export const contentRoutes: readonly ContentRoute[] = [
   { pathname: "/", kind: "page" },
   { pathname: "/contact", kind: "page" },
-  { pathname: "/about", kind: "page" },
+  { pathname: "/a-propos", kind: "page" },
   { pathname: "/blog", kind: "page", lastModified: derniereDateArticle },
-  { pathname: "/work", kind: "page" },
+  { pathname: "/realisations", kind: "page" },
   /*
    * PAGES DE PRESTATION, ajoutées le 2026-08-27 avec le retrait de la grille
    * tarifaire de la page d'accueil. Elles sont DÉRIVÉES de `offre.ts`, comme les
@@ -47,13 +47,13 @@ export const contentRoutes: readonly ContentRoute[] = [
   // le sitemap, dont l'ordre n'a aucun effet sur l'exploration, mais deux
   // listes qui disent la même chose dans deux ordres différents finissent par
   // diverger sur autre chose que l'ordre.
-  { pathname: "/work/kpsull", kind: "work", contentSlug: "kpsull" },
+  { pathname: "/realisations/kpsull", kind: "work", contentSlug: "kpsull" },
   {
-    pathname: "/work/wurth-creation-de-compte",
+    pathname: "/realisations/wurth-creation-de-compte",
     kind: "work",
     contentSlug: "wurth-creation-de-compte",
   },
-  { pathname: "/work/nslysium", kind: "work", contentSlug: "nslysium" },
+  { pathname: "/realisations/nslysium", kind: "work", contentSlug: "nslysium" },
   /*
    * PAGES LÉGALES, aux slugs FRANCISÉS depuis le 2026-08-28.
    *

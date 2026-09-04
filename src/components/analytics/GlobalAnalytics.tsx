@@ -182,7 +182,7 @@ export function GlobalAnalytics({ enabled }: { enabled: boolean }) {
           });
           return;
         }
-        if (path.startsWith("/work/")) {
+        if (path.startsWith("/realisations/")) {
           capture(ANALYTICS_EVENTS.workLinkClicked, {
             ...common,
             work_slug: slug,

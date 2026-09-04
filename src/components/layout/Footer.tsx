@@ -670,7 +670,7 @@ export async function Footer() {
                     hauteur de 25 px poussait la rangée de crédits à 25 px contre
                     24 sur la source, second pixel de l'écart de la barre légale. */}
                 <a
-                  href={credits?.createdBy?.href ?? "/about"}
+                  href={credits?.createdBy?.href ?? "/a-propos"}
                   {...(credits?.createdBy?.external
                     ? { target: "_blank", rel: "noopener noreferrer" }
                     : {})}

@@ -68,7 +68,7 @@ export function WorkCardPin({
       {/* framer-z2o4lz : hublot — c'est LE LIEN de la carte sur le live. Fenêtre
           visible, il CENTRE le track et le clippe. */}
       <a
-        href={`/work/${work.slug}`}
+        href={`/realisations/${work.slug}`}
         data-part="work-card-window"
         className="relative flex h-full w-full flex-col items-center justify-center overflow-clip bg-background no-underline"
       >

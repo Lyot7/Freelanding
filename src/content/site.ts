@@ -43,17 +43,17 @@ export const siteConfig: SiteConfig = {
    soulignée, pas le mot « sur mesure » qui suit. */
   taglineEmphasis: ["logiciels"],
   nav: [
-    { label: "Réalisations", href: "/work" },
+    { label: "Réalisations", href: "/realisations" },
     { label: "Blog", href: "/blog" },
-    { label: "À propos", href: "/about" },
+    { label: "À propos", href: "/a-propos" },
     { label: "Contact", href: "/contact" },
   ],
   // Panneau du menu flottant — ordre source, différent de la nav d'en-tête et
   // de la colonne « Navigation » du pied de page (qui, elle, contient « 404 »).
   menuNav: [
     { label: "Accueil", href: "/" },
-    { label: "Réalisations", href: "/work" },
-    { label: "À propos", href: "/about" },
+    { label: "Réalisations", href: "/realisations" },
+    { label: "À propos", href: "/a-propos" },
     { label: "Blog", href: "/blog" },
     { label: "Contact", href: "/contact" },
   ],
@@ -113,7 +113,7 @@ export const siteConfig: SiteConfig = {
    */
   footerNav: [
     { label: "Accueil", href: "/" },
-    { label: "Réalisations", href: "/work" },
+    { label: "Réalisations", href: "/realisations" },
     { label: "Contact", href: "/contact" },
     { label: "Blog", href: "/blog" },
   ],
@@ -260,7 +260,7 @@ export const siteConfig: SiteConfig = {
     builtWithLabel: "Construit avec ",
     createdBy: {
       label: "Eliott Bouquerel",
-      href: "/about",
+      href: "/a-propos",
     },
     createdByLabel: "Par",
     // Portrait réel d'Eliott depuis le 2026-08-10, fond harmonisé sur `--accent`

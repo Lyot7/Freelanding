@@ -57,7 +57,7 @@ export function personSchema(site: SiteConfig) {
     "@id": PERSON_ID,
     name: site.contact.person?.name ?? site.brand.name,
     jobTitle: site.contact.person?.role,
-    url: absoluteUrl("/about"),
+    url: absoluteUrl("/a-propos"),
     email: site.contact.email ? `mailto:${site.contact.email}` : undefined,
     image: site.credits?.createdByAvatar
       ? absoluteUrl(site.credits.createdByAvatar.src)
@@ -98,6 +98,12 @@ export function businessSchema(site: SiteConfig, home: HomeContent) {
     name: `${site.brand.name}${site.brand.mark}`,
     description: site.meta.description,
     url: absoluteUrl("/"),
+    // Sans `logo` declare, Google choisit seul la vignette de l'entite et
+    // s'appuie sur ce qu'il a garde en cache : sur un domaine qui a deja servi
+    // un autre site, c'est l'ancienne marque qui ressort. `apple-icon.png` fait
+    // 180x180, au-dessus du minimum de 112x112 exige pour un logo.
+    logo: absoluteUrl("/apple-icon.png"),
+    image: absoluteUrl("/apple-icon.png"),
     email: site.contact.email ? `mailto:${site.contact.email}` : undefined,
     telephone: telephoneE164(site.contact.phone),
     founder: { "@id": PERSON_ID },
@@ -161,7 +167,7 @@ export function workSchema(work: WorkItem) {
       "@type": "CreativeWork",
       name: work.title,
       description: work.overview,
-      url: absoluteUrl(`/work/${work.slug}`),
+      url: absoluteUrl(`/realisations/${work.slug}`),
       image: absoluteUrl(work.cover.src),
       dateCreated: work.year,
       creator: { "@id": PERSON_ID },
@@ -169,7 +175,7 @@ export function workSchema(work: WorkItem) {
     }),
     breadcrumbSchema([
       { name: "Accueil", item: absoluteUrl("/") },
-      { name: "Réalisations", item: absoluteUrl("/work") },
+      { name: "Réalisations", item: absoluteUrl("/realisations") },
       { name: work.title },
     ]),
   ];

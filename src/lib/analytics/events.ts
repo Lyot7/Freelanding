@@ -100,11 +100,11 @@ export type PageType =
 export function pageTypeFromPathname(pathname: string): PageType {
   const path = pathname.replace(/\/+$/, "") || "/";
   if (path === "/") return "home";
-  if (path === "/about") return "about";
+  if (path === "/a-propos") return "about";
   if (path === "/contact") return "contact";
-  if (path === "/work") return "work_index";
+  if (path === "/realisations") return "work_index";
   if (path === "/blog") return "blog_index";
-  if (path.startsWith("/work/")) return "work_detail";
+  if (path.startsWith("/realisations/")) return "work_detail";
   if (path.startsWith("/blog/")) return "article";
   if (path.startsWith("/services/")) return "service";
   if (path.startsWith("/legal/")) return "legal";

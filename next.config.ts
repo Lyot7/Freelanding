@@ -88,9 +88,11 @@ const nextConfig: NextConfig = {
       { source: "/cgv", destination: "/legal/conditions-generales-de-vente", statusCode: 301 },
       /* Ancien site : la prise de rendez-vous est devenue la page contact. */
       { source: "/rendez-vous", destination: "/contact", statusCode: 301 },
-      /* Ancien site : les études de cas, dans les deux langues d'URL. */
-      { source: "/projets/kpsull", destination: "/work/kpsull", statusCode: 301 },
-      { source: "/projects/kpsull", destination: "/work/kpsull", statusCode: 301 },
+      /* Ancien site : les études de cas, dans les deux langues d'URL.
+         Elles visent la destination FINALE, pas `/work/kpsull` : enchaîner
+         deux 301 dilue le signal transféré et rallonge le trajet du visiteur. */
+      { source: "/projets/kpsull", destination: "/realisations/kpsull", statusCode: 301 },
+      { source: "/projects/kpsull", destination: "/realisations/kpsull", statusCode: 301 },
       /* Francisation des slugs légaux (2026-08-28). */
       {
         source: "/legal/privacy-policy",
@@ -102,6 +104,27 @@ const nextConfig: NextConfig = {
         destination: "/legal/conditions-generales-de-vente",
         statusCode: 301,
       },
+      /*
+       * Francisation des deux derniers segments anglais (2026-09-04).
+       *
+       * `/about` et `/work` étaient les seuls chemins du gabarit Framer restés
+       * en anglais après la francisation des slugs légaux du 2026-08-28, sur un
+       * site dont tout le reste est en français. Ils ont été servis en
+       * production et annoncés au sitemap : ils redirigent au lieu de
+       * disparaître.
+       *
+       * `/work/:slug` couvre les trois études de cas d'un coup, et continuera de
+       * couvrir celles qui s'ajouteront.
+       *
+       * ATTENTION AUX MÉDIAS DE `public/work/`, qui gardent ce chemin : les
+       * redirections passent AVANT le système de fichiers, donc une règle trop
+       * large les intercepterait. `:slug` ne filant qu'UN segment,
+       * `/work/kpsull/demo.mp4` n'est pas capté et continue d'être servi. Ne
+       * jamais élargir cette règle en `/work/:chemin*` sans déplacer les médias.
+       */
+      { source: "/about", destination: "/a-propos", statusCode: 301 },
+      { source: "/work", destination: "/realisations", statusCode: 301 },
+      { source: "/work/:slug", destination: "/realisations/:slug", statusCode: 301 },
     ];
   },
 
