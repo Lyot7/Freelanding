@@ -1,10 +1,9 @@
 import type { ImageAsset, ServiceItem } from "@/lib/content/types";
 import {
-  fourchette,
   prestations,
   type PrestationId,
 } from "@/content/offre";
-import { lienRendezVous, RDV_PAR_PRESTATION } from "@/content/rendez-vous";
+import { lienRendezVous } from "@/content/rendez-vous";
 
 /**
  * Prestations de la section « Services » (section06.ts de l'archive Framer).
@@ -141,28 +140,24 @@ export const services: ServiceItem[] = [
       number: String(index + 3).padStart(2, "0"),
       title: p.nom,
       /*
-       * FOURCHETTE ET NON PLANCHER sur l'en-tête, depuis le 2026-09-02.
+       * AUCUN PRIX SUR L'EN-TÊTE depuis le 2026-09-07.
        *
-       * « Dès 3 000 € » ne dit rien du haut de gamme : le visiteur qui ferme
-       * les cinq lignes lit cinq points d'entrée et repart sans savoir ce que
-       * coûte un projet complet. « De 3 000 € à 7 200 € » donne la carte de
-       * l'offre en une lecture, lignes fermées, ce qui est exactement l'état
-       * d'arrivée depuis que plus aucun panneau ne s'ouvre tout seul.
+       * Les fourchettes y étaient posées pour qu'on situe l'offre sans ouvrir
+       * le panneau. Elles produisaient l'inverse : trois fourchettes côte à
+       * côte, chacune large de plus du double de son plancher, invitent à
+       * comparer des montants avant d'avoir lu ce qu'ils achètent — et la
+       * ligne portait alors deux appels concurrents, l'un vers le détail,
+       * l'autre vers la prise de rendez-vous.
        *
-       * `priceParts()` ne découpe que « from », « à partir de » et « dès » :
-       * « de X à Y » ne correspond à aucun, il part donc entier dans le montant
-       * et le libellé gris reste « Prix : ». Rendu bicolore inchangé.
+       * Le prix se lit désormais sur la page de la prestation, entouré de son
+       * périmètre, où la réservation se fait sur place avec le sujet déjà
+       * imposé. La ligne n'a plus qu'un seul appel, qui annonce ce qu'il ouvre.
        */
-      price: fourchette(p.id),
       body: [p.resume, RENVOI[p.id]],
       image: IMAGES[p.id],
       cta: { label: "Voir le détail et les prix", href: `/services/${p.slug}` },
-      // COMPOSÉE, jamais écrite à la main : `RDV_PAR_PRESTATION` est le seul
-      // endroit où « vitrine » devient « site ».
-      rdvHref: lienRendezVous(RDV_PAR_PRESTATION[p.id]),
     }),
   ),
-
 ];
 
 /**
