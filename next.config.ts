@@ -1,5 +1,4 @@
 import createMDX from "@next/mdx";
-import remarkGfm from "remark-gfm";
 import type { NextConfig } from "next";
 
 /**
@@ -205,7 +204,7 @@ const nextConfig: NextConfig = {
 };
 
 /**
- * MDX sans greffon remark/rehype pour l'instant.
+ * MDX, et ce que le frontmatter n'y fera jamais.
  *
  * Le frontmatter YAML n'est volontairement PAS activé : les métadonnées d'un
  * article (titre, date, description, image de partage) vivent dans le registre
@@ -223,12 +222,19 @@ const nextConfig: NextConfig = {
  * cite telle quelle.
  *
  * L'extension apporte aussi les listes de tâches et le texte barré, dont le
- * contenu ne se sert pas. Les liens automatiques, eux, sont désactivés :
- * transformer chaque URL nue en lien produirait des ancres sans intitulé,
- * exactement ce que l'audit de liens interdit.
+ * contenu ne se sert pas.
+ *
+ * LE PLUGIN EST NOMMÉ PAR UNE CHAÎNE, JAMAIS IMPORTÉ, et ce détail a coûté un
+ * déploiement. `next build` tourne sous Turbopack, qui sérialise les options de
+ * loader pour les passer à ses processus de travail : une fonction importée n'y
+ * survit pas et le build meurt sur « does not have serializable options ». Le
+ * serveur de développement, lui, tourne sous webpack et acceptait l'import
+ * sans broncher — le défaut n'existait donc QUE sur le chemin de production.
+ * Toute évolution de cette liste se vérifie par un `bun run build`, jamais par
+ * le seul serveur de développement.
  */
 const withMDX = createMDX({
-  options: { remarkPlugins: [[remarkGfm, { singleTilde: false }]] },
+  options: { remarkPlugins: [["remark-gfm", { singleTilde: false }]] },
 });
 
 export default withMDX(nextConfig);
