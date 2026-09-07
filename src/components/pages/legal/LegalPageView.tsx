@@ -3,6 +3,8 @@ import { FloatingNav, Footer, Header } from "@/components/layout";
 import { Reveal } from "@/components/motion/Reveal";
 import { GradientWaveBackdrop } from "@/components/effects/GradientWaveBackdrop";
 import { RichText } from "@/components/pages/RichText";
+import { TableOfContents } from "@/components/blog/TableOfContents";
+import { sommaireDesBlocs } from "@/lib/blog/sommaire";
 import type { LegalDocument, SiteConfig } from "@/lib/content/types";
 import { Grain } from "@/components/effects/Grain";
 import { formatLongDate } from "@/components/format-date";
@@ -15,6 +17,8 @@ export function LegalPageView({
   document: LegalDocument;
   site: SiteConfig;
 }) {
+  const sommaire = sommaireDesBlocs(document.body);
+
   return (
     <>
       <SvgSprite />
@@ -83,7 +87,6 @@ export function LegalPageView({
             moitié. Un `pl-40` l'amputait de 40px supplémentaires, ce qui
             rallongeait le document de plus de 500px en tablette. */}
         <article className="relative bg-muted p-[20px] text-background tablet:px-[24px] tablet:pb-[60px] tablet:pt-[30px] desktop:px-[30px]">
-          <span className="absolute inset-y-0 left-1/2 hidden w-px bg-background/10 desktop:block" />
           {/* AUCUN plafond de 1440 ici, contrairement à la page ARTICLE du
                 blog qui, elle, en pose un sur la source (temps de lecture à
                 x 240 des deux côtés à 1920). Le gabarit légal étale sa grille
@@ -99,7 +102,7 @@ export function LegalPageView({
               il ne se voyait ni en mobile (une seule colonne) ni en grand
               écran (colonnes larges). Le trait de séparation suit la même
               règle, sans quoi il partagerait une grille qui n'existe plus. */}
-          <div className="relative grid gap-y-[28px] desktop:grid-cols-2 desktop:gap-0">
+          <div className="relative grid gap-y-[28px] desktop:grid-cols-[minmax(0,260px)_minmax(0,1fr)] desktop:gap-x-[40px] desktop:gap-y-[44px]">
             {/* Le libellé et les noms de mois viennent de `uiLabels.dates` : ce
                 bloc portait « Last updated: » et son propre tableau de mois
                 anglais en capitales. `lastUpdatedLabel` inclut déjà l'espace
@@ -116,17 +119,32 @@ export function LegalPageView({
                 {formatLongDate(document.lastUpdated)}
               </time>
             </p>
-            {/* La colonne de texte démarre 44px sous le haut du bloc sur la
-                source, alors que « Last updated » reste calé en haut. */}
-            {/* 680px et non 600 : à 15px de corps, 600 donnait 80 caractères
-                par ligne, au-dessus de la fourchette de confort. La mesure de
-                référence pour un texte suivi est le nombre de caractères, pas
-                la largeur en pixels : 620px donne environ 72 caractères à
-                15px, dans la fourchette de confort admise de 45 à 75. */}
-            <RichText
-              blocks={document.body}
-              className="max-w-[620px] desktop:mt-[44px]"
-            />
+            {/* SOMMAIRE, comme sur un article, et pour la même raison inversée.
+                Un document de droit se consulte : on y cherche une section
+                précise, on ne le lit pas d'un bout à l'autre. Sans sommaire, la
+                seule façon de trouver « combien de temps sont conservées mes
+                données » était de faire défiler deux mille mots. Le donner en
+                colonne, c'est aussi cesser de faire comme si ces pages étaient
+                un passage obligé qu'on préfère voir ignoré.
+
+                `self-stretch` est indispensable : une cellule de grille se
+                réduit à son contenu, et un enfant `sticky` n'aurait alors
+                aucune course. Même remarque que sur la page article. */}
+            {sommaire.length > 0 ? (
+              <aside className="hidden desktop:col-start-1 desktop:row-start-2 desktop:block desktop:self-stretch desktop:pr-[40px]">
+                <TableOfContents
+                  entrees={sommaire}
+                  titre={uiLabels.filters.blogTableOfContentsLabel}
+                />
+              </aside>
+            ) : null}
+            {/* 620px donne environ 72 caractères à 15px de corps, dans la
+                fourchette de confort admise de 45 à 75. La mesure de référence
+                pour un texte suivi est le nombre de caractères, pas la largeur
+                en pixels. */}
+            <div className="desktop:col-start-2 desktop:row-start-2">
+              <RichText blocks={document.body} className="max-w-[620px]" />
+            </div>
           </div>
         </article>
 

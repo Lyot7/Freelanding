@@ -28,7 +28,7 @@ import { consentCopy } from "@/content/consent";
  *     qu'elle est exemptée (l'enregistrement du choix lui-même). Aucune case
  *     n'est pré-cochée : l'état de départ du panneau est le refus.
  *  4. RÉVERSIBILITÉ. Un lien permanent en pied de page rouvre ce panneau
- *     (`ConsentFooterBar`), et « Retirer mon consentement » efface le choix.
+ *     (`ConsentPreferencesLink`, dans la rangée légale du pied de page), et « Retirer mon consentement » efface le choix.
  *  5. PAS DE BLOCAGE. Encart en bas d'écran, pas de voile, pas de modale
  *     plein écran : la page reste lisible et navigable pendant la décision.
  *     Le seul moment où le focus est piégé est le panneau « Personnaliser »,

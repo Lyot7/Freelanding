@@ -34,14 +34,36 @@ import { idDeTitre } from "@/lib/blog/sommaire";
  */
 
 /** Écart vertical uniforme entre blocs, relevé sur la source. */
-const ECART = "mt-[20px] first:mt-0";
+const ECART = "mt-[22px] first:mt-0";
 
-/** Corps de texte d'article : 15 px, gris, sur le fond clair de la page. */
+/**
+ * RYTHME ÉDITORIAL, revu le 2026-09-07.
+ *
+ * CE QUI N'ALLAIT PAS. Un écart de 20px entre TOUS les blocs, titres compris,
+ * un corps de 15px et un interligne de 1,3. Sur un fragment de page d'accueil
+ * c'est juste ; sur mille deux cents mots, rien ne signale qu'une section
+ * commence et l'œil descend sans trouver où se poser. C'est ce que décrivait le
+ * lecteur en parlant de « gros pavés ».
+ *
+ * CE QUI CHANGE, et l'ordre compte : d'abord l'interligne (1,3 → 1,7), qui est
+ * la fourchette de confort d'un texte suivi ; ensuite le CONTRASTE d'écart,
+ * 22px entre deux paragraphes contre 72px avant un titre. C'est ce contraste,
+ * bien plus que la taille des titres, qui rend une page longue parcourable.
+ */
 const CORPS =
-  "text-[15px] font-medium leading-[1.3] tracking-[-0.01em] text-background/60";
+  "text-[16px] font-medium leading-[1.7] tracking-[-0.005em] text-background/75";
 
 /** Titres : sombres et pleins, l'échelle du h2 suit la largeur, le h3 non. */
-const TITRE = "font-medium leading-[1.2] text-background";
+const TITRE = "font-medium leading-[1.05] text-background";
+
+/**
+ * ÉCART AVANT UN TITRE, très supérieur à l'écart entre paragraphes.
+ *
+ * Un titre appartient à ce qui SUIT, pas à ce qui précède : le blanc au-dessus
+ * doit donc être nettement plus grand que celui du dessous. Sans cette
+ * asymétrie, un titre flotte au milieu de deux paragraphes et ne découpe rien.
+ */
+const ECART_TITRE = "mt-[64px] first:mt-0 tablet:mt-[88px]";
 
 /**
  * Texte brut d'un titre, pour en déduire son ancre.
@@ -84,7 +106,7 @@ function AncreH2({ children }: { children: ReactNode }) {
   return (
     <h2
       id={idDeTitre(texteDe(children))}
-      className={`${ECART} ${TITRE} scroll-mt-[100px] text-[18px] tracking-[-0.03em] tablet:text-[24px] desktop:text-[30px]`}
+      className={`${ECART_TITRE} ${TITRE} scroll-mt-[100px] border-t border-background/12 pt-[26px] text-[26px] tracking-[-0.04em] tablet:text-[32px] desktop:text-[38px]`}
     >
       {children}
     </h2>
@@ -99,11 +121,27 @@ const components: MDXComponents = {
   h1: AncreH2,
   h2: AncreH2,
   h3: ({ children }) => (
-    <h3 className={`${ECART} ${TITRE} text-[22px] tracking-[-0.04em]`}>
+    <h3
+      className={`mt-[44px] ${TITRE} text-[19px] leading-[1.25] tracking-[-0.03em] tablet:text-[21px]`}
+    >
       {children}
     </h3>
   ),
-  p: ({ children }) => <p className={`${ECART} ${CORPS}`}>{children}</p>,
+  /*
+   * LE PREMIER PARAGRAPHE EST LE CHAPÔ, et il se distingue par le corps.
+   *
+   * Tous les articles ouvrent sur leur réponse — c'est la règle éditoriale du
+   * blog, et c'est ce que les moteurs extraient. La rendre visible coûte une
+   * pseudo-classe : `first:` cible le premier enfant du corps, qui est toujours
+   * ce paragraphe-là. Aucune donnée à ajouter, rien à tenir à jour.
+   */
+  p: ({ children }) => (
+    <p
+      className={`${ECART} ${CORPS} first:text-[19px] first:leading-[1.55] first:tracking-[-0.015em] first:text-background tablet:first:text-[21px]`}
+    >
+      {children}
+    </p>
+  ),
   strong: ({ children }) => (
     // L'emphase passe par la COULEUR, pas par la graisse : le corps est déjà en
     // 500, et monter à 600 sur quelques mots donne un gris plus dense plutôt
@@ -130,7 +168,7 @@ const components: MDXComponents = {
   ol: ({ children }) => (
     <ol className={`${ECART} list-decimal pl-[20px] ${CORPS}`}>{children}</ol>
   ),
-  li: ({ children }) => <li className="mt-[6px] first:mt-0">{children}</li>,
+  li: ({ children }) => <li className="mt-[12px] first:mt-0">{children}</li>,
   blockquote: ({ children }) => <Quote>{children}</Quote>,
   code: ({ children }) => (
     <code className="rounded-[3px] bg-background/[0.06] px-[5px] py-[2px] font-mono text-[13px] text-background">
@@ -146,7 +184,35 @@ const components: MDXComponents = {
       {children}
     </pre>
   ),
-  hr: () => <hr className="mt-[30px] border-0 border-t border-background/15" />,
+  hr: () => (
+    <hr className="mt-[56px] border-0 border-t border-background/15" />
+  ),
+  /*
+   * TABLEAUX. `remark-gfm` les produit depuis le 2026-09-07 ; sans habillage
+   * ils sortaient en lignes nues, collées, sans lisibilité. Le conteneur
+   * défile POUR LUI-MÊME : une grille tarifaire large ne doit jamais faire
+   * défiler la page entière sur un téléphone.
+   */
+  table: ({ children }) => (
+    <div className={`${ECART} -mx-[4px] overflow-x-auto`}>
+      <table className="w-full min-w-[520px] border-collapse text-left text-[15px]">
+        {children}
+      </table>
+    </div>
+  ),
+  thead: ({ children }) => (
+    <thead className="border-b border-background/25">{children}</thead>
+  ),
+  th: ({ children }) => (
+    <th className="px-[4px] py-[12px] align-bottom text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-background">
+      {children}
+    </th>
+  ),
+  td: ({ children }) => (
+    <td className="border-t border-background/10 px-[4px] py-[14px] align-top font-medium leading-[1.45] tracking-[-0.005em] text-background/75">
+      {children}
+    </td>
+  ),
   img: (props) => {
     const { src, alt } = props as { src?: string; alt?: string };
     return <Figure src={src ?? ""} alt={alt ?? ""} />;

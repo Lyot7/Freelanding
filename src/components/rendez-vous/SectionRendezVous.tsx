@@ -4,6 +4,7 @@ import { ReservationAvecSujet } from "@/components/rendez-vous/ReservationAvecSu
 import { ReservationRendezVous } from "@/components/rendez-vous/ReservationRendezVous";
 import { rendezVousContent } from "@/content/rendez-vous";
 import { resoudreConfiguration } from "@/lib/rendez-vous/config";
+import type { IdRendezVous } from "@/content/rendez-vous";
 
 /**
  * Section « prendre rendez-vous » — composant SERVEUR.
@@ -34,7 +35,22 @@ import { resoudreConfiguration } from "@/lib/rendez-vous/config";
  * entre le corps clair et la FAQ claire, et redonne au bas de page l'alternance
  * sombre/clair du reste du site.
  */
-export function SectionRendezVous({ emailContact }: { emailContact: string }) {
+/**
+ * `typeImpose` : la page CONNAÎT déjà le sujet, il n'y a rien à lire dans l'URL.
+ *
+ * Sur `/contact`, le sujet vient du paramètre `?sujet=` et doit donc être lu
+ * côté client, derrière une frontière `Suspense`. Sur une page de prestation, la
+ * prestation EST le sujet : le passer en propriété évite la frontière, évite le
+ * rendu dynamique, et surtout évite au visiteur de choisir une case qu'il vient
+ * déjà de choisir en ouvrant la page.
+ */
+export function SectionRendezVous({
+  emailContact,
+  typeImpose,
+}: {
+  emailContact: string;
+  typeImpose?: IdRendezVous;
+}) {
   const { typesDisponibles } = resoudreConfiguration();
   if (typesDisponibles.length === 0) return null;
 
@@ -89,13 +105,23 @@ export function SectionRendezVous({ emailContact }: { emailContact: string }) {
         </div>
 
         <div className="tablet:pl-[40px]">
-          <Suspense
-            fallback={
-              <ReservationRendezVous types={types} emailContact={emailContact} />
-            }
-          >
-            <ReservationAvecSujet types={types} emailContact={emailContact} />
-          </Suspense>
+          {typeImpose ? (
+            <ReservationRendezVous
+              types={types}
+              emailContact={emailContact}
+              typeInitial={
+                typesDisponibles.includes(typeImpose) ? typeImpose : undefined
+              }
+            />
+          ) : (
+            <Suspense
+              fallback={
+                <ReservationRendezVous types={types} emailContact={emailContact} />
+              }
+            >
+              <ReservationAvecSujet types={types} emailContact={emailContact} />
+            </Suspense>
+          )}
         </div>
       </div>
     </section>

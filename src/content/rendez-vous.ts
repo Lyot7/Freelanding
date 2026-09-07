@@ -122,28 +122,28 @@ export const rendezVousContent: ContenuRendezVous = {
       nom: "Parle-moi de ton projet de site",
       duree: "30 minutes",
       description:
-        "Vitrine, refonte, visibilité locale. On regarde ce que tu as déjà, ce qui manque, et ce que ça représente.",
+        "On regarde ce que tu as aujourd’hui, ce que tu veux que le site rapporte, et à quoi ressemblerait la bonne version. Tu repars avec un ordre de grandeur de budget et de délai, et on cale la suite.",
     },
     {
       id: "outil",
       nom: "Quel outil te ferait gagner du temps",
       duree: "30 minutes",
       description:
-        "Devis, planning, suivi de chantier. On part de ce que tu fais à la main aujourd’hui.",
+        "On part de ce que tu fais à la main aujourd’hui : les devis, le planning, le suivi. On regarde où passe le temps et ce qu’un outil sur mesure changerait vraiment. Tu repars avec un ordre de grandeur et une prochaine étape.",
     },
     {
       id: "logiciel",
       nom: "Explique-moi ton projet de logiciel",
       duree: "30 minutes",
       description:
-        "Plusieurs utilisateurs, plusieurs rôles, des données à tenir dans le temps. On dégrossit l’essentiel.",
+        "Plusieurs utilisateurs, plusieurs rôles, des données à tenir dans le temps : on dégrossit l’essentiel, ce qui existe déjà et ce qui doit tenir dans dix ans. Tu repars avec un ordre de grandeur, et on cale un second échange pour le périmètre.",
     },
     {
       id: "decouverte",
-      nom: "Dis-moi où tu en es",
+      nom: "Décris-moi ton projet",
       duree: "30 minutes",
       description:
-        "Tu vois le problème, pas encore la solution. C’est souvent le meilleur moment pour en parler.",
+        "Tu vois le problème, pas encore la solution. On en parle sans que tu aies à choisir une case avant. Si ce n’est pas pour moi, je te le dis pendant l’appel, ça t’évite de perdre du temps.",
     },
   ],
 

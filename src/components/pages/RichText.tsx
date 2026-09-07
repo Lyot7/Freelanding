@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type { ContentBlock } from "@/lib/content/types";
+import { idDeTitre } from "@/lib/blog/sommaire";
 
 /**
  * Adresses e-mail du corps de texte, rendues en LIEN comme sur la source.
@@ -99,9 +100,14 @@ export function RichText({
           const common =
             "mt-[52px] font-medium leading-[1.15] text-background first:mt-0 tablet:mt-[64px]";
           return block.level === 2 ? (
+            /* `id` calculé par la MÊME fonction que le sommaire, sans quoi un
+               lien du sommaire tomberait dans le vide sans erreur ni au build
+               ni au rendu. `scroll-mt` réserve la hauteur de l'en-tête fixe :
+               sans lui, l'ancre place le titre sous la barre de navigation. */
             <h2
               key={key}
-              className={`${common} text-[18px] tracking-[-0.03em] tablet:text-[24px] desktop:text-[30px]`}
+              id={idDeTitre(block.text)}
+              className={`${common} scroll-mt-[100px] text-[18px] tracking-[-0.03em] tablet:text-[24px] desktop:text-[30px]`}
             >
               {block.text}
             </h2>

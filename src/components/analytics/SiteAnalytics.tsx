@@ -2,7 +2,6 @@
 
 import { AnalyticsRuntime } from "@/components/analytics/AnalyticsRuntime";
 import { ConsentBanner } from "@/components/consent/ConsentBanner";
-import { ConsentFooterBar } from "@/components/consent/ConsentFooterBar";
 import { ConsentProvider } from "@/components/consent/ConsentProvider";
 
 /**
@@ -21,7 +20,6 @@ export function SiteAnalytics() {
   return (
     <ConsentProvider>
       <AnalyticsRuntime />
-      <ConsentFooterBar />
       <ConsentBanner />
     </ConsentProvider>
   );

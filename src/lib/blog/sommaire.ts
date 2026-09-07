@@ -80,3 +80,30 @@ export function sommaireDeLArticle(slug: string): EntreeSommaire[] {
 
   return entrees;
 }
+
+/**
+ * Sommaire d'un document dont le corps est déjà structuré en blocs.
+ *
+ * POURQUOI IL NE PASSE PAS PAR LE FICHIER, contrairement à `sommaireDeLArticle`.
+ * Les pages légales ne sont pas du MDX : leur corps vit dans `content/legal.ts`
+ * sous forme d'un tableau de blocs typés, où un titre est déjà un titre. Il n'y
+ * a donc rien à analyser, seulement à filtrer — et surtout rien à lire sur le
+ * disque, ce qui rend la fonction utilisable partout, y compris là où le système
+ * de fichiers n'est pas disponible.
+ *
+ * MÊME NIVEAU RETENU QUE POUR LES ARTICLES, le 2 : c'est le découpage en
+ * sections. Les niveaux 3 subdivisent une section et allongeraient la colonne
+ * au-delà de ce qu'elle peut tenir sans défiler pour elle-même.
+ */
+export function sommaireDesBlocs(
+  blocs: readonly { type: string; level?: number; text?: string }[],
+): EntreeSommaire[] {
+  const entrees: EntreeSommaire[] = [];
+  for (const bloc of blocs) {
+    if (bloc.type !== "heading" || bloc.level !== 2) continue;
+    const titre = (bloc.text ?? "").trim();
+    if (!titre) continue;
+    entrees.push({ id: idDeTitre(titre), titre });
+  }
+  return entrees;
+}

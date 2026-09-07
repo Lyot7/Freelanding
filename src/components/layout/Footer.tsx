@@ -4,6 +4,7 @@ import Image from "next/image";
 /* Le pied de page est sur les NEUF routes : ses liens préchargeaient toutes les
    routes du site dès qu'on descendait jusqu'à lui. Voir `HoverPrefetchLink`. */
 import { HoverPrefetchLink } from "@/components/ui/HoverPrefetchLink";
+import { ConsentPreferencesLink } from "@/components/consent/ConsentPreferencesLink";
 import { content } from "@/lib/content";
 import { Reveal } from "@/components/motion/Reveal";
 import { Grain } from "@/components/effects/Grain";
@@ -533,6 +534,19 @@ export async function Footer() {
                   </HoverPrefetchLink>
                 </p>
               ))}
+              {/* LE RETOUR SUR LE CONSENTEMENT REJOINT LA RANGÉE LÉGALE, et il
+                  s'appelle autrement que la page voisine. Il vivait dans une
+                  bande à part sous le pied de page, sous l'intitulé « Gérer mes
+                  préférences de confidentialité » : à côté d'un lien
+                  « Confidentialité » menant à la politique, les deux se lisaient
+                  comme la même chose. Ce n'est pas la même : l'un explique ce
+                  qui est collecté, l'autre rouvre le choix. D'où
+                  « Cookies », qui nomme la commande et non le document.
+
+                  `data-consent-open` est écouté par `ConsentProvider` : le
+                  bouton ne rend rien tant que la mesure n'est pas configurée,
+                  puisqu'il n'y aurait alors aucun choix à rouvrir. */}
+              <ConsentPreferencesLink />
             </div>
           </div>
 

@@ -16,7 +16,8 @@ import {
   type Prestation,
 } from "@/content/offre";
 import { servicePageLabels, servicePageSeo } from "@/content/service-pages";
-import { lienRendezVous, RDV_PAR_PRESTATION } from "@/content/rendez-vous";
+import { RDV_PAR_PRESTATION } from "@/content/rendez-vous";
+import { SectionRendezVous } from "@/components/rendez-vous/SectionRendezVous";
 
 /**
  * PAGE D'UNE PRESTATION — le détail des prix, là où il peut être expliqué.
@@ -386,7 +387,11 @@ export function ServicePage({
                     index > 0 ? prestation.packs[index - 1].nom : undefined
                   }
                   misEnAvant={index === avant}
-                  href={lienRendezVous(RDV_PAR_PRESTATION[prestation.id])}
+                  /* ANCRE LOCALE, plus un aller vers `/contact` : la prise de
+                     rendez-vous est désormais SUR cette page, avec le bon sujet
+                     déjà coché. Envoyer ailleurs coûterait un chargement pour
+                     arriver au même formulaire. */
+                  href="#rendez-vous"
                 />
               ))}
             </div>
@@ -443,6 +448,23 @@ export function ServicePage({
             </ul>
           </div>
         </section>
+
+        {/* LA PRISE DE RENDEZ-VOUS EST ICI, ET PLUS SEULEMENT UN LIEN VERS ELLE.
+            La page portait trois boutons « En parler » menant tous à
+            `/contact?sujet=…` : trois occasions de partir, aucune de réserver.
+            Le visiteur qui vient de lire les prix et le périmètre d'une
+            prestation est exactement celui qui est prêt à poser une date, et
+            l'envoyer sur une autre page pour ça lui coûtait un chargement, un
+            défilement et un choix.
+
+            LE SUJET EST IMPOSÉ, pas suggéré : la prestation qu'on vient de lire
+            EST le type de rendez-vous. `RDV_PAR_PRESTATION` porte la
+            correspondance, qui n'est pas l'identité (« vitrine » devient
+            « site »). */}
+        <SectionRendezVous
+          emailContact={site.contact.email}
+          typeImpose={RDV_PAR_PRESTATION[prestation.id]}
+        />
 
         <FaqSection faq={[...faqItems]} />
       </main>
