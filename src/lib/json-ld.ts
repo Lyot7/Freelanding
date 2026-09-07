@@ -229,6 +229,61 @@ export function serviceSchema(prestation: Prestation, description: string) {
 }
 
 /**
+ * UN ARTICLE, ET LE FIL D'ARIANE QUI LE SITUE.
+ *
+ * POURQUOI CE NŒUD EXISTE. L'accueil déclarait cinq types de données
+ * structurées, `/realisations/*` et `/services/*` le leur, et les SEIZE
+ * articles du blog n'en déclaraient AUCUN. Mesuré le 2026-09-07 sur le HTML
+ * servi en production : zéro bloc `application/ld+json` sur `/blog/*`. Un
+ * moteur y lisait du texte sans savoir que c'était un article, qui l'avait
+ * écrit, ni quand — c'est-à-dire sans aucun des signaux d'auteur et de
+ * fraîcheur sur lesquels il classe une page éditoriale.
+ *
+ * `BlogPosting` ET NON `Article` : les deux sont acceptés, le premier est le
+ * sous-type exact et n'exige rien de plus.
+ *
+ * L'AUTEUR POINTE SUR `@id` PLUTÔT QUE DE SE REDÉCRIRE. La personne est déjà
+ * décrite par `personSchema` sur l'accueil ; répéter ici son nom et sa photo
+ * créerait une seconde entité homonyme au lieu de renforcer la première.
+ *
+ * `dateModified` VAUT `datePublished` FAUTE DE MIEUX, et c'est volontaire : le
+ * modèle ne porte pas de date de révision. En inventer une, ou pire y mettre la
+ * date du jour à chaque construction, annoncerait une fraîcheur que le contenu
+ * n'a pas. Le jour où une date de révision existera, elle se branchera ici.
+ */
+export function articleSchema(post: {
+  slug: string;
+  title: string;
+  date: string;
+  excerpt: string;
+  cover: { src: string };
+  seo?: { title?: string; description?: string };
+}) {
+  const url = absoluteUrl(`/blog/${post.slug}`);
+  return [
+    compact({
+      "@type": "BlogPosting",
+      "@id": `${url}#article`,
+      headline: post.seo?.title ?? post.title,
+      description: post.seo?.description ?? post.excerpt,
+      url,
+      mainEntityOfPage: url,
+      image: absoluteUrl(post.cover.src),
+      datePublished: post.date,
+      dateModified: post.date,
+      inLanguage: "fr-FR",
+      author: { "@id": PERSON_ID },
+      publisher: { "@id": BUSINESS_ID },
+    }),
+    breadcrumbSchema([
+      { name: "Accueil", item: absoluteUrl("/") },
+      { name: "Blog", item: absoluteUrl("/blog") },
+      { name: post.title },
+    ]),
+  ];
+}
+
+/**
  * Assemble un graphe unique. Un seul bloc par page plutôt qu'un script par
  * entité : les `@id` relient alors les nœuds entre eux (la personne travaille
  * pour l'activité) au lieu de laisser trois objets sans rapport.

@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { BlogArticlePage } from "@/components/pages/blog/BlogArticlePage";
+import { JsonLd } from "@/components/JsonLd";
 import { content } from "@/lib/content";
+import { articleSchema, graph, personSchema } from "@/lib/json-ld";
+import { absoluteUrl } from "@/lib/site-url";
 import { sommaireDeLArticle } from "@/lib/blog/sommaire";
 
 export const dynamicParams = false;
@@ -28,6 +31,13 @@ export async function generateMetadata({
     title,
     description,
     alternates: { canonical },
+    /*
+     * L'AUTEUR, EN CLAIR DANS L'HEADER. Le JSON-LD le déclare déjà, mais il le
+     * fait par référence d'identifiant : les vérificateurs qui ne résolvent pas
+     * les `@id` ne voyaient aucun auteur sur un article signé. Une balise ne
+     * coûte rien et ferme l'écart.
+     */
+    authors: [{ name: post.author.name, url: absoluteUrl("/a-propos") }],
     openGraph: {
       title,
       description,
@@ -82,13 +92,23 @@ export default async function BlogPostPage({
 
   const related = posts.filter((candidate) => candidate.slug !== post.slug);
   return (
-    <BlogArticlePage
-      post={post}
-      related={related}
-      site={site}
-      sommaire={sommaireDeLArticle(post.slug)}
-    >
-      <Corps />
-    </BlogArticlePage>
+    <>
+      {/*
+       * `personSchema` VOYAGE AVEC L'ARTICLE, et ce n'est pas une redite de
+       * l'accueil : `articleSchema` désigne son auteur par `@id`, et une
+       * référence dont la cible n'est décrite sur aucune page du parcours reste
+       * un identifiant creux. Le nœud est déclaré ici pour que l'auteur se
+       * résolve sur la page même, là où le signal compte.
+       */}
+      <JsonLd data={graph(articleSchema(post), personSchema(site))} />
+      <BlogArticlePage
+        post={post}
+        related={related}
+        site={site}
+        sommaire={sommaireDeLArticle(post.slug)}
+      >
+        <Corps />
+      </BlogArticlePage>
+    </>
   );
 }
