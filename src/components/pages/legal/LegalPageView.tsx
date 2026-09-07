@@ -56,9 +56,16 @@ export function LegalPageView({
               duration={1.2}
               className="accent-room clip-room [--accent-room:26px] [--clip-room:4px] tablet:col-start-2 tablet:row-start-1"
             >
-              {/* 510px de large sur la source à 1200 comme à 1440 (nous étions à
-                  560, sans effet sur la coupure mais faux au repère). */}
-              <h1 className="max-w-[510px] text-[63px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] tablet:text-[78px] desktop:text-[98px]">
+              {/* LE TITRE NE PEUT PLUS SE FAIRE COUPER, et il l'était.
+                  « POLITIQUE DE CONFIDENTIALITÉ » mesurait 774px de contenu pour
+                  510px de boîte à 98px de corps : le dernier caractère passait
+                  sous l'`overflow-hidden` de la section, et la page s'affichait
+                  « CONFIDENTIALIT ». Un mot de quinze lettres ne se coupe pas,
+                  donc c'est le corps qui cède : la taille suit désormais la
+                  largeur disponible, et la boîte occupe sa colonne entière.
+                  Repère de la source conservé pour les titres courts, qui
+                  gardent leur présence. */}
+              <h1 className="max-w-[680px] text-[clamp(38px,9vw,63px)] font-semibold uppercase leading-[0.82] tracking-[-0.05em] tablet:text-[clamp(44px,6.2vw,78px)] desktop:text-[clamp(52px,5.4vw,98px)]">
                 {document.title}
               </h1>
             </Reveal>
@@ -76,7 +83,7 @@ export function LegalPageView({
             moitié. Un `pl-40` l'amputait de 40px supplémentaires, ce qui
             rallongeait le document de plus de 500px en tablette. */}
         <article className="relative bg-muted p-[20px] text-background tablet:px-[24px] tablet:pb-[60px] tablet:pt-[30px] desktop:px-[30px]">
-          <span className="absolute inset-y-0 left-1/2 hidden w-px bg-background/10 tablet:block" />
+          <span className="absolute inset-y-0 left-1/2 hidden w-px bg-background/10 desktop:block" />
           {/* AUCUN plafond de 1440 ici, contrairement à la page ARTICLE du
                 blog qui, elle, en pose un sur la source (temps de lecture à
                 x 240 des deux côtés à 1920). Le gabarit légal étale sa grille
@@ -85,7 +92,14 @@ export function LegalPageView({
                 jour » à x 240 au lieu de x 30, soit 210 px d'écart. La colonne
                 de texte, elle, ne bouge pas : son propre `max-w-[600px]` la cale
                 au même endroit des deux côtés. */}
-          <div className="relative grid gap-y-[28px] tablet:grid-cols-2 tablet:gap-0">
+          {/* DEUX COLONNES SEULEMENT À PARTIR DE 1200px, et non dès 810.
+              Entre les deux, chaque colonne tombait sous 400px : à 15px de
+              corps, le texte y descendait à environ 25 caractères par ligne,
+              soit deux ou trois mots. C'est le défaut que voyait le lecteur, et
+              il ne se voyait ni en mobile (une seule colonne) ni en grand
+              écran (colonnes larges). Le trait de séparation suit la même
+              règle, sans quoi il partagerait une grille qui n'existe plus. */}
+          <div className="relative grid gap-y-[28px] desktop:grid-cols-2 desktop:gap-0">
             {/* Le libellé et les noms de mois viennent de `uiLabels.dates` : ce
                 bloc portait « Last updated: » et son propre tableau de mois
                 anglais en capitales. `lastUpdatedLabel` inclut déjà l'espace
@@ -96,7 +110,7 @@ export function LegalPageView({
             {/* 12 px, interligne 1,2, chasse -0,01em : relevé sur la source
                 aux 5 largeurs. Nous rendions 10 px, interligne 15, sans
                 chasse. */}
-            <p className="text-right text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/60 tablet:text-left">
+            <p className="text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/60 desktop:text-left">
               {uiLabels.dates.lastUpdatedLabel}
               <time dateTime={document.lastUpdated} className="text-background">
                 {formatLongDate(document.lastUpdated)}
@@ -104,9 +118,14 @@ export function LegalPageView({
             </p>
             {/* La colonne de texte démarre 44px sous le haut du bloc sur la
                 source, alors que « Last updated » reste calé en haut. */}
+            {/* 680px et non 600 : à 15px de corps, 600 donnait 80 caractères
+                par ligne, au-dessus de la fourchette de confort. La mesure de
+                référence pour un texte suivi est le nombre de caractères, pas
+                la largeur en pixels : 620px donne environ 72 caractères à
+                15px, dans la fourchette de confort admise de 45 à 75. */}
             <RichText
               blocks={document.body}
-              className="max-w-[600px] tablet:mt-[44px]"
+              className="max-w-[620px] desktop:mt-[44px]"
             />
           </div>
         </article>

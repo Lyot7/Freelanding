@@ -65,7 +65,22 @@ export function RichText({
 }) {
   // Interligne 1,3 et interlettrage -0,01em des deux côtés : seule la taille
   // change, les rapports sont identiques (19,5 / -0,15 à 15px, 18,2 / -0,14 à 14).
-  const body = bodySize === 15 ? "text-[15px]" : "text-[14px]";
+  /*
+   * RYTHME DE LECTURE, révisé le 2026-09-07.
+   *
+   * CE QUI N'ALLAIT PAS. Le gabarit d'origine posait un écart UNIFORME de 20px
+   * entre tous les blocs, titres compris, un corps de 14px et un interligne de
+   * 1,3. Sur une page d'accueil, où le texte se lit par fragments, c'est juste.
+   * Sur une politique de confidentialité de deux mille mots ou un article de
+   * mille, ça produit un mur : rien ne signale qu'une section commence, et
+   * l'œil descend sans jamais trouver où se poser.
+   *
+   * CE QUI CHANGE. L'interligne passe à 1,65, qui est la fourchette de confort
+   * admise pour un texte suivi, et l'écart AVANT un titre devient nettement
+   * plus grand que l'écart entre deux paragraphes. C'est ce contraste, et non
+   * la taille des titres, qui rend une page longue parcourable.
+   */
+  const body = bodySize === 15 ? "text-[16px]" : "text-[15px]";
   return (
     <div className={className}>
       {blocks.map((block, index) => {
@@ -81,7 +96,8 @@ export function RichText({
           // Écart UNIFORME de 20px entre tous les blocs sur la source : titres et
           // paragraphes partagent la même marge, il n'y a pas de respiration
           // supplémentaire avant une section.
-          const common = "mt-[20px] font-medium leading-[1.2] text-background first:mt-0";
+          const common =
+            "mt-[52px] font-medium leading-[1.15] text-background first:mt-0 tablet:mt-[64px]";
           return block.level === 2 ? (
             <h2
               key={key}
@@ -107,7 +123,7 @@ export function RichText({
             // ajoutait un marqueur absent de la source et décalait le texte.
             <List
               key={key}
-              className={`mt-[20px] text-[14px] font-medium leading-[1.3] tracking-[-0.01em] text-background/60 ${
+              className={`mt-[22px] space-y-[10px] text-[15px] font-medium leading-[1.65] tracking-[-0.005em] text-background/75 ${
                 ordered ? "list-decimal pl-[20px]" : "list-none pl-0"
               }`}
             >
@@ -129,7 +145,7 @@ export function RichText({
             // coupure et avalait donc la ligne vide. Les pages légales n'ont
             // que des retours simples (`contactDetails.join("\n")`) et rendent
             // identiquement sous les deux valeurs.
-            className={`mt-[20px] whitespace-pre-wrap ${body} font-medium leading-[1.3] tracking-[-0.01em] text-background/60 first:mt-0`}
+            className={`mt-[22px] whitespace-pre-wrap ${body} font-medium leading-[1.65] tracking-[-0.005em] text-background/75 first:mt-0`}
           >
             {linkifyEmails(block.text)}
           </p>

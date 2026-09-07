@@ -236,7 +236,11 @@ export function BlogFilterGrid({
           </div>
         </div>
       </div>
-      <div className="px-[4px] pt-[4px] tablet:px-[24px] desktop:px-[30px]">
+      {/* Le bas de la grille RESPIRE : sans lui, la dernière rangée de cartes
+          touchait le pied de section et la section suivante démarrait au ras
+          des vignettes, sans que rien ne sépare la liste de l'appel à
+          projet. Mesuré : `padding-bottom` valait 0. */}
+      <div className="px-[4px] pb-[80px] pt-[4px] tablet:px-[24px] tablet:pb-[120px] desktop:px-[30px]">
         <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-[4px] tablet:grid-cols-2">
           {filteredPosts.map((post) => (
             <BlogIndexCard key={post.slug} post={post} />
