@@ -2,8 +2,9 @@ Un site e-commerce lent coûte des commandes avant même d’être vu. Google pu
 des seuils précis pour ses signaux Web essentiels : l’affichage du plus grand
 élément visible doit se faire en moins de **2,5 secondes**, la réponse à une
 interaction rester sous **200 millisecondes**, et le décalage cumulé de mise en
-page sous **0,1**. Ce sont des valeurs publiées, et elles se mesurent sur ta
-boutique en dix minutes.
+page sous **0,1**. Ce sont les valeurs
+[publiées par Google sur web.dev](https://web.dev/articles/vitals), et elles se
+mesurent sur ta boutique en dix minutes.
 
 Cet article explique ce que ces trois nombres veulent dire, comment les relever
 sans outil payant, et ce qui les dégrade réellement sur une boutique.
@@ -12,12 +13,15 @@ sans outil payant, et ce qui les dégrade réellement sur une boutique.
 
 **LCP**, pour Largest Contentful Paint. Le temps au bout duquel le plus grand
 élément visible de la page est affiché : sur une fiche produit, c’est presque
-toujours la photo principale. Bon en dessous de 2,5 secondes.
+toujours la photo principale.
+[Bon en dessous de 2,5 secondes](https://web.dev/articles/lcp).
 
 **INP**, pour Interaction to Next Paint. Le délai entre le moment où l’on touche
 quelque chose et le moment où l’écran réagit. Bon en dessous de 200
 millisecondes. C’est la mesure qui a remplacé l’ancien FID, et elle est plus
 sévère parce qu’elle regarde toutes les interactions, pas seulement la première.
+Le seuil et la méthode de mesure sont détaillés dans
+[la documentation des signaux Web essentiels](https://web.dev/articles/vitals).
 
 **CLS**, pour Cumulative Layout Shift. À quel point le contenu saute pendant le
 chargement. Bon en dessous de 0,1. C’est la mesure qui correspond au bouton
@@ -25,7 +29,7 @@ qu’on rate parce qu’une bannière s’est insérée au-dessus au dernier mom
 
 <Stat
   value="2,5 s"
-  label="seuil publié par Google pour le LCP, au-delà duquel l’expérience n’est plus considérée comme bonne. Mesuré sur le terrain, pas en laboratoire."
+  label="seuil publié par Google pour le LCP, au-delà duquel l’expérience n’est plus considérée comme bonne. Il s’apprécie au 75e centile des chargements, séparément sur mobile et sur ordinateur : ce n’est pas ta page la plus rapide qui compte, c’est celle que subissent tes visiteurs les moins bien lotis."
 />
 
 ## Ce que la lenteur coûte, sans invoquer d’étude douteuse
@@ -33,25 +37,33 @@ qu’on rate parce qu’une bannière s’est insérée au-dessus au dernier mom
 Je ne vais pas te servir un pourcentage de conversion perdue par seconde. Ces
 chiffres circulent, ils viennent d’échantillons très différents du tien, et je
 n’ai personnellement mesuré aucun résultat client sur ce point : je démarre mon
-activité.
+activité. J’ai relevé les trois seuils cités plus haut directement dans la
+documentation de Google, un par un, plutôt que de les recopier d’un article de
+blog : c’est la seule partie de ce texte que je peux garantir au chiffre près.
 
 Ce que je peux affirmer sans risque tient en trois mécanismes.
 
 <Steps items={[
   "Un visiteur qui attend part. C’est une évidence, elle se vérifie dans tes propres statistiques : compare le taux de rebond de tes pages les plus lentes et de tes pages les plus rapides, à trafic comparable.",
   "Une publicité payée sur une page lente est payée deux fois. Tu paies le clic, et tu perds une partie du trafic avant l’affichage. C’est le seul poste où la lenteur se chiffre directement en euros.",
-  "La vitesse est un signal de classement documenté par Google, via l’expérience de page. Elle ne fait pas classer une mauvaise page devant une bonne, mais elle départage à qualité égale."
+  "La vitesse est un signal de classement documenté par Google, via l’expérience de page, [ce que la Search Central confirme noir sur blanc](https://developers.google.com/search/docs/appearance/core-web-vitals). Elle ne fait pas classer une mauvaise page devant une bonne, mais elle départage à qualité égale."
 ]} />
 
 Le troisième point mérite une nuance qu’on entend rarement : la vitesse ne fera
 jamais d’un catalogue générique un site bien classé. Elle empêche seulement de
 perdre à cause d’elle.
 
+Les **signaux Web essentiels** sont les trois mesures par lesquelles Google
+résume l’expérience réelle d’un visiteur : le temps d’affichage du contenu
+principal, la vitesse de réaction aux interactions, et la stabilité visuelle de
+la page pendant son chargement. Ils se relèvent sur des visiteurs réels, au
+75e centile, et non sur un test de laboratoire.
+
 ## Mesurer en dix minutes, gratuitement
 
 Trois relevés, dans cet ordre.
 
-**PageSpeed Insights**, l’outil public de Google. Entre l’adresse d’une fiche
+**[PageSpeed Insights](https://developers.google.com/speed/docs/insights/v5/about)**, l’outil public de Google. Entre l’adresse d’une fiche
 produit, pas ta page d’accueil : c’est là qu’atterrissent tes visiteurs. Regarde
 la section des données de terrain, celles qui viennent d’utilisateurs réels,
 avant la section de laboratoire.
@@ -106,9 +118,8 @@ situation banale. C’est un des arguments qui pèsent dans l’arbitrage entre
 
 Une page produit dont le contenu n’existe qu’après l’exécution du JavaScript
 est lente pour le visiteur et opaque pour les moteurs. C’est aussi ce qui
-empêche un assistant de la citer, sujet que je traite dans [comment être cité
-par ChatGPT, Perplexity et les Aperçus IA de
-Google](/blog/etre-cite-par-chatgpt-et-perplexity).
+empêche un assistant de la citer : ces moteurs lisent une page rendue, et une
+page qui met huit secondes à s’afficher est souvent abandonnée avant.
 
 ### Les polices
 

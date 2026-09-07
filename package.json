@@ -37,6 +37,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.11",
     "node-html-parser": "^9.0.0",
+    "remark-gfm": "^4.0.1",
     "tailwindcss": "^4",
     "typescript": "^5"
   },

@@ -19,15 +19,30 @@ Trois choses se referment lentement, sans que rien ne le signale.
 
 ## Ce que la loi te garantit, et ce qu’elle ne garantit pas
 
-Le RGPD te donne un droit à la portabilité des données (article 20) : les
-données personnelles que tu as fournies doivent pouvoir t’être rendues dans un
-format structuré et lisible par machine.
+Le RGPD te donne un droit à la portabilité des données
+([article 20](https://www.cnil.fr/fr/reglement-europeen-protection-donnees/chapitre3#Article20)) :
+les données personnelles que tu as fournies doivent pouvoir t’être rendues dans
+un format « structuré, couramment utilisé et lisible par machine », selon les
+termes du texte. La CNIL précise les formats attendus (XML, JSON, CSV, VCF) et
+[écarte explicitement le PDF et l’image](https://www.cnil.fr/fr/professionnels-comment-repondre-une-demande-de-droit-la-portabilite),
+qui ne sont pas exploitables.
 
-Ce droit est réel et il est utile. Mais il porte sur les données personnelles,
-pas sur tout ce qui fait la valeur de ton outil. Ton historique d’interventions,
-tes modèles de devis, tes règles de tarification, la façon dont tes rendez-vous
-sont organisés : rien de tout cela n’est couvert. Tu récupères une liste de
-contacts, pas ta façon de travailler.
+J’ai relevé les termes exacts de l’article 20 et de la doctrine de la CNIL
+avant d’écrire ce qui suit, parce que la portabilité est le point sur lequel on lit le plus
+d’approximations. Ce droit est réel et il est utile. Mais il porte sur les données personnelles,
+pas sur tout ce qui fait la valeur de ton outil. La CNIL le borne dans les mêmes
+termes : sont couvertes les données que tu as déclarées et celles générées par
+ton activité, tandis que les données déduites ou inférées ensuite en sortent.
+
+Ton historique d’interventions, tes modèles de devis, tes règles de tarification,
+la façon dont tes rendez-vous sont organisés : rien de tout cela n’est couvert.
+Tu récupères une liste de contacts, pas ta façon de travailler.
+
+La **portabilité** est le droit de récupérer tes données dans un format
+réutilisable. La **réversibilité** est tout autre chose : c’est la capacité de
+remettre ton activité en marche ailleurs, avec tes règles et ton organisation.
+Le droit européen te garantit la première et reste muet sur la seconde, qui se
+négocie au contrat ou ne s’obtient jamais.
 
 <Quote>
 Récupérer ses données et récupérer son outil sont deux choses différentes. La
@@ -82,9 +97,9 @@ Elles ne coûtent rien à poser avant. Elles coûtent une migration après.
 
 Ces quatre questions se posent aussi à une plateforme de vente : je les ai
 reprises du côté de la boutique dans [outil sur mesure ou abonnements
-SaaS](/blog/outil-sur-mesure-ou-abonnements-saas), et le jour où tu veux
-partir, tout se joue sur l’export, comme le montre [migrer sa boutique sans
-perdre son référencement](/blog/migrer-sa-boutique-sans-perdre-son-referencement).
+SaaS](/blog/outil-sur-mesure-ou-abonnements-saas). Et le jour où tu veux
+partir, tout se joue sur l’export : un fichier client qu’on ne peut sortir
+qu’en recopiant un écran n’est pas à toi, quel que soit le contrat.
 
 Si tu veux un outil dont le code et les données restent les tiens, c’est
 exactement ce que couvrent l’[outil métier](/services/outil-metier) et le

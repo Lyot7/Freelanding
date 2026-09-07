@@ -1,4 +1,5 @@
 import createMDX from "@next/mdx";
+import remarkGfm from "remark-gfm";
 import type { NextConfig } from "next";
 
 /**
@@ -125,6 +126,57 @@ const nextConfig: NextConfig = {
       { source: "/about", destination: "/a-propos", statusCode: 301 },
       { source: "/work", destination: "/realisations", statusCode: 301 },
       { source: "/work/:slug", destination: "/realisations/:slug", statusCode: 301 },
+      /*
+       * RESSERREMENT DU BLOG (2026-09-07) — dix articles retirés sur seize.
+       *
+       * CE QUI A DÉCIDÉ, et ce n'est pas la qualité d'écriture : l'offre que
+       * l'article sert. Les six qui restent amènent quelqu'un qui compare avant
+       * d'acheter un site ou un logiciel métier. Les dix autres amenaient un
+       * lecteur qui voulait améliorer son marketing lui-même, et deux d'entre
+       * eux se cannibalisaient (recouvrement de vocabulaire 0,240 entre la fiche
+       * produit et la landing page, 0,206 entre les deux articles GEO).
+       *
+       * ILS ONT ÉTÉ SERVIS ET ANNONCÉS AU SITEMAP, donc ils redirigent. Chacun
+       * vise le survivant le plus PROCHE par le sujet, jamais un renvoi de
+       * confort : une redirection vers une page sans rapport est lue comme une
+       * page introuvable déguisée, et perd ce qu'elle prétendait transférer.
+       * Faute de voisin honnête, la destination est l'index du blog.
+       */
+      {
+        source: "/blog/fiche-produit-qui-convertit",
+        destination: "/blog/landing-page-ou-page-produit",
+        statusCode: 301,
+      },
+      {
+        source: "/blog/abandon-de-panier-causes-et-remedes",
+        destination: "/blog/landing-page-ou-page-produit",
+        statusCode: 301,
+      },
+      {
+        source: "/blog/formulaire-inscription-erreurs-saisie",
+        destination: "/blog/landing-page-ou-page-produit",
+        statusCode: 301,
+      },
+      {
+        source: "/blog/experience-utilisateur-boutique-en-ligne",
+        destination: "/blog/site-e-commerce-lent-ce-que-ca-coute",
+        statusCode: 301,
+      },
+      {
+        source: "/blog/migrer-sa-boutique-sans-perdre-son-referencement",
+        destination: "/blog/shopify-ou-site-sur-mesure",
+        statusCode: 301,
+      },
+      {
+        source: "/blog/accessibilite-boutique-en-ligne-obligation-et-levier",
+        destination: "/blog/shopify-ou-site-sur-mesure",
+        statusCode: 301,
+      },
+      /* Sans voisin honnête : l'index du blog plutôt qu'un rapprochement forcé. */
+      { source: "/blog/etre-cite-par-chatgpt-et-perplexity", destination: "/blog", statusCode: 301 },
+      { source: "/blog/seo-et-geo-quelles-differences", destination: "/blog", statusCode: 301 },
+      { source: "/blog/ce-que-google-montre-de-vous", destination: "/blog", statusCode: 301 },
+      { source: "/blog/dessiner-avant-de-coder", destination: "/a-propos", statusCode: 301 },
     ];
   },
 
@@ -161,6 +213,22 @@ const nextConfig: NextConfig = {
  * l'article échapperait à tout contrôle, et c'est précisément ce qu'il ne faut
  * pas quand les articles sont rédigés par un agent. Voir `docs/BLOG.md`.
  */
-const withMDX = createMDX({});
+/*
+ * `remark-gfm` POUR LES TABLEAUX, et pour rien d'autre qui compte ici.
+ *
+ * MDX seul ne connaît pas la syntaxe de tableau : `| a | b |` sortait en
+ * paragraphe avec ses barres verticales visibles. Or un tableau est la forme
+ * qu'un moteur, classique ou génératif, extrait le plus volontiers d'un
+ * article — une grille tarifaire en prose se cite mal, la même en lignes se
+ * cite telle quelle.
+ *
+ * L'extension apporte aussi les listes de tâches et le texte barré, dont le
+ * contenu ne se sert pas. Les liens automatiques, eux, sont désactivés :
+ * transformer chaque URL nue en lien produirait des ancres sans intitulé,
+ * exactement ce que l'audit de liens interdit.
+ */
+const withMDX = createMDX({
+  options: { remarkPlugins: [[remarkGfm, { singleTilde: false }]] },
+});
 
 export default withMDX(nextConfig);

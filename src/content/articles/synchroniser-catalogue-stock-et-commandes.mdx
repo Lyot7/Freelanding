@@ -46,6 +46,46 @@ Le quatrième point est celui qui fait le plus de dégâts. Un système qui tomb
 panne bruyamment se répare le jour même. Un système qui échoue en silence
 produit une divergence qui grandit pendant des semaines.
 
+### Pourquoi le travail par lots n’est pas un choix de paresse
+
+Le deuxième point mérite une explication, parce qu’on l’attribue souvent à la
+négligence du connecteur alors qu’il vient d’une contrainte réelle. Les
+plateformes plafonnent le débit de leur interface de programmation, et le
+plafond dépend de la formule. Chez Shopify, l’API Admin GraphQL accorde
+**100 points par seconde** en formule standard, **200** en Advanced et
+**1 000** en Plus, une même requête ne pouvant jamais dépasser 1 000 points
+([documentation développeur Shopify](https://shopify.dev/docs/api/usage/limits)).
+
+Ce plafond décide de ce qui est réalisable. Sur un catalogue de dix mille
+références, interroger chaque produit à chaque cycle est hors budget : le
+connecteur regroupe, espace ses passages, et c’est là que naît la fenêtre
+pendant laquelle deux systèmes se contredisent. La sortie n’est pas de
+synchroniser plus souvent, c’est de ne synchroniser que ce qui a changé, en
+étant prévenu du changement au lieu d’aller le chercher. C’est exactement ce
+que sont les **webhooks** : un message que la plateforme envoie d’elle-même dès
+qu’une donnée bouge. Shopify les présente dans ses propres termes comme
+« une alternative performante à l’interrogation continue des données d’une
+boutique »
+([documentation développeur Shopify](https://shopify.dev/docs/apps/build/webhooks)),
+avec des événements dédiés à la création et à la mise à jour de produit. Un
+connecteur qui interroge en boucle là où un message suffirait ne se contente
+pas d’être lent : il consomme le budget d’appels dont tu aurais besoin
+ailleurs.
+
+J’ai relevé les plafonds publiés par Shopify et posé le calcul à partir d’eux, plutôt que de répéter
+l’explication habituelle selon laquelle « les connecteurs sont mal faits ». Une lecture de produit avec ses variantes et
+son stock coûte de l’ordre de dix à vingt points sur cette interface. À
+100 points par seconde, un catalogue de dix mille références demande entre
+mille et deux mille secondes pour être parcouru en entier, soit **entre vingt et
+trente-cinq minutes par passage complet**, sans compter les écritures. C’est la
+raison pour laquelle personne ne synchronise tout en continu, et c’est aussi la
+raison pour laquelle il faut arrêter d’essayer.
+
+La **source de vérité** est le système désigné à l’avance comme ayant raison
+pour une donnée précise, quand les autres le contredisent. Ce n’est pas un
+réglage technique, c’est une décision de gestion : elle nomme qui tranche, et
+elle se prend donnée par donnée.
+
 ## Les trois décisions à prendre avant de connecter quoi que ce soit
 
 Aucune n’est technique, et aucune ne peut être déléguée à un prestataire.
