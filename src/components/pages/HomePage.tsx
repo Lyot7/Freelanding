@@ -6,7 +6,7 @@ import { ArticlesSection } from "@/components/sections/ArticlesSection";
 import { FaqSection } from "@/components/sections/FaqSection";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { LogoBandSection } from "@/components/sections/LogoBandSection";
-import { PricingSection } from "@/components/sections/PricingSection";
+import { MethodeSection } from "@/components/sections/MethodeSection";
 import { ServicesSection } from "@/components/sections/ServicesSection";
 import { ShowreelSection } from "@/components/sections/ShowreelSection";
 import { StatsSection } from "@/components/sections/StatsSection";
@@ -48,17 +48,15 @@ export async function HomePage() {
         services={home.services.items}
         intro={home.services.intro}
         horsCatalogue={home.services.horsCatalogue}
-        /* BANDE CLAIRE, ET NON ORANGE, DEPUIS QUE LES TARIFS SUIVENT.
-           La bande orange en bas de l'accordéon annonçait la section des
-           chiffres, qui est orange pleine page et la suivait immédiatement. La
-           section tarifs s'intercale : la bande orange conduisait désormais à
-           une section sombre, et la section orange arrivait sans annonce. Elle
-           passe donc en bas des tarifs, et l'accordéon se ferme sur la même
-           bande claire que celle qui l'ouvre. */
-        bottomAccent="muted"
+        /* BANDE ORANGE RETROUVÉE. Elle annonce la section des chiffres, qui
+           est orange pleine page. Elle était passée en clair quand la section
+           tarifs s'intercalait entre les deux ; celle-ci ayant quitté l'accueil
+           le 2026-09-07, l'accordéon touche de nouveau les chiffres et reprend
+           donc la bande qui les annonce. */
+        bottomAccent="accent"
       />
     ),
-    tarifs: <PricingSection />,
+    methode: <MethodeSection />,
     numbers: <StatsSection numbers={home.numbers} />,
     faq: <FaqSection faq={home.faq ?? []} />,
     testimonials: (

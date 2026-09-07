@@ -21,7 +21,7 @@ import type { Testimonial } from "@/lib/content/types";
  * drapeau sont tous intacts : il ne manque que la parole d'un client.
  *
  * CE QUI RESTE ICI SONT DES PHRASES D'ELIOTT — `jenniferTestimonial` et
- * `pricingPromise`.
+ * `methodePromise`.
  *    Dans le template, elles étaient attribuées à des membres de l'« équipe ».
  *    Eliott travaille seul : ce ne sont pas des témoignages mais des phrases de
  *    manifeste, réécrites à la première personne du singulier. Les deux sections
@@ -64,24 +64,32 @@ export const jenniferTestimonial: Testimonial = {
 /**
  * Citation d'ouverture de la section tarifs (home.ts, œil « Ma façon de voir »)
  * — SECTION VISIBLE. Phrase d'Eliott, pas un témoignage.
- * Les guillemets font partie de la CHAÎNE : `PricingSection.tsx` rend
+ * Les guillemets font partie de la CHAÎNE : `MethodeSection.tsx` rend
  * `quote.quote` tel quel, sans rien ajouter autour. Les retirer ferait
  * disparaître les guillemets à l'écran.
  */
 /**
- * Ouverture de la section TARIFS. Ce n'est ni un témoignage ni un manifeste :
- * c'est l'ENGAGEMENT DE FACTURATION, à l'endroit précis où le visiteur se
- * demande si le prix affiché va déraper. La forme `Testimonial` est conservée
- * parce que le composant attend une citation signée, mais le contenu est une
- * information vérifiable, pas une opinion sur le métier.
+ * PRISE DE PAROLE SUR LA MÉTHODE, rendue par `MethodeSection` sur l'accueil.
  *
- * Chaque phrase doit rester tenable : le périmètre est écrit dans le devis,
- * l'acompte est de 30 % (voir la FAQ), et une demande hors périmètre est
- * chiffrée à part au lieu d'être absorbée en silence.
+ * CE QU'ELLE REMPLACE. Ce nœud portait l'engagement de FACTURATION : « le prix
+ * est fixé avant que je commence, et il ne bouge pas ». Vrai, tenable, et sans
+ * portée : tout prestataire sérieux facture ce qu'il a devisé, l'écrire ne
+ * distingue de personne. La seule prise de parole directe de la page d'accueil
+ * servait ainsi à parler d'argent à quelqu'un qui sait déjà qu'il va payer, et
+ * qui cherche à savoir comment ça va se passer.
+ *
+ * CE QUI LA REMPLACE RESTE VÉRIFIABLE, comme l'ancienne l'était. Elle décrit
+ * une pratique réelle et observable sur les projets livrés : pas de maquette
+ * intermédiaire, une première version fonctionnelle comme premier jalon. Rien
+ * qui ne puisse être montré.
+ *
+ * La forme `Testimonial` est conservée parce que le composant attend une
+ * citation signée, mais le contenu est une description de méthode, pas une
+ * opinion sur le métier.
  */
-export const pricingPromise: Testimonial = {
+export const methodePromise: Testimonial = {
   quote:
-    "« Le prix est fixé avant que je commence, et il ne bouge pas. Ce qui n’est pas écrit dans le devis n’arrive pas dans la facture. »",
+    "« Je ne dessine pas de maquette, je construis directement la vraie page. Tu la vois tourner dans les premiers jours, tu me dis ce qui cloche, et on avance sur du réel plutôt que sur une image. »",
   author: {
     name: "Eliott Bouquerel",
     // RÔLE REMIS. La source affiche trois lignes sous le portrait : le nom, la
@@ -109,5 +117,5 @@ export const pricingPromise: Testimonial = {
  */
 export const testimonials: Testimonial[] = [
   jenniferTestimonial,
-  pricingPromise,
+  methodePromise,
 ];

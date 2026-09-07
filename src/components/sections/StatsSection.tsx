@@ -145,7 +145,7 @@ function Testimonial({ testimonial }: { testimonial: TestimonialContent }) {
         {/* framer-c7vzye : avatar 50×50 (51 en mobile). Le CADRE lui-même
             disparaît quand la citation n'a pas de portrait : il laissait sinon
             un trou de 50 px et son écart de 16 px devant le nom. Même
-            traitement que `PricingSection`, qui conditionne déjà son avatar. */}
+            traitement que `MethodeSection`, qui conditionne déjà son avatar. */}
         {author.avatar ? (
           <div className="relative aspect-square h-[51px] w-[50px] overflow-hidden rounded-[50px] tablet:h-[50px]">
             <Image

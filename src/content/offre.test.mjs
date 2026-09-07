@@ -16,7 +16,7 @@ import {
   tauxSuivi,
 } from "./offre.ts";
 import { horsCatalogue, services } from "./services.ts";
-import { lienDevis, tarifsLabels } from "./tarifs.ts";
+import { lienDevis, methodeLabels } from "./tarifs.ts";
 import { contentRoutes as routesTarifs } from "./routes.ts";
 import { faqItems } from "./faq.ts";
 import { uiLabels } from "./ui.ts";
@@ -445,7 +445,7 @@ describe("la section tarifs ne peut pas diverger de l'offre", () => {
   test("le taux journalier n'apparaît pas dans l'habillage de la section", () => {
     const isole = new RegExp(`(?<![\\d\\u00A0])${TJM}\\u00A0\\u20AC`, "u");
     const vocabulaire = /taux journalier|\bTJM\b|par jour|\/\s*jour|à la journée/iu;
-    const textes = Object.values(tarifsLabels).filter(
+    const textes = Object.values(methodeLabels).filter(
       (v) => typeof v === "string",
     );
     for (const texte of textes) {

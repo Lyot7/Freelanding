@@ -19,7 +19,7 @@ import type { SiteFeatures } from "@/lib/content/types";
  *   page contact et de la section tarifs. CONFIRMÉ PAR ELIOTT (2026-08-10) :
  *   c'est bien SA signature, pas celle du template. Rien à remplacer, le drapeau
  *   reste allumé. La note précédente affirmait le contraire — elle était fausse.
- *   Le tracé vit dans `sections/hero/Signature.tsx` et `sections/PricingSection.tsx`.
+ *   Le tracé vit dans `sections/hero/Signature.tsx` et `sections/MethodeSection.tsx`.
  *   Le vecteur étant positionné en absolu, l'éteindre ne déplacerait aucun autre
  *   élément.
  *

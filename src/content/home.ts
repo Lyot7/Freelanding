@@ -576,7 +576,16 @@ export const homeContent: HomeContent = {
     "works",
     "whyUs",
     "services",
-    "tarifs",
+    /* LES TARIFS NE SONT PLUS SUR L'ACCUEIL depuis le 2026-09-07.
+       Un tableau à trois colonnes comparant trois prestations obligeait le
+       visiteur à choisir son offre ET son forfait dans le même écran, sur une
+       grille qui ne tenait pas sur un téléphone. Chaque page de prestation
+       porte désormais SES forfaits et SA prise de rendez-vous : on compare
+       dans le contexte d'une offre, pas dans une grille hors sol. L'accueil
+       garde la section services, qui conduit à la bonne page, et le bloc
+       signé qui occupait l'ouverture de cette section parle désormais de la
+       façon de travailler plutôt que de la façon de facturer. */
+    "methode",
     "numbers",
     "faq",
     "testimonials",
