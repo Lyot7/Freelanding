@@ -128,28 +128,18 @@ describe("les prix descendent tous du taux journalier", () => {
 });
 
 describe("le site annonce le même prix que le module", () => {
-  test("la fourchette calculée reste juste, et l'accordéon n'en porte aucune", () => {
-    /*
-     * DEUX INVARIANTS DANS LE MÊME TEST, parce qu'ils tombent ensemble.
-     *
-     * L'en-tête de l'accordéon a porté un plancher (« Dès 3 000 € »), puis la
-     * fourchette entière, puis plus rien depuis le 2026-09-07 : trois montants
-     * côte à côte invitaient à comparer avant d'avoir lu ce qu'ils achètent, et
-     * le prix se lit maintenant sur la page de la prestation.
-     *
-     * `fourchette()` SERT ENCORE, sur cette page-là. Elle reste donc vérifiée
-     * ici : sa borne basse EST le prix du pack d'entrée, et les deux
-     * formulations doivent rester d'accord quoi qu'il arrive au TJM. Un calcul
-     * faux ne se verrait nulle part ailleurs.
-     */
+  test("l'accordéon reprend la fourchette calculée, jamais une copie", () => {
+    // L'EN-TÊTE ANNONÇAIT UN PLANCHER (« Dès 3 000 € ») jusqu'au 2026-09-02, et
+    // ne disait donc rien du haut de gamme. Il porte maintenant la fourchette
+    // entière : cinq lignes fermées donnent la carte de l'offre en une lecture.
+    // Ce qui ne change pas : le montant reste CALCULÉ, jamais recopié.
     for (const p of prestations) {
       const presta = services.find((s) => s.title === p.nom);
       expect(presta, `prestation « ${p.nom} » absente de services.ts`).toBeDefined();
-      expect(
-        presta.price,
-        `« ${p.nom} » affiche de nouveau un prix sur l'accueil`,
-      ).toBeUndefined();
-      expect(fourchette(p.id)).toContain(prixPack(packEntree(p.id)));
+      expect(presta.price).toBe(fourchette(p.id));
+      // La borne basse de la fourchette EST le prix du pack d'entrée : les deux
+      // formulations doivent rester d'accord, quoi qu'il arrive au TJM.
+      expect(presta.price).toContain(prixPack(packEntree(p.id)));
     }
   });
 
@@ -166,35 +156,36 @@ describe("le site annonce le même prix que le module", () => {
     }
   });
 
-  test("chaque ligne mène à la page qui porte les prix et la réservation", () => {
+  test("chaque ligne mène à la prise de rendez-vous, sujet présélectionné", () => {
     /*
      * CE QUI EST ARRIVÉ SANS CE TEST. La prise de rendez-vous existait,
      * fonctionnait et affichait les vrais créneaux Cal.com, et AUCUN lien du
      * site n'y menait : zéro occurrence de `#rendez-vous` dans tout `src/`, en
-     * dehors de la déclaration de l'ancre elle-même.
+     * dehors de la déclaration de l'ancre elle-même. Le seul chemin était
+     * d'ouvrir `/contact` et de descendre 2 300 px en traversant un formulaire
+     * de contact complet, qui est son concurrent direct.
      *
-     * CE QU'IL GARDE DEPUIS LE 2026-09-07, le chemin ayant changé. L'accordéon
-     * de l'accueil ne porte plus ni prix ni second appel : il conduit à la page
-     * de la prestation, qui porte les forfaits ET la réservation avec son sujet
-     * déjà imposé. L'invariant reste le même — aucune prestation ne doit être
-     * un cul-de-sac — mais son point d'arrivée n'est plus `/contact`.
-     *
-     * LE PIÈGE QUE GARDE `RDV_PAR_PRESTATION` : la correspondance n'est PAS
-     * l'identité. La prestation « vitrine » se réserve sous le sujet « site »,
-     * et un identifiant mal composé ne casse rien de visible — le sujet inconnu
-     * est ignoré en silence et le visiteur retombe sur un sélecteur vide.
+     * LE PIÈGE QU'IL GARDE : la correspondance n'est PAS l'identité. La
+     * prestation « vitrine » se réserve sous le sujet « site », et une adresse
+     * composée avec le mauvais identifiant ne casse rien de visible — le sujet
+     * inconnu est ignoré en silence et le visiteur retombe sur un sélecteur
+     * vide, exactement comme s'il n'avait cliqué sur rien.
      */
     for (const s of services) {
-      expect(s.cta?.href, `« ${s.title} » n'a pas de point d'arrivée`).toBeDefined();
+      expect(s.rdvHref, `« ${s.title} » n'a pas de point d'arrivée`).toBeDefined();
+      const url = new URL(s.rdvHref, "https://exemple.fr");
+      expect(url.pathname).toBe("/contact");
+      expect(url.hash).toBe("#rendez-vous");
+      const sujet = url.searchParams.get(PARAM_SUJET);
+      expect(IDS_RENDEZ_VOUS, `sujet inconnu sur « ${s.title} » : ${sujet}`).toContain(
+        sujet,
+      );
     }
+    // Les trois prestations chiffrées passent par la table, jamais par leur
+    // propre identifiant : « vitrine » n'est pas un sujet de rendez-vous.
     for (const p of prestations) {
       const presta = services.find((s) => s.title === p.nom);
-      expect(presta.cta?.href).toBe(`/services/${p.slug}`);
-      // Aucun prix sur l'accueil : il se lit sur la page de la prestation.
-      expect(presta.price, `« ${p.nom} » affiche un prix sur l'accueil`).toBeUndefined();
-      // La table de correspondance reste tenue, c'est elle qui impose le sujet
-      // sur la page de prestation.
-      expect(IDS_RENDEZ_VOUS).toContain(RDV_PAR_PRESTATION[p.id]);
+      expect(presta.rdvHref).toBe(lienRendezVous(RDV_PAR_PRESTATION[p.id]));
     }
     expect(RDV_PAR_PRESTATION.vitrine).toBe("site");
   });
