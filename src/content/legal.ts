@@ -367,7 +367,7 @@ export const legalDocuments: readonly LegalDocument[] = [
       },
       {
         type: "paragraph",
-        text: "Votre choix se modifie à tout moment par le lien « Gérer mes préférences de confidentialité » en pied de page. Refuser ne dégrade rien : le site fonctionne à l’identique. Votre navigateur permet aussi de bloquer les cookies, au risque de gêner d’autres sites que celui-ci.",
+        text: "Votre choix se modifie à tout moment par le lien « Cookies », en pied de page, à côté des mentions légales. Refuser ne dégrade rien : le site fonctionne à l’identique. Votre navigateur permet aussi de bloquer les cookies, au risque de gêner d’autres sites que celui-ci.",
       },
       { type: "heading", level: 2, text: "7. Sécurité" },
       {

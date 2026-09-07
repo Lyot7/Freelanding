@@ -32,7 +32,6 @@ export const consentCopy = {
   alwaysOn: "Toujours actif",
 
   /** Libellé du lien permanent de pied de page qui rouvre ce panneau. */
-  footerLink: "Gérer mes préférences de confidentialité",
   /* Forme courte, pour la rangée légale du pied de page, où elle voisine
      « Confidentialité ». Nomme la COMMANDE (rouvrir le choix) et non le
      document (la politique), sans quoi les deux se lisent comme un doublon. */
