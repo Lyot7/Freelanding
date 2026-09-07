@@ -78,10 +78,18 @@ export const jenniferTestimonial: Testimonial = {
  * servait ainsi à parler d'argent à quelqu'un qui sait déjà qu'il va payer, et
  * qui cherche à savoir comment ça va se passer.
  *
- * CE QUI LA REMPLACE RESTE VÉRIFIABLE, comme l'ancienne l'était. Elle décrit
- * une pratique réelle et observable sur les projets livrés : pas de maquette
- * intermédiaire, une première version fonctionnelle comme premier jalon. Rien
- * qui ne puisse être montré.
+ * CE QUI LA REMPLACE EST DÉJÀ ÉCRIT AILLEURS, mot pour mot, ce qui est la
+ * meilleure preuve qu'elle est tenable. « L'abonnement est la décision
+ * raisonnable, et je te le dirai » apparaît dans DEUX articles du blog, et le
+ * descriptif du rendez-vous de découverte porte la même promesse : « si ce
+ * n'est pas pour moi, je te le dis pendant l'appel ». Une phrase qu'on répète
+ * sans y penser dans trois textes séparés n'est pas une posture, c'est une
+ * pratique.
+ *
+ * ELLE PORTE AUSSI L'IDÉE DE DÉPART, celle qui voulait que la réflexion vaille
+ * plus que l'exécution, sans avoir à le dire : savoir renvoyer quelqu'un vers
+ * un abonnement à quarante euros suppose d'avoir compris son problème avant de
+ * lui vendre quoi que ce soit.
  *
  * La forme `Testimonial` est conservée parce que le composant attend une
  * citation signée, mais le contenu est une description de méthode, pas une
@@ -89,7 +97,7 @@ export const jenniferTestimonial: Testimonial = {
  */
 export const methodePromise: Testimonial = {
   quote:
-    "« Je ne dessine pas de maquette, je construis directement la vraie page. Tu la vois tourner dans les premiers jours, tu me dis ce qui cloche, et on avance sur du réel plutôt que sur une image. »",
+    "« Si un abonnement à quarante euros règle ton problème, je te le dirai. Ce que je vends commence là où il ne suffit plus. »",
   author: {
     name: "Eliott Bouquerel",
     // RÔLE REMIS. La source affiche trois lignes sous le portrait : le nom, la
