@@ -43,14 +43,14 @@ export function MethodeSection() {
       <div className="relative z-[2] flex w-full max-w-[1440px] flex-col items-center gap-[30px] overflow-hidden tablet:gap-0">
         {/* Œil à gauche, auteur à droite. L'ordre visuel s'inverse sous 810 :
             la citation passe en tête, l'auteur la signe en dessous. */}
-        <div className="relative order-2 flex w-full flex-col gap-[12px] tablet:order-1 tablet:flex-row tablet:items-start tablet:gap-0 tablet:pb-[50px] tablet:pt-[30px]">
-          <div className="relative hidden w-px flex-[1_0_0] flex-row items-start justify-start gap-[10px] tablet:flex">
+        <div className="relative order-2 flex w-full flex-col gap-[12px] desktop:order-1 desktop:flex-row desktop:items-start desktop:gap-0 desktop:pb-[50px] desktop:pt-[30px]">
+          <div className="relative hidden w-px flex-[1_0_0] flex-row items-start justify-start gap-[10px] desktop:flex">
             <p className="whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60">
               {methodeLabels.eyebrow}
             </p>
           </div>
 
-          <div className="relative flex w-full flex-row items-end justify-start gap-[20px] overflow-hidden tablet:w-px tablet:flex-[1_0_0] tablet:gap-[30px] tablet:pt-[50px]">
+          <div className="relative flex w-full flex-row items-end justify-start gap-[20px] overflow-hidden desktop:w-px desktop:flex-[1_0_0] desktop:gap-[30px] desktop:pt-[50px]">
             {portrait ? (
               <div className="relative z-[1] h-[143px] w-[116px] flex-none overflow-hidden desktop:h-[167px] desktop:w-[136px]">
                 <ParallaxBackdrop
@@ -82,9 +82,15 @@ export function MethodeSection() {
           </div>
         </div>
 
-        <div className="relative order-1 flex w-full flex-col gap-[12px] tablet:order-2 tablet:flex-row tablet:items-start tablet:gap-0">
-          <div className="relative flex w-full flex-col items-start gap-[14px] overflow-hidden tablet:w-1/2 tablet:items-end tablet:gap-[30px]">
-            <p className="m-0 flex w-full max-w-[550px] flex-col justify-center text-left text-[22px] font-medium leading-[1.1] tracking-[-0.02em] text-foreground tablet:text-right tablet:text-[26px] desktop:text-[32px]">
+        {/* LA CITATION NE SE SERRE QU'À PARTIR DE 1200px. En demi-colonne dès
+            810, elle disposait de 379px pour un corps de 26px : le découpage
+            ligne par ligne produisait ONZE lignes de deux à trois mots, et la
+            phrase se lisait mot à mot. Mesuré le 2026-09-08. Elle occupe donc
+            toute la largeur tant que la moitié ne suffit pas — même cause, même
+            correction que la grille des forfaits et celle des pages légales. */}
+        <div className="relative order-1 flex w-full flex-col gap-[12px] desktop:order-2 desktop:flex-row desktop:items-start desktop:gap-0">
+          <div className="relative flex w-full flex-col items-start gap-[14px] overflow-hidden desktop:w-1/2 desktop:items-end desktop:gap-[30px]">
+            <p className="m-0 flex w-full max-w-[550px] flex-col justify-center text-left text-[22px] font-medium leading-[1.15] tracking-[-0.02em] text-foreground desktop:text-right desktop:text-[32px]">
               <LineReveal
                 text={methodePromise.quote}
                 className="block w-full"
@@ -96,7 +102,7 @@ export function MethodeSection() {
               as="p"
               initialOpacity={0.001}
               delay={0.15}
-              className="m-0 h-auto w-full max-w-[230px] text-left text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60 [text-wrap:balance] tablet:text-right"
+              className="m-0 h-auto w-full max-w-[230px] text-left text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60 [text-wrap:balance] desktop:text-right"
             >
               {methodeLabels.quoteFooter}
             </Reveal>

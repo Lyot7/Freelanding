@@ -378,7 +378,13 @@ export function ServicePage({
                 `grid-rows-subgrid`. La cinquième est en `1fr` : c'est la liste
                 des livrables qui absorbe la hauteur restante, ce que faisait
                 `flex-1` quand chaque carte était une colonne autonome. */}
-            <div className="grid gap-[4px] tablet:grid-cols-3 tablet:grid-rows-[auto_auto_auto_auto_1fr_auto]">
+            {/* TROIS COLONNES SEULEMENT À PARTIR DE 1200px, et non dès 810.
+                Entre les deux, chaque carte tombait à 250px et son texte à
+                166px : à 14px de corps, les lignes d'inclusion se coupaient
+                tous les deux mots. Mesuré le 2026-09-08 sur `/services/*`.
+                C'est le même défaut que la grille des pages légales, et il a la
+                même cause : un partage déclenché avant que la place existe. */}
+            <div className="grid gap-[4px] desktop:grid-cols-3 desktop:grid-rows-[auto_auto_auto_auto_1fr_auto]">
               {prestation.packs.map((pack, index) => (
                 <PackCard
                   key={pack.id}

@@ -748,7 +748,7 @@ export function ServicesSection({
                 <p className="max-w-[560px] text-[14px] font-medium leading-[1.35] tracking-[-0.01em] text-foreground-60">
                   {horsCatalogue.intro}
                 </p>
-                <ul className="flex w-full flex-col gap-[12px] tablet:grid tablet:grid-cols-3 tablet:gap-[16px]">
+                <ul className="flex w-full flex-col gap-[12px] desktop:grid desktop:grid-cols-3 desktop:gap-[16px]">
                   {horsCatalogue.items.map((item) => (
                     <li key={item.nom} className="flex flex-col gap-[4px]">
                       <span className="accent-room text-[14px] font-semibold leading-[1.2] tracking-[-0.01em] text-foreground">
