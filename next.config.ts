@@ -1,35 +1,6 @@
 import createMDX from "@next/mdx";
 import type { NextConfig } from "next";
 
-/**
- * PROXY D'INGESTION POSTHOG — la mesure part de l'origine du site.
- *
- * CE QU'IL ACHÈTE, et pourquoi ça compte ICI plus qu'ailleurs. Les listes de
- * filtrage (uBlock, Brave, résolveurs DNS filtrants) bloquent les requêtes vers
- * les domaines d'analytics connus. Sur un site à fort volume, c'est une perte
- * statistique ; sur celui-ci, où quelques dizaines de visites par mois sont
- * autant de prospects qu'Eliott a appelés un par un, perdre un tiers de la
- * mesure revient à perdre la trace de la personne qu'on cherchait. Servi depuis
- * `https://www.eliottbouquerel.fr/ingest`, le trafic n'est plus reconnaissable
- * à son domaine.
- *
- * CE QU'IL N'ACHÈTE PAS : rien ne part avant le consentement. Le proxy déplace
- * l'adresse, jamais la règle. Voir `src/lib/analytics/posthog.ts`.
- *
- * HÉBERGEMENT UE PAR DÉFAUT, et c'est un choix qui ne se discute pas ici : le
- * site est français et sa cible l'est aussi. `NEXT_PUBLIC_POSTHOG_HOST` permet
- * d'en changer, mais l'absence de valeur donne l'Europe, jamais les États-Unis.
- * Attention au piège des deux domaines PostHog : `eu.i.posthog.com` est
- * l'INGESTION, `eu.posthog.com` est l'interface — les intervertir donne un
- * proxy qui répond 200 en servant du HTML.
- */
-const POSTHOG_INGEST = (
-  process.env.NEXT_PUBLIC_POSTHOG_HOST ?? ""
-).trim() || "https://eu.i.posthog.com";
-
-const POSTHOG_ASSETS = POSTHOG_INGEST.includes("us.i.posthog.com")
-  ? "https://us-assets.i.posthog.com"
-  : "https://eu-assets.i.posthog.com";
 
 const nextConfig: NextConfig = {
   /**
@@ -183,24 +154,17 @@ const nextConfig: NextConfig = {
    * Proxy d'ingestion PostHog, ACTIF EN PRODUCTION. Voir l'entête de
    * `POSTHOG_INGEST` pour ce qu'il achète.
    */
-  async rewrites() {
-    /* Proxy d'ingestion PostHog, ACTIF EN PRODUCTION (contrairement au
-       `/live-proxy` ci-dessus, qui lui doit rester en développement). Voir
-       l'entête de `POSTHOG_INGEST` pour ce qu'il achète. */
-    const posthog = [
-      /* Le SDK va chercher ses modules optionnels (enregistreur de session,
-         toolbar) sur l'hôte d'ASSETS, distinct de l'hôte d'ingestion. Cette
-         règle vient EN PREMIER : `/ingest/:path*` capterait sinon aussi
-         `/ingest/static/...` et enverrait la demande au mauvais domaine. */
-      {
-        source: "/ingest/static/:path*",
-        destination: `${POSTHOG_ASSETS}/static/:path*`,
-      },
-      { source: "/ingest/:path*", destination: `${POSTHOG_INGEST}/:path*` },
-    ];
-
-    return posthog;
-  },
+  /*
+   * PLUS AUCUNE RÉÉCRITURE POUR POSTHOG, et c'est une correction, pas un choix
+   * de style. Une réécriture vers un hôte externe transmet l'en-tête `Host` de
+   * la requête d'origine : PostHog recevait `Host: eliottbouquerel.fr`,
+   * répondait 403, et Next remontait un 500. Mesuré le 2026-09-08, la mesure
+   * d'audience ne recevait donc RIEN depuis sa mise en service, sans une seule
+   * erreur visible sur le site.
+   *
+   * Le relais vit maintenant dans `src/app/ingest/[...chemin]/route.ts`, où
+   * l'en-tête est maîtrisé. Voir son en-tête pour le détail.
+   */
 };
 
 /**
