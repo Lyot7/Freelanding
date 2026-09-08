@@ -21,10 +21,9 @@
  * l'hôte d'INGESTION. Confondre les deux donne des 404 silencieux sur des
  * modules dont l'absence ne se voit qu'à l'usage.
  *
- * CE QUI N'EST PAS RELAYÉ, et c'est délibéré : `host`, `connection` et les
- * en-têtes propres au saut réseau. Les transmettre reproduirait exactement la
- * panne qu'on corrige. Le reste passe, cookies compris, sans quoi PostHog ne
- * pourrait pas reconnaître une visite d'une autre.
+ * CE QUI EST RELAYÉ EST ÉNUMÉRÉ, jamais déduit par exclusion : voir
+ * `ENTETES_RELAYES` plus bas et la raison pour laquelle la liste noire de la
+ * première version échouait en production.
  *
  * RIEN NE PART AVANT LE CONSENTEMENT : ce relais déplace une adresse, jamais
  * une règle. Voir `src/lib/analytics/posthog.ts`.
@@ -42,19 +41,31 @@ const ASSETS = INGESTION.includes("us.i.posthog.com")
   ? "https://us-assets.i.posthog.com"
   : "https://eu-assets.i.posthog.com";
 
-/** En-têtes qui décrivent le saut réseau, pas la requête. */
-const ENTETES_A_NE_PAS_RELAYER = new Set([
-  "host",
-  "connection",
-  "keep-alive",
-  "transfer-encoding",
-  "upgrade",
-  "proxy-authorization",
-  "proxy-authenticate",
-  "te",
-  "trailer",
-  "content-length",
-]);
+/**
+ * LISTE BLANCHE, ET NON LISTE NOIRE. La version précédente relayait tout sauf
+ * une liste d'exclusions, et échouait en production là où elle passait en
+ * local : derrière le proxy inverse, la requête porte des en-têtes que le
+ * client n'a pas envoyés (`x-forwarded-*`, `accept-encoding: br`) et dont
+ * certains font échouer l'appel sortant. Énumérer ce qui sert est la seule
+ * façon de ne pas dépendre de ce que la couche réseau ajoute au passage.
+ *
+ * `cookie` EST RELAYÉ, et il le faut : c'est lui qui permet à PostHog de
+ * reconnaître deux visites de la même personne. Sans lui, chaque page vue
+ * compterait comme un nouveau visiteur.
+ *
+ * `accept-encoding` N'EST PAS RELAYÉ : `fetch` négocie sa propre compression
+ * avec le serveur et livre un corps déjà décodé. Transmettre celui du client
+ * revient à demander un encodage qu'on ne saura pas forcément défaire.
+ */
+const ENTETES_RELAYES = [
+  "content-type",
+  "cookie",
+  "user-agent",
+  "referer",
+  "origin",
+  "accept",
+  "accept-language",
+] as const;
 
 function cible(chemin: string[], recherche: string): string {
   // `/ingest/static/...` part vers l'hôte d'assets, tout le reste vers
@@ -69,9 +80,10 @@ async function relayer(requete: Request, chemin: string[]): Promise<Response> {
   const destination = cible(chemin, url.search);
 
   const entetes = new Headers();
-  requete.headers.forEach((valeur, nom) => {
-    if (!ENTETES_A_NE_PAS_RELAYER.has(nom.toLowerCase())) entetes.set(nom, valeur);
-  });
+  for (const nom of ENTETES_RELAYES) {
+    const valeur = requete.headers.get(nom);
+    if (valeur) entetes.set(nom, valeur);
+  }
 
   try {
     const reponse = await fetch(destination, {
@@ -86,20 +98,48 @@ async function relayer(requete: Request, chemin: string[]): Promise<Response> {
       signal: AbortSignal.timeout(10_000),
     });
 
-    const sortie = new Headers(reponse.headers);
-    // L'encodage a déjà été défait par `fetch` : le réannoncer ferait lire au
-    // navigateur un corps compressé qui ne l'est plus.
-    sortie.delete("content-encoding");
-    sortie.delete("content-length");
+    /*
+     * LE CORPS EST MATÉRIALISÉ, jamais retransmis en flux. Rendre le
+     * `ReadableStream` de la réponse amont marche en local et se casse derrière
+     * un proxy inverse, où la réponse est recompressée : le flux est alors
+     * consommé deux fois. Ces charges utiles font quelques kilo-octets, les
+     * garder en mémoire ne coûte rien.
+     */
+    const corps = await reponse.arrayBuffer();
 
-    return new Response(reponse.body, {
+    /*
+     * SEULS LES EN-TÊTES QU'ON SAIT JUSTES SONT RENVOYÉS. `content-encoding` et
+     * `content-length` décrivent le corps AMONT, déjà décodé par `fetch` : les
+     * réannoncer ferait lire au navigateur un contenu compressé qui ne l'est
+     * plus. Le reste (cache, sécurité) appartient à PostHog et n'a pas de sens
+     * une fois servi depuis notre origine.
+     */
+    const sortie = new Headers();
+    const type = reponse.headers.get("content-type");
+    if (type) sortie.set("content-type", type);
+    const cookies = reponse.headers.get("set-cookie");
+    if (cookies) sortie.set("set-cookie", cookies);
+    sortie.set("cache-control", "no-store");
+
+    return new Response(corps, {
       status: reponse.status,
       statusText: reponse.statusText,
       headers: sortie,
     });
-  } catch {
-    // 502 et non 500 : la panne est chez le fournisseur ou sur le lien, pas
-    // dans cette route. Le SDK réessaiera, et le visiteur ne voit rien.
+  } catch (erreur) {
+    /*
+     * 502 et non 500 : la panne est chez le fournisseur ou sur le lien, pas
+     * dans cette route. Le SDK réessaiera, et le visiteur ne voit rien.
+     *
+     * LA CAUSE EST JOURNALISÉE, parce que l'absence de trace est exactement ce
+     * qui a laissé cette panne invisible pendant des semaines : le relais
+     * échouait, le site continuait de s'afficher, et rien ne le disait.
+     */
+    console.error(
+      "[ingest] relais impossible",
+      destination,
+      erreur instanceof Error ? erreur.message : String(erreur),
+    );
     return new Response(null, { status: 502 });
   }
 }
