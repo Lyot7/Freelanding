@@ -52,6 +52,8 @@ import {
 } from "@/components/rendez-vous/messages";
 import { Icon, Spinner } from "@/components/ui";
 import { rendezVousContent } from "@/content/rendez-vous";
+import { ANALYTICS_EVENTS } from "@/lib/analytics/events";
+import { capture } from "@/lib/analytics/posthog";
 import type { IdRendezVous, TypeRendezVous } from "@/content/rendez-vous";
 import {
   ajouterJours,
@@ -426,6 +428,31 @@ export function ReservationRendezVous({
     if (creneau) refNom.current?.focus();
   }, [creneau]);
 
+  /*
+   * UN SUJET PRÉSÉLECTIONNÉ FRANCHIT LA MÊME MARCHE QU'UN SUJET CHOISI.
+   *
+   * Sur `/services/*` et sur `/contact?sujet=…`, le prospect n'appuie sur rien :
+   * la page décide pour lui. Sans cet envoi, l'entonnoir ne verrait jamais
+   * l'étape 2 pour ces visites-là, et le chemin le plus court vers la
+   * réservation apparaîtrait comme le moins performant. `preselected`
+   * distingue les deux populations, dont les taux de suite n'ont aucune raison
+   * de se ressembler.
+   *
+   * IL NE PART QU'UNE FOIS, et la garde est un `ref` plutôt qu'un tableau de
+   * dépendances vide : `typeInitial` reste dans les dépendances, donc la règle
+   * d'exhaustivité n'a pas à être désactivée, et le doublon est empêché par
+   * l'état plutôt que par une exception au lint.
+   */
+  const sujetInitialAnnonce = useRef(false);
+  useEffect(() => {
+    if (!typeInitial || sujetInitialAnnonce.current) return;
+    sujetInitialAnnonce.current = true;
+    capture(ANALYTICS_EVENTS.rdvTypeSelected, {
+      rdv_type: typeInitial,
+      preselected: true,
+    });
+  }, [typeInitial]);
+
   useEffect(() => {
     const typeDemande = type;
     if (!typeDemande) return;
@@ -442,12 +469,32 @@ export function ReservationRendezVous({
         // panne passagère : proposer « Réessayer » y serait mensonger.
         if (reponse.status === 503) {
           setResultat({ cle, type: typeDemande, etat: "indisponible" });
+          capture(ANALYTICS_EVENTS.rdvSlotsFailed, {
+            rdv_type: typeDemande,
+            reason: "non_configure",
+          });
           return;
         }
         if (!reponse.ok) throw new Error(String(reponse.status));
         const charge = lireReponseCreneaux(await reponse.json());
         if (!charge) throw new Error("charge_illisible");
         setResultat({ cle, type: typeDemande, etat: "aucune", donnees: charge });
+        /*
+         * ZÉRO CRÉNEAU N'EST PAS UN CHARGEMENT RÉUSSI, du point de vue du
+         * prospect : l'écran est le même que celui d'une panne. L'événement
+         * part quand même, avec le compte à zéro, pour que l'entonnoir
+         * distingue « agenda vide » de « appel échoué » — deux causes qui
+         * demandent deux corrections opposées.
+         */
+        const creneauxOfferts = charge.jours.reduce(
+          (total, jour) => total + jour.creneaux.length,
+          0,
+        );
+        capture(ANALYTICS_EVENTS.rdvSlotsLoaded, {
+          rdv_type: typeDemande,
+          slots_count: creneauxOfferts,
+          days_count: charge.jours.length,
+        });
       })
       .catch(() => {
         // Une requête annulée n'est pas une panne : c'est nous qui l'avons
@@ -455,12 +502,20 @@ export function ReservationRendezVous({
         // afficherait « la connexion a échoué » à chaque changement de semaine.
         if (controleur.signal.aborted) return;
         setResultat({ cle, type: typeDemande, etat: "reseau" });
+        capture(ANALYTICS_EVENTS.rdvSlotsFailed, {
+          rdv_type: typeDemande,
+          reason: "reseau",
+        });
       });
 
     return () => controleur.abort();
   }, [type, semaine, cle]);
 
   const choisirType = useCallback((id: IdRendezVous) => {
+    capture(ANALYTICS_EVENTS.rdvTypeSelected, {
+      rdv_type: id,
+      preselected: false,
+    });
     setType(id);
     setCreneau(undefined);
     // La semaine repart d'aujourd'hui : les disponibilités d'un rendez-vous de
@@ -469,6 +524,34 @@ export function ReservationRendezVous({
     setEtatEnvoi("repos");
     setMessageEnvoi("");
   }, []);
+
+  /*
+   * LE CRÉNEAU RETENU, avec le DÉLAI qu'il représente et non son horaire.
+   *
+   * `days_ahead` répond à une question qu'aucune autre mesure ne pose : le
+   * prospect prend-il le premier créneau venu, ou repousse-t-il à la semaine
+   * suivante ? Un délai qui s'allonge est le signal qu'il faut ouvrir des
+   * disponibilités, bien avant que le taux de réservation ne bouge.
+   *
+   * L'HEURE PRÉCISE N'EST PAS ENVOYÉE : elle identifierait la réservation, donc
+   * la personne, dès qu'on la croise avec l'agenda.
+   */
+  const choisirCreneau = useCallback(
+    (choix: Creneau) => {
+      const delai = Math.max(
+        0,
+        Math.round(
+          (new Date(choix.debut).getTime() - Date.now()) / (24 * 60 * 60 * 1000),
+        ),
+      );
+      capture(ANALYTICS_EVENTS.rdvSlotSelected, {
+        rdv_type: type,
+        days_ahead: delai,
+      });
+      setCreneau(choix);
+    },
+    [type],
+  );
 
   const decalerSemaine = useCallback(
     (jours: number) => {
@@ -513,6 +596,17 @@ export function ReservationRendezVous({
       if (!protection.configure) {
         setEtatEnvoi("erreur");
         setMessageEnvoi(messageProtectionAbsente(emailContact));
+        /*
+         * ÉCHEC LE PLUS COÛTEUX DE TOUS, et le plus silencieux : le prospect a
+         * choisi son sujet, son créneau, rempli ses coordonnées, appuyé sur le
+         * bouton, et rien ne part. Turnstile mal configuré a tenu le formulaire
+         * de contact hors service pendant des semaines sans qu'aucune mesure ne
+         * le dise (relevé le 2026-09-08).
+         */
+        capture(ANALYTICS_EVENTS.rdvFailed, {
+          rdv_type: type,
+          reason: "protection_absente",
+        });
         return;
       }
 
@@ -539,6 +633,13 @@ export function ReservationRendezVous({
           setEtatEnvoi("succes");
           setMessageEnvoi("");
           protection.reinitialiser();
+          /*
+           * LA SEULE CONVERSION QUI COMPTE, et elle n'était mesurée nulle part.
+           * `form_submitted`, émis par la délégation globale, part au clic :
+           * il compte donc aussi les envois que Cal.com a refusés. L'entonnoir
+           * se termine ici, sur la réponse du serveur.
+           */
+          capture(ANALYTICS_EVENTS.rdvConfirmed, { rdv_type: type });
           return;
         }
 
@@ -548,6 +649,19 @@ export function ReservationRendezVous({
         );
         const champ = estMessage(charge) ? charge.champ : undefined;
         setChampEnErreur(champ);
+        /*
+         * `field` EST LE NOM DU CHAMP FAUTIF, jamais ce que le prospect y a
+         * écrit. C'est lui qui sépare les trois causes d'échec qui demandent
+         * trois corrections différentes : `creneau` = course entre deux
+         * réservations, `jetonCaptcha` = protection mal réglée, le reste =
+         * validation trop stricte.
+         */
+        capture(ANALYTICS_EVENTS.rdvFailed, {
+          rdv_type: type,
+          reason: "refus_serveur",
+          status: reponse.status,
+          field: champ ?? "inconnu",
+        });
         // Créneau pris entre l'affichage et la confirmation : on renvoie le
         // prospect à la grille, en la rechargeant, plutôt que de le laisser
         // réappuyer sur un bouton qui échouera à l'identique.
@@ -562,6 +676,10 @@ export function ReservationRendezVous({
         setEtatEnvoi("erreur");
         setMessageEnvoi(MESSAGE_RESEAU);
         protection.reinitialiser();
+        capture(ANALYTICS_EVENTS.rdvFailed, {
+          rdv_type: type,
+          reason: "reseau",
+        });
       }
     },
     [etatEnvoi, type, creneau, protection, emailContact],
@@ -660,7 +778,7 @@ export function ReservationRendezVous({
                   donnees={donnees}
                   jourActif={jourActif ?? donnees.jours[0]}
                   onChoisirJour={setJourChoisi}
-                  onChoisir={setCreneau}
+                  onChoisir={choisirCreneau}
                 />
               ) : (
                 <p className="text-[14px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground-60">
@@ -675,6 +793,11 @@ export function ReservationRendezVous({
       {typeChoisi && creneau ? (
         <Etape index={2} titre={contenu.etapes.coordonnees} ouverte>
           <form
+            /* SANS CE NOM, la mesure appelle ce formulaire « form » : `formId`
+               retombe sur cette chaîne quand ni `data-analytics-form`, ni
+               `name`, ni `id` ne sont posés, et les trois formulaires de
+               contact du site se confondent alors dans un même seau. */
+            data-analytics-form="rendez-vous"
             className="relative flex flex-col gap-[14px]"
             /* `method="post"` et `action` : sans script, le navigateur soumet
                lui-même, en POST et dans un CORPS. La route refusera faute de

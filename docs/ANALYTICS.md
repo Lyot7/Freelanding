@@ -123,8 +123,26 @@ Mesurés **par délégation**, sans que le formulaire ait à savoir quoi que ce 
 champ), `form_submitted` (soumission native, qui remonte même quand React fait
 `preventDefault`).
 
+`form_succeeded` et `form_failed` disent l'ISSUE, ce que `form_submitted` ne
+peut pas dire : il part au clic, avant la réponse du serveur. Un envoi refusé
+par la protection anti-robot y comptait donc comme une conversion. `form_failed`
+porte `reason` (`captcha_absent`, `reponse_erreur`, `reseau`) et `status`.
+
 **Aucune valeur saisie ne quitte le navigateur.** On enregistre le NOM du champ
 et un booléen `filled`, jamais son contenu.
+
+### Prise de rendez-vous
+
+Six événements dédiés, parce que le parcours de réservation ne se ramène pas à
+un formulaire : `rdv_type_selected` (`preselected` distingue le clic du sujet
+imposé par `/services/*` ou `?sujet=`), `rdv_slots_loaded` (`slots_count` à zéro
+= agenda vide, ce qui n'est pas une panne), `rdv_slots_failed`
+(`non_configure` = Cal.com absent ou mal réglé, `reseau` = appel échoué),
+`rdv_slot_selected` (`days_ahead`, jamais l'horaire, qui identifierait la
+personne une fois croisé avec l'agenda), `rdv_confirmed`, `rdv_failed`.
+
+`rdv_confirmed` EST LA SEULE CONVERSION. Il part sur la réponse du serveur,
+jamais au clic.
 
 ### Automatique, en plus
 
@@ -152,6 +170,14 @@ plus. Dans l'interface : **Product analytics → New insight → Funnel**.
    À décomposer par `work_slug`.
 6. **Canal e-mail** — fenêtre 1 jour
    `$pageview` → `contact_email_clicked`
+7. **Prise de rendez-vous** — fenêtre 1 jour
+   `section_viewed` (filtrer `section = rendez-vous`) → `rdv_type_selected` →
+   `rdv_slots_loaded` → `rdv_slot_selected` → `form_submitted` → `rdv_confirmed`
+
+   Une chute entre les étapes 2 et 3 se lit à côté de `rdv_slots_failed` AVANT
+   d'être attribuée au désintérêt : une panne Cal.com dessine exactement la même
+   courbe. Le 2026-09-06, les quatre types pointaient sur des identifiants
+   inexistants et aucun créneau ne s'affichait ; rien ne le disait.
 
 Avec quelques dizaines de visites par mois, **les taux ne veulent rien dire**.
 Ce qui vaut, c'est le rejeu de session du prospect qu'Eliott vient d'appeler,

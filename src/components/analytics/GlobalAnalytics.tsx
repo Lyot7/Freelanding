@@ -324,16 +324,59 @@ export function GlobalAnalytics({ enabled }: { enabled: boolean }) {
       });
     };
 
+    /*
+     * ISSUE DES FORMULAIRES — l'étape que `submit` ne pourra jamais voir.
+     *
+     * `form_submitted` part au clic sur le bouton. Il ne dit rien de la
+     * réponse du serveur : un envoi refusé par la protection anti-robot, une
+     * validation en échec, une panne réseau comptaient tous comme une
+     * conversion. Le défaut n'est pas théorique — Turnstile a tenu le
+     * formulaire de contact hors service pendant des semaines (relevé le
+     * 2026-09-08) sans qu'aucune courbe ne bouge.
+     *
+     * `useEnvoiFormulaire` DIFFUSAIT DÉJÀ CES ÉVÉNEMENTS SUR `window`, et
+     * personne ne les écoutait : ils étaient émis dans le vide depuis leur
+     * écriture. On branche l'écouteur ici plutôt que d'appeler `capture()`
+     * dans le hook, pour la même raison que tout le reste de ce fichier : un
+     * composant de formulaire n'a pas à connaître l'existence de la mesure.
+     *
+     * `motif` NOMME LA CAUSE, jamais la saisie : `captcha_absent`,
+     * `reponse_erreur`, `reseau`.
+     */
+    const onIssue = (event: Event) => {
+      const detail =
+        event instanceof CustomEvent && typeof event.detail === "object"
+          ? (event.detail as Record<string, unknown>)
+          : {};
+      const reussi = event.type === "formulaire:succes";
+      capture(
+        reussi ? ANALYTICS_EVENTS.formSucceeded : ANALYTICS_EVENTS.formFailed,
+        {
+          form_intent: typeof detail.intention === "string" ? detail.intention : "inconnu",
+          ...(reussi
+            ? {}
+            : {
+                reason: typeof detail.motif === "string" ? detail.motif : "inconnu",
+                status: typeof detail.statut === "number" ? detail.statut : 0,
+              }),
+        },
+      );
+    };
+
     document.addEventListener("click", onClick, { capture: true });
     document.addEventListener("focusin", onFocusIn, { capture: true });
     document.addEventListener("focusout", onFocusOut, { capture: true });
     document.addEventListener("submit", onSubmit, { capture: true });
+    window.addEventListener("formulaire:succes", onIssue);
+    window.addEventListener("formulaire:echec", onIssue);
 
     return () => {
       document.removeEventListener("click", onClick, { capture: true });
       document.removeEventListener("focusin", onFocusIn, { capture: true });
       document.removeEventListener("focusout", onFocusOut, { capture: true });
       document.removeEventListener("submit", onSubmit, { capture: true });
+      window.removeEventListener("formulaire:succes", onIssue);
+      window.removeEventListener("formulaire:echec", onIssue);
     };
   }, [enabled]);
 

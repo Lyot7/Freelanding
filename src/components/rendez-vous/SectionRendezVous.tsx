@@ -63,6 +63,12 @@ export function SectionRendezVous({
   return (
     <section
       id="rendez-vous"
+      /* `data-section` EST CE QUE LIT LA MESURE, et son absence rendait la
+         section invisible : `PageAnalytics` n'émet `section_viewed` que pour
+         les sections qui le portent, si bien que la première marche de
+         l'entonnoir de rendez-vous n'existait pas. Toutes les sections de
+         l'accueil le portent déjà ; celle-ci avait été écrite à part. */
+      data-section="rendez-vous"
       className="relative flex w-full justify-center bg-background px-[20px] py-[50px] text-foreground tablet:px-[24px] tablet:py-[80px] desktop:px-[30px]"
     >
       {/* Même opacité que les autres calques de `/contact` (relevé : 0,05). */}
