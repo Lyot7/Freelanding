@@ -438,19 +438,53 @@ export function ReservationRendezVous({
    * distingue les deux populations, dont les taux de suite n'ont aucune raison
    * de se ressembler.
    *
-   * IL NE PART QU'UNE FOIS, et la garde est un `ref` plutôt qu'un tableau de
-   * dépendances vide : `typeInitial` reste dans les dépendances, donc la règle
-   * d'exhaustivité n'a pas à être désactivée, et le doublon est empêché par
-   * l'état plutôt que par une exception au lint.
+   * IL NE PART PAS AU MONTAGE MAIS À LA PREMIÈRE VISIBILITÉ DU BLOC, et c'est
+   * l'ORDRE DE L'ENTONNOIR qui l'impose. Un entonnoir PostHog ordonné n'accepte
+   * une étape que si la précédente l'a précédée dans le temps. Sur
+   * `/services/*`, le bloc est en bas de page : un événement émis au montage
+   * arriverait des dizaines de secondes AVANT le `section_viewed` qui ouvre
+   * l'entonnoir, et la visite resterait bloquée à l'étape 1 quoi qu'elle fasse
+   * ensuite. Attendre la visibilité aligne l'événement sur ce qu'il prétend
+   * dire — le prospect est devant le bloc, avec un sujet déjà retenu — et le
+   * remet dans le même ordre que le clic de `choisirType`.
+   *
+   * IL NE PART QU'UNE FOIS : `unobserve` sur la première intersection, et la
+   * garde par `ref` couvre le double montage du mode strict.
+   *
+   * PAS D'`IntersectionObserver` = ÉMISSION IMMÉDIATE. L'API est disponible
+   * partout où le site tourne, mais un repli qui perdrait l'étape vaudrait
+   * moins qu'un repli qui la remet dans le désordre.
    */
   const sujetInitialAnnonce = useRef(false);
+  const racine = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     if (!typeInitial || sujetInitialAnnonce.current) return;
-    sujetInitialAnnonce.current = true;
-    capture(ANALYTICS_EVENTS.rdvTypeSelected, {
-      rdv_type: typeInitial,
-      preselected: true,
-    });
+
+    const annoncer = () => {
+      if (sujetInitialAnnonce.current) return;
+      sujetInitialAnnonce.current = true;
+      capture(ANALYTICS_EVENTS.rdvTypeSelected, {
+        rdv_type: typeInitial,
+        preselected: true,
+      });
+    };
+
+    const noeud = racine.current;
+    if (!noeud || typeof IntersectionObserver === "undefined") {
+      annoncer();
+      return;
+    }
+
+    const observateur = new IntersectionObserver(
+      (entrees) => {
+        if (!entrees.some((entree) => entree.isIntersecting)) return;
+        observateur.disconnect();
+        annoncer();
+      },
+      { threshold: 0 },
+    );
+    observateur.observe(noeud);
+    return () => observateur.disconnect();
   }, [typeInitial]);
 
   useEffect(() => {
@@ -708,7 +742,7 @@ export function ReservationRendezVous({
   const enCours = etatEnvoi === "envoi";
 
   return (
-    <div className="flex flex-col gap-[20px]">
+    <div ref={racine} className="flex flex-col gap-[20px]">
       {/* L'étape 01 ne se replie JAMAIS, et ce n'est pas un oubli de symétrie.
           Dans un `radiogroup`, les flèches déplacent la sélection : replier le
           groupe dès le premier choix ferait disparaître le contrôle sous les
