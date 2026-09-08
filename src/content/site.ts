@@ -82,10 +82,18 @@ export const siteConfig: SiteConfig = {
     // liens `tel:` en retirent les espaces, et le JSON-LD le republie au format
     // international E.164 (conversion dans `@/lib/json-ld`).
     phone: "06 32 21 37 11",
-    // Normandie en tête : c'est la zone où Eliott se déplace et où porte le
-    // référencement local qu'il vend. Le reste de la France suit, à distance,
-    // sans se restreindre à une région.
-    address: "Normandie, et France à distance",
+    // LES TROIS DÉPARTEMENTS, PAS « NORMANDIE ». Alignement NAP du 2026-09-08 :
+    // la fiche Google d'Eliott déclare exactement Calvados, Manche et Orne
+    // comme zones desservies. Un moteur recoupe le site et la fiche pour
+    // décider qu'il s'agit de la même entité ; « Normandie » d'un côté et trois
+    // départements de l'autre, c'est un écart qu'il faut lui faire résoudre
+    // alors qu'on peut le lui épargner. Les trois noms sont par ailleurs les
+    // mots que les gens tapent, là où « Normandie » ne se cherche pas.
+    //
+    // Le reste de la France suit, à distance, sans se restreindre à une région :
+    // c'est le fond de l'activité, et `areaServed` en fait une zone à part
+    // entière dans le JSON-LD.
+    address: "Calvados, Manche, Orne, et France à distance",
     addressLabel: "Zone d’intervention",
     hours: ["Lun. au ven. : 9h - 18h"],
     responseTime:

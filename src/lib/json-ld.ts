@@ -68,6 +68,52 @@ export function personSchema(site: SiteConfig) {
 }
 
 /**
+ * Les deux bornes d'un prix affiché, telles que schema.org les attend.
+ *
+ * CE QUE ÇA RÉPARE. `fourchette()` rend « de 3 000 € à 7 200 € ». La version
+ * précédente en retirait tout ce qui n'était pas un chiffre, ce qui collait les
+ * deux montants l'un derrière l'autre : `minPrice: 30007200`. Le site vitrine
+ * était donc balisé à trente millions d'euros, et les trois prestations
+ * chiffrées annonçaient chacune un montant absurde aux moteurs — Google, Bing
+ * et les assistants lisent ce champ, pas le texte à côté.
+ *
+ * POURQUOI DEUX BORNES ET NON UNE. Depuis le passage des en-têtes à la
+ * fourchette entière (2026-09-02), la page affiche un bas ET un haut. Ne
+ * baliser que `minPrice` redirait « dès X » quand la page dit « de X à Y » :
+ * un balisage qui affirme autre chose que la page est une déclaration
+ * trompeuse. Les deux bornes, ou aucune.
+ *
+ * LE DÉCOUPAGE EST FAIT SUR LES GROUPES DE CHIFFRES, pas sur le mot « à » :
+ * `euros()` insère des insécables dans les milliers, et le séparateur lui-même
+ * a déjà changé une fois. Ce qui ne change pas, c'est qu'un montant est une
+ * suite de chiffres et d'espaces, et qu'il y en a un ou deux.
+ *
+ * `\s` AVEC LE DRAPEAU `u` COUVRE LES DEUX INSÉCABLES, l'ordinaire (U+00A0)
+ * que produit `euros()` comme l'étroite (U+202F) des versions récentes d'ICU.
+ * Les écrire en clair dans la classe de caractères rouvrait exactement le piège
+ * que le commentaire d'`euros()` décrit : dans un diff comme à l'écran, une
+ * insécable ne se distingue pas d'une espace ordinaire.
+ */
+function bornesPrix(prix: string | undefined) {
+  if (!prix) return undefined;
+
+  const montants = (prix.match(/\d[\d\s]*/gu) ?? [])
+    .map((m) => Number.parseInt(m.replace(/\s/gu, ""), 10))
+    .filter((n) => Number.isFinite(n) && n > 0);
+
+  if (!montants.length) return undefined;
+
+  return compact({
+    "@type": "PriceSpecification",
+    priceCurrency: "EUR",
+    minPrice: Math.min(...montants),
+    // Absent quand la page n'annonce qu'un seul montant : déclarer un plafond
+    // égal au plancher fermerait une offre que la page laisse ouverte.
+    maxPrice: montants.length > 1 ? Math.max(...montants) : undefined,
+  });
+}
+
+/**
  * L'activité, ses prestations et sa zone. `areaServed` est ce qui fait la
  * différence sur une recherche locale : sans lui, rien ne relie le site à la
  * Normandie autrement que par un mot dans un paragraphe.
@@ -82,20 +128,24 @@ export function businessSchema(site: SiteConfig, home: HomeContent) {
       // avec `priceSpecification`, pas avec `price`, qui annoncerait un tarif
       // ferme et deviendrait un prix trompeur.
       priceCurrency: "EUR",
-      priceSpecification: service.price
-        ? {
-            "@type": "PriceSpecification",
-            priceCurrency: "EUR",
-            minPrice: Number.parseInt(service.price.replace(/[^\d]/g, ""), 10) || undefined,
-          }
-        : undefined,
+      priceSpecification: bornesPrix(service.price),
     }),
   );
 
   return compact({
     "@type": "ProfessionalService",
     "@id": BUSINESS_ID,
-    name: `${site.brand.name}${site.brand.mark}`,
+    // LE NOM DE L'ENTITÉ, PAS CELUI DU LOGO. Alignement NAP du 2026-09-08 :
+    // `brand.name` vaut « Bouquerel », qui est la marque affichée en en-tête,
+    // quand la fiche Google et le registre disent « Eliott Bouquerel ». Le
+    // premier des trois champs que les moteurs recoupent pour rattacher un site
+    // à sa fiche est le nom : le faire diverger de la fiche, c'est demander à
+    // Google de trancher entre deux entités possibles.
+    //
+    // `alternateName` garde la marque courte : elle reste ce qu'on lit sur le
+    // site, et un moteur qui la rencontre ailleurs sait à qui la rattacher.
+    name: site.contact.person?.name ?? `${site.brand.name}${site.brand.mark}`,
+    alternateName: `${site.brand.name}${site.brand.mark}`,
     description: site.meta.description,
     url: absoluteUrl("/"),
     // Sans `logo` declare, Google choisit seul la vignette de l'entite et
