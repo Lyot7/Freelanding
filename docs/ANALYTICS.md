@@ -159,9 +159,21 @@ Autocapture (tous les clics et changements), rageclick, dead clicks, heatmaps
 
 ## 3. Entonnoirs à monter dans PostHog
 
+**ILS SONT DÉJÀ MONTÉS** depuis le 2026-09-08, sur le tableau de bord
+« Parcours commerciaux » :
+https://eu.posthog.com/project/121262/dashboard/940936
+
 Ils sont aussi déclarés en code (`RECOMMENDED_FUNNELS` dans
 `src/lib/analytics/events.ts`) : le compilateur y refuse une étape qui n'existe
-plus. Dans l'interface : **Product analytics → New insight → Funnel**.
+plus. **Les deux listes doivent rester d'accord** — modifier un entonnoir dans
+l'interface sans toucher au code laisse une documentation qui ment. Pour en
+ajouter un à la main : **Product analytics → New insight → Funnel**.
+
+Le tableau porte aussi deux COURBES qui ne sont pas des entonnoirs et sans
+lesquelles les entonnoirs se lisent de travers : « Pannes de créneaux » et
+« Échecs d'envoi de formulaire », toutes deux décomposées par `reason`. Une
+chute d'entonnoir sans coup d'œil à ces deux courbes se met sur le compte du
+désintérêt alors qu'elle vient d'une panne.
 
 1. **Prise de contact** (le principal) — fenêtre 7 jours
    `home_viewed` → `service_page_viewed` → `contact_page_viewed` → `form_submitted`
