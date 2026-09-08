@@ -448,7 +448,16 @@ export function ReservationRendezVous({
    * dire — le prospect est devant le bloc, avec un sujet déjà retenu — et le
    * remet dans le même ordre que le clic de `choisirType`.
    *
-   * IL NE PART QU'UNE FOIS : `unobserve` sur la première intersection, et la
+   * LA BANDE OBSERVÉE EST CELLE DE `PageAnalytics` (`-20 %` en haut et en bas),
+   * ET LE DÉLAI DE 500 ms N'EST PAS UNE PRÉCAUTION DÉCORATIVE. Deux
+   * observateurs distincts déclenchés par le même défilement ne garantissent
+   * aucun ordre entre eux : sur un écran large, où le titre de section et le
+   * bloc de réservation entrent dans la bande au même instant, l'étape 2
+   * pouvait encore devancer l'étape 1 d'une poignée de millisecondes. Le délai
+   * rend l'ordre certain, et il dit quelque chose de vrai : une demi-seconde
+   * passée devant le bloc, ce n'est plus un défilement qui traverse.
+   *
+   * IL NE PART QU'UNE FOIS : `disconnect` sur la première intersection, et la
    * garde par `ref` couvre le double montage du mode strict.
    *
    * PAS D'`IntersectionObserver` = ÉMISSION IMMÉDIATE. L'API est disponible
@@ -475,16 +484,20 @@ export function ReservationRendezVous({
       return;
     }
 
+    let minuterie: ReturnType<typeof setTimeout> | undefined;
     const observateur = new IntersectionObserver(
       (entrees) => {
         if (!entrees.some((entree) => entree.isIntersecting)) return;
         observateur.disconnect();
-        annoncer();
+        minuterie = setTimeout(annoncer, 500);
       },
-      { threshold: 0 },
+      { threshold: 0, rootMargin: "-20% 0px -20% 0px" },
     );
     observateur.observe(noeud);
-    return () => observateur.disconnect();
+    return () => {
+      observateur.disconnect();
+      if (minuterie !== undefined) clearTimeout(minuterie);
+    };
   }, [typeInitial]);
 
   useEffect(() => {

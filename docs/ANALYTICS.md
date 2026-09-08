@@ -144,6 +144,12 @@ personne une fois croisé avec l'agenda), `rdv_confirmed`, `rdv_failed`.
 `rdv_confirmed` EST LA SEULE CONVERSION. Il part sur la réponse du serveur,
 jamais au clic.
 
+Quand le sujet est imposé par la page (`/services/*`) ou par `?sujet=`,
+`rdv_type_selected` attend que le bloc soit resté visible une demi-seconde, et
+non le montage : émis au chargement, il devançait le `section_viewed` qui ouvre
+l'entonnoir, et un entonnoir ordonné bloquait alors la visite à l'étape 1 quoi
+qu'elle fasse ensuite.
+
 ### Automatique, en plus
 
 Autocapture (tous les clics et changements), rageclick, dead clicks, heatmaps
