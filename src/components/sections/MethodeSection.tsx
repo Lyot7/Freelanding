@@ -90,7 +90,12 @@ export function MethodeSection() {
             correction que la grille des forfaits et celle des pages légales. */}
         <div className="relative order-1 flex w-full flex-col gap-[12px] desktop:order-2 desktop:flex-row desktop:items-start desktop:gap-0">
           <div className="relative flex w-full flex-col items-start gap-[14px] overflow-hidden desktop:w-1/2 desktop:items-end desktop:gap-[30px]">
-            <p className="m-0 flex w-full max-w-[550px] flex-col justify-center text-left text-[22px] font-medium leading-[1.15] tracking-[-0.02em] text-foreground desktop:text-right desktop:text-[32px]">
+            {/* LARGEUR ET CORPS ACCORDÉS AU NOMBRE DE MOTS. À 550px et 32px, une
+                phrase de vingt-six mots tombait sur neuf lignes de trois mots :
+                le gabarit d'origine portait une citation deux fois plus courte.
+                660px à 28px ramène la coupure autour de quatre à cinq mots, ce
+                qui se lit comme une phrase et non comme une liste. */}
+            <p className="m-0 flex w-full max-w-[660px] flex-col justify-center text-left text-[22px] font-medium leading-[1.2] tracking-[-0.02em] text-foreground desktop:text-right desktop:text-[28px]">
               <LineReveal
                 text={methodePromise.quote}
                 className="block w-full"
