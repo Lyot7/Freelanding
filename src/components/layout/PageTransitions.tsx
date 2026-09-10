@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { maintenirAncre } from "./ancre";
 
 /**
  * PageTransitions — transitions de page via l'API native View Transitions,
@@ -21,7 +22,8 @@ import { usePathname, useRouter } from "next/navigation";
  *
  * Deux détails repris du live, tous deux mesurés :
  *   - la remise à zéro du scroll se fait DANS le callback et sans `behavior`,
- *     donc instantanée et masquée par le snapshot de l'ancienne page ;
+ *     donc instantanée et masquée par le snapshot de l'ancienne page, sauf
+ *     vers une ancre, où la cible est tenue en place (voir `./ancre`) ;
  *   - sur retour arrière, on ne touche PAS au scroll : le live laisse la
  *     restauration native opérer (aucun `scrollTo` relevé dans son journal).
  *
@@ -57,6 +59,17 @@ export function PageTransitions() {
   // Dernier chemin RENDU par React, à distinguer de `location.pathname` qui, sur
   // retour arrière, vaut déjà la nouvelle valeur avant que React n'ait re-rendu.
   const renderedPath = useRef(pathname);
+
+  // Arrivée de l'extérieur sur une ancre (signature mail, lien de campagne) :
+  // le navigateur saute seul à la cible, on la tient pendant le chargement.
+  // Navigation neuve seulement : un rechargement ou un retour arrière restaure
+  // la position du visiteur, qui prime sur l'ancre.
+  useEffect(() => {
+    const [entree] = performance.getEntriesByType("navigation");
+    if (!(entree instanceof PerformanceNavigationTiming)) return;
+    if (entree.type !== "navigate") return;
+    return maintenirAncre(window.location.hash);
+  }, []);
 
   // La nouvelle route est rendue : on libère la transition en attente.
   useEffect(() => {
@@ -143,7 +156,10 @@ export function PageTransitions() {
         });
         return Promise.race([navigated, safety]).then(() => {
           pendingResolve.current = null;
-          window.scrollTo(0, 0);
+          // Lien vers une ancre (`/contact?sujet=…#rendez-vous`) : Next a déjà
+          // défilé jusqu'à la cible au rendu, la remise à zéro l'annulait.
+          if (url.hash) maintenirAncre(url.hash);
+          else window.scrollTo(0, 0);
         });
       });
     };
