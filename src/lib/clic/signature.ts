@@ -18,17 +18,19 @@ import type { MessageCompose } from "../contact/emails";
 import type { ResolutionExpediteur } from "../contact/mailer";
 import { creerLimiteur } from "../contact/rate-limit";
 import { echapperHtml } from "../contact/sanitize";
-import { absoluteUrl } from "../site-url";
 
 const ID_CLIC = /^[a-z0-9-]{3,80}$/;
 
 /**
- * Destination FIXE. Rien de la requête n'y entre : une redirection dont la
- * cible viendrait d'un paramètre serait une open redirect sur notre domaine.
+ * Destination FIXE et LITTÉRALE. Rien de la requête n'y entre : une
+ * redirection dont la cible viendrait d'un paramètre serait une open redirect
+ * sur notre domaine. Rien de l'environnement non plus : dérivée de
+ * `NEXT_PUBLIC_SITE_URL`, une variable absente au build enverrait les
+ * prospects sur `localhost`. Hôte canonique mesuré le 2026-09-11 : l'apex
+ * répond 200 et porte la balise canonical, `www` redirige en 307 vers lui.
  */
-export const DESTINATION_CLIC = absoluteUrl(
-  "/contact?utm_source=email&utm_medium=signature&utm_campaign=prospection",
-);
+export const DESTINATION_CLIC =
+  "https://eliottbouquerel.fr/contact?utm_source=email&utm_medium=signature&utm_campaign=prospection";
 
 const ROBOT =
   /bot|crawl|spider|preview|scanner|safelinks|proofpoint|mimecast|barracuda|headless|python|curl|wget|go-http|java\//i;
@@ -51,11 +53,14 @@ export function estRobotProbable(userAgent: string | null): boolean {
   return ROBOT.test(userAgent);
 }
 
-/** Une ligne, sans caractère de contrôle, 300 caractères au plus. */
+/**
+ * Une ligne, sans caractère de contrôle (C0, DEL, C1) ni séparateur de ligne
+ * Unicode, 300 caractères au plus : le pipeline parse le corps ligne par ligne.
+ */
 export function nettoyerNavigateur(userAgent: string | null): string {
   if (!userAgent) return "";
   return userAgent
-    .replace(/[\u0000-\u001F\u007F]+/g, " ")
+    .replace(/[\u0000-\u001F\u007F-\u009F\u2028\u2029]+/g, " ")
     .trim()
     .slice(0, LONGUEUR_NAVIGATEUR);
 }
@@ -81,19 +86,15 @@ export function composerNotificationClic(clic: ClicARapporter): MessageCompose {
 }
 
 export interface ThrottleClic {
-  autoriser(id: string, maintenantMs: number): boolean;
+  autoriser(id: string, maintenantMs: number, robot: boolean): boolean;
 }
 
 /**
- * Anti-inondation : quelqu'un qui martèle `/r/xxx` ne doit pas remplir la
- * boîte d'Eliott. L'identifiant est vérifié AVANT le plafond global, pour
- * qu'un clic répété ne consomme pas le quota horaire.
- *
- * ponytail: plafond en mémoire du processus, 1 notification par id toutes les
- * 10 minutes et 30 par heure au total. Il repart de zéro à chaque
- * redéploiement et ne se partage pas entre instances (voir `rate-limit.ts`).
+ * 1 notification par id toutes les 10 minutes, 30 par heure au total.
+ * Les deux limites sont consultées d'abord, et consommées seulement si la
+ * notification part : un refus de l'une ne mange pas le quota de l'autre.
  */
-export function creerThrottleClic(): ThrottleClic {
+function creerPlafond(): (id: string, maintenantMs: number) => boolean {
   const parId = creerLimiteur({
     fenetreMs: 10 * 60_000,
     maxParFenetre: 1,
@@ -104,10 +105,34 @@ export function creerThrottleClic(): ThrottleClic {
     maxParFenetre: 30,
     maxCles: 1,
   });
+  return (id, maintenantMs) => {
+    if (!parId.consulter(id, maintenantMs)) return false;
+    if (!global.consulter("tous", maintenantMs)) return false;
+    parId.verifier(id, maintenantMs);
+    global.verifier("tous", maintenantMs);
+    return true;
+  };
+}
+
+/**
+ * Anti-inondation : quelqu'un qui martèle `/r/xxx` ne doit pas remplir la
+ * boîte d'Eliott.
+ *
+ * Deux plafonds identiques et étanches, un pour les robots probables, un pour
+ * les humains. Une passerelle de sécurité (SafeLinks, Proofpoint…) suit le
+ * lien à la livraison, quelques secondes avant le destinataire : avec un
+ * plafond commun, elle verrouillerait l'identifiant et le vrai clic ne serait
+ * jamais notifié. Les robots restent notifiés, le pipeline s'en sert.
+ *
+ * ponytail: plafonds en mémoire du processus. Ils repartent de zéro à chaque
+ * redéploiement et ne se partagent pas entre instances (voir `rate-limit.ts`).
+ */
+export function creerThrottleClic(): ThrottleClic {
+  const humains = creerPlafond();
+  const robots = creerPlafond();
   return {
-    autoriser(id, maintenantMs) {
-      if (!parId.verifier(id, maintenantMs).autorise) return false;
-      return global.verifier("tous", maintenantMs).autorise;
+    autoriser(id, maintenantMs, robot) {
+      return (robot ? robots : humains)(id, maintenantMs);
     },
   };
 }
@@ -181,12 +206,10 @@ export function traiterClic(
 ): Response {
   if (requete.method === "GET" && idClicValide(id)) {
     const maintenantMs = deps.maintenantMs();
-    if (deps.throttle.autoriser(id, maintenantMs)) {
-      const clic: ClicARapporter = {
-        id,
-        maintenantMs,
-        userAgent: requete.headers.get("user-agent"),
-      };
+    const userAgent = requete.headers.get("user-agent");
+    const robot = estRobotProbable(userAgent);
+    if (deps.throttle.autoriser(id, maintenantMs, robot)) {
+      const clic: ClicARapporter = { id, maintenantMs, userAgent };
       deps.planifier(() => notifier(clic, deps.resoudreExpediteur));
     }
   }

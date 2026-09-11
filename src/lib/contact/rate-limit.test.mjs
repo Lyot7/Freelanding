@@ -41,6 +41,16 @@ describe("creerLimiteur", () => {
     expect(limiteur.verifier("ip-a", T0 + 60_001).autorise).toBe(true);
   });
 
+  it("consulter répond comme verifier sans rien enregistrer", () => {
+    const limiteur = creerLimiteur({ fenetreMs: 60_000, maxParFenetre: 1, maxCles: 10 });
+    expect(limiteur.consulter("ip-a", T0)).toBe(true);
+    expect(limiteur.consulter("ip-a", T0)).toBe(true);
+    expect(limiteur.taille()).toBe(0);
+    expect(limiteur.verifier("ip-a", T0).autorise).toBe(true);
+    expect(limiteur.consulter("ip-a", T0 + 1)).toBe(false);
+    expect(limiteur.consulter("ip-a", T0 + 60_001)).toBe(true);
+  });
+
   it("annonce un délai d'attente cohérent avec la fenêtre", () => {
     const limiteur = creerLimiteur({ fenetreMs: 60_000, maxParFenetre: 1, maxCles: 10 });
     limiteur.verifier("ip-a", T0);

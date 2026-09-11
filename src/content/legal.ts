@@ -262,6 +262,10 @@ export const legalDocuments: readonly LegalDocument[] = [
         text: "Le serveur et, si vous l’avez accepté, l’outil de mesure d’audience enregistrent des données techniques : adresse IP, navigateur et sa version, type d’appareil, page d’où vous venez, pages consultées et temps passé, clics et progression dans la page. La mesure d’audience ne démarre pas tant que vous ne l’avez pas acceptée.",
       },
       {
+        type: "paragraph",
+        text: "Chaque lien de mes e-mails de prospection est propre à son destinataire : quand il est suivi, je reçois l’identifiant du message, la date et le navigateur utilisé.",
+      },
+      {
         type: "heading",
         level: 2,
         text: "3. Pourquoi, sur quelle base, pendant combien de temps",
@@ -368,10 +372,6 @@ export const legalDocuments: readonly LegalDocument[] = [
       {
         type: "paragraph",
         text: "Votre choix se modifie à tout moment par le lien « Cookies », en pied de page, à côté des mentions légales. Refuser ne dégrade rien : le site fonctionne à l’identique. Votre navigateur permet aussi de bloquer les cookies, au risque de gêner d’autres sites que celui-ci.",
-      },
-      {
-        type: "paragraph",
-        text: "Les liens de mes e-mails de prospection passent par une adresse de redirection de ce site, qui m’indique qu’ils ont été ouverts, avec la date et le type de navigateur, sans déposer de cookie ni de traceur.",
       },
       { type: "heading", level: 2, text: "7. Sécurité" },
       {

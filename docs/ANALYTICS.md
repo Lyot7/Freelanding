@@ -372,10 +372,11 @@ connu.
 | Tests | `src/lib/clic/signature.test.mjs` |
 
 - **Réponse.** Toujours un 302 vers
-  `/contact?utm_source=email&utm_medium=signature&utm_campaign=prospection`,
+  `https://eliottbouquerel.fr/contact?utm_source=email&utm_medium=signature&utm_campaign=prospection`,
   avec `Cache-Control: no-store`, `X-Robots-Tag: noindex, nofollow` et
-  `Referrer-Policy: no-referrer`. La destination est fixe, rien de la requête
-  n'y entre. `robots.txt` interdit `/r/`.
+  `Referrer-Policy: no-referrer`. La destination est une constante littérale :
+  rien de la requête ni de l'environnement (`NEXT_PUBLIC_SITE_URL`) n'y entre.
+  Hôte canonique : l'apex (`www` redirige vers lui). `robots.txt` interdit `/r/`.
 - **Notification.** Seulement pour un `GET` dont l'identifiant matche
   `^[a-z0-9-]{3,80}$`. `HEAD` et identifiant invalide redirigent sans rien
   envoyer. L'envoi part après la réponse (`after()`), par le mailer du
@@ -388,7 +389,7 @@ connu.
   ```
   Identifiant : <id>
   Date : <ISO 8601 UTC>
-  Navigateur : <user-agent, une ligne, 300 caractères au plus>
+  Navigateur : <user-agent sans contrôles C0/C1 ni U+2028/U+2029, 300 caractères au plus>
   Robot probable : oui|non
   ```
 
@@ -397,7 +398,11 @@ connu.
   Barracuda) ou un client HTTP. Ces passerelles suivent les liens avant le
   destinataire : un `oui` n'est pas un clic humain.
 - **Plafond.** Une notification par identifiant toutes les 10 minutes, 30 par
-  heure au total, au-delà redirection sans notification. Compteurs en mémoire
-  du processus : remis à zéro à chaque redéploiement.
+  heure au total, au-delà redirection sans notification. Deux jeux de
+  compteurs étanches : robots probables d'un côté, humains de l'autre, pour
+  qu'une passerelle qui suit le lien à la livraison ne verrouille pas le vrai
+  clic qui arrive après. Les deux limites sont consultées avant d'être
+  consommées : un refus du plafond global ne verrouille pas l'identifiant.
+  Compteurs en mémoire du processus : remis à zéro à chaque redéploiement.
 - **Sonder la production en `HEAD` uniquement** (`curl -I`). Un `GET` avec un
   identifiant valide envoie une vraie notification.

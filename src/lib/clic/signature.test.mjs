@@ -86,6 +86,11 @@ describe("nettoyerNavigateur", () => {
     expect(nettoyerNavigateur(null)).toBe("");
     expect(nettoyerNavigateur("python-requests/2.31")).toBe("python-requests/2.31");
   });
+
+  it("retire aussi les contrôles C1 et les séparateurs de ligne Unicode", () => {
+    expect(nettoyerNavigateur("a\u0085b\u2028c\u2029d\u009Fe")).toBe("a b c d e");
+    expect(nettoyerNavigateur(`${"x".repeat(299)}\u2028yyy`)).toHaveLength(300);
+  });
 });
 
 describe("composerNotificationClic", () => {
@@ -122,21 +127,53 @@ describe("composerNotificationClic", () => {
 });
 
 describe("creerThrottleClic", () => {
-  it("une notification par identifiant toutes les dix minutes", () => {
+  for (const robot of [false, true]) {
+    const qui = robot ? "robots" : "humains";
+
+    it(`${qui} : une notification par identifiant toutes les dix minutes`, () => {
+      const throttle = creerThrottleClic();
+      expect(throttle.autoriser("abc", T0, robot)).toBe(true);
+      expect(throttle.autoriser("abc", T0 + 9 * MINUTE, robot)).toBe(false);
+      expect(throttle.autoriser("autre", T0 + 9 * MINUTE, robot)).toBe(true);
+      expect(throttle.autoriser("abc", T0 + 10 * MINUTE + 1, robot)).toBe(true);
+    });
+
+    it(`${qui} : trente notifications par heure au total, puis plus rien`, () => {
+      const throttle = creerThrottleClic();
+      for (let i = 0; i < 30; i += 1) {
+        expect(throttle.autoriser(`id-${i}`, T0 + i, robot)).toBe(true);
+      }
+      expect(throttle.autoriser("id-30", T0 + 30, robot)).toBe(false);
+      expect(throttle.autoriser("id-31", T0 + 60 * MINUTE + 1, robot)).toBe(true);
+    });
+  }
+
+  it("le plafond global atteint ne consomme pas l'identifiant", () => {
     const throttle = creerThrottleClic();
-    expect(throttle.autoriser("abc", T0)).toBe(true);
-    expect(throttle.autoriser("abc", T0 + 9 * MINUTE)).toBe(false);
-    expect(throttle.autoriser("autre", T0 + 9 * MINUTE)).toBe(true);
-    expect(throttle.autoriser("abc", T0 + 10 * MINUTE + 1)).toBe(true);
+    for (let i = 0; i < 30; i += 1) throttle.autoriser(`id-${i}`, T0, false);
+    expect(throttle.autoriser("abc", T0 + 59 * MINUTE, false)).toBe(false);
+    // Le plafond se libère à T0 + 60 min. Si le refus avait enregistré « abc »,
+    // il resterait bloqué jusqu'à T0 + 69 min.
+    expect(throttle.autoriser("abc", T0 + 60 * MINUTE + 1, false)).toBe(true);
   });
 
-  it("trente notifications par heure au total, puis plus rien", () => {
+  it("un identifiant refusé ne consomme pas le plafond global", () => {
     const throttle = creerThrottleClic();
-    for (let i = 0; i < 30; i += 1) {
-      expect(throttle.autoriser(`id-${i}`, T0 + i)).toBe(true);
+    expect(throttle.autoriser("abc", T0, false)).toBe(true);
+    for (let i = 0; i < 50; i += 1) {
+      expect(throttle.autoriser("abc", T0 + i, false)).toBe(false);
     }
-    expect(throttle.autoriser("id-30", T0 + 30)).toBe(false);
-    expect(throttle.autoriser("id-31", T0 + 60 * MINUTE + 1)).toBe(true);
+    for (let i = 0; i < 29; i += 1) {
+      expect(throttle.autoriser(`id-${i}`, T0 + 100, false)).toBe(true);
+    }
+  });
+
+  it("un robot ne consomme pas le quota des humains", () => {
+    const throttle = creerThrottleClic();
+    expect(throttle.autoriser("abc", T0, true)).toBe(true);
+    expect(throttle.autoriser("abc", T0 + 1, false)).toBe(true);
+    for (let i = 0; i < 40; i += 1) throttle.autoriser(`robot-${i}`, T0 + 2, true);
+    expect(throttle.autoriser("humain", T0 + 3, false)).toBe(true);
   });
 });
 
@@ -164,6 +201,19 @@ function banc() {
   return { deps, planifies, envois };
 }
 
+/** Exécute la tâche en capturant `console.error` ; rend les lignes journalisées. */
+async function silencieux(tache) {
+  const lignes = [];
+  const erreurs = console.error;
+  console.error = (...args) => lignes.push(args.join(" "));
+  try {
+    await expect(tache()).resolves.toBeUndefined();
+  } finally {
+    console.error = erreurs;
+  }
+  return lignes;
+}
+
 function requete(methode, ua = "Mozilla/5.0 Safari") {
   return new Request("http://localhost/r/x", {
     method: methode,
@@ -171,19 +221,63 @@ function requete(methode, ua = "Mozilla/5.0 Safari") {
   });
 }
 
+const DESTINATION_ATTENDUE =
+  "https://eliottbouquerel.fr/contact?utm_source=email&utm_medium=signature&utm_campaign=prospection";
+
 function verifierRedirection(reponse) {
   expect(reponse.status).toBe(302);
-  expect(reponse.headers.get("location")).toBe(DESTINATION_CLIC);
+  expect(reponse.headers.get("location")).toBe(DESTINATION_ATTENDUE);
   expect(reponse.headers.get("cache-control")).toBe("no-store");
   expect(reponse.headers.get("x-robots-tag")).toBe("noindex, nofollow");
   expect(reponse.headers.get("referrer-policy")).toBe("no-referrer");
 }
 
 describe("traiterClic", () => {
-  it("la destination est fixe", () => {
-    expect(DESTINATION_CLIC).toEndWith(
-      "/contact?utm_source=email&utm_medium=signature&utm_campaign=prospection",
-    );
+  it("la destination est fixe, sur l'hôte canonique, sans dépendre de l'environnement", () => {
+    expect(DESTINATION_CLIC).toBe(DESTINATION_ATTENDUE);
+    expect(new URL(DESTINATION_CLIC).host).toBe("eliottbouquerel.fr");
+  });
+
+  it("un robot puis un humain sur le même identifiant : deux notifications", async () => {
+    const { deps, planifies, envois } = banc();
+    traiterClic(requete("GET", "Microsoft SafeLinks"), "abc", deps);
+    traiterClic(requete("GET"), "abc", deps);
+    expect(planifies).toHaveLength(2);
+    await planifies[0]();
+    await planifies[1]();
+    expect(envois[0].message.texte).toContain("Robot probable : oui");
+    expect(envois[1].message.texte).toContain("Robot probable : non");
+  });
+
+  it("expéditeur non configuré : rien n'est envoyé, l'échec est journalisé", async () => {
+    const { deps, planifies } = banc();
+    deps.resoudreExpediteur = () => ({
+      ok: false,
+      variableManquante: "RESEND_API_KEY",
+    });
+    traiterClic(requete("GET"), "abc", deps);
+    const journal = await silencieux(() => planifies[0]());
+    expect(journal).toHaveLength(1);
+    expect(journal[0]).toContain("[clic] expediteur_non_configure");
+    expect(journal[0]).toContain("RESEND_API_KEY");
+  });
+
+  it("envoi refusé par le transport : ne remonte pas, journalisé", async () => {
+    const { deps, planifies } = banc();
+    deps.resoudreExpediteur = () => ({
+      ok: true,
+      expediteur: {
+        nom: "resend",
+        de: "d",
+        versEliott: "v",
+        envoyer: async () => ({ ok: false, raison: "quota" }),
+      },
+    });
+    traiterClic(requete("GET"), "abc", deps);
+    const journal = await silencieux(() => planifies[0]());
+    expect(journal).toHaveLength(1);
+    expect(journal[0]).toContain("[clic] notification_echouee");
+    expect(journal[0]).toContain('"id":"abc"');
   });
 
   it("GET valide : 302 et une notification planifiée après la réponse", async () => {

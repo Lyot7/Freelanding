@@ -51,6 +51,11 @@ export interface Limiteur {
    * @param maintenantMs Horloge injectée, pour que les tests ne dorment pas.
    */
   verifier(clef: string, maintenantMs?: number): ResultatLimite;
+  /**
+   * Même verdict que `verifier`, sans rien enregistrer : sert à tester
+   * plusieurs limiteurs avant d'en consommer un seul.
+   */
+  consulter(clef: string, maintenantMs?: number): boolean;
   /** Nombre de clefs actuellement suivies. Sert aux tests et au diagnostic. */
   taille(): number;
 }
@@ -68,12 +73,18 @@ export function creerLimiteur(options: OptionsLimiteur): Limiteur {
     }
   }
 
+  function recentsDe(clef: string, maintenantMs: number): number[] {
+    return (historique.get(clef) ?? []).filter(
+      (t) => maintenantMs - t < options.fenetreMs,
+    );
+  }
+
   return {
+    consulter(clef, maintenantMs = Date.now()) {
+      return recentsDe(clef, maintenantMs).length < options.maxParFenetre;
+    },
     verifier(clef, maintenantMs = Date.now()) {
-      const horodatages = historique.get(clef) ?? [];
-      const recents = horodatages.filter(
-        (t) => maintenantMs - t < options.fenetreMs,
-      );
+      const recents = recentsDe(clef, maintenantMs);
 
       if (recents.length >= options.maxParFenetre) {
         historique.set(clef, recents);
