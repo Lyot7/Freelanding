@@ -284,7 +284,8 @@ cet ordre. Une étape par ligne.
 
 ### Sitemap et robots
 
-- `src/app/robots.ts` autorise tout et déclare `sitemap.xml`. Rien à changer.
+- `src/app/robots.ts` autorise tout sauf `/r/` (redirections des e-mails,
+  voir §9) et déclare `sitemap.xml`.
 - `src/app/(site)/sitemap.ts` dérive les URL de `src/content/routes.ts`.
 - `lastModified` n'est publié **que là où une vraie date existe** : les articles
   (leur `date` dans `src/content/blog.ts`) et `/blog` (la plus récente d'entre
@@ -354,3 +355,49 @@ recharger. Chaque capture est journalisée dans la console sous la forme
   réécritures, sinon les modules du SDK sont demandés au mauvais domaine.
 - **Rejeu et heatmaps se règlent AUSSI côté projet PostHog.** Le code peut être
   parfait, si l'interrupteur du projet est fermé il ne se passe rien.
+
+---
+
+## 9. Clics sur les liens des e-mails
+
+Le lien « Prendre contact » de la signature des e-mails de prospection pointe
+vers `https://eliottbouquerel.fr/r/<id>`, un identifiant unique par e-mail
+généré par le pipeline d'envoi. Aucun pixel, aucun cookie : seul le clic est
+connu.
+
+| Quoi | Où |
+|---|---|
+| Route | `src/app/r/[id]/route.ts` |
+| Logique (pure, injectée) | `src/lib/clic/signature.ts` |
+| Tests | `src/lib/clic/signature.test.mjs` |
+
+- **Réponse.** Toujours un 302 vers
+  `/contact?utm_source=email&utm_medium=signature&utm_campaign=prospection`,
+  avec `Cache-Control: no-store`, `X-Robots-Tag: noindex, nofollow` et
+  `Referrer-Policy: no-referrer`. La destination est fixe, rien de la requête
+  n'y entre. `robots.txt` interdit `/r/`.
+- **Notification.** Seulement pour un `GET` dont l'identifiant matche
+  `^[a-z0-9-]{3,80}$`. `HEAD` et identifiant invalide redirigent sans rien
+  envoyer. L'envoi part après la réponse (`after()`), par le mailer du
+  formulaire de contact (Resend, sinon SMTP), vers `CONTACT_TO_EMAIL`. Un échec
+  est journalisé (`[clic] notification_echouee`, identifiant seul) et ne touche
+  jamais la redirection.
+- **Format**, parsé par le pipeline, à ne pas modifier sans lui. Sujet
+  `Clic signature : <id>`, corps :
+
+  ```
+  Identifiant : <id>
+  Date : <ISO 8601 UTC>
+  Navigateur : <user-agent, une ligne, 300 caractères au plus>
+  Robot probable : oui|non
+  ```
+
+  `oui` quand le user-agent est vide ou ressemble à un robot, un aperçu de
+  lien, une passerelle de sécurité (SafeLinks, Proofpoint, Mimecast,
+  Barracuda) ou un client HTTP. Ces passerelles suivent les liens avant le
+  destinataire : un `oui` n'est pas un clic humain.
+- **Plafond.** Une notification par identifiant toutes les 10 minutes, 30 par
+  heure au total, au-delà redirection sans notification. Compteurs en mémoire
+  du processus : remis à zéro à chaque redéploiement.
+- **Sonder la production en `HEAD` uniquement** (`curl -I`). Un `GET` avec un
+  identifiant valide envoie une vraie notification.

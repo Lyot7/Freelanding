@@ -109,7 +109,7 @@ const contactDetails = [
  * fausse sur une politique de confidentialité est un défaut de conformité à
  * elle seule (art. 12 RGPD, information « à jour »).
  */
-const lastUpdated = "2026-08-29";
+const lastUpdated = "2026-09-11";
 
 export const legalDocuments: readonly LegalDocument[] = [
   {
@@ -368,6 +368,10 @@ export const legalDocuments: readonly LegalDocument[] = [
       {
         type: "paragraph",
         text: "Votre choix se modifie à tout moment par le lien « Cookies », en pied de page, à côté des mentions légales. Refuser ne dégrade rien : le site fonctionne à l’identique. Votre navigateur permet aussi de bloquer les cookies, au risque de gêner d’autres sites que celui-ci.",
+      },
+      {
+        type: "paragraph",
+        text: "Les liens de mes e-mails de prospection passent par une adresse de redirection de ce site, qui m’indique qu’ils ont été ouverts, avec la date et le type de navigateur, sans déposer de cookie ni de traceur.",
       },
       { type: "heading", level: 2, text: "7. Sécurité" },
       {
