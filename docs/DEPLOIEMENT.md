@@ -62,6 +62,7 @@ erreur dans les journaux.
 | `CAL_COM_EVENT_OUTIL` | non | type « un outil » | entrée masquée |
 | `CAL_COM_EVENT_LOGICIEL` | non | type « un logiciel » | entrée masquée |
 | `CAL_COM_EVENT_DECOUVERTE` | non | type « je ne sais pas encore » | entrée masquée |
+| `CLIC_TOKEN` | non | jeton du cockpit, enregistre les clics des liens `/r/<id>` des e-mails de prospection | clic non enregistré, journal `[clic] <id> non_configure`, redirection intacte |
 
 **Aucune absence ne provoque d'erreur visible pour le visiteur** : chaque
 fonction se désactive proprement et le dit. C'est voulu, et c'est aussi ce qui

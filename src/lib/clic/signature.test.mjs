@@ -1,19 +1,20 @@
 import { describe, expect, it } from "bun:test";
 import {
-  composerNotificationClic,
   creerThrottleClic,
   DESTINATION_CLIC,
   estRobotProbable,
   idClicValide,
   nettoyerNavigateur,
   traiterClic,
+  URL_COCKPIT_CLICS,
 } from "./signature.ts";
 
 /**
- * Le contrat de cette route est lu par un autre programme : le pipeline de
- * prospection génère les identifiants et parse le corps de la notification.
- * Les libellés, le sujet et la destination sont donc figés ici au caractère
- * près. Changer l'un d'eux sans changer le pipeline casse le suivi en silence.
+ * Deux autres programmes lisent ce contrat : le pipeline de prospection génère
+ * les identifiants, le cockpit (`admin.eliottbouquerel.fr`) reçoit les clics.
+ * L'URL, les en-têtes, le corps et la destination sont donc figés ici au
+ * caractère près. Changer l'un d'eux sans changer l'autre côté casse le suivi
+ * en silence.
  */
 
 const T0 = 1_700_000_000_000;
@@ -93,44 +94,11 @@ describe("nettoyerNavigateur", () => {
   });
 });
 
-describe("composerNotificationClic", () => {
-  it("produit le sujet et les quatre lignes exactes", () => {
-    const message = composerNotificationClic({
-      id: "dupont-plomberie",
-      maintenantMs: T0,
-      userAgent: "Mozilla/5.0 Safari",
-    });
-    expect(message.sujet).toBe("Clic signature : dupont-plomberie");
-    expect(message.texte).toBe(
-      [
-        "Identifiant : dupont-plomberie",
-        `Date : ${new Date(T0).toISOString()}`,
-        "Navigateur : Mozilla/5.0 Safari",
-        "Robot probable : non",
-      ].join("\n"),
-    );
-  });
-
-  it("échappe le HTML et nettoie le navigateur", () => {
-    const message = composerNotificationClic({
-      id: "abc",
-      maintenantMs: T0,
-      userAgent: "<script>alert(1)</script>\ncurl",
-    });
-    expect(message.html).not.toContain("<script>");
-    expect(message.html).toContain("&lt;script&gt;");
-    expect(message.html).toContain("<p>Robot probable : oui</p>");
-    expect(message.texte).toContain(
-      "Navigateur : <script>alert(1)</script> curl",
-    );
-  });
-});
-
 describe("creerThrottleClic", () => {
   for (const robot of [false, true]) {
     const qui = robot ? "robots" : "humains";
 
-    it(`${qui} : une notification par identifiant toutes les dix minutes`, () => {
+    it(`${qui} : un enregistrement par identifiant toutes les dix minutes`, () => {
       const throttle = creerThrottleClic();
       expect(throttle.autoriser("abc", T0, robot)).toBe(true);
       expect(throttle.autoriser("abc", T0 + 9 * MINUTE, robot)).toBe(false);
@@ -138,7 +106,7 @@ describe("creerThrottleClic", () => {
       expect(throttle.autoriser("abc", T0 + 10 * MINUTE + 1, robot)).toBe(true);
     });
 
-    it(`${qui} : trente notifications par heure au total, puis plus rien`, () => {
+    it(`${qui} : trente enregistrements par heure au total, puis plus rien`, () => {
       const throttle = creerThrottleClic();
       for (let i = 0; i < 30; i += 1) {
         expect(throttle.autoriser(`id-${i}`, T0 + i, robot)).toBe(true);
@@ -177,48 +145,57 @@ describe("creerThrottleClic", () => {
   });
 });
 
-/** Dépendances factices : on capture ce que la route planifie et envoie. */
-function banc() {
+const URL_COCKPIT = "https://admin.eliottbouquerel.fr/api/clics";
+const UA_SAFARI =
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15";
+
+/**
+ * Dépendances factices : on capture ce que la route planifie et ce qui part
+ * vers le cockpit. `repondre` fabrique la réponse (ou lève) à chaque appel.
+ */
+function banc(options = {}) {
+  // `in` et non une valeur par défaut : `jeton: undefined` doit rester absent.
+  const jeton = "jeton" in options ? options.jeton : "jeton-de-test";
+  const repondre =
+    options.repondre ?? (async () => new Response(null, { status: 201 }));
   const planifies = [];
-  const envois = [];
+  const appels = [];
   const deps = {
     planifier: (tache) => planifies.push(tache),
-    resoudreExpediteur: () => ({
-      ok: true,
-      expediteur: {
-        nom: "resend",
-        de: "Test <de@exemple.test>",
-        versEliott: "boite@exemple.test",
-        envoyer: async (demande) => {
-          envois.push(demande);
-          return { ok: true, id: "msg-1" };
-        },
-      },
-    }),
+    jeton: () => jeton,
+    envoyer: async (url, init) => {
+      appels.push({ url, init });
+      return repondre();
+    },
     throttle: creerThrottleClic(),
     maintenantMs: () => T0,
   };
-  return { deps, planifies, envois };
+  return { deps, planifies, appels };
 }
 
-/** Exécute la tâche en capturant `console.error` ; rend les lignes journalisées. */
-async function silencieux(tache) {
-  const lignes = [];
-  const erreurs = console.error;
-  console.error = (...args) => lignes.push(args.join(" "));
+/**
+ * Exécute les tâches planifiées en capturant `console.info` et
+ * `console.error`. Aucune ne doit lever.
+ */
+async function executer(planifies) {
+  const journal = { info: [], erreur: [] };
+  const { info, error } = console;
+  console.info = (...args) => journal.info.push(args.join(" "));
+  console.error = (...args) => journal.erreur.push(args.join(" "));
   try {
-    await expect(tache()).resolves.toBeUndefined();
+    for (const tache of planifies) {
+      await expect(tache()).resolves.toBeUndefined();
+    }
   } finally {
-    console.error = erreurs;
+    console.info = info;
+    console.error = error;
   }
-  return lignes;
+  return journal;
 }
 
-function requete(methode, ua = "Mozilla/5.0 Safari") {
-  return new Request("http://localhost/r/x", {
-    method: methode,
-    headers: { "user-agent": ua },
-  });
+function requete(methode, ua = UA_SAFARI) {
+  const headers = ua === null ? {} : { "user-agent": ua };
+  return new Request("http://localhost/r/x", { method: methode, headers });
 }
 
 const DESTINATION_ATTENDUE =
@@ -232,105 +209,180 @@ function verifierRedirection(reponse) {
   expect(reponse.headers.get("referrer-policy")).toBe("no-referrer");
 }
 
-describe("traiterClic", () => {
+describe("traiterClic : redirection", () => {
   it("la destination est fixe, sur l'hôte canonique, sans dépendre de l'environnement", () => {
     expect(DESTINATION_CLIC).toBe(DESTINATION_ATTENDUE);
     expect(new URL(DESTINATION_CLIC).host).toBe("eliottbouquerel.fr");
   });
 
-  it("un robot puis un humain sur le même identifiant : deux notifications", async () => {
-    const { deps, planifies, envois } = banc();
-    traiterClic(requete("GET", "Microsoft SafeLinks"), "abc", deps);
-    traiterClic(requete("GET"), "abc", deps);
-    expect(planifies).toHaveLength(2);
-    await planifies[0]();
-    await planifies[1]();
-    expect(envois[0].message.texte).toContain("Robot probable : oui");
-    expect(envois[1].message.texte).toContain("Robot probable : non");
-  });
-
-  it("expéditeur non configuré : rien n'est envoyé, l'échec est journalisé", async () => {
-    const { deps, planifies } = banc();
-    deps.resoudreExpediteur = () => ({
-      ok: false,
-      variableManquante: "RESEND_API_KEY",
-    });
-    traiterClic(requete("GET"), "abc", deps);
-    const journal = await silencieux(() => planifies[0]());
-    expect(journal).toHaveLength(1);
-    expect(journal[0]).toContain("[clic] expediteur_non_configure");
-    expect(journal[0]).toContain("RESEND_API_KEY");
-  });
-
-  it("envoi refusé par le transport : ne remonte pas, journalisé", async () => {
-    const { deps, planifies } = banc();
-    deps.resoudreExpediteur = () => ({
-      ok: true,
-      expediteur: {
-        nom: "resend",
-        de: "d",
-        versEliott: "v",
-        envoyer: async () => ({ ok: false, raison: "quota" }),
-      },
-    });
-    traiterClic(requete("GET"), "abc", deps);
-    const journal = await silencieux(() => planifies[0]());
-    expect(journal).toHaveLength(1);
-    expect(journal[0]).toContain("[clic] notification_echouee");
-    expect(journal[0]).toContain('"id":"abc"');
-  });
-
-  it("GET valide : 302 et une notification planifiée après la réponse", async () => {
-    const { deps, planifies, envois } = banc();
+  it("GET valide : 302 immédiat, l'appel au cockpit part après la réponse", async () => {
+    const { deps, planifies, appels } = banc();
     verifierRedirection(traiterClic(requete("GET"), "dupont-plomberie", deps));
     expect(planifies).toHaveLength(1);
-    expect(envois).toHaveLength(0);
-
-    await planifies[0]();
-    expect(envois).toHaveLength(1);
-    expect(envois[0].destinataire).toBe("boite@exemple.test");
-    expect(envois[0].message.sujet).toBe("Clic signature : dupont-plomberie");
+    expect(appels).toHaveLength(0);
+    await executer(planifies);
+    expect(appels).toHaveLength(1);
   });
 
-  it("identifiant invalide : 302 sans notification", () => {
-    const { deps, planifies } = banc();
+  it("identifiant invalide : 302 sans appel", async () => {
+    const { deps, planifies, appels } = banc();
     verifierRedirection(traiterClic(requete("GET"), "AB CD", deps));
     expect(planifies).toHaveLength(0);
+    await executer(planifies);
+    expect(appels).toHaveLength(0);
   });
 
-  it("HEAD : 302 sans notification", () => {
-    const { deps, planifies } = banc();
+  it("HEAD : 302 sans appel", async () => {
+    const { deps, planifies, appels } = banc();
     verifierRedirection(traiterClic(requete("HEAD"), "dupont-plomberie", deps));
     expect(planifies).toHaveLength(0);
+    await executer(planifies);
+    expect(appels).toHaveLength(0);
   });
 
-  it("second clic dans les dix minutes : 302 sans notification", () => {
-    const { deps, planifies } = banc();
+  it("second clic dans les dix minutes : 302 sans second appel", async () => {
+    const { deps, planifies, appels } = banc();
     traiterClic(requete("GET"), "abc", deps);
     verifierRedirection(traiterClic(requete("GET"), "abc", deps));
     expect(planifies).toHaveLength(1);
+    await executer(planifies);
+    expect(appels).toHaveLength(1);
+  });
+});
+
+describe("traiterClic : appel au cockpit", () => {
+  it("URL, méthode, en-têtes et corps exacts", async () => {
+    const { deps, planifies, appels } = banc();
+    traiterClic(requete("GET"), "dupont-plomberie", deps);
+    await executer(planifies);
+
+    const { url, init } = appels[0];
+    expect(url).toBe(URL_COCKPIT);
+    expect(init.method).toBe("POST");
+    expect(init.headers).toEqual({
+      authorization: "Bearer jeton-de-test",
+      "content-type": "application/json",
+    });
+    expect(init.body).toBe(
+      JSON.stringify({
+        id: "dupont-plomberie",
+        cliqueLe: new Date(T0).toISOString(),
+        navigateur: UA_SAFARI,
+        robotProbable: false,
+      }),
+    );
+    expect(init.signal).toBeInstanceOf(AbortSignal);
   });
 
-  it("un envoi qui échoue ou qui lève ne remonte pas", async () => {
-    const { deps, planifies } = banc();
-    deps.resoudreExpediteur = () => ({
-      ok: true,
-      expediteur: {
-        nom: "smtp",
-        de: "d",
-        versEliott: "v",
-        envoyer: async () => {
-          throw new Error("réseau");
-        },
+  it("l'URL est une constante littérale sur le cockpit", () => {
+    expect(URL_COCKPIT_CLICS).toBe(URL_COCKPIT);
+  });
+
+  it("robot probable : robotProbable vaut true, navigateur nettoyé", async () => {
+    const { deps, planifies, appels } = banc();
+    traiterClic(requete("GET", "Microsoft SafeLinks\tX"), "abc", deps);
+    await executer(planifies);
+    const corps = JSON.parse(appels[0].init.body);
+    expect(corps.robotProbable).toBe(true);
+    expect(corps.navigateur).toBe("Microsoft SafeLinks X");
+  });
+
+  it("user-agent absent : robot probable, navigateur vide", async () => {
+    const { deps, planifies, appels } = banc();
+    traiterClic(requete("GET", null), "abc", deps);
+    await executer(planifies);
+    const corps = JSON.parse(appels[0].init.body);
+    expect(corps.robotProbable).toBe(true);
+    expect(corps.navigateur).toBe("");
+  });
+
+  it("navigateur tronqué à 300 caractères", async () => {
+    const { deps, planifies, appels } = banc();
+    traiterClic(requete("GET", "x".repeat(500)), "abc", deps);
+    await executer(planifies);
+    expect(JSON.parse(appels[0].init.body).navigateur).toHaveLength(300);
+  });
+
+  it("un robot puis un humain sur le même identifiant : deux appels", async () => {
+    const { deps, planifies, appels } = banc();
+    traiterClic(requete("GET", "Microsoft SafeLinks"), "abc", deps);
+    traiterClic(requete("GET"), "abc", deps);
+    await executer(planifies);
+    expect(appels.map((a) => JSON.parse(a.init.body).robotProbable)).toEqual([
+      true,
+      false,
+    ]);
+  });
+
+  it("CLIC_TOKEN absent : aucun appel, non_configure journalisé", async () => {
+    for (const jeton of [undefined, "", "   "]) {
+      const { deps, planifies, appels } = banc({ jeton });
+      verifierRedirection(traiterClic(requete("GET"), "abc", deps));
+      const journal = await executer(planifies);
+      expect(appels).toHaveLength(0);
+      expect(journal.erreur).toEqual(["[clic] abc non_configure"]);
+      expect(journal.info).toEqual([]);
+    }
+  });
+
+  for (const [statut, corps] of [
+    [201, { statut: "cree" }],
+    [200, { statut: "deja_enregistre" }],
+    [404, { erreur: "envoi_inconnu" }],
+  ]) {
+    it(`${statut} : issue normale, journalisée en info, aucune erreur`, async () => {
+      const { deps, planifies } = banc({
+        repondre: async () => Response.json(corps, { status: statut }),
+      });
+      traiterClic(requete("GET"), "abc", deps);
+      const journal = await executer(planifies);
+      expect(journal.erreur).toEqual([]);
+      expect(journal.info).toEqual([`[clic] abc ${statut}`]);
+    });
+  }
+
+  for (const statut of [401, 503, 500, 400]) {
+    it(`${statut} : journalisé en erreur, sans exception`, async () => {
+      const { deps, planifies } = banc({
+        repondre: async () => new Response("{}", { status: statut }),
+      });
+      traiterClic(requete("GET"), "abc", deps);
+      const journal = await executer(planifies);
+      expect(journal.info).toEqual([]);
+      expect(journal.erreur).toEqual([`[clic] abc ${statut}`]);
+    });
+  }
+
+  it("timeout : journalisé en erreur, sans exception", async () => {
+    const { deps, planifies } = banc({
+      repondre: async () => {
+        throw new DOMException("délai dépassé", "TimeoutError");
       },
     });
     traiterClic(requete("GET"), "abc", deps);
-    const erreurs = console.error;
-    console.error = () => {};
-    try {
-      await expect(planifies[0]()).resolves.toBeUndefined();
-    } finally {
-      console.error = erreurs;
-    }
+    const journal = await executer(planifies);
+    expect(journal.erreur).toEqual(["[clic] abc timeout"]);
+  });
+
+  it("erreur réseau : journalisée en erreur, sans exception", async () => {
+    const { deps, planifies } = banc({
+      repondre: async () => {
+        throw new TypeError("fetch failed");
+      },
+    });
+    traiterClic(requete("GET"), "abc", deps);
+    const journal = await executer(planifies);
+    expect(journal.erreur).toEqual(["[clic] abc reseau"]);
+  });
+
+  it("le journal ne contient ni le jeton ni le navigateur", async () => {
+    const { deps, planifies } = banc({
+      repondre: async () => new Response(null, { status: 401 }),
+    });
+    traiterClic(requete("GET", "Mozilla/5.0 Signe-Distinctif"), "abc", deps);
+    const journal = await executer(planifies);
+    const tout = [...journal.info, ...journal.erreur].join("\n");
+    expect(tout).not.toContain("jeton-de-test");
+    expect(tout).not.toContain("Signe-Distinctif");
   });
 });
