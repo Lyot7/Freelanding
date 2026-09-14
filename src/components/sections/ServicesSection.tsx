@@ -322,7 +322,7 @@ function ServiceRow({
           {/* framer-ykbjth : colonne du numéro (align top, width min) */}
           <span className="relative flex w-min flex-none flex-col items-center justify-start gap-[10px] self-stretch pt-[2px]">
             {/* framer-a00aq6 : Number (preset 18rrjz2, 11px, blanc 50%) */}
-            <span className="whitespace-pre text-[11px] font-medium leading-[1.2] tracking-[-0.01em] text-[rgba(255,255,255,0.5)]">
+            <span className="whitespace-pre text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-[rgba(255,255,255,0.5)]">
               {service.number}
             </span>
           </span>

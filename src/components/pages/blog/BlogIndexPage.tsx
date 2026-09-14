@@ -49,7 +49,8 @@ export function BlogIndexPage({
                   (`blogContent.hero.titleLines`), plus une copie en dur du
                   titre anglais : le saut de ligne forcé reste celui de la
                   source, seul le texte vient désormais du contenu. */}
-              <h1 className="text-[63px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] tablet:text-[78px] desktop:text-[98px]">
+              {/* Corps plafonné : « DERNIERS » débordait de 8 px à 320. */}
+              <h1 className="text-[clamp(44px,17.2vw,63px)] font-semibold uppercase leading-[0.82] tracking-[-0.05em] tablet:text-[78px] desktop:text-[98px]">
                 {(blog.hero.titleLines ?? [blog.hero.title]).map((line, index) => (
                   <Fragment key={line}>
                     {index > 0 ? <br /> : null}

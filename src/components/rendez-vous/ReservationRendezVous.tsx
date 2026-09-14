@@ -99,7 +99,7 @@ function numero(index: number): string {
 }
 
 const CLASSE_LIBELLE =
-  "text-[11px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60";
+  "text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60";
 
 const CLASSE_CHAMP =
   "h-[50px] w-full border border-border bg-transparent px-[16px] text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground transition-colors placeholder:text-white/25 focus:border-b-accent tablet:text-[14px]";
@@ -139,7 +139,7 @@ function Etape({
           <button
             type="button"
             onClick={onChanger}
-            className="text-[11px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground underline decoration-white/30 underline-offset-4 transition-colors hover:text-accent motion-reduce:transition-none"
+            className="text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground underline decoration-white/30 underline-offset-4 transition-colors hover:text-accent motion-reduce:transition-none"
           >
             {contenu.actions.changer}
           </button>
@@ -196,7 +196,7 @@ function ChoixType({
                 className="mt-[3px] size-[14px] flex-none cursor-pointer appearance-none rounded-full border border-white/40 bg-transparent transition-colors checked:border-accent checked:bg-accent motion-reduce:transition-none"
               />
             </span>
-            <span className="text-[11px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-accent">
+            <span className="text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-accent">
               {type.duree}
             </span>
             <span className="text-[12px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground-60">

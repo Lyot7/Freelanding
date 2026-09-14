@@ -53,7 +53,7 @@ function FormField({
     // framer-x05314 / 1cbluft : label (flex col, items-end, gap 10)
     <label className="relative flex w-full flex-col items-end gap-[10px]">
       {/* preset 18rrjz2 (11px), color rgba(255,255,255,.6), aligné droite */}
-      <span className="h-auto w-auto whitespace-pre text-right text-[11px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground-60">
+      <span className="h-auto w-auto whitespace-pre text-right text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground-60">
         {label}
       </span>
       {/* framer-70kwgc : input 50px (54 mobile), border top+right+bottom rgba(255,255,255,.1) */}
@@ -158,7 +158,7 @@ export function FooterContactForm({
           en masque SVG via `::before`. Le `<select>` est donc nu, ce
           qui ramène sa largeur de 682,5 à 666,5px. */}
       <label className="relative flex w-full flex-col items-end gap-[10px]">
-        <span className="h-auto w-auto whitespace-pre text-right text-[11px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground-60">
+        <span className="h-auto w-auto whitespace-pre text-right text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground-60">
           {footerForm.selectLabel}
         </span>
         <div className="footer-select-wrapper w-full">

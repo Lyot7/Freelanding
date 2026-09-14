@@ -41,14 +41,14 @@ export async function NotFoundView() {
           <span className="absolute inset-y-0 left-1/2 w-px bg-white/10" />
           <div className="relative mx-auto grid w-full max-w-[1440px] gap-[46px] tablet:grid-cols-2 tablet:items-end">
             <div className="flex flex-col items-start gap-[64px] tablet:items-end">
-              <p className="max-w-[230px] text-[11px] font-medium uppercase leading-[1.2] text-white/60 tablet:text-right">
+              <p className="max-w-[230px] text-[12px] font-medium uppercase leading-[1.2] text-white/60 tablet:text-right">
                 {messageLine1}
                 <br />
                 {messageLine2}
               </p>
               <Link
                 href={notFound.backLink.href}
-                className="inline-flex items-center gap-[12px] text-[11px] font-medium uppercase text-foreground no-underline"
+                className="inline-flex items-center gap-[12px] text-[12px] font-medium uppercase text-foreground no-underline"
               >
                 <span className="flex h-[20px] w-[20px] items-center justify-center rounded-full bg-accent text-background">
                   ←

@@ -82,7 +82,8 @@ export function TableOfContents({
       aria-label={titre}
       className="sticky top-[110px] max-w-[320px] pb-[40px]"
     >
-      <p className="text-[11px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/40">
+      {/* Encre à 60 % et non 40 : 2,64:1 sur le gris clair, sous le seuil AA. */}
+      <p className="text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/60">
         {titre}
       </p>
       <ol className="mt-[14px] list-none p-0">
@@ -96,7 +97,7 @@ export function TableOfContents({
                 className={`flex gap-[10px] text-[13px] font-medium leading-[1.3] tracking-[-0.01em] no-underline transition-colors duration-200 motion-reduce:transition-none ${
                   courant
                     ? "text-background"
-                    : "text-background/40 hover:text-background/70"
+                    : "text-background/60 hover:text-background/80"
                 }`}
               >
                 <span className="shrink-0 tabular-nums">

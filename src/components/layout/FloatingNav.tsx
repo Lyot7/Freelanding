@@ -268,7 +268,7 @@ export function FloatingNav({ site }: { site: SiteConfig }) {
   const closeMenu = () => setOpen(false);
   const tab = open ? 0 : -1;
   const labelCls =
-    "m-0 whitespace-pre text-[11px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60";
+    "m-0 whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60";
 
   return (
     <div
@@ -417,7 +417,7 @@ export function FloatingNav({ site }: { site: SiteConfig }) {
                       href={link.href}
                       tabIndex={tab}
                       onClick={closeMenu}
-                      className="whitespace-pre text-[11px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60 underline decoration-[#ffffff21] underline-offset-[3px] transition-[color,text-decoration-color,text-underline-offset] duration-200 hover:text-foreground hover:underline-offset-4 motion-reduce:transition-none"
+                      className="whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60 underline decoration-[#ffffff21] underline-offset-[3px] transition-[color,text-decoration-color,text-underline-offset] duration-200 hover:text-foreground hover:underline-offset-4 motion-reduce:transition-none"
                     >
                       {link.label}
                     </HoverPrefetchLink>

@@ -67,7 +67,7 @@ const CELL =
 const CELL_NOM =
   "text-[18px] font-semibold uppercase leading-[1.05] tracking-[-0.03em] text-background tablet:text-[20px]";
 const CELL_DETAIL =
-  "text-[11px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/55 tablet:text-[12px]";
+  "text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/55 tablet:text-[12px]";
 
 export function LogoBandSection({ logoBand }: { logoBand: LogoBand }): ReactNode {
   const logos = logoBand.logos;

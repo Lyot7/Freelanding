@@ -175,7 +175,7 @@ function Testimonial({ testimonial }: { testimonial: TestimonialContent }) {
             <div className="relative flex w-full flex-col items-start gap-[1px]">
               {/* framer-qsmhrc : rôle (preset 18rrjz2, 11px, opacity .7) */}
               {author.role ? (
-                <p className="h-auto w-auto whitespace-pre text-[11px] font-medium leading-[1.2] tracking-[-0.01em] text-accent-ink opacity-70">
+                <p className="h-auto w-auto whitespace-pre text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-accent-ink opacity-70">
                   {author.company
                     ? `${author.role}${uiLabels.testimonials.roleSuffix}`
                     : author.role}

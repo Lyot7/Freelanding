@@ -191,7 +191,7 @@ function ContactHero({
                   une enveloppe à `opacity: .7`. Mesuré sur le fond du héros,
                   rgb(184,184,184) chez elle contre rgb(158,158,158) chez nous
                   tant que la ligne était à `text-foreground-60`. */}
-              <p className="text-[11px] font-medium leading-[1.2] tracking-[-0.01em] text-white/70">
+              <p className="text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-white/70">
                 {person.role}
                 {person.company ? (
                   <>
@@ -294,7 +294,7 @@ function ContactDetails({ contact }: { contact: ContactContent }) {
           </a>
           <div className="flex flex-col gap-[16px]">
             <div className="flex flex-col gap-[5px]">
-              <span className="text-[11px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/60">
+              <span className="text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/60">
                 {card.addressLabel}
               </span>
               <span className="text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-background">
@@ -308,7 +308,7 @@ function ContactDetails({ contact }: { contact: ContactContent }) {
                 laisse donc aucun espace résiduel. */}
             {card.phone ? (
               <div className="flex flex-col gap-[5px]">
-                <span className="text-[11px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/60">
+                <span className="text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/60">
                   {card.phoneLabel}
                 </span>
                 <a
@@ -362,7 +362,7 @@ function ContactBody({ contact }: { contact: ContactContent }) {
           <div className="w-full tablet:ml-auto tablet:w-3/4">
             <Reveal
               as="p"
-              className="w-full max-w-[900px] pb-[16px] text-[22px] font-medium leading-[1.1] tracking-[-0.02em] tablet:pb-[40px] tablet:text-[26px] tablet:tracking-[-0.01em] desktop:text-[32px]"
+              className="w-full max-w-[900px] pb-[16px] text-[22px] font-medium leading-[1.2] tracking-[-0.02em] tablet:pb-[40px] tablet:leading-[1.1] tablet:text-[26px] tablet:tracking-[-0.01em] desktop:text-[32px]"
               initialOpacity={0}
               initialY={30}
               duration={0.75}

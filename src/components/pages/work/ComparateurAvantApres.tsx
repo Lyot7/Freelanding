@@ -196,7 +196,7 @@ export function ComparateurAvantApres({
           est : sans ligne de séparation, un fondu sans rail ne laisse rien
           deviner de ce qui le pilote. */}
       <div className="mt-[12px] flex items-center gap-[12px] tablet:mt-[16px]">
-        <span className="flex flex-none items-center gap-[8px] text-[11px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/60 tablet:text-[12px]">
+        <span className="flex flex-none items-center gap-[8px] text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/60 tablet:text-[12px]">
           <span aria-hidden className="h-[8px] w-[8px] flex-none rounded-full bg-background/30" />
           {libelleAvant}
         </span>
@@ -224,7 +224,7 @@ export function ComparateurAvantApres({
           onKeyDown={figer}
           className="comparateur-rail h-[20px] min-w-0 flex-1 cursor-ew-resize appearance-none bg-transparent"
         />
-        <span className="flex flex-none items-center gap-[8px] text-right text-[11px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/60 tablet:text-[12px]">
+        <span className="flex flex-none items-center gap-[8px] text-right text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/60 tablet:text-[12px]">
           {libelleApres}
           <span aria-hidden className="h-[8px] w-[8px] flex-none rounded-full bg-accent" />
         </span>

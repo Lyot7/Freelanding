@@ -123,7 +123,7 @@ function CategoryRow({
       </div>
       {locked ? (
         <span
-          className="mt-[2px] flex-none whitespace-pre text-[11px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-white/70"
+          className="mt-[2px] flex-none whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-white/70"
           aria-describedby={bodyId}
         >
           {consentCopy.alwaysOn}
@@ -306,7 +306,7 @@ export function ConsentBanner() {
     "transition-opacity duration-200 hover:opacity-85 motion-reduce:transition-none";
 
   const linkButton =
-    "inline-flex min-h-[44px] items-center whitespace-pre text-[11px] font-medium uppercase " +
+    "inline-flex min-h-[44px] items-center whitespace-pre text-[12px] font-medium uppercase " +
     "leading-[1.2] tracking-[-0.01em] text-white/70 underline decoration-white/25 underline-offset-[3px] " +
     "transition-[color,text-decoration-color,text-underline-offset] duration-200 " +
     "hover:text-foreground hover:decoration-white hover:underline-offset-4 motion-reduce:transition-none";
@@ -353,7 +353,7 @@ export function ConsentBanner() {
                 d'adresse rétractée et surestime la place disponible. */}
             <div className="relative z-[1] flex max-h-[calc(100svh-120px)] flex-col gap-[16px] overflow-y-auto p-[20px]">
               <div className="flex flex-col gap-[8px]">
-                <p className="whitespace-pre text-[11px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-white/60">
+                <p className="whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-white/60">
                   {consentCopy.eyebrow}
                 </p>
                 <h2

@@ -104,7 +104,7 @@ function FaqRow({
             <span
               aria-hidden
               className={
-                "whitespace-pre text-[11px] font-medium uppercase leading-[1.2] tracking-[-0.01em] " +
+                "whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] " +
                 (open
                   ? "absolute left-[-18px] top-[46%] -translate-y-1/2"
                   : "relative")
@@ -115,7 +115,7 @@ function FaqRow({
             </span>
             {/* framer-1nopks0 : question (11px, 60% noir, uppercase) */}
             <span
-              className="w-px flex-[1_0_0] whitespace-pre-wrap break-words text-[11px] font-medium uppercase leading-[1.2] tracking-[-0.01em]"
+              className="w-px flex-[1_0_0] whitespace-pre-wrap break-words text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em]"
               style={{ color: INK_60 }}
             >
               {item.question}

@@ -239,7 +239,7 @@ function FounderCard({ person }: { person: HeroContent["person"] }) {
           </p>
         </div>
         <div className="relative h-auto w-full flex-none whitespace-pre-wrap break-words">
-          <p className="m-0 text-[11px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground-60">
+          <p className="m-0 text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground-60">
             {person.role}
           </p>
         </div>
@@ -340,7 +340,9 @@ function BottomBar({ site }: { site: SiteConfig }) {
       /* `clip-room` : la barre a exactement la hauteur de son contenu, et
          l'accent de « RÉPONSE SOUS 24 HEURES OUVRÉES » y montait 0,7 px trop
          haut. 2 px de marge de coupe, sans rien déplacer. */
-      className="clip-room absolute bottom-[20px] left-[20px] right-[20px] z-[2] flex h-min flex-none flex-row items-center justify-between [--clip-room:2px] tablet:bottom-[30px] tablet:left-[30px] tablet:right-[30px]"
+      /* `flex-wrap` : sous 430 px la jauge et « PRENDRE RENDEZ-VOUS » ne
+         tiennent pas sur une ligne, et le lien sortait coupé en « RENDEZ- ». */
+      className="clip-room absolute bottom-[20px] left-[20px] right-[20px] z-[2] flex h-min flex-none flex-row flex-wrap items-center justify-between gap-x-[16px] gap-y-[10px] [--clip-room:2px] tablet:bottom-[30px] tablet:left-[30px] tablet:right-[30px]"
       {...appearReveal(
         "irdhqz",
         { opacity: 0.001, y: 50, scale: 1.3 },
@@ -410,7 +412,9 @@ function NoiseTexture() {
 function EyebrowReveal({ children }: { children: React.ReactNode }) {
   return (
     <motion.div
-      className="relative h-auto w-auto flex-none whitespace-pre"
+      // Retour à la ligne permis sous 810 : en `pre`, le surtitre sortait
+      // coupé en « …PARTOU » à 320.
+      className="relative h-auto w-auto min-w-0 flex-1 whitespace-normal tablet:flex-none tablet:whitespace-pre"
       {...appearReveal("vsspgz", { opacity: 0.001, y: 16 }, spring(199, 0.7), {
         opacity: 0.8,
         y: 0,
@@ -519,10 +523,10 @@ function HeroContentBox({
             {/* framer-1s2pu2o : Heading (eyebrow + wordmark) */}
             <div className="relative flex h-min w-full flex-none flex-col items-start gap-[6px] overflow-hidden">
               {/* framer-1nxvkw5 : Top text */}
-              <div className="relative flex h-min w-min flex-none flex-row items-center justify-center gap-[10px] overflow-hidden">
+              <div className="relative flex h-min w-full flex-none flex-row items-center justify-start gap-[10px] overflow-hidden tablet:w-min tablet:justify-center">
                 {/* framer-vsspgz : eyebrow — reveal y16 → opacity .8 spring delay .7 */}
                 <EyebrowReveal>
-                  <p className="m-0 text-[11px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground">
+                  <p className="m-0 text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground">
                     {hero.eyebrow}
                   </p>
                 </EyebrowReveal>

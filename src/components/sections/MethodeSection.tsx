@@ -70,7 +70,7 @@ export function MethodeSection() {
                 {auteur?.name}
               </p>
               {auteur?.role ? (
-                <p className="whitespace-pre text-[11px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground opacity-70">
+                <p className="whitespace-pre text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground opacity-70">
                   {auteur.role}
                 </p>
               ) : null}

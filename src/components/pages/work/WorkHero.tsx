@@ -86,7 +86,9 @@ export function WorkHero({ hero }: { hero: HeroContent }) {
               initialY={36}
               duration={0.8}
             >
-              <h1 className="m-0 text-[63px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] tablet:text-[78px] desktop:text-[98px]">
+              {/* Corps plafonné et non fixe : « PROJETS » demandait 319 px pour
+                  280 disponibles à 320, et 395 pour 381 à 810. */}
+              <h1 className="m-0 text-[clamp(44px,17.2vw,63px)] font-semibold uppercase leading-[0.82] tracking-[-0.05em] tablet:text-[clamp(60px,9.2vw,78px)] desktop:text-[98px]">
                 {hero.title}
               </h1>
             </Reveal>

@@ -83,7 +83,7 @@ export function SectionRendezVous({
 
       <div className="relative z-[3] grid w-full max-w-[1440px] grid-cols-1 gap-[30px] tablet:grid-cols-2 tablet:gap-0">
         <div className="flex flex-col gap-[16px] tablet:pr-[40px]">
-          <p className="text-[11px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60">
+          <p className="text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60">
             {rendezVousContent.eyebrow}
           </p>
           {/* DEUX ÉCARTS ASSUMÉS avec les autres titres de section du site, et

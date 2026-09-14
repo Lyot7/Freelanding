@@ -119,7 +119,7 @@ function PreferredSourceLink({ label }: { label: string }) {
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="relative flex min-h-[24px] w-min flex-row items-center gap-[8px] whitespace-pre text-[11px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60 no-underline transition-colors duration-200 hover:text-foreground"
+      className="relative flex min-h-[24px] w-min flex-row items-center gap-[8px] whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60 no-underline transition-colors duration-200 hover:text-foreground"
     >
       <svg viewBox="0 0 24 24" aria-hidden className="block h-[12px] w-[12px] flex-none">
         <path
@@ -281,7 +281,7 @@ function TestimonialCard({ person }: { person: FooterPerson }) {
         </p>
         {/* framer-1pe9chb : rôle (preset 11kvajf, 11px, rgba(11,11,11,.6), aligné droite) */}
         {person.role ? (
-          <p className="h-auto w-full whitespace-pre-wrap break-words text-right text-[11px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-[rgba(11,11,11,0.6)]">
+          <p className="h-auto w-full whitespace-pre-wrap break-words text-right text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-[rgba(11,11,11,0.6)]">
             {person.role}
           </p>
         ) : null}
@@ -368,7 +368,7 @@ export async function Footer() {
     " desktop:text-[20px]";
   // Petit label de section (preset 11kvajf 11px, blanc 60 %, uppercase).
   const sectionLabelCls =
-    "relative h-auto w-auto whitespace-pre text-[11px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60";
+    "relative h-auto w-auto whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60";
 
   return (
     <Reveal
@@ -477,7 +477,7 @@ export async function Footer() {
                   62 px au seul palier fautif — 408 x 62/68 = 372, sous les 381
                   disponibles. `scripts/word-break-audit.mjs` vérifie qu'aucun
                   mot ne se recoupe ailleurs. */}
-              <h2 className="relative m-0 w-full max-w-full whitespace-pre-wrap p-0 text-left text-[52px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] text-foreground tablet:max-w-[390px] desktop:max-w-none tablet:text-[62px] desktop:text-[92px]">
+              <h2 className="relative m-0 w-full max-w-full whitespace-pre-wrap p-0 text-left text-[clamp(40px,13.6vw,52px)] font-semibold uppercase leading-[0.82] tracking-[-0.05em] text-foreground tablet:max-w-[390px] desktop:max-w-none tablet:text-[62px] desktop:text-[92px]">
                 {footerCta?.heading}
               </h2>
               {/* framer-dak6ek : sous-texte (preset wwtw0z 12px, blanc 60 % + emphase blanche) */}
@@ -508,7 +508,10 @@ export async function Footer() {
             source, et le contenu poussé à 61 px du haut au lieu de 60. */}
         <div className="relative flex w-full flex-col gap-[22px] pt-[30px] before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-[rgba(255,255,255,0.1)] before:content-[''] tablet:grid tablet:grid-cols-[repeat(2,minmax(50px,1fr))] tablet:justify-center tablet:gap-0 tablet:pt-[60px]">
           {/* framer-114nzdq "Column" : legal links (order 1 mobile, collés en bas dès tablet) */}
-          <div className="relative order-1 flex w-full flex-col items-start justify-end overflow-visible tablet:order-none tablet:h-full">
+          {/* `pb-[70px]` sous 810 : cette rangée finit la page, et le bouton de
+              navigation flottante (50 px, à 20 px du bas) recouvrait
+              « Confidentialité » en fin de défilement. */}
+          <div className="relative order-1 flex w-full flex-col items-start justify-end overflow-visible pb-[70px] tablet:order-none tablet:h-full tablet:pb-0">
             {/* framer-mqix49 "Legal Links" (gap 32) */}
             <div className="relative flex w-min flex-row items-center gap-[32px] overflow-visible">
               {/* FORME COURTE ICI, et ici seulement. Les trois liens légaux
@@ -522,7 +525,7 @@ export async function Footer() {
               {legalLinks.map((l) => (
                 <p
                   key={l.href}
-                  className="relative h-auto w-auto whitespace-pre text-[11px] font-medium uppercase leading-[1.2] tracking-[-0.01em]"
+                  className="relative h-auto w-auto whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em]"
                 >
                   <HoverPrefetchLink
                     href={l.href}
@@ -609,7 +612,7 @@ export async function Footer() {
                       {contact.hours.map((h) => (
                         <p
                           key={h}
-                          className="relative h-auto w-auto whitespace-pre text-[11px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground-60"
+                          className="relative h-auto w-auto whitespace-pre text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground-60"
                         >
                           {h}
                         </p>
@@ -637,7 +640,7 @@ export async function Footer() {
                 {/* `uppercase` : le live rend « © 2026 LA MARQUE D'ORIGINE. ALL RIGHTS
                     RESERVED. » en capitales (`text-transform: uppercase`). Sans
                     lui la casse de la donnée passait telle quelle. */}
-                <p className="h-auto w-full max-w-[90%] whitespace-pre-wrap break-words text-[11px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60">
+                <p className="h-auto w-full max-w-[90%] whitespace-pre-wrap break-words text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60">
                   {copyrightLong}
                 </p>
               </div>
@@ -658,7 +661,7 @@ export async function Footer() {
                   className="group relative flex min-h-[24px] w-min flex-row items-center gap-[8px] overflow-hidden no-underline"
                 >
                   <BuiltWithMark />
-                  <span className="relative h-auto w-auto whitespace-pre text-[11px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground">
+                  <span className="relative h-auto w-auto whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground">
                     {/* Motif `.framer-xh8ae` : 18 px vers le BAS et AUCUN
                         fondu. Relevé rAF sur `/live-proxy` : les deux copies
                         restent à `opacity: 1` sur toute la course, seul le cadre
@@ -692,7 +695,7 @@ export async function Footer() {
                     : {})}
                   className="group relative flex w-min flex-row items-center gap-[8px] overflow-hidden no-underline"
                 >
-                  <span className="relative h-auto w-auto whitespace-pre text-[11px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60">
+                  <span className="relative h-auto w-auto whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60">
                     {credits?.createdByLabel}
                   </span>
                   {/* PERMUTATION ANIMÉE portrait → pastille, au survol du lien.
@@ -732,7 +735,7 @@ export async function Footer() {
                       <CreatedByLogo />
                     </span>
                   </span>
-                  <span className="relative h-auto w-auto whitespace-pre text-[11px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground">
+                  <span className="relative h-auto w-auto whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground">
                     {credits?.createdBy?.label}
                   </span>
                 </a>

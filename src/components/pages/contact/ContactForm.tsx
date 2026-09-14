@@ -106,7 +106,7 @@ function FormField({
   return (
     <FieldReveal delay={delay}>
       <label htmlFor={id} className="flex w-full flex-col items-end gap-[10px]">
-        <span className="text-right text-[11px] font-medium leading-[1.2] tracking-[-0.01em] text-background/60">
+        <span className="text-right text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-background/60">
           {label} *
         </span>
         <input
@@ -205,7 +205,7 @@ export function ContactForm({
           htmlFor="projectType"
           className="flex w-full flex-col items-end gap-[10px]"
         >
-          <span className="text-right text-[11px] font-medium leading-[1.2] tracking-[-0.01em] text-background/60">
+          <span className="text-right text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-background/60">
             {form.projectType.label}
           </span>
           <span className="relative block w-full">
@@ -265,7 +265,7 @@ export function ContactForm({
           htmlFor="message"
           className="flex w-full flex-col items-end gap-[10px]"
         >
-          <span className="text-right text-[11px] font-medium leading-[1.2] tracking-[-0.01em] text-background/60">
+          <span className="text-right text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-background/60">
             {form.message.label}
           </span>
           <textarea

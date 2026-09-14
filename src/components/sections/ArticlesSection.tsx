@@ -76,9 +76,14 @@ function SeeMoreButton({ cta }: { cta?: { label: string; href: string } }) {
  * home contre 64px sur `/about` entre 810 et 1199. Les deux littéraux sont
  * écrits ici pour que Tailwind les génère.
  */
+/*
+ * PLAFONNÉS ET NON FIXES depuis le 2026-09-14 : « NOUVEAUTÉS. » débordait de
+ * 53 px à 810 sur la home (68 px) et de 27 px sur `/a-propos` (64 px), rogné par
+ * le masque de ligne. Le corps suit la largeur jusqu'au repère de la source.
+ */
 const HEADING_TABLET = {
-  68: "tablet:text-[68px]",
-  64: "tablet:text-[64px]",
+  68: "tablet:text-[clamp(52px,7.2vw,68px)]",
+  64: "tablet:text-[clamp(52px,7.2vw,64px)]",
 } as const;
 
 export type ArticlesHeadingTabletPx = keyof typeof HEADING_TABLET;
@@ -113,7 +118,7 @@ function Heading({
       <LineReveal
         as="h2"
         lines={[...lines]}
-        className={`relative m-0 flex w-full flex-col justify-center p-0 text-left text-[52px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] text-background desktop:text-[92px] ${HEADING_TABLET[tabletPx]}`}
+        className={`relative m-0 flex w-full flex-col justify-center p-0 text-left text-[clamp(40px,13.6vw,52px)] font-semibold uppercase leading-[0.82] tracking-[-0.05em] text-background desktop:text-[92px] ${HEADING_TABLET[tabletPx]}`}
         lineClassName={lineClass}
       />
     </div>

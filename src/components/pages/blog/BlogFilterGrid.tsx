@@ -140,7 +140,7 @@ function BlogIndexCard({ post }: { post: BlogPost }) {
               {/* Rôle de l'auteur : MESURÉ sur le live en 11 px et SANS capitales
                   (« Lead Developer », `text-transform: none`, largeur 79 px). La
                   version précédente forçait 10 px en capitales (86 px). */}
-              <p className="text-[11px] font-medium leading-[1.2] tracking-[-0.01em] text-white/60">
+              <p className="text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-white/60">
                 {post.author.role}
               </p>
             </div>

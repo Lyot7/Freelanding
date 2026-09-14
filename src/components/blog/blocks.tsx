@@ -33,7 +33,7 @@ const CORPS =
 
 /** Légende : plus petite, en capitales, comme les métadonnées de la page. */
 const LEGENDE =
-  "mt-[10px] text-[11px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/60";
+  "mt-[10px] text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/60";
 
 /**
  * Image légendée. LE bloc le plus utilisé, et le seul moyen de poser une image

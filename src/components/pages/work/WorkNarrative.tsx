@@ -98,7 +98,11 @@ function FactRow({
   children: React.ReactNode;
 }) {
   return (
-    <div className="relative flex items-center justify-between overflow-clip py-[18px] after:pointer-events-none after:absolute after:inset-0 after:border-t after:border-black/10 after:content-['']">
+    // `flex-wrap` et `pre` levé sous 810 : à 320-375, « DÉVELOPPEMENT » et
+    // « PÉRIMÈTRE DE LA MISSION » sortaient rognés de 11 à 51 px. La valeur
+    // passe à la ligne au lieu d'être coupée ; le contrat de 50,4 px de la
+    // source reste tenu à partir de 810.
+    <div className="relative flex flex-wrap items-center justify-between gap-x-[12px] gap-y-[4px] overflow-clip py-[18px] tablet:flex-nowrap after:pointer-events-none after:absolute after:inset-0 after:border-t after:border-black/10 after:content-['']">
       {/* `whitespace-pre` des deux côtés : le préréglage de texte de la source
           est en `white-space: pre`, c'est pour ça que la ligne mesure 50,40625
           aux 18 largeurs sans jamais se replier, et que le débordement est
@@ -106,8 +110,8 @@ function FactRow({
           work » de `/work/nomad-stays` dépassait de 0,1px (96,3 + 183,8 pour
           280 de large), repliait ses DEUX colonnes et prenait 64,78 au lieu de
           50,39, soit les +16 que la page traînait à cette seule largeur. */}
-      <dt className={`${LABEL} whitespace-pre`}>{label}</dt>
-      <dd className="m-0 whitespace-pre text-right text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background">
+      <dt className={`${LABEL} tablet:whitespace-pre`}>{label}</dt>
+      <dd className="m-0 ml-auto text-right tablet:whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background">
         {children}
       </dd>
     </div>

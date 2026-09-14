@@ -220,7 +220,7 @@ function PackCard({
           (misEnAvant ? "text-background/70" : "text-white/60")
         }
       >
-        <span className="text-[11px] font-semibold uppercase leading-[1.2] tracking-[0.02em]">
+        <span className="text-[12px] font-semibold uppercase leading-[1.2] tracking-[0.02em]">
           {servicePageLabels.pourQui}
         </span>
         <p className="text-[13px] font-medium leading-[1.4] tracking-[-0.01em]">

@@ -162,7 +162,7 @@ export function WorkTestimonial({
                 {testimonial.author.name}
               </p>
               {testimonial.author.role ? (
-                <p className="mt-[5px] text-[11px] leading-[1.2] tracking-[-0.01em] text-white/60">
+                <p className="mt-[5px] text-[12px] leading-[1.2] tracking-[-0.01em] text-white/60">
                   {testimonial.author.role}
                 </p>
               ) : null}

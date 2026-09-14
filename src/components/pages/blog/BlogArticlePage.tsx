@@ -124,7 +124,7 @@ function RelatedArticle({ post }: { post: BlogPost }) {
               <p className="text-[14px] font-medium leading-[1.3] tracking-[-0.01em]">
                 {post.author.name}
               </p>
-              <p className="text-[11px] font-medium leading-[1.2] tracking-[-0.01em] text-white/60">
+              <p className="text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-white/60">
                 {post.author.role}
               </p>
             </div>
@@ -283,7 +283,7 @@ export function BlogArticlePage({
                 </p>
                 {/* Opacités EFFECTIVES relevées sur la source : le rôle est à
                     70 % et la marque à 100 %. Les deux étaient à 60 % ici. */}
-                <p className="text-[11px] leading-[1.2] tracking-[-0.01em] text-white/70">
+                <p className="text-[12px] leading-[1.2] tracking-[-0.01em] text-white/70">
                   {post.author.role}
                 </p>
                 <p className="text-[13px] leading-[1.2] tracking-[-0.01em] text-white">

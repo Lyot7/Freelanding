@@ -199,7 +199,7 @@ function TeamCard({ member }: { member: TeamMember }) {
         <h3 className="text-[14px] font-medium leading-[1.3] tracking-[-0.01em] text-background">
           {member.name}
         </h3>
-        <p className="text-[11px] font-medium leading-[1.2] tracking-[-0.01em] text-black/60">
+        <p className="text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-black/60">
           {member.role}
           {member.company ? (
             <>
@@ -265,7 +265,7 @@ function AboutStory({ about }: { about: AboutContent }) {
               as="p"
               // 22 / 26 / 32 px. La chasse mobile est plus serrée (-0,02em) que
               // celle des paliers supérieurs (-0,01em) sur la source.
-              className="w-full max-w-[900px] pb-[16px] text-[22px] font-medium leading-[1.1] tracking-[-0.02em] tablet:pb-[40px] tablet:text-[26px] tablet:tracking-[-0.01em] desktop:text-[32px]"
+              className="w-full max-w-[900px] pb-[16px] text-[22px] font-medium leading-[1.2] tracking-[-0.02em] tablet:pb-[40px] tablet:leading-[1.1] tablet:text-[26px] tablet:tracking-[-0.01em] desktop:text-[32px]"
               initialOpacity={0}
               initialY={30}
               duration={0.75}
@@ -552,7 +552,7 @@ function AboutParcours({
                             {etape.structure}
                           </p>
                         )}
-                        <span className="rounded-[50px] border border-black/20 px-[10px] py-[4px] text-[11px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/60">
+                        <span className="rounded-[50px] border border-black/20 px-[10px] py-[4px] text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/60">
                           {etape.nature}
                         </span>
                       </div>

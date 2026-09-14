@@ -39,7 +39,7 @@ export function ConsentPreferencesLink() {
   if (!mesureConfiguree) return null;
 
   return (
-    <p className="relative h-auto w-auto whitespace-pre text-[11px] font-medium uppercase leading-[1.2] tracking-[-0.01em]">
+    <p className="relative h-auto w-auto whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em]">
       <button
         type="button"
         data-consent-open=""
