@@ -118,9 +118,6 @@ export const uiLabels: UiLabels = {
 
   services: {
     priceLabel: "Prix :",
-    toggleShowLabel: "Afficher",
-    toggleHideLabel: "Masquer",
-    toggleSuffix: " le détail",
     /*
      * AUCUN MONTANT DANS CE LIBELLÉ, jamais, et c'est une contrainte d'Eliott
      * avant d'être un choix de mise en page. « Rendez-vous à 3 000 € » se lit

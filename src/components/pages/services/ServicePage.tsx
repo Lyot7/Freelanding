@@ -319,6 +319,8 @@ export function ServicePage({
               <FilAriane prestation={prestation} />
             </div>
             <Reveal
+              trigger="appear"
+              appearId="service-hero-titre"
               initialOpacity={0.001}
               initialY={80}
               duration={1.2}

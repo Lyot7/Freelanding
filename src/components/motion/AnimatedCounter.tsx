@@ -113,12 +113,11 @@ export function AnimatedCounter({
   ]);
 
   return (
-    <span
-      ref={rootRef}
-      className={className}
-      aria-label={value}
-      data-counter-value={value}
-    >
+    // Valeur finale en texte masqué, et non en `aria-label` : un `span` sans
+    // rôle n'a pas le droit de porter un nom accessible (règle axe
+    // `aria-prohibited-attr`), la plupart des lecteurs d'écran l'ignorent.
+    <span ref={rootRef} className={className} data-counter-value={value}>
+      <span className="sr-only">{value}</span>
       <span aria-hidden>
         {formatCounterValue(displayValue, definition.precision)}
       </span>

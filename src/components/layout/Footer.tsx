@@ -119,7 +119,7 @@ function PreferredSourceLink({ label }: { label: string }) {
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="relative flex w-min flex-row items-center gap-[8px] whitespace-pre text-[11px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60 no-underline transition-colors duration-200 hover:text-foreground"
+      className="relative flex min-h-[24px] w-min flex-row items-center gap-[8px] whitespace-pre text-[11px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60 no-underline transition-colors duration-200 hover:text-foreground"
     >
       <svg viewBox="0 0 24 24" aria-hidden className="block h-[12px] w-[12px] flex-none">
         <path
@@ -653,7 +653,9 @@ export async function Footer() {
                   href={BUILT_WITH_HREF}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group relative flex w-min flex-row items-center gap-[8px] overflow-hidden no-underline"
+                  /* `min-h-[24px]` : cible tactile minimale WCAG 2.5.8, les
+                     deux liens de crédit mesuraient 14 px de haut. */
+                  className="group relative flex min-h-[24px] w-min flex-row items-center gap-[8px] overflow-hidden no-underline"
                 >
                   <BuiltWithMark />
                   <span className="relative h-auto w-auto whitespace-pre text-[11px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground">

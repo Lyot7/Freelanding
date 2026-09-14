@@ -79,7 +79,13 @@ export function WorkHero({ hero }: { hero: HeroContent }) {
         <div className="flex w-full flex-col tablet:flex-row tablet:items-start tablet:justify-center">
           <div aria-hidden className="hidden tablet:block tablet:w-px tablet:flex-[1_0_0]" />
           <div className={HALF}>
-            <Reveal initialOpacity={0.001} initialY={36} duration={0.8}>
+            <Reveal
+              trigger="appear"
+              appearId="realisations-hero-titre"
+              initialOpacity={0.001}
+              initialY={36}
+              duration={0.8}
+            >
               <h1 className="m-0 text-[63px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] tablet:text-[78px] desktop:text-[98px]">
                 {hero.title}
               </h1>
@@ -93,6 +99,8 @@ export function WorkHero({ hero }: { hero: HeroContent }) {
           <div className="flex w-full flex-col tablet:flex-row tablet:items-start tablet:justify-center">
             <div className={`flex ${HALF} tablet:justify-end`}>
               <Reveal
+                trigger="appear"
+                appearId="realisations-hero-chapo"
                 className="flex w-full max-w-[330px] flex-col text-left tablet:text-right"
                 initialOpacity={0.001}
                 initialY={16}

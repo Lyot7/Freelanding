@@ -247,6 +247,11 @@ export function LineReveal({
           >
             {line}
           </motion.span>
+          {/* Espace HORS du bloc animé : elle tombe en fin de ligne, où une
+              espace se replie et ne décale rien, mais elle sépare les mots
+              dans le nom accessible. Sans elle, un lecteur d'écran annonçait
+              « Quije suis. » ou « Actualités etnouveautés. ». */}
+          {" "}
         </span>
       ))}
     </Container>

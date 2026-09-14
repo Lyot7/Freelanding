@@ -37,7 +37,7 @@ export async function NotFoundView() {
       {/* Cible du lien d'évitement (voir SkipLink.tsx et focus.css). */}
       <main id="main-content" tabIndex={-1}>
         <section className="relative flex min-h-[900px] items-end overflow-hidden bg-background px-[20px] pb-[46px] pt-[150px] text-foreground tablet:px-[24px] desktop:px-[30px]">
-          <span className="pointer-events-none absolute inset-0 bg-[url('/images/grain.png')] bg-repeat opacity-[0.08] [background-size:256px_256px]" />
+          <span className="pointer-events-none absolute inset-0 bg-[url('/images/grain.webp')] bg-repeat opacity-[0.08] [background-size:256px_256px]" />
           <span className="absolute inset-y-0 left-1/2 w-px bg-white/10" />
           <div className="relative mx-auto grid w-full max-w-[1440px] gap-[46px] tablet:grid-cols-2 tablet:items-end">
             <div className="flex flex-col items-start gap-[64px] tablet:items-end">

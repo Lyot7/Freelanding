@@ -55,6 +55,8 @@ export function LegalPageView({
               deux à TROIS lignes (192 px de haut au lieu de 128). */}
           <div className="relative z-[2] mx-auto grid w-full max-w-[1440px] gap-[20px] tablet:grid-cols-2 tablet:gap-x-0 tablet:gap-y-[30px]">
             <Reveal
+              trigger="appear"
+              appearId="legal-hero-titre"
               initialOpacity={0.001}
               initialY={80}
               duration={1.2}

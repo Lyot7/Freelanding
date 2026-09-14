@@ -86,7 +86,7 @@ function Counter({ stat, speedMs }: { stat: Stat; speedMs: number }) {
       <Reveal
         as="p"
         data-part="counter-label"
-        className="h-auto w-full max-w-[160px] text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-accent-ink/70 [text-wrap:balance]"
+        className="h-auto w-full max-w-[160px] text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-accent-ink/80 [text-wrap:balance]"
         initialOpacity={0.001}
         duration={0.8}
         delay={0.15}
@@ -130,7 +130,9 @@ function Testimonial({ testimonial }: { testimonial: TestimonialContent }) {
     // framer-19tf8ze : Quote Stack
     <div className="relative flex w-full flex-col items-start gap-[20px] overflow-hidden tablet:gap-[30px]">
       {/* framer-n1faye : description (preset wwtw0z, uppercase 12px, blanc 60%) */}
-      <p className="h-auto w-full max-w-[340px] whitespace-pre-wrap break-words text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-accent-ink/60">
+      {/* Encre à 80 % et non 60 : sur l'aplat accent, 60 % tombait sous le
+          contraste AA de 4,5:1 pour du 12 px (relevé Lighthouse). */}
+      <p className="h-auto w-full max-w-[340px] whitespace-pre-wrap break-words text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-accent-ink/80">
         {/* Les fragments en emphase viennent de la DONNÉE (`Testimonial.highlights`).
             Ils étaient recopiés en dur, en anglais : l'emphase disparaissait dès
             que la citation passait au français. */}

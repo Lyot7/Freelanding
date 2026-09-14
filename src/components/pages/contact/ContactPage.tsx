@@ -87,9 +87,14 @@ function ContactHero({
           sienne (770). */}
       <div className="relative z-[3] flex w-full max-w-[1440px] flex-col items-end gap-[30px] tablet:gap-[70px]">
         <div className="flex w-full flex-col items-end gap-[20px] tablet:gap-[30px]">
+          {/* `appear` sur les trois blocs du hero : le H1 est l'élément LCP, et
+              déclenché par l'observateur il attendait l'hydratation (4,6 s
+              mesurés sur mobile bridé). Voir le hero de `AboutPage`. */}
           <Reveal
+            trigger="appear"
+            appearId="contact-hero-titre"
             className="grid w-full grid-cols-1 tablet:grid-cols-2"
-            initialOpacity={0}
+            initialOpacity={0.001}
             initialY={48}
             duration={0.9}
             delay={0.12}
@@ -112,7 +117,9 @@ function ContactHero({
                 // `self-start` : sur le live la boîte fait la hauteur du texte,
                 // ici le grid l'étirait à 167 px.
                 className="max-w-[280px] self-start text-left text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60 tablet:text-right"
-                initialOpacity={0}
+                trigger="appear"
+                appearId="contact-hero-chapo"
+                initialOpacity={0.001}
                 initialY={28}
                 duration={0.8}
                 delay={0.24}
@@ -135,7 +142,9 @@ function ContactHero({
             // compensaient à l'aveugle la jauge de disponibilité restée sur une
             // ligne — voir le commentaire de l'écart de colonne plus haut.
             className="relative flex w-fit items-end gap-[20px] self-start pt-[20px] tablet:w-1/2 tablet:gap-[30px] tablet:self-end tablet:pt-0"
-            initialOpacity={0}
+            trigger="appear"
+            appearId="contact-hero-personne"
+            initialOpacity={0.001}
             initialY={32}
             duration={0.8}
             delay={0.32}

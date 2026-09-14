@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { ArticlesSection } from "@/components/sections/ArticlesSection";
 import { LogoBandSection } from "@/components/sections/LogoBandSection";
 import { ServicesSection } from "@/components/sections/ServicesSection";
@@ -23,11 +24,14 @@ import type {
 
 /*
  * FOND DU HERO. Il n'a pas de champ dans le modèle de contenu, contrairement à
- * `about.cover` : il reste donc une constante, mais elle pointe désormais sur
- * une image du mécanisme d'horlogerie extraite de notre propre boucle
- * (`public/videos/hero-loop.mp4`) plutôt que sur la photo du template.
+ * `about.cover` : il reste donc une constante.
+ *
+ * PORTRAIT D'ELIOTT depuis le 2026-09-14, à la place du mécanisme d'horlogerie.
+ * La page répond à « qui je suis » : un engrenage n'y disait rien. Le cadrage
+ * paysage garde le visage lisible en 90svh, et en mobile le recadrage centré
+ * le conserve.
  */
-const HERO_IMAGE = "/images/mecanisme-large.jpg";
+const HERO_IMAGE = "/images/eliott-nature-paysage.jpg";
 const COUNTER_SPEEDS = [10, 12, 40, 10] as const;
 
 function AboutHero({ about }: { about: AboutContent }) {
@@ -64,13 +68,17 @@ function AboutHero({ about }: { about: AboutContent }) {
           sizes="100vw"
           /* `grayscale` fusionné DANS le `filter` : posés côte à côte, les
              deux écrivent la même propriété et l'utilitaire arbitraire gagne,
-             donc le `grayscale` ne s'appliquait pas. Le fond est une image du
-             mécanisme, quasi neutre (saturation moyenne 5/255), l'écart est
-             invisible — mais c'est la collision qui, sur la couverture de cette
-             même page, faisait sortir le portrait en couleur. */
+             donc le `grayscale` ne s'appliquait pas. La photo est en couleur
+             sur le disque, la page est monochrome. */
           className="absolute inset-0 h-full w-full object-cover object-center [filter:grayscale(1)_brightness(.65)]"
         />
       </ScrollParallax>
+      {/* Voile bas : le titre et le chapô de 12 px sont posés sur le buste,
+          une zone texturée (veste, reflets de l'étang) où ils se lisaient mal. */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[55%] bg-gradient-to-t from-black/80 via-black/35 to-transparent"
+      />
       {/* RELEVÉ sur `/about` : hôte 1440 × 810, z-1, opacité 0,09. */}
       <Grain opacity={0.09} className="z-[1]" />
       <span
@@ -79,9 +87,16 @@ function AboutHero({ about }: { about: AboutContent }) {
       />
 
       <div className="relative z-[3] flex w-full max-w-[1440px] flex-col items-end gap-[20px] tablet:gap-[30px]">
+        {/* `appear` : le titre est l'élément LCP de la page. Déclenché par
+            l'observateur, il attendait l'hydratation (5,6 s mesurés sur mobile
+            bridé) ; démarré à la première peinture, il compte dès le HTML.
+            Opacité de départ 0,001 et non 0 : Chrome ignore un élément à
+            opacité nulle comme candidat LCP. */}
         <Reveal
+          trigger="appear"
+          appearId="about-hero-titre"
           className="grid w-full grid-cols-1 tablet:grid-cols-2"
-          initialOpacity={0}
+          initialOpacity={0.001}
           initialY={48}
           duration={0.9}
           delay={0.12}
@@ -95,8 +110,10 @@ function AboutHero({ about }: { about: AboutContent }) {
 
         {subtitleText ? (
           <Reveal
+            trigger="appear"
+            appearId="about-hero-chapo"
             className="grid w-full grid-cols-1 tablet:grid-cols-2"
-            initialOpacity={0}
+            initialOpacity={0.001}
             initialY={28}
             duration={0.8}
             delay={0.24}
@@ -465,6 +482,100 @@ function AboutStory({ about }: { about: AboutContent }) {
   );
 }
 
+/**
+ * Parcours : expérience puis formation, en lignes datées.
+ *
+ * Même grammaire que les sections sombres du site : deux moitiés séparées par un
+ * filet vertical, grand titre à gauche (collant à partir de 810), contenu à
+ * droite. La colonne « nature » (alternance, stage, diplôme) dit le statut de
+ * chaque ligne par la structure, sans phrase d'explication.
+ */
+function AboutParcours({
+  parcours,
+}: {
+  parcours: NonNullable<AboutContent["parcours"]>;
+}) {
+  return (
+    // FOND CLAIR, dans le prolongement du récit : la section Services qui suit
+    // ouvre sur une encoche claire en haut à gauche, qui raccorde au gris du
+    // bloc précédent. Une section sombre intercalée l'aurait laissée orpheline.
+    <section className="relative flex w-full justify-center bg-muted px-[20px] pb-[50px] pt-[20px] text-background tablet:px-[24px] tablet:pb-[90px] tablet:pt-[40px] desktop:px-[30px] desktop:pb-[120px]">
+      <span
+        aria-hidden
+        className="absolute inset-y-0 left-1/2 hidden w-px bg-black/[0.08] tablet:block"
+      />
+      <div className="relative grid w-full max-w-[1440px] grid-cols-1 gap-[36px] tablet:grid-cols-2 tablet:gap-0">
+        <div className="flex flex-col gap-[12px] tablet:sticky tablet:top-[100px] tablet:items-end tablet:self-start tablet:pr-[30px] desktop:pr-[40px]">
+          <p className="text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/60">
+            {parcours.eyebrow}
+          </p>
+          <LineReveal
+            as="h2"
+            lines={[...parcours.titleLines]}
+            className="m-0 flex w-full flex-col p-0 text-left text-[52px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] tablet:text-right tablet:text-[68px] desktop:text-[92px]"
+            lineClassName="w-full overflow-hidden leading-[0.82]"
+          />
+        </div>
+
+        <div className="flex flex-col gap-[48px] tablet:pl-[30px] desktop:gap-[64px] desktop:pl-[40px]">
+          {parcours.groupes.map((groupe) => (
+            <Reveal
+              key={groupe.titre}
+              className="flex flex-col"
+              initialOpacity={0.001}
+              initialY={30}
+              duration={0.8}
+            >
+              <h3 className="m-0 pb-[14px] text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/60">
+                {groupe.titre}
+              </h3>
+              <ol className="m-0 flex list-none flex-col p-0">
+                {groupe.etapes.map((etape) => (
+                  <li
+                    key={`${etape.structure}-${etape.periode}`}
+                    className="grid grid-cols-1 gap-[8px] border-t border-black/10 py-[18px] tablet:grid-cols-[130px_1fr] tablet:gap-x-[20px] desktop:grid-cols-[180px_1fr] desktop:py-[22px]"
+                  >
+                    <p className="m-0 text-[12px] font-medium uppercase leading-[1.3] tracking-[-0.01em] text-background/60 tablet:pt-[6px]">
+                      {etape.periode}
+                    </p>
+                    <div className="flex min-w-0 flex-col gap-[6px]">
+                      <div className="flex flex-wrap items-center justify-between gap-x-[12px] gap-y-[6px]">
+                        {etape.href ? (
+                          <Link
+                            href={etape.href}
+                            className="text-[20px] font-medium leading-[1.2] tracking-[-0.02em] text-background underline decoration-black/30 underline-offset-[5px] transition-colors duration-200 hover:decoration-background tablet:text-[22px] desktop:text-[26px]"
+                          >
+                            {etape.structure}
+                          </Link>
+                        ) : (
+                          <p className="m-0 text-[20px] font-medium leading-[1.2] tracking-[-0.02em] text-background tablet:text-[22px] desktop:text-[26px]">
+                            {etape.structure}
+                          </p>
+                        )}
+                        <span className="rounded-[50px] border border-black/20 px-[10px] py-[4px] text-[11px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/60">
+                          {etape.nature}
+                        </span>
+                      </div>
+                      <p className="m-0 text-[15px] font-medium leading-[1.35] tracking-[-0.01em] text-background">
+                        {etape.role}
+                      </p>
+                      {etape.lieu ? (
+                        <p className="m-0 text-[12px] font-medium uppercase leading-[1.3] tracking-[-0.01em] text-background/60">
+                          {etape.lieu}
+                        </p>
+                      ) : null}
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function selectArticles(
   posts: BlogPost[],
   featuredSlugs: readonly string[],
@@ -490,6 +601,7 @@ export async function AboutPage() {
       <main id="main-content" tabIndex={-1}>
         <AboutHero about={about} />
         <AboutStory about={about} />
+        {about.parcours ? <AboutParcours parcours={about.parcours} /> : null}
         {/* Pas de barre d'accent orange ici : mesuré absent sur le live pour
             cette page (le seul élément orange y est le bouton « START A PROJECT »). */}
         <ServicesSection

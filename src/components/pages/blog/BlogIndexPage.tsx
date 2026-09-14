@@ -38,6 +38,8 @@ export function BlogIndexPage({
               C'est la structure que `LegalPageView` implémente déjà. */}
           <div className="relative z-[2] mx-auto mb-[170px] grid w-full max-w-[1440px] gap-[20px] tablet:mb-[113px] tablet:grid-cols-2 tablet:gap-x-0 tablet:gap-y-[30px]">
             <Reveal
+              trigger="appear"
+              appearId="blog-hero-titre"
               initialOpacity={0.001}
               initialY={80}
               duration={1.2}

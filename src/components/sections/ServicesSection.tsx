@@ -16,6 +16,7 @@ import { Grain } from "@/components/effects/Grain";
 import { ToggleIcon } from "@/components/ui/ToggleIcon";
 import type { HorsCatalogue, ServiceItem } from "@/lib/content/types";
 import { uiLabels } from "@/content/ui";
+import { urlImageFond } from "@/lib/image-fond";
 
 /**
  * ServicesSection — reconstruction fidèle (CSS Framer → Tailwind responsive) de
@@ -326,7 +327,9 @@ function ServiceRow({
             </span>
           </span>
           {/* framer-1tzzlex : Title (preset htsnb8, 16px, blanc) */}
-          <span className="w-px flex-[1_0_0] whitespace-pre-wrap break-words text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground">
+          <span
+            id={`${panelId}-titre`}
+            className="w-px flex-[1_0_0] whitespace-pre-wrap break-words text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground">
             {service.title}
           </span>
         </button>
@@ -340,23 +343,13 @@ function ServiceRow({
             aria-expanded={open}
             aria-controls={panelId}
             data-analytics-service={service.title}
-            /* CE LIBELLÉ ÉTAIT RESTÉ EN ANGLAIS. Il annonçait « Site et
-               visibilité locale — Show details » à tout lecteur d'écran, sur
-               un site déclaré `lang="fr"`. Il n'apparaissait nulle part à
-               l'écran, et `scripts/hardcoded-text-audit.mjs` ne le voyait pas :
-               son motif d'attributs ne couvrait que `attr="…"`, jamais un
-               gabarit `attr={`…`}`. Le motif a été élargi.
-
-               Les trois fragments viennent maintenant de la donnée
-               (`uiLabels.services`), qui les portait déjà en français sans que
-               personne ne les lise. La virgule remplace le tiret cadratin :
-               un lecteur d'écran le prononce « tiret », et les règles d'Eliott
-               le proscrivent. */
-            aria-label={`${service.title}, ${
-              open
-                ? uiLabels.services.toggleHideLabel
-                : uiLabels.services.toggleShowLabel
-            }${uiLabels.services.toggleSuffix}`}
+            /* NOM = titre de la prestation + fourchette VISIBLE dans le bouton.
+               L'ancien `aria-label` (« Titre, Afficher le détail ») ne
+               contenait pas le texte affiché, ce qui casse la commande vocale
+               (« cliquer sur de 3 000 € ») : règle WCAG 2.5.3, relevée par
+               Lighthouse. L'état ouvert ou fermé est déjà porté par
+               `aria-expanded`. */
+            aria-labelledby={`${panelId}-titre ${panelId}-prix`}
             className={
               btnReset +
               " relative flex w-full flex-row items-center justify-between gap-[10px] overflow-hidden pt-[20px]"
@@ -383,6 +376,7 @@ function ServiceRow({
                 Une fourchette tronquée se lit comme un prix, ce qui est
                 exactement la lecture qu'on veut éviter. */}
             <span
+              id={`${panelId}-prix`}
               className={
                 "relative flex min-w-0 flex-1 flex-col items-start gap-[2px] " +
                 "tablet:w-min tablet:flex-none tablet:flex-row tablet:items-end tablet:gap-[6px]"
@@ -569,7 +563,7 @@ function ServiceRow({
                     <motion.div
                       className="absolute bottom-[-7%] left-0 right-0 top-[-7%] bg-cover bg-center"
                       style={{
-                        backgroundImage: image ? `url(${image})` : undefined,
+                        backgroundImage: image ? `url("${urlImageFond(image)}")` : undefined,
                         ...(imageY ? { y: imageY } : null),
                       }}
                     />

@@ -216,6 +216,8 @@ export function BlogArticlePage({
               médiane. `LegalPageView` fait déjà le 50/50 et le documente. */}
           <div className="relative mx-auto grid w-full max-w-[1440px] gap-[30px] tablet:grid-cols-2 tablet:items-end tablet:gap-x-0">
             <Reveal
+              trigger="appear"
+              appearId="article-hero-titre"
               initialOpacity={0.001}
               initialY={70}
               duration={1.1}

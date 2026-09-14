@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Grain } from "@/components/effects/Grain";
 import { Ticker } from "@/components/ui/Ticker";
 import { uiLabels } from "@/content/ui";
+import { urlImageFond } from "@/lib/image-fond";
 import type { WorkItem } from "@/lib/content/types";
 import {
   getWorkCardMedia,
@@ -160,7 +161,9 @@ function WorkCardMedia({
     return (
       <WorkCardVideo
         src={media.src}
-        poster={media.poster.src}
+        // Affiche servie par l'optimiseur : le fichier fait 1376 px pour une
+        // vignette de 384 à 950 px, 70 Ko partaient pour rien.
+        poster={urlImageFond(media.poster.src, 1080)}
         reducedMotion={reducedMotion}
       />
     );

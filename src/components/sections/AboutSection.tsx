@@ -10,6 +10,7 @@ import {
   Reveal,
 } from "@/components/motion/Reveal";
 import { useParallaxLayerY } from "@/components/motion/ParallaxImage";
+import { urlImageFond } from "@/lib/image-fond";
 import { Grain } from "@/components/effects/Grain";
 import { Highlighted } from "@/components/ui";
 import { facteurDeChasse } from "@/lib/ajustement-titre";
@@ -313,7 +314,7 @@ function AboutImage({ src }: { src?: string }) {
                copie, que le remplacement du visuel aurait laissée derrière lui
                sans que rien ne le signale. */
             style={{
-              backgroundImage: src ? `url(${src})` : undefined,
+              backgroundImage: src ? `url("${urlImageFond(src, 1080)}")` : undefined,
               ...(parallaxY ? { y: parallaxY } : null),
             }}
           />

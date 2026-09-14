@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type RefObject } from "react";
+import { preload } from "react-dom";
 import { motion } from "motion/react";
 import type { HeroContent, SiteConfig } from "@/lib/content/types";
 import {
@@ -636,6 +637,11 @@ function HeroGlass({ height }: { height: number | null }) {
 export function HeroSection({ hero, site }: { hero: HeroContent; site: SiteConfig }) {
   const media = hero.media;
   const hasVideo = media?.kind === "video" && Boolean(media.src);
+  // L'affiche est l'élément LCP du mobile : préchargée en priorité haute, elle
+  // part avec le HTML au lieu d'attendre que le navigateur découvre la vidéo.
+  if (hasVideo && media?.poster) {
+    preload(media.poster, { as: "image", fetchPriority: "high" });
+  }
   // La boîte encadrée commande la hauteur du verre posé derrière elle.
   const boxRef = useRef<HTMLDivElement>(null);
   const boxHeight = useBoxHeight(boxRef);

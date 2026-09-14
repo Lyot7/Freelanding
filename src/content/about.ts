@@ -154,6 +154,69 @@ export const aboutContent: AboutContent = {
   // « Seul par choix… » suffisent à porter la section.
   team: [],
   stats: aboutStats,
+  /* PARCOURS, ajouté le 2026-09-14. Source : profil LinkedIn, CV et Malt,
+     relevés le 2026-08-29 (fiche profil du vault). Würth est un STAGE de
+     quatre mois en 2024, jamais une alternance : le site l'a déjà publié faux.
+     La nature de chaque ligne est une colonne à part entière, ce qui distingue
+     employeur et client sans phrase défensive. */
+  parcours: {
+    eyebrow: "Expérience et formation",
+    titleLines: ["Mon", "parcours."],
+    groupes: [
+      {
+        titre: "Expérience",
+        etapes: [
+          {
+            periode: "Depuis juil. 2026",
+            structure: "Indépendant",
+            lieu: "Normandie, et à distance",
+            role: "Développeur full-stack : sites, outils métier, logiciels",
+            nature: "Freelance",
+          },
+          {
+            periode: "Sept. 2025 à juil. 2026",
+            structure: "MECA SERVICES",
+            lieu: "Carantilly",
+            role: "Développeur full-stack, responsable e-commerce",
+            nature: "Alternance",
+          },
+          {
+            periode: "Sept. 2024 à mai 2025",
+            structure: "MeilleursBiens",
+            lieu: "Courbevoie",
+            role: "Développeur web front-end",
+            nature: "Alternance",
+          },
+          {
+            periode: "Mars à juin 2024",
+            structure: "Würth France",
+            lieu: "Erstein",
+            role: "Développeur web front-end",
+            nature: "Stage",
+            href: "/realisations/wurth-creation-de-compte",
+          },
+          {
+            periode: "Avr. à juin 2023",
+            structure: "Mediapilote",
+            lieu: "Caen",
+            role: "Intégration WordPress",
+            nature: "Stage",
+          },
+        ],
+      },
+      {
+        titre: "Formation",
+        etapes: [
+          {
+            periode: "Juil. 2026",
+            structure: "MyDigitalSchool",
+            role: "MBA Développeur Full-Stack",
+            nature: "Diplôme",
+          },
+        ],
+      },
+    ],
+  },
   services: {
     eyebrow: "Services",
     // IDENTIQUE à `homeContent.services.intro` (même section, deux pages).

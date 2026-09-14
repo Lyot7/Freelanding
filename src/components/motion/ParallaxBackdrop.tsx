@@ -8,6 +8,7 @@ import {
   MEDIA_REVEAL_FROM,
   MEDIA_REVEAL_TRANSITION,
 } from "@/components/motion/mediaReveal";
+import { urlImageFond } from "@/lib/image-fond";
 
 /**
  * Calque dérivant à IMAGE DE FOND, tel que la source le pose.
@@ -67,7 +68,7 @@ export function ParallaxBackdrop({
       style={{
         top: edge,
         bottom: edge,
-        backgroundImage: `url(${src})`,
+        backgroundImage: `url("${urlImageFond(src, 1080)}")`,
         ...(y ? { y } : null),
       }}
     />

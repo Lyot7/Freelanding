@@ -114,6 +114,9 @@ export const homeContent: HomeContent = {
     media: {
       kind: "video",
       src: "/videos/hero-loop.mp4",
+      // Première image de la boucle, 14 Ko. Sans affiche, l'élément LCP du
+      // mobile était la vidéo elle-même, peinte à 8,8 s sur réseau bridé.
+      poster: "/videos/hero-loop-poster.webp",
     },
     // Mot posé à droite du logotype dans la source. Le hero reconstruit affiche
     // « Eliott » en dur : ce champ n'est plus lu par le rendu.

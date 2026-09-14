@@ -740,7 +740,32 @@ export interface HomeContent {
   sectionOrder: string[];
 }
 
+/** Une ligne du parcours : poste, stage ou diplôme. */
+export interface ParcoursEtape {
+  /** « Sept. 2025 à juil. 2026 ». */
+  periode: string;
+  /** Entreprise ou école. */
+  structure: string;
+  lieu?: string;
+  role: string;
+  /** Alternance, stage, freelance, diplôme. */
+  nature: string;
+  /** Étude de cas liée, quand elle existe. */
+  href?: string;
+}
+
+export interface ParcoursGroupe {
+  titre: string;
+  etapes: readonly ParcoursEtape[];
+}
+
 export interface AboutContent {
+  /** Expérience et formation. Section absente si le champ l'est. */
+  parcours?: {
+    eyebrow: string;
+    titleLines: readonly string[];
+    groupes: readonly ParcoursGroupe[];
+  };
   hero: HeroContent;
   body: string[];
   /** Fragments des paragraphes du récit rendus en blanc plein. */
@@ -920,9 +945,6 @@ export interface UiLabels {
   /** Accordéon des prestations. */
   services: {
     priceLabel: string; // « Prix : » — le préfixe vient du prix lui-même
-    toggleShowLabel: string; // « Show »
-    toggleHideLabel: string; // « Hide »
-    toggleSuffix: string; // « details »
     /**
      * Bouton de prise de rendez-vous, IDENTIQUE sur les cinq lignes.
      *

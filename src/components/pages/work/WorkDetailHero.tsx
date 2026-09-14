@@ -101,6 +101,8 @@ export function WorkDetailHero({ work }: { work: WorkItem }) {
       <div className="relative z-[1] mx-auto grid w-full max-w-[1440px] grid-cols-1 tablet:grid-cols-12 tablet:gap-x-[4px]">
         <div className="tablet:col-start-7 tablet:col-end-12">
           <Reveal
+            trigger="appear"
+            appearId="projet-hero-titre"
             initialOpacity={0.001}
             initialY={32}
             duration={0.8}
@@ -117,6 +119,8 @@ export function WorkDetailHero({ work }: { work: WorkItem }) {
           {work.excerpt ? (
             <Reveal
               as="p"
+              trigger="appear"
+              appearId="projet-hero-chapo"
               initialOpacity={0.001}
               initialY={14}
               delay={0.12}

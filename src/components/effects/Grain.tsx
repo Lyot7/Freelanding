@@ -5,7 +5,9 @@ import { useEffect, useRef } from "react";
 // Texture generee par nos soins (bruit gaussien 256x256, graine fixe). Le
 // fichier du template faisait le meme travail, mais sa licence n'etait pas
 // tracable et du bruit aleatoire ne merite pas qu'on la cherche.
-const TEXTURE = "/images/grain.png";
+// WebP qualité 75 : 29 Ko au lieu des 92 du PNG, écart invisible à l'opacité
+// de 0,05 à 0,1 où le calque est posé.
+const TEXTURE = "/images/grain.webp";
 
 /**
  * SEUL calque de grain du site. Il n'existe AUCUN grain global : la source pose

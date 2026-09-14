@@ -4,6 +4,13 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /**
+   * AVIF D'ABORD, WebP en repli. Par défaut l'optimiseur ne sert que du WebP ;
+   * l'AVIF pèse 20 à 30 % de moins sur les photos du site. Le premier encodage
+   * est plus lent, puis la variante est mise en cache.
+   */
+  images: { formats: ["image/avif", "image/webp"] },
+
+  /**
    * `.mdx` reconnu comme extension de page.
    *
    * Les ARTICLES ne vivent pas dans `src/app/` mais dans `content/blog/` : ils
