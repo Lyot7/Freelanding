@@ -35,12 +35,25 @@ function SearchIcon() {
   );
 }
 
-function BlogIndexCard({ post }: { post: BlogPost }) {
+function BlogIndexCard({
+  post,
+  prioritaire = false,
+}: {
+  post: BlogPost;
+  /**
+   * Première carte : c'est l'élément LCP du listing en mobile. Sans apparition
+   * différée (elle attendait l'observateur, donc l'hydratation) et avec une
+   * image préchargée en priorité haute au lieu du `loading="lazy"` par défaut.
+   */
+  prioritaire?: boolean;
+}) {
   const coverFrame = useRef<HTMLDivElement>(null);
   // 0.06 : la source pose ces calques en `top:-6%; height:calc(100% + 12%)`.
   const coverY = useParallaxLayerY(coverFrame, 0.06);
   const { reveal } = useReveal();
-  const appear = reveal(MEDIA_REVEAL_FROM, MEDIA_REVEAL_TRANSITION);
+  const appear = prioritaire
+    ? {}
+    : reveal(MEDIA_REVEAL_FROM, MEDIA_REVEAL_TRANSITION);
   return (
     <Link
       href={`/blog/${post.slug}`}
@@ -80,6 +93,8 @@ function BlogIndexCard({ post }: { post: BlogPost }) {
         src={post.cover.src}
         alt={post.cover.alt}
         fill
+        preload={prioritaire}
+        fetchPriority={prioritaire ? "high" : undefined}
         sizes="(min-width: 810px) 50vw, 100vw"
         // La couverture est affichée sur TOUTES les cartes. Une version
         // antérieure la masquait à partir de l'index 2 (`index >= 2 → "hidden"`),
@@ -242,8 +257,8 @@ export function BlogFilterGrid({
           projet. Mesuré : `padding-bottom` valait 0. */}
       <div className="px-[4px] pb-[80px] pt-[4px] tablet:px-[24px] tablet:pb-[120px] desktop:px-[30px]">
         <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-[4px] tablet:grid-cols-2">
-          {filteredPosts.map((post) => (
-            <BlogIndexCard key={post.slug} post={post} />
+          {filteredPosts.map((post, index) => (
+            <BlogIndexCard key={post.slug} post={post} prioritaire={index === 0} />
           ))}
         </div>
         {filteredPosts.length === 0 ? (

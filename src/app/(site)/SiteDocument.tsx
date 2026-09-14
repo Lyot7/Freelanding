@@ -93,21 +93,15 @@ export function SiteDocument({ children }: Readonly<{ children: ReactNode }>) {
         <noscript>
           <style>{`[data-reveal]{opacity:1!important;transform:none!important}`}</style>
         </noscript>
-        {/* Les deux fichiers de police du premier écran, préchargés. Découverts
-            seulement après la feuille de style, ils arrivaient après la
-            première peinture et le texte se recomposait : décalage de mise en
-            page de 0,205 relevé sur l'accueil desktop. Le premier sert les
-            graisses 400 et 600 en latin, le second la graisse 500. */}
+        {/* LA police du premier écran, préchargée. Découverte seulement après
+            la feuille de style, elle arrivait après la première peinture et le
+            texte se recomposait : décalage de mise en page de 0,205 relevé sur
+            l'accueil desktop. Ce fichier est VARIABLE (graisses 100 à 900) : il
+            sert à lui seul 400, 500, 600 et 700 en latin, voir la surcharge
+            en tête de `globals.css`. */}
         <link
           rel="preload"
           href="/fonts.gstatic.com/s/geist/v5/gyByhwUxId8gMEwcGFU.woff2"
-          as="font"
-          type="font/woff2"
-          crossOrigin="anonymous"
-        />
-        <link
-          rel="preload"
-          href="/fonts.gstatic.com/s/geist/v4/gyBhhwUxId8gMGYQMKR3pzfaWI_RruM4mJPby1QNtA.woff2"
           as="font"
           type="font/woff2"
           crossOrigin="anonymous"

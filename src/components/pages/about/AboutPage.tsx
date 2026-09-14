@@ -65,6 +65,7 @@ function AboutHero({ about }: { about: AboutContent }) {
           alt=""
           fill
           preload
+          fetchPriority="high"
           sizes="100vw"
           /* `grayscale` fusionné DANS le `filter` : posés côte à côte, les
              deux écrivent la même propriété et l'utilitaire arbitraire gagne,

@@ -22,6 +22,14 @@ const nextConfig: NextConfig = {
 
   experimental: {
     /**
+     * CSS INLINE dans le `<head>`. La feuille Tailwind (17 Kio) était la seule
+     * requête bloquant le rendu : 450 ms relevés par PageSpeed sur mobile en 4G
+     * lente. Le site est en CSS atomique, donc la feuille reste petite, et la
+     * majorité des visites arrivent de l'extérieur sans cache. Ne fonctionne
+     * qu'en build de production.
+     */
+    inlineCss: true,
+    /**
      * `src/app/` n'a pas de `layout.tsx` à la racine — le layout du site vit
      * dans le groupe `(site)` —, donc pas de layout dans lequel composer un 404
      * global. (Le second layout racine, celui de l'admin Payload, a disparu

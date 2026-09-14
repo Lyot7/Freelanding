@@ -3,6 +3,17 @@
 /* @font-face copiés du live (générés par scripts/extract-fonts.mjs). */
 @import "./fonts.css";
 
+/* GRAISSES 500 ET 700 SERVIES PAR LE FICHIER VARIABLE, en latin.
+   `fonts.css` (généré, ne pas y toucher) les fait venir de deux fichiers
+   statiques v4 de 30 Kio chacun, sans `unicode-range`. Arrivés après la
+   première peinture, ils recomposaient le texte : décalage de 0,096 relevé sur
+   `/contact` en réseau bridé. Le fichier v5 latin, déjà préchargé pour 400 et
+   600, est variable de 100 à 900 (axe `wght` vérifié). Déclarées APRÈS, ces
+   règles l'emportent sur la plage latine ; les fichiers v4 ne partent plus que
+   pour un caractère hors de cette plage. */
+@font-face { font-family: "Geist"; font-style: normal; font-weight: 500; font-display: swap; src: url(/fonts.gstatic.com/s/geist/v5/gyByhwUxId8gMEwcGFU.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Geist"; font-style: normal; font-weight: 700; font-display: swap; src: url(/fonts.gstatic.com/s/geist/v5/gyByhwUxId8gMEwcGFU.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
 /* ============================================================
    Design tokens — extraits fidèlement du site d'origine (Framer)
    Source de vérité unique. Re-brandable : changer ces valeurs.

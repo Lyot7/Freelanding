@@ -32,7 +32,10 @@ function linkifyEmails(text: string): ReactNode[] {
         href={`mailto:${m[0]}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-background no-underline transition-colors duration-200 ease-[cubic-bezier(0.44,0,0.56,1)] hover:text-accent motion-reduce:transition-none"
+        // SOULIGNÉ : dans un paragraphe, la couleur seule ne distingue pas un
+        // lien du texte qui l'entoure (règle axe `link-in-text-block`, relevée
+        // sur les pages légales).
+        className="text-background underline decoration-background/40 underline-offset-[3px] transition-colors duration-200 ease-[cubic-bezier(0.44,0,0.56,1)] hover:text-accent hover:decoration-accent motion-reduce:transition-none"
       >
         {m[0]}
       </a>,

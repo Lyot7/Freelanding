@@ -638,6 +638,59 @@ function HeroGlass({ height }: { height: number | null }) {
   );
 }
 
+/**
+ * Fond du hero : l'AFFICHE d'abord, la vidéo après le chargement de la page.
+ *
+ * Quand la `<video>` est dans le HTML, c'est elle que le navigateur retient
+ * comme élément LCP, et son fichier (234 Kio) passe en concurrence avec tout le
+ * reste du premier chargement : LCP de 10,2 s relevé par PageSpeed sur mobile.
+ * L'affiche (14 Kio, préchargée en priorité haute) est une vraie image, peinte
+ * avec le HTML. La vidéo n'est montée qu'à l'événement `load`, posée au-dessus
+ * en fondu dès qu'elle joue : même boîte, donc aucun nouveau candidat LCP, et
+ * la première image de la boucle est celle de l'affiche.
+ */
+function HeroVideo({ src, poster }: { src: string; poster?: string }) {
+  const [monter, setMonter] = useState(false);
+  const [joue, setJoue] = useState(false);
+  useEffect(() => {
+    const lancer = () => setMonter(true);
+    if (document.readyState === "complete") {
+      const id = window.setTimeout(lancer, 0);
+      return () => window.clearTimeout(id);
+    }
+    window.addEventListener("load", lancer, { once: true });
+    return () => window.removeEventListener("load", lancer);
+  }, []);
+  return (
+    <>
+      {poster ? (
+        // eslint-disable-next-line @next/next/no-img-element -- affiche déjà dimensionnée (14 Kio) et préchargée par `preload()` : l'optimiseur ajouterait une requête.
+        <img
+          src={poster}
+          alt=""
+          fetchPriority="high"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      ) : null}
+      {monter && src ? (
+        <video
+          className={
+            "absolute inset-0 h-full w-full object-cover transition-opacity duration-500 " +
+            (joue ? "opacity-100" : "opacity-0")
+          }
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          src={src}
+          onPlaying={() => setJoue(true)}
+        />
+      ) : null}
+    </>
+  );
+}
+
 export function HeroSection({ hero, site }: { hero: HeroContent; site: SiteConfig }) {
   const media = hero.media;
   const hasVideo = media?.kind === "video" && Boolean(media.src);
@@ -664,17 +717,7 @@ export function HeroSection({ hero, site }: { hero: HeroContent; site: SiteConfi
           decorative
           className="pointer-events-none absolute inset-0 z-0 overflow-clip"
         >
-          {/* Vidéo de fond native — joue sur TOUTES les tailles (mobile inclus) */}
-          <video
-            className="h-full w-full object-cover"
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
-            poster={media?.poster}
-            src={media?.src}
-          />
+          <HeroVideo src={media?.src ?? ""} poster={media?.poster} />
         </ScrollParallax>
       )}
 
