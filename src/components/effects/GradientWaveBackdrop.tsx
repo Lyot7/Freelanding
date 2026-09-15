@@ -220,8 +220,30 @@ export function GradientWaveBackdrop({
     // par image, relevé par Lighthouse comme « ajustement forcé ».
     let cssWidth = canvas.clientWidth;
     let cssHeight = canvas.clientHeight;
-    // Vague FIGÉE sur sa première image : mouvement réduit, profil léger.
-    const figee = reducedMotion || estProfilLeger();
+    // Rendu LOGICIEL (pas de GPU utilisable) : chaque image est calculée par le
+    // processeur. MESURÉ sur PageSpeed mobile, /contact : 39 s de fil principal
+    // et 18,8 s de TBT, par tâches de 140 à 285 ms répétées tant que la vague
+    // tournait. Un téléphone sans accélération matérielle paierait la même
+    // chose en batterie et en réactivité.
+    const rendu = (() => {
+      const info = gl.getExtension("WEBGL_debug_renderer_info");
+      const brut: unknown = gl.getParameter(
+        info ? info.UNMASKED_RENDERER_WEBGL : gl.RENDERER,
+      );
+      return typeof brut === "string" ? brut : "";
+    })();
+    const logiciel = /swiftshader|llvmpipe|softpipe|software|basic render/i.test(
+      rendu,
+    );
+    // Vague FIGÉE sur sa première image : mouvement réduit, profil léger, rendu
+    // logiciel, ou images trop lentes constatées (voir `tick`).
+    let figee = reducedMotion || estProfilLeger() || logiciel;
+    // Garde de cadence : sur les premières images, trois intervalles au-delà de
+    // 50 ms (moins de 20 images/s) figent la vague là où elle est. Couvre les
+    // GPU trop faibles que le nom du moteur de rendu ne trahit pas.
+    let precedent = 0;
+    let imagesSurveillees = 0;
+    let imagesLentes = 0;
     // La boucle d'animation ne part qu'après `load` : pendant le chargement, le
     // fil principal appartient à la peinture du contenu. MESURÉ sur /contact
     // mobile (CPU ×4) : 5 s de script dans ce canevas avant la fin du
@@ -307,11 +329,23 @@ export function GradientWaveBackdrop({
         if (figee || !inViewport || document.visibilityState !== "visible") {
           return;
         }
+        if (precedent && imagesSurveillees < 30) {
+          imagesSurveillees += 1;
+          if (now - precedent > 50) imagesLentes += 1;
+          if (imagesLentes >= 3) {
+            figee = true;
+            canvas.dataset.gradientWaveStatus = "ready-static-slow";
+            return;
+          }
+        }
+        precedent = now;
         draw((now - startedAt) / 1000);
         animationFrame = requestAnimationFrame(tick);
       };
       const start = () => {
         if (figee || !chargee || !inViewport || animationFrame) return;
+        // Une pause (hors champ, onglet masqué) n'est pas une image lente.
+        precedent = 0;
         // Horloge recalée au premier départ : la dérive reprend depuis la
         // première image peinte, sans saut.
         if (!aDemarre) {
@@ -348,9 +382,11 @@ export function GradientWaveBackdrop({
         else stop();
       };
       document.addEventListener("visibilitychange", onVisibilityChange);
-      canvas.dataset.gradientWaveStatus = figee
-        ? "ready-reduced-motion"
-        : "ready";
+      canvas.dataset.gradientWaveStatus = logiciel
+        ? "ready-static-software"
+        : figee
+          ? "ready-reduced-motion"
+          : "ready";
       start();
 
       return () => {
