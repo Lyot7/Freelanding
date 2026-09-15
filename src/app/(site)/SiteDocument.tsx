@@ -108,7 +108,7 @@ export function SiteDocument({ children }: Readonly<{ children: ReactNode }>) {
             en tête de `globals.css`. */}
         <link
           rel="preload"
-          href="/fonts.gstatic.com/s/geist/v5/gyByhwUxId8gMEwcGFU.woff2"
+          href="/fonts/geist-v5-latin-espace-fine.woff2"
           as="font"
           type="font/woff2"
           crossOrigin="anonymous"
