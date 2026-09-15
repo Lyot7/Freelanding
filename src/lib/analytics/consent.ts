@@ -43,6 +43,29 @@ export const CONSENT_TTL_MS = CONSENT_TTL_DAYS * 24 * 60 * 60 * 1000;
  */
 const CLOCK_SKEW_TOLERANCE_MS = 24 * 60 * 60 * 1000;
 
+/** Posé sur `<html>` avant la première peinture quand un choix valide existe. */
+export const CONSENT_DECIDED_ATTRIBUTE = "data-consent-choisi";
+
+/**
+ * Script inline du `<head>` : la bannière est rendue dans le HTML serveur pour
+ * être peinte avec le reste du premier écran, et ce script la masque AVANT la
+ * première peinture chez qui a déjà choisi.
+ *
+ * Peinte seulement après l'hydratation, la bannière arrivait seule, tard, et
+ * devenait le plus grand élément peint de la page : c'était elle que mesurait
+ * le LCP de /contact mobile (3,9 s).
+ *
+ * MÊMES RÈGLES que {@link parseConsent}, recopiées parce qu'un script inline ne
+ * peut importer aucun module ; `consent.test.mjs` vérifie qu'ils s'accordent.
+ * Un désaccord ne coûte qu'un affichage : c'est `parseConsent` qui tranche à
+ * l'hydratation.
+ */
+export const CONSENT_BOOT_SCRIPT = `(function(){try{
+var r=JSON.parse(localStorage.getItem(${JSON.stringify(CONSENT_STORAGE_KEY)})||"null"),n=Date.now(),d=r&&r.decidedAt;
+if(r&&typeof r==="object"&&r.version===${CONSENT_VERSION}&&typeof d==="number"&&isFinite(d)&&d<=n+${CLOCK_SKEW_TOLERANCE_MS}&&n-d<${CONSENT_TTL_MS}&&r.choices&&typeof r.choices==="object"&&typeof r.choices.analytics==="boolean")
+document.documentElement.setAttribute(${JSON.stringify(CONSENT_DECIDED_ATTRIBUTE)},"");
+}catch(e){}})();`;
+
 /** Finalités distinctes présentées au visiteur. */
 export type ConsentCategory = "necessary" | "analytics" | "replay";
 

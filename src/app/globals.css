@@ -609,6 +609,33 @@ body {
   transform: none !important;
 }
 
+/* BANDEAU DE CONSENTEMENT au premier écran (`ConsentBanner`). Rendu dans le
+   HTML serveur, il entre avec la page par une animation CSS, sans attendre le
+   JavaScript. Départ à 0,001 et non 0 : un élément d'opacité nulle n'est pas
+   compté comme peint, et le bandeau serait mesuré à la fin de son entrée.
+   Masqué avant la première peinture chez qui a déjà choisi
+   (`CONSENT_BOOT_SCRIPT`). */
+@keyframes consent-entree {
+  from {
+    opacity: 0.001;
+    transform: translateY(24px);
+  }
+}
+.consent-entree {
+  animation: consent-entree 0.36s cubic-bezier(0.68, 0, 0, 1);
+}
+html[data-consent-choisi] [data-consent-attente] {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .consent-entree {
+    animation: none;
+  }
+}
+[data-profil="leger"] .consent-entree {
+  animation: none;
+}
+
 /* ============================================================
    Ticker — bandeau à VITESSE CONSTANTE (composant Ticker.tsx)
    Contrairement au Marquee ci-dessous (durée fixe, donc vitesse variable

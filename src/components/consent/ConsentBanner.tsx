@@ -3,11 +3,21 @@
 // Préchargement AU SURVOL : le bandeau est visible dès l'arrivée, un `Link`
 // classique téléchargeait la politique de confidentialité pendant le chargement.
 import { HoverPrefetchLink as Link } from "@/components/ui/HoverPrefetchLink";
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import type { Transition } from "motion/react";
 
-import type { ConsentChoices } from "@/lib/analytics/consent";
+import {
+  CONSENT_DECIDED_ATTRIBUTE,
+  type ConsentChoices,
+} from "@/lib/analytics/consent";
 import { useConsent } from "./ConsentProvider";
 import { consentCopy } from "@/content/consent";
 
@@ -252,41 +262,26 @@ export function ConsentBanner() {
   const titleId = useId();
   const descriptionId = useId();
 
-  /* PREMIÈRE APPARITION APRÈS LE CHARGEMENT. Monté à l'hydratation, le bandeau
-     arrivait pendant la peinture du premier écran, animation comprise, et
-     recouvrait le héros sur mobile au moment où PageSpeed mesure. Il attend
-     désormais `load` puis un moment de repos du navigateur (2 s au plus).
-     Rien n'est mesuré avant un choix, ce délai ne change donc rien au
-     consentement. Une réouverture depuis le pied de page reste immédiate. */
-  const [pret, setPret] = useState(false);
-  useEffect(() => {
-    let annule = false;
-    let idle: number | undefined;
-    const montrer = () => {
-      if (annule) return;
-      if (typeof window.requestIdleCallback === "function") {
-        idle = window.requestIdleCallback(() => setPret(true), { timeout: 2000 });
-      } else {
-        // Safari : pas de `requestIdleCallback`, un délai court le remplace.
-        idle = window.setTimeout(() => setPret(true), 1200);
-      }
-    };
-    if (document.readyState === "complete") montrer();
-    else window.addEventListener("load", montrer, { once: true });
-    return () => {
-      annule = true;
-      window.removeEventListener("load", montrer);
-      if (idle !== undefined) {
-        if (typeof window.cancelIdleCallback === "function") {
-          window.cancelIdleCallback(idle);
-        }
-        window.clearTimeout(idle);
-      }
-    };
-  }, []);
-
+  /* PEINTE AVEC LE PREMIER ÉCRAN. Tant que le stockage n'est pas lu (rendu
+     serveur, hydratation), la bannière est rendue « en attente » : présente
+     dans le HTML, entrée par une animation CSS, et masquée avant la première
+     peinture par `CONSENT_BOOT_SCRIPT` chez qui a déjà choisi. Montée seulement
+     après l'hydratation, elle arrivait seule et tard, et devenait l'élément
+     mesuré par le LCP (3,9 s sur /contact mobile). */
   const hasDecision = record !== null;
-  const visible = ready && configured && (panelOpen || (!hasDecision && pret));
+  const enAttente = configured && !ready;
+  const ouverte = ready && configured && (panelOpen || !hasDecision);
+  const visible = enAttente || ouverte;
+
+  /* Le masquage posé par le script ne vaut que pour le premier écran : dès que
+     la bannière doit se montrer (révocation, réouverture depuis le pied de
+     page), il est levé. Avant peinture, pour ne pas perdre la première image
+     de l'entrée. */
+  useLayoutEffect(() => {
+    if (ouverte) {
+      document.documentElement.removeAttribute(CONSENT_DECIDED_ATTRIBUTE);
+    }
+  }, [ouverte]);
 
   /* Fermeture par Échap. Deux comportements, et la nuance compte :
      - un choix existe déjà (panneau rouvert depuis le pied de page) : Échap
@@ -351,11 +346,21 @@ export function ConsentBanner() {
       {visible ? (
         <motion.div
           key="consent-banner"
-          initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 24 }}
+          /* Rendue au serveur, l'entrée est CSS (`.consent-entree`) : un état
+             initial framer-motion serait écrit masqué dans le HTML et
+             n'animerait qu'à l'hydratation. */
+          initial={
+            enAttente
+              ? false
+              : reduceMotion
+                ? { opacity: 0 }
+                : { opacity: 0, y: 24 }
+          }
           animate={{ opacity: 1, y: 0 }}
           exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 24 }}
           transition={transition}
           data-consent-ui=""
+          data-consent-attente={enAttente ? "" : undefined}
           /* PLACEMENT. Au-dessus du menu flottant (z-9) et de tout le contenu.
              Remontée à 88 px du bas tant qu'on n'est pas en desktop : la
              pastille du menu est centrée en bas et croiserait la carte sur les
@@ -366,7 +371,7 @@ export function ConsentBanner() {
              plafonne à 460 px. Sans cela, la bande vide à sa droite avalerait
              les clics sur le contenu — et pendant l'animation de sortie, une
              carte déjà invisible continuerait de bloquer la page. */
-          className="pointer-events-none fixed inset-x-[16px] bottom-[88px] z-[60] flex justify-start tablet:inset-x-[24px] desktop:inset-x-[30px] desktop:bottom-[20px]"
+          className={`pointer-events-none fixed inset-x-[16px] bottom-[88px] z-[60] flex justify-start tablet:inset-x-[24px] desktop:inset-x-[30px] desktop:bottom-[20px]${enAttente ? " consent-entree" : ""}`}
         >
           <div
             ref={cardRef}

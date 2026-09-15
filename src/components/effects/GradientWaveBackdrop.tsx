@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useReducedMotion } from "motion/react";
+import { estProfilLeger } from "@/lib/profil-appareil";
 
 /**
  * Fragment shader copié sans modification fonctionnelle depuis
@@ -213,7 +214,21 @@ export function GradientWaveBackdrop({
     let intersectionObserver: IntersectionObserver | null = null;
     let animationFrame = 0;
     let inViewport = true;
-    const startedAt = performance.now();
+    let startedAt = performance.now();
+    // Taille CSS du canevas, tenue par le `ResizeObserver`. La lire par
+    // `getBoundingClientRect` à chaque image forçait un calcul de mise en page
+    // par image, relevé par Lighthouse comme « ajustement forcé ».
+    let cssWidth = canvas.clientWidth;
+    let cssHeight = canvas.clientHeight;
+    // Vague FIGÉE sur sa première image : mouvement réduit, profil léger.
+    const figee = reducedMotion || estProfilLeger();
+    // La boucle d'animation ne part qu'après `load` : pendant le chargement, le
+    // fil principal appartient à la peinture du contenu. MESURÉ sur /contact
+    // mobile (CPU ×4) : 5 s de script dans ce canevas avant la fin du
+    // chargement. La première image est peinte tout de suite, seule la dérive
+    // attend.
+    let chargee = document.readyState === "complete";
+    let aDemarre = false;
 
     try {
       vertexShader = compileShader(gl, gl.VERTEX_SHADER, VERTEX_SHADER);
@@ -271,9 +286,8 @@ export function GradientWaveBackdrop({
 
       const draw = (elapsedSeconds: number) => {
         const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
-        const rect = canvas.getBoundingClientRect();
-        const width = Math.max(1, Math.round(rect.width * pixelRatio));
-        const height = Math.max(1, Math.round(rect.height * pixelRatio));
+        const width = Math.max(1, Math.round(cssWidth * pixelRatio));
+        const height = Math.max(1, Math.round(cssHeight * pixelRatio));
         if (canvas.width !== width || canvas.height !== height) {
           canvas.width = width;
           canvas.height = height;
@@ -290,25 +304,35 @@ export function GradientWaveBackdrop({
       };
       const tick = (now: number) => {
         animationFrame = 0;
-        if (
-          reducedMotion ||
-          !inViewport ||
-          document.visibilityState !== "visible"
-        ) {
+        if (figee || !inViewport || document.visibilityState !== "visible") {
           return;
         }
         draw((now - startedAt) / 1000);
         animationFrame = requestAnimationFrame(tick);
       };
       const start = () => {
-        if (!reducedMotion && inViewport && !animationFrame) {
-          animationFrame = requestAnimationFrame(tick);
+        if (figee || !chargee || !inViewport || animationFrame) return;
+        // Horloge recalée au premier départ : la dérive reprend depuis la
+        // première image peinte, sans saut.
+        if (!aDemarre) {
+          aDemarre = true;
+          startedAt = performance.now();
         }
+        animationFrame = requestAnimationFrame(tick);
       };
+      const onLoad = () => {
+        chargee = true;
+        start();
+      };
+      if (!chargee) window.addEventListener("load", onLoad, { once: true });
 
       draw(0);
-      resizeObserver = new ResizeObserver(() => {
-        draw(reducedMotion ? 0 : (performance.now() - startedAt) / 1000);
+      resizeObserver = new ResizeObserver(([entry]) => {
+        if (entry) {
+          cssWidth = entry.contentRect.width;
+          cssHeight = entry.contentRect.height;
+        }
+        draw(figee || !aDemarre ? 0 : (performance.now() - startedAt) / 1000);
       });
       resizeObserver.observe(canvas);
 
@@ -324,12 +348,13 @@ export function GradientWaveBackdrop({
         else stop();
       };
       document.addEventListener("visibilitychange", onVisibilityChange);
-      canvas.dataset.gradientWaveStatus = reducedMotion
+      canvas.dataset.gradientWaveStatus = figee
         ? "ready-reduced-motion"
         : "ready";
       start();
 
       return () => {
+        window.removeEventListener("load", onLoad);
         document.removeEventListener("visibilitychange", onVisibilityChange);
         stop();
         resizeObserver?.disconnect();

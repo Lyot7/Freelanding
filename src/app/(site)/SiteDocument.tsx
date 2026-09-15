@@ -18,6 +18,7 @@ import { MotionSettings } from "@/components/motion/MotionSettings";
 import { APPEAR_BOOT_SCRIPT } from "@/components/motion/appearAnimations";
 import { siteConfig } from "@/content/site";
 import { GOOGLE_SITE_VERIFICATION } from "@/lib/analytics/config";
+import { CONSENT_BOOT_SCRIPT } from "@/lib/analytics/consent";
 import type { SiteConfig } from "@/lib/content/types";
 import { SITE_URL } from "@/lib/site-url";
 import { PROFIL_SCRIPT } from "@/lib/profil-appareil";
@@ -92,6 +93,9 @@ export function SiteDocument({ children }: Readonly<{ children: ReactNode }>) {
             la feuille de style s'applique et avant le démarreur d'apparitions.
             Voir `@/lib/profil-appareil`. */}
         <script dangerouslySetInnerHTML={{ __html: PROFIL_SCRIPT }} />
+        {/* Masque la bannière de consentement rendue au serveur chez qui a
+            déjà choisi, avant la première peinture. */}
+        <script dangerouslySetInnerHTML={{ __html: CONSENT_BOOT_SCRIPT }} />
         {/* Filet sans JavaScript. Les apparitions rendent leur état MASQUÉ dès
             le HTML serveur (c'est ce qui évite le rejeu visible après
             hydratation, cf. l'entête de `@/components/motion/Reveal`) : sans
