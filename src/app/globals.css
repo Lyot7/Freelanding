@@ -1,43 +1,9 @@
 @import "tailwindcss";
 @import "lenis/dist/lenis.css";
-/* @font-face copiés du live (générés par scripts/extract-fonts.mjs). */
-@import "./fonts.css";
-
-/* GRAISSES 500 ET 700 SERVIES PAR LE FICHIER VARIABLE, en latin.
-   `fonts.css` (généré, ne pas y toucher) les fait venir de deux fichiers
-   statiques v4 de 30 Kio chacun, sans `unicode-range`. Arrivés après la
-   première peinture, ils recomposaient le texte : décalage de 0,096 relevé sur
-   `/contact` en réseau bridé. Le fichier v5 latin, déjà préchargé pour 400 et
-   600, est variable de 100 à 900 (axe `wght` vérifié). Déclarées APRÈS, ces
-   règles l'emportent sur la plage latine ; les fichiers v4 ne partent plus que
-   pour un caractère hors de cette plage. */
-/* FICHIER `public/fonts/geist-v5-latin-espace-fine.woff2` : copie du v5 latin
-   de `fonts.css` où U+202F (espace fine insécable, posée par la typographie
-   française) pointe vers le glyphe d'espace. Absent du fichier d'origine alors
-   que sa plage le déclare, ce caractère faisait télécharger le v4 complet
-   (30 Ko, qui ne l'a pas non plus) et retardait `document.fonts.ready` vers
-   1 s : le ticker et la découpe des titres se re-mesuraient alors, et le héros
-   bougeait (décalage de 0,108 sur l'accueil desktop). Fabriqué avec fontTools
-   depuis le fichier d'origine ; à refaire si `scripts/extract-fonts.mjs`
-   remplace ce dernier. */
-/* `font-display: optional` ET NON `swap`, sur les quatre graisses latines.
-   Avec `swap`, un fichier arrivé après la première peinture recomposait le
-   bloc du héros : décalage de 0,177 relevé sur l'accueil desktop en
-   production. Avec `optional`, la police préchargée s'affiche si elle est
-   prête dans la fenêtre de blocage courte ; sinon la police de secours reste
-   pour cette page, sans saut, et Geist est en cache pour la suivante. Sur un
-   réseau lent, la typographie s'adapte au lieu de faire bouger la page. */
-/* Les deux fichiers statiques v4 (500 et 700, SANS `unicode-range`) restent
-   demandés dès qu'un caractère sort de la plage latine : le fichier 500
-   arrivait à 963 ms et recomposait encore le héros desktop (décalage de
-   0,105 relevé en production). Mêmes fichiers que `fonts.css`, redéclarés
-   après lui en `optional`, ils ne peuvent plus déplacer la page. */
-@font-face { font-family: "Geist"; src: url("/fonts.gstatic.com/s/geist/v4/gyBhhwUxId8gMGYQMKR3pzfaWI_RruM4mJPby1QNtA.woff2"); font-display: optional; font-style: normal; font-weight: 500 }
-@font-face { font-family: "Geist"; src: url("/fonts.gstatic.com/s/geist/v4/gyBhhwUxId8gMGYQMKR3pzfaWI_Re-Q4mJPby1QNtA.woff2"); font-display: optional; font-style: normal; font-weight: 700 }
-@font-face { font-family: "Geist"; font-style: normal; font-weight: 400; font-display: optional; src: url(/fonts/geist-v5-latin-espace-fine.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-@font-face { font-family: "Geist"; font-style: normal; font-weight: 500; font-display: optional; src: url(/fonts/geist-v5-latin-espace-fine.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-@font-face { font-family: "Geist"; font-style: normal; font-weight: 600; font-display: optional; src: url(/fonts/geist-v5-latin-espace-fine.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-@font-face { font-family: "Geist"; font-style: normal; font-weight: 700; font-display: optional; src: url(/fonts/geist-v5-latin-espace-fine.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+/* Polices tenues à la main (voir l'en-tête de `polices.css`). `fonts.css`,
+   généré depuis le live, n'est plus importé : ses faces latines téléchargeaient
+   trois fichiers en production et recomposaient le héros de l'accueil. */
+@import "./polices.css";
 
 /* ============================================================
    Design tokens — extraits fidèlement du site d'origine (Framer)
