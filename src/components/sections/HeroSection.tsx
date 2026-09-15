@@ -673,13 +673,22 @@ function HeroVideo({ src, poster }: { src: string; poster?: string }) {
   return (
     <>
       {poster ? (
-        // eslint-disable-next-line @next/next/no-img-element -- affiche déjà dimensionnée (14 Kio) et préchargée par `preload()` : l'optimiseur ajouterait une requête.
-        <img
-          src={poster}
-          alt=""
-          fetchPriority="high"
-          className="absolute inset-0 h-full w-full object-cover"
-        />
+        /* AFFICHE À PARTIR DE 810 PX SEULEMENT. Sur mobile, elle était
+           l'élément LCP, peinte avec près de 2 s de retard par le processeur
+           lent de PageSpeed alors que le texte du héros était déjà affiché.
+           Sous 810 px la source vide fait retomber `<img>` sur un GIF
+           transparent de 1 px, que Chrome ne retient pas comme LCP : le texte
+           du héros le devient. L'affiche est quasi noire (luminance 13/255),
+           le fond sombre, le grain et le verre restent. */
+        <picture>
+          <source media="(min-width: 810px)" srcSet={poster} />
+          <img
+            src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+            alt=""
+            fetchPriority="high"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        </picture>
       ) : null}
       {monter && src ? (
         <video
@@ -706,7 +715,13 @@ export function HeroSection({ hero, site }: { hero: HeroContent; site: SiteConfi
   // L'affiche est l'élément LCP du mobile : préchargée en priorité haute, elle
   // part avec le HTML au lieu d'attendre que le navigateur découvre la vidéo.
   if (hasVideo && media?.poster) {
-    preload(media.poster, { as: "image", fetchPriority: "high" });
+    // Préchargée à partir de 810 px seulement, comme l'affiche elle-même
+    // (voir `HeroVideo`) : un téléphone ne la télécharge pas.
+    preload(media.poster, {
+      as: "image",
+      fetchPriority: "high",
+      media: "(min-width: 810px)",
+    });
   }
   // La boîte encadrée commande la hauteur du verre posé derrière elle.
   const boxRef = useRef<HTMLDivElement>(null);

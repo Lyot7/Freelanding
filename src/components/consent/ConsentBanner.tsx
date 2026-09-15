@@ -252,8 +252,41 @@ export function ConsentBanner() {
   const titleId = useId();
   const descriptionId = useId();
 
+  /* PREMIÈRE APPARITION APRÈS LE CHARGEMENT. Monté à l'hydratation, le bandeau
+     arrivait pendant la peinture du premier écran, animation comprise, et
+     recouvrait le héros sur mobile au moment où PageSpeed mesure. Il attend
+     désormais `load` puis un moment de repos du navigateur (2 s au plus).
+     Rien n'est mesuré avant un choix, ce délai ne change donc rien au
+     consentement. Une réouverture depuis le pied de page reste immédiate. */
+  const [pret, setPret] = useState(false);
+  useEffect(() => {
+    let annule = false;
+    let idle: number | undefined;
+    const montrer = () => {
+      if (annule) return;
+      if (typeof window.requestIdleCallback === "function") {
+        idle = window.requestIdleCallback(() => setPret(true), { timeout: 2000 });
+      } else {
+        // Safari : pas de `requestIdleCallback`, un délai court le remplace.
+        idle = window.setTimeout(() => setPret(true), 1200);
+      }
+    };
+    if (document.readyState === "complete") montrer();
+    else window.addEventListener("load", montrer, { once: true });
+    return () => {
+      annule = true;
+      window.removeEventListener("load", montrer);
+      if (idle !== undefined) {
+        if (typeof window.cancelIdleCallback === "function") {
+          window.cancelIdleCallback(idle);
+        }
+        window.clearTimeout(idle);
+      }
+    };
+  }, []);
+
   const hasDecision = record !== null;
-  const visible = ready && configured && (!hasDecision || panelOpen);
+  const visible = ready && configured && (panelOpen || (!hasDecision && pret));
 
   /* Fermeture par Échap. Deux comportements, et la nuance compte :
      - un choix existe déjà (panneau rouvert depuis le pied de page) : Échap
