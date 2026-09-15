@@ -64,6 +64,23 @@ export const APPEAR_ID_ATTRIBUTE = optimizedAppearDataAttribute;
 export const APPEAR_SPEC_ATTRIBUTE = "data-appear";
 
 /**
+ * Hauteur recopiée AVANT la première peinture : l'élément qui porte cet
+ * attribut prend la hauteur de mise en page (`offsetHeight`) de l'élément
+ * `[data-part="<valeur>"]` de la même section. Sert au verre du hero, qui ne
+ * peut pas être imbriqué dans la boîte dont il suit la taille : relevée
+ * seulement à l'hydratation, sa hauteur changeait après peinture, décalage de
+ * mise en page de 0,036 mesuré sur l'accueil mobile. Exécuté même en mouvement
+ * réduit et en profil léger, puisque c'est de la géométrie, pas du mouvement.
+ *
+ * Une lecture unique ne suffit pas : MESURÉ à 1024 × 768, la boîte faisait
+ * 458 px au passage du script et 442 px à la première image, d'où un décalage
+ * de 0,011 au recalage de l'hydratation. Le script garde donc la hauteur à jour
+ * par un `ResizeObserver`, dont le rappel tombe après la mise en page et avant
+ * la peinture de chaque image.
+ */
+export const HEIGHT_FROM_ATTRIBUTE = "data-hauteur-de";
+
+/**
  * Ordre de composition du `transform`, et unités, COPIÉS sur ceux de
  * framer-motion (`transformPropOrder` : x, y, scale, rotate). L'ordre n'est pas
  * cosmétique — `scale(1.5) rotate(2deg)` et `rotate(2deg) scale(1.5)` ne
@@ -265,6 +282,7 @@ export function appearAttributes(
 export const APPEAR_BOOT_SCRIPT = `(function(){
 var W=window,D=document;
 if(W.__appearBoot)return;W.__appearBoot=1;
+try{var hs=D.querySelectorAll("[${HEIGHT_FROM_ATTRIBUTE}]");for(var k=0;k<hs.length;k++)(function(h){var sc=h.closest("section")||D,sr=sc.querySelector('[data-part="'+h.getAttribute("${HEIGHT_FROM_ATTRIBUTE}")+'"]');if(!sr)return;var cp=function(){if(sr.offsetHeight)h.style.height=sr.offsetHeight+"px";};cp();if(W.ResizeObserver)new ResizeObserver(cp).observe(sr);})(hs[k]);}catch(e){}
 try{if(W.matchMedia&&W.matchMedia("(prefers-reduced-motion: reduce)").matches)return;}catch(e){return;}
 if(D.documentElement.getAttribute("data-profil")==="leger")return;
 if(!D.querySelectorAll||!Element.prototype.animate)return;

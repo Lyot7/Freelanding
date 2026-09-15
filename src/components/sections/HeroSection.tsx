@@ -10,6 +10,7 @@ import {
   framerSpring as spring,
   framerTween as tween,
 } from "@/components/motion/Reveal";
+import { HEIGHT_FROM_ATTRIBUTE } from "@/components/motion/appearAnimations";
 import {
   ScrollParallax,
   useScrollParallaxY,
@@ -622,6 +623,11 @@ function HeroGlass({ height }: { height: number | null }) {
     <motion.div
       aria-hidden
       data-part="hero-glass"
+      // Hauteur posée avant peinture par le démarreur d'apparitions (voir
+      // `HEIGHT_FROM_ATTRIBUTE`), puis tenue par `useBoxHeight` : le style
+      // serveur n'a donc pas encore de `height` quand l'hydratation passe.
+      {...{ [HEIGHT_FROM_ATTRIBUTE]: "hero-box" }}
+      suppressHydrationWarning
       className="pointer-events-none absolute inset-y-0 left-[20px] right-[20px] z-[1] m-auto h-[367px] bg-[#ffffff08] [backdrop-filter:blur(8px)] tablet:inset-x-0 tablet:h-[394px] tablet:w-[740px]"
       style={{ ...(y ? { y } : null), ...(height ? { height } : null) }}
       {...appearReveal(
