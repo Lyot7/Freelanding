@@ -653,6 +653,11 @@ function HeroVideo({ src, poster }: { src: string; poster?: string }) {
   const [monter, setMonter] = useState(false);
   const [joue, setJoue] = useState(false);
   useEffect(() => {
+    // PAS DE VIDÉO SOUS 810 PX. La boucle est quasi noire (luminance moyenne
+    // 13/255) : sur un écran de téléphone elle ne se distingue pas de son
+    // affiche, alors qu'elle coûte 234 Kio et un décodage continu au processeur
+    // le plus lent du parc. L'affiche reste, identique à la première image.
+    if (!window.matchMedia("(min-width: 810px)").matches) return;
     const lancer = () => setMonter(true);
     if (document.readyState === "complete") {
       const id = window.setTimeout(lancer, 0);

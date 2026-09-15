@@ -589,10 +589,13 @@ body {
 
 .grain-drift {
   animation: grain-drift 4.5s steps(9) infinite;
-  /* `will-change` est POSÉ ici et RETIRÉ par `effects/Grain.tsx` dès que le
-     calque sort du champ : le laisser en permanence sur les vingt calques de la
-     home garde autant de textures promues pour rien. */
-  will-change: transform;
+  /* EN PAUSE PAR DÉFAUT depuis le 2026-09-15. Lancée dès le HTML, la dérive
+     tournait sur les vingt calques de la home (textures de 400 % × 400 %)
+     pendant tout le premier chargement : rendu et composition occupaient le
+     fil principal au moment où l'image LCP devait se peindre, et le Speed Index
+     ne se stabilisait jamais. `effects/Grain.tsx` relance les seuls calques
+     visibles, après l'événement `load`, et pose `will-change` à ce moment-là. */
+  animation-play-state: paused;
 }
 
 @media (prefers-reduced-motion: reduce) {

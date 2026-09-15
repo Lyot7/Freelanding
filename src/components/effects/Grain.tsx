@@ -110,8 +110,20 @@ export function Grain({
     if (!el || reduitLeMouvement()) return;
     const obs = obtenirObservateur();
     if (!obs) return;
-    obs.observe(el);
-    return () => obs.unobserve(el);
+    // La dérive est en pause dans la feuille (`.grain-drift`) et ne démarre
+    // qu'APRÈS l'événement `load` : pendant le premier chargement, le fil
+    // principal appartient à la peinture de la page, pas au grain.
+    let observe = false;
+    const demarrer = () => {
+      observe = true;
+      obs.observe(el);
+    };
+    if (document.readyState === "complete") demarrer();
+    else window.addEventListener("load", demarrer, { once: true });
+    return () => {
+      window.removeEventListener("load", demarrer);
+      if (observe) obs.unobserve(el);
+    };
   }, []);
 
   return (
