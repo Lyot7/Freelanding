@@ -7,6 +7,7 @@ import { Grain } from "@/components/effects/Grain";
 import { Ticker } from "@/components/ui/Ticker";
 import { uiLabels } from "@/content/ui";
 import { urlImageFond } from "@/lib/image-fond";
+import { estProfilLeger } from "@/lib/profil-appareil";
 import type { WorkItem } from "@/lib/content/types";
 import {
   getWorkCardMedia,
@@ -82,13 +83,26 @@ function WorkCardVideo({
     if (!video) return;
 
     const pause = () => video.pause();
-    if (reducedMotion) {
+    // Mouvement réduit ou profil léger (`@/lib/profil-appareil`) : l'affiche
+    // seule, le fichier vidéo n'est jamais demandé.
+    if (reducedMotion || estProfilLeger()) {
       pause();
-      video.currentTime = 0;
       return;
     }
 
+    /* LE FICHIER N'EST DEMANDÉ QU'À L'APPROCHE DE L'ÉCRAN. Avec `preload`
+       dans le HTML, les quatre vidéos de projets partaient au chargement de
+       `/realisations` (1,6 Mo, dont 1 Mo pour la seule démo Kpsull), en
+       concurrence avec l'image LCP et le JavaScript. */
+    let source = false;
+    const charger = () => {
+      if (source) return;
+      source = true;
+      video.src = src;
+    };
+
     const play = () => {
+      charger();
       const playback = video.play();
       playback?.catch((error: unknown) => {
         if (
@@ -106,17 +120,21 @@ function WorkCardVideo({
       return pause;
     }
 
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry?.isIntersecting) play();
-      else pause();
-    });
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) play();
+        else pause();
+      },
+      // Un demi-écran d'avance : la vidéo est prête quand la carte arrive.
+      { rootMargin: "50% 0px" },
+    );
     observer.observe(video);
 
     return () => {
       observer.disconnect();
       pause();
     };
-  }, [reducedMotion]);
+  }, [reducedMotion, src]);
 
   return (
     <video
@@ -125,7 +143,7 @@ function WorkCardVideo({
       muted
       loop
       playsInline
-      preload="metadata"
+      preload="none"
       poster={poster}
       /* `absolute inset-0`, et c'est le CŒUR du réglage, pas une préférence.
          Le cadre parent déclare `aspect-[1.73678]` et son enfant direct prend
@@ -140,9 +158,8 @@ function WorkCardVideo({
          `position: absolute` : il n'apporte aucune hauteur intrinsèque, donc le
          rapport déclaré tient. On aligne donc la vidéo sur l'image. */
       className="absolute inset-0 block h-full w-full object-cover object-center"
-    >
-      <source src={src} type="video/mp4" />
-    </video>
+    />
+    /* Pas de `<source>` : l'adresse est posée par l'effet, à l'approche. */
   );
 }
 

@@ -1,4 +1,6 @@
-import Link from "next/link";
+// Préchargement AU SURVOL : le logo est visible sur toutes les pages, un
+// `Link` classique téléchargeait la home dès l'arrivée, pendant le chargement.
+import { HoverPrefetchLink as Link } from "@/components/ui/HoverPrefetchLink";
 import { BouquerelWordmark } from "@/components/brand/BouquerelWordmark";
 import { uiLabels } from "@/content/ui";
 import type { SiteConfig } from "@/lib/content/types";

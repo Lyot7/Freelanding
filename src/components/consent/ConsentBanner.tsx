@@ -1,6 +1,8 @@
 "use client";
 
-import Link from "next/link";
+// Préchargement AU SURVOL : le bandeau est visible dès l'arrivée, un `Link`
+// classique téléchargeait la politique de confidentialité pendant le chargement.
+import { HoverPrefetchLink as Link } from "@/components/ui/HoverPrefetchLink";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import type { Transition } from "motion/react";

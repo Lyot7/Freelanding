@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
-import Link from "next/link";
+// Préchargement AU SURVOL : l'en-tête est visible sur toutes les pages, ses
+// liens classiques téléchargeaient `/contact` et les autres routes dès l'arrivée.
+import { HoverPrefetchLink as Link } from "@/components/ui/HoverPrefetchLink";
 import { Reveal } from "@/components/motion/Reveal";
 import { SwapCopies } from "@/components/ui/SwapCopies";
 import { uiLabels } from "@/content/ui";
