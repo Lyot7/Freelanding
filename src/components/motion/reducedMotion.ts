@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { estProfilLeger } from "@/lib/profil-appareil";
 
 const REQUETE = "(prefers-reduced-motion: reduce)";
 
@@ -13,7 +14,9 @@ function ecouter(rappel: () => void): () => void {
 
 function lire(): boolean {
   if (typeof window === "undefined" || !window.matchMedia) return false;
-  return window.matchMedia(REQUETE).matches;
+  // Le profil léger (`@/lib/profil-appareil`) vaut préférence de mouvement
+  // réduit pour tout ce qui passe par ce hook : parallaxes, compteurs, etc.
+  return window.matchMedia(REQUETE).matches || estProfilLeger();
 }
 
 /**

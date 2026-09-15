@@ -20,6 +20,7 @@ import { siteConfig } from "@/content/site";
 import { GOOGLE_SITE_VERIFICATION } from "@/lib/analytics/config";
 import type { SiteConfig } from "@/lib/content/types";
 import { SITE_URL } from "@/lib/site-url";
+import { PROFIL_SCRIPT } from "@/lib/profil-appareil";
 
 
 /**
@@ -83,8 +84,14 @@ export const SITE_METADATA: Metadata = buildSiteMetadata(siteConfig);
 
 export function SiteDocument({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <html lang="fr" className="h-full antialiased">
+    // `suppressHydrationWarning` : `data-profil` est posé par le script inline
+    // ci-dessous avant l'hydratation, donc absent du rendu serveur par nature.
+    <html lang="fr" className="h-full antialiased" suppressHydrationWarning>
       <head>
+        {/* PREMIER nœud du head : le profil d'appareil doit exister avant que
+            la feuille de style s'applique et avant le démarreur d'apparitions.
+            Voir `@/lib/profil-appareil`. */}
+        <script dangerouslySetInnerHTML={{ __html: PROFIL_SCRIPT }} />
         {/* Filet sans JavaScript. Les apparitions rendent leur état MASQUÉ dès
             le HTML serveur (c'est ce qui évite le rejeu visible après
             hydratation, cf. l'entête de `@/components/motion/Reveal`) : sans

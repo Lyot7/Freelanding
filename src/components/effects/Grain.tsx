@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { estProfilLeger } from "@/lib/profil-appareil";
 
 // Texture generee par nos soins (bruit gaussien 256x256, graine fixe). Le
 // fichier du template faisait le meme travail, mais sa licence n'etait pas
@@ -107,7 +108,7 @@ export function Grain({
 
   useEffect(() => {
     const el = ref.current;
-    if (!el || reduitLeMouvement()) return;
+    if (!el || reduitLeMouvement() || estProfilLeger()) return;
     const obs = obtenirObservateur();
     if (!obs) return;
     // La dérive est en pause dans la feuille (`.grain-drift`) et ne démarre

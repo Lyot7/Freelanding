@@ -2,6 +2,7 @@
 
 import { MotionConfig } from "motion/react";
 import type { ReactNode } from "react";
+import { useReducedMotionAfterMount } from "@/components/motion/reducedMotion";
 
 /**
  * Réglages framer-motion valables pour tout le document.
@@ -20,5 +21,10 @@ import type { ReactNode } from "react";
  * être monté depuis le layout serveur sans cette frontière.
  */
 export function MotionSettings({ children }: { children: ReactNode }) {
-  return <MotionConfig reducedMotion="user">{children}</MotionConfig>;
+  // Profil léger (`@/lib/profil-appareil`) : même traitement qu'une préférence
+  // de mouvement réduit, décidé après montage pour ne pas diverger du serveur.
+  const reduit = useReducedMotionAfterMount();
+  return (
+    <MotionConfig reducedMotion={reduit ? "always" : "user"}>{children}</MotionConfig>
+  );
 }

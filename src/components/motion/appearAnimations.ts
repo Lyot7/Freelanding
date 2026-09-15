@@ -266,6 +266,7 @@ export const APPEAR_BOOT_SCRIPT = `(function(){
 var W=window,D=document;
 if(W.__appearBoot)return;W.__appearBoot=1;
 try{if(W.matchMedia&&W.matchMedia("(prefers-reduced-motion: reduce)").matches)return;}catch(e){return;}
+if(D.documentElement.getAttribute("data-profil")==="leger")return;
 if(!D.querySelectorAll||!Element.prototype.animate)return;
 var nodes=D.querySelectorAll("[${APPEAR_ID_ATTRIBUTE}][${APPEAR_SPEC_ATTRIBUTE}]");
 if(!nodes.length)return;

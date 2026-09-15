@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { preload } from "react-dom";
+import { estProfilLeger } from "@/lib/profil-appareil";
 import { motion } from "motion/react";
 import type { HeroContent, SiteConfig } from "@/lib/content/types";
 import {
@@ -658,6 +659,9 @@ function HeroVideo({ src, poster }: { src: string; poster?: string }) {
     // affiche, alors qu'elle coûte 234 Kio et un décodage continu au processeur
     // le plus lent du parc. L'affiche reste, identique à la première image.
     if (!window.matchMedia("(min-width: 810px)").matches) return;
+    // Profil léger (appareil modeste, réseau lent, économie de données) : pas
+    // de vidéo non plus sur grand écran. Voir `@/lib/profil-appareil`.
+    if (estProfilLeger()) return;
     const lancer = () => setMonter(true);
     if (document.readyState === "complete") {
       const id = window.setTimeout(lancer, 0);

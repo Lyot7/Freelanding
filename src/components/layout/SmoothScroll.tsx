@@ -2,6 +2,7 @@
 
 import Lenis, { type LenisOptions } from "lenis";
 import { useEffect } from "react";
+import { estProfilLeger } from "@/lib/profil-appareil";
 
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 
@@ -25,7 +26,8 @@ export function SmoothScroll() {
     let lenis: Lenis | null = null;
 
     const syncMotionPreference = () => {
-      if (reducedMotion.matches) {
+      // Profil léger : défilement natif, pas de boucle rAF permanente.
+      if (reducedMotion.matches || estProfilLeger()) {
         lenis?.destroy();
         lenis = null;
         return;

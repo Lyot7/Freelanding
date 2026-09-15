@@ -605,6 +605,19 @@ body {
   }
 }
 
+/* PROFIL LÉGER (`@/lib/profil-appareil`) : appareil modeste, réseau lent ou
+   économie de données. Même contenu, mêmes images, sans mouvement : le grain
+   reste posé mais immobile, et tout ce qui attendait une entrée animée est
+   visible dès la première peinture, comme sans JavaScript. */
+[data-profil="leger"] .grain-drift {
+  animation: none;
+  will-change: auto;
+}
+[data-profil="leger"] [data-reveal] {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
 /* ============================================================
    Ticker — bandeau à VITESSE CONSTANTE (composant Ticker.tsx)
    Contrairement au Marquee ci-dessous (durée fixe, donc vitesse variable
