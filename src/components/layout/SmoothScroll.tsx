@@ -36,10 +36,19 @@ export function SmoothScroll() {
       lenis ??= new Lenis(LENIS_OPTIONS);
     };
 
-    syncMotionPreference();
-    reducedMotion.addEventListener("change", syncMotionPreference);
+    // Démarrage APRÈS `load` : la boucle `autoRaf` tourne à chaque image dès sa
+    // création. MESURÉ sur l'accueil mobile (CPU ×4) : le module qui la porte
+    // cumulait 0,9 s de fil principal pendant le chargement. Avant `load`, le
+    // défilement reste natif, sans à-coup à la bascule.
+    const demarrer = () => {
+      syncMotionPreference();
+      reducedMotion.addEventListener("change", syncMotionPreference);
+    };
+    if (document.readyState === "complete") demarrer();
+    else window.addEventListener("load", demarrer, { once: true });
 
     return () => {
+      window.removeEventListener("load", demarrer);
       reducedMotion.removeEventListener("change", syncMotionPreference);
       lenis?.destroy();
     };
