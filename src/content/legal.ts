@@ -109,7 +109,7 @@ const contactDetails = [
  * fausse sur une politique de confidentialité est un défaut de conformité à
  * elle seule (art. 12 RGPD, information « à jour »).
  */
-const lastUpdated = "2026-09-11";
+const lastUpdated = "2026-09-21";
 
 export const legalDocuments: readonly LegalDocument[] = [
   {

@@ -82,6 +82,15 @@ export async function GET(): Promise<Response> {
     ligne("À propos", "/a-propos", "parcours et façon de travailler"),
     ligne("Réalisations", "/realisations", "les projets en détail"),
     ligne("Contact", "/contact", "formulaire et coordonnées"),
+    /*
+     * PAGES DE DROIT. Un agent interrogé sur l’éditeur, l’hébergeur, les
+     * données collectées ou les conditions de vente n’a aucun moyen de
+     * deviner qu’elles existent : elles ne sont citées nulle part ailleurs
+     * dans ce fichier, et le pied de page n’est pas lu comme un sommaire.
+     */
+    ligne("Mentions légales", "/legal/mentions-legales", "éditeur, directeur de publication, hébergeur"),
+    ligne("Politique de confidentialité", "/legal/politique-de-confidentialite", "données collectées, bases légales, durées, droits RGPD"),
+    ligne("Conditions générales de vente", "/legal/conditions-generales-de-vente", "vente aux professionnels : devis, paiement, délais, droits sur le livrable"),
     "",
     ...(questions.length ? ["## Questions fréquentes", "", ...questions] : []),
   ].join("\n");

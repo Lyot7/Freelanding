@@ -133,12 +133,12 @@ export function LegalPageView({
                 réduit à son contenu, et un enfant `sticky` n'aurait alors
                 aucune course. Même remarque que sur la page article. */}
             {sommaire.length > 0 ? (
-              <aside className="hidden desktop:col-start-1 desktop:row-start-2 desktop:block desktop:self-stretch desktop:pr-[40px]">
+              <div className="hidden desktop:col-start-1 desktop:row-start-2 desktop:block desktop:self-stretch desktop:pr-[40px]">
                 <TableOfContents
                   entrees={sommaire}
                   titre={uiLabels.filters.blogTableOfContentsLabel}
                 />
-              </aside>
+              </div>
             ) : null}
             {/* 620px donne environ 72 caractères à 15px de corps, dans la
                 fourchette de confort admise de 45 à 75. La mesure de référence

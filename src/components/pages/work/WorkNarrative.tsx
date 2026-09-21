@@ -328,7 +328,7 @@ function BlocEtape({
       >
         <div className="flex items-center gap-[12px]">
           {step ? (
-            <span className="text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/40">
+            <span className="text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/60">
               {step}
             </span>
           ) : null}
