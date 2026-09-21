@@ -3,11 +3,16 @@
 > Registre des visuels servis au visiteur. **Règle : aucun fichier n'est servi
 > depuis `public/` sans une ligne ici.** Un visuel dont la licence n'est pas
 > traçable ne se voit pas : il s'affiche, il est joli, et rien ne dit qu'il
-> appartient à quelqu'un d'autre. Le contrôle automatique correspondant est
-> `bun run audit:fichiers`, qui vérifie que tout média cité par le contenu
-> existe bien sur le disque. (`scripts/template-assets-audit.mjs`, qui
-> traquait les restes du template servis au visiteur, a été supprimé le
-> 2026-09-21 : il n'y en a plus un seul à traquer.)
+> appartient à quelqu'un d'autre.
+>
+> **Cette règle n'a plus de contrôle automatique**, et c'est une perte assumée.
+> `scripts/template-assets-audit.mjs` mesurait ce que le navigateur chargeait
+> réellement sur chaque route, page défilée de bout en bout : il prouvait que
+> tout fichier SERVI était un fichier déclaré ici. Il a été supprimé le
+> 2026-09-21 avec le reste de l'outillage du portage Framer. `audit:fichiers`
+> ne le remplace pas : il vérifie que tout média CITÉ par le contenu existe sur
+> le disque, ce qui est la propriété inverse. Un visuel servi sans être déclaré
+> ici passerait aujourd'hui inaperçu.
 
 Dernière revue : **2026-08-26**.
 

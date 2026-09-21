@@ -256,15 +256,12 @@ await run([
   output,
 ]);
 
-const webm = output.replace(/\.mp4$/, ".webm");
-await run([
-  "-v", "error", "-y",
-  ...(isStill ? ["-loop", "1", "-t", String(LOOP_SECONDS)] : []),
-  "-i", source,
-  ...common,
-  "-c:v", "libvpx-vp9", "-crf", "34", "-b:v", "0", "-row-mt", "1",
-  webm,
-]);
+/* PLUS DE .webm, DEPUIS LE 2026-09-21. Ce script en produisait un a cote du
+   mp4, et personne ne l'a jamais servi : la balise `<video>` du hero n'a qu'un
+   seul `src`, en mp4, sans `<source>` de repli. Les trois `.webm` du depot ont
+   donc ete supprimes, et les reproduire a chaque passage du script les aurait
+   fait revenir. Le jour ou le hero sert deux formats, l'encodage VP9 est dans
+   l'historique git. */
 
 // Vérification sur le FICHIER FINAL, pas sur le filtre : l'encodage lui-même
 // peut déplacer la distribution.
@@ -276,9 +273,7 @@ const pass =
   final.p99 <= TARGET.p99Max;
 
 console.log("\nfichier final :");
-for (const file of [output, webm]) {
-  console.log(`  ${file}  ${(statSync(file).size / 1024).toFixed(0)} Ko`);
-}
+console.log(`  ${output}  ${(statSync(output).size / 1024).toFixed(0)} Ko`);
 console.log(
   `  moyenne ${final.mean.toFixed(1)}/255  max ${final.max}  p99 ${final.p99}  ` +
     `>200 ${final.over200Pct.toFixed(3)} %`,
