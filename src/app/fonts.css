@@ -1,9 +1,16 @@
-/* GÉNÉRÉ par scripts/extract-fonts.mjs — ne pas éditer à la main.
+/* Les 55 @font-face du site, et le seul endroit où ils sont déclarés.
  *
- * Copie fidèle des @font-face du live (../site/raw-live/routes/index.html), origine réécrite vers
- * les woff2 rapatriés dans public/. Reproduire ces déclarations à l'identique
- * est ce qui garantit des largeurs de texte, donc des retours à la ligne,
- * identiques à la source. */
+ * FICHIER GÉNÉRÉ À L'ORIGINE, PLUS REGÉNÉRABLE, ET C'EST VOULU. Il a été
+ * produit par `scripts/extract-fonts.mjs` depuis le miroir hors ligne du site
+ * d'origine ; le script comme le miroir ont été supprimés le 2026-09-21, faute
+ * d'entrée à lire. Ce fichier est donc désormais édité à la main comme
+ * n'importe quelle feuille du projet.
+ *
+ * NE PAS REMPLACER CES DÉCLARATIONS PAR UN PAQUET npm. Le paquet `geist` sert
+ * la fonte variable de Vercel, dont les métriques diffèrent de ces fichiers
+ * statiques : mêmes dessins, largeurs de texte différentes, donc retours à la
+ * ligne différents sur tout le site. Les woff2 sont servis depuis
+ * `public/fonts.gstatic.com/`, dont le nom reproduit le chemin d'origine. */
 
 @font-face { font-family: "Geist"; font-style: normal; font-weight: 400; font-display: swap; src: url(/fonts.gstatic.com/s/geist/v5/gyByhwUxId8gMEwRGFWfOw.woff2) format("woff2"); unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F; }
 @font-face { font-family: "Geist"; font-style: normal; font-weight: 400; font-display: swap; src: url(/fonts.gstatic.com/s/geist/v5/gyByhwUxId8gMEwYGFWfOw.woff2) format("woff2"); unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116; }

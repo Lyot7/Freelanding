@@ -16,6 +16,10 @@ const eslintConfig = defineConfig([
     "public/**",
     // Dev-only extraction tooling (Node .mjs, not part of the app build).
     "scripts/**",
+    // Worktrees d'agents : des COPIES du depot, branchees ailleurs. Sans cette
+    // ligne, `bun run lint` lint le projet une fois par worktree present et
+    // rend 778 erreurs qui n'existent dans aucun fichier de travail.
+    ".claude/**",
     // Generated Framer HTML-string modules (port fidele) — not hand-written
     // code; eslint mis-parses the inlined markup as JSX/hooks. Owned by the
     // extraction pipeline, never linted.

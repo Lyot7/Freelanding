@@ -12,9 +12,8 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
 /* Les feuilles restent à la racine de `src/app` et NON dans `(site)` : elles ne
-   sont pas des fichiers de route, et `scripts/extract-fonts.mjs` régénère
-   `src/app/fonts.css` (importée par `globals.css`) à cet emplacement exact. Les
-   déplacer casserait un contrôle de fidélité pour un gain nul. */
+   sont pas des fichiers de route, et `globals.css` importe `fonts.css` par un
+   chemin relatif à cet emplacement. Les déplacer n'apporte rien. */
 import "../globals.css";
 /* Focus clavier — feuille dédiée, importée APRÈS `globals.css` et volontairement
    HORS de toute couche CSS : c'est ce qui lui permet de battre les utilitaires

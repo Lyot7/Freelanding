@@ -292,25 +292,60 @@ function collect([accents, TAUX, PLANCHER]) {
   return found;
 }
 
-const browser = await chromium.launch();
+/*
+ * POURQUOI CE BLOC RELANCE LE NAVIGATEUR AU LIEU D'EN GARDER UN SEUL.
+ *
+ * MESURÉ le 2026-09-21, et c'est la machine qui décide : sur un poste dont
+ * il reste environ 300 Mo de mémoire libre, macOS tue le navigateur au bout
+ * de quelques dizaines de pages. Le symptôme est toujours le même —
+ * « Network service crashed or was terminated », puis « Target page, context
+ * or browser has been closed » sur tout ce qui suit. L'audit s'arrêtait alors
+ * sur une pile Playwright de cinquante lignes, SANS avoir mesuré les routes
+ * restantes, et un run vert ne prouvait plus rien.
+ *
+ * 21 routes x 3 largeurs font 63 pages : aucun découpage fixe ne met à l'abri,
+ * puisque le seuil dépend de ce que la machine fait par ailleurs. Le navigateur
+ * est donc traité comme une ressource qui PEUT mourir : on vérifie qu'il est
+ * vivant avant chaque route, on le relance sinon, et chaque route a droit à
+ * trois tentatives espacées d'un repos croissant. Une route n'est déclarée
+ * injoignable qu'après ça.
+ *
+ * LES DRAPEAUX GPU sont l'autre moitié du correctif, et répondent à une cause
+ * différente : sans eux, la page des réalisations à elle seule (rendu WebGL)
+ * tue le navigateur en trois secondes, sur une machine au repos comme chargée.
+ * Ils ne changent rien à ce qui est mesuré ici — de la géométrie de texte,
+ * jamais un pixel rendu.
+ */
+const ARGS_NAVIGATEUR = [
+  "--disable-gpu",
+  "--disable-software-rasterizer",
+  "--disable-webgl",
+];
+
 const findings = [];
 
-for (const width of widths) {
-  const ctx = await browser.newContext({ viewport: { width, height: 900 } });
-  for (const route of ROUTES) {
-    const page = await ctx.newPage();
-    try {
-      // `domcontentloaded`, PAS `networkidle`. Le hero porte une boucle vidéo
-      // qui ne cesse jamais de solliciter le réseau : `networkidle` expirait
-      // donc à 30 s sur les seize routes, et l'audit annonçait tout de même
-      // « Aucun accent coupé » — un vert obtenu en n'ayant rien regardé.
-      await page.goto(BASE + route, { waitUntil: "domcontentloaded", timeout: 60_000 });
-    } catch {
-      console.error(`INJOIGNABLE ${route} @${width}`);
-      injoignables.push(`${route} @${width}`);
-      await page.close();
-      continue;
-    }
+/** Navigateur et contexte courants, remplacés dès que le système les emporte. */
+let browser = null;
+let ctx = null;
+
+/** Rend un contexte vivant à la largeur demandée, en relançant si besoin. */
+async function contexteVivant(width) {
+  if (browser?.isConnected() && ctx) return ctx;
+  await browser?.close().catch(() => {});
+  browser = await chromium.launch({ args: ARGS_NAVIGATEUR });
+  ctx = await browser.newContext({ viewport: { width, height: 900 } });
+  return ctx;
+}
+
+/** Mesure une route, sur une page neuve. Lève si quoi que ce soit échoue. */
+async function mesurer(route, width) {
+  const page = await (await contexteVivant(width)).newPage();
+  try {
+    // `domcontentloaded`, PAS `networkidle`. Le hero porte une boucle vidéo
+    // qui ne cesse jamais de solliciter le réseau : `networkidle` expirait
+    // donc à 30 s sur les seize routes, et l'audit annonçait tout de même
+    // « Aucun accent coupé » — un vert obtenu en n'ayant rien regardé.
+    await page.goto(BASE + route, { waitUntil: "domcontentloaded", timeout: 60_000 });
     await page.waitForTimeout(2600);
     // ÉTAT DE REPOS FORCÉ. Sans cette feuille, tout ce qui est sous la ligne de
     // flottaison reste garé dans son état initial d'apparition (translation de
@@ -325,14 +360,49 @@ for (const width of widths) {
       await document.fonts.ready;
     });
     await page.waitForTimeout(150);
-    for (const f of await page.evaluate(collect, [ACCENTS, TAUX_MARGE, PLANCHER_MARGE])) {
-      findings.push({ route, width, ...f });
-    }
-    await page.close();
+    return await page.evaluate(collect, [ACCENTS, TAUX_MARGE, PLANCHER_MARGE]);
+  } finally {
+    await page.close().catch(() => {});
   }
-  await ctx.close();
 }
-await browser.close();
+
+for (const width of widths) {
+  /* Le contexte porte la largeur : il change à chaque tour, même si le
+     navigateur, lui, a survécu au précédent. */
+  await ctx?.close().catch(() => {});
+  ctx = null;
+
+  for (const route of ROUTES) {
+    let derniere = null;
+    for (const tentative of [1, 2, 3]) {
+      try {
+        for (const f of await mesurer(route, width)) {
+          findings.push({ route, width, ...f });
+        }
+        derniere = null;
+        break;
+      } catch (erreur) {
+        derniere = String(erreur).split("\n")[0].slice(0, 100);
+        /* Une mort du navigateur se répare en le relançant ; un vrai défaut de
+           la page se reproduira à l'identique au tour suivant. Dans les deux
+           cas on repart d'un processus neuf, c'est la seule reprise qui tienne
+           sans distinguer des messages d'erreur à la main. */
+        await browser?.close().catch(() => {});
+        browser = null;
+        ctx = null;
+        /* Une seconde de repos avant de repartir. Quand la cause est la
+           pression memoire de la machine, relancer dans l'instant echoue
+           pour exactement la meme raison que la premiere fois. */
+        await new Promise((resoudre) => setTimeout(resoudre, 1000 * tentative));
+      }
+    }
+    if (derniere) {
+      console.error(`INJOIGNABLE ${route} @${width} — ${derniere}`);
+      injoignables.push(`${route} @${width}`);
+    }
+  }
+}
+await browser?.close().catch(() => {});
 
 // UNE ROUTE INJOIGNABLE EST UN ÉCHEC, pas une ligne d'information. Sans cette
 // sortie en erreur, un serveur éteint produit exactement le même message qu'un
