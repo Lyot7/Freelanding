@@ -656,7 +656,8 @@ function HeroGlass({ height }: { height: number | null }) {
  * en fondu dès qu'elle joue : même boîte, donc aucun nouveau candidat LCP, et
  * la première image de la boucle est celle de l'affiche.
  */
-function HeroVideo({ src, poster }: { src: string; poster?: string }) {
+/** Exporté pour le test unitaire ciblé (`HeroSection.test.mjs`) : le seul appelant reste `HeroSection`. */
+export function HeroVideo({ src, poster }: { src: string; poster?: string }) {
   const [monter, setMonter] = useState(false);
   const [joue, setJoue] = useState(false);
   useEffect(() => {
