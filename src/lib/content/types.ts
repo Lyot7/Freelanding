@@ -829,21 +829,10 @@ export interface ContactContent {
   seo: PageSeo;
 }
 
-/** Bloc d'inscription à la newsletter, en pied d'article. */
-export interface NewsletterContent {
-  title: string; // « Newsletter »
-  body: string; // « Short notes on conversion… »
-  emailLabel: string; // libellé lu par les lecteurs d'écran
-  placeholder: string; // « your@email.com »
-  submitLabel: string; // « Subscribe »
-}
-
 export interface BlogContent {
   hero: HeroContent;
   categories: readonly string[];
   posts: readonly BlogPost[];
-  /** Bloc newsletter affiché sous chaque article. */
-  newsletter?: NewsletterContent;
   /** Lien au-dessus des articles liés (« All articles »). */
   relatedLink?: Link;
   /** Découpage du titre des articles liés (« Latest » / « articles. »). */

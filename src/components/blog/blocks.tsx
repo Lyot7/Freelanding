@@ -99,6 +99,11 @@ export function Video({
         className="block h-auto w-full"
         src={src}
         poster={poster}
+        /* Les captures d'article sont muettes : pas de sous-titres a fournir
+           (WCAG 1.2.2 ne s'applique qu'au son). Ce qu'elles montrent doit en
+           revanche etre dit : la legende porte cette alternative, et le
+           `aria-label` la rattache a la video quand elle existe. */
+        aria-label={caption}
         autoPlay
         muted
         loop
@@ -124,7 +129,7 @@ export function Callout({
   children: ReactNode;
 }) {
   return (
-    <aside
+    <div
       className={`${ECART} border-l-2 border-accent pl-[16px] [&>p]:mt-0 [&>p+p]:mt-[10px]`}
     >
       {title ? (
@@ -133,7 +138,7 @@ export function Callout({
         </p>
       ) : null}
       <div className={`${CORPS} ${title ? "mt-[8px]" : ""}`}>{children}</div>
-    </aside>
+    </div>
   );
 }
 

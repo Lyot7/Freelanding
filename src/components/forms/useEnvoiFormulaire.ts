@@ -28,8 +28,8 @@ import type { ProtectionTurnstile } from "./turnstile";
  * Le `detail` ne contient JAMAIS de donnée saisie : ni adresse, ni message.
  */
 
-/** Les trois intentions reconnues par `POST /api/contact`. */
-export type IntentionFormulaire = "projet" | "footer" | "newsletter";
+/** Les deux intentions reconnues par `POST /api/contact`. */
+export type IntentionFormulaire = "projet" | "footer";
 
 export type EtatEnvoi = "repos" | "envoi" | "succes" | "erreur";
 
@@ -45,8 +45,6 @@ const MESSAGES_SUCCES: Record<IntentionFormulaire, string> = {
     "Message envoyé. Un accusé de réception vient de partir vers ta boîte : je te réponds sous 24 heures ouvrées.",
   footer:
     "Message envoyé. Un accusé de réception vient de partir vers ta boîte : je te réponds sous 24 heures ouvrées.",
-  newsletter:
-    "Adresse enregistrée. Un e-mail de confirmation vient de partir vers ta boîte.",
 };
 
 const MESSAGE_RESEAU =
@@ -151,10 +149,8 @@ export function useEnvoiFormulaire(
         [NOM_CHAMP_PIEGE]: lire(NOM_CHAMP_PIEGE),
         ...(jetonCaptcha ? { jetonCaptcha } : {}),
       };
-      if (intention !== "newsletter") {
-        corps.nom = lire("nom");
-        corps.typeProjet = lire("typeProjet");
-      }
+      corps.nom = lire("nom");
+      corps.typeProjet = lire("typeProjet");
       if (intention === "projet") {
         corps.message = lire("message");
       }

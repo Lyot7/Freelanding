@@ -10,12 +10,11 @@ import type { Link } from "@/lib/content/types";
  * d'aucune couleur de la page, et `currentColor` y retombe sur le noir par
  * défaut. Sur un pied de page presque noir, l'icône disparaissait.
  *
- * CE QU'UNE COULEUR ÉCRITE EN DUR N'AURAIT PAS RÉGLÉ. Les mêmes glyphes servent
- * à deux endroits aux fonds opposés : le pied de page, sombre, où il les faut
- * clairs, et la pastille ronde du bloc newsletter du blog, en `rgb(245,245,245)`,
- * où il les faut sombres. Un `fill="#fff"` dans le fichier aurait déplacé le
- * défaut au lieu de le supprimer. Inline, `currentColor` fonctionne : chaque
- * hôte pose sa couleur de texte et le glyphe suit.
+ * CE QU'UNE COULEUR ÉCRITE EN DUR N'AURAIT PAS RÉGLÉ. Le glyphe doit pouvoir
+ * servir sur un fond sombre, où il le faut clair, comme sur un fond clair, où
+ * il le faut sombre. Un `fill="#fff"` dans le fichier aurait déplacé le défaut
+ * au lieu de le supprimer. Inline, `currentColor` fonctionne : chaque hôte pose
+ * sa couleur de texte et le glyphe suit.
  *
  * Effet de bord favorable : deux requêtes HTTP en moins, et la règle
  * `@next/next/no-img-element` cesse d'être enfreinte à cet endroit.
