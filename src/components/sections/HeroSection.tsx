@@ -702,6 +702,11 @@ function HeroVideo({ src, poster }: { src: string; poster?: string }) {
             "absolute inset-0 h-full w-full object-cover transition-opacity duration-500 " +
             (joue ? "opacity-100" : "opacity-0")
           }
+          /* Décor pur, sans piste audio : sorti de l'arbre d'accessibilité pour
+             qu'un lecteur d'écran n'annonce pas un lecteur vidéo vide au milieu
+             du titre, et du parcours clavier où il n'a rien à offrir. */
+          aria-hidden
+          tabIndex={-1}
           autoPlay
           muted
           loop

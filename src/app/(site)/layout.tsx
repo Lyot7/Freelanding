@@ -12,7 +12,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
 /* Les feuilles restent à la racine de `src/app` et NON dans `(site)` : elles ne
-   sont pas des fichiers de route, et `globals.css` importe `fonts.css` par un
+   sont pas des fichiers de route, et `globals.css` importe `polices.css` par un
    chemin relatif à cet emplacement. Les déplacer n'apporte rien. */
 import "../globals.css";
 /* Focus clavier — feuille dédiée, importée APRÈS `globals.css` et volontairement

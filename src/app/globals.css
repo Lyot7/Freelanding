@@ -1,8 +1,7 @@
 @import "tailwindcss";
 @import "lenis/dist/lenis.css";
-/* Polices tenues à la main (voir l'en-tête de `polices.css`). `fonts.css`,
-   généré depuis le live, n'est plus importé : ses faces latines téléchargeaient
-   trois fichiers en production et recomposaient le héros de l'accueil. */
+/* Polices tenues à la main — voir l'en-tête de `polices.css`, qui dit pourquoi
+   la liste générée depuis le live a été abandonnée. */
 @import "./polices.css";
 
 /* ============================================================
@@ -55,7 +54,7 @@
   --color-text-secondary: var(--text-secondary);
   --color-foreground-60: var(--foreground-60);
 
-  /* Fonts — stack EXACTE du live (voir fonts.css). Le paquet npm `geist` sert
+  /* Fonts — stack EXACTE du live (voir polices.css). Le paquet npm `geist` sert
      la variable font de Vercel, dont les métriques diffèrent des fichiers
      statiques Google Fonts utilisés par la source : mêmes dessins, largeurs de
      texte différentes, donc retours à la ligne différents. */
