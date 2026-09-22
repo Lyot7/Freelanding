@@ -40,3 +40,26 @@ contenu de `public/`. Une image manquante ne casse rien de visible : les types
 sont verts, Next renvoie un 404 sur le fichier et la page affiche un cadre vide.
 Ce script rend l'attente explicite, ce qui permet d'écrire une entrée de galerie
 avant d'avoir la capture.
+
+## Avant de chercher dans ce dépôt
+
+Un graphe de connaissance est construit sur le code : **1474 nœuds, 3021 arêtes**, extraction AST
+déterministe, aucun token de modèle. Il répond en quelques millisecondes à ce qui coûterait
+sinon des dizaines de `grep` et de `Read`.
+
+```bash
+graphify query "comment X fonctionne"     # contexte large autour d'un sujet
+graphify affected "maFonction()"          # ce qui casse si je touche ça
+graphify path "moduleA" "moduleB"         # le chemin entre deux modules
+graphify explain "maFonction()"           # ce que fait un nœud et son voisinage
+```
+
+L'interroger d'abord, lire les fichiers ensuite, et seulement ceux que la réponse désigne.
+C'est à ça que sert l'architecture documentée : s'en servir, pas relire la codebase.
+
+**Le tenir à jour fait partie du travail.** Après un changement de structure (fichier ajouté,
+déplacé, supprimé, module extrait) : `~/ai-config/core/scripts/graphe-projet.sh` depuis la racine
+du dépôt. Incrémental, quelques secondes, toujours sans modèle. Un graphe périmé ment, et un
+agent qui s'y fie se trompe de fichier.
+
+Vue d'ensemble rédigée : `graphify-out/GRAPH_REPORT.md`. `graphify-out/` est ignoré au git.

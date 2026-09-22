@@ -17,19 +17,17 @@
  * ligne. Tout ce qui compte se décide ici.
  */
 
-/** Intentions distinctes portées par les trois formulaires du site. */
-export const INTENTIONS = ["projet", "footer", "newsletter"] as const;
+/** Intentions distinctes portées par les deux formulaires du site. */
+export const INTENTIONS = ["projet", "footer"] as const;
 
 export type Intention = (typeof INTENTIONS)[number];
 
 /** Soumission acceptée, normalisée, prête à être mise en gabarit d'e-mail. */
 export interface SoumissionValide {
   readonly intention: Intention;
-  /** Absent pour l'intention `newsletter`, qui ne demande que l'adresse. */
-  readonly nom?: string;
+  readonly nom: string;
   readonly email: string;
-  /** Absent pour `newsletter`. */
-  readonly typeProjet?: string;
+  readonly typeProjet: string;
   /** Présent pour `projet` seulement, et facultatif même là. */
   readonly message?: string;
 }
@@ -189,10 +187,6 @@ export function validerSoumission(
       ok: false,
       motif: { type: "champ_invalide", champ: "email", raison: "format" },
     };
-  }
-
-  if (intention === "newsletter") {
-    return { ok: true, soumission: { intention, email } };
   }
 
   const nom = normaliserLigne(lireChaine(champs, "nom") ?? "");

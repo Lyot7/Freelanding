@@ -1,17 +1,22 @@
-# Framer static-port scripts
+# Outillage de developpement
 
-Outillage de dev (jamais execute au runtime) pour porter les pages du site
-Framer archive (`../site/le-site-d-origine/*.html`) dans l'app Next.js, a
-l'identique de la home. Necessite la devDependency `node-html-parser`.
+Scripts jamais executes au runtime : audits lances contre le serveur de dev, et
+fabricants d'assets. Aucun n'est necessaire pour construire ou servir le site.
 
-## Vue d'ensemble
+## Le portage depuis Framer est termine
 
-| Fichier | Role |
-|---|---|
-| `lib/framer-rewrite.mjs` | Rewrites partages : strip `<script>`, `https://framerusercontent.com` -> `/framerusercontent.com`, `https://fonts.gstatic.com` -> `/fonts.gstatic.com`, strip des query strings d'assets. Serialisation `export const html = "..."`. |
-| `lib/css-split.mjs` | Tokenizer CSS + split par hash racine de page (rules scopees `.framer-<rootHash>` = page ; le reste = global). Recurse dans `@media/@supports`. Lossless. |
-| `extract-framer-page.mjs` | Extracteur principal : une page HTML -> fragments HTML par section + CSS specifique + `_meta.json`. |
-| `split-framer-css.mjs` | Bootstrap one-shot : decoupe `framer.css` (home) en `framer-global.css` + `framer-home.css`. Deja execute. |
+Ce site a d'abord ete un portage fidele d'un template Framer, puis d'un site
+SvelteKit. Les cinq extracteurs de cette epoque (`extract-framer-page.mjs`,
+`split-framer-css.mjs`, `css-source.mjs`, `extract-fonts.mjs`,
+`template-assets-audit.mjs`) et leurs deux librairies ont ete **supprimes le
+2026-09-21** : leur entree commune, le miroir hors ligne `../site/`, n'existe
+plus, et les sorties qu'ils fabriquaient (`src/content/framer-html/`,
+`src/app/framer*.css`, `public/framerusercontent.com/`) non plus. Ils restent
+lisibles dans l'historique git.
+
+Les commentaires `Source : markup content/framer-html/<page>.ts` que portent
+encore les composants de section designent cette archive disparue : ils disent
+d'ou vient le dessin d'un bloc, pas un fichier a ouvrir.
 
 ## Typographie et orthographe francaises
 
@@ -40,78 +45,6 @@ L'orthographe, elle, n'est pas couverte par ces outils. Elle a ete verifiee le
 texte rendu des seize routes : zero faute, les seuls signalements etant des noms
 propres (Kpsull, NSLysium, Aether) et des mots absents du dictionnaire mais
 corrects (precontractuelles, retirable, indexable).
-
-## Modele d'architecture (rappel)
-
-- **CSS content-addressed** : chaque hash (`framer-XXXXX`) porte les memes regles
-  partout, sans collision. Les sections d'une page sont scopees sous le hash
-  racine de la page (`.framer-pK5Ni` pour la home, `.framer-WEpYk` pour about...),
-  tandis que le chrome (header `EGNs3`, footer `Rrp39`...) est scope sous son
-  propre hash, identique sur les 18 pages.
-- Donc : **CSS de page = regles referencant `.framer-<rootHash>`** ; **global =
-  tout le reste** (fonts, reset, tokens, presets, breakpoint, chrome, override POC).
-- Le chrome est monte une seule fois via `<FramerShell>` (voir
-  `src/components/framer/FramerShell.tsx`) ; chaque page ne fournit que ses sections
-  + son `rootClassName`/`mainClassName`.
-
-## Porter une nouvelle page (ex : `about`)
-
-```bash
-cd web
-node scripts/extract-framer-page.mjs \
-  --in ../site/le-site-d-origine/about.html \
-  --page about
-# ou --dry pour juste voir le plan de decoupage
-```
-
-Produit :
-
-- `src/content/framer-html/about/section-01.ts … section-NN.ts`
-  (un fragment par section = enfant direct de `<main>` ; les variantes
-  responsive `ssr-variant` consecutives d'un meme composant sont regroupees).
-  Chaque fichier exporte `export const html = "..."` (rewrites deja appliques,
-  commentaires `<!--$-->` preserves).
-- `src/content/framer-html/about/_meta.json` : `rootHash`, `rootClass`,
-  `mainClass`, `componentHashes`, et la liste des sections (index, hash de
-  composant, `data-framer-name`, nb de variantes) pour mapper les fragments.
-- `src/app/framer-about.css` : CSS specifique a la page (regles `.framer-WEpYk`).
-
-### Cablage manuel (ce que le script ne fait pas)
-
-1. Creer les composants de section (sur le modele de
-   `src/components/framer/HeroSection.tsx` : `dangerouslySetInnerHTML` +
-   `display:contents`), un par `section-NN.ts` — ou les regrouper/renommer selon
-   `_meta.json`.
-2. Creer `src/app/about/page.tsx` :
-   ```tsx
-   import { FramerShell } from "@/components/framer/FramerShell";
-   import "../framer-about.css"; // apres framer-global.css (importe au layout)
-   // ...imports des sections
-   export default function About() {
-     return (
-       <FramerShell rootClassName={/* _meta.json rootClass */} mainClassName={/* _meta.json mainClass */}>
-         {/* <Section01/> ... */}
-       </FramerShell>
-     );
-   }
-   ```
-3. Verifier le rendu contre la source (`site/…` ouverte en local) aux 3 breakpoints.
-
-## Pieges connus (voir aussi la note de livraison)
-
-- **Nav "page courante"** : header/footer embarquent un marqueur Framer
-  `data-framer-page-link-current` fige sur la home. Sur les autres pages, l'etat
-  actif de la nav sera faux tant qu'il n'est pas ajuste par page.
-- **Reveal des animations d'apparition** : l'override global ne revele que
-  `[style*="opacity:0.001"]`. Certaines pages (ex : hero d'about) demarrent a
-  `opacity:0` — il faudra etendre l'override (ou neutraliser ces styles inline)
-  au portage de ces pages.
-- **Composants standalone nouveaux** : un composant Framer scope sous son propre
-  hash (pas sous le hash racine) part dans le CSS *global* seulement s'il etait
-  deja present a la home. Un composant inedit d'une nouvelle page apparaitra dans
-  le `framer-<page>.css` uniquement s'il est scope sous le hash racine ; sinon
-  ajouter ses regles a `framer-global.css`. `_meta.json.componentHashes` aide a
-  reperer ces cas.
 
 ## Grain — inventaire compare source / clone
 
@@ -171,4 +104,4 @@ temps de script / de style / de mise en page, nombre d'`IntersectionObserver` et
 de `ResizeObserver` construits avec leurs jeux d'options, elements portant
 encore un `will-change` a la fin, fuites au demontage (cibles encore observees
 alors qu'elles sont DETACHEES du document) et tenue de
-`prefers-reduced-motion` avec le mouvement normal pour temoin.
+`prefers-reduced-motion` avec le mouvement normal pour temoin.\n

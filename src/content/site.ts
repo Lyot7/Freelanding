@@ -126,7 +126,7 @@ export const siteConfig: SiteConfig = {
     { label: "Blog", href: "/blog" },
   ],
   /*
-   * RÉSEAUX DU PIED DE PAGE ET DU BLOC NEWSLETTER.
+   * RÉSEAUX DU PIED DE PAGE.
    *
    * RÈGLE : aucune URL n'est devinée. Un lien social mort dans un pied de page
    * est exactement le genre de détail qui coûte la crédibilité que le reste de

@@ -101,12 +101,10 @@ describe("gabarits d'e-mail", () => {
     expect(notification.texte).toContain("jean@example.com");
   });
 
-  it("le sujet distingue une inscription d'une demande de projet", () => {
-    const inscription = composerNotification({
-      intention: "newsletter",
-      email: "lecteur@example.org",
-    });
-    expect(inscription.sujet).toContain("Inscription");
-    expect(composerNotification(soumissionHostile).sujet).toContain("Nouvelle demande");
+  it("le sujet nomme le demandeur sans laisser passer d'en-tete", () => {
+    const sujet = composerNotification(soumissionHostile).sujet;
+    expect(sujet).toContain("Nouvelle demande");
+    expect(sujet).not.toContain("\n");
+    expect(sujet).not.toContain("\r");
   });
 });

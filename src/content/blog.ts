@@ -324,13 +324,6 @@ export const blogContent = {
     ),
   ],
   posts: blogPosts.filter(({ listedInIndex }) => listedInIndex),
-  newsletter: {
-    title: "Newsletter",
-    body: "Des notes courtes sur les boutiques en ligne, la conversion et les outils qui font gagner des heures.",
-    emailLabel: "Adresse e-mail",
-    placeholder: "toi@exemple.com",
-    submitLabel: "S’inscrire",
-  },
   relatedLink: { label: "Tous les articles", href: "/blog" },
   relatedTitleLines: ["Derniers", "articles."],
   readingTimeFallback: "3 min de lecture",

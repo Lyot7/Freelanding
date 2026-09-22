@@ -3,8 +3,16 @@
 > Registre des visuels servis au visiteur. **Règle : aucun fichier n'est servi
 > depuis `public/` sans une ligne ici.** Un visuel dont la licence n'est pas
 > traçable ne se voit pas : il s'affiche, il est joli, et rien ne dit qu'il
-> appartient à quelqu'un d'autre. Le contrôle automatique correspondant est
-> `scripts/template-assets-audit.mjs`.
+> appartient à quelqu'un d'autre.
+>
+> **Cette règle n'a plus de contrôle automatique**, et c'est une perte assumée.
+> `scripts/template-assets-audit.mjs` mesurait ce que le navigateur chargeait
+> réellement sur chaque route, page défilée de bout en bout : il prouvait que
+> tout fichier SERVI était un fichier déclaré ici. Il a été supprimé le
+> 2026-09-21 avec le reste de l'outillage du portage Framer. `audit:fichiers`
+> ne le remplace pas : il vérifie que tout média CITÉ par le contenu existe sur
+> le disque, ce qui est la propriété inverse. Un visuel servi sans être déclaré
+> ici passerait aujourd'hui inaperçu.
 
 Dernière revue : **2026-08-26**.
 
@@ -46,7 +54,7 @@ fonctionne.
 
 | Fichier | Ce que c'est | Origine |
 | --- | --- | --- |
-| `videos/hero-loop.mp4` · `.webm` | Boucle de fond du hero | Généré (Veo / Nano Banana, 2026-08-10), calibré par `scripts/hero-loop.mjs` |
+| `videos/hero-loop.mp4` | Boucle de fond du hero | Généré (Veo / Nano Banana, 2026-08-10), calibré par `scripts/hero-loop.mjs` |
 | `images/mecanisme-large.jpg` · `-carre` · `-bandeau` | Macro d'un mouvement d'horlogerie | Images fixes extraites de la boucle ci-dessus |
 | `images/og.jpg` | Image de partage | `scripts/og-image.mjs` |
 | `images/grain.png` | Motif de bruit 256 × 256 | Généré |
@@ -109,8 +117,8 @@ Les deux fichiers `images/icon-github.svg` et `icon-link.svg` ont été supprim�
 le 2026-08-27. Ils étaient servis par une balise `<img>`, donc en document isolé,
 donc sans héritage de couleur : leur `currentColor` retombait sur le noir et le
 glyphe GitHub sortait **noir sur noir dans le pied de page**. Une couleur écrite
-en dur n'aurait pas réglé le cas, les mêmes glyphes servant aussi la pastille
-claire du bloc newsletter du blog, où il les faut sombres. Ils sont désormais
+en dur n'aurait pas réglé le cas : le même glyphe doit pouvoir servir sur un
+fond clair, où il le faut sombre. Ils sont désormais
 rendus en SVG inline par `SocialGlyph`, et héritent de la couleur de leur hôte.
 
 **Provenance des tracés.** GitHub, LinkedIn et Strava sont les logotypes
@@ -333,13 +341,14 @@ vectorisées. Cette version-là ne permettait pas la mise en ligne : la licence
 
 - **`public/framerusercontent.com/`** (58 Mo, ~735 fichiers) : copie complète des
   assets du template Framer, servie publiquement sous notre origine. Supprimée le
-  2026-08-26. L'archive de référence hors ligne reste dans `../site/`, qui n'est
-  pas un dossier servi et que les scripts `mirror:framer` / `verify:framer-mirror`
-  utilisent déjà (`../site/raw-live`, `../site/offline-next`).
+  2026-08-26. L'archive de référence hors ligne vivait dans `../site/`, hors du
+  dépôt ; elle n'existe plus, et les scripts qui la lisaient ont été supprimés
+  le 2026-09-21.
 - **Les cinq visuels de la section Services** — remplacés, voir §4.
 - **Les deux avatars des témoignages de démonstration** (`testimonials.ts`) :
   portraits d'inconnus servis sous des noms inventés. Retirés, pas remplacés.
-- **Les deux glyphes sociaux du bloc newsletter du blog** : remplacés par les
+- **Les deux glyphes sociaux du bloc de bas d'article** (bloc retiré le
+  2026-09-21) : remplacés par les
   icônes locales, appariées au réseau et non à son rang (`social-icon-source.ts`).
 - **L'attribut `data-source-module`** du canevas `GradientWaveBackdrop` : il
   publiait une adresse du template dans le balisage servi.

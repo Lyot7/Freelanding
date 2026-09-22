@@ -1,6 +1,7 @@
 /* POLICES DU SITE — liste tenue À LA MAIN depuis le 2026-09-15.
  *
  * Remplace l'import de `fonts.css` (généré par `scripts/extract-fonts.mjs`,
+ * tous deux supprimés le 2026-09-21,
  * copie fidèle du live Framer). Ce fichier généré déclarait les graisses
  * latines 400 et 600 sur le fichier v5 d'origine et les graisses 500 et 700
  * sur deux fichiers statiques v4 sans plage de caractères. En production,

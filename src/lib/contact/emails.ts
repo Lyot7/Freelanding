@@ -61,8 +61,6 @@ function libelleIntention(intention: SoumissionValide["intention"]): string {
       return "formulaire de contact";
     case "footer":
       return "formulaire du pied de page";
-    case "newsletter":
-      return "inscription aux notes du blog";
   }
 }
 
@@ -71,17 +69,12 @@ export function composerNotification(
   soumission: SoumissionValide,
 ): MessageCompose {
   const origine = libelleIntention(soumission.intention);
-  const qui = soumission.nom ?? soumission.email;
-  const sujet = nettoyerEnTete(
-    soumission.intention === "newsletter"
-      ? `Inscription aux notes — ${soumission.email}`
-      : `Nouvelle demande — ${qui}`,
-  );
+  const sujet = nettoyerEnTete(`Nouvelle demande — ${soumission.nom}`);
 
   const morceaux: string[] = [
     `<p style="${STYLE_ETIQUETTE}">Reçu depuis le ${echapperHtml(origine)}</p>`,
   ];
-  if (soumission.nom) morceaux.push(bloc("Nom", echapperHtml(soumission.nom)));
+  morceaux.push(bloc("Nom", echapperHtml(soumission.nom)));
   morceaux.push(
     bloc(
       "E-mail",
@@ -98,7 +91,7 @@ export function composerNotification(
   const html = `<div style="${STYLE_CORPS}max-width:560px;">${morceaux.join("")}<hr style="border:none;border-top:1px solid #e5e5e5;margin:24px 0;" /><p style="font-size:12px;color:#6b6b6b;margin:0;">Répondre à ce message écrit directement au prospect.</p></div>`;
 
   const lignesTexte = [`Reçu depuis le ${origine}`, ""];
-  if (soumission.nom) lignesTexte.push(`Nom : ${soumission.nom}`);
+  lignesTexte.push(`Nom : ${soumission.nom}`);
   lignesTexte.push(`E-mail : ${soumission.email}`);
   if (soumission.typeProjet) {
     lignesTexte.push(`Type de projet : ${soumission.typeProjet}`);
@@ -115,26 +108,7 @@ export function composerAccuseReception(
   soumission: SoumissionValide,
   contactEmail: string,
 ): MessageCompose {
-  if (soumission.intention === "newsletter") {
-    const html = `<div style="${STYLE_CORPS}max-width:560px;"><p style="margin:0 0 16px;">Bonjour,</p><p style="margin:0 0 16px;">Ton adresse est bien enregistrée pour recevoir mes notes sur les sites, les outils métier et ce qui fait décider un client.</p><p style="margin:0 0 16px;">Ces notes partent à la main, pas plus d’une fois par mois. Pour ne plus les recevoir, il suffit de répondre « stop » à ce message.</p><p style="margin:0 0 4px;">Eliott Bouquerel</p><p style="margin:0;"><a href="mailto:${echapperHtml(contactEmail)}" style="color:#0b0b0b;">${echapperHtml(contactEmail)}</a></p></div>`;
-    return {
-      sujet: "Ton adresse est bien enregistrée",
-      html,
-      texte: [
-        "Bonjour,",
-        "",
-        "Ton adresse est bien enregistrée pour recevoir mes notes sur les sites, les outils métier et ce qui fait décider un client.",
-        "",
-        "Ces notes partent à la main, pas plus d’une fois par mois. Pour ne plus les recevoir, répondez « stop » à ce message.",
-        "",
-        "Eliott Bouquerel",
-        contactEmail,
-      ].join("\n"),
-    };
-  }
-
-  const prenom = soumission.nom ? echapperHtml(soumission.nom) : "";
-  const salutation = prenom ? `Bonjour ${prenom},` : "Bonjour,";
+  const salutation = `Bonjour ${echapperHtml(soumission.nom)},`;
 
   const rappel: string[] = [];
   if (soumission.typeProjet) {
@@ -147,7 +121,7 @@ export function composerAccuseReception(
   const html = `<div style="${STYLE_CORPS}max-width:560px;"><p style="margin:0 0 16px;">${salutation}</p><p style="margin:0 0 16px;">J’ai bien reçu ta demande. ${echapperHtml(PROMESSE_DELAI)}</p><p style="margin:0 0 24px;">Je lis ton message moi-même : la réponse sera honnête, même si c’est pour te dire que ce projet n’est pas pour moi.</p>${rappel.length > 0 ? `<hr style="border:none;border-top:1px solid #e5e5e5;margin:0 0 24px;" />${rappel.join("")}` : ""}<p style="margin:0 0 4px;">Eliott Bouquerel</p><p style="margin:0;"><a href="mailto:${echapperHtml(contactEmail)}" style="color:#0b0b0b;">${echapperHtml(contactEmail)}</a></p></div>`;
 
   const texte = [
-    soumission.nom ? `Bonjour ${soumission.nom},` : "Bonjour,",
+    `Bonjour ${soumission.nom},`,
     "",
     `J’ai bien reçu ta demande. ${PROMESSE_DELAI}`,
     "",

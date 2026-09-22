@@ -623,8 +623,7 @@ export async function Footer() {
                   <div className="relative flex w-min flex-row items-center gap-[14px] pt-[4px] tablet:gap-[12px]">
                     {/* Glyphes appariés au RÉSEAU et non à son rang dans la
                         liste, et rendus inline pour qu'ils héritent de la
-                        couleur de leur hôte — voir `SocialGlyph`, qui sert
-                        aussi le bloc newsletter du blog, sur fond clair. */}
+                        couleur de leur hôte — voir `SocialGlyph`. */}
                     {exposedSocials.map((s) => (
                       <SocialIcon key={s.href} social={s} />
                     ))}

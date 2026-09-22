@@ -95,3 +95,6 @@ docs/AUDIT-*.md
 docs/AUTORISATIONS-LOGOS.md
 docs/COPY-PROPOSITION*.md
 docs/EMAIL-WURTH-AUTORISATION.md
+
+# graphe de connaissance : regenerable par graphe-projet.sh
+graphify-out/

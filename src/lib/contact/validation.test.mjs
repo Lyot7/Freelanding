@@ -65,17 +65,14 @@ describe("validerSoumission — cas nominal", () => {
     expect(resultat.soumission.message).toBeUndefined();
   });
 
-  it("accepte la newsletter avec la seule adresse", () => {
+  it("refuse une intention inconnue", () => {
     const resultat = valider({
       intention: "newsletter",
       email: "lecteur@example.org",
+      nom: "Jean Dupont",
       debutMs: DEBUT_HUMAIN,
     });
-    expect(resultat.ok).toBe(true);
-    expect(resultat.soumission).toEqual({
-      intention: "newsletter",
-      email: "lecteur@example.org",
-    });
+    expect(resultat.ok).toBe(false);
   });
 
   it("accepte une demande de contact sans message (le champ est facultatif)", () => {

@@ -433,13 +433,12 @@ Framer n'expose sur aucun ancêtre.
 
 ### Visuels — chantier soldé le 2026-08-26
 
-Plus AUCUN asset du template n'est servi au visiteur, sur aucune route :
-`scripts/template-assets-audit.mjs` le vérifie en mesurant ce que le navigateur
-charge réellement, page défilée de bout en bout. Le dossier
-`public/framerusercontent.com` (58 Mo, ~735 fichiers du template servis sous
-notre origine) a été supprimé ; l'archive de référence hors ligne reste dans
-`../site/`, que les scripts `mirror:framer` et `verify:framer-mirror` utilisaient
-déjà. La provenance et la licence de chaque fichier encore servi sont tenues
+Plus AUCUN asset du template n'est servi au visiteur, sur aucune route. Le
+dossier `public/framerusercontent.com` (58 Mo, ~735 fichiers du template servis
+sous notre origine) a été supprimé le 2026-08-26, et l'archive de référence
+hors ligne `../site/` n'existe plus non plus. `template-assets-audit.mjs`, qui
+mesurait ce que le navigateur chargeait vraiment pour débusquer les restes, a
+donc été supprimé le 2026-09-21, faute de reste à débusquer. La provenance et la licence de chaque fichier encore servi sont tenues
 dans **`docs/ASSETS.md`** : toute image ajoutée à `public/` s'y déclare.
 
 ### Décisions ouvertes

@@ -13,14 +13,11 @@ import { ScrollParallax } from "@/components/motion/ScrollParallax";
 import type { BlogPost, SiteConfig } from "@/lib/content/types";
 import { Grain } from "@/components/effects/Grain";
 import { TableOfContents } from "@/components/blog/TableOfContents";
-// Le bloc newsletter est un composant CLIENT (soumission, état d'envoi) ; cette
-// page reste serveur. Voir l'en-tête de `NewsletterForm.tsx`.
-import { NewsletterForm } from "@/components/blog/NewsletterForm";
 import type { EntreeSommaire } from "@/lib/blog/sommaire";
 import { formatShortDate } from "@/components/format-date";
 // La page appelante (`src/app/(site)/blog/[slug]/page.tsx`) ne charge que
 // l'article, ses voisins et la configuration du site : le contenu de section du
-// blog (newsletter, lien et titre des articles liés) est lu directement ici,
+// blog (lien et titre des articles liés) est lu directement ici,
 // comme `BlogIndexPage` le fait déjà pour `@/content/faq`.
 import { blogContent } from "@/content/blog";
 import { uiLabels } from "@/content/ui";
@@ -360,12 +357,12 @@ export function BlogArticlePage({
               {/* Colonne gauche. `self-stretch` est indispensable : une cellule
                   de grille se réduit à son contenu par défaut, et un enfant
                   `sticky` n'a alors aucune course sur laquelle se déplacer. */}
-              <aside className="hidden tablet:col-start-1 tablet:row-start-2 tablet:block tablet:self-stretch tablet:pr-[40px]">
+              <div className="hidden tablet:col-start-1 tablet:row-start-2 tablet:block tablet:self-stretch tablet:pr-[40px]">
                 <TableOfContents
                   entrees={sommaire}
                   titre={uiLabels.filters.blogTableOfContentsLabel}
                 />
-              </aside>
+              </div>
               <div className="tablet:col-start-2 tablet:row-start-2">
                 <div className="mt-[20px] tablet:mt-[40px] tablet:pr-[20px] desktop:pr-[60px]">
                   {/* LE CORPS DE L'ARTICLE, rendu par la page depuis
@@ -375,11 +372,6 @@ export function BlogArticlePage({
                     `src/mdx-components.tsx`. */}
                   {children}
                 </div>
-                <NewsletterForm
-                  newsletter={blogContent.newsletter}
-                  socials={site.socials}
-                  emailContact={site.contact.email}
-                />
               </div>
             </div>
           </div>
