@@ -3,11 +3,10 @@ import { notFound } from "next/navigation";
 import { ServicePage } from "@/components/pages/services/ServicePage";
 import { JsonLd } from "@/components/JsonLd";
 import { content } from "@/lib/content";
-import { breadcrumbSchema, graph, serviceSchema } from "@/lib/json-ld";
-import { absoluteUrl } from "@/lib/site-url";
+import { filArianeSchema, graph, serviceSchema } from "@/lib/json-ld";
 import { pageMetadata } from "@/lib/page-metadata";
 import { prestations } from "@/content/offre";
-import { servicePageLabels, servicePageSeo } from "@/content/service-pages";
+import { marchesFilAriane, servicePageSeo } from "@/content/service-pages";
 
 type ServiceRouteProps = {
   params: Promise<{ slug: string }>;
@@ -76,17 +75,7 @@ export default async function ServiceDetail({ params }: ServiceRouteProps) {
       <JsonLd
         data={graph(
           serviceSchema(prestation, prestation.resume),
-          breadcrumbSchema([
-            {
-              name: servicePageLabels.filAriane.accueil,
-              item: absoluteUrl("/"),
-            },
-            {
-              name: servicePageLabels.filAriane.prestations,
-              item: absoluteUrl("/#services"),
-            },
-            { name: prestation.nom },
-          ]),
+          filArianeSchema(marchesFilAriane(prestation)),
         )}
       />
       <ServicePage prestation={prestation} site={site} />

@@ -989,7 +989,9 @@ export type ContentRouteKind =
   | "post"
   | "legal"
   /** Page dédiée d'une prestation, sous `/services/`. */
-  | "service";
+  | "service"
+  /** Prestation déclinée pour une ville (`/creation-site-internet-caen`). */
+  | "local";
 
 /** Route publique issue du sitemap live, sans hypothèse sur le routeur entrant. */
 export interface ContentRoute {

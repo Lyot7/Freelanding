@@ -1,6 +1,7 @@
 import { content } from "@/lib/content";
 import { absoluteUrl } from "@/lib/site-url";
 import { fourchette, prestations as offre } from "@/content/offre";
+import { pageCaen } from "@/content/page-caen";
 
 /**
  * `/llms.txt` — fiche d'identité du site à destination des assistants.
@@ -78,6 +79,11 @@ export async function GET(): Promise<Response> {
         `/services/${p.slug}`,
         `trois périmètres chiffrés, ${fourchette(p.id)} HT`,
       ),
+    ),
+    ligne(
+      pageCaen.h1,
+      pageCaen.chemin,
+      "le site vitrine pour les entreprises de Caen et du Calvados",
     ),
     ligne("À propos", "/a-propos", "parcours et façon de travailler"),
     ligne("Réalisations", "/realisations", "les projets en détail"),

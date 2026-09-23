@@ -10,7 +10,8 @@
  * CE QUI NE FIGURE PAS ICI : les prix, les durées et les périmètres. Ils vivent
  * dans `offre.ts` et sont calculés.
  */
-import type { PrestationId } from "./offre";
+import type { Prestation, PrestationId } from "./offre";
+import { lienVersPageCaen, type PageLocale } from "./page-caen";
 
 /**
  * TITRE DE RECHERCHE ET TITRE DE PAGE, prestation par prestation.
@@ -192,3 +193,45 @@ export const servicePageLabels = {
     },
   ],
 } as const;
+
+/** Une marche du fil d'Ariane. Sans `href`, c'est la page courante. */
+export interface MarcheFilAriane {
+  readonly libelle: string;
+  readonly href?: string;
+}
+
+/**
+ * LES MARCHES DU FIL D'ARIANE, calculées au même endroit pour la page affichée
+ * et pour le `BreadcrumbList` émis par la route : deux listes écrites
+ * séparément finissent toujours par diverger.
+ *
+ * Une page locale se range SOUS sa prestation : le nom de catalogue redevient
+ * un lien vers `/services/<slug>`, et la ville devient la dernière marche.
+ */
+export function marchesFilAriane(
+  prestation: Prestation,
+  local?: PageLocale,
+): readonly MarcheFilAriane[] {
+  const { filAriane } = servicePageLabels;
+  const base: MarcheFilAriane[] = [
+    { libelle: filAriane.accueil, href: "/" },
+    { libelle: filAriane.prestations, href: "/#services" },
+  ];
+  return local
+    ? [
+        ...base,
+        { libelle: prestation.nom, href: `/services/${prestation.slug}` },
+        { libelle: local.marcheFilAriane },
+      ]
+    : [...base, { libelle: prestation.nom }];
+}
+
+/**
+ * LIEN VERS UNE PAGE LOCALE, posé sous les périmètres de la prestation qu'elle
+ * décline. Un seul aujourd'hui : le site vitrine mène à la page de Caen.
+ */
+export const lienLocalParPrestation: Partial<
+  Record<PrestationId, { readonly avant: string; readonly libelle: string; readonly href: string }>
+> = {
+  vitrine: lienVersPageCaen,
+};

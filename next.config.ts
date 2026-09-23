@@ -79,6 +79,16 @@ const nextConfig: NextConfig = {
          deux 301 dilue le signal transféré et rallonge le trajet du visiteur. */
       { source: "/projets/kpsull", destination: "/realisations/kpsull", statusCode: 301 },
       { source: "/projects/kpsull", destination: "/realisations/kpsull", statusCode: 301 },
+      /*
+       * Ancien site SvelteKit : les pages d'offre et la page locale « identité »
+       * (2026-09-23). Elles répondaient 404 depuis la refonte Next.js alors que
+       * Google les avait indexées. Chacune vise la page qui porte aujourd'hui la
+       * même intention. `/creation-site-internet-caen` n'est PAS ici : l'adresse
+       * est reprise telle quelle par la page locale, elle n'a rien à rediriger.
+       */
+      { source: "/creation-site-internet", destination: "/services/site-vitrine", statusCode: 301 },
+      { source: "/logiciel-sur-mesure", destination: "/services/logiciel-metier", statusCode: 301 },
+      { source: "/developpeur-web-caen", destination: "/creation-site-internet-caen", statusCode: 301 },
       /* Francisation des slugs légaux (2026-08-28). */
       {
         source: "/legal/privacy-policy",

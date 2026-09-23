@@ -210,6 +210,21 @@ export function breadcrumbSchema(
   };
 }
 
+/**
+ * Le fil d'Ariane AFFICHÉ, traduit pour les moteurs. Les marches viennent de
+ * `marchesFilAriane` : la page et le balisage lisent la même liste.
+ */
+export function filArianeSchema(
+  marches: readonly { libelle: string; href?: string }[],
+) {
+  return breadcrumbSchema(
+    marches.map((m) => ({
+      name: m.libelle,
+      item: m.href ? absoluteUrl(m.href) : undefined,
+    })),
+  );
+}
+
 /** Une étude de cas, et le fil d'Ariane qui la situe. */
 export function workSchema(work: WorkItem) {
   return [
@@ -254,15 +269,36 @@ export function workSchema(work: WorkItem) {
  * Le déclarer en `price` nu laisserait entendre un prix toutes taxes comprises,
  * ce qui serait un prix trompeur pour un lecteur qui n'est pas assujetti.
  */
-export function serviceSchema(prestation: Prestation, description: string) {
+export function serviceSchema(
+  prestation: Prestation,
+  description: string,
+  local?: {
+    /** Nom de la page locale (son H1), qui devient le nom du service. */
+    nom: string;
+    /** Chemin de la page locale, qui remplace `/services/<slug>`. */
+    chemin: string;
+    zones: { villes: readonly string[]; departements: readonly string[] };
+  },
+) {
   return compact({
     "@type": "Service",
-    name: prestation.nom,
+    name: local?.nom ?? prestation.nom,
     description,
-    url: absoluteUrl(`/services/${prestation.slug}`),
+    url: absoluteUrl(local?.chemin ?? `/services/${prestation.slug}`),
     serviceType: prestation.nom,
     provider: { "@id": BUSINESS_ID },
-    areaServed: { "@type": "Country", name: "France" },
+    // UNE PAGE LOCALE DÉCLARE SA VILLE, et rien qu'elle. La même prestation
+    // vendue à distance vaut pour la France ; la page de Caen, elle, existe
+    // pour la recherche « … Caen », et c'est cette zone qu'elle déclare.
+    areaServed: local
+      ? [
+          ...local.zones.villes.map((name) => ({ "@type": "City", name })),
+          ...local.zones.departements.map((name) => ({
+            "@type": "AdministrativeArea",
+            name,
+          })),
+        ]
+      : { "@type": "Country", name: "France" },
     offers: prestation.packs.map((pack) => ({
       "@type": "Offer",
       name: pack.nom,

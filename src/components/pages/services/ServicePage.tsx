@@ -15,7 +15,14 @@ import {
   type Pack,
   type Prestation,
 } from "@/content/offre";
-import { servicePageLabels, servicePageSeo } from "@/content/service-pages";
+import {
+  lienLocalParPrestation,
+  marchesFilAriane,
+  servicePageLabels,
+  servicePageSeo,
+  type MarcheFilAriane,
+} from "@/content/service-pages";
+import type { PageLocale } from "@/content/page-caen";
 import { RDV_PAR_PRESTATION } from "@/content/rendez-vous";
 import { SectionRendezVous } from "@/components/rendez-vous/SectionRendezVous";
 
@@ -58,13 +65,8 @@ import { SectionRendezVous } from "@/components/rendez-vous/SectionRendezVous";
  * prestation (« L'Outil », « Le Logiciel ») lisible sur la page, maintenant que
  * le titre principal porte les mots que le client tape.
  */
-function FilAriane({ prestation }: { prestation: Prestation }) {
+function FilAriane({ marches }: { marches: readonly MarcheFilAriane[] }) {
   const { filAriane } = servicePageLabels;
-  const marches: readonly { libelle: string; href?: string }[] = [
-    { libelle: filAriane.accueil, href: "/" },
-    { libelle: filAriane.prestations, href: "/#services" },
-    { libelle: prestation.nom },
-  ];
 
   return (
     <nav
@@ -282,13 +284,95 @@ function PackCard({
   );
 }
 
+/**
+ * LE CONTEXTE LOCAL D'UNE PAGE DE VILLE, entre le héros et les périmètres.
+ *
+ * MÊME DÉCOUPE QUE LA SECTION `#devis` : fond clair, deux moitiés, filet sur
+ * l'axe, gouttière reportée en rembourrage. Aucun gabarit neuf : une page
+ * locale reprend la grammaire de la page de prestation qu'elle décline.
+ *
+ * Placée AVANT les prix : le visiteur arrivé sur « création site internet
+ * Caen » doit lire d'abord ce qui le concerne, lui, à Caen. Les périmètres
+ * viennent ensuite, identiques à ceux du site vitrine.
+ */
+function ContexteLocal({ contexte }: { contexte: PageLocale["contexte"] }) {
+  return (
+    <section
+      data-section="contexte-local"
+      className="relative bg-muted px-[20px] py-[60px] text-background tablet:px-[24px] tablet:py-[90px] desktop:px-[30px]"
+    >
+      <span
+        aria-hidden
+        className="absolute inset-y-0 left-1/2 hidden w-px bg-black/[0.08] tablet:block"
+      />
+      <div className="relative mx-auto grid w-full max-w-[1440px] gap-[30px] tablet:grid-cols-2 tablet:gap-x-0 tablet:gap-y-[30px]">
+        <div className="flex flex-col gap-[16px] tablet:pr-[30px] desktop:pr-[40px]">
+          <h2 className="accent-room max-w-[460px] text-[26px] font-semibold uppercase leading-[0.95] tracking-[-0.04em] tablet:text-[34px]">
+            {contexte.titre}
+          </h2>
+          <p className="max-w-[460px] text-[15px] font-medium leading-[1.45] tracking-[-0.01em] text-background/70">
+            {contexte.intro}
+          </p>
+          <nav
+            aria-label={contexte.titreLiens}
+            className="mt-[14px] flex max-w-[460px] flex-col gap-[12px]"
+          >
+            <p className="text-[12px] font-semibold uppercase leading-[1.2] tracking-[0.02em] text-background/60">
+              {contexte.titreLiens}
+            </p>
+            <ul className="flex flex-col gap-[12px]">
+              {contexte.liens.map((lien) => (
+                <li key={lien.href} className="flex flex-col gap-[2px]">
+                  <Link
+                    href={lien.href}
+                    className="w-fit text-[15px] font-semibold leading-[1.3] tracking-[-0.01em] underline decoration-black/25 underline-offset-[3px] transition-[text-decoration-color,text-underline-offset] duration-200 hover:decoration-black hover:underline-offset-[4px]"
+                  >
+                    {lien.libelle}
+                  </Link>
+                  <span className="text-[14px] font-medium leading-[1.4] tracking-[-0.01em] text-background/70">
+                    {lien.description}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </div>
+        <ul className="flex flex-col gap-[18px] tablet:pl-[30px] desktop:pl-[40px]">
+          {contexte.points.map((point) => (
+            <li key={point.titre} className="flex flex-col gap-[6px]">
+              <h3 className="text-[15px] font-semibold leading-[1.3] tracking-[-0.01em]">
+                {point.titre}
+              </h3>
+              <p className="text-[14px] font-medium leading-[1.45] tracking-[-0.01em] text-background/70">
+                {point.corps}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
 export function ServicePage({
   prestation,
   site,
+  local,
 }: {
   prestation: Prestation;
   site: SiteConfig;
+  /**
+   * Page locale qui décline la prestation (`/creation-site-internet-caen`).
+   * Elle remplace le H1, le chapô, la FAQ et prolonge le fil d'Ariane ; les
+   * périmètres, les prix et la prise de rendez-vous restent ceux de la
+   * prestation.
+   */
+  local?: PageLocale;
 }) {
+  // Le lien vers la page locale ne s'affiche que sur la page de prestation :
+  // sur la page locale elle-même, il pointerait vers la page courante.
+  const lienLocal = local ? undefined : lienLocalParPrestation[prestation.id];
+
   // Le périmètre du milieu est celui qui se vend : il est mis en avant, comme
   // sur la grille qu'il remplace.
   const avant = 1;
@@ -316,7 +400,7 @@ export function ServicePage({
               occupant (le retour, le titre). */}
           <div className="relative z-[2] mx-auto grid w-full max-w-[1440px] gap-[20px] tablet:grid-cols-2 tablet:items-end tablet:gap-x-0 tablet:gap-y-[30px]">
             <div className="tablet:col-start-1 tablet:row-start-1">
-              <FilAriane prestation={prestation} />
+              <FilAriane marches={marchesFilAriane(prestation, local)} />
             </div>
             <Reveal
               trigger="appear"
@@ -334,7 +418,7 @@ export function ServicePage({
                   lui, reste affiché sur la dernière marche du fil d'Ariane, à
                   quelques centimètres au-dessus. */}
               <h1 className="max-w-[510px] text-[63px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] tablet:text-[78px] desktop:text-[98px]">
-                {servicePageSeo[prestation.id].h1}
+                {local?.h1 ?? servicePageSeo[prestation.id].h1}
               </h1>
             </Reveal>
             {/* `mr` SYMÉTRIQUE DU `pl` D'EN FACE. Le gabarit de la source pose
@@ -346,7 +430,7 @@ export function ServicePage({
                 largeur de 340 px est celle du texte, un `pr` l'aurait amputée
                 d'autant et changé toutes les coupures de ligne. */}
             <p className="max-w-[340px] text-[14px] font-medium leading-[1.35] tracking-[-0.01em] text-white/60 tablet:col-start-1 tablet:row-start-3 tablet:mr-[30px] tablet:justify-self-end tablet:text-right desktop:mr-[40px]">
-              {prestation.resume}
+              {local?.resume ?? prestation.resume}
             </p>
             {/* `pl` À PARTIR DE 810 : la gouttière de cette grille est NULLE
                 (les deux colonnes se touchent sur la ligne médiane, c'est le
@@ -359,6 +443,8 @@ export function ServicePage({
             </p>
           </div>
         </section>
+
+        {local ? <ContexteLocal contexte={local.contexte} /> : null}
 
         {/* RIEN EN HAUT DE CETTE SECTION JUSQU'ICI : elle n'avait pas de
             rembourrage haut du tout. Le titre « 3 périmètres, et ce qui les
@@ -403,6 +489,17 @@ export function ServicePage({
                 />
               ))}
             </div>
+            {lienLocal ? (
+              <p className="text-[14px] font-medium leading-[1.4] tracking-[-0.01em] text-white/60">
+                {lienLocal.avant}{" "}
+                <Link
+                  href={lienLocal.href}
+                  className="text-foreground underline decoration-white/30 underline-offset-[3px] transition-[text-decoration-color,text-underline-offset] duration-200 hover:decoration-white hover:underline-offset-[4px]"
+                >
+                  {lienLocal.libelle}
+                </Link>
+              </p>
+            ) : null}
           </div>
         </section>
 
@@ -474,7 +571,15 @@ export function ServicePage({
           typeImpose={RDV_PAR_PRESTATION[prestation.id]}
         />
 
-        <FaqSection faq={[...faqItems]} />
+        {local ? (
+          <FaqSection
+            faq={[...local.faq.items]}
+            eyebrow={local.faq.eyebrow}
+            titleLines={local.faq.titleLines}
+          />
+        ) : (
+          <FaqSection faq={[...faqItems]} />
+        )}
       </main>
       <Footer />
       <FloatingNav site={site} />
