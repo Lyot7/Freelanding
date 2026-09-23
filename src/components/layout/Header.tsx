@@ -5,6 +5,7 @@ import { HoverPrefetchLink as Link } from "@/components/ui/HoverPrefetchLink";
 import { Reveal } from "@/components/motion/Reveal";
 import { SwapCopies } from "@/components/ui/SwapCopies";
 import { uiLabels } from "@/content/ui";
+import { CHEMIN_VUE_AGENT, vueAgentContent } from "@/content/vue-agent";
 import type { SiteConfig } from "@/lib/content/types";
 import { Logo } from "./Logo";
 
@@ -120,11 +121,85 @@ function StartProjectCta({
   );
 }
 
+export type Vue = "humain" | "agent";
+
+/**
+ * Sélecteur « Humain / Agent ». La vue Agent est une PAGE (`/agent`), rendue
+ * au serveur et indexable : le choix se mémorise dans l'adresse, qu'on peut
+ * garder en favori ou partager, sans stockage côté navigateur.
+ *
+ * DEUX FORMES, MESURÉES sur l'en-tête de `/contact` le 2026-09-23 :
+ *   - à partir de 1200 px, les deux vues côte à côte (118 px) : il reste
+ *     249 px libres entre la baseline et la navigation ;
+ *   - en dessous, un seul bouton qui mène à l'autre vue (56 px). À 390 px il
+ *     reste 80 px à côté du logo et du bouton « Démarrer », à 320 px aussi
+ *     grâce au libellé court de ce dernier.
+ * Entre 810 et 919 px la navigation complète ne laisse que 87 px : le bouton
+ * y disparaît, plutôt que de pousser l'en-tête hors de l'écran. La vue reste
+ * joignable par le pied de page.
+ */
+function ToggleVue({ vue }: { vue: Vue }) {
+  const t = vueAgentContent.toggle;
+  const base =
+    "flex h-[30px] items-center whitespace-nowrap px-[10px] text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] no-underline transition-colors duration-200 ease-[cubic-bezier(0.44,0,0.56,1)] motion-reduce:transition-none";
+  // Segment actif en blanc à 12 % et non en blanc plein : plein, il devenait
+  // l'élément le plus contrasté de l'en-tête et concurrençait le bouton vert.
+  const actif = "bg-foreground/[0.12] text-foreground";
+  const inactif = "text-foreground/60 hover:text-accent";
+  const cadre =
+    "shadow-[inset_0_0_0_1px_rgba(255,255,255,0.12)] [--focus-shadow-keep:inset_0_0_0_1px_rgba(255,255,255,0.12)]";
+  const autre = vue === "agent" ? "/" : CHEMIN_VUE_AGENT;
+  // La vue courante n'est pas un lien : cliquer « Humain » depuis `/contact`
+  // ne doit pas renvoyer à l'accueil.
+  const segment = (cle: Vue, href: string, libelle: string) =>
+    cle === vue ? (
+      <span aria-current="true" className={`${base} ${actif}`}>
+        {libelle}
+      </span>
+    ) : (
+      <Link href={href} className={`${base} ${inactif}`}>
+        {libelle}
+      </Link>
+    );
+
+  return (
+    <>
+      <nav
+        aria-label={t.libelle}
+        className={`hidden flex-none flex-row desktop:flex ${cadre}`}
+      >
+        {segment("humain", "/", t.humain)}
+        {segment("agent", CHEMIN_VUE_AGENT, t.agent)}
+      </nav>
+      {/* Texte à 80 % et flèches de bascule : à côté du bouton vert,
+          il ne doit pas se lire comme un second appel à l'action. Le préfixe
+          masqué donne « Vue agent » aux lecteurs d'écran tout en contenant le
+          mot affiché, pour la commande vocale. */}
+      <Link
+        href={autre}
+        className={`${base} ${cadre} flex-none gap-[6px] text-foreground/80 hover:text-accent desktop:hidden tablet:max-[919px]:hidden`}
+      >
+        {/* Deux flèches opposées : c'est une bascule, pas un lien de plus.
+            Pas sous 810 px : leurs 16 px poussaient le bouton « Démarrer »
+            contre le bord de l'écran à 320 et 390 (mesuré). */}
+        <svg aria-hidden viewBox="0 0 12 12" className="hidden h-[10px] w-[10px] flex-none tablet:block" fill="none" stroke="currentColor" strokeWidth="1.3">
+          <path d="M1.5 4h8M7.5 1.5 10 4 7.5 6.5M10.5 8h-8M4.5 5.5 2 8l2.5 2.5" />
+        </svg>
+        <span className="sr-only">{t.prefixe}</span>
+        {vue === "agent" ? t.humain : t.agent}
+      </Link>
+    </>
+  );
+}
+
 export function Header({
   site,
   appear = false,
+  vue = "humain",
 }: {
   site: SiteConfig;
+  /** Vue affichée, pour le sélecteur « Humain / Agent ». */
+  vue?: Vue;
   /**
    * Joue l'entrée `scale(1.3)` + `translateY(-100)` du header. RÉSERVÉ À LA HOME.
    *
@@ -191,7 +266,11 @@ export function Header({
       </div>
 
       {/* framer-beg1hm : Nav (gap 28→36px) */}
-      <div className="relative flex w-min flex-none flex-row items-center justify-start gap-[28px] overflow-visible desktop:gap-[36px]">
+      {/* Écart de 10 px sous 810 : la navigation y est masquée, il ne sépare
+          que le sélecteur de vue et le bouton, et 28 px ne tenaient pas à 390. */}
+      <div className="relative flex w-min flex-none flex-row items-center justify-start gap-[10px] overflow-visible tablet:gap-[28px] desktop:gap-[36px]">
+        <ToggleVue vue={vue} />
+
         {/* framer-16rltc5 : menu — visible dès 810px (gap 20→24px) */}
         <nav
           aria-label={uiLabels.chrome.mainNavLabel}
