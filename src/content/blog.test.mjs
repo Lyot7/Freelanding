@@ -21,8 +21,8 @@ import { blogPosts, blogContent } from "./blog.ts";
  *  - une image markdown sans texte de remplacement.
  */
 
-const DOSSIER = join(import.meta.dir, "articles");
-const PUBLIC = join(import.meta.dir, "..", "..", "public");
+const DOSSIER = join(import.meta.dirname, "articles");
+const PUBLIC = join(import.meta.dirname, "..", "..", "public");
 
 /** Bornes usuelles d'un extrait de résultat de recherche, en caractères. */
 const DESCRIPTION = { min: 70, max: 200 };

@@ -28,7 +28,7 @@ import {
  * pas : personne ne les lit à l'écran.
  */
 
-const RACINE = path.join(import.meta.dir);
+const RACINE = path.join(import.meta.dirname);
 
 function fichiers(racine, motif) {
   const out = [];

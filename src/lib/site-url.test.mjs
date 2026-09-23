@@ -8,12 +8,23 @@ import { describe, expect, it } from "bun:test";
  */
 const FALLBACK = "http://localhost:3000";
 
+let cas = 0;
+
 async function chargerAvec(valeur) {
   const precedente = process.env.NEXT_PUBLIC_SITE_URL;
   if (valeur === undefined) delete process.env.NEXT_PUBLIC_SITE_URL;
   else process.env.NEXT_PUBLIC_SITE_URL = valeur;
   // Chemin unique par cas : le registre de modules met le résultat en cache.
-  const charge = await import(`./site-url.ts?cas=${encodeURIComponent(String(valeur))}`);
+  // Le chemin est calculé AVANT l'import, et non écrit en gabarit dans
+  // `import()` : Vite refuse un import dynamique à variable (« Unknown
+  // variable dynamic import ») et vitest échouait sur les cinq cas, quand
+  // `bun test` les passait. Il reste RELATIF : Bun ignore la requête d'une
+  // adresse `file://` absolue et servait alors le même module à chaque cas.
+  // Un COMPTEUR et non la valeur : une requête finissant par « .fr » faisait
+  // prendre le module pour du JavaScript à Vite, qui refusait les types.
+  cas += 1;
+  const chemin = `./site-url.ts?cas=${cas}`;
+  const charge = await import(/* @vite-ignore */ chemin);
   if (precedente === undefined) delete process.env.NEXT_PUBLIC_SITE_URL;
   else process.env.NEXT_PUBLIC_SITE_URL = precedente;
   return charge;
