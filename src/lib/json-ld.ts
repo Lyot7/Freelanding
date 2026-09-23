@@ -260,10 +260,10 @@ export function workSchema(work: WorkItem) {
  * donc les trois pages se rattachent à l'entité de l'accueil au lieu de
  * décrire une quatrième activité anonyme.
  *
- * LES PRIX SONT CALCULÉS, JAMAIS ÉCRITS. `prixPackHT` descend du taux
- * journalier comme tout le reste du site ; un montant recopié ici aurait
- * divergé au premier changement de curseur, et cette fois SANS être visible à
- * l'écran, donc sans que personne le voie jamais.
+ * LES PRIX VIENNENT DE `offre.ts`, JAMAIS ÉCRITS ICI. Un montant recopié
+ * aurait divergé au premier changement de grille, et SANS être visible à
+ * l'écran, donc sans que personne le voie jamais. Un palier sur mesure déclare
+ * un `minPrice` : son montant est un plancher, pas un prix.
  *
  * `priceSpecification` PLUTÔT QUE `price` : le montant est un prix HORS TAXES.
  * Le déclarer en `price` nu laisserait entendre un prix toutes taxes comprises,
@@ -307,7 +307,9 @@ export function serviceSchema(
       priceSpecification: {
         "@type": "PriceSpecification",
         priceCurrency: "EUR",
-        price: prixPackHT(pack),
+        ...(pack.surMesure
+          ? { minPrice: prixPackHT(pack) }
+          : { price: prixPackHT(pack) }),
         valueAddedTaxIncluded: false,
       },
     })),

@@ -112,22 +112,11 @@ export const aboutContent: AboutContent = {
      *    paragraphe renvoyait ailleurs les clients qu'il cherche.
      *
      * CE QUI LES REMPLACE suit l'ordre de ses arguments : ce qu'il sait faire et
-     * pourquoi ca coute plus cher, l'IA remise a sa vraie place, l'agence, puis
-     * la part invisible du travail.
+     * pourquoi ca coute plus cher, l'agence, puis
+     * la part invisible du travail. Le paragraphe sur l'IA est sorti le
+     * 2026-09-23 : aucun argument IA face aux clients, decision d'Eliott.
      */
     "Ce que je construis est pensé pour le référencement naturel et pour la conversion, avec ce que je sais faire en expérience utilisateur, en interface, en ergonomie, en accessibilité et en marketing. Sur un projet à quelques centaines d’euros, ces étapes-là sautent : personne n’a le temps d’y penser et de rester rentable. C’est pour ça que je facture au-dessus, et c’est pour ça que ce que je livre n’a pas grand-chose à voir.",
-    /*
-     * L'IA SE DIT, ET C'EST ELIOTT QUI L'A TRANCHE le 2026-08-31, contre l'avis
-     * qui lui etait donne. Son argument : la transparence sur sa facon de
-     * travailler vaut mieux que le silence.
-     *
-     * LA NUANCE PORTE TOUT L'ARGUMENT, et elle doit rester lisible ligne a
-     * ligne. Son concurrent fait GENERER le site ; lui s'en sert pour DECIDER,
-     * et il ecrit le code lui-meme. Meme outil, place opposee dans la chaine.
-     * Ecrire « je genere des sites avec l'IA » le rangerait du cote du moteur
-     * lent, c'est-a-dire du cote de son concurrent.
-     */
-    "Je travaille avec l’intelligence artificielle, et je préfère le dire. Pas pour fabriquer ton site : pour décider. Avant d’écrire une ligne, je m’en sers comme d’un contradicteur sur les arbitrages qui comptent : ton positionnement, ce qu’il faut montrer et à qui, l’architecture du projet, les outils sur lesquels il reposera encore dans deux ans. Le code, lui, je l’écris et j’en réponds.",
     "Une agence, ce sont des salariés, des plannings, des ressources humaines et plusieurs corps de métier : des frais qui courent que ton projet avance ou non, et une chaîne de personnes entre toi et le travail. Je vais droit au but. Je suis développeur, et je suis à l’aise avec les métiers qui gravitent autour, ce qui me permet de tenir un projet d’un bout à l’autre au lieu de le faire passer de main en main.",
     /*
      * LES SIX CHOSES QU'ELIOTT FAIT SANS QU'ON LES LUI DEMANDE, tenues en un

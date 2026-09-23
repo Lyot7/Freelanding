@@ -48,7 +48,6 @@ const ROUTES = [
   "/blog",
   ...blogPosts.map(({ slug }) => `/blog/${slug}`),
   "/services/site-vitrine",
-  "/services/outil-metier",
   "/services/logiciel-metier",
   "/contact",
   // Vue agent (2026-09-23) : le profil y écrit ses liens en clair.

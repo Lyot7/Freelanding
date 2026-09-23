@@ -78,7 +78,7 @@ export async function GET(): Promise<Response> {
       ligne(
         p.nom,
         `/services/${p.slug}`,
-        `trois périmètres chiffrés, ${fourchette(p.id)} HT`,
+        `3 forfaits, ${fourchette(p.id, " HT")}`,
       ),
     ),
     ligne(

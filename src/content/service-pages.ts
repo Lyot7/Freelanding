@@ -7,8 +7,8 @@
  * est qu'une chaîne dans un composant échappe au correcteur typographique
  * français, la seconde est qu'on ne relit pas une offre en ouvrant du JSX.
  *
- * CE QUI NE FIGURE PAS ICI : les prix, les durées et les périmètres. Ils vivent
- * dans `offre.ts` et sont calculés.
+ * CE QUI NE FIGURE PAS ICI : les prix et les périmètres. Ils vivent dans
+ * `offre.ts`, seule source des montants.
  */
 import type { Prestation, PrestationId } from "./offre";
 import { lienVersPageCaen, type PageLocale } from "./page-caen";
@@ -57,10 +57,6 @@ export const servicePageSeo: Record<
     titre: "Création de site vitrine en Normandie · Eliott Bouquerel",
     h1: "Site vitrine sur mesure",
   },
-  outil: {
-    titre: "Outil métier sur mesure pour TPE et PME · Eliott Bouquerel",
-    h1: "Outil métier sur mesure",
-  },
   logiciel: {
     titre: "Logiciel métier sur mesure pour PME · Eliott Bouquerel",
     h1: "Logiciel métier sur mesure",
@@ -95,7 +91,7 @@ export const servicePageLabels = {
   },
 
   /** Chapô de la fourchette, en tête de page. */
-  fourchette: "Selon le périmètre,",
+  fourchette: "Selon le forfait,",
 
   /** Suffixe des montants. Toujours séparé du chiffre : jamais « 5 000 €HT ». */
   horsTaxes: "HT",
@@ -107,7 +103,10 @@ export const servicePageLabels = {
    * tout le site : un nombre écrit en chiffres s'accroche à l'œil, le même
    * nombre écrit en lettres se lit comme un mot de plus.
    */
-  titrePacks: "3 périmètres, et ce qui les sépare",
+  titrePacks: (hautSurMesure: boolean) =>
+    hautSurMesure
+      ? "3 forfaits, du prix ferme au sur mesure"
+      : "3 forfaits, à prix ferme",
 
   /**
    * Signalement du périmètre conseillé.
@@ -133,65 +132,55 @@ export const servicePageLabels = {
    */
   toutLePrecedent: (precedent: string) => `Tout ce que contient ${precedent}, plus :`,
 
-  /** Bouton de chaque carte. */
+  /** En vis-à-vis du titre des forfaits : comment on paie, et que le prix tient. */
+  reassurance:
+    "Le prix est fixé au devis et ne bouge plus. Tu paies 30 % à la signature, 40 % à la première version fonctionnelle et 30 % à la livraison. Le code et l’hébergement sont à ton nom.",
+
+  /** Bouton de chaque forfait. */
   cta: "En parler",
 
-  /** Titre de la section qui explique les écarts de prix. */
-  titreVariation: "Pourquoi un devis ne tombe jamais pile sur ces montants",
+  /** Amorce du montant d'un palier sur mesure : son prix est un plancher. */
+  aPartirDe: "À partir de",
+
+  /** Signalement du palier sur mesure, à la place de « Recommandé ». */
+  surMesure: "Sur mesure",
 
   /**
-   * CE QUI FAIT BOUGER LE PRIX.
+   * LE BLOC « SUR MESURE, SUR DEVIS », qui remplace depuis le 2026-09-23 la
+   * section « Pourquoi un devis ne tombe jamais pile sur ces montants ». Un
+   * forfait à prix ferme qui explique pourquoi il ne l'est pas se contredit :
+   * la section est partie, décision d'Eliott.
    *
-   * La grille comparative supprimée le 2026-08-27 ne répondait à cette question
-   * nulle part : elle montrait une différence entre trois colonnes sans jamais
-   * dire ce qui la produisait. C'est pourtant la seule question que se pose un
-   * dirigeant devant trois montants.
-   *
-   * Les quatre points ci-dessous sont les quatre causes réelles de dérive, dans
-   * l'ordre où elles apparaissent sur un projet. Elles sont écrites du côté du
-   * client, parce que ce sont ses décisions à lui qui déplacent la date.
+   * CE QU'IL FAIT À LA PLACE : il dit ce qui sort des forfaits (`horsPack` de
+   * la prestation) et il prépare le visiteur aux trois questions du
+   * questionnaire de rendez-vous. Eliott veut des demandes déjà cadrées, budget
+   * compris : le lecteur apprend ici que le budget se pose d'entrée, et
+   * pourquoi il l'aide, lui, à choisir.
    */
-  variation: [
-    {
-      titre: "Ce que tu fournis, et ce que je produis",
-      corps:
-        "Des textes prêts et des photos exploitables ne coûtent pas la même chose qu’une page blanche. C’est le premier poste d’écart, et c’est celui sur lequel tu as la main.",
-    },
-    {
-      titre: "Ce qui existe déjà chez toi",
-      corps:
-        "Un outil documenté, avec une interface prévue pour, se branche en 1 jour. Un logiciel fermé, ou un export qu’il faut aller chercher à la main, en prend 5. Je le regarde avant de chiffrer, jamais après.",
-    },
-    {
-      titre: "Le nombre de décisions à prendre",
-      corps:
-        "Ce qui fait déraper un projet, c’est presque toujours une question d’organisation à laquelle personne n’a répondu, et le temps passé à attendre la réponse. Plus tes règles sont écrites, plus le chiffrage est bas.",
-    },
-    /*
-     * CE POINT ÉTAIT À MOITIÉ FAUX, corrigé sur relevé d'Eliott le 2026-09-01.
-     *
-     * Il rangeait tout ce qui arrive en cours de route dans un seul sac, avec
-     * pour seule conséquence un délai plus long. Deux choses très différentes y
-     * étaient confondues :
-     *
-     *  - la MODIFICATION (un texte, une photo, une couleur), qui est comprise ;
-     *  - l'AJOUT D'UNE FONCTION qui n'était pas au cadrage, qui fait l'objet
-     *    d'un devis, parce qu'elle n'y était pas.
-     *
-     * Mot d'Eliott : « moi je travaille pas dans le vent, je rallonge pas mes
-     * délais pour le même prix ». La règle est déjà au corpus (« une demande
-     * nouvelle fait l'objet d'un devis »), elle manquait ici.
-     *
-     * ÉCRIT SANS MENACE, ET SANS AMBIGUÏTÉ NON PLUS : le lecteur doit pouvoir
-     * demander une retouche sans craindre une facture, et savoir qu'une
-     * fonction en plus se chiffre. Les deux moitiés sont dans la même phrase.
-     */
-    {
-      titre: "Ce que tu décides d’ajouter en cours de route",
-      corps:
-        "Changer un texte, une photo ou une couleur pendant le développement : c’est compris. Une fonction qui n’était pas au cadrage est un autre travail, avec sa propre durée : je la chiffre à part, et tu décides. Le prix déjà signé, lui, ne bouge pas.",
-    },
-  ],
+  surMesureBloc: {
+    titre: "Hors forfait, sur devis",
+    cta: "Réserver un appel",
+    titreQuestions: "Pas sûr du forfait ?",
+    introQuestions:
+      "3 questions, posées quand tu réserves ton appel. Je te dis tout de suite ce que ton budget permet, et ce qu’il ne permet pas.",
+    questions: [
+      {
+        titre: "Ton budget",
+        corps:
+          "Le repère le plus utile des trois. À budget connu, je te montre le forfait qu’il paie et ce que tu obtiens avec.",
+      },
+      {
+        titre: "Ton objectif",
+        corps:
+          "Le résultat que tu attends décide du forfait. Dis-le avec tes mots, je le traduis en périmètre.",
+      },
+      {
+        titre: "Ton échéance",
+        corps:
+          "Si une date compte pour toi, dis-la dès le premier appel. Je te dis tout de suite si elle tient.",
+      },
+    ],
+  },
 } as const;
 
 /** Une marche du fil d'Ariane. Sans `href`, c'est la page courante. */

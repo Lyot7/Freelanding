@@ -12,10 +12,8 @@ import {
   VOILE_TEXTE,
 } from "@/components/pages/services/HeroPhoto";
 import { herosPages } from "@/content/heros-pages";
-import { Icon } from "@/components/ui/Icon";
 import type { SiteConfig } from "@/lib/content/types";
 import {
-  delaiPack,
   fourchette,
   prixPack,
   type Pack,
@@ -46,9 +44,9 @@ import { SectionRendezVous } from "@/components/rendez-vous/SectionRendezVous";
  * choisir, et ce qu'il ajoute au précédent. Le prix vient ensuite, et il vient
  * comme une conséquence.
  *
- * LE TAUX JOURNALIER N'APPARAÎT PAS. Il construit tous les montants de la page
- * et ne s'affiche nulle part : le périmètre est l'argument, le taux n'est que
- * l'arithmétique. Voir l'en-tête de `offre.ts`.
+ * PRIX FERMES, SANS DURÉE NI TAUX JOURNALIER, depuis le 2026-09-23 : le
+ * périmètre est l'argument, et un montant accolé à des jours se divise. Voir
+ * l'en-tête de `offre.ts`.
  */
 
 /**
@@ -119,186 +117,133 @@ function FilAriane({
 }
 
 /**
- * Une carte de périmètre.
+ * UN FORFAIT, EN RANGÉE ET NON EN CARTE, depuis le 2026-09-23.
  *
- * `precedent` porte le nom du pack de gauche : à partir du deuxième, la liste
- * n'énumère que le DELTA, et cette phrase dit à quoi il s'ajoute. Sans elle, le
- * lecteur croit que le pack le plus cher contient moins de choses que le premier,
- * puisque sa liste est plus courte.
+ * CE QU'IL REMPLACE. Trois cartes côte à côte, dont celle du milieu inversée
+ * en blanc plein, titres à 28 px, prix à 34 px : la seule section de la page
+ * qui ne parlait pas la langue du gabarit. Eliott l'a jugée « vraiment pas
+ * belle », et c'était mesurable : aucune autre section du site ne pose de
+ * carte pleine, toutes découpent l'espace par des filets.
+ *
+ * LA GRAMMAIRE REPRISE EST CELLE DE L'ACCORDÉON DES PRESTATIONS ET DU HÉROS :
+ * un filet haut par rangée, le numéro à 12 px en demi-teinte, deux moitiés
+ * séparées par le filet médian de la section, gouttière nulle reportée en
+ * rembourrage de part et d'autre. À gauche ce que le forfait promet et à qui ;
+ * à droite le prix, ce qu'il contient, et l'action.
+ *
+ * L'ORANGE NE SERT QU'UNE FOIS PAR FORFAIT RECOMMANDÉ : la pastille et le
+ * bouton plein. Les deux autres rangées gardent le lien souligné, second
+ * niveau d'action de l'accordéon. Trois boutons orange empilés se seraient
+ * annulés les uns les autres.
  */
-function PackCard({
+function PackRow({
   pack,
+  numero,
   precedent,
   misEnAvant,
   href,
 }: {
   pack: Pack;
+  numero: string;
   precedent?: string;
   misEnAvant: boolean;
   /** Prise de rendez-vous, sujet déjà choisi. Composée par l'appelant. */
   href: string;
 }) {
   return (
-    /* LES SIX RANGÉES DE LA CARTE SONT CELLES DE LA GRILLE, à partir de 810.
-       Chaque carte était une colonne flex autonome : ses rangées se calaient
-       sur SON contenu, donc le prix de « La Crédibilité » tombait 46 px plus
-       bas que celui de ses voisines sur `/services/logiciel-metier` à 810, et
-       27 px plus bas sur `/services/outil-metier` à 1440, parce que son titre
-       passe à la ligne et pas les leurs. Trois montants qu'on ne peut comparer
-       qu'en balayant du regard de haut en bas annulent l'intérêt de les mettre
-       côte à côte. En `grid-rows-subgrid`, les six rangées (titre, promesse,
-       prix, pour qui, liste, bouton) sont des pistes de la grille PARENTE :
-       elles sont communes aux trois cartes, donc chaque ligne démarre au même
-       y d'un bout à l'autre.
-
-       `grid-cols-1` EST OBLIGATOIRE, et ce n'est pas une redondance. Sans
-       colonne déclarée, la carte n'a qu'une piste implicite en `auto`, dont la
-       limite haute est le max-content de ses éléments. La rangée du titre porte
-       le titre ET la pastille « Recommandé » en `justify-between` : son
-       max-content vaut 236 px pour 191 px disponibles, et la carte du milieu
-       débordait sa propre boîte de 15 px, texte par-dessus le fond blanc.
-       `repeat(1, minmax(0, 1fr))` borne la piste à la largeur de la carte.
-
-       LES GOUTTIÈRES PASSENT EN MARGES. Une sous-grille impose une gouttière
-       unique à toutes ses pistes, or l'écart titre → promesse vaut 10 px et
-       tous les autres 24 px. Gouttière nulle et marge haute par élément rendent
-       exactement le rythme d'avant, et la marge compte dans le dimensionnement
-       de la piste, donc l'alignement tient. */
-    <article
+    <li
       data-part="pack"
-      className={
-        "relative flex h-full flex-col gap-[24px] p-[24px] tablet:row-span-6 tablet:grid tablet:grid-cols-1 tablet:grid-rows-subgrid tablet:gap-y-0 tablet:p-[30px] " +
-        (misEnAvant
-          ? "bg-foreground text-background"
-          : "bg-white/[0.04] text-foreground ring-1 ring-inset ring-white/10")
-      }
+      className="relative grid grid-cols-1 gap-[24px] py-[30px] tablet:grid-cols-2 tablet:gap-x-0 tablet:py-[40px]"
     >
-      <header className="tablet:contents">
-        {/* LE SIGNALEMENT EST DANS LE FLUX, plus posé en absolu au coin de la
-            carte. En absolu, il ne réservait aucune place : à 810, où les trois
-            colonnes tombent à 240 px, « LE LOGICIEL COMPLET » passait dessous et
-            se lisait « LE LOGIC RECOMMANDÉ COMPLET ». Sur la même ligne, le
-            titre se coupe devant lui au lieu de passer dessous, et la position
-            haute-droite reste celle du gabarit. */}
-        <div className="flex items-start justify-between gap-[12px]">
-          {/* `min-w-0` : sans lui, le titre garde sa largeur de min-content
-              (le mot le plus long, « CRÉDIBILITÉ », 155 px à 24 px de corps) et
-              la pastille, qui ne se comprime pas, était poussée 15 px HORS de
-              la carte à 810 — une étiquette verte posée à cheval sur le bord du
-              fond blanc. Mesuré sur la carte du milieu des trois pages. */}
-          <h3 className="accent-room min-w-0 max-w-[240px] text-[24px] font-semibold uppercase leading-[0.95] tracking-[-0.03em] desktop:text-[28px]">
-            {pack.nom}
-          </h3>
+      <span
+        aria-hidden
+        className="absolute left-0 right-0 top-0 h-px bg-[rgba(255,255,255,0.1)]"
+      />
+      <div className="flex flex-col gap-[14px] tablet:pr-[30px] desktop:pr-[40px]">
+        <div className="flex h-[20px] items-center gap-[10px]">
+          <span className="text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-white/50">
+            {numero}
+          </span>
           {misEnAvant ? (
-            <span className="shrink-0 bg-accent px-[8px] py-[4px] text-[10px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-background">
+            <span className="bg-accent px-[8px] py-[3px] text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-background">
               {servicePageLabels.misEnAvant}
             </span>
           ) : null}
+          {pack.surMesure ? (
+            <span className="px-[8px] py-[3px] text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-white/70 ring-1 ring-inset ring-white/25">
+              {servicePageLabels.surMesure}
+            </span>
+          ) : null}
         </div>
-        <p
-          className={
-            "mt-[10px] text-[15px] font-medium leading-[1.3] tracking-[-0.01em] tablet:mt-0 tablet:pt-[10px] " +
-            (misEnAvant ? "text-background" : "text-foreground")
-          }
-        >
+        <h3 className="accent-room text-[26px] font-semibold uppercase leading-[0.95] tracking-[-0.04em] tablet:text-[32px]">
+          {pack.nom}
+        </h3>
+        <p className="max-w-[440px] text-[16px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground">
           {pack.promesse}
         </p>
-      </header>
+        <div className="flex max-w-[440px] flex-col gap-[4px] pt-[6px] text-white/60">
+          <span className="text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em]">
+            {servicePageLabels.pourQui}
+          </span>
+          <p className="text-[14px] font-medium leading-[1.4] tracking-[-0.01em]">
+            {pack.pourQui}
+          </p>
+        </div>
+      </div>
 
-      {/* LE PRIX ET LA DURÉE SE TOUCHENT, et c'est assumé : c'est ce qui permet
-          au visiteur de juger si le périmètre est sérieux. Le taux journalier
-          s'en déduit, il est de toute façon dans la nature dès qu'on publie une
-          durée et un montant. Ce qui compte est de ne pas le REVENDIQUER. */}
-      <div className="flex flex-col gap-[4px] tablet:pt-[24px]">
-        <p className="text-[30px] font-semibold leading-[1] tracking-[-0.03em] desktop:text-[34px]">
-          {prixPack(pack)}
-          <span
-            className={
-              "ml-[6px] align-baseline text-[13px] font-medium uppercase tracking-[-0.01em] " +
-              (misEnAvant ? "text-background/60" : "text-white/50")
-            }
-          >
-            {servicePageLabels.horsTaxes}
+      <div className="flex flex-col gap-[20px] tablet:pl-[30px] desktop:pl-[40px]">
+        {/* LE MONTANT EST LE PREMIER ÉLÉMENT DE LA MOITIÉ DROITE, sur la
+            ligne du numéro et du nom : l'œil qui descend la colonne de droite
+            compare trois prix alignés, sans lire le reste. La durée n'y est
+            plus : à côté d'un prix ferme, elle ne servait qu'à le diviser. */}
+        <p className="flex flex-col gap-[6px]">
+          {pack.surMesure ? (
+            <span className="text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-white/60">
+              {servicePageLabels.aPartirDe}
+            </span>
+          ) : null}
+          <span className="text-[32px] font-semibold leading-[1] tracking-[-0.04em] desktop:text-[44px]">
+            {prixPack(pack)}
+            <span className="ml-[8px] align-baseline text-[13px] font-medium uppercase tracking-[-0.01em] text-white/50">
+              {servicePageLabels.horsTaxes}
+            </span>
           </span>
         </p>
-        <p
-          className={
-            "text-[13px] font-medium leading-[1.3] tracking-[-0.01em] " +
-            (misEnAvant ? "text-background/70" : "text-white/60")
-          }
-        >
-          {delaiPack(pack)}
-        </p>
-      </div>
 
-      {/* Le libellé est sur SA PROPRE LIGNE. Sur la même, il donnait « POUR VOUS
-          SI Vous n'avez rien en ligne » : deux majuscules qui se suivent et une
-          phrase qui semble commencer deux fois. */}
-      <div
-        className={
-          "flex flex-col gap-[4px] tablet:pt-[24px] " +
-          (misEnAvant ? "text-background/70" : "text-white/60")
-        }
-      >
-        <span className="text-[12px] font-semibold uppercase leading-[1.2] tracking-[0.02em]">
-          {servicePageLabels.pourQui}
-        </span>
-        <p className="text-[13px] font-medium leading-[1.4] tracking-[-0.01em]">
-          {pack.pourQui}
-        </p>
-      </div>
-
-      <div className="flex flex-1 flex-col gap-[12px] tablet:pt-[24px]">
-        {precedent ? (
-          <p
-            className={
-              "text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] " +
-              (misEnAvant ? "text-background/60" : "text-white/50")
-            }
-          >
-            {servicePageLabels.toutLePrecedent(precedent)}
-          </p>
-        ) : null}
-        <ul className="flex flex-col gap-[10px]">
-          {pack.ajoute.map((ligne) => (
-            <li key={ligne} className="flex items-start gap-[10px]">
-              <Icon
-                name="check"
-                size={14}
-                className={
-                  "mt-[3px] shrink-0 " +
-                  (misEnAvant ? "text-background" : "text-accent")
-                }
-              />
-              <span
-                className={
-                  "text-[14px] font-medium leading-[1.35] tracking-[-0.01em] " +
-                  (misEnAvant ? "text-background/80" : "text-white/70")
-                }
+        <div className="flex flex-col gap-[12px]">
+          {precedent ? (
+            <p className="text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-white/50">
+              {servicePageLabels.toutLePrecedent(precedent)}
+            </p>
+          ) : null}
+          <ul className="flex max-w-[520px] flex-col gap-[10px]">
+            {pack.ajoute.map((ligne) => (
+              <li
+                key={ligne}
+                className="text-[14px] font-medium leading-[1.35] tracking-[-0.01em] text-white/70"
               >
                 {ligne}
-              </span>
-            </li>
-          ))}
-        </ul>
-      </div>
+              </li>
+            ))}
+          </ul>
+        </div>
 
-      {/* IL POINTAIT SUR `/contact` NU, donc sur le formulaire de contact, et
-          le visiteur qui venait de choisir un périmètre se voyait redemander ce
-          qu'il cherchait. Il mène maintenant à la prise de rendez-vous avec son
-          sujet déjà coché. */}
-      <Link
-        href={href}
-        className={
-          "flex h-[36px] flex-none items-center justify-center px-[14px] text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] no-underline transition-opacity duration-200 hover:opacity-80 tablet:mt-[24px] " +
-          (misEnAvant
-            ? "bg-accent text-background"
-            : "bg-foreground text-background")
-        }
-      >
-        <span className="accent-room">{servicePageLabels.cta}</span>
-      </Link>
-    </article>
+        {/* LES DEUX NIVEAUX D'ACTION DE L'ACCORDÉON, à l'identique : bouton
+            plein à 30 px pour le forfait recommandé, lien souligné pour les
+            autres. Même hauteur, donc même ligne d'appui d'une rangée à
+            l'autre. */}
+        <Link
+          href={href}
+          className={
+            misEnAvant
+              ? "flex h-[30px] w-fit flex-none items-center justify-center bg-accent px-[10px] text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-background no-underline transition-opacity duration-200 hover:opacity-80 motion-reduce:transition-none"
+              : "flex h-[30px] w-fit flex-none items-center text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-foreground underline decoration-white/30 underline-offset-4 transition-colors hover:text-accent hover:decoration-accent motion-reduce:transition-none"
+          }
+        >
+          <span className="accent-room">{servicePageLabels.cta}</span>
+        </Link>
+      </div>
+    </li>
   );
 }
 
@@ -394,6 +339,7 @@ export function ServicePage({
   // Le périmètre du milieu est celui qui se vend : il est mis en avant, comme
   // sur la grille qu'il remplace.
   const avant = 1;
+  const { surMesureBloc } = servicePageLabels;
 
   // Photo de fond portée par la page locale ; les pages de prestation n'en ont
   // pas et gardent leur fond animé.
@@ -476,8 +422,8 @@ export function ServicePage({
                 donc sans ce retrait les deux textes se collent au pixel près et
                 se lisent comme une seule phrase cassée en deux. */}
             <p className={`text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-white/50 tablet:col-start-2 tablet:row-start-3 tablet:pl-[30px] desktop:pl-[40px]${heroImage ? ` ${VOILE_TEXTE}` : ""}`}>
-              {servicePageLabels.fourchette} {fourchette(prestation.id)}{" "}
-              {servicePageLabels.horsTaxes}
+              {servicePageLabels.fourchette}{" "}
+              {fourchette(prestation.id, ` ${servicePageLabels.horsTaxes}`)}
             </p>
           </div>
           {heroImage ? <CreditHeroPhoto credit={heroImage.credit} /> : null}
@@ -485,51 +431,51 @@ export function ServicePage({
 
         {local ? <ContexteLocal contexte={local.contexte} /> : null}
 
-        {/* RIEN EN HAUT DE CETTE SECTION JUSQU'ICI : elle n'avait pas de
-            rembourrage haut du tout. Le titre « 3 périmètres, et ce qui les
-            sépare » démarrait donc à la frontière exacte du héros, et son encre
-            en capitales à interligne 0,95 la franchissait même de 6 px, mesuré
-            aux trois largeurs. Il se lisait comme la fin du héros et non comme
-            le début de la grille qu'il annonce. Le rembourrage reprend celui de
-            la section qui suit (60 / 90), pour que le rythme vertical de la
-            page soit le même partout. */}
+        {/* LES FORFAITS. Même rembourrage que les sections voisines (60 / 90)
+            et même filet médian que le héros : la page garde un seul rythme
+            vertical et une seule découpe du haut en bas. Le titre tient dans
+            la moitié gauche, comme le H1 tient dans la droite. */}
         <section
           data-section="packs"
-          className="relative bg-background px-[20px] pb-[80px] pt-[60px] text-foreground tablet:px-[24px] tablet:pt-[90px] desktop:px-[30px]"
+          className="relative bg-background px-[20px] py-[60px] text-foreground tablet:px-[24px] tablet:py-[90px] desktop:px-[30px]"
         >
-          <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-[30px]">
-            <h2 className="accent-room max-w-[600px] text-[26px] font-semibold uppercase leading-[0.95] tracking-[-0.04em] tablet:text-[34px]">
-              {servicePageLabels.titrePacks}
-            </h2>
-            {/* SIX PISTES DÉCLARÉES ICI, reprises par chaque carte en
-                `grid-rows-subgrid`. La cinquième est en `1fr` : c'est la liste
-                des livrables qui absorbe la hauteur restante, ce que faisait
-                `flex-1` quand chaque carte était une colonne autonome. */}
-            {/* TROIS COLONNES SEULEMENT À PARTIR DE 1200px, et non dès 810.
-                Entre les deux, chaque carte tombait à 250px et son texte à
-                166px : à 14px de corps, les lignes d'inclusion se coupaient
-                tous les deux mots. Mesuré le 2026-09-08 sur `/services/*`.
-                C'est le même défaut que la grille des pages légales, et il a la
-                même cause : un partage déclenché avant que la place existe. */}
-            <div className="grid gap-[4px] desktop:grid-cols-3 desktop:grid-rows-[auto_auto_auto_auto_1fr_auto]">
+          <span
+            aria-hidden
+            className="absolute inset-y-0 left-1/2 hidden w-px bg-white/10 tablet:block"
+          />
+          <div className="relative mx-auto flex w-full max-w-[1440px] flex-col">
+            <div className="grid gap-[16px] pb-[30px] tablet:grid-cols-2 tablet:items-end tablet:gap-0 tablet:pb-[40px]">
+              <h2 className="accent-room max-w-[460px] text-[26px] font-semibold uppercase leading-[0.95] tracking-[-0.04em] tablet:pr-[30px] tablet:text-[34px] desktop:pr-[40px]">
+                {servicePageLabels.titrePacks(
+                  prestation.packs[2].surMesure === true,
+                )}
+              </h2>
+              {/* LA RÉASSURANCE SE LIT AU MOMENT DU CHOIX, en vis-à-vis du
+                  titre et sur sa ligne d'appui, comme le chapô du héros :
+                  devant 18 000 €, le lecteur cherche d'abord comment il paie
+                  et si le montant peut bouger. */}
+              <p className="max-w-[440px] text-[15px] font-medium leading-[1.45] tracking-[-0.01em] text-white/80 tablet:pl-[30px] desktop:pl-[40px]">
+                {servicePageLabels.reassurance}
+              </p>
+            </div>
+            <ol className="flex flex-col">
               {prestation.packs.map((pack, index) => (
-                <PackCard
+                <PackRow
                   key={pack.id}
                   pack={pack}
+                  numero={String(index + 1).padStart(2, "0")}
                   precedent={
                     index > 0 ? prestation.packs[index - 1].nom : undefined
                   }
                   misEnAvant={index === avant}
-                  /* ANCRE LOCALE, plus un aller vers `/contact` : la prise de
-                     rendez-vous est désormais SUR cette page, avec le bon sujet
-                     déjà coché. Envoyer ailleurs coûterait un chargement pour
-                     arriver au même formulaire. */
+                  /* ANCRE LOCALE : la prise de rendez-vous est sur cette page,
+                     avec le bon sujet déjà coché. */
                   href="#rendez-vous"
                 />
               ))}
-            </div>
+            </ol>
             {lienLocal ? (
-              <p className="text-[14px] font-medium leading-[1.4] tracking-[-0.01em] text-white/60">
+              <p className="border-t border-white/10 pt-[30px] text-[14px] font-medium leading-[1.4] tracking-[-0.01em] text-white/60 tablet:pt-[40px]">
                 {lienLocal.avant}{" "}
                 <Link
                   href={lienLocal.href}
@@ -542,54 +488,73 @@ export function ServicePage({
           </div>
         </section>
 
-        {/* CE QUI FAIT BOUGER LE PRIX. C'est la question que la grille de coches
-            ne traitait nulle part, et c'est celle que tout le monde se pose. */}
-        {/* `id` : la section tarifs de la page d'accueil ne recopie pas ces
-            quatre points, elle y renvoie. Sans ancre, le lien ouvrait la page
-            en haut et le visiteur devait retrouver le bloc à la main. */}
+        {/* SUR MESURE, SUR DEVIS. Même découpe que le contexte local des pages
+            de ville : fond clair, deux moitiés, filet sur l'axe. À gauche ce
+            qui sort des forfaits, à droite les trois questions du
+            questionnaire de rendez-vous, pour que le visiteur arrive à
+            l'agenda en sachant ce qu'on va lui demander.
+
+            `id="devis"` : l'ancre est gardée, `lienDevis()` y mène toujours. */}
         <section
           id="devis"
+          data-section="sur-mesure"
           className="relative scroll-mt-[100px] bg-muted px-[20px] py-[60px] text-background tablet:px-[24px] tablet:py-[90px] desktop:px-[30px]"
         >
-          {/* LE MÊME PARTAGE QUE LE HÉROS, ET POUR LA MÊME RAISON.
-              Cette section était la seule de la page à couper en deux SANS le
-              filet médian et avec une gouttière de 60 px, alors que toutes les
-              sections en deux moitiés du site posent une gouttière nulle et un
-              filet sur l'axe. Deux découpes différentes sur une même page se
-              voient tout de suite. La gouttière est reportée en rembourrage de
-              part et d'autre du filet, comme dans le héros. */}
           <span
             aria-hidden
             className="absolute inset-y-0 left-1/2 hidden w-px bg-black/[0.08] tablet:block"
           />
-          <div className="relative mx-auto grid w-full max-w-[1440px] gap-[30px] tablet:grid-cols-2 tablet:gap-x-0 tablet:gap-y-[30px]">
-            {/* `justify-between` À PARTIR DE 810 : la moitié gauche tient en
-                deux blocs (le titre, puis ce qui sort du forfait) et la droite
-                en quatre points. À hauteur égale de cellule, la gauche
-                s'arrêtait de 117 à 291 px au-dessus de la droite selon la page
-                et la largeur. Le titre reste calé en haut, la note descend
-                jusqu'à la ligne d'appui du dernier point, et les deux moitiés
-                se terminent ensemble. */}
-            <div className="flex flex-col gap-[16px] tablet:justify-between tablet:pr-[30px] desktop:pr-[40px]">
+          <div className="relative mx-auto grid w-full max-w-[1440px] gap-[40px] tablet:grid-cols-2 tablet:gap-x-0">
+            <div className="flex flex-col gap-[16px] tablet:pr-[30px] desktop:pr-[40px]">
               <h2 className="accent-room max-w-[420px] text-[26px] font-semibold uppercase leading-[0.95] tracking-[-0.04em] tablet:text-[34px]">
-                {servicePageLabels.titreVariation}
+                {surMesureBloc.titre}
               </h2>
               <p className="max-w-[460px] text-[15px] font-medium leading-[1.45] tracking-[-0.01em] text-background/70">
                 {prestation.horsPack}
               </p>
             </div>
-            <ul className="flex flex-col gap-[18px] tablet:pl-[30px] desktop:pl-[40px]">
-              {servicePageLabels.variation.map((point) => (
-                <li key={point.titre} className="flex flex-col gap-[6px]">
-                  <p className="text-[15px] font-semibold leading-[1.3] tracking-[-0.01em]">
-                    {point.titre}
-                  </p>
-                  <p className="text-[14px] font-medium leading-[1.45] tracking-[-0.01em] text-background/70">
-                    {point.corps}
-                  </p>
-                </li>
-              ))}
-            </ul>
+            <div className="flex flex-col gap-[20px] tablet:pl-[30px] desktop:pl-[40px]">
+              <div className="flex max-w-[460px] flex-col gap-[16px]">
+                {/* MÊME CORPS QUE LE TITRE D'EN FACE : le chemin qui mène au
+                    rendez-vous ne peut pas peser moins que l'exception qu'il
+                    côtoie. */}
+                <h3 className="accent-room max-w-[420px] text-[26px] font-semibold uppercase leading-[0.95] tracking-[-0.04em] tablet:text-[34px]">
+                  {surMesureBloc.titreQuestions}
+                </h3>
+                <p className="text-[14px] font-medium leading-[1.45] tracking-[-0.01em] text-background/70">
+                  {surMesureBloc.introQuestions}
+                </p>
+              </div>
+              <ol className="flex flex-col">
+                {surMesureBloc.questions.map((question, index) => (
+                  <li
+                    key={question.titre}
+                    className="grid grid-cols-[32px_1fr] gap-x-[10px] border-t border-black/[0.08] py-[16px]"
+                  >
+                    <span className="pt-[2px] text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-background/70">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <div className="flex flex-col gap-[6px]">
+                      <p className="text-[15px] font-semibold leading-[1.3] tracking-[-0.01em]">
+                        {question.titre}
+                      </p>
+                      <p className="max-w-[460px] text-[14px] font-medium leading-[1.45] tracking-[-0.01em] text-background/70">
+                        {question.corps}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+              {/* LE BOUTON SUIT LES QUESTIONS qu'il vient d'annoncer : placé
+                  à gauche, il se lisait avant elles. Plein, à l'accent, comme
+                  l'action principale de la rangée recommandée. */}
+              <Link
+                href="#rendez-vous"
+                className="flex h-[30px] w-fit flex-none items-center justify-center bg-accent px-[10px] text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-background no-underline transition-opacity duration-200 hover:opacity-80 motion-reduce:transition-none"
+              >
+                <span className="accent-room">{surMesureBloc.cta}</span>
+              </Link>
+            </div>
           </div>
         </section>
 

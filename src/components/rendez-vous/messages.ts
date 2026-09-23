@@ -11,7 +11,7 @@
 
 /** Coupure réseau côté navigateur : la requête n'a jamais atteint le serveur. */
 export const MESSAGE_RESEAU =
-  "La connexion a échoué. Vérifiez votre réseau et réessayez.";
+  "La connexion a échoué. Vérifie ton réseau et réessaie.";
 
 /**
  * Clef Turnstile absente.
@@ -21,10 +21,10 @@ export const MESSAGE_RESEAU =
  * roue qui tourne.
  */
 export function messageProtectionAbsente(emailContact: string): string {
-  return `La réservation est momentanément indisponible (protection anti-robot non configurée). Écrivez-moi directement à ${emailContact}.`;
+  return `La réservation est momentanément indisponible (protection anti-robot non configurée). Écris-moi directement à ${emailContact}.`;
 }
 
 /** Réponse d'erreur sans message exploitable : dernier repli. */
 export function messageEchecInconnu(emailContact: string): string {
-  return `Le rendez-vous n’a pas pu être enregistré. Écrivez-moi directement à ${emailContact}.`;
+  return `Le rendez-vous n’a pas pu être enregistré. Écris-moi directement à ${emailContact}.`;
 }

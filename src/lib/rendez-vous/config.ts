@@ -36,7 +36,6 @@ export type CibleEvenement =
 /** Nom de la variable d'environnement portant chaque type de rendez-vous. */
 export const VARIABLES_EVENEMENT: Readonly<Record<IdRendezVous, string>> = {
   site: "CAL_COM_EVENT_SITE",
-  outil: "CAL_COM_EVENT_OUTIL",
   logiciel: "CAL_COM_EVENT_LOGICIEL",
   decouverte: "CAL_COM_EVENT_DECOUVERTE",
 };
@@ -106,4 +105,29 @@ export function estIdRendezVous(valeur: unknown): valeur is IdRendezVous {
     typeof valeur === "string" &&
     (IDS_RENDEZ_VOUS as readonly string[]).includes(valeur)
   );
+}
+
+/**
+ * Anciens sujets encore présents dans des liens publiés, et leur successeur.
+ *
+ * « outil » a été fusionné dans « logiciel » le 2026-09-23. Un lien
+ * `?sujet=outil` envoyé par e-mail ou indexé avant cette date doit encore
+ * présélectionner quelque chose : le visiteur n'a rien demandé de faux.
+ */
+const SUJETS_RENOMMES: Readonly<Record<string, IdRendezVous>> = {
+  outil: "logiciel",
+};
+
+/**
+ * Sujet lu dans l'URL → type de rendez-vous, ancien nom compris.
+ *
+ * `undefined` pour tout ce qui n'est ni un type connu ni un ancien nom : le
+ * paramètre est alors ignoré en silence, comme avant.
+ */
+export function resoudreSujet(valeur: unknown): IdRendezVous | undefined {
+  if (estIdRendezVous(valeur)) return valeur;
+  if (typeof valeur !== "string" || !Object.hasOwn(SUJETS_RENOMMES, valeur)) {
+    return undefined;
+  }
+  return SUJETS_RENOMMES[valeur];
 }

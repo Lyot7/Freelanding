@@ -37,11 +37,11 @@ import { siteConfig } from "@/content/site";
  * AUDIT DE CONFORMITÉ DU 2026-08-29 (`docs/AUDIT-LEGAL.md`), APPLIQUÉ ICI.
  * Cinq manquements étaient constitués, chacun corrigé dans ce fichier :
  *   - CGV, art. L. 441-1 I C. com. : ni barème de prix, ni méthode de calcul,
- *     ni mention d'escompte. Amende administrative jusqu'à 75 000 €. Le barème
- *     décrit la méthode RÉELLE du site (jours du pack x taux journalier, cf.
- *     `offre.ts`) plutôt qu'une grille figée qui se périmerait. Le taux
- *     lui-même n'est PAS publié, `offre.ts` en fait une règle : il est
- *     communicable sur demande, ce qui satisfait le III du même article.
+ *     ni mention d'escompte. Amende administrative jusqu'à 75 000 €. Depuis le
+ *     2026-09-23, le barème est la grille des forfaits à prix ferme publiée
+ *     sur les pages de prestation (`offre.ts`) ; le hors-périmètre se chiffre
+ *     à la charge estimée, détail communicable sur demande (III du même
+ *     article).
  *   - Mentions légales, art. 1-1 I 5° LCEN, créé par la loi SREN : les tiers
  *     qui stockent des données traitées dans le cadre de l'édition du service
  *     doivent être nommés et adressés. Seul l'hébergeur l'était. Les cinq
@@ -254,6 +254,7 @@ export const legalDocuments: readonly LegalDocument[] = [
           "Numéro de téléphone, si vous le laissez",
           "Nom de votre entreprise, si vous le laissez",
           "Le contenu de votre message et des échanges qui suivent",
+          "Quand vous réservez un créneau, vos réponses au questionnaire : budget, objectif et échéance du projet, transmises à Cal.com avec le rendez-vous",
         ],
       },
       { type: "heading", level: 3, text: "2.2 Ce que la visite produit" },
@@ -465,7 +466,7 @@ export const legalDocuments: readonly LegalDocument[] = [
       { type: "heading", level: 2, text: "3. Prix, échéancier et paiement" },
       {
         type: "paragraph",
-        text: "Les prix de départ de chaque prestation sont publiés sur ce site et constituent le barème applicable. Aucun n’y est écrit à la main : tout montant affiché est le produit du nombre de jours ouvrés estimé pour le pack concerné par mon taux journalier en vigueur. Lorsqu’une prestation ne peut pas être chiffrée à l’avance, son prix est établi par la même méthode, estimation de la charge en jours multipliée par ce taux journalier, puis récapitulée dans un devis détaillé. Le taux journalier en vigueur, le détail du calcul et le devis correspondant sont communiqués sur simple demande à tout client professionnel, sur support durable.",
+        text: "Les forfaits de chaque prestation sont publiés sur ce site, à prix ferme et hors taxes pour le périmètre décrit, et constituent le barème applicable. Un besoin qui sort de ces périmètres, ou un forfait signalé « à partir de », fait l’objet d’un devis détaillé, établi à partir de la charge de travail estimée et jamais inférieur au montant affiché. Le détail du calcul et le devis correspondant sont communiqués sur simple demande à tout client professionnel, sur support durable.",
       },
       {
         type: "paragraph",

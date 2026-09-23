@@ -14,7 +14,7 @@ import {
 
 const MAINTENANT = Date.UTC(2026, 8, 1, 13, 0, 0);
 const DEBUT_HUMAIN = MAINTENANT - 10_000;
-const TYPES = ["site", "outil", "decouverte"];
+const TYPES = ["site", "decouverte"];
 
 function valider(surcharge = {}) {
   return validerReservation(
@@ -23,6 +23,8 @@ function valider(surcharge = {}) {
       debut: new Date(MAINTENANT + 48 * 3600 * 1000).toISOString(),
       nom: "Camille Renard",
       email: "camille@exemple.fr",
+      budget: "4800-7200",
+      objectif: "google",
       debutMs: DEBUT_HUMAIN,
       ...surcharge,
     },
@@ -151,5 +153,55 @@ describe("validerReservation — anti-robot", () => {
     expect(validerReservation(null, options).motif.type).toBe("corps_illisible");
     expect(validerReservation([], options).motif.type).toBe("corps_illisible");
     expect(validerReservation("nom=x", options).motif.type).toBe("corps_illisible");
+  });
+});
+
+describe("validerReservation — le questionnaire", () => {
+  it("garde les trois réponses, échéance comprise", () => {
+    const resultat = valider({ echeance: "trimestre" });
+    expect(resultat.ok).toBe(true);
+    expect(resultat.reservation.budget).toBe("4800-7200");
+    expect(resultat.reservation.objectif).toBe("google");
+    expect(resultat.reservation.echeance).toBe("trimestre");
+  });
+
+  it("accepte une échéance absente, et la laisse absente", () => {
+    expect(valider({ echeance: "" }).reservation.echeance).toBeUndefined();
+    expect(valider().reservation.echeance).toBeUndefined();
+  });
+
+  it("exige le budget et l’objectif", () => {
+    expect(valider({ budget: "" }).motif).toEqual({
+      type: "champ_invalide",
+      champ: "budget",
+      raison: "requis",
+    });
+    expect(valider({ objectif: undefined }).motif).toEqual({
+      type: "champ_invalide",
+      champ: "objectif",
+      raison: "requis",
+    });
+  });
+
+  it("accepte « je ne sais pas encore » comme budget", () => {
+    expect(valider({ budget: "inconnu" }).ok).toBe(true);
+  });
+
+  it("refuse une réponse hors de la liste du type choisi", () => {
+    // `6000-18000` est une tranche du rendez-vous « logiciel », pas du « site ».
+    expect(valider({ budget: "6000-18000" }).motif).toEqual({
+      type: "champ_invalide",
+      champ: "budget",
+      raison: "hors_liste",
+    });
+    // `tableur` est un objectif du « logiciel », pas du « site ».
+    expect(valider({ objectif: "tableur" }).motif.champ).toBe("objectif");
+    expect(valider({ echeance: "demain" }).motif.champ).toBe("echeance");
+    expect(valider({ budget: 4800 }).motif.raison).toBe("requis");
+  });
+
+  it("lit les tranches du type réellement demandé", () => {
+    const resultat = valider({ type: "decouverte", budget: "6000-18000", objectif: "tache" });
+    expect(resultat.ok).toBe(true);
   });
 });

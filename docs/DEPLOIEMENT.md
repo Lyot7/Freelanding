@@ -59,8 +59,7 @@ erreur dans les journaux.
 | `RESEND_API_KEY` | non | chemin d'envoi préféré s'il est posé | bascule sur SMTP |
 | `CAL_COM_USERNAME` | non | compte Cal.com | prise de rendez-vous masquée |
 | `CAL_COM_EVENT_SITE` | non | type d'événement « un site » | entrée masquée |
-| `CAL_COM_EVENT_OUTIL` | non | type « un outil » | entrée masquée |
-| `CAL_COM_EVENT_LOGICIEL` | non | type « un logiciel » | entrée masquée |
+| `CAL_COM_EVENT_LOGICIEL` | non | type « une solution métier » | entrée masquée |
 | `CAL_COM_EVENT_DECOUVERTE` | non | type « je ne sais pas encore » | entrée masquée |
 | `CLIC_TOKEN` | non | jeton du cockpit, enregistre les clics des liens `/r/<id>` des e-mails de prospection | clic non enregistré, journal `[clic] <id> non_configure`, redirection intacte |
 

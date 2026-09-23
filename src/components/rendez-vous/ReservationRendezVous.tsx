@@ -10,12 +10,21 @@
  * clef d'API (vérifié, voir `src/lib/rendez-vous/cal-com.ts`), donc rien
  * n'obligeait à l'iframe.
  *
- * TROIS TEMPS, ET UN SEUL VISIBLE À LA FOIS :
- *   01 le sujet — quatre entrées, en boutons, jamais en menu déroulant. Un menu
+ * QUATRE TEMPS :
+ *   01 le sujet — trois entrées, en boutons, jamais en menu déroulant. Un menu
  *      cache ses options derrière un clic et ne laisse pas lire les durées ;
  *   02 le créneau — alimenté par notre route, pas par Cal.com en direct ;
- *   03 les coordonnées — nom, adresse, et un message facultatif.
+ *   03 le projet — budget, objectif, échéance, et le retour « ce que tu peux
+ *      espérer à ce budget » calculé sur place depuis la grille de l'offre ;
+ *   04 les coordonnées — nom, adresse, et un message facultatif.
  * Les étapes déjà franchies restent affichées en résumé, avec de quoi revenir.
+ *
+ * LE QUESTIONNAIRE VIENT APRÈS LE CRÉNEAU, PAS AVANT (2026-09-23). Trois
+ * questions posées avant de voir un agenda sont une barrière à l'entrée ;
+ * posées une fois l'heure retenue, elles se remplissent parce que le visiteur
+ * a déjà choisi de venir. Le retour sur le budget arrive quand même AVANT la
+ * confirmation, donc avant l'appel. Les étapes 03 et 04 partagent un seul
+ * formulaire et un seul bouton : pas de clic « Continuer » de plus.
  *
  * AUCUNE ANIMATION D'APPARITION ICI, contrairement au reste du site. `Reveal`
  * rend l'état MASQUÉ dès le serveur et compte sur une animation pour le lever :
@@ -26,7 +35,7 @@
  *
  * ACCESSIBILITÉ — les trois points qui comptent :
  *   - le choix du sujet est un vrai `radiogroup` (`fieldset` + `input[radio]`),
- *     donc les flèches naviguent et un lecteur d'écran annonce « 1 sur 4 ». Une
+ *     donc les flèches naviguent et un lecteur d'écran annonce « 1 sur 3 ». Une
  *     rangée de `<button aria-pressed>` n'aurait dit ni l'un ni l'autre ;
  *   - la pastille du radio est VISIBLE et fait 14 px : l'anneau de focus global
  *     (`src/app/focus.css`) a donc une cible réelle à entourer. Un
@@ -37,7 +46,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { FormEvent, ReactNode } from "react";
+import type { FormEvent, ReactNode, RefObject } from "react";
 import {
   ChampsProtection,
   MessageEtat,
@@ -54,7 +63,11 @@ import { Icon, Spinner } from "@/components/ui";
 import { rendezVousContent } from "@/content/rendez-vous";
 import { ANALYTICS_EVENTS } from "@/lib/analytics/events";
 import { capture } from "@/lib/analytics/posthog";
-import type { IdRendezVous, TypeRendezVous } from "@/content/rendez-vous";
+import type {
+  IdRendezVous,
+  OptionQuestion,
+  TypeRendezVous,
+} from "@/content/rendez-vous";
 import {
   ajouterJours,
   JOURS_PAR_FENETRE,
@@ -65,6 +78,13 @@ import type {
   JourDeCreneaux,
   ReponseCreneaux,
 } from "@/lib/rendez-vous/creneaux";
+import {
+  OPTIONS_ECHEANCE,
+  optionsObjectif,
+  retourBudget,
+  tranchesBudget,
+} from "@/lib/rendez-vous/questionnaire";
+import type { RetourBudget } from "@/lib/rendez-vous/questionnaire";
 
 const contenu = rendezVousContent;
 
@@ -129,7 +149,11 @@ function Etape({
   children: ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-[16px] border-t border-border pt-[20px] first:border-t-0 first:pt-0">
+    // Filet posé par l'INDEX, pas par `first:` : les étapes 03 et 04 vivent dans
+    // le même `<form>`, où la 03 serait la première enfant et perdrait le sien.
+    <div
+      className={`flex flex-col gap-[16px] ${index === 0 ? "" : "border-t border-border pt-[20px]"}`}
+    >
       <div className="flex items-baseline justify-between gap-[16px]">
         <p className={CLASSE_LIBELLE}>
           <span className="text-accent">{numero(index)}</span>
@@ -206,6 +230,142 @@ function ChoixType({
         );
       })}
     </fieldset>
+  );
+}
+
+/**
+ * Une question à choix unique du questionnaire.
+ *
+ * MÊME MÉCANIQUE QUE `ChoixType` : `fieldset` + `legend` + vrais `radio`, donc
+ * flèches au clavier et « 2 sur 5 » au lecteur d'écran, et une pastille
+ * visible que l'anneau de focus global peut entourer. En pastilles qui passent
+ * à la ligne plutôt qu'en cartes : les réponses tiennent en quelques mots.
+ *
+ * PAS D'ATTRIBUT `required` sur les radios : le navigateur afficherait sa
+ * propre bulle, dans sa langue et son dessin. L'erreur s'écrit sous le groupe,
+ * et c'est le serveur qui fait autorité.
+ */
+function ChoixUnique({
+  nom,
+  legende,
+  options,
+  choisi,
+  onChoisir,
+  erreur,
+  refPremier,
+}: {
+  nom: string;
+  legende: string;
+  options: readonly OptionQuestion[];
+  choisi: string;
+  onChoisir: (id: string) => void;
+  /** Texte affiché sous le groupe ; absent = pas d'erreur. */
+  erreur?: string;
+  /** Reçoit la première pastille, pour y poser le focus. */
+  refPremier?: RefObject<HTMLInputElement | null>;
+}) {
+  const idErreur = `rdv-${nom}-erreur`;
+  return (
+    <fieldset
+      className="m-0 min-w-0 border-0 p-0"
+      aria-describedby={erreur ? idErreur : undefined}
+    >
+      <legend className={`${CLASSE_LIBELLE} mb-[10px] p-0`}>{legende}</legend>
+      <div className="flex flex-wrap gap-[8px]">
+        {options.map((option, index) => {
+          const actif = option.id === choisi;
+          return (
+            <label
+              key={option.id}
+              className={`flex min-h-[44px] cursor-pointer items-center gap-[10px] border px-[14px] py-[10px] transition-colors has-[:focus-visible]:border-accent motion-reduce:transition-none ${
+                actif ? "border-accent bg-accent/[0.07]" : "border-border hover:border-white/35"
+              }`}
+            >
+              <input
+                ref={index === 0 ? refPremier : undefined}
+                type="radio"
+                name={nom}
+                value={option.id}
+                checked={actif}
+                onChange={() => onChoisir(option.id)}
+                className="size-[14px] flex-none cursor-pointer appearance-none rounded-full border border-white/40 bg-transparent transition-colors checked:border-accent checked:bg-accent motion-reduce:transition-none"
+              />
+              <span className="text-[13px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground">
+                {option.libelle}
+              </span>
+            </label>
+          );
+        })}
+      </div>
+      {erreur ? (
+        <p
+          id={idErreur}
+          className="mt-[10px] text-[12px] font-medium leading-[1.3] tracking-[-0.01em] text-accent"
+        >
+          {erreur}
+        </p>
+      ) : null}
+    </fieldset>
+  );
+}
+
+/**
+ * « Ce que tu peux espérer à ce budget ».
+ *
+ * LA RÉGION LIVE EXISTE AVANT SON CONTENU : un lecteur d'écran n'annonce pas
+ * une région qui apparaît déjà remplie. Vide, elle ne prend aucune place.
+ */
+function RetourEspere({ retour }: { retour: RetourBudget | undefined }) {
+  const texte = "text-[13px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground-60";
+  return (
+    <div aria-live="polite">
+      {retour ? (
+        <div className="mt-[12px] flex flex-col gap-[14px] border border-border p-[16px]">
+          <p className={CLASSE_LIBELLE}>{contenu.retour.titre}</p>
+
+          {retour.type === "forfaits"
+            ? retour.lignes.map((ligne) => (
+                <div key={ligne.forfait} className="flex flex-col gap-[6px]">
+                  {ligne.prestation ? (
+                    <p className={CLASSE_LIBELLE}>{ligne.prestation}</p>
+                  ) : null}
+                  <p className="flex flex-wrap items-baseline justify-between gap-x-[12px] gap-y-[4px]">
+                    <span className="text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground">
+                      {ligne.forfait}
+                    </span>
+                    <span className="text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-accent">
+                      {ligne.prix}
+                    </span>
+                  </p>
+                  <p className={texte}>{ligne.promesse}</p>
+                  {ligne.complement ? <p className={texte}>{ligne.complement}</p> : null}
+                </div>
+              ))
+            : null}
+
+          {retour.type === "aucun" ? (
+            <p className="text-[14px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground">
+              {retour.texte}
+            </p>
+          ) : null}
+
+          {retour.type === "inconnu" ? (
+            <div className="flex flex-col gap-[6px]">
+              <p className="text-[14px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground">
+                {retour.texte}
+              </p>
+              <ul className="m-0 flex list-none flex-col gap-[4px] p-0">
+                {retour.reperes.map((repere) => (
+                  <li key={repere} className={texte}>
+                    {repere}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+    </div>
   );
 }
 
@@ -395,6 +555,44 @@ export function ReservationRendezVous({
   const [champEnErreur, setChampEnErreur] = useState<string | undefined>(undefined);
   const protection = useProtectionTurnstile();
 
+  /*
+   * LE QUESTIONNAIRE. Les réponses brutes sont gardées telles quelles ; leur
+   * VALIDITÉ pour le sujet courant est déduite. Changer de sujet ne remet donc
+   * rien à zéro dans un effet : une tranche qui n'existe pas pour le nouveau
+   * sujet cesse simplement de compter, et « je ne sais pas encore », commun à
+   * tous, survit au changement.
+   */
+  const [budget, setBudget] = useState("");
+  const [objectif, setObjectif] = useState("");
+  const [echeance, setEcheance] = useState("");
+  /** Vrai après un envoi refusé côté client : les champs requis vides s'affichent en erreur. */
+  const [envoiTente, setEnvoiTente] = useState(false);
+  const tranches = useMemo(() => (type ? tranchesBudget(type) : []), [type]);
+  const objectifs = useMemo(() => (type ? optionsObjectif(type) : []), [type]);
+  const budgetChoisi = tranches.some((t) => t.id === budget) ? budget : "";
+  const objectifChoisi = objectifs.some((o) => o.id === objectif) ? objectif : "";
+  const retour = useMemo(
+    () => (type && budgetChoisi ? retourBudget(type, budgetChoisi) : undefined),
+    [type, budgetChoisi],
+  );
+  const erreurBudget =
+    (envoiTente && !budgetChoisi) || champEnErreur === "budget"
+      ? contenu.questionnaire.budget.erreur
+      : undefined;
+  const erreurObjectif =
+    (envoiTente && !objectifChoisi) || champEnErreur === "objectif"
+      ? contenu.questionnaire.objectif.erreur
+      : undefined;
+
+  const choisirBudget = useCallback((id: string) => {
+    setBudget(id);
+    setChampEnErreur((champ) => (champ === "budget" ? undefined : champ));
+  }, []);
+  const choisirObjectif = useCallback((id: string) => {
+    setObjectif(id);
+    setChampEnErreur((champ) => (champ === "objectif" ? undefined : champ));
+  }, []);
+
   /**
    * Horodatage d'affichage, posé APRÈS le montage.
    *
@@ -423,9 +621,10 @@ export function ReservationRendezVous({
    * condition, pas une commodité : ne jamais la remplacer par un déclenchement
    * sur le changement de `type`.
    */
-  const refNom = useRef<HTMLInputElement | null>(null);
+  const refBudget = useRef<HTMLInputElement | null>(null);
+  const refObjectif = useRef<HTMLInputElement | null>(null);
   useEffect(() => {
-    if (creneau) refNom.current?.focus();
+    if (creneau) refBudget.current?.focus();
   }, [creneau]);
 
   /*
@@ -570,6 +769,7 @@ export function ReservationRendezVous({
     setSemaine("");
     setEtatEnvoi("repos");
     setMessageEnvoi("");
+    setEnvoiTente(false);
   }, []);
 
   /*
@@ -615,6 +815,10 @@ export function ReservationRendezVous({
     setEtatEnvoi("repos");
     setMessageEnvoi("");
     setChampEnErreur(undefined);
+    setBudget("");
+    setObjectif("");
+    setEcheance("");
+    setEnvoiTente(false);
     refDebut.current = Date.now();
   }, []);
 
@@ -635,6 +839,14 @@ export function ReservationRendezVous({
         const valeur = donneesFormulaire.get(nom);
         return typeof valeur === "string" ? valeur : "";
       };
+
+      // Budget et objectif manquants : l'erreur s'écrit sous la question, le
+      // focus y va, et rien ne part. Le serveur refuserait de toute façon.
+      if (!budgetChoisi || !objectifChoisi) {
+        setEnvoiTente(true);
+        (budgetChoisi ? refObjectif : refBudget).current?.focus();
+        return;
+      }
 
       setEtatEnvoi("envoi");
       setMessageEnvoi("");
@@ -669,6 +881,9 @@ export function ReservationRendezVous({
             nom: lire("nom"),
             email: lire("email"),
             message: lire("message"),
+            budget: budgetChoisi,
+            objectif: objectifChoisi,
+            echeance,
             debutMs: refDebut.current,
             [NOM_CHAMP_PIEGE]: lire(NOM_CHAMP_PIEGE),
             ...(jetonCaptcha ? { jetonCaptcha } : {}),
@@ -686,7 +901,12 @@ export function ReservationRendezVous({
            * il compte donc aussi les envois que Cal.com a refusés. L'entonnoir
            * se termine ici, sur la réponse du serveur.
            */
-          capture(ANALYTICS_EVENTS.rdvConfirmed, { rdv_type: type });
+          // La tranche, jamais un montant : c'est elle qui dira quels budgets
+          // vont jusqu'au bout de la réservation.
+          capture(ANALYTICS_EVENTS.rdvConfirmed, {
+            rdv_type: type,
+            budget: budgetChoisi,
+          });
           return;
         }
 
@@ -729,7 +949,16 @@ export function ReservationRendezVous({
         });
       }
     },
-    [etatEnvoi, type, creneau, protection, emailContact],
+    [
+      etatEnvoi,
+      type,
+      creneau,
+      protection,
+      emailContact,
+      budgetChoisi,
+      objectifChoisi,
+      echeance,
+    ],
   );
 
   if (etatEnvoi === "succes") {
@@ -838,97 +1067,131 @@ export function ReservationRendezVous({
       ) : null}
 
       {typeChoisi && creneau ? (
-        <Etape index={2} titre={contenu.etapes.coordonnees} ouverte>
-          <form
-            /* SANS CE NOM, la mesure appelle ce formulaire « form » : `formId`
-               retombe sur cette chaîne quand ni `data-analytics-form`, ni
-               `name`, ni `id` ne sont posés, et les trois formulaires de
-               contact du site se confondent alors dans un même seau. */
-            data-analytics-form="rendez-vous"
-            className="relative flex flex-col gap-[14px]"
-            /* `method="post"` et `action` : sans script, le navigateur soumet
-               lui-même, en POST et dans un CORPS. La route refusera faute de
-               JSON et de jeton, mais aucune donnée personnelle ne peut partir
-               dans une chaîne de requête. Même raisonnement que les trois
-               formulaires de contact. */
-            method="post"
-            action="/api/rendez-vous"
-            onSubmit={gererSoumission}
-            /* Première interaction = chargement du script Turnstile. Tant que
-               personne ne touche le formulaire, aucune requête ne part vers
-               Cloudflare. */
-            onFocusCapture={protection.activer}
-          >
-            <label htmlFor="rdv-nom" className="flex w-full flex-col gap-[10px]">
-              <span className={CLASSE_LIBELLE}>{contenu.formulaire.nomLabel}</span>
-              <input
-                id="rdv-nom"
-                ref={refNom}
-                name="nom"
-                type="text"
-                required
-                autoComplete="name"
-                placeholder={contenu.formulaire.nomPlaceholder}
-                aria-invalid={champEnErreur === "nom" || undefined}
-                className={`${CLASSE_CHAMP} ${champEnErreur === "nom" ? "border-accent" : ""}`}
+        <form
+          /* SANS CE NOM, la mesure appelle ce formulaire « form » : `formId`
+             retombe sur cette chaîne quand ni `data-analytics-form`, ni
+             `name`, ni `id` ne sont posés, et les trois formulaires de
+             contact du site se confondent alors dans un même seau. */
+          data-analytics-form="rendez-vous"
+          className="relative flex flex-col gap-[20px]"
+          /* `method="post"` et `action` : sans script, le navigateur soumet
+             lui-même, en POST et dans un CORPS. La route refusera faute de
+             JSON et de jeton, mais aucune donnée personnelle ne peut partir
+             dans une chaîne de requête. Même raisonnement que les trois
+             formulaires de contact. */
+          method="post"
+          action="/api/rendez-vous"
+          onSubmit={gererSoumission}
+          /* Première interaction = chargement du script Turnstile. Tant que
+             personne ne touche le formulaire, aucune requête ne part vers
+             Cloudflare. */
+          onFocusCapture={protection.activer}
+        >
+          <Etape index={2} titre={contenu.etapes.projet} ouverte>
+            <div className="flex flex-col gap-[24px]">
+              <div>
+                <ChoixUnique
+                  nom="budget"
+                  legende={contenu.questionnaire.budget.legende}
+                  options={tranches}
+                  choisi={budgetChoisi}
+                  onChoisir={choisirBudget}
+                  erreur={erreurBudget}
+                  refPremier={refBudget}
+                />
+                <RetourEspere retour={retour} />
+              </div>
+              <ChoixUnique
+                nom="objectif"
+                legende={contenu.questionnaire.objectif.legende}
+                options={objectifs}
+                choisi={objectifChoisi}
+                onChoisir={choisirObjectif}
+                erreur={erreurObjectif}
+                refPremier={refObjectif}
               />
-            </label>
-
-            <label htmlFor="rdv-email" className="flex w-full flex-col gap-[10px]">
-              <span className={CLASSE_LIBELLE}>{contenu.formulaire.emailLabel}</span>
-              <input
-                id="rdv-email"
-                name="email"
-                type="email"
-                required
-                autoComplete="email"
-                placeholder={contenu.formulaire.emailPlaceholder}
-                aria-invalid={champEnErreur === "email" || undefined}
-                className={`${CLASSE_CHAMP} ${champEnErreur === "email" ? "border-accent" : ""}`}
+              <ChoixUnique
+                nom="echeance"
+                legende={contenu.questionnaire.echeance.legende}
+                options={OPTIONS_ECHEANCE}
+                choisi={echeance}
+                onChoisir={setEcheance}
               />
-            </label>
+            </div>
+          </Etape>
 
-            <label htmlFor="rdv-message" className="flex w-full flex-col gap-[10px]">
-              <span className={CLASSE_LIBELLE}>{contenu.formulaire.messageLabel}</span>
-              <textarea
-                id="rdv-message"
-                name="message"
-                maxLength={1500}
-                placeholder={contenu.formulaire.messagePlaceholder}
-                aria-invalid={champEnErreur === "message" || undefined}
-                className="min-h-[90px] w-full resize-y border border-border bg-transparent p-[16px] text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground transition-colors placeholder:text-white/25 focus:border-b-accent tablet:text-[14px]"
-              />
-            </label>
+          <Etape index={3} titre={contenu.etapes.coordonnees} ouverte>
+            <div className="flex flex-col gap-[14px]">
+              <label htmlFor="rdv-nom" className="flex w-full flex-col gap-[10px]">
+                <span className={CLASSE_LIBELLE}>{contenu.formulaire.nomLabel}</span>
+                <input
+                  id="rdv-nom"
+                  name="nom"
+                  type="text"
+                  required
+                  autoComplete="name"
+                  placeholder={contenu.formulaire.nomPlaceholder}
+                  aria-invalid={champEnErreur === "nom" || undefined}
+                  className={`${CLASSE_CHAMP} ${champEnErreur === "nom" ? "border-accent" : ""}`}
+                />
+              </label>
 
-            <button
-              type="submit"
-              disabled={enCours}
-              className="mt-[6px] flex h-[50px] w-full items-center justify-center bg-accent px-[20px] text-[13px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-accent-ink transition-opacity disabled:cursor-progress disabled:opacity-60 tablet:w-fit"
-            >
-              {enCours ? contenu.formulaire.envoiEnCours : contenu.formulaire.envoyer}
-            </button>
+              <label htmlFor="rdv-email" className="flex w-full flex-col gap-[10px]">
+                <span className={CLASSE_LIBELLE}>{contenu.formulaire.emailLabel}</span>
+                <input
+                  id="rdv-email"
+                  name="email"
+                  type="email"
+                  required
+                  autoComplete="email"
+                  placeholder={contenu.formulaire.emailPlaceholder}
+                  aria-invalid={champEnErreur === "email" || undefined}
+                  className={`${CLASSE_CHAMP} ${champEnErreur === "email" ? "border-accent" : ""}`}
+                />
+              </label>
 
-            <MessageEtat
-              etat={etatEnvoi}
-              message={messageEnvoi}
-              ton="clair"
-              className="max-w-[420px]"
-            />
+              <label htmlFor="rdv-message" className="flex w-full flex-col gap-[10px]">
+                <span className={CLASSE_LIBELLE}>{contenu.formulaire.messageLabel}</span>
+                <textarea
+                  id="rdv-message"
+                  name="message"
+                  maxLength={1500}
+                  placeholder={contenu.formulaire.messagePlaceholder}
+                  aria-invalid={champEnErreur === "message" || undefined}
+                  className="min-h-[90px] w-full resize-y border border-border bg-transparent p-[16px] text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground transition-colors placeholder:text-white/25 focus:border-b-accent tablet:text-[14px]"
+                />
+              </label>
 
-            <p className="text-[12px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground-60">
-              {contenu.formulaire.mention}{" "}
-              <Link
-                href={contenu.formulaire.mentionHref}
-                className="text-foreground no-underline transition-colors duration-200 ease-[cubic-bezier(0.44,0,0.56,1)] hover:text-accent motion-reduce:transition-none"
+              <button
+                type="submit"
+                disabled={enCours}
+                className="mt-[6px] flex h-[50px] w-full items-center justify-center bg-accent px-[20px] text-[13px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-accent-ink transition-opacity disabled:cursor-progress disabled:opacity-60 tablet:w-fit"
               >
-                {contenu.formulaire.mentionLien}
-              </Link>
-              .
-            </p>
+                {enCours ? contenu.formulaire.envoiEnCours : contenu.formulaire.envoyer}
+              </button>
 
-            <ChampsProtection refConteneur={protection.refConteneur} />
-          </form>
-        </Etape>
+              <MessageEtat
+                etat={etatEnvoi}
+                message={messageEnvoi}
+                ton="clair"
+                className="max-w-[420px]"
+              />
+
+              <p className="text-[12px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground-60">
+                {contenu.formulaire.mention}{" "}
+                <Link
+                  href={contenu.formulaire.mentionHref}
+                  className="text-foreground no-underline transition-colors duration-200 ease-[cubic-bezier(0.44,0,0.56,1)] hover:text-accent motion-reduce:transition-none"
+                >
+                  {contenu.formulaire.mentionLien}
+                </Link>
+                .
+              </p>
+
+              <ChampsProtection refConteneur={protection.refConteneur} />
+            </div>
+          </Etape>
+        </form>
       ) : null}
     </div>
   );

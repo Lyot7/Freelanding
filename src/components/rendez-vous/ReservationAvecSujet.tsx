@@ -16,6 +16,9 @@
  * est donc le même bloc, sans présélection : le pire cas est un sujet à cocher
  * à la main, jamais un bloc absent.
  *
+ * UN ANCIEN SUJET EST TRADUIT : `?sujet=outil`, fusionné dans « logiciel » le
+ * 2026-09-23, présélectionne « logiciel » (`resoudreSujet`).
+ *
  * UN SUJET INCONNU EST IGNORÉ EN SILENCE. `?sujet=nimportequoi`, ou un sujet
  * réel dont la variable d'environnement Cal.com n'est pas posée, retombent sur
  * l'absence de sélection. Pas de message d'erreur : le visiteur n'a rien
@@ -26,7 +29,7 @@ import { useSearchParams } from "next/navigation";
 import { ReservationRendezVous } from "@/components/rendez-vous/ReservationRendezVous";
 import { PARAM_SUJET } from "@/content/rendez-vous";
 import type { TypeRendezVous } from "@/content/rendez-vous";
-import { estIdRendezVous } from "@/lib/rendez-vous/config";
+import { resoudreSujet } from "@/lib/rendez-vous/config";
 
 export function ReservationAvecSujet({
   types,
@@ -35,13 +38,11 @@ export function ReservationAvecSujet({
   types: readonly TypeRendezVous[];
   emailContact: string;
 }) {
-  const demande = useSearchParams().get(PARAM_SUJET);
+  const demande = resoudreSujet(useSearchParams().get(PARAM_SUJET));
   // Deux filtres, pas un : le sujet doit être connu du contenu ET réellement
   // configuré. `types` est déjà réduit aux seconds par le composant serveur.
   const typeInitial =
-    estIdRendezVous(demande) && types.some((type) => type.id === demande)
-      ? demande
-      : undefined;
+    demande && types.some((type) => type.id === demande) ? demande : undefined;
 
   return (
     <ReservationRendezVous

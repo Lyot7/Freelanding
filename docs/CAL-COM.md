@@ -57,7 +57,6 @@ Voilà ce que je propose, et l'argument derrière chaque ligne.
 | Type de rendez-vous     | Durée | Pourquoi cette durée |
 | ----------------------- | ----- | -------------------- |
 | Un site                 | **20 min** | Assez pour couvrir ce qui existe, ce qui coince, l'échéance et l'ordre de grandeur du budget. Assez court pour qu'on le réserve sans en parler à personne. |
-| Un outil métier         | **20 min** | Même raisonnement. Le sujet est concret (« qu'est-ce que vous faites à la main aujourd'hui »), il n'appelle pas de tour d'horizon. |
 | Un logiciel sur mesure  | **30 min** | Plusieurs utilisateurs, plusieurs rôles, des données à tenir. Cadrer ça en 20 minutes produit une estimation fausse, et une estimation fausse coûte infiniment plus cher que dix minutes d'agenda. |
 | Je ne sais pas encore   | **15 min** | Le prospect n'a pas de quoi remplir vingt minutes : il a un problème, pas encore une demande. Le but ici n'est pas de cadrer, c'est de qualifier puis de reprendre un créneau plus long. Quinze minutes est la barrière la plus basse qu'on puisse poser. |
 
@@ -85,7 +84,7 @@ rendez-vous de plus à caler, pas un de gagné.
 
 ---
 
-## 3. Créer les quatre types d'événements, étape par étape
+## 3. Créer les trois types d'événements, étape par étape
 
 Compte Cal.com gratuit, aucune carte bancaire, aucune facturation à ouvrir.
 Répète la procédure quatre fois, une par ligne du tableau ci-dessus.
@@ -107,7 +106,7 @@ Répète la procédure quatre fois, une par ligne du tableau ci-dessus.
    rendez-vous, et les matinées sont le seul moment où on écrit du code
    sérieusement. Lundi et vendredi restent libres pour les rendez-vous clients
    en cours.
-4. Cette disponibilité sera assignée aux quatre types d'événements. Une seule à
+4. Cette disponibilité sera assignée aux trois types d'événements. Une seule à
    maintenir.
 
 ### 3.2 Chaque type d'événement
@@ -118,8 +117,8 @@ Répète la procédure quatre fois, une par ligne du tableau ci-dessus.
 
 | Champ | Valeur |
 | ----- | ------ |
-| Title | `Un site`, `Un outil métier`, `Un logiciel sur mesure`, `Je ne sais pas encore` |
-| URL (slug) | `site-20min`, `outil-20min`, `logiciel-30min`, `decouverte-15min` |
+| Title | `Un site`, `Une solution métier`, `Je ne sais pas encore` |
+| URL (slug) | `site-20min`, `logiciel-30min`, `decouverte-15min` |
 | Description | Reprendre la description affichée sur le site (`src/content/rendez-vous.ts`) : elle sera reprise dans l'e-mail de confirmation. |
 | Duration | 20 / 20 / 30 / 15 minutes |
 | Location | **Cal Video**. C'est ce qui fait générer le lien de visioconférence annoncé par l'écran de succès du site. Ne pas laisser « Attendee phone number » ni « Link meeting » : le premier exige un champ que notre formulaire n'envoie pas, le second exige une URL. |
@@ -137,6 +136,22 @@ Répète la procédure quatre fois, une par ligne du tableau ci-dessus.
 | Limit future bookings | **30 jours glissants** | Au-delà, personne ne tient son agenda. Notre code borne de son côté à 120 jours (`HORIZON_JOURS`) : le plus strict des deux gagne, c'est-à-dire Cal.com. |
 | Limit booking frequency | 3 par jour, 8 par semaine | Facultatif. Empêche une journée entière de disparaître en appels de découverte. |
 
+**Le questionnaire ne demande rien à Cal.com.** Budget, objectif et échéance
+sont posés par le site (`src/lib/rendez-vous/questionnaire.ts`), vérifiés par
+la route, puis écrits en clair dans `notes`, par exemple :
+
+```
+Budget HT : De 4 800 € à 7 200 €
+Forfait atteignable : Le Site, 4 800 € HT
+Objectif : Être trouvé sur Google
+Échéance : Dans les trois mois
+
+<message libre>
+```
+
+Ne crée AUCUN champ de réservation pour ces réponses : il ferait doublon, et
+un champ obligatoire casserait la route.
+
 **Onglet « Advanced » — c'est ici que ça se joue**
 
 > ⚠️ **Un champ de réservation OBLIGATOIRE que notre formulaire n'envoie pas
@@ -147,7 +162,7 @@ Répète la procédure quatre fois, une par ligne du tableau ci-dessus.
 | -------------------- | ------------ | -------- |
 | `name` (Your name) | activé, obligatoire | Envoyé par le formulaire. |
 | `email` (Email address) | activé, obligatoire | Envoyé par le formulaire. |
-| `notes` (Additional notes) | **activé, FACULTATIF** | Le message libre du formulaire y est déposé. S'il est désactivé, Cal.com refuse la réponse ; s'il est obligatoire, un prospect qui ne l'a pas rempli est refusé. |
+| `notes` (Additional notes) | **activé, FACULTATIF** | Le site y dépose les réponses au questionnaire (budget, forfait atteignable, objectif, échéance), puis le message libre. S'il est désactivé, Cal.com refuse la réservation. |
 | `attendeePhoneNumber` | **désactivé** | Non envoyé. |
 | `title` (What is this meeting about) | **désactivé** | Non envoyé. |
 | `guests` | désactivé | Non envoyé, et sans usage ici. |
@@ -181,8 +196,7 @@ le gestionnaire de secrets du service.
 | -------- | ------------- | ------------- |
 | `CAL_COM_USERNAME` | Le `<username>` de ton URL publique `cal.com/<username>`. Aussi dans `Settings > My Account > Username`. | Seulement si les variables ci-dessous portent des **slugs**. |
 | `CAL_COM_EVENT_SITE` | Slug ou identifiant du type « Un site ». | Non, mais son absence retire l'entrée du sélecteur. |
-| `CAL_COM_EVENT_OUTIL` | Idem, « Un outil métier ». | Non. |
-| `CAL_COM_EVENT_LOGICIEL` | Idem, « Un logiciel sur mesure ». | Non. |
+| `CAL_COM_EVENT_LOGICIEL` | Idem, « Une solution métier » (outil simple comme logiciel complet). | Non. |
 | `CAL_COM_EVENT_DECOUVERTE` | Idem, « Je ne sais pas encore ». | Non. |
 
 **Deux façons de désigner un type d'événement**, au choix, variable par
@@ -224,7 +238,7 @@ configuration dans le paquet JavaScript de chaque visiteur.
 Le dépôt ne contient pas ton compte. Tout ce qui suit se règle dans l'interface
 Cal.com, et seulement là :
 
-1. **Créer le compte et les quatre types d'événements** (partie 3).
+1. **Créer le compte et les trois types d'événements** (partie 3).
 2. **Connecter l'agenda** — la seule étape dont l'oubli produit un double
    rendez-vous.
 3. **Régler durées, disponibilité, préavis, tampons et fenêtre de réservation.**

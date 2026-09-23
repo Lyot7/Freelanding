@@ -1,4 +1,4 @@
-/** Adresse du bloc « pourquoi un devis ne tombe jamais pile », sur sa page. */
+/** Adresse du bloc « Sur mesure, sur devis », sur sa page. */
 export const lienDevis = (slug: string): string => `/services/${slug}#devis`;
 
 /**

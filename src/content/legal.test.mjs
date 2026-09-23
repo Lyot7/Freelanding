@@ -195,7 +195,8 @@ describe("documents légaux", () => {
     const texte = bodyText([cgv]);
 
     expect(texte).toContain("barème");
-    expect(texte).toContain("taux journalier");
+    expect(texte).toContain("prix ferme");
+    expect(texte).not.toContain("taux journalier");
     expect(texte).toContain("support durable");
     expect(texte).toContain("escompte");
   });

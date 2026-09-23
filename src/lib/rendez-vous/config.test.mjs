@@ -2,6 +2,7 @@ import { describe, expect, it } from "bun:test";
 import {
   estIdRendezVous,
   resoudreCible,
+  resoudreSujet,
   resoudreConfiguration,
   VARIABLES_EVENEMENT,
 } from "./config.ts";
@@ -31,11 +32,11 @@ describe("resoudreCible", () => {
 
   it("rogne les espaces autour des valeurs collées à la main", () => {
     expect(
-      resoudreCible("outil", {
-        CAL_COM_EVENT_OUTIL: "  outil-20min  ",
+      resoudreCible("logiciel", {
+        CAL_COM_EVENT_LOGICIEL: "  logiciel-30min  ",
         CAL_COM_USERNAME: "  eliott  ",
       }),
-    ).toEqual({ par: "slug", eventTypeSlug: "outil-20min", username: "eliott" });
+    ).toEqual({ par: "slug", eventTypeSlug: "logiciel-30min", username: "eliott" });
   });
 
   it("refuse une variable vide, une variable absente et un zéro", () => {
@@ -71,7 +72,7 @@ describe("resoudreConfiguration", () => {
       CAL_COM_EVENT_DECOUVERTE: "9876543",
     });
     expect(config.typesDisponibles).toEqual(["site", "decouverte"]);
-    expect(config.cibles.outil).toBeUndefined();
+    expect(config.cibles.logiciel).toBeUndefined();
     expect(config.cibles.decouverte).toEqual({ par: "id", eventTypeId: 9876543 });
   });
 
@@ -80,35 +81,56 @@ describe("resoudreConfiguration", () => {
       CAL_COM_EVENT_DECOUVERTE: "4",
       CAL_COM_EVENT_SITE: "1",
       CAL_COM_EVENT_LOGICIEL: "3",
-      CAL_COM_EVENT_OUTIL: "2",
     });
-    expect(config.typesDisponibles).toEqual([
-      "site",
-      "outil",
-      "logiciel",
-      "decouverte",
-    ]);
+    expect(config.typesDisponibles).toEqual(["site", "logiciel", "decouverte"]);
   });
 
-  it("couvre les quatre types du contenu, sans variable orpheline", () => {
+  it("couvre les trois types du contenu, sans variable orpheline", () => {
     expect(Object.keys(VARIABLES_EVENEMENT).sort()).toEqual([
       "decouverte",
       "logiciel",
-      "outil",
       "site",
     ]);
+  });
+
+  it("ignore l’ancienne variable du type « outil », fusionné dans « logiciel »", () => {
+    // Une valeur restée dans un `.env` ne doit pas ressusciter une entrée.
+    const config = resoudreConfiguration({ CAL_COM_EVENT_OUTIL: "2" });
+    expect(config.typesDisponibles).toEqual([]);
   });
 });
 
 describe("estIdRendezVous", () => {
-  it("accepte les quatre identifiants et refuse tout le reste", () => {
+  it("accepte les trois identifiants et refuse tout le reste", () => {
     expect(estIdRendezVous("site")).toBe(true);
+    expect(estIdRendezVous("logiciel")).toBe(true);
     expect(estIdRendezVous("decouverte")).toBe(true);
+    expect(estIdRendezVous("outil")).toBe(false);
     expect(estIdRendezVous("autre")).toBe(false);
     expect(estIdRendezVous(undefined)).toBe(false);
     expect(estIdRendezVous(12)).toBe(false);
     // `toString` traîne sur le prototype de tout objet : un `includes` naïf sur
     // un objet, plutôt que sur le tableau, l'accepterait.
     expect(estIdRendezVous("toString")).toBe(false);
+  });
+});
+
+describe("resoudreSujet", () => {
+  it("rend un sujet connu tel quel", () => {
+    expect(resoudreSujet("site")).toBe("site");
+    expect(resoudreSujet("decouverte")).toBe("decouverte");
+  });
+
+  it("redirige l’ancien sujet « outil » vers « logiciel »", () => {
+    // Des liens `?sujet=outil` ont été publiés avant la fusion du 2026-09-23.
+    expect(resoudreSujet("outil")).toBe("logiciel");
+  });
+
+  it("ignore tout le reste, prototype compris", () => {
+    expect(resoudreSujet("autre")).toBeUndefined();
+    expect(resoudreSujet(null)).toBeUndefined();
+    expect(resoudreSujet(undefined)).toBeUndefined();
+    expect(resoudreSujet("toString")).toBeUndefined();
+    expect(resoudreSujet("constructor")).toBeUndefined();
   });
 });

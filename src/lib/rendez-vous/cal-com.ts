@@ -147,7 +147,8 @@ export interface DemandeReservation {
   readonly debutUtc: string;
   readonly nom: string;
   readonly email: string;
-  readonly message?: string;
+  /** Texte composé par `composerNotes` : réponses au questionnaire, puis message libre. */
+  readonly notes?: string;
 }
 
 export interface ReservationCreee {
@@ -177,11 +178,13 @@ export async function creerReservation(
       language: "fr",
     },
   };
-  if (demande.message) {
+  if (demande.notes) {
     // `notes` est le champ de réservation natif « Notes supplémentaires ».
     // Il doit rester ACTIF sur chaque type d'événement, sinon Cal.com refuse la
-    // réponse : c'est écrit noir sur blanc dans `docs/CAL-COM.md`.
-    corps.bookingFieldsResponses = { notes: demande.message };
+    // réponse : c'est écrit noir sur blanc dans `docs/CAL-COM.md`. Il porte
+    // depuis le 2026-09-23 les réponses au questionnaire, donc il part à
+    // chaque réservation.
+    corps.bookingFieldsResponses = { notes: demande.notes };
   }
 
   try {

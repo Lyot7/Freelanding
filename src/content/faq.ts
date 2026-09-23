@@ -1,20 +1,19 @@
 import {
   packEntree,
   plancherSuivi,
+  prestation,
   prixPack,
   suiviMensuel,
   tauxSuivi,
-  TJM,
 } from "@/content/offre";
 import type { FaqItem } from "@/lib/content/types";
 
 /**
- * Le pack d'entrée du logiciel sert DEUX FOIS dans cette FAQ : comme montant
- * haut de la gamme, et comme projet de référence de l'exemple de suivi. Il est
- * nommé une fois ici pour que les deux ne puissent pas diverger entre eux, en
- * plus de ne pas diverger du module.
+ * Le projet de référence de l'exemple de suivi : Le Logiciel, palier du milieu
+ * de La Solution métier. Nommé une fois pour que la mensualité et le prix du
+ * projet cités dans la même phrase ne puissent pas diverger.
  */
-const PACK_LOGICIEL = packEntree("logiciel");
+const PACK_LOGICIEL = prestation("logiciel").packs[1];
 
 /**
  * Source unique de la FAQ. Rendue à l'identique sur la page d'accueil, sur
@@ -84,7 +83,7 @@ export const faqItems: FaqItem[] = [
        les nombres s'écrivent en chiffres, déjà appliquée dans
        `service-pages.ts`, `tarifs.ts` et `services.ts`. Les 30 / 40 / 30 de
        l'échéancier restent des pourcentages, pas des montants. */
-    answer: `Un site vitrine démarre à ${prixPack(packEntree("vitrine"))}, une fonction branchée sur ton existant à ${prixPack(packEntree("outil"))}, un logiciel métier complet à ${prixPack(PACK_LOGICIEL)}. Chaque prestation existe en 3 périmètres, détaillés sur sa page : ce qui change de l’un à l’autre y est écrit ligne à ligne. Le montant est arrêté avant que je commence, et il ne bouge plus. Tu verses 30 % à la signature, 40 % à mi-parcours et 30 % à la livraison.`,
+    answer: `Un site démarre à ${prixPack(packEntree("vitrine"))}, une solution métier à ${prixPack(packEntree("logiciel"))}. Chaque prestation existe en 3 forfaits, détaillés sur sa page : ce qui change de l’un à l’autre y est écrit ligne à ligne. Le prix d’un forfait est arrêté avant que je commence, et il ne bouge plus ; au-delà du dernier, je chiffre sur mesure. Tu verses 30 % à la signature, 40 % à mi-parcours et 30 % à la livraison.`,
   },
   {
     question: "Qu’est-ce que je vois avant la mise en ligne ?",
@@ -112,11 +111,6 @@ export const faqItems: FaqItem[] = [
       "Une agence, ce sont des salariés, des plannings, des ressources humaines et plusieurs corps de métier : des frais qui courent que ton projet avance ou non, et une chaîne de personnes entre toi et le travail. Je vais droit au but. Je suis développeur, et je suis à l’aise avec les métiers qui gravitent autour : positionnement, marketing, design, référencement, accessibilité. Tu parles à celui qui écrit le code.",
   },
   {
-    question: "Tu utilises l’intelligence artificielle ?",
-    answer:
-      "Oui, et je préfère le dire. Pas pour fabriquer ton site : pour décider. Avant d’écrire une ligne, je m’en sers comme d’un contradicteur sur les arbitrages qui comptent : ton positionnement, ce qu’il faut montrer et à qui, l’architecture du projet, les outils sur lesquels il reposera encore dans deux ans. Le code, lui, je l’écris et j’en réponds. C’est l’inverse d’un site généré, où la machine produit et où personne n’a rien décidé.",
-  },
-  {
     question: "Tu écris le contenu ou je dois le fournir ?",
     answer:
       "Les deux fonctionnent. Tu peux fournir tes propres textes, ou je les rédige moi-même : un contenu professionnel, optimisé pour la recherche locale, calé sur ton métier et tes objectifs.",
@@ -127,7 +121,7 @@ export const faqItems: FaqItem[] = [
        projet de référence) sont dérivés : l'exemple se recalcule tout seul le
        jour où le taux ou la grille bougent, au lieu de rester juste par
        coïncidence. */
-    answer: `Je ne disparais pas. Je propose un suivi mensuel qui revient à ${tauxSuivi()} du prix du projet par an, avec un minimum de ${plancherSuivi()} : compte ${suiviMensuel(TJM * PACK_LOGICIEL.jours)} par mois pour un projet à ${prixPack(PACK_LOGICIEL)}. Il couvre ce qui existe : mises à jour, sauvegardes vérifiées, corrections. Une demande nouvelle, elle, fait l’objet d’un devis, parce qu’elle n’était pas au cadrage : tu sais toujours ce que tu paies. Et tu n’as pas besoin de ce suivi pour continuer à te servir de ce que je t’ai livré.`,
+    answer: `Je ne disparais pas. Je propose un suivi mensuel qui revient à ${tauxSuivi()} du prix du projet par an, avec un minimum de ${plancherSuivi()} : compte ${suiviMensuel(PACK_LOGICIEL.prix)} par mois pour un projet à ${prixPack(PACK_LOGICIEL)}. Il couvre ce qui existe : mises à jour, sauvegardes vérifiées, corrections. Une demande nouvelle, elle, fait l’objet d’un devis, parce qu’elle n’était pas au cadrage : tu sais toujours ce que tu paies. Et tu n’as pas besoin de ce suivi pour continuer à te servir de ce que je t’ai livré.`,
   },
   /*
    * LA CLAUSE D'INFRASTRUCTURE, ajoutée le 2026-08-27.

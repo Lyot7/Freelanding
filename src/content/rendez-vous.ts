@@ -7,21 +7,29 @@
  * libellé, pas même « Réessayer ».
  *
  * CE QUI N'EST PAS ICI, et ne doit pas y venir : la durée RÉELLE de chaque
- * rendez-vous et les questions posées à la réservation. Elles vivent chez
- * Cal.com, qui est l'autorité sur l'agenda. Le champ `duree` ci-dessous n'est
- * qu'un AFFICHAGE : s'il ment, c'est le réglage Cal.com qui fait foi, et
- * `docs/CAL-COM.md` donne la procédure pour que les deux coïncident.
+ * rendez-vous. Elle vit chez Cal.com, qui est l'autorité sur l'agenda. Le champ
+ * `duree` ci-dessous n'est qu'un AFFICHAGE : s'il ment, c'est le réglage
+ * Cal.com qui fait foi, et `docs/CAL-COM.md` donne la procédure pour que les
+ * deux coïncident.
+ *
+ * LE QUESTIONNAIRE, LUI, VIT ICI ET PAS CHEZ CAL.COM (2026-09-23). Ses
+ * réponses partent dans le champ natif `notes` de la réservation, mises en
+ * forme par `src/lib/rendez-vous/questionnaire.ts`. Aucun champ Cal.com
+ * supplémentaire : un champ personnalisé obligatoire ajouté là-bas casserait
+ * la route sans que rien ne change dans le dépôt.
  */
 
 import type { PrestationId } from "@/content/offre";
 
-/** Les quatre entrées du sélecteur, et l'ordre dans lequel elles s'affichent. */
-export const IDS_RENDEZ_VOUS = [
-  "site",
-  "outil",
-  "logiciel",
-  "decouverte",
-] as const;
+/**
+ * Les trois entrées du sélecteur, et l'ordre dans lequel elles s'affichent.
+ *
+ * « outil » a disparu le 2026-09-23 avec la prestation du même nom : L'Outil
+ * est devenu le premier palier de La Solution métier, et le rendez-vous
+ * « logiciel » couvre les deux tailles. Un ancien lien `?sujet=outil` est
+ * redirigé vers « logiciel » par `resoudreSujet` (`src/lib/rendez-vous/config.ts`).
+ */
+export const IDS_RENDEZ_VOUS = ["site", "logiciel", "decouverte"] as const;
 
 export type IdRendezVous = (typeof IDS_RENDEZ_VOUS)[number];
 
@@ -33,6 +41,13 @@ export interface TypeRendezVous {
   readonly description: string;
 }
 
+/** Une réponse possible à une question du questionnaire. */
+export interface OptionQuestion {
+  /** Identifiant stable, transmis au serveur et vérifié en liste fermée. */
+  readonly id: string;
+  readonly libelle: string;
+}
+
 export interface ContenuRendezVous {
   readonly eyebrow: string;
   readonly titre: string;
@@ -42,6 +57,7 @@ export interface ContenuRendezVous {
   readonly etapes: {
     readonly sujet: string;
     readonly creneau: string;
+    readonly projet: string;
     readonly coordonnees: string;
   };
   readonly actions: {
@@ -71,6 +87,50 @@ export interface ContenuRendezVous {
     readonly mentionLien: string;
     readonly mentionHref: string;
   };
+  readonly questionnaire: {
+    readonly budget: {
+      readonly legende: string;
+      readonly erreur: string;
+      /** Les tranches sont CALCULÉES depuis `offre.ts` ; seuls leurs mots sont ici. */
+      readonly moinsDe: (prix: string) => string;
+      readonly entre: (bas: string, haut: string) => string;
+      readonly plusDe: (prix: string) => string;
+      readonly inconnu: string;
+    };
+    readonly objectif: {
+      readonly legende: string;
+      readonly erreur: string;
+      readonly options: Readonly<Record<IdRendezVous, readonly OptionQuestion[]>>;
+    };
+    readonly echeance: {
+      readonly legende: string;
+      readonly options: readonly OptionQuestion[];
+    };
+  };
+  /** « Ce que tu peux espérer à ce budget », affiché dès qu'une tranche est choisie. */
+  readonly retour: {
+    readonly titre: string;
+    readonly aucun: (prixEntree: string) => string;
+    readonly inconnu: string;
+    readonly repere: (prestation: string, fourchette: string) => string;
+    readonly prixFerme: (prix: string) => string;
+    readonly prixPlancher: (prix: string) => string;
+    readonly surMesure: string;
+    readonly surMesureSuivant: (forfait: string, prix: string) => string;
+    readonly horsForfait: string;
+  };
+  /**
+   * Intitulés des lignes déposées dans les notes Cal.com. Lus par Eliott dans
+   * son agenda, jamais par le visiteur.
+   */
+  readonly notes: {
+    readonly budget: string;
+    readonly forfait: string;
+    readonly objectif: string;
+    readonly echeance: string;
+    readonly aucunForfait: string;
+    readonly aCaler: string;
+  };
   readonly succes: {
     readonly titre: string;
     readonly texte: string;
@@ -82,7 +142,7 @@ export const rendezVousContent: ContenuRendezVous = {
   eyebrow: "Prendre rendez-vous",
   titre: "Réserver un créneau",
   chapeau:
-    "Dis-moi de quoi tu veux parler, choisis une heure, et c’est réglé. Le lien de visioconférence part par e-mail dans la foulée.",
+    "Choisis un sujet et une heure, puis réponds à trois questions sur ton projet : tu sais avant l’appel ce que ton budget permet. Le lien de visioconférence part par e-mail dans la foulée.",
   noteFuseau: "Heures affichées à l’heure de Paris.",
 
   /*
@@ -94,6 +154,11 @@ export const rendezVousContent: ContenuRendezVous = {
    * site, ou quel outil te ferait gagner du temps ». Les quatre commencent donc
    * par un verbe qui s'adresse à quelqu'un, et chacun un verbe DIFFÉRENT : deux
    * entrées qui ouvriraient sur « parle-moi » se liraient comme un doublon.
+   *
+   * TROIS ENTRÉES DEPUIS LE 2026-09-23. « logiciel » absorbe l'ancien « outil » :
+   * son intitulé part du problème (ce qui coince) et non de la taille de la
+   * réponse, parce que c'est le budget du questionnaire qui dira ensuite s'il
+   * s'agit de L'Outil ou du Logiciel.
    *
    * ILS NE SONT PAS CE QU'ELIOTT LIT DANS SON AGENDA, et c'est voulu. Le nom de
    * l'événement dans Google Agenda est réglé chez Cal.com, sobre et scannable
@@ -125,18 +190,11 @@ export const rendezVousContent: ContenuRendezVous = {
         "On regarde ce que tu as aujourd’hui, ce que tu veux que le site rapporte, et à quoi ressemblerait la bonne version. Tu repars avec un ordre de grandeur de budget et de délai, et on cale la suite.",
     },
     {
-      id: "outil",
-      nom: "Quel outil te ferait gagner du temps",
-      duree: "30 minutes",
-      description:
-        "On part de ce que tu fais à la main aujourd’hui : les devis, le planning, le suivi. On regarde où passe le temps et ce qu’un outil sur mesure changerait vraiment. Tu repars avec un ordre de grandeur et une prochaine étape.",
-    },
-    {
       id: "logiciel",
-      nom: "Explique-moi ton projet de logiciel",
+      nom: "Explique-moi ce qui coince dans ton métier",
       duree: "30 minutes",
       description:
-        "Plusieurs utilisateurs, plusieurs rôles, des données à tenir dans le temps : on dégrossit l’essentiel, ce qui existe déjà et ce qui doit tenir dans dix ans. Tu repars avec un ordre de grandeur, et on cale un second échange pour le périmètre.",
+        "Une tâche que tu refais à la main, un tableur qui déborde, des outils qui ne se parlent pas, ou un logiciel entier à construire. On regarde où passe le temps et ce qui existe déjà. Tu repars avec un ordre de grandeur et une prochaine étape.",
     },
     {
       id: "decouverte",
@@ -150,6 +208,7 @@ export const rendezVousContent: ContenuRendezVous = {
   etapes: {
     sujet: "Le sujet",
     creneau: "Le créneau",
+    projet: "Ton projet",
     coordonnees: "Tes coordonnées",
   },
 
@@ -177,13 +236,95 @@ export const rendezVousContent: ContenuRendezVous = {
     emailLabel: "Ton e-mail",
     emailPlaceholder: "toi@exemple.fr",
     messageLabel: "Ta situation en deux lignes (facultatif)",
-    messagePlaceholder: "Ce que tu as déjà, ce qui coince, ton échéance.",
+    messagePlaceholder:
+      "Ce que tu as aujourd’hui, ce qui coince, ce que tu as déjà essayé.",
     envoyer: "Confirmer le rendez-vous",
     envoiEnCours: "Confirmation en cours…",
     mention:
-      "Ton nom et ton adresse sont transmis à Cal.com, qui héberge mon agenda, dans le seul but de créer ce rendez-vous. Détail dans la",
+      "Ton nom, ton adresse et tes réponses sont transmis à Cal.com, qui héberge mon agenda, dans le seul but de créer ce rendez-vous. Détail dans la",
     mentionLien: "politique de confidentialité",
     mentionHref: "/legal/politique-de-confidentialite",
+  },
+
+  /*
+   * LE QUESTIONNAIRE, demandé par Eliott le 2026-09-23 : « avoir leur budget
+   * c'est de l'OR, sinon ce qu'ils veulent et leur dire si c'est possible ou non
+   * et ce qu'ils peuvent espérer à ce prix ». Trois questions, deux obligatoires.
+   *
+   * AUCUN MONTANT ICI. Les tranches de budget sont calculées depuis la grille de
+   * `offre.ts` par `src/lib/rendez-vous/questionnaire.ts` : un prix qui change
+   * là-bas déplace les tranches sans qu'on touche à ce fichier.
+   *
+   * « AUTRE CHOSE » RENVOIE AU MESSAGE LIBRE, qui existe déjà à l'étape
+   * suivante. Pas de champ texte de plus sous l'option.
+   */
+  questionnaire: {
+    budget: {
+      legende: "Ton budget, hors taxes",
+      erreur: "Choisis une tranche. « Je ne sais pas encore » est une réponse valable.",
+      moinsDe: (prix) => `Moins de ${prix}`,
+      entre: (bas, haut) => `De ${bas} à ${haut}`,
+      plusDe: (prix) => `Plus de ${prix}`,
+      inconnu: "Je ne sais pas encore",
+    },
+    objectif: {
+      legende: "Ce que tu veux obtenir en priorité",
+      erreur: "Choisis ce qui compte le plus pour toi.",
+      options: {
+        site: [
+          { id: "google", libelle: "Être trouvé sur Google" },
+          { id: "demandes", libelle: "Recevoir plus d’appels et de demandes" },
+          { id: "concurrents", libelle: "Faire sérieux face à mes concurrents" },
+          { id: "remplacer", libelle: "Remplacer un site qui date" },
+          { id: "autre", libelle: "Autre chose" },
+        ],
+        logiciel: [
+          { id: "tache", libelle: "Supprimer une tâche faite à la main" },
+          { id: "tableur", libelle: "Sortir du tableur partagé" },
+          { id: "relier", libelle: "Relier des outils qui ne se parlent pas" },
+          { id: "clients", libelle: "Donner un accès à mes clients" },
+          { id: "autre", libelle: "Autre chose" },
+        ],
+        decouverte: [
+          { id: "google", libelle: "Être trouvé sur Google" },
+          { id: "demandes", libelle: "Recevoir plus de demandes" },
+          { id: "tache", libelle: "Supprimer une tâche faite à la main" },
+          { id: "relier", libelle: "Relier des outils qui ne se parlent pas" },
+          { id: "autre", libelle: "Autre chose" },
+        ],
+      },
+    },
+    echeance: {
+      legende: "Ton échéance (facultatif)",
+      options: [
+        { id: "vite", libelle: "Dès que possible" },
+        { id: "trimestre", libelle: "Dans les trois mois" },
+        { id: "libre", libelle: "Pas de date précise" },
+      ],
+    },
+  },
+
+  retour: {
+    titre: "Ce que tu peux espérer à ce budget",
+    aucun: (prixEntree) =>
+      `Mes forfaits commencent à ${prixEntree} HT, et aucun ne tient à ce budget. Réserve quand même : on regarde ensemble ce qui est faisable, et par quoi commencer.`,
+    inconnu: "On le cale ensemble pendant l’appel. Pour te situer :",
+    repere: (prestation, fourchette) => `${prestation}, ${fourchette} HT.`,
+    prixFerme: (prix) => `${prix} HT`,
+    prixPlancher: (prix) => `À partir de ${prix} HT`,
+    surMesure: "Le périmètre n’a pas de plafond : on le fixe ensemble, au devis.",
+    surMesureSuivant: (forfait, prix) =>
+      `Au-delà, ${forfait} se chiffre sur mesure, à partir de ${prix} HT.`,
+    horsForfait: "Au-delà, ce que tu veux ajouter se chiffre sur mesure, au devis.",
+  },
+
+  notes: {
+    budget: "Budget HT",
+    forfait: "Forfait atteignable",
+    objectif: "Objectif",
+    echeance: "Échéance",
+    aucunForfait: "aucun à ce budget",
+    aCaler: "à caler pendant l’appel",
   },
 
   succes: {
@@ -216,7 +357,6 @@ export const PARAM_SUJET = "sujet";
  */
 export const RDV_PAR_PRESTATION: Readonly<Record<PrestationId, IdRendezVous>> = {
   vitrine: "site",
-  outil: "outil",
   logiciel: "logiciel",
 };
 

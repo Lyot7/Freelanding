@@ -31,7 +31,7 @@ import type { FaqItem, ImageHero } from "@/lib/content/types";
 import { fourchette, prestation, prixPack } from "./offre";
 
 const VITRINE = prestation("vitrine");
-const [ESSENTIEL, CREDIBILITE, CONVERSION] = VITRINE.packs;
+const [LANDING, SITE, SIGNATURE] = VITRINE.packs;
 
 export const CHEMIN_PAGE_CAEN = "/creation-site-internet-caen";
 
@@ -148,11 +148,11 @@ export const pageCaen: PageLocale = {
       {
         libelle: "Le site vitrine en détail",
         href: "/services/site-vitrine",
-        description: "Les 3 périmètres, ce que chacun contient et son prix.",
+        description: "Les 3 forfaits, ce que chacun contient et son prix.",
       },
       {
-        libelle: "Un outil métier sur mesure",
-        href: "/services/outil-metier",
+        libelle: "Une solution métier sur mesure",
+        href: "/services/logiciel-metier",
         description:
           "Quand il te faut une réservation, un espace client ou une tâche automatisée.",
       },
@@ -170,7 +170,7 @@ export const pageCaen: PageLocale = {
     points: [
       {
         titre: "Les recherches locales d’abord",
-        corps: `Tes clients tapent « plombier Caen » ou « fleuriste Bayeux », rarement le nom de ton entreprise. À partir de ${CREDIBILITE.nom}, je cherche ces mots avant d’écrire, et je crée une page par métier ou par ville quand ton marché est local.`,
+        corps: `Tes clients tapent « plombier Caen » ou « fleuriste Bayeux », rarement le nom de ton entreprise. À partir de ${SITE.nom}, je cherche ces mots avant d’écrire, et je crée une page par métier ou par ville quand ton marché est local.`,
       },
       {
         titre: "Les mêmes coordonnées partout",
@@ -195,7 +195,7 @@ export const pageCaen: PageLocale = {
     items: [
       {
         question: "Combien coûte un site internet à Caen ?",
-        answer: `Le site coûte ${fourchette("vitrine")} HT selon le périmètre : ${prixPack(ESSENTIEL)} pour ${ESSENTIEL.nom}, ${prixPack(CREDIBILITE)} pour ${CREDIBILITE.nom}, ${prixPack(CONVERSION)} pour ${CONVERSION.nom}. Le prix dépend du nombre de pages, des fonctions et des textes à produire. Une fois le devis signé, il ne bouge plus.`,
+        answer: `Le site coûte ${fourchette("vitrine")} HT, en 3 forfaits à prix ferme : ${prixPack(LANDING)} pour ${LANDING.nom}, ${prixPack(SITE)} pour ${SITE.nom}, ${prixPack(SIGNATURE)} pour ${SIGNATURE.nom}. Ce qui change de l’un à l’autre : le nombre de pages, le travail sur les textes et la mesure de ce que le site rapporte. Le prix du forfait choisi ne bouge plus.`,
       },
       {
         question: "Faut-il se rencontrer pour lancer le projet ?",
@@ -204,7 +204,7 @@ export const pageCaen: PageLocale = {
       },
       {
         question: "Mon site sortira-t-il dans les recherches à Caen ?",
-        answer: `Chaque site part avec les bases du référencement posées et son indexation vérifiée. À partir de ${CREDIBILITE.nom}, il vise les mots que tapent tes clients et déclare ta zone d’intervention à Google. Personne ne peut te garantir une position : le référencement local prend plusieurs mois, et ta fiche d’établissement Google pèse lourd dans les résultats.`,
+        answer: `Chaque site part avec les bases du référencement posées et son indexation vérifiée. À partir de ${SITE.nom}, il vise les mots que tapent tes clients et déclare ta zone d’intervention à Google. Personne ne peut te garantir une position : le référencement local prend plusieurs mois, et ta fiche d’établissement Google pèse lourd dans les résultats.`,
       },
       {
         question: "Tu travailles seulement avec des entreprises de Caen ?",

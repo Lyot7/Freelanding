@@ -30,10 +30,6 @@ const IMAGES: Record<PrestationId, ImageAsset> = {
     src: "/images/services/02-visibilite-locale.jpg",
     alt: "Deux commerces de quartier au coin d’une rue",
   },
-  outil: {
-    src: "/images/services/03-outil-metier.jpg",
-    alt: "Ciseaux à bois posés sur un établi tracé au crayon",
-  },
   logiciel: {
     src: "/images/services/04-logiciel-metier.jpg",
     alt: "Engrenages d’une machine industrielle en prise",
@@ -42,7 +38,7 @@ const IMAGES: Record<PrestationId, ImageAsset> = {
 
 /**
  * Deuxième paragraphe de chaque prestation : ce que le visiteur gagne à ouvrir
- * la page dédiée. Il annonce les trois périmètres sans les détailler, parce que
+ * la page dédiée. Il annonce les trois forfaits sans les détailler, parce que
  * les détailler ici reconstruirait la grille qu'on vient de retirer.
  *
  * « 3 » ET NON « TROIS », règle d'Eliott du 2026-09-01. Elle a une raison de
@@ -54,11 +50,9 @@ const IMAGES: Record<PrestationId, ImageAsset> = {
  */
 const RENVOI: Record<PrestationId, string> = {
   vitrine:
-    "3 périmètres, de la simple mise en ligne au site qui te dit ce qu’il rapporte. Le détail est sur la page dédiée.",
-  outil:
-    "3 périmètres, du simple branchement à l’outil supervisé qui t’alerte avant que tu constates la panne. Le détail est sur la page dédiée.",
+    "3 forfaits à prix ferme, de la page qui fait appeler au site qui te dit ce qu’il rapporte. Le détail est sur la page dédiée.",
   logiciel:
-    "3 périmètres, du socle qui remplace le tableur partagé à l’écosystème où plusieurs systèmes restent d’accord entre eux. Le détail est sur la page dédiée.",
+    "3 forfaits, de l’outil qui fait disparaître une tâche à l’infrastructure où tes systèmes restent d’accord entre eux. Le détail est sur la page dédiée.",
 };
 
 export const services: ServiceItem[] = [
@@ -137,7 +131,7 @@ export const services: ServiceItem[] = [
 
   ...prestations.map(
     (p, index): ServiceItem => ({
-      // 01 Diagnostic, 02 Audit de code, puis les trois prestations chiffrées.
+      // 01 Diagnostic, 02 Audit de code, puis les prestations chiffrées.
       number: String(index + 3).padStart(2, "0"),
       title: p.nom,
       /*
@@ -168,6 +162,10 @@ export const services: ServiceItem[] = [
 /**
  * CE QUE FAIT ELIOTT AU-DELÀ DU CATALOGUE.
  *
+ * AUCUN ARGUMENT « IA » CÔTÉ CLIENT depuis le 2026-09-23 (décision d'Eliott) :
+ * la ligne s'appelle « L'automatisation », le client achète la tâche qui
+ * disparaît, pas la technologie.
+ *
  * DEMANDE D'ELIOTT DU 2026-09-02, ses mots : « je fais de l'automatisation IA,
  * je fais des audits, que ce soit de performance, de conversion […] montrer que
  * je suis vraiment complet sur le sujet et que je peux faire plein de choses. »
@@ -190,7 +188,7 @@ export const horsCatalogue = {
     "Tout ne rentre pas dans un forfait. Ces sujets se chiffrent au cas par cas, une fois qu’on en a parlé.",
   items: [
     {
-      nom: "L’automatisation par IA",
+      nom: "L’automatisation",
       corps: "Les tâches que tu refais à la main, confiées à une machine.",
     },
     {

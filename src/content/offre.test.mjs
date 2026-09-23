@@ -2,11 +2,8 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import {
-  TJM,
   euros,
   fourchette,
-  lignesComparees,
-  packContient,
   packEntree,
   prestation,
   prestations,
@@ -29,79 +26,68 @@ import {
 } from "./rendez-vous.ts";
 
 /**
- * L'OFFRE NE DOIT ANNONCER QU'UN PRIX PAR PRESTATION, ET CE PRIX DOIT ÊTRE
- * CALCULÉ.
+ * L'OFFRE NE DOIT ANNONCER QU'UN PRIX PAR FORFAIT, ET CE PRIX NE S'ÉCRIT QU'À
+ * UN ENDROIT.
  *
  * CE QUI EST ARRIVÉ SANS CE TEST. L'accordéon des services annonçait « à partir
  * de 5 000 € » pour l'outil métier pendant que la grille comparative affichait
  * « 5 000 à 15 000 € » pour la même prestation, à deux écrans d'intervalle. Rien
- * ne le signalait : deux fichiers, deux chaînes de caractères, aucun lien entre
- * les deux.
+ * ne le signalait : deux fichiers, deux chaînes de caractères, aucun lien.
  *
- * Depuis le 2026-08-27, plus aucun prix n'est écrit à la main : tout descend du
- * taux journalier et du nombre de jours de chaque pack. Ces tests vérifient que
- * la chaîne tient de bout en bout, du module jusqu'aux pages.
+ * Depuis le 2026-09-23, les forfaits sont à PRIX FERME : chaque montant s'écrit
+ * une fois dans `offre.ts`, et tout le reste du site le lit de là.
  */
 
-describe("les prix descendent tous du taux journalier", () => {
-  test("le taux est un nombre exploitable", () => {
-    expect(TJM).toBeGreaterThan(0);
-    expect(Number.isInteger(TJM)).toBe(true);
-  });
-
-  test("chaque prestation a trois packs, ordonnés du moins cher au plus cher", () => {
-    expect(prestations.length).toBe(3);
-    const ids = prestations.map((p) => p.id);
-    expect(new Set(ids).size).toBe(ids.length);
+describe("les forfaits sont à prix ferme, écrits une seule fois", () => {
+  test("chaque prestation a trois forfaits, ordonnés du moins cher au plus cher", () => {
+    expect(prestations.map((p) => p.id)).toEqual(["vitrine", "logiciel"]);
     const slugs = prestations.map((p) => p.slug);
     expect(new Set(slugs).size).toBe(slugs.length);
 
     for (const p of prestations) {
-      expect(p.packs.length, `« ${p.nom} » doit avoir trois packs`).toBe(3);
-      const jours = p.packs.map((k) => k.jours);
-      expect(jours, `les packs de « ${p.nom} » doivent monter`).toEqual(
-        [...jours].sort((a, b) => a - b),
+      expect(p.packs.length, `« ${p.nom} » doit avoir trois forfaits`).toBe(3);
+      const prix = p.packs.map((k) => k.prix);
+      for (const montant of prix) {
+        expect(Number.isInteger(montant) && montant > 0).toBe(true);
+      }
+      expect(prix, `les forfaits de « ${p.nom} » doivent monter`).toEqual(
+        [...prix].sort((a, b) => a - b),
+      );
+      expect(new Set(prix).size, `deux forfaits de « ${p.nom} » au même prix`).toBe(
+        prix.length,
       );
       const packIds = p.packs.map((k) => k.id);
       expect(new Set(packIds).size).toBe(packIds.length);
     }
   });
 
-  test("le plancher tient et chaque marche se voit dans le livrable", () => {
-    // PLANCHER À CINQ JOURS, ramené de dix le 2026-08-27 : à dix jours, l'entrée
-    // de gamme du site vitrine tombait à 5 000 €, au-dessus de la médiane du
-    // marché (3 500 €) et du budget médian d'une TPE (4 000 €).
-    //
-    // MARCHE EN PROPORTION, ET NON EN JOURS ABSOLUS. La règle disait « au moins
-    // cinq jours de plus » ; avec un premier pack à cinq jours, elle imposait de
-    // doubler. Ce qui compte n'a jamais été l'écart absolu : c'est qu'un pack se
-    // VOIE dans le livrable, sinon c'est une remise déguisée. Un quart de jours
-    // en plus vaut à tous les niveaux d'échelle.
-    for (const p of prestations) {
-      expect(
-        p.packs[0].jours,
-        `« ${p.nom} » démarre trop bas`,
-      ).toBeGreaterThanOrEqual(5);
-      for (let i = 1; i < p.packs.length; i += 1) {
-        const avant = p.packs[i - 1].jours;
-        const ratio = p.packs[i].jours / avant;
-        expect(
-          ratio,
-          `« ${p.packs[i].nom} » n'ajoute que ${p.packs[i].jours - avant} jours à ${avant}`,
-        ).toBeGreaterThanOrEqual(1.25);
-      }
-    }
+  test("la grille arrêtée par Eliott le 2026-09-23", () => {
+    // Montants de décision, pas de calcul : les figer ici fait échouer toute
+    // modification involontaire, et oblige une modification voulue à passer
+    // par ce test.
+    expect(prestation("vitrine").packs.map((k) => k.prix)).toEqual([3000, 4800, 7200]);
+    expect(prestation("logiciel").packs.map((k) => k.prix)).toEqual([6000, 18000, 36000]);
   });
 
-  test("le prix d'un pack vaut exactement le taux multiplié par ses jours", () => {
+  test("seul le dernier palier peut être sur mesure", () => {
+    for (const p of prestations) {
+      p.packs.slice(0, -1).forEach((pack) => {
+        expect(pack.surMesure, `« ${pack.nom} » ne peut pas être sur mesure`).toBeUndefined();
+      });
+    }
+    expect(prestation("logiciel").packs[2].surMesure).toBe(true);
+    expect(prestation("vitrine").packs[2].surMesure).toBeUndefined();
+  });
+
+  test("le prix affiché est le montant du forfait, formaté", () => {
     for (const p of prestations) {
       for (const pack of p.packs) {
-        expect(prixPack(pack)).toBe(euros(TJM * pack.jours));
+        expect(prixPack(pack)).toBe(euros(pack.prix));
       }
     }
   });
 
-  test("chaque pack est décrit, et ne redit pas ce que le précédent contient", () => {
+  test("chaque forfait est décrit, et ne redit pas ce que le précédent contient", () => {
     for (const p of prestations) {
       for (const pack of p.packs) {
         expect(pack.promesse.length).toBeGreaterThan(15);
@@ -111,8 +97,8 @@ describe("les prix descendent tous du taux journalier", () => {
           `« ${pack.nom} » n'ajoute rien`,
         ).toBeGreaterThan(2);
       }
-      // Le premier pack liste tout, les suivants ne listent que le delta : une
-      // ligne identique d'un pack à l'autre est donc une erreur de rédaction.
+      // Le premier forfait liste tout, les suivants ne listent que le delta :
+      // une ligne identique d'un forfait à l'autre est une erreur de rédaction.
       const vues = new Set();
       for (const pack of p.packs) {
         for (const ligne of pack.ajoute) {
@@ -123,6 +109,19 @@ describe("les prix descendent tous du taux journalier", () => {
           vues.add(ligne);
         }
       }
+    }
+  });
+
+  test("aucune durée n'est annoncée à côté d'un prix", () => {
+    // Un prix ferme accolé à « environ 5 jours ouvrés » redonnait le taux
+    // journalier en une division. La date vit au devis.
+    const textes = prestations.flatMap((p) => [
+      p.resume,
+      p.horsPack,
+      ...p.packs.flatMap((k) => [k.promesse, k.pourQui, ...k.ajoute]),
+    ]);
+    for (const texte of textes) {
+      expect(/jours? ouvrés?|semaines?\b/iu.test(texte), texte).toBe(false);
     }
   });
 });
@@ -276,11 +275,9 @@ describe("le site annonce le même prix que le module", () => {
       plancherSuivi(),
     );
     /* L'exemple chiffré doit rester juste : il est recalculé, pas relu. Le
-       projet de référence est le pack d'entrée du logiciel, DÉRIVÉ et non
-       écrit : la valeur 10 000 était codée ici, elle est devenue fausse le jour
-       où le taux journalier est passé de 500 à 600. Un test qui fige un montant
-       reproduit le défaut qu'il surveille. */
-    const projetReference = TJM * packEntree("logiciel").jours;
+       projet de référence est Le Logiciel, palier du milieu de La Solution
+       métier, lu dans le module. */
+    const projetReference = prestation("logiciel").packs[1].prix;
     expect(
       suivi,
       "l'exemple chiffré du suivi ne correspond plus au taux",
@@ -290,7 +287,7 @@ describe("le site annonce le même prix que le module", () => {
     // était appliqué seul.
     for (const p of prestations) {
       for (const pack of p.packs) {
-        expect(suiviMensuel(TJM * pack.jours)).not.toBe(euros(0));
+        expect(suiviMensuel(pack.prix)).not.toBe(euros(0));
       }
     }
     expect(suiviMensuel(1)).toBe(plancherSuivi());
@@ -326,21 +323,9 @@ describe("le site annonce le même prix que le module", () => {
     );
   });
 
-  test("le taux journalier n'est écrit nulle part en clair", () => {
-    // RÈGLE DU VAULT, et conclusion des deux audits du 2026-08-27 : le taux est
-    // la règle de construction, jamais un argument de vente. Il est déjà
-    // déductible par division dès qu'un prix et une durée se touchent, ce qui
-    // est une raison de plus de ne pas l'écrire.
-    //
-    // LE MONTANT SEUL NE SUFFIT PAS À LE DÉTECTER : « 500 € » est un morceau de
-    // « 2 500 € », et la première version de ce test échouait sur le prix
-    // d'entrée du site vitrine. Deux vérifications séparées, donc : le montant
-    // isolé (jamais précédé d'un chiffre ni d'une insécable), et le vocabulaire
-    // qui présenterait un prix comme un tarif à la journée.
-    const isole = new RegExp(
-      `(?<![\\d\\u00A0])${TJM}\\u00A0\\u20AC`,
-      "u",
-    );
+  test("aucun prix n'est présenté comme un tarif à la journée", () => {
+    // Le taux journalier n'existe plus dans le code du site depuis le passage
+    // au prix ferme. Reste à garder le vocabulaire qui le réintroduirait.
     const vocabulaire = /taux journalier|\bTJM\b|par jour|\/\s*jour|à la journée/iu;
     const textes = [
       ...services.flatMap((s) => [s.title, s.price ?? "", ...s.body]),
@@ -350,12 +335,9 @@ describe("le site annonce le même prix que le module", () => {
         p.horsPack,
         ...p.packs.flatMap((k) => [k.promesse, k.pourQui, ...k.ajoute]),
       ]),
+      ...Object.values(methodeLabels).filter((v) => typeof v === "string"),
     ];
     for (const texte of textes) {
-      expect(
-        isole.test(texte),
-        `le taux journalier apparaît en clair : ${texte}`,
-      ).toBe(false);
       expect(
         vocabulaire.test(texte),
         `un prix est présenté comme un tarif à la journée : ${texte}`,
@@ -363,12 +345,16 @@ describe("le site annonce le même prix que le module", () => {
     }
   });
 
-  test("la fourchette publique encadre bien les trois packs", () => {
+  test("la fourchette publique encadre bien les trois forfaits", () => {
     for (const p of prestations) {
       const rendu = fourchette(p.id);
       expect(rendu).toContain(prixPack(p.packs[0]));
       expect(rendu).toContain(prixPack(p.packs[2]));
+      // Un haut de grille sur mesure n'a pas de plafond : la fourchette le dit.
+      expect(rendu.endsWith(" et plus")).toBe(p.packs[2].surMesure === true);
     }
+    // La taxe se place derrière le montant, jamais après « et plus ».
+    expect(fourchette("logiciel", " HT")).toMatch(/\u20AC HT et plus$/u);
   });
 
   test("prestation() refuse un identifiant inconnu au lieu de rendre indéfini", () => {
@@ -377,47 +363,12 @@ describe("le site annonce le même prix que le module", () => {
 });
 
 /**
- * LA SECTION TARIFS DE LA PAGE D'ACCUEIL.
- *
- * ELLE NE PORTE AUCUNE DONNÉE À ELLE, et c'est la seule chose qui empêche la
- * classe d'erreur que raconte l'en-tête de `offre.ts` de revenir : deux sources
- * de vérité sur le contenu d'un périmètre, à deux écrans d'intervalle, sans
- * rien pour signaler leur divergence. Sa matrice est DÉRIVÉE de `ajoute`.
+ * L'HABILLAGE DES TARIFS : ses liens et ses libellés ne portent aucun montant.
+ * Tout prix vient de `offre.ts`, sans quoi deux sources de vérité divergent à
+ * deux écrans d'intervalle.
  */
 describe("la section tarifs ne peut pas diverger de l'offre", () => {
-  test("la matrice reprend exactement les livrables, sans en perdre ni en ajouter", () => {
-    for (const p of prestations) {
-      const attendu = p.packs.flatMap((pack) => [...pack.ajoute]);
-      const rendu = lignesComparees(p.id).map((l) => l.libelle);
-      expect(rendu, `la matrice de « ${p.nom} » ne dit pas la même chose que ses packs`).toEqual(
-        attendu,
-      );
-    }
-  });
-
-  test("les périmètres sont cumulatifs : une ligne cochée le reste au-dessus", () => {
-    // C'EST LE SENS MÊME DE `ajoute`, et la matrice serait mensongère sans lui :
-    // le premier périmètre liste tout ce qu'il contient, les suivants ne listent
-    // que leur delta. Un `===` au lieu d'un `>=` afficherait « La Conversion »
-    // sans les sept livrables de « L'Essentiel », donc plus cher pour moins.
-    for (const p of prestations) {
-      for (const ligne of lignesComparees(p.id)) {
-        for (let index = 0; index < p.packs.length; index += 1) {
-          expect(
-            packContient(ligne, index),
-            `« ${ligne.libelle} » mal placée sur le périmètre ${index} de « ${p.nom} »`,
-          ).toBe(index >= ligne.depuis);
-        }
-      }
-      // Le périmètre le plus haut contient forcément TOUT.
-      const dernier = p.packs.length - 1;
-      for (const ligne of lignesComparees(p.id)) {
-        expect(packContient(ligne, dernier)).toBe(true);
-      }
-    }
-  });
-
-  test("le lien « pourquoi un devis » mène à une page qui existe", () => {
+  test("le lien « sur mesure, sur devis » mène à une page qui existe", () => {
     const chemins = routesTarifs.map((r) => r.pathname);
     for (const p of prestations) {
       const lien = lienDevis(p.slug);
@@ -440,21 +391,6 @@ describe("la section tarifs ne peut pas diverger de l'offre", () => {
       montants,
       `un montant en euros est écrit à la main dans tarifs.ts : ${montants.join(", ")}`,
     ).toEqual([]);
-  });
-
-  test("le taux journalier n'apparaît pas dans l'habillage de la section", () => {
-    const isole = new RegExp(`(?<![\\d\\u00A0])${TJM}\\u00A0\\u20AC`, "u");
-    const vocabulaire = /taux journalier|\bTJM\b|par jour|\/\s*jour|à la journée/iu;
-    const textes = Object.values(methodeLabels).filter(
-      (v) => typeof v === "string",
-    );
-    for (const texte of textes) {
-      expect(isole.test(texte), `le taux apparaît en clair : ${texte}`).toBe(false);
-      expect(
-        vocabulaire.test(texte),
-        `un prix est présenté comme un tarif à la journée : ${texte}`,
-      ).toBe(false);
-    }
   });
 });
 

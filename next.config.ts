@@ -172,6 +172,9 @@ const nextConfig: NextConfig = {
       { source: "/blog/seo-et-geo-quelles-differences", destination: "/blog", statusCode: 301 },
       { source: "/blog/ce-que-google-montre-de-vous", destination: "/blog", statusCode: 301 },
       { source: "/blog/dessiner-avant-de-coder", destination: "/a-propos", statusCode: 301 },
+      /* L'Outil est devenu le premier palier de La Solution métier le
+         2026-09-23 : sa page a fusionné avec celle du logiciel métier. */
+      { source: "/services/outil-metier", destination: "/services/logiciel-metier", statusCode: 301 },
     ];
   },
 
