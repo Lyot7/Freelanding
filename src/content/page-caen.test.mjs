@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { readFileSync } from "node:fs";
+import { readFileSync, statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { CHEMIN_PAGE_CAEN, pageCaen } from "./page-caen.ts";
 import { contentRoutes } from "./routes.ts";
@@ -28,7 +28,13 @@ function textes() {
     ...contexte.points.flatMap((p) => [p.titre, p.corps]),
     ...faq.titleLines,
     ...faq.items.flatMap((i) => [i.question, i.answer]),
+    pageCaen.heroImage?.alt ?? "",
   ];
+}
+
+/** Chemin disque d'un fichier servi depuis `public/`. */
+function fichierPublic(src) {
+  return fileURLToPath(new URL(`../../public${src}`, import.meta.url));
 }
 
 describe("la page de Caen est cherchable", () => {
@@ -80,5 +86,33 @@ describe("la page de Caen ne promet que ce qui est vrai", () => {
       .replace(/\/\*[\s\S]*?\*\//g, " ")
       .replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
     expect(source.match(/\d[\d   ]*€/gu) ?? []).toEqual([]);
+  });
+});
+
+describe("la photo du héros de Caen", () => {
+  const image = pageCaen.heroImage;
+
+  test("existe sur le disque et reste légère", () => {
+    expect(image).toBeDefined();
+    // Source de l'optimiseur de Next, pas le fichier servi : au-delà, c'est
+    // un JPEG réencodé trop haut ou une image trop grande.
+    expect(statSync(fichierPublic(image.src)).size).toBeLessThanOrEqual(420_000);
+    expect(image.alt.length).toBeGreaterThan(20);
+  });
+
+  test("porte le crédit exigé par CC BY-SA 4.0", () => {
+    const { credit } = image;
+    expect(credit.auteur.libelle).toBe("Florian Pépellin");
+    expect(credit.auteur.href).toMatch(/^https:\/\/commons\.wikimedia\.org\/wiki\/File:/);
+    expect(credit.licence.libelle).toBe("CC BY-SA 4.0");
+    expect(credit.licence.href).toBe("https://creativecommons.org/licenses/by-sa/4.0/deed.fr");
+    // La licence exige de dire que l'image a été modifiée.
+    expect(credit.modification).toBeTruthy();
+  });
+
+  test("fournit une vignette de partage 1200 × 630 présente sur le disque", () => {
+    expect(image.og.width).toBe(1200);
+    expect(image.og.height).toBe(630);
+    expect(statSync(fichierPublic(image.og.src)).size).toBeGreaterThan(0);
   });
 });

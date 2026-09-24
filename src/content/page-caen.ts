@@ -27,7 +27,7 @@
  * LES PRIX NE S'ÉCRIVENT PAS ICI, ils se calculent (`fourchette`, `prixPack`),
  * comme partout ailleurs sur le site.
  */
-import type { FaqItem } from "@/lib/content/types";
+import type { FaqItem, ImageHero } from "@/lib/content/types";
 import { fourchette, prestation, prixPack } from "./offre";
 
 const VITRINE = prestation("vitrine");
@@ -59,6 +59,11 @@ export interface PageLocale {
   readonly h1: string;
   /** Chapô du héros, à la place du résumé de la prestation. */
   readonly resume: string;
+  /**
+   * Photo de fond du héros. Facultative : sans elle, le héros garde le fond
+   * animé des pages de prestation.
+   */
+  readonly heroImage?: ImageHero;
   /** Dernière marche du fil d'Ariane : la page courante. */
   readonly marcheFilAriane: string;
   /** Villes et départements déclarés en `areaServed` du JSON-LD. */
@@ -89,6 +94,42 @@ export const pageCaen: PageLocale = {
   h1: "Création de site internet à Caen",
   resume:
     "Un site sur mesure pour les TPE et PME de Caen et du Calvados. Il dit ce que tu fais, il sort quand on cherche ton métier près de chez toi, et il est à toi une fois livré.",
+  /*
+   * L'ÉGLISE SAINT-PIERRE VUE DU CHÂTEAU, et non une photo de bureau : c'est la
+   * vue que tout Caennais reconnaît, et elle dit la ville avant le titre.
+   * Photo Wikimedia Commons sous CC BY-SA 4.0, retouchée (contour vert de
+   * l'église, bas fondu vers le fond du site) : le crédit est donc obligatoire,
+   * avec la mention de la retouche.
+   *
+   * CADRAGE MOBILE : la flèche est à 49,5 % de la largeur de l'image. Centrée,
+   * elle reste à l'écran jusqu'à 320 px de large. En hauteur, l'image est posée
+   * par le haut pour ne pas rogner la pointe.
+   */
+  heroImage: {
+    src: "/images/heros/caen-saint-pierre.jpg",
+    alt: "L’église Saint-Pierre de Caen sous un ciel d’été, vue depuis le château",
+    width: 2400,
+    height: 1150,
+    cadrage: { x: 49.5, y: 0 },
+    credit: {
+      prefixe: "Photo :",
+      auteur: {
+        libelle: "Florian Pépellin",
+        href: "https://commons.wikimedia.org/wiki/File:Caen_et_l%27%C3%A9glise_Saint-Pierre_depuis_le_ch%C3%A2teau_(juillet_2025).JPG",
+      },
+      licence: {
+        libelle: "CC BY-SA 4.0",
+        href: "https://creativecommons.org/licenses/by-sa/4.0/deed.fr",
+      },
+      modification: "retouchée",
+    },
+    og: {
+      src: "/images/og-caen.jpg",
+      alt: "L’église Saint-Pierre de Caen sous un ciel d’été, vue depuis le château",
+      width: 1200,
+      height: 630,
+    },
+  },
   marcheFilAriane: "Caen",
   zones: {
     villes: ["Caen"],

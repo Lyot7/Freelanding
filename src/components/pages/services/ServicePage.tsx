@@ -6,6 +6,7 @@ import { faqItems } from "@/content/faq";
 import { Reveal } from "@/components/motion/Reveal";
 import { GradientWaveBackdrop } from "@/components/effects/GradientWaveBackdrop";
 import { Grain } from "@/components/effects/Grain";
+import { CreditHeroPhoto, HeroPhoto } from "@/components/pages/services/HeroPhoto";
 import { Icon } from "@/components/ui/Icon";
 import type { SiteConfig } from "@/lib/content/types";
 import {
@@ -64,20 +65,31 @@ import { SectionRendezVous } from "@/components/rendez-vous/SectionRendezVous";
  * le dit aux lecteurs d'écran, et elle garde le nom de CATALOGUE de la
  * prestation (« L'Outil », « Le Logiciel ») lisible sur la page, maintenant que
  * le titre principal porte les mots que le client tape.
+ *
+ * SUR UNE PHOTO, LE FIL EST PLUS CLAIR. Le blanc à 50 % tient 5:1 sur le fond
+ * uni du site, mais il tombait à 2,3:1 sur le ciel et le contour de l'église du
+ * héros de Caen, mesuré au rendu à 375 px. Le passer à 80 % règle la lecture
+ * sans assombrir la photo au point d'éteindre la flèche.
  */
-function FilAriane({ marches }: { marches: readonly MarcheFilAriane[] }) {
+function FilAriane({
+  marches,
+  surPhoto = false,
+}: {
+  marches: readonly MarcheFilAriane[];
+  surPhoto?: boolean;
+}) {
   const { filAriane } = servicePageLabels;
 
   return (
     <nav
       aria-label={filAriane.intitule}
-      className="text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-white/50"
+      className={`text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] ${surPhoto ? "text-white/80" : "text-white/50"}`}
     >
       <ol className="flex flex-wrap items-center gap-x-[8px] gap-y-[4px]">
         {marches.map((marche, index) => (
           <li key={marche.libelle} className="flex items-center gap-[8px]">
             {index > 0 ? (
-              <span aria-hidden className="text-white/25">
+              <span aria-hidden className={surPhoto ? "text-white/50" : "text-white/25"}>
                 {filAriane.separateur}
               </span>
             ) : null}
@@ -377,13 +389,26 @@ export function ServicePage({
   // sur la grille qu'il remplace.
   const avant = 1;
 
+  // Photo de fond portée par la page locale ; les pages de prestation n'en ont
+  // pas et gardent leur fond animé.
+  const heroImage = local?.heroImage;
+
   return (
     <>
       <SvgSprite />
       <Header site={site} />
       <main id="main-content" tabIndex={-1}>
-        <section className="relative flex min-h-[70svh] items-end overflow-hidden bg-background px-[20px] pb-[60px] pt-[140px] text-foreground tablet:px-[24px] tablet:pb-[90px] desktop:px-[30px]">
-          <GradientWaveBackdrop seed={51} />
+        {/* PLUS HAUT SUR MOBILE QUAND LE HÉROS PORTE UNE PHOTO. Le texte est
+            calé en bas : à 70svh, le titre de quatre lignes remontait jusqu'au
+            fil d'Ariane et ne laissait à la photo qu'une bande de 150 px sous
+            la navigation. À 85svh, le sujet de la photo a la place de se lire
+            au-dessus du texte. */}
+        <section className={`relative flex ${heroImage ? "min-h-[85svh] tablet:min-h-[70svh]" : "min-h-[70svh]"} items-end overflow-hidden bg-background px-[20px] pb-[60px] pt-[140px] text-foreground tablet:px-[24px] tablet:pb-[90px] desktop:px-[30px]`}>
+          {heroImage ? (
+            <HeroPhoto image={heroImage} />
+          ) : (
+            <GradientWaveBackdrop seed={51} />
+          )}
           <Grain opacity={0.05} className="z-[1]" />
           <span className="absolute inset-y-0 left-1/2 z-[1] w-px bg-white/10" />
           {/* `items-end` À PARTIR DE 810, ET C'EST LE CŒUR DU HÉROS.
@@ -400,7 +425,10 @@ export function ServicePage({
               occupant (le retour, le titre). */}
           <div className="relative z-[2] mx-auto grid w-full max-w-[1440px] gap-[20px] tablet:grid-cols-2 tablet:items-end tablet:gap-x-0 tablet:gap-y-[30px]">
             <div className="tablet:col-start-1 tablet:row-start-1">
-              <FilAriane marches={marchesFilAriane(prestation, local)} />
+              <FilAriane
+                marches={marchesFilAriane(prestation, local)}
+                surPhoto={heroImage !== undefined}
+              />
             </div>
             <Reveal
               trigger="appear"
@@ -442,6 +470,7 @@ export function ServicePage({
               {servicePageLabels.horsTaxes}
             </p>
           </div>
+          {heroImage ? <CreditHeroPhoto credit={heroImage.credit} /> : null}
         </section>
 
         {local ? <ContexteLocal contexte={local.contexte} /> : null}

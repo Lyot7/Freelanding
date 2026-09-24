@@ -67,6 +67,48 @@ export interface Link {
   external?: boolean;
 }
 
+/** Un lien de crédit : le texte affiché et l'adresse qu'il ouvre. */
+export interface LienCredit {
+  readonly libelle: string;
+  readonly href: string;
+}
+
+/**
+ * Crédit d'une photo sous licence libre, rendu en clair à côté de l'image.
+ *
+ * CC BY-SA exige le nom de l'auteur, la licence avec son lien, et la mention
+ * des modifications apportées. Les trois sont des champs, pas une phrase : un
+ * crédit écrit d'un bloc perdrait ses liens, et la licence en demande un.
+ */
+export interface CreditPhoto {
+  /** Ce qui précède le nom, « Photo : ». */
+  readonly prefixe: string;
+  readonly auteur: LienCredit;
+  readonly licence: LienCredit;
+  /** Modification apportée à l'original (« retouchée »), exigée par CC BY-SA. */
+  readonly modification?: string;
+}
+
+/**
+ * Photo de fond d'un héros, posée sous le titre et le chapô.
+ *
+ * `cadrage` est le point de l'image, en pourcentages, qui reste à l'écran quand
+ * `object-cover` la rogne (`object-position`). Sur mobile, où le cadre est plus
+ * haut que l'image, elle est rognée sur les côtés et c'est `x` qui décide ; sur
+ * grand écran, elle est rognée en hauteur et c'est `y` qui compte. En nombres
+ * et non en chaîne CSS : c'est un réglage, pas un texte.
+ */
+export interface ImageHero {
+  readonly src: string;
+  readonly alt: string;
+  readonly width: number;
+  readonly height: number;
+  readonly cadrage: { readonly x: number; readonly y: number };
+  readonly credit: CreditPhoto;
+  /** Vignette de partage 1200 × 630 tirée du même visuel. */
+  readonly og: ImageAsset;
+}
+
 export interface Person {
   name: string;
   role?: string;

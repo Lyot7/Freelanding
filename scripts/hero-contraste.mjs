@@ -32,11 +32,15 @@ const BASE = process.env.AUDIT_BASE ?? "http://localhost:3000";
 const LARGEURS = process.argv.slice(2).map(Number).filter(Boolean);
 const CIBLES = LARGEURS.length > 0 ? LARGEURS : [390, 810, 1440];
 
-/** Pages à vérifier. Toute page projet porte le même hero. */
+/**
+ * Pages à vérifier. Toute page projet porte le même hero ; la page de Caen
+ * porte une photo derrière le titre (`HeroPhoto.tsx`).
+ */
 const PAGES = [
   "/work/kpsull",
   "/work/wurth-creation-de-compte",
   "/work/nslysium",
+  "/creation-site-internet-caen",
 ];
 
 /**
@@ -141,7 +145,7 @@ await navigateur.close();
 
 if (echecs > 0) {
   console.error(
-    `\n✖ ${echecs} relevé(s) sous le plancher de ${PLANCHER}:1. Assombrir le dégradé de WorkDetailHero.tsx, ou changer le fond.`,
+    `\n✖ ${echecs} relevé(s) sous le plancher de ${PLANCHER}:1. Assombrir le dégradé du hero en cause (WorkDetailHero.tsx, HeroPhoto.tsx), ou changer le fond.`,
   );
   process.exit(1);
 }

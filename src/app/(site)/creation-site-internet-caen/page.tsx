@@ -25,6 +25,7 @@ export function generateMetadata(): Metadata {
   return pageMetadata(
     { title: pageCaen.seo.titre, description: pageCaen.seo.description },
     pageCaen.chemin,
+    { ogImage: pageCaen.heroImage?.og },
   );
 }
 
