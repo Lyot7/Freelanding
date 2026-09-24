@@ -2,6 +2,7 @@ import { content, type ContentRepository } from "@/lib/content";
 import type { ContentBlock, Stat } from "@/lib/content/types";
 import { absoluteUrl } from "@/lib/site-url";
 import {
+  fourchette,
   packEntree,
   prestations,
   prixPack,
@@ -15,7 +16,7 @@ import { CHEMIN_VUE_AGENT, vueAgentContent } from "@/content/vue-agent";
  * version brute (`/llms-full.txt`) et le prompt que le visiteur copie.
  *
  * ASSEMBLÉ, JAMAIS ÉCRIT. Chaque fait vient du fichier de contenu qui l'affiche
- * déjà sur le site : les prix de `offre.ts` (donc du `TJM`), les rendez-vous de
+ * déjà sur le site : les forfaits et leurs prix fermes de `offre.ts`, les rendez-vous de
  * `rendez-vous.ts`, les projets de `work.ts`, la FAQ de `faq.ts`. Changer un
  * tarif ou ajouter une réalisation met à jour les trois sorties sans qu'on y
  * pense. `vue-agent.ts` ne porte que les intertitres et les liaisons.
@@ -82,7 +83,9 @@ function blocsPrestation(prestation: Prestation): ContentBlock[] {
     blocs.push(
       p(
         [
-          T.offres.pack(pack.nom, prixPack(pack)),
+          pack.surMesure
+            ? T.offres.packSurMesure(pack.nom, prixPack(pack))
+            : T.offres.pack(pack.nom, prixPack(pack)),
           pack.promesse,
           `${T.offres.pourQui}${DP} ${minuscule(phrase(pack.pourQui))}`,
         ].join(" "),
@@ -152,14 +155,16 @@ export async function construireProfil(
   blocs.push(h2(T.sections.pourQui), ...T.pourQui.map(p));
 
   /* Offres : l'ordre et les intitulés de l'accordéon de l'accueil, le détail
-     des périmètres tiré de `offre.ts`. */
+     des périmètres tiré de `offre.ts`. La fourchette est recalculée par
+     `fourchette` avec la taxe à sa place : « et plus » vient après « HT ». */
   blocs.push(h2(T.sections.offres), p(home.services.intro ?? ""), ...T.offres.prix.map(p));
   for (const service of home.services.items) {
     const prestation = sources.prestations.find(
       (candidate) => service.cta?.href === `/services/${candidate.slug}`,
     );
+    const prix = prestation ? fourchette(prestation.id, "\u00A0HT") : service.price;
     blocs.push(
-      h3(service.price ? T.offres.fourchette(service.title, service.price) : service.title),
+      h3(prix ? T.offres.fourchette(service.title, prix) : service.title),
       ...service.body.map(p),
       ...(prestation ? blocsPrestation(prestation) : []),
       ...(prestation
@@ -167,17 +172,6 @@ export async function construireProfil(
         : []),
       ...(service.rdvHref
         ? [p(`${T.offres.rendezVous}${DP} ${absoluteUrl(service.rdvHref)}`)]
-        : []),
-    );
-  }
-  const horsCatalogue = home.services.horsCatalogue;
-  if (horsCatalogue) {
-    blocs.push(
-      h3(horsCatalogue.titre),
-      p(horsCatalogue.intro),
-      liste(horsCatalogue.items.map((item) => `${item.nom}${DP} ${minuscule(item.corps)}`)),
-      ...(horsCatalogue.cta
-        ? [p(`${T.offres.rendezVous}${DP} ${absoluteUrl(horsCatalogue.cta.href)}`)]
         : []),
     );
   }
@@ -258,7 +252,7 @@ export async function construireProfil(
   /* Limites, pour que l'assistant du visiteur puisse trancher honnêtement. */
   const plancher = sources.prestations
     .map((prestation) => packEntree(prestation.id))
-    .reduce((a, b) => (a.jours <= b.jours ? a : b));
+    .reduce((a, b) => (a.prix <= b.prix ? a : b));
   blocs.push(
     h2(T.sections.limites),
     liste([T.limites.prixPlancher(prixPack(plancher)), ...T.limites.items]),

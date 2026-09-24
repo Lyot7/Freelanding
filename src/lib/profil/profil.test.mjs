@@ -17,14 +17,32 @@ const markdown = profilEnMarkdown(profil);
 const prompt = construirePrompt(profil);
 
 describe("profil complet de la vue Agent", () => {
-  it("cite chaque pack comme un repère, au prix calculé par offre.ts, sans durée", () => {
+  it("cite chaque forfait au prix ferme d'offre.ts, le palier sur mesure en plancher, sans durée", () => {
     for (const prestation of prestations) {
       for (const pack of prestation.packs) {
-        expect(markdown).toContain(`${pack.nom}\u00A0: repère à ${prixPack(pack)}\u00A0HT.`);
+        expect(markdown).toContain(
+          pack.surMesure
+            ? `${pack.nom}\u00A0: sur mesure, à partir de ${prixPack(pack)}\u00A0HT, prix fixé au devis.`
+            : `${pack.nom}\u00A0: ${prixPack(pack)}\u00A0HT, prix ferme.`,
+        );
       }
     }
-    expect(markdown).not.toMatch(/jours ouvrés/u);
-    expect(markdown).toMatch(/se fixe au devis/u);
+    expect(markdown).not.toMatch(/jours ouvrés|repère/u);
+    expect(markdown).not.toMatch(/\bTJM\b|taux journalier|par jour/iu);
+  });
+
+  it("ne garde rien de l'ancienne offre : ni Diagnostic, ni Audit, ni « Et aussi », ni lot payant", () => {
+    expect(markdown).not.toMatch(/Le Diagnostic|Audit de code|Et aussi|lot payant|outil-metier/u);
+    expect(consignesDuPrompt()).not.toMatch(/repères|30 minutes/u);
+  });
+
+  it("met « HT » avant « et plus » dans la fourchette d'un palier sur mesure", () => {
+    expect(markdown).not.toMatch(/et plus\u00A0HT|et plus HT/u);
+  });
+
+  it("nomme le rendez-vous avec le libellé unique du site", () => {
+    expect(markdown).toContain("Réserver un appel\u00A0: ");
+    expect(markdown).not.toContain("En parler");
   });
 
   it("cite chaque réalisation et chaque question de la FAQ", () => {
@@ -112,7 +130,6 @@ const sourcesDepouillees = {
       services: {
         ...homeReel.services,
         intro: undefined,
-        horsCatalogue: undefined,
         items: [{ ...premierService, rdvHref: undefined }, ...autresServices],
       },
       numbers: { ...homeReel.numbers, title: undefined, testimonial: undefined },
@@ -142,13 +159,6 @@ const sourcesSansRole = {
       ...siteReel,
       contact: { ...siteReel.contact, person: undefined, hours: [] },
     },
-    home: {
-      ...homeReel,
-      services: {
-        ...homeReel.services,
-        horsCatalogue: { ...homeReel.services.horsCatalogue, cta: undefined },
-      },
-    },
     about: {
       ...aboutReel,
       parcours: {
@@ -177,7 +187,6 @@ describe("profil : contenu facultatif absent", () => {
     expect(texte).not.toContain("Délai de réponse");
     expect(texte).not.toContain("## Parcours");
     expect(texte).not.toContain("## Questions fréquentes");
-    expect(texte).not.toContain(homeReel.services.horsCatalogue.titre);
     expect(texte).not.toContain("appeler directement");
     expect(texte).not.toContain("- Contexte");
     expect(texte).not.toContain("- Rôle");
@@ -188,17 +197,17 @@ describe("profil : contenu facultatif absent", () => {
   it("garde le premier service sans lien de rendez-vous, et les suivants avec", async () => {
     const texte = profilEnMarkdown(await construireProfil(sourcesDepouillees));
     const premier = texte.split(`### ${premierService.title}`)[1].split("\n### ")[0];
-    expect(premier).not.toContain("En parler");
-    expect(texte).toContain(`En parler\u00A0: ${absoluteUrl(autresServices[0].rdvHref)}`);
+    expect(premier).not.toContain("Réserver un appel\u00A0:");
+    expect(texte).toContain(`Réserver un appel\u00A0: ${absoluteUrl(autresServices[0].rdvHref)}`);
   });
 
   it("donne le même prix plancher quel que soit l'ordre des prestations", async () => {
     const inverse = profilEnMarkdown(await construireProfil(sourcesDepouillees));
     const [plancher] = prestations
       .map((prestation) => prestation.packs[0])
-      .sort((a, b) => a.jours - b.jours);
-    expect(inverse).toContain(`démarrent autour de ${prixPack(plancher)}\u00A0HT`);
-    expect(markdown).toContain(`démarrent autour de ${prixPack(plancher)}\u00A0HT`);
+      .sort((a, b) => a.prix - b.prix);
+    expect(inverse).toContain(`mon premier forfait est à ${prixPack(plancher)}\u00A0HT`);
+    expect(markdown).toContain(`mon premier forfait est à ${prixPack(plancher)}\u00A0HT`);
   });
 
   it("titre au nom de la marque sans rôle, et le téléphone sans horaires", async () => {
@@ -209,9 +218,6 @@ describe("profil : contenu facultatif absent", () => {
     expect(texte).toContain(`Tu peux aussi appeler directement au ${siteReel.contact.phone}.`);
     expect(texte).not.toContain("- Horaires");
     expect(texte).toContain("- 2020\u00A0: Développeur, Studio\n");
-    expect(texte).toContain(`### ${homeReel.services.horsCatalogue.titre}`);
-    const horsCatalogue = texte.split(`### ${homeReel.services.horsCatalogue.titre}`)[1].split("\n## ")[0];
-    expect(horsCatalogue).not.toContain("En parler");
   });
 
   it("titre au seul nom d'une personne déclarée sans rôle", async () => {
