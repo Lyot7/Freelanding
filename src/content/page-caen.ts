@@ -101,9 +101,12 @@ export const pageCaen: PageLocale = {
    * l'église, bas fondu vers le fond du site) : le crédit est donc obligatoire,
    * avec la mention de la retouche.
    *
-   * CADRAGE MOBILE : la flèche est à 49,5 % de la largeur de l'image. Centrée,
-   * elle reste à l'écran jusqu'à 320 px de large. En hauteur, l'image est posée
-   * par le haut pour ne pas rogner la pointe.
+   * CADRAGE : la flèche est à 49,5 % de la largeur de l'image. Sur mobile,
+   * l'image centrée la garde au milieu de l'écran, au-dessus du titre. À partir
+   * de 810 px, le titre occupe la moitié droite : l'image est élargie de 30 %
+   * vers la gauche, ce qui pose la flèche vers 34 % de la largeur, dans la
+   * moitié gauche, à l'écart du titre (mesuré à 810, 1200 et 1440 px). En
+   * hauteur, l'image est posée par le haut pour ne pas rogner la pointe.
    */
   heroImage: {
     src: "/images/heros/caen-saint-pierre.jpg",
@@ -111,6 +114,7 @@ export const pageCaen: PageLocale = {
     width: 2400,
     height: 1150,
     cadrage: { x: 49.5, y: 0 },
+    elargissement: 30,
     credit: {
       prefixe: "Photo :",
       auteur: {

@@ -104,6 +104,13 @@ export interface ImageHero {
   readonly width: number;
   readonly height: number;
   readonly cadrage: { readonly x: number; readonly y: number };
+  /**
+   * À partir de 810 px, l'image déborde à GAUCHE du héros de ce pourcentage de
+   * sa largeur. Sur grand écran, le cadre est à peine plus large que l'image :
+   * sans ce débord, le sujet reste au centre, sous le titre posé dans la
+   * moitié droite. Élargie, l'image décale son sujet vers la gauche.
+   */
+  readonly elargissement?: number;
   readonly credit: CreditPhoto;
   /** Vignette de partage 1200 × 630 tirée du même visuel. */
   readonly og: ImageAsset;

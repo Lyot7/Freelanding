@@ -6,7 +6,11 @@ import { faqItems } from "@/content/faq";
 import { Reveal } from "@/components/motion/Reveal";
 import { GradientWaveBackdrop } from "@/components/effects/GradientWaveBackdrop";
 import { Grain } from "@/components/effects/Grain";
-import { CreditHeroPhoto, HeroPhoto } from "@/components/pages/services/HeroPhoto";
+import {
+  CreditHeroPhoto,
+  HeroPhoto,
+  VOILE_TEXTE,
+} from "@/components/pages/services/HeroPhoto";
 import { Icon } from "@/components/ui/Icon";
 import type { SiteConfig } from "@/lib/content/types";
 import {
@@ -66,10 +70,11 @@ import { SectionRendezVous } from "@/components/rendez-vous/SectionRendezVous";
  * prestation (« L'Outil », « Le Logiciel ») lisible sur la page, maintenant que
  * le titre principal porte les mots que le client tape.
  *
- * SUR UNE PHOTO, LE FIL EST PLUS CLAIR. Le blanc à 50 % tient 5:1 sur le fond
- * uni du site, mais il tombait à 2,3:1 sur le ciel et le contour de l'église du
- * héros de Caen, mesuré au rendu à 375 px. Le passer à 80 % règle la lecture
- * sans assombrir la photo au point d'éteindre la flèche.
+ * SUR UNE PHOTO, LE FIL EST PLUS CLAIR ET PORTE SON VOILE. Le blanc à 50 % tient
+ * 5:1 sur le fond uni du site, mais il tombait à 2,3:1 sur le ciel et le
+ * contour de l'église du héros de Caen. À 810 px, il croise la flèche : même
+ * avec le voile collé au texte (`VOILE_TEXTE`), le blanc à 80 % restait à
+ * 4,35:1. À 90 %, il passe sans assombrir davantage la photo.
  */
 function FilAriane({
   marches,
@@ -83,13 +88,13 @@ function FilAriane({
   return (
     <nav
       aria-label={filAriane.intitule}
-      className={`text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] ${surPhoto ? "text-white/80" : "text-white/50"}`}
+      className={`text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] ${surPhoto ? `text-white/90 ${VOILE_TEXTE}` : "text-white/50"}`}
     >
       <ol className="flex flex-wrap items-center gap-x-[8px] gap-y-[4px]">
         {marches.map((marche, index) => (
           <li key={marche.libelle} className="flex items-center gap-[8px]">
             {index > 0 ? (
-              <span aria-hidden className={surPhoto ? "text-white/50" : "text-white/25"}>
+              <span aria-hidden className={surPhoto ? "text-white/60" : "text-white/25"}>
                 {filAriane.separateur}
               </span>
             ) : null}
@@ -423,7 +428,11 @@ export function ServicePage({
               Aligner par le BAS remet les deux dernières lignes sur la même
               ligne d'appui, et ne change rien aux rangées qui n'ont qu'un
               occupant (le retour, le titre). */}
-          <div className="relative z-[2] mx-auto grid w-full max-w-[1440px] gap-[20px] tablet:grid-cols-2 tablet:items-end tablet:gap-x-0 tablet:gap-y-[30px]">
+          {/* Ombre de texte sur photo : un halo discret qui détache les lettres des
+              détails fins de l'image (contour vert, fenêtres). Héritée par tous
+              les textes de la grille. Les voiles de `HeroPhoto` suffisent à
+              l'AA ; l'ombre n'est pas comptée dans la mesure. */}
+          <div className={`relative z-[2] mx-auto grid w-full max-w-[1440px] gap-[20px] tablet:grid-cols-2 tablet:items-end tablet:gap-x-0 tablet:gap-y-[30px]${heroImage ? " [text-shadow:0_0_18px_rgba(0,0,0,.45)]" : ""}`}>
             <div className="tablet:col-start-1 tablet:row-start-1">
               <FilAriane
                 marches={marchesFilAriane(prestation, local)}
@@ -457,7 +466,7 @@ export function ServicePage({
                 des deux côtés du filet. En marge et non en rembourrage : la
                 largeur de 340 px est celle du texte, un `pr` l'aurait amputée
                 d'autant et changé toutes les coupures de ligne. */}
-            <p className="max-w-[340px] text-[14px] font-medium leading-[1.35] tracking-[-0.01em] text-white/60 tablet:col-start-1 tablet:row-start-3 tablet:mr-[30px] tablet:justify-self-end tablet:text-right desktop:mr-[40px]">
+            <p className={`max-w-[340px] text-[14px] font-medium leading-[1.35] tracking-[-0.01em] text-white/60 tablet:col-start-1 tablet:row-start-3 tablet:mr-[30px] tablet:justify-self-end tablet:text-right desktop:mr-[40px]${heroImage ? ` ${VOILE_TEXTE}` : ""}`}>
               {local?.resume ?? prestation.resume}
             </p>
             {/* `pl` À PARTIR DE 810 : la gouttière de cette grille est NULLE
@@ -465,7 +474,7 @@ export function ServicePage({
                 gabarit de la source). Le résumé de gauche est calé à droite,
                 donc sans ce retrait les deux textes se collent au pixel près et
                 se lisent comme une seule phrase cassée en deux. */}
-            <p className="text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-white/50 tablet:col-start-2 tablet:row-start-3 tablet:pl-[30px] desktop:pl-[40px]">
+            <p className={`text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-white/50 tablet:col-start-2 tablet:row-start-3 tablet:pl-[30px] desktop:pl-[40px]${heroImage ? ` ${VOILE_TEXTE}` : ""}`}>
               {servicePageLabels.fourchette} {fourchette(prestation.id)}{" "}
               {servicePageLabels.horsTaxes}
             </p>
