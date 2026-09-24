@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState, type RefObject } from "react"
 import { preload } from "react-dom";
 import { estProfilLeger } from "@/lib/profil-appareil";
 import { useDepixelisation } from "@/components/motion/useDepixelisation";
+import { recadrageCover } from "@/lib/images/recadrage";
 import { motion } from "motion/react";
 import type { HeroContent, SiteConfig } from "@/lib/content/types";
 import {
@@ -664,7 +665,7 @@ export function HeroVideo({ src, poster }: { src: string; poster?: string }) {
   // Téléphone en profil complet : affiche dépixelisée puis vidéo. Décidé
   // après l'hydratation, le serveur ne connaît ni l'écran ni l'appareil.
   const [mobile, setMobile] = useState(false);
-  const calque = useRef<HTMLDivElement>(null);
+  const calque = useRef<HTMLCanvasElement>(null);
   const affiche = useRef<Promise<HTMLImageElement | null> | null>(null);
   const [afficheChargee, setAfficheChargee] = useState(false);
   const afficheChargeeRef = useRef(false);
@@ -714,18 +715,78 @@ export function HeroVideo({ src, poster }: { src: string; poster?: string }) {
     window.addEventListener("load", lancer, { once: true });
     return () => window.removeEventListener("load", lancer);
   }, [chargerAffiche, poster]);
+  // SUR TÉLÉPHONE, LA VIDÉO EST PEINTE DANS UNE TOILE. Une `<video>` visible
+  // de 375 × 710 devient l'élément LCP de la page (mesuré : le texte du héros
+  // perdait sa place) et le LCP mobile tombait au moment où la boucle, montée
+  // après le `load`, finissait de télécharger. Une `<canvas>` n'est pas
+  // candidate au LCP : le texte le reste, la vidéo arrive quand elle arrive.
+  // La balise vidéo reste dans la page, réduite à 1 px, pour être décodée.
+  // Hors de l'écran, la lecture s'arrête : ni décodage ni batterie pour rien.
+  const video = useRef<HTMLVideoElement>(null);
+  const toile = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const v = video.current;
+    const c = toile.current;
+    const ctx = c?.getContext("2d");
+    if (!mobile || !monter || !v || !c || !ctx) return;
+    let actif = true;
+    const peindre = () => {
+      if (!actif) return;
+      const ratio = Math.min(window.devicePixelRatio, 2);
+      const l = Math.round(c.clientWidth * ratio);
+      const h = Math.round(c.clientHeight * ratio);
+      if (c.width !== l) c.width = l;
+      if (c.height !== h) c.height = h;
+      const zone = recadrageCover(v.videoWidth, v.videoHeight, l, h);
+      if (zone) ctx.drawImage(v, zone.x, zone.y, zone.l, zone.h, 0, 0, l, h);
+      if (typeof v.requestVideoFrameCallback === "function") {
+        v.requestVideoFrameCallback(peindre);
+      } else {
+        window.requestAnimationFrame(peindre);
+      }
+    };
+    peindre();
+    const visibilite = new IntersectionObserver((entrees) => {
+      if (entrees.some((entree) => entree.isIntersecting)) void v.play().catch(() => undefined);
+      else v.pause();
+    });
+    visibilite.observe(c);
+    return () => {
+      actif = false;
+      visibilite.disconnect();
+    };
+  }, [mobile, monter]);
   const fondMobile = etape ?? (afficheChargee ? poster : null);
+  // L'affiche et ses étapes sont PEINTES dans une toile, comme la vidéo : en
+  // fond CSS, l'affiche nette devenait l'élément LCP (mesuré à 1,8 s sur un
+  // Pixel 7 émulé) à la place du texte du héros. Les étapes sont agrandies
+  // sans lissage, ce qui donne les gros pixels nets.
+  useEffect(() => {
+    const c = calque.current;
+    const ctx = c?.getContext("2d");
+    if (!c || !ctx || !fondMobile) return;
+    let valide = true;
+    const img = new window.Image();
+    img.onload = () => {
+      if (!valide) return;
+      const ratio = Math.min(window.devicePixelRatio, 2);
+      const l = Math.round(c.clientWidth * ratio);
+      const h = Math.round(c.clientHeight * ratio);
+      if (c.width !== l) c.width = l;
+      if (c.height !== h) c.height = h;
+      const zone = recadrageCover(img.naturalWidth, img.naturalHeight, l, h);
+      ctx.imageSmoothingEnabled = !etape;
+      if (zone) ctx.drawImage(img, zone.x, zone.y, zone.l, zone.h, 0, 0, l, h);
+    };
+    img.src = fondMobile;
+    return () => {
+      valide = false;
+    };
+  }, [fondMobile, etape]);
   return (
     <>
       {mobile ? (
-        <div
-          ref={calque}
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage: fondMobile ? `url("${fondMobile}")` : undefined,
-            imageRendering: etape ? "pixelated" : undefined,
-          }}
-        />
+        <canvas ref={calque} aria-hidden className="absolute inset-0 h-full w-full" />
       ) : null}
       {poster ? (
         /* AFFICHE À PARTIR DE 810 PX SEULEMENT. Sur mobile, elle était
@@ -745,7 +806,31 @@ export function HeroVideo({ src, poster }: { src: string; poster?: string }) {
           />
         </picture>
       ) : null}
-      {monter && src ? (
+      {mobile && monter && src ? (
+        <>
+          <video
+            ref={video}
+            className="pointer-events-none absolute left-0 top-0 h-px w-px opacity-0"
+            aria-hidden
+            tabIndex={-1}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            src={src}
+            onPlaying={() => setJoue(true)}
+          />
+          <canvas
+            ref={toile}
+            aria-hidden
+            className={
+              "absolute inset-0 h-full w-full transition-opacity duration-500 " +
+              (joue && !etape ? "opacity-100" : "opacity-0")
+            }
+          />
+        </>
+      ) : monter && src ? (
         <video
           className={
             "absolute inset-0 h-full w-full object-cover transition-opacity duration-500 " +
