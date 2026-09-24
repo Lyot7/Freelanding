@@ -88,10 +88,35 @@ export const blogPosts: BlogPost[] = [
     category: "Conversion",
     author: eliott,
     cover: {
-      src: "/work/nslysium/cover.jpg",
-      alt: "La page d’accueil d’un site consacré à un seul produit",
-      width: 1600,
-      height: 1000,
+      src: "/images/blog/landing-page-ou-page-produit.jpg",
+      alt: "Une bottine en cuir noir posée seule sur une caisse en bois dans une boutique",
+      width: 1200,
+      height: 1114,
+    },
+    heroImage: {
+      src: "/images/heros/blog-landing-page-ou-page-produit.jpg",
+      alt: "Une bottine en cuir noir posée seule sur une caisse en bois dans une boutique",
+      width: 2400,
+      height: 1350,
+      cadrage: { x: 30, y: 40 },
+      credit: {
+        prefixe: "Photo :",
+        auteur: {
+          libelle: "Clark Street Mercantile",
+          href: "https://commons.wikimedia.org/wiki/File:Black_boot_in_a_store_(Unsplash).jpg",
+        },
+        licence: {
+          libelle: "CC0",
+          href: "https://creativecommons.org/publicdomain/zero/1.0/deed.fr",
+        },
+        modification: "retouchée",
+      },
+      og: {
+        src: "/images/og-blog-landing-page-ou-page-produit.jpg",
+        alt: "Une bottine en cuir noir posée seule sur une caisse en bois dans une boutique",
+        width: 1200,
+        height: 630,
+      },
     },
     excerpt:
       "Ce qui décide, c’est d’où vient la personne, pas ce qu’il y a sur la page. Une landing page se justifie dès qu’il y a un budget d’acquisition en face, et se périme avec la campagne.",
@@ -102,10 +127,10 @@ export const blogPosts: BlogPost[] = [
       description:
         "Ce qu’une landing page fait de plus, les quatre situations où elle rapporte, la structure section par section, et les erreurs qui gaspillent un budget publicitaire.",
       ogImage: {
-        src: "/work/nslysium/cover.jpg",
-        alt: "La page d’accueil d’un site consacré à un seul produit",
-        width: 1600,
-        height: 1000,
+        src: "/images/og-blog-landing-page-ou-page-produit.jpg",
+        alt: "Une bottine en cuir noir posée seule sur une caisse en bois dans une boutique",
+        width: 1200,
+        height: 630,
       },
     },
   },
@@ -119,10 +144,35 @@ export const blogPosts: BlogPost[] = [
     category: "Performance",
     author: eliott,
     cover: {
-      src: "/images/services/05-suivi-evolution.jpg",
-      alt: "Deux manomètres d’atelier montés sur leur détendeur",
-      width: 1600,
-      height: 926,
+      src: "/images/blog/site-e-commerce-lent-ce-que-ca-coute.jpg",
+      alt: "Chronomètre mécanique à cadran blanc posé sur une table claire, couronne et anneau en haut à droite",
+      width: 1200,
+      height: 1114,
+    },
+    heroImage: {
+      src: "/images/heros/blog-site-e-commerce-lent-ce-que-ca-coute.jpg",
+      alt: "Chronomètre mécanique à cadran blanc posé sur une table claire, couronne et anneau en haut à droite",
+      width: 2400,
+      height: 1350,
+      cadrage: { x: 28, y: 40 },
+      credit: {
+        prefixe: "Photo :",
+        auteur: {
+          libelle: "Tim Reckmann",
+          href: "https://commons.wikimedia.org/wiki/File:Stoppuhr_I_(12163259433).jpg",
+        },
+        licence: {
+          libelle: "CC BY 2.0",
+          href: "https://creativecommons.org/licenses/by/2.0/deed.fr",
+        },
+        modification: "retouchée",
+      },
+      og: {
+        src: "/images/og-blog-site-e-commerce-lent-ce-que-ca-coute.jpg",
+        alt: "Chronomètre mécanique à cadran blanc posé sur une table claire, couronne et anneau en haut à droite",
+        width: 1200,
+        height: 630,
+      },
     },
     excerpt:
       "Trois seuils publiés par Google décident si ta boutique est considérée comme rapide. Ils se relèvent gratuitement, et les deux tiers des corrections consistent à retirer.",
@@ -133,10 +183,10 @@ export const blogPosts: BlogPost[] = [
       description:
         "Les trois seuils publiés par Google expliqués en français, comment les relever gratuitement en dix minutes, ce qui ralentit réellement une boutique, et dans quel ordre le traiter.",
       ogImage: {
-        src: "/images/services/05-suivi-evolution.jpg",
-        alt: "Deux manomètres d’atelier montés sur leur détendeur",
-        width: 1600,
-        height: 926,
+        src: "/images/og-blog-site-e-commerce-lent-ce-que-ca-coute.jpg",
+        alt: "Chronomètre mécanique à cadran blanc posé sur une table claire, couronne et anneau en haut à droite",
+        width: 1200,
+        height: 630,
       },
     },
   },
@@ -150,10 +200,35 @@ export const blogPosts: BlogPost[] = [
     category: "Méthode",
     author: eliott,
     cover: {
-      src: "/work/kpsull/cover.jpg",
-      alt: "La page d’accueil d’une boutique en ligne développée sur mesure",
-      width: 1600,
-      height: 1000,
+      src: "/images/blog/shopify-ou-site-sur-mesure.jpg",
+      alt: "Buste de couture habillé d’un tissu à fines rayures, un mètre ruban autour du cou, dans un atelier",
+      width: 1200,
+      height: 1114,
+    },
+    heroImage: {
+      src: "/images/heros/blog-shopify-ou-site-sur-mesure.jpg",
+      alt: "Buste de couture habillé d’un tissu à fines rayures, un mètre ruban autour du cou, dans un atelier",
+      width: 2400,
+      height: 1350,
+      cadrage: { x: 26, y: 40 },
+      credit: {
+        prefixe: "Photo :",
+        auteur: {
+          libelle: "Igor Ovsyannykov",
+          href: "https://commons.wikimedia.org/wiki/File:Igor_Ovsyannykov_2017-05-08_(Unsplash).jpg",
+        },
+        licence: {
+          libelle: "CC0",
+          href: "https://creativecommons.org/publicdomain/zero/1.0/deed.fr",
+        },
+        modification: "retouchée",
+      },
+      og: {
+        src: "/images/og-blog-shopify-ou-site-sur-mesure.jpg",
+        alt: "Buste de couture habillé d’un tissu à fines rayures, un mètre ruban autour du cou, dans un atelier",
+        width: 1200,
+        height: 630,
+      },
     },
     excerpt:
       "Ce qui coûte, c’est l’écart entre ta façon de vendre et ce que la plateforme prévoit. Voici comment mettre un chiffre en face de cet écart.",
@@ -164,10 +239,10 @@ export const blogPosts: BlogPost[] = [
       description:
         "Ce que chaque option achète vraiment, le calcul de coût sur trois ans commissions comprises, les trois signaux qui font basculer, et la solution mixte qui convient souvent mieux.",
       ogImage: {
-        src: "/work/kpsull/cover.jpg",
-        alt: "La page d’accueil d’une boutique en ligne développée sur mesure",
-        width: 1600,
-        height: 1000,
+        src: "/images/og-blog-shopify-ou-site-sur-mesure.jpg",
+        alt: "Buste de couture habillé d’un tissu à fines rayures, un mètre ruban autour du cou, dans un atelier",
+        width: 1200,
+        height: 630,
       },
     },
   },
@@ -181,10 +256,35 @@ export const blogPosts: BlogPost[] = [
     category: "Outils métier",
     author: eliott,
     cover: {
-      src: "/images/services/03-outil-metier.jpg",
-      alt: "Des ciseaux à bois posés sur un établi tracé au crayon",
-      width: 1600,
-      height: 926,
+      src: "/images/blog/outil-sur-mesure-ou-abonnements-saas.jpg",
+      alt: "Rabot à main en métal posé sur une planche de pin, au milieu des copeaux",
+      width: 1200,
+      height: 1114,
+    },
+    heroImage: {
+      src: "/images/heros/blog-outil-sur-mesure-ou-abonnements-saas.jpg",
+      alt: "Rabot à main en métal posé sur une planche de pin, au milieu des copeaux",
+      width: 2400,
+      height: 1350,
+      cadrage: { x: 30, y: 40 },
+      credit: {
+        prefixe: "Photo :",
+        auteur: {
+          libelle: "Phil Gradwell",
+          href: "https://commons.wikimedia.org/wiki/File:Stanley_jack_plane.jpg",
+        },
+        licence: {
+          libelle: "CC BY 2.0",
+          href: "https://creativecommons.org/licenses/by/2.0/deed.fr",
+        },
+        modification: "retouchée",
+      },
+      og: {
+        src: "/images/og-blog-outil-sur-mesure-ou-abonnements-saas.jpg",
+        alt: "Rabot à main en métal posé sur une planche de pin, au milieu des copeaux",
+        width: 1200,
+        height: 630,
+      },
     },
     excerpt:
       "Un abonnement achète un droit d’usage, un outil sur mesure achète un actif. Avant de comparer les prix, regarde ce qui, chez toi, ne rentre dans aucune case.",
@@ -195,10 +295,10 @@ export const blogPosts: BlogPost[] = [
       description:
         "Le calcul de coût que personne ne fait, les cas où l’abonnement reste le bon choix, les trois signaux qui font basculer, et la voie mixte qui rend le plus vite.",
       ogImage: {
-        src: "/images/services/03-outil-metier.jpg",
-        alt: "Des ciseaux à bois posés sur un établi tracé au crayon",
-        width: 1600,
-        height: 926,
+        src: "/images/og-blog-outil-sur-mesure-ou-abonnements-saas.jpg",
+        alt: "Rabot à main en métal posé sur une planche de pin, au milieu des copeaux",
+        width: 1200,
+        height: 630,
       },
     },
   },
@@ -212,10 +312,35 @@ export const blogPosts: BlogPost[] = [
     category: "Outils métier",
     author: eliott,
     cover: {
-      src: "/images/services/04-logiciel-metier.jpg",
-      alt: "Les engrenages d’une machine industrielle en prise",
-      width: 1600,
-      height: 926,
+      src: "/images/blog/synchroniser-catalogue-stock-et-commandes.jpg",
+      alt: "Travée de rayonnage métallique chargée de cartons dans un entrepôt",
+      width: 1200,
+      height: 1114,
+    },
+    heroImage: {
+      src: "/images/heros/blog-synchroniser-catalogue-stock-et-commandes.jpg",
+      alt: "Travée de rayonnage métallique chargée de cartons dans un entrepôt",
+      width: 2400,
+      height: 1350,
+      cadrage: { x: 27, y: 40 },
+      credit: {
+        prefixe: "Photo :",
+        auteur: {
+          libelle: "Encik Tekateki",
+          href: "https://commons.wikimedia.org/wiki/File:Warehouse_Interior_Storing_Batteries_in_Indonesia.jpg",
+        },
+        licence: {
+          libelle: "CC BY 4.0",
+          href: "https://creativecommons.org/licenses/by/4.0/deed.fr",
+        },
+        modification: "retouchée",
+      },
+      og: {
+        src: "/images/og-blog-synchroniser-catalogue-stock-et-commandes.jpg",
+        alt: "Travée de rayonnage métallique chargée de cartons dans un entrepôt",
+        width: 1200,
+        height: 630,
+      },
     },
     excerpt:
       "Aucun de tes outils n’a été désigné comme la source de vérité. C’est une décision de gestion, et aucun connecteur ne la prendra à ta place.",
@@ -226,10 +351,10 @@ export const blogPosts: BlogPost[] = [
       description:
         "Pourquoi les connecteurs du marché finissent par casser, les trois décisions à prendre avant de brancher quoi que ce soit, et les six éléments d’une synchronisation qui tient.",
       ogImage: {
-        src: "/images/services/04-logiciel-metier.jpg",
-        alt: "Les engrenages d’une machine industrielle en prise",
-        width: 1600,
-        height: 926,
+        src: "/images/og-blog-synchroniser-catalogue-stock-et-commandes.jpg",
+        alt: "Travée de rayonnage métallique chargée de cartons dans un entrepôt",
+        width: 1200,
+        height: 630,
       },
     },
   },

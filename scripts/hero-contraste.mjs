@@ -43,6 +43,11 @@ const PAGES = [
   "/work/nslysium",
   "/creation-site-internet-caen",
   "/blog/a-qui-appartient-votre-fichier-client",
+  "/blog/landing-page-ou-page-produit",
+  "/blog/site-e-commerce-lent-ce-que-ca-coute",
+  "/blog/shopify-ou-site-sur-mesure",
+  "/blog/outil-sur-mesure-ou-abonnements-saas",
+  "/blog/synchroniser-catalogue-stock-et-commandes",
 ];
 
 /**
