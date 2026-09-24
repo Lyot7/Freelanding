@@ -2,7 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { animate, useReducedMotion } from "motion/react";
-import Image from "next/image";
+import { ImageProgressive } from "@/components/ui/ImageProgressive";
 import Link from "next/link";
 import type { HomeContent, Link as LinkData, Stat } from "@/lib/content/types";
 import { BrandB } from "@/components/brand/BrandB";
@@ -435,7 +435,7 @@ export function WhyUsSection({ whyUs }: { whyUs: HomeContent["whyUs"] }) {
                       qui n'existe pas. Pas de `preload` pour autant : ce bloc est
                       à plus de 5 000 px du haut de l'accueil, un indice de
                       préchargement dans l'en-tête serait du gaspillage. */}
-                  <Image
+                  <ImageProgressive
                     src="/images/mecanisme-carre.jpg"
                     alt=""
                     width={100}

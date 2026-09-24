@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import Image from "next/image";
+import { ImageProgressive } from "@/components/ui/ImageProgressive";
 import { GradientWaveBackdrop } from "@/components/effects/GradientWaveBackdrop";
 import { Grain } from "@/components/effects/Grain";
 import { Reveal } from "@/components/motion/Reveal";
@@ -135,7 +135,7 @@ export function WorkTestimonial({
           >
             {avatar ? (
               <div className="relative h-[162px] w-[130px] flex-none overflow-hidden">
-                <Image
+                <ImageProgressive
                   src={avatar.src}
                   alt={avatar.alt}
                   fill

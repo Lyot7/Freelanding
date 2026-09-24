@@ -1,4 +1,11 @@
 /**
+ * Événement émis sur `window` quand la page est finie et au repos : les
+ * calques à image de fond (`ParallaxBackdrop`), que le navigateur ne sait pas
+ * différer seul, chargent alors leur image d'avance.
+ */
+export const EVENEMENT_PRECHARGEMENT = "prechargement:images";
+
+/**
  * Préfixes jamais préchargés : ce ne sont pas des pages. `/r/` compte un clic
  * puis redirige, `/ingest/` relaie la mesure d'audience.
  */

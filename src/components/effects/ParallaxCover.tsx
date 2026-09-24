@@ -5,6 +5,12 @@ import { motion } from "motion/react";
 import { getImageProps } from "next/image";
 import { useParallaxLayerY } from "@/components/motion/ParallaxImage";
 import { pourcentage } from "@/components/motion/reducedMotion";
+import {
+  chargementImg,
+  imgChargee,
+  styleEtape,
+  useDepixelisation,
+} from "@/components/motion/useDepixelisation";
 import { useReveal } from "@/components/motion/Reveal";
 import {
   MEDIA_REVEAL_FROM,
@@ -103,8 +109,18 @@ export function ParallaxCover({
     height: 1,
     sizes,
   }).props;
+  // Dépixelisation à la première apparition, comme les `<ImageProgressive>`.
+  const img = useRef<HTMLImageElement>(null);
+  const etape = useDepixelisation({
+    cible: img,
+    src,
+    actif: true,
+    estChargee: () => imgChargee(img.current),
+    charger: () => chargementImg(img.current),
+  });
   const image = (
     <motion.img
+      ref={img}
       src={optimizedSrc}
       srcSet={srcSet}
       sizes={sizes}
@@ -117,6 +133,7 @@ export function ParallaxCover({
         top: pourcentage(-overshoot * 100),
         height: pourcentage((1 + 2 * overshoot) * 100),
         ...(y ? { y } : null),
+        ...styleEtape(etape, imgClassName),
       }}
     />
   );

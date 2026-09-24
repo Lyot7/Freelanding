@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { ImageProgressive } from "@/components/ui/ImageProgressive";
 import Link from "next/link";
 import { ArticlesSection } from "@/components/sections/ArticlesSection";
 import { LogoBandSection } from "@/components/sections/LogoBandSection";
@@ -60,7 +60,7 @@ function AboutHero({ about }: { about: AboutContent }) {
         decorative
         className="pointer-events-none absolute inset-0 z-0 overflow-clip"
       >
-        <Image
+        <ImageProgressive
           src={HERO_IMAGE}
           alt=""
           fill

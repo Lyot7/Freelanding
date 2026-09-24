@@ -38,3 +38,9 @@ export function tailleMiniature(
   const rapport = largeur > 0 && hauteur > 0 ? hauteur / largeur : 1;
   return { largeur: colonnes, hauteur: Math.max(1, Math.round(colonnes * rapport)) };
 }
+
+/**
+ * Largeur affichée sous laquelle on ne dépixelise pas : avatars, logos,
+ * vignettes. À cette taille, 8 colonnes ne se lisent pas comme une image.
+ */
+export const LARGEUR_MIN_EFFET = 80;

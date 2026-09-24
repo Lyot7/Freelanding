@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import Image from "next/image";
+import { ImageProgressive } from "@/components/ui/ImageProgressive";
 import { Reveal } from "@/components/motion/Reveal";
 import { Marquee } from "@/components/ui/Marquee";
 import type { LogoBand } from "@/lib/content/types";
@@ -125,7 +125,7 @@ export function LogoBandSection({ logoBand }: { logoBand: LogoBand }): ReactNode
                      voulues ; `maxWidth: 100%` garde le garde-fou de cellule.
                      Les dimensions restent optionnelles dans `ImageAsset`,
                      d'où le repli. */
-                  <Image
+                  <ImageProgressive
                     src={logo.image.src}
                     alt={logo.image.alt}
                     width={logo.image.width ?? 130}

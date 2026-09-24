@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import Image from "next/image";
+import { ImageProgressive } from "@/components/ui/ImageProgressive";
 import { ScrollParallax } from "@/components/motion/ScrollParallax";
 import type { CreditPhoto, ImageHero } from "@/lib/content/types";
 
@@ -63,7 +63,7 @@ export function HeroPhoto({ image }: { image: ImageHero }) {
           style={style}
           className="absolute inset-y-0 left-0 right-0 tablet:left-[calc(var(--elargi)*-1)]"
         >
-          <Image
+          <ImageProgressive
             src={image.src}
             alt={image.alt}
             fill

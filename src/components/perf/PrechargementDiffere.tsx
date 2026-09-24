@@ -3,6 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import {
+  EVENEMENT_PRECHARGEMENT,
   reseauEconome,
   routesAPrecharger,
   type Connexion,
@@ -11,8 +12,9 @@ import {
 /**
  * Une fois la page chargée et le navigateur au repos, charge d'avance tout ce
  * que la visite va demander ensuite :
- *  - les images encore en `loading="lazy"` de la page, passées en `eager` :
- *    le défilement ne rencontre plus d'image vide ;
+ *  - les images encore en `loading="lazy"` de la page, passées en `eager`, et
+ *    celles des calques de fond (`EVENEMENT_PRECHARGEMENT`) : le défilement ne
+ *    rencontre plus d'image vide ;
  *  - les pages internes liées depuis celle-ci, par `router.prefetch` : le clic
  *    affiche la page sans aller-retour réseau.
  *
@@ -40,6 +42,7 @@ export function PrechargementDiffere() {
         .forEach((img) => {
           img.loading = "eager";
         });
+      window.dispatchEvent(new Event(EVENEMENT_PRECHARGEMENT));
       const hrefs = Array.from(document.querySelectorAll("a[href]"), (lien) =>
         lien.getAttribute("href"),
       );

@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { ImageProgressive } from "@/components/ui/ImageProgressive";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { useReducedMotionAfterMount } from "@/components/motion/reducedMotion";
 import { uiLabels } from "@/content/ui";
@@ -163,7 +163,7 @@ export function ComparateurAvantApres({
         style={{ aspectRatio: ratio }}
       >
         {/* État APRÈS en dessous, sur toute la surface. */}
-        <Image
+        <ImageProgressive
           src={apres.src}
           alt={apres.alt}
           fill
@@ -177,7 +177,7 @@ export function ComparateurAvantApres({
           className="absolute inset-0"
           style={{ clipPath: `inset(0 ${position}% 0 0)` }}
         >
-          <Image
+          <ImageProgressive
             src={avant.src}
             alt={avant.alt}
             fill

@@ -175,6 +175,7 @@ function ContactHero({
                   src={person.avatar.src}
                   overshoot={0.06}
                   label={person.avatar.alt}
+                  prioritaire
                 >
                   {/* RELEVÉ sur `/contact` : hôte 136 × 167 à 1440, z-3,
                       opacité 0,06. */}
