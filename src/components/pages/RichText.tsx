@@ -80,7 +80,7 @@ function linkify(text: string, liens: boolean): ReactNode[] {
   const parts: ReactNode[] = [];
   let cursor = 0;
   for (const m of text.matchAll(URL_WEB)) {
-    const at = m.index ?? 0;
+    const at = m.index;
     if (at > cursor) parts.push(...linkifyEmails(text.slice(cursor, at), `${cursor}-`));
     const interne = cibleInterne(m[0]);
     parts.push(

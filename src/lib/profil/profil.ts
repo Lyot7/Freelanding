@@ -1,4 +1,4 @@
-import { content } from "@/lib/content";
+import { content, type ContentRepository } from "@/lib/content";
 import type { ContentBlock, Stat } from "@/lib/content/types";
 import { absoluteUrl } from "@/lib/site-url";
 import {
@@ -33,6 +33,21 @@ export interface Profil {
   readonly titre: string;
   readonly blocs: readonly ContentBlock[];
 }
+
+/**
+ * D'où le profil tire ses faits. Par défaut, le contenu du site ; un test y
+ * substitue des variantes (coordonnées absentes, projet sans témoignage, ordre
+ * des prestations inversé) sans toucher aux fichiers de `src/content/`.
+ */
+export interface SourcesProfil {
+  readonly depot: Pick<
+    ContentRepository,
+    "getSiteConfig" | "getHome" | "getAbout" | "getWorks" | "getFaq"
+  >;
+  readonly prestations: readonly Prestation[];
+}
+
+const SOURCES_DU_SITE: SourcesProfil = { depot: content, prestations };
 
 const T = vueAgentContent.profil;
 
@@ -91,13 +106,16 @@ function phrasesDeMethode(stats: readonly Stat[]): string[] {
     .map((stat) => `${stat.value} ${minuscule(stat.label)}`);
 }
 
-export async function construireProfil(): Promise<Profil> {
+export async function construireProfil(
+  sources: SourcesProfil = SOURCES_DU_SITE,
+): Promise<Profil> {
+  const { depot } = sources;
   const [site, home, about, works, faq] = await Promise.all([
-    content.getSiteConfig(),
-    content.getHome(),
-    content.getAbout(),
-    content.getWorks(),
-    content.getFaq(),
+    depot.getSiteConfig(),
+    depot.getHome(),
+    depot.getAbout(),
+    depot.getWorks(),
+    depot.getFaq(),
   ]);
   const { contact } = site;
   const horaires = (contact.hours ?? []).join(", ");
@@ -137,7 +155,7 @@ export async function construireProfil(): Promise<Profil> {
      des périmètres tiré de `offre.ts`. */
   blocs.push(h2(T.sections.offres), p(home.services.intro ?? ""), ...T.offres.prix.map(p));
   for (const service of home.services.items) {
-    const prestation = prestations.find(
+    const prestation = sources.prestations.find(
       (candidate) => service.cta?.href === `/services/${candidate.slug}`,
     );
     blocs.push(
@@ -238,7 +256,7 @@ export async function construireProfil(): Promise<Profil> {
   );
 
   /* Limites, pour que l'assistant du visiteur puisse trancher honnêtement. */
-  const plancher = prestations
+  const plancher = sources.prestations
     .map((prestation) => packEntree(prestation.id))
     .reduce((a, b) => (a.jours <= b.jours ? a : b));
   blocs.push(
