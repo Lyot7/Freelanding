@@ -184,12 +184,19 @@ export function FaqSection({
   eyebrow = homeContent.faqSection?.eyebrow ?? "",
   titleLines = homeContent.faqSection?.titleLines ?? [],
   cta = homeContent.faqSection?.cta,
+  topAccent = true,
 }: {
   faq: FaqItem[];
   eyebrow?: string;
   /** Deux lignes exactement sur la source : leur concaténation fait le titre. */
   titleLines?: readonly string[];
   cta?: { label: string; href: string };
+  /**
+   * Bande claire qui monte sur la section précédente (moitié droite). Utile
+   * sous une section sombre ; sous une section claire elle ne se voit pas et
+   * recouvre le bas de sa voisine.
+   */
+  topAccent?: boolean;
 }) {
   // Item 01 ouvert par défaut (source : premier item = "Desktop open").
   const [openItems, setOpenItems] = useState<Set<number>>(() => new Set([0]));
@@ -207,7 +214,9 @@ export function FaqSection({
       }
     >
       {/* framer-9ek4ve : Accent — prolonge le fond clair au-dessus (moitié droite) */}
-      <div className="absolute right-0 top-[-20px] z-[2] h-[22px] w-1/2 overflow-hidden bg-muted tablet:top-[-30px] tablet:h-[32px]" />
+      {topAccent ? (
+        <div className="absolute right-0 top-[-20px] z-[2] h-[22px] w-1/2 overflow-hidden bg-muted tablet:top-[-30px] tablet:h-[32px]" />
+      ) : null}
 
       {/* framer-1sm0lew : Container (max 1440, aligné à gauche) */}
       <div className="relative flex w-full max-w-[1440px] flex-col items-start gap-[10px] tablet:gap-[30px]">

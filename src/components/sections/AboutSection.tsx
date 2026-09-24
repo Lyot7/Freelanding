@@ -367,7 +367,12 @@ export function AboutSection({
         {/* framer-bv0uaa : Top (colonne en mobile, 2 moitiés côte à côte dès 810) */}
         <div className="relative flex w-full flex-col items-start gap-[20px] overflow-visible tablet:flex-row tablet:justify-center tablet:gap-0">
           {/* framer-lrbq21 : Info Grid (2 colonnes) — order 1 en mobile */}
-          <div className="relative order-1 grid w-full auto-rows-[minmax(0,1fr)] grid-cols-[repeat(2,minmax(50px,1fr))] grid-rows-[repeat(1,minmax(0,1fr))] justify-center gap-0 overflow-hidden tablet:order-none tablet:w-px tablet:flex-[1_0_0]">
+          {/* Sans libellé (accueil et `/a-propos` depuis le 2026-09-24), la
+              grille ne garde que sa moitié de rangée dès 810 : sous 810 elle
+              ne laisserait qu'un intervalle vide sous le titre. */}
+          <div className={`relative order-1 w-full auto-rows-[minmax(0,1fr)] grid-cols-[repeat(2,minmax(50px,1fr))] grid-rows-[repeat(1,minmax(0,1fr))] justify-center gap-0 overflow-hidden tablet:order-none tablet:grid tablet:w-px tablet:flex-[1_0_0] ${
+            homeAbout?.launchedLabel || homeAbout?.projectsLabel ? "grid" : "hidden"
+          }`}>
             {/* framer-1olnusi : libellé de gauche (« Launched » dans la source) */}
             <p className={`relative h-auto w-full self-start whitespace-pre text-accent-ink ${PRESET_WWTW0Z}`}>
               {homeAbout?.launchedLabel}
@@ -384,14 +389,18 @@ export function AboutSection({
           <div className="relative order-0 flex w-full flex-col items-end overflow-visible tablet:order-none tablet:w-px tablet:flex-[1_0_0] tablet:flex-row tablet:items-start tablet:justify-between">
             {/* framer-1mvoez4 : millésime (« 2019-26© » dans la source, pas
                 d'ancienneté à afficher : la donnée porte « 2026© ») */}
-            <p className={`relative h-auto w-full whitespace-pre-wrap break-words text-left text-accent-ink tablet:w-auto tablet:whitespace-pre ${PRESET_WWTW0Z}`}>
-              {homeAbout?.vintage}
-            </p>
+            {homeAbout?.vintage ? (
+              <p className={`relative h-auto w-full whitespace-pre-wrap break-words text-left text-accent-ink tablet:w-auto tablet:whitespace-pre ${PRESET_WWTW0Z}`}>
+                {homeAbout.vintage}
+              </p>
+            ) : null}
             {/* framer-1m4gs77 : conteneur du titre (aligné à droite, max 570) */}
             {/* `overflow-clip` avec une marge verticale : le conteneur doit
                 contenir le titre EN LARGEUR, mais laisser passer les accents des
                 capitales, qui dépassent la boîte de ligne par le haut. */}
-            <div className="accent-clip-titre relative flex w-full max-w-[570px] flex-none flex-col items-end justify-end gap-[10px] overflow-clip tablet:w-px tablet:flex-[1_0_0]">
+            {/* `tablet:ml-auto` : sans millésime à sa gauche, le titre reste
+                calé à droite comme lorsque `justify-between` l'y poussait. */}
+            <div className="accent-clip-titre relative flex w-full max-w-[570px] flex-none flex-col items-end justify-end gap-[10px] overflow-clip tablet:ml-auto tablet:w-px tablet:flex-[1_0_0]">
               {title ? (
                 <TitleFitText title={title} lines={titleLines} />
               ) : null}

@@ -24,7 +24,6 @@ import { Highlighted } from "@/components/ui";
 import { Signature } from "./hero/Signature";
 import { lienRendezVous } from "@/content/rendez-vous";
 import { uiLabels } from "@/content/ui";
-import { SwapText } from "@/components/ui/SwapText";
 import { DemanderAssistant } from "@/components/pages/agent/DemanderAssistant";
 
 /**
@@ -261,8 +260,13 @@ function ServicesList({
   words?: readonly string[];
   separator?: string;
 }) {
+  /* RÉDUITE AU REGISTRE DES ÉTIQUETTES depuis le 2026-09-24 (12 px, blanc
+     60 %, comme le surtitre). En 18 px gras et blanc plein, ces trois mots
+     pesaient autant que la phrase d'offre et se lisaient avant elle en bas du
+     cadre. Ils gardent leur cascade d'apparition, sur une seule ligne à toutes
+     les largeurs : en colonne, ils prenaient 70 px de hauteur au mobile. */
   const itemCls =
-    "m-0 text-[16px] font-semibold uppercase leading-[0.82] tracking-[-0.02em] text-foreground tablet:text-[17px] desktop:text-[18px]";
+    "m-0 text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60";
   // Séquence exacte (item + séparateurs), delays 0.9 → 1.1 par pas de 0.05.
   // `appearId` = la clé de l'entrée dans le bloc appear de la source. La liste
   // compte TROIS mots dans la source : les `appearId` sont donc écrits un à un,
@@ -283,7 +287,7 @@ function ServicesList({
        qu'un. Ce conteneur est aussi le masque d'apparition des trois mots,
        d'où les 2 px et pas davantage : ils suffisent à la queue de la barre et
        ne laissent rien voir de la course de 20 px. */
-    <div className="accent-room clip-room relative flex h-min w-min flex-none flex-col items-start gap-[10px] [--clip-room:2px] tablet:flex-row tablet:items-center tablet:gap-[16px]">
+    <div className="accent-room clip-room relative flex h-min w-min flex-none flex-row items-center gap-[10px] [--clip-room:2px] tablet:gap-[16px]">
       {parts.map((p, i) => {
         const delay = 0.9 + i * 0.05;
         if (p.kind === "sep") {
@@ -294,7 +298,7 @@ function ServicesList({
               // après le chargement et laissait les deux derniers mots figés.
               key={`sep-${i}`}
               aria-hidden
-              className="relative hidden h-auto w-auto flex-none whitespace-pre tablet:block"
+              className="relative block h-auto w-auto flex-none whitespace-pre"
               {...appearReveal(p.appearId, { y: 20 }, spring(172, delay), {
                 opacity: 0.2,
                 y: 0,
@@ -337,7 +341,6 @@ function Decoration() {
 
 /** Barre bas : disponibilité (meter) + horloge locale live (framer-irdhqz). */
 function BottomBar({ site }: { site: SiteConfig }) {
-  const localTimeLabel = (site.contact.localTimeLabel ?? "Heure locale").toUpperCase();
   const presetWwtw0z =
     "m-0 text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em]";
   return (
@@ -376,26 +379,10 @@ function BottomBar({ site }: { site: SiteConfig }) {
         </div>
       </div>
 
-      {/*
-        L'HORLOGE LOCALE A ÉTÉ REMPLACÉE PAR LE SEUL APPEL À L'ACTION DU CADRE,
-        le 2026-09-02, et les deux moitiés de ce changement comptent.
-
-        CE QUI PARTAIT : « HEURE LOCALE : 19:19 », un artefact de gabarit
-        d'agence internationale. Il informe quand le studio est à Berlin et le
-        client à New York. Ici l'un et l'autre sont en France : la ligne
-        occupait un coin du premier écran pour dire au visiteur l'heure qu'il
-        a déjà sous les yeux.
-
-        CE QUI ARRIVE : le hero n'avait AUCUN bouton dans son cadre. Le seul
-        chemin vers une action était la barre de navigation, hors du bloc qui
-        capte le regard. C'est le point de conversion le moins cher de la page.
-
-        LE TYPE VISÉ EST « decouverte », jamais un des trois autres : quelqu'un
-        qui n'a pas encore lu une ligne de l'offre ne sait pas s'il vient pour
-        un site, un outil ou un logiciel. Le préselectionner sur un type précis
-        lui ferait choisir avant de savoir, ce que les intitulés de
-        `rendez-vous.ts` évitent déjà par ailleurs.
-      */}
+      {/* LE LIEN « RÉSERVER UN APPEL » DE CETTE BARRE EST PARTI le 2026-09-24 :
+          le bouton plein du cadre porte désormais le rendez-vous, avec la même
+          destination (`decouverte`). Deux fois la même action dans le même
+          écran, en plus de l'en-tête, en affaiblissait chacune. */}
       {/* RACCOURCI DE LA VUE AGENT (2026-09-24), entre la jauge et le rendez-
           vous : copie en un clic un prompt qui contient tout le profil, à
           coller dans l'assistant du visiteur. Même typo que ses voisins, seul
@@ -407,14 +394,6 @@ function BottomBar({ site }: { site: SiteConfig }) {
       <DemanderAssistant
         className={`${presetWwtw0z} tablet:absolute tablet:left-[calc(50%+16px)] tablet:top-1/2 tablet:-translate-y-1/2 desktop:left-[calc(50%+20px)]`}
       />
-      <a
-        href={lienRendezVous("decouverte")}
-        // Focus : voir `src/app/focus.css` (source de vérité unique).
-        className={`${presetWwtw0z} group relative flex h-min w-max flex-none items-center gap-[8px] text-foreground no-underline`}
-      >
-        <span className="h-[6px] w-[6px] flex-none rounded-full bg-accent" />
-        <SwapText travel={12}>{uiLabels.services.rdvLabel}</SwapText>
-      </a>
     </motion.div>
   );
 }
@@ -510,9 +489,11 @@ function HeroContentBox({
   const subtitleEmphasis = subtitleParagraph?.emphasis
     ? [...subtitleParagraph.emphasis]
     : [];
+  // Non `inverted`, l'emphase passe à la ligne (le prix sous l'offre) ;
+  // `inverted`, elle s'atténue à 60 % dans le fil du texte.
   const subtitleHighlightClass = subtitleParagraph?.inverted
     ? "text-foreground-60"
-    : "text-foreground";
+    : "block text-foreground";
   return (
     // framer-h0duhu : Container — reveal scale1.5 rotate2 tween 1.6s + parallaxe
     <motion.div
@@ -550,38 +531,54 @@ function HeroContentBox({
               <Wordmark brand={site.brand} />
             </div>
 
-            {/* framer-1luv26g : sous-titre | fondateur (flex mobile → grid 2col dès 810) */}
-            {/* LE H1 QUI OCCUPAIT CETTE PLACE EST PARTI SUR `AboutSection` le
-                2026-08-31, et le rythme vertical de la source revient avec son
-                départ (14 px en mobile, 30 px dès 810). Ce sont les valeurs
-                d'avant le 2026-08-29 ; les 10/22 px qui les avaient remplacées
-                n'existaient que pour desserrer ce titre du logotype. */}
-            <div className="relative z-[2] flex h-min w-full flex-none flex-col items-start gap-[16px] overflow-hidden pt-[14px] pb-[40px] tablet:grid tablet:auto-rows-[minmax(0,1fr)] tablet:grid-cols-[repeat(2,minmax(50px,1fr))] tablet:grid-rows-[repeat(1,minmax(0,1fr))] tablet:justify-center tablet:gap-0 tablet:pt-[30px] tablet:pb-[130px]">
-              {/* framer-1qzjqre : sous-titre (emphase blanc 60%) */}
-              <div className="relative h-auto w-full max-w-[400px] flex-none self-auto whitespace-pre-wrap break-words tablet:max-w-[91%] tablet:place-self-start">
-                {/* TEXTE COURANT depuis le 2026-09-24 : 16 px en casse normale.
-                    C'est la seule phrase du premier écran qui dit ce qui se
-                    vend, elle était en 12 px capitales. */}
-                <p className="m-0 text-[16px] font-medium leading-[1.35] tracking-[-0.01em] text-foreground">
-                  <Highlighted
-                    text={subtitleText}
-                    highlights={subtitleEmphasis}
-                    highlightClassName={subtitleHighlightClass}
-                  />
-                </p>
-                {/* Lien sobre vers l'accordéon des prestations, même grammaire
-                    que « ↓ Voir les réalisations » du showreel : une étiquette,
-                    pas un second bouton face au rendez-vous. */}
-                {hero.offerLink ? (
+            {/* L'OFFRE A LE PREMIER RANG DE LECTURE depuis le 2026-09-24
+                (panel design, phase C). Au test des cinq secondes, le visiteur
+                retenait le nom et pas ce qui se vend : la phrase d'offre était
+                en 16 px, au même poids que la carte fondateur, sous un
+                logotype de 110 px et au-dessus de trois mots en 18 px gras.
+
+                Elle reprend désormais le corps du chapô de l'accordéon
+                (22 / 26 / 32 px, même graisse, même interlettrage) et occupe
+                toute la largeur du cadre : c'est le second bloc lu après le
+                mot-symbole, et le premier qui dit quoi, pour qui et à partir
+                de combien. Le prix est lu dans `offre.ts` par `home.ts`.
+
+                Les retraits bas (64 px, 140 dès 810) laissent la place du
+                paraphe, calé sur le bas de la colonne : plus serrés, il
+                barrait la carte fondateur.
+
+                Le bouton plein reprend celui de l'accordéon (30 px, aplat
+                accent) : c'est le seul aplat accent du cadre, le lien vers
+                les prestations reste une étiquette à côté de lui. */}
+            <div className="relative z-[2] flex h-min w-full flex-none flex-col items-start gap-[18px] overflow-hidden pt-[16px] pb-[64px] tablet:gap-[26px] tablet:pt-[26px] tablet:pb-[140px]">
+              <p className="m-0 w-full text-[22px] font-medium leading-[1.1] tracking-[-0.02em] text-foreground tablet:text-[26px] desktop:text-[32px]">
+                <Highlighted
+                  text={subtitleText}
+                  highlights={subtitleEmphasis}
+                  highlightClassName={subtitleHighlightClass}
+                />
+              </p>
+              <div className="relative flex w-full flex-col items-start gap-[16px] tablet:grid tablet:grid-cols-[repeat(2,minmax(50px,1fr))] tablet:items-center tablet:gap-0">
+                <div className="flex flex-row flex-wrap items-center gap-x-[20px] gap-y-[12px]">
                   <a
-                    href={hero.offerLink.href}
-                    className="mt-[14px] inline-block text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60 no-underline transition-colors duration-200 hover:text-foreground motion-reduce:transition-none"
+                    href={lienRendezVous("decouverte")}
+                    className="group relative flex h-[30px] flex-none flex-row items-center justify-center overflow-hidden bg-accent px-[10px] no-underline"
                   >
-                    {hero.offerLink.label}
+                    <span className="accent-room whitespace-pre text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-background">
+                      {uiLabels.services.rdvLabel}
+                    </span>
                   </a>
-                ) : null}
+                  {hero.offerLink ? (
+                    <a
+                      href={hero.offerLink.href}
+                      className="flex h-[30px] flex-none items-center text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60 no-underline transition-colors duration-200 hover:text-foreground motion-reduce:transition-none"
+                    >
+                      <span className="accent-room">{hero.offerLink.label}</span>
+                    </a>
+                  ) : null}
+                </div>
+                <FounderCard person={hero.person} />
               </div>
-              <FounderCard person={hero.person} />
             </div>
 
             <ServicesList
@@ -589,8 +586,16 @@ function HeroContentBox({
               separator={hero.serviceWordsSeparator}
             />
 
-            {/* framer-126i1qf : signature orange (absolue dans framer-1cdgr7m) */}
-            <Signature />
+            {/* framer-126i1qf : paraphe (absolu dans framer-1cdgr7m).
+                ATTÉNUÉ À 40 % sur l'accueil depuis le 2026-09-24 : en volt
+                plein, ce tracé de 450 px était la plus grande surface accent
+                du cadre et tirait l'œil loin du bouton, seul autre aplat
+                accent. Il garde son apparition et sa dérive au défilement.
+                L'enveloppe n'est pas positionnée : le paraphe reste calé sur
+                la colonne interne, l'opacité ne fait que le fondre. */}
+            <div className="pointer-events-none opacity-40">
+              <Signature />
+            </div>
           </div>
 
           {/* framer-3kxc86 : le calque de verre dépoli N'EST PLUS ICI.

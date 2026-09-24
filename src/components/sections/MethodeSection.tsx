@@ -30,7 +30,15 @@ import { methodeLabels } from "@/content/tarifs";
  * droite dès 810. Il n'y avait aucune raison de redessiner un bloc dont la
  * géométrie était déjà réglée.
  */
-export function MethodeSection() {
+export function MethodeSection({
+  bottomAccent,
+}: {
+  /**
+   * Bande claire en bas à droite, 20 px puis 30 dès 810 : elle annonce une
+   * section claire qui suit, comme `framer-9ek4ve` en tête de la FAQ.
+   */
+  bottomAccent?: "muted";
+} = {}) {
   const auteur = methodePromise.author;
   const portrait = auteur?.avatar;
 
@@ -114,6 +122,9 @@ export function MethodeSection() {
           </div>
         </div>
       </div>
+      {bottomAccent === "muted" ? (
+        <div className="absolute bottom-0 right-0 z-[2] h-[20px] w-1/2 bg-muted tablet:h-[30px]" />
+      ) : null}
     </section>
   );
 }

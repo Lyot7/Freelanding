@@ -174,8 +174,10 @@ function SwapLink({ cta, colorClass }: { cta: LinkData; colorClass: string }) {
       <span className={`relative block whitespace-pre group-hover:translate-y-[14px] ${swapCls}`}>
         {cta.label}
       </span>
-      {/* framer-1et5oru : copie masquée au-dessus (rentre au hover) */}
-      <span className={`pointer-events-none absolute left-0 top-0 z-[1] block -translate-y-[14px] whitespace-pre opacity-0 group-hover:translate-y-0 group-hover:opacity-100 ${swapCls}`}>
+      {/* framer-1et5oru : copie masquée au-dessus (rentre au hover).
+          `aria-hidden` : sans lui, le nom accessible du lien lisait le
+          libellé deux fois. */}
+      <span aria-hidden className={`pointer-events-none absolute left-0 top-0 z-[1] block -translate-y-[14px] whitespace-pre opacity-0 group-hover:translate-y-0 group-hover:opacity-100 ${swapCls}`}>
         {cta.label}
       </span>
       {/* framer-1ijauur : flèche 15px (sprite #2430009286 = arrow-up-right) */}

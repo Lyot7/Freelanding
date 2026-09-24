@@ -9,6 +9,13 @@ import { howWeDoItStats, reputationStats } from "@/content/stats";
 const ENTREE_VITRINE = prixPack(packEntree("vitrine"));
 const ENTREE_LOGICIEL = prixPack(packEntree("logiciel"));
 const ACCROCHE_HERO = `Je conçois et je code ton site vitrine, à partir de ${ENTREE_VITRINE} HT, ou ta solution métier, à partir de ${ENTREE_LOGICIEL} HT. Le prix est fixé avant de commencer.`;
+// Le plus bas des deux prix d'entrée, lu dans `offre.ts` : la phrase d'offre du
+// héros ne peut pas annoncer un plancher qui n'existe plus.
+const PACK_PLANCHER = [packEntree("vitrine"), packEntree("logiciel")].reduce(
+  (bas, pack) => (pack.prix < bas.prix ? pack : bas),
+);
+const PRIX_HERO = `Prix ferme dès ${prixPack(PACK_PLANCHER)} HT.`;
+const OFFRE_HERO = `Sites et logiciels sur mesure pour TPE et PME. ${PRIX_HERO}`;
 
 /**
  * Contenu de la page d'accueil — recomposé fidèlement à partir des sections de
@@ -82,13 +89,20 @@ export const homeContent: HomeContent = {
      * `inverted: true` ATTÉNUE les fragments listés : la seconde phrase passe à
      * 60 %, l'offre reste en blanc plein.
      */
-    subtitleParagraphs: [
-      {
-        text: ACCROCHE_HERO,
-        emphasis: ["Le prix est fixé avant de commencer."],
-        inverted: true,
-      },
-    ],
+    /*
+     * PHRASE D'OFFRE, EN CORPS DE CHAPÔ depuis le 2026-09-24 (phase C). Le
+     * panel design retenait le nom au test des cinq secondes, pas l'offre :
+     * la phrase de la phase B listait deux prestations et deux prix en 16 px.
+     * Elle dit maintenant quoi, pour qui et le prix plancher en une ligne
+     * lue d'un coup d'œil ; le détail des deux prix d'entrée est dans
+     * l'accordéon, un clic plus bas.
+     *
+     * Le prix est déclaré en `emphasis` pour passer à la ligne : le héros rend
+     * l'emphase d'un paragraphe non `inverted` en bloc, en blanc plein comme
+     * le reste. Offre sur une ligne, prix sur la suivante, à toutes les
+     * largeurs, au lieu d'une coupure au hasard du corps.
+     */
+    subtitleParagraphs: [{ text: OFFRE_HERO, emphasis: [PRIX_HERO] }],
     offerLink: { label: "↓ Voir les prestations", href: "#services" },
     // Fond du hero. Remplace le plan de pilote du template, dont la licence
     // n'était pas traçable, par un asset généré et possédé (Veo/Nano Banana,
@@ -307,19 +321,18 @@ export const homeContent: HomeContent = {
       "une belle carrosserie posée sur un moteur lent",
       "décidé avant la première ligne de code",
     ],
-    // Habillage de la section (grille d'infos, millésime, compteur, lien,
-    // photo). Le « 24+ projects » et le compteur « 12+ industries » du template
-    // étaient fabriqués : remplacés par des mentions vérifiables.
-    launchedLabel: "Lancé en 2026",
-    projectsLabel: "Développeur freelance",
-    vintage: "2026©",
-    // « 1 INTERLOCUTEUR » RETIRÉ le 2026-09-24 : il ne disait rien d'utile au
-    // client. Le compteur garde sa place dans la grille (photo | chiffre) et
-    // porte la règle de travail qu'Eliott a choisie.
-    counter: {
-      value: "1",
-      caption: "Projet à la fois",
-    },
+    /*
+     * GRILLE D'INFOS, MILLÉSIME ET COMPTEUR VIDÉS le 2026-09-24 (panel design,
+     * phase C), comme sur `/a-propos` qui monte la même section sans eux :
+     *   - « Lancé en 2026 » se lisait « débutant », sans rien apprendre au
+     *     client ;
+     *   - « Développeur freelance » redisait la carte fondateur du héros,
+     *     un écran plus haut ;
+     *   - « 2026© » est déjà le millésime du showreel ;
+     *   - « 1 / Projet à la fois » est dit par la section chiffres, « Ton
+     *     projet n'attend personne ».
+     * Les champs restent dans le type : la section sait encore les rendre.
+     */
     cta: { label: "À propos", href: "/a-propos" },
     // PHOTO PLEINE CADRE depuis le 2026-08-27. Ce cadre portait le portrait
     // DÉTOURÉ sur aplat accent, alors que la source y met une photographie qui
@@ -351,7 +364,8 @@ export const homeContent: HomeContent = {
 
   // numbers.ts — 3 chiffres sur fond accent.
   numbers: {
-    eyebrow: "Comment je travaille",
+    // SANS ÉTIQUETTE depuis le 2026-09-24 (phase C) : le titre suffit, et
+    // « Comment je travaille » redisait l'étiquette de la méthode, qui suit.
     /*
      * TITRE ET SOUS-TITRE CHOISIS PAR ELIOTT le 2026-09-24. « Pas de maquettes
      * à valider. Une adresse en ligne qui avance. » parlait de la méthode ; le
@@ -383,7 +397,9 @@ export const homeContent: HomeContent = {
 
   // section06.ts — prestations en accordéon.
   services: {
-    eyebrow: "Services",
+    // PAS D'ÉTIQUETTE SUR L'ACCUEIL depuis le 2026-09-24 (phase C) : le chapô
+    // et l'accordéon disent d'eux-mêmes ce qu'ils présentent, et le gabarit
+    // étiquette / titre / paragraphe revenait cinq fois de suite.
     // IDENTIQUE à `aboutContent.services.intro` : les deux pages rendent le même
     // bloc, et un chapô qui dérive est une page qui ne dit pas la même chose que
     // l’autre sans que personne le remarque.
@@ -508,34 +524,34 @@ export const homeContent: HomeContent = {
   },
 
   /*
-   * ORDRE DES SECTIONS, refait le 2026-09-24 (audit des parcours, phase B).
+   * ORDRE DES SECTIONS, refait le 2026-09-24 (phase B, puis phase C).
    *
-   * L'OFFRE MONTE JUSTE SOUS LE H1. L'accordéon des prestations arrivait après
-   * le showreel, les réalisations et « Pourquoi moi » : le visiteur lisait
-   * trois sections avant d'apprendre ce qui se vend et à quel prix. Il suit
-   * maintenant `about`, qui porte le h1.
+   * L'OFFRE SUIT LE H1 (phase B) : l'accordéon des prestations vient juste
+   * après `about`, au lieu de trois sections plus bas.
    *
-   * PUIS LA PREUVE, DU CONCRET AU CHIFFRÉ : les réalisations (annoncées par le
-   * showreel), « Pourquoi moi », les chiffres, la méthode, la FAQ.
+   * LA BANDE DES LOGOS REMONTE SOUS LE HÉROS (phase C), sans intitulé : elle
+   * garde le libellé de la donnée, c'est-à-dire aucun, et rien ne présente ces
+   * entreprises comme des clients.
    *
-   * La bande des employeurs reste après la FAQ et avant les articles : ce sont
-   * des employeurs, pas des clients, et une file d'entreprises en tête de page
-   * se lirait comme un mur de références commerciales.
+   * LES CHIFFRES PASSENT AVANT LA MÉTHODE, « POURQUOI MOI » APRÈS (phase C).
+   * Les deux sections à cartes noires se suivaient et se lisaient comme une
+   * seule, deux fois plus longue. La méthode les sépare, et « Pourquoi moi »
+   * finit sur le rendez-vous juste avant la FAQ.
    *
    * LES TARIFS NE SONT PLUS SUR L'ACCUEIL depuis le 2026-09-07 : chaque page de
    * prestation porte ses forfaits et sa prise de rendez-vous.
    */
   sectionOrder: [
     "hero",
+    "logoBand",
     "about",
     "services",
     "showreel",
     "works",
-    "whyUs",
     "numbers",
     "methode",
+    "whyUs",
     "faq",
-    "logoBand",
     "articles",
   ],
 

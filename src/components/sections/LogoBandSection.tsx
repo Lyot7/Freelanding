@@ -66,8 +66,10 @@ const CELL =
    site, pas celle de son texte. */
 const CELL_NOM =
   "text-[18px] font-semibold uppercase leading-[1.05] tracking-[-0.03em] text-background tablet:text-[20px]";
+// `/65` et non `/55` : sur la cellule blanche, 55 % d'encre donnait 4,37:1,
+// sous le seuil AA de 4,5:1 pour un texte de 12 px.
 const CELL_DETAIL =
-  "text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/55 tablet:text-[12px]";
+  "text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/65 tablet:text-[12px]";
 
 export function LogoBandSection({ logoBand }: { logoBand: LogoBand }): ReactNode {
   const logos = logoBand.logos;

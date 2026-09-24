@@ -623,9 +623,16 @@ export function ServicesSection({
    * où l'accordéon suit l'aplat accent de la section `about`.
    */
   topAccent = "muted",
+  /**
+   * Étiquette de la section, lue dans la donnée. Absente sur l'accueil depuis
+   * le 2026-09-24 : le chapô suffit. La moitié gauche de l'en-tête garde sa
+   * place, vide, pour que le chapô reste dans la moitié droite.
+   */
+  eyebrow,
 }: {
   services: ServiceItem[];
   intro?: string;
+  eyebrow?: string;
   bottomAccent?: "accent" | "muted";
   topAccent?: "accent" | "muted";
 }) {
@@ -666,9 +673,11 @@ export function ServicesSection({
             {/* framer-6dlxcu : Label */}
             <div className="relative flex w-full flex-row items-start gap-[10px] overflow-visible tablet:w-px tablet:flex-[1_0_0]">
               {/* framer-9f2eim : "Services" (preset wwtw0z, 12px uppercase, blanc 60%) */}
-              <p className="whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60">
-                Services
-              </p>
+              {eyebrow ? (
+                <p className="whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60">
+                  {eyebrow}
+                </p>
+              ) : null}
             </div>
             {/* framer-1fn9a7l : intro (code-component, max-w 560) */}
             <div className="relative flex w-full flex-row items-start overflow-hidden pt-[12px] tablet:w-px tablet:flex-[1_0_0] tablet:pt-[50px]">

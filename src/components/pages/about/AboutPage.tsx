@@ -608,6 +608,7 @@ export async function AboutPage() {
         <ServicesSection
           services={about.services.items}
           intro={about.services.intro}
+          eyebrow={about.services.eyebrow}
           bottomAccent="muted"
         />
         {/* Témoignage client : DEUX conditions, et il en faut deux. Le drapeau

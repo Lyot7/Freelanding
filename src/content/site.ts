@@ -59,18 +59,20 @@ export const siteConfig: SiteConfig = {
     { label: "Blog", href: "/blog" },
     { label: "Contact", href: "/contact" },
   ],
-  // `shortLabel` ne sort que sous 390 px, où le libellé complet pousse le bouton
-  // hors de l'écran (mesuré : bord droit à 357 pour une fenêtre de 320).
   /*
-   * « DÉMARRER UN PROJET » MÈNE AU RENDEZ-VOUS depuis le 2026-09-24, sujet
-   * « découverte ». Le rendez-vous est le chemin principal du site : il vivait
-   * sous le formulaire de /contact, et ce bouton, le plus visible de toutes les
-   * pages, menait au formulaire. Écrire reste possible par « Contact » dans le
-   * menu et par « Poser une question » sous la FAQ.
+   * « RÉSERVER UN APPEL » depuis le 2026-09-24 (phase C) : un seul libellé
+   * pour le rendez-vous sur tout le site. « Démarrer un projet » menait déjà au
+   * même endroit, sujet « découverte », sous un autre nom que le bouton du
+   * héros, de l'accordéon et des pages de prestation : le visiteur pouvait y
+   * lire deux actions. Écrire reste possible par « Contact » dans le menu et
+   * par « Poser une question » sous la FAQ.
+   *
+   * `shortLabel` ne sort que sous 390 px, où le libellé complet pousse le
+   * bouton hors de l'écran.
    */
   primaryCta: {
-    label: "DÉMARRER UN PROJET",
-    shortLabel: "DÉMARRER",
+    label: "RÉSERVER UN APPEL",
+    shortLabel: "RÉSERVER",
     href: lienRendezVous("decouverte"),
   },
   contact: {
@@ -270,7 +272,7 @@ export const siteConfig: SiteConfig = {
     ],
   },
   // La source distingue la casse du bouton flottant de celle de la nav.
-  floatingCta: { label: "Démarrer un projet", href: lienRendezVous("decouverte") },
+  floatingCta: { label: "Réserver un appel", href: lienRendezVous("decouverte") },
   credits: {
     // Le template créditait Framer et l'auteur du thème. Ce site est une
     // reconstruction Next.js écrite par Eliott : le crédit lui revient.

@@ -47,6 +47,7 @@ export async function HomePage() {
       <ServicesSection
         services={home.services.items}
         intro={home.services.intro}
+        eyebrow={home.services.eyebrow}
         /* BANDES ACCORDÉES AUX VOISINES depuis le 2026-09-24 : l'accordéon suit
            désormais `about` (aplat accent) et précède le showreel (clair). La
            bande du haut prolonge donc l'accent, celle du bas annonce le clair. */
@@ -54,9 +55,14 @@ export async function HomePage() {
         bottomAccent="muted"
       />
     ),
-    methode: <MethodeSection />,
+    /* « Pourquoi moi », sur fond clair, suit la méthode, sombre, depuis le
+       2026-09-24 : la bande claire du bas l'annonce, comme celle de la FAQ le
+       faisait quand elle suivait la méthode. */
+    methode: <MethodeSection bottomAccent="muted" />,
     numbers: <StatsSection numbers={home.numbers} />,
-    faq: <FaqSection faq={home.faq ?? []} />,
+    /* Pas de bande en tête de la FAQ sur l'accueil : elle suit « Pourquoi
+       moi », déjà clair, et la bande y recouvrait le bas de sa carte droite. */
+    faq: <FaqSection faq={home.faq ?? []} topAccent={false} />,
     testimonials: home.testimonials ? (
       <TestimonialsSection testimonials={home.testimonials.items} />
     ) : null,

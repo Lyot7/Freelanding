@@ -222,9 +222,11 @@ export function StatsSection({ numbers }: { numbers: StatsSectionContent }) {
       {/* framer-cilo4b : Container (max 1440, aligné à gauche) */}
       <div className="relative flex w-full max-w-[1440px] flex-col items-start gap-[12px] tablet:gap-[30px]">
         {/* framer-kqrkbn : Label (preset wwtw0z, uppercase 12px, blanc 70%) */}
-        <p data-part="label" className="h-auto w-auto whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-accent-ink/70">
-          {numbers.eyebrow}
-        </p>
+        {numbers.eyebrow ? (
+          <p data-part="label" className="h-auto w-auto whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-accent-ink/70">
+            {numbers.eyebrow}
+          </p>
+        ) : null}
 
         {/* framer-19d6ceo : Row (colonnes empilées en mobile, côte à côte dès 810) */}
         <div className="relative flex w-full flex-col items-end gap-[34px] tablet:flex-row tablet:items-end tablet:justify-center tablet:gap-0">
