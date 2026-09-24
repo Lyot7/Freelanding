@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { ImageProgressive } from "@/components/ui/ImageProgressive";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { ParallaxImage } from "@/components/motion/ParallaxImage";
@@ -860,7 +860,7 @@ export function WorkNarrative({
                       : "16 / 10",
                 }}
               >
-                <Image
+                <ImageProgressive
                   src={entree.image.src}
                   alt={entree.image.alt}
                   fill

@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { ImageProgressive } from "@/components/ui/ImageProgressive";
 import type { ReactNode } from "react";
 
 /**
@@ -62,7 +62,7 @@ export function Figure({
 }) {
   return (
     <figure className={ECART}>
-      <Image
+      <ImageProgressive
         src={src}
         alt={alt}
         width={width}

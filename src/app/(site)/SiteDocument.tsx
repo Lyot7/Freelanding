@@ -13,6 +13,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
 import { SiteAnalytics } from "@/components/analytics/SiteAnalytics";
+import { PrechargementDiffere } from "@/components/perf/PrechargementDiffere";
 import { PageTransitions, SkipLink, SmoothScroll } from "@/components/layout";
 import { MotionSettings } from "@/components/motion/MotionSettings";
 import { APPEAR_BOOT_SCRIPT } from "@/components/motion/appearAnimations";
@@ -133,6 +134,8 @@ export function SiteDocument({ children }: Readonly<{ children: ReactNode }>) {
             arrive en fin d'ordre de tabulation. Sans clé PostHog configurée,
             l'ensemble ne rend rien et ne pose aucun écouteur. */}
         <SiteAnalytics />
+        {/* Images et pages suivantes chargées d'avance, page finie et au repos. */}
+        <PrechargementDiffere />
         {/* Démarreur des apparitions, DERNIER nœud du body : il lit les
             éléments animés dans le DOM, ils doivent donc être déjà analysés.
             Script nu et non `next/script` : il ne doit dépendre d'aucun module

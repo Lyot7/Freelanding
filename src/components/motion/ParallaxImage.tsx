@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, type RefObject } from "react";
 import Image from "next/image";
+import { ImageProgressive } from "@/components/ui/ImageProgressive";
 import { motion, useMotionValue, useScroll, useTransform } from "motion/react";
 import {
   pourcentage,
@@ -281,7 +282,7 @@ export function ParallaxImage({
           `translateY` de la parallaxe via framer-motion, qui écrit le
           `transform` en inline et écraserait une classe utilitaire. Deux
           éléments distincts, donc aucun conflit. */}
-      <Image
+      <ImageProgressive
         src={src}
         alt={alt}
         fill
