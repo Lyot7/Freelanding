@@ -128,11 +128,17 @@ describe("titre de l'accueil", () => {
     // Contrôle du contrôle : à 0,82em, la valeur d'origine, le test ci-dessus
     // doit échouer. Sans cette assertion, un `jeuEntreLignes` toujours positif
     // passerait pour un garde-fou.
-    const tailles = lignesDuTitre.map((l) => tailleAjustee(l, 570, 92));
-    const jeux = lignesDuTitre
+    //
+    // SUR UN TITRE FIXE, celui qui a révélé le défaut (h1 de l'accueil jusqu'au
+    // 2026-09-24) : ses virgules et ses jambages se touchaient à 0,82em. Le
+    // titre courant de la section n'en a pas forcément, et ce contrôle ne doit
+    // pas dépendre du texte en ligne.
+    const temoin = ["Des sites qui", "amènent des clients,", "des outils qui te", "rendent des heures."];
+    const tailles = temoin.map((l) => tailleAjustee(l, 570, 92));
+    const jeux = temoin
       .slice(0, -1)
       .map((l, i) =>
-        jeuEntreLignes(l, tailles[i], lignesDuTitre[i + 1], tailles[i + 1], 0.82),
+        jeuEntreLignes(l, tailles[i], temoin[i + 1], tailles[i + 1], 0.82),
       );
     expect(Math.min(...jeux)).toBeLessThan(0);
   });

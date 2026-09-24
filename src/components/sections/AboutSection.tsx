@@ -38,7 +38,7 @@ import { facteurDeChasse } from "@/lib/ajustement-titre";
  *   desktop= ≥1200    (min-width 1200)
  *
  * Contenu / props :
- *   - `about.title` / `about.titleLines` → titre H1 fit-text (lignes empilées,
+ *   - `about.title` / `about.titleLines` → titre H2 fit-text (lignes empilées,
  *     ajustées à la largeur du cadre, slide-up masqué).
  *   - `about.body[]` → paragraphe(s) de la colonne gauche (preset wwtw0z,
  *     12px uppercase, blanc 70 %). Le modèle `homeContent.about.body` recompose
@@ -71,12 +71,11 @@ const PRESET_1HGNCHR =
 /**
  * Titre fit-text : une ligne par entrée, masquée en overflow, slide-up.
  *
- * `h1` DE NOUVEAU depuis le 2026-08-31, et seul h1 de la page d'accueil. Il
- * l'était déjà avant le 2026-08-29 ; il était redescendu en `h2` le jour où un
- * titre est apparu dans le hero, et il remonte le jour où ce titre en repart
- * (cf. l'en-tête de `HeroSection`). Cette section est le premier bloc de contenu
- * de la page, son titre est le plus gros caractère du document, et il porte
- * maintenant ce qui est vendu : c'est le titre de premier niveau naturel.
+ * `h2` DEPUIS LE 2026-09-24 (phase E). Il a été le h1 de l'accueil du
+ * 2026-08-31 à ce jour ; sa phrase est montée dans le cadre du héros, qui
+ * porte désormais le seul h1 de la page (cf. l'en-tête de `HeroSection`).
+ * Cette section garde un titre à elle, de même corps : le plus gros caractère
+ * du document n'a pas besoin d'être le titre de premier niveau.
  *
  * IL AJUSTE ENFIN, depuis le 2026-09-01. Il portait le nom du composant Framer
  * « fit text » et posait une taille FIXE — 52 / 68 / 92 px selon le point
@@ -88,7 +87,7 @@ const PRESET_1HGNCHR =
  * exactement le reproche d'Eliott au titre précédent, « c'est pas assez pour
  * un H1 ».
  *
- * COMMENT, EN CSS SEUL. Le `h1` devient un conteneur de requête
+ * COMMENT, EN CSS SEUL. Le titre devient un conteneur de requête
  * (`container-type: inline-size`) et chaque ligne pose
  *
  *     font-size: min(var(--fit-plafond), calc(100cqw / facteur))
@@ -108,7 +107,7 @@ const PRESET_1HGNCHR =
  *
  * LES MARGES D'ENCRE SUIVENT. `accent-room` (0,32em) et `descender-room`
  * (0,24em) sont posées sur la ligne, qui porte sa taille en propre : elles se
- * résolvent donc sur le corps rendu et non sur celui, plus grand, du `h1`.
+ * résolvent donc sur le corps rendu et non sur celui, plus grand, du titre.
  *
  * DÉCOUPAGE EN LIGNES : `about.titleLines` quand la donnée le porte, un mot par
  * ligne sinon (le comportement du template). Le découpage coupe aux unités de
@@ -132,7 +131,7 @@ function TitleFitText({
     // framer-17vvig5-container : titre (code-component), aligné à droite.
     // Les `text-[…]` restent : ils donnent le corps hérité si une ligne ne
     // portait pas le sien, et l'em de référence du reste de la boîte.
-    <h1 className="relative m-0 flex w-full flex-col justify-center p-0 text-right text-[52px] font-semibold uppercase leading-[0.95] tracking-[-0.05em] text-accent-ink [--fit-plafond:52px] [container-type:inline-size] tablet:text-[68px] tablet:[--fit-plafond:68px] desktop:text-[92px] desktop:[--fit-plafond:92px]">
+    <h2 className="relative m-0 flex w-full flex-col justify-center p-0 text-right text-[52px] font-semibold uppercase leading-[0.95] tracking-[-0.05em] text-accent-ink [--fit-plafond:52px] [container-type:inline-size] tablet:text-[68px] tablet:[--fit-plafond:68px] desktop:text-[92px] desktop:[--fit-plafond:92px]">
       {lignes.map((ligne, i) => (
         <span
           key={ligne + i}
@@ -159,9 +158,9 @@ function TitleFitText({
              calcule (cf. `src/lib/ajustement-titre.ts`) : 0,910 pour l'encre
              d'un « É », plus les 4 % de marge qu'exige l'audit des accents. */
           /* `tracking-[-0.05em]` EST REPOSÉ ICI, alors qu'il est déjà sur le
-             `h1`. Ce n'est pas une redite : `letter-spacing` en `em` se résout
+             titre. Ce n'est pas une redite : `letter-spacing` en `em` se résout
              une seule fois, sur le corps de l'élément qui le DÉCLARE, puis
-             s'hérite en pixels. Déclaré sur le `h1` à 92 px, il valait -4,6 px
+             s'hérite en pixels. Déclaré sur le titre à 92 px, il valait -4,6 px
              pour toutes les lignes, y compris celle rendue à 48 px, qui aurait
              dû recevoir -2,4. MESURÉ avant correction : « logiciels sur mesure »
              occupait 523,8 px sur les 570 calculés, soit 40 px de manque, et le
@@ -169,7 +168,7 @@ function TitleFitText({
              petit, plus il était resserré. Redéclaré sur la ligne, il se résout
              sur le corps de la ligne. */
           className="accent-room descender-room block w-full overflow-hidden text-right leading-[0.95em] tracking-[-0.05em]"
-          /* LA TAILLE EST PORTÉE PAR LA LIGNE, pas par le `h1`. C'est ce qui
+          /* LA TAILLE EST PORTÉE PAR LA LIGNE, pas par le titre. C'est ce qui
              permet à `leading`, `tracking`, `accent-room` et `descender-room`,
              tous en em, de suivre le corps de CETTE ligne. */
           /* UN SEUL CORPS POUR TOUT LE TITRE, celui que dicte la ligne la plus
@@ -197,7 +196,7 @@ function TitleFitText({
           </motion.span>
         </span>
       ))}
-    </h1>
+    </h2>
   );
 }
 

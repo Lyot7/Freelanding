@@ -66,11 +66,17 @@ import { DemanderAssistant } from "@/components/pages/agent/DemanderAssistant";
  *     `hero.eyebrow` et `site.brand` viennent des props.
  *   - La carte "fondateur" lit `hero.person` (nom, rôle, avatar). Le template y
  *     affichait une persona fictive écrite en JSX ; elle n'existe pas.
- *   - AUCUN `<h1>` ICI, comme dans la source : le hero du template n'avait pas
- *     de titre de niveau 1 (logotype en `<div role="img">`, tout le reste en
- *     `<p>`). Un `HeroHeadline` en a porté un du 2026-08-29 au 2026-08-31 ;
- *     il faisait un second pavé typographique sous le logotype. Le h1 de la
- *     page d'accueil est celui d'`AboutSection`, un écran plus bas.
+ *   - LE SEUL `<h1>` DE L'ACCUEIL EST ICI depuis le 2026-09-24 (phase E),
+ *     sous le mot-symbole : `hero.title`, la phrase qui était le h1 de la
+ *     section About un écran plus bas. Le mot-symbole reste un
+ *     `<div role="img">`. Du 2026-08-31 à cette date, le cadre n'avait aucun
+ *     titre, parce qu'un pavé de 48 px concurrençait le logotype ; la phrase
+ *     tient ici le rang que la phrase d'offre avait déjà (26 à 52 px, une
+ *     seule masse typographique sous le logotype).
+ *   - LARGEUR : 740 px dès 810, puis la fenêtre moins 100 px de chaque côté
+ *     dès 1200, plafonnée à 1 400 px. Le mot-symbole garde sa largeur de
+ *     tablette (677 px de rangée) : son prénom est calibré dessus, et le
+ *     titre prend la largeur gagnée.
  */
 
 /**
@@ -83,7 +89,7 @@ import { DemanderAssistant } from "@/components/pages/agent/DemanderAssistant";
 function Wordmark({ brand }: { brand: SiteConfig["brand"] }) {
   return (
     // framer-pjz3qu : Title (colonne en mobile, rangée dès 810)
-    <div className="relative flex h-min w-full flex-none flex-col items-start justify-center overflow-visible pr-px tablet:flex-row tablet:items-center">
+    <div className="relative flex h-min w-full flex-none flex-col items-start justify-center overflow-visible pr-px tablet:flex-row tablet:items-center desktop:max-w-[678px]">
       {/* framer-qa4q6y : zone du wordmark (overflow-hidden = masque du slide-up) */}
       <div className="relative flex h-min w-full flex-none flex-row items-start justify-start overflow-hidden tablet:w-px tablet:flex-[1_0_0]">
         {/* framer-1lrracs « Matter » : le logotype occupe 100 % de la
@@ -500,7 +506,7 @@ function HeroContentBox({
   const subtitleEmphasis = subtitleParagraph?.emphasis
     ? [...subtitleParagraph.emphasis]
     : [];
-  // Non `inverted`, l'emphase passe à la ligne (le prix sous l'offre) ;
+  // Non `inverted`, l’emphase passe à la ligne, en blanc plein ;
   // `inverted`, elle s'atténue à 60 % dans le fil du texte.
   const subtitleHighlightClass = subtitleParagraph?.inverted
     ? "text-foreground-60"
@@ -524,7 +530,7 @@ function HeroContentBox({
         <div
           ref={boxRef}
           data-part="hero-box"
-          className="relative flex h-min w-px flex-[1_0_0] flex-col items-center justify-center gap-[10px] overflow-visible border border-[#ffffff2e] p-[20px] tablet:w-[740px] tablet:flex-none tablet:p-[30px]"
+          className="relative flex h-min w-px flex-[1_0_0] flex-col items-center justify-center gap-[10px] overflow-visible border border-[#ffffff2e] p-[20px] tablet:w-[740px] tablet:flex-none tablet:p-[30px] desktop:w-[min(1400px,calc(100vw-200px))] desktop:px-[40px]"
         >
           {/* framer-1cdgr7m : colonne interne (offsetParent de la signature) */}
           <div className="relative z-[2] flex h-min w-full flex-none flex-col items-start justify-start overflow-visible">
@@ -542,18 +548,12 @@ function HeroContentBox({
               <Wordmark brand={site.brand} />
             </div>
 
-            {/* L'OFFRE A LE PREMIER RANG DE LECTURE depuis le 2026-09-24
-                (panel design, phase C). Au test des cinq secondes, le visiteur
-                retenait le nom et pas ce qui se vend : la phrase d'offre était
-                en 16 px, au même poids que la carte fondateur, sous un
-                logotype de 110 px et au-dessus de trois mots en 18 px gras.
-
-                Elle a d'abord repris le corps du chapô de l'accordéon (22 /
-                26 / 32 px). Le panel lisait encore le logotype puis le paraphe
-                avant elle : elle passe à 26 / 32 / 38 px (phase D), équilibrée
-                sur ses lignes. C'est le second bloc lu après le mot-symbole, et
-                le premier qui dit quoi, pour qui et à partir de combien. Le
-                prix est lu dans `offre.ts` par `home.ts`.
+            {/* LE TITRE A LE PREMIER RANG DE LECTURE après le mot-symbole.
+                Il reprend le corps que la phrase d'offre avait gagné au panel
+                design (26 / 32 / 38 px, phases C et D), et grandit avec le
+                cadre dès 1200 : sur deux lignes à 1440, là où la phrase
+                d'offre en prenait trois dans 740 px. Sous lui, en corps de
+                lecture et à 60 %, la ligne qui dit pour qui.
 
                 Les retraits bas (64 px, 96 dès 810) laissent la place du
                 paraphe, calé dans l'angle bas droit de la colonne, à côté des
@@ -563,19 +563,45 @@ function HeroContentBox({
                 Le bouton plein reprend celui de l'accordéon (30 px, aplat
                 accent) : c'est le seul aplat accent du cadre, le lien vers
                 les prestations reste une étiquette à côté de lui. */}
-            <div className="relative z-[2] flex h-min w-full flex-none flex-col items-start gap-[18px] overflow-hidden pt-[16px] pb-[64px] tablet:gap-[26px] tablet:pt-[26px] tablet:pb-[96px]">
-              <p
-                data-part="hero-offre"
-                className="m-0 w-full text-[26px] font-medium leading-[1.08] tracking-[-0.025em] text-foreground [text-wrap:balance] tablet:text-[32px] desktop:text-[38px]"
-              >
-                <Highlighted
-                  text={subtitleText}
-                  highlights={subtitleEmphasis}
-                  highlightClassName={subtitleHighlightClass}
-                />
-              </p>
-              <div className="relative flex w-full flex-col items-start gap-[16px] tablet:grid tablet:grid-cols-[repeat(2,minmax(50px,1fr))] tablet:items-center tablet:gap-0">
-                <div className="flex flex-col items-start gap-[10px]">
+            {/* DÈS 1200, DEUX COLONNES : le titre à gauche, et à droite la
+                colonne d'action (carte fondateur, rendez-vous, délai,
+                raccourci agent), calée sur le bas du titre. Le cadre gagne
+                en largeur ce qu'il perd en hauteur. */}
+            <div className="relative z-[2] flex h-min w-full flex-none flex-col items-start gap-[18px] overflow-hidden pt-[16px] pb-[64px] tablet:gap-[26px] tablet:pt-[26px] tablet:pb-[96px] desktop:grid desktop:grid-cols-[minmax(0,1fr)_auto] desktop:items-end desktop:gap-x-[48px]">
+              <div className="flex w-full flex-col items-start gap-[10px] tablet:gap-[14px]">
+                <h1
+                  data-part="hero-titre"
+                  className="m-0 w-full text-[26px] font-medium leading-[1.08] tracking-[-0.025em] text-foreground [text-wrap:balance] tablet:text-[32px] desktop:text-[40px] min-[1440px]:text-[48px] min-[1680px]:text-[56px]"
+                >
+                  {/* Une ligne par entrée de `titleLines` dès 1360 px, où
+                      chacune tient dans sa colonne ; en dessous, le texte
+                      s'équilibre seul. */}
+                  {hero.titleLines?.length
+                    ? hero.titleLines.map((ligne, i) => (
+                        <span key={ligne} className="min-[1360px]:block">
+                          {i > 0 ? " " : null}
+                          {ligne}
+                        </span>
+                      ))
+                    : hero.title}
+                </h1>
+                {subtitleText ? (
+                  <p
+                    data-part="hero-pour-qui"
+                    className="m-0 max-w-[60ch] text-[15px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground-60 tablet:text-[17px]"
+                  >
+                    <Highlighted
+                      text={subtitleText}
+                      highlights={subtitleEmphasis}
+                      highlightClassName={subtitleHighlightClass}
+                    />
+                  </p>
+                ) : null}
+              </div>
+              {/* `flex-col-reverse` dès 1200 : la carte fondateur passe
+                  au-dessus du bouton, le visage avant l'action. */}
+              <div className="relative flex w-full flex-col items-start gap-[16px] tablet:grid tablet:grid-cols-[repeat(2,minmax(50px,1fr))] tablet:items-center tablet:gap-0 desktop:flex desktop:w-auto desktop:flex-col-reverse desktop:items-start desktop:gap-[22px]">
+                <div className="flex w-full min-w-0 flex-col items-start gap-[10px]">
                   <div className="flex flex-row flex-wrap items-center gap-x-[20px] gap-y-[12px]">
                     <a
                       href={lienRendezVous("decouverte")}
@@ -609,6 +635,15 @@ function HeroContentBox({
                       />
                     </div>
                   ) : null}
+                  {/* RACCOURCI DE LA VUE AGENT (2026-09-24) : copie en un clic
+                      un prompt qui contient tout le profil, à coller dans
+                      l'assistant du visiteur. Il vivait dans la barre basse du
+                      héros ; la preuve Würth et les logos l'y ont remplacé en
+                      phase D, et il remonte ici, sous le délai : c'est l'autre
+                      façon de décider, au même endroit que le rendez-vous.
+                      Même typo que le délai, seul le curseur vert le
+                      distingue. Voir `DemanderAssistant`. */}
+                  <DemanderAssistant className="m-0 text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em]" />
                 </div>
                 <FounderCard person={hero.person} />
               </div>
@@ -695,7 +730,7 @@ function HeroGlass({ height }: { height: number | null }) {
       // serveur n'a donc pas encore de `height` quand l'hydratation passe.
       {...{ [HEIGHT_FROM_ATTRIBUTE]: "hero-box" }}
       suppressHydrationWarning
-      className="pointer-events-none absolute inset-y-0 left-[20px] right-[20px] z-[1] m-auto h-[367px] bg-[#ffffff08] [backdrop-filter:blur(8px)] tablet:inset-x-0 tablet:h-[394px] tablet:w-[740px]"
+      className="pointer-events-none absolute top-[64px] bottom-[120px] left-[20px] right-[20px] z-[1] m-auto h-[367px] tablet:inset-y-0 bg-[#ffffff08] [backdrop-filter:blur(8px)] tablet:inset-x-0 tablet:h-[394px] tablet:w-[740px] desktop:w-[min(1400px,calc(100vw-200px))]"
       style={{ ...(y ? { y } : null), ...(height ? { height } : null) }}
       {...appearReveal(
         // Identifiant DISTINCT de celui de la boîte, alors que l'animation est
@@ -950,7 +985,12 @@ export function HeroSection({
     // framer-lotasx : section Hero (100vh desktop/tablet, 710px mobile)
     <section
       data-section="hero"
-      className="relative flex h-[710px] w-full flex-row items-center justify-center gap-[10px] overflow-hidden [font-family:var(--font-sans)] tablet:h-[100vh] tablet:min-h-[700px]"
+      /* SOUS 810 PX, 800 PX DE HAUT ET DEUX RETRAITS (2026-09-24, phase E).
+         Le titre du héros et la ligne « pour qui » ont ajouté trois lignes au
+         cadre, qui chevauchait alors la barre de preuve à 710 px. Les retraits
+         réservent l'en-tête (64 px) et la barre de preuve (120 px) : le cadre
+         se centre entre les deux, et `HeroGlass` reprend les mêmes valeurs. */
+      className="relative flex h-[800px] w-full flex-row items-center justify-center gap-[10px] overflow-hidden pt-[64px] pb-[120px] [font-family:var(--font-sans)] tablet:h-[100vh] tablet:min-h-[700px] tablet:py-0"
     >
       {/* framer-60s0ze « BG » : couche de fond en parallaxe. Le live dérive de
           `translateY = 0.15 × scrollY` sans borne (R² = 1.000000) ; le débord est

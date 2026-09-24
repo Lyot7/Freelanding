@@ -9,13 +9,23 @@ import { howWeDoItStats, reputationStats } from "@/content/stats";
 const ENTREE_VITRINE = prixPack(packEntree("vitrine"));
 const ENTREE_LOGICIEL = prixPack(packEntree("logiciel"));
 const ACCROCHE_HERO = `Je conçois et je code ton site vitrine, à partir de ${ENTREE_VITRINE} HT, ou ta solution métier, à partir de ${ENTREE_LOGICIEL} HT. Le prix est fixé avant de commencer.`;
-// Le plus bas des deux prix d'entrée, lu dans `offre.ts` : la phrase d'offre du
-// héros ne peut pas annoncer un plancher qui n'existe plus.
-const PACK_PLANCHER = [packEntree("vitrine"), packEntree("logiciel")].reduce(
-  (bas, pack) => (pack.prix < bas.prix ? pack : bas),
-);
-const PRIX_HERO = `Prix ferme dès ${prixPack(PACK_PLANCHER)} HT.`;
-const OFFRE_HERO = `Sites et logiciels sur mesure pour TPE et PME. ${PRIX_HERO}`;
+
+/*
+ * LE TITRE DU HÉROS, ET LE SEUL H1 DE L'ACCUEIL, depuis le 2026-09-24 (phase E).
+ * Eliott : « ton titre, ce serait bien que ce soit ce qu'on a ensuite ». La
+ * phrase était le h1 de la section About, un écran plus bas ; elle monte dans
+ * le cadre du héros et About passe à un h2 qui lui est propre.
+ */
+const TITRE_ACCUEIL =
+  "Des sites qui amènent des clients, des outils qui te rendent des heures.";
+
+/*
+ * LA LIGNE « POUR QUI », SANS PRIX, depuis la même date. « Prix ferme dès
+ * 3 000 € HT » est parti : il affirmait un prix ferme pour toute l'offre alors
+ * que La Plateforme et ce qui dépasse les forfaits se chiffrent sur mesure. Les
+ * prix restent dans l'accordéon et sur les pages de prestation.
+ */
+const POUR_QUI_HERO = "Sites vitrines et solutions métier pour les TPE et les PME.";
 
 /** La ligne de preuve du héros, tirée du chiffre Würth de `stats.ts`. */
 function preuveWurth(): HomeContent["hero"]["proof"] {
@@ -65,56 +75,25 @@ export const homeContent: HomeContent = {
      * cherche du local, et rien ne le lui disait.
      */
     eyebrow: "Sur mesure, depuis la Normandie, partout en France",
-    // PLUS DE H1 DANS LE HERO depuis le 2026-08-31 : retour au gabarit d'avant
-    // le 2026-08-29, où cette section était une SIGNATURE DE MARQUE (millésime,
-    // logotype, sous-accroche, carte fondateur, métiers) et rien d'autre.
-    //
-    // POURQUOI IL EN SORT. Le logotype « Bouquerel » est déjà un bloc
-    // typographique plein cadre. Un titre de 48 px posé vingt pixels dessous
-    // dressait un second pavé de densité comparable, et les deux se
-    // concurrençaient : le regard ne savait plus lequel des deux était le sujet
-    // de la page. Mot d'Eliott le 2026-08-31, « le design était mieux ordonné
-    // avant ». Aucun rythme vertical ne rattrape deux masses de même poids
-    // empilées.
-    //
-    // OÙ LE H1 EST PARTI. Sur la première section de contenu, `about`, dont le
-    // titre est rendu en 92 px et n'a aucun voisin typographique. Il y porte les
-    // mêmes mots-clés (sites, outils, logiciels, sur mesure) au lieu de les
-    // dupliquer ici.
-    //
-    // `title` RESTE RENSEIGNÉ parce que `HeroContent` l'exige et que les autres
-    // pages (contact, à propos, blog, réalisations) rendent le leur. Celui-ci
-    // n'est plus lu par aucun rendu : `HeroSection` n'affiche plus de titre.
-    title: "Sites, outils et logiciels sur mesure",
+    // LE H1 DE L'ACCUEIL, rendu dans le cadre du héros sous le mot-symbole.
+    // Voir `TITRE_ACCUEIL` plus haut.
+    title: TITRE_ACCUEIL,
+    // Coupure à la virgule dès 1360 px, où les deux moitiés tiennent chacune
+    // sur une ligne (voir `HeroSection`).
+    titleLines: [
+      "Des sites qui amènent des clients,",
+      "des outils qui te rendent des heures.",
+    ],
     // `subtitle` est la copy de repli, non affichée ici : le hero rend le
     // paragraphe de `subtitleParagraphs`. Les deux disent désormais la même
     // chose, il n'y a plus de raison qu'elles divergent.
     subtitle: ACCROCHE_HERO,
     /*
-     * LE HERO NOMME L'OFFRE depuis le 2026-09-24 (audit des parcours, phase B).
-     * Il ne disait ni ce qui se vend ni à quel prix : le visiteur devait
-     * descendre trois sections pour l'apprendre. La phrase nomme les deux
-     * prestations et leur prix d'entrée, lus dans `offre.ts` pour ne jamais
-     * diverger de l'accordéon. Corps 16 px en casse normale : c'est un texte
-     * qu'on lit, pas une étiquette.
-     *
-     * `inverted: true` ATTÉNUE les fragments listés : la seconde phrase passe à
-     * 60 %, l'offre reste en blanc plein.
-     */
-    /*
-     * PHRASE D'OFFRE, EN CORPS DE CHAPÔ depuis le 2026-09-24 (phase C). Le
-     * panel design retenait le nom au test des cinq secondes, pas l'offre :
-     * la phrase de la phase B listait deux prestations et deux prix en 16 px.
-     * Elle dit maintenant quoi, pour qui et le prix plancher en une ligne
-     * lue d'un coup d'œil ; le détail des deux prix d'entrée est dans
+     * SOUS LE TITRE, LA CIBLE ET LES DEUX PRESTATIONS, en corps de lecture et
+     * sans prix (voir `POUR_QUI_HERO`). Le détail des forfaits est dans
      * l'accordéon, un clic plus bas.
-     *
-     * Le prix est déclaré en `emphasis` pour passer à la ligne : le héros rend
-     * l'emphase d'un paragraphe non `inverted` en bloc, en blanc plein comme
-     * le reste. Offre sur une ligne, prix sur la suivante, à toutes les
-     * largeurs, au lieu d'une coupure au hasard du corps.
      */
-    subtitleParagraphs: [{ text: OFFRE_HERO, emphasis: [PRIX_HERO] }],
+    subtitleParagraphs: [{ text: POUR_QUI_HERO }],
     offerLink: { label: "↓ Voir les prestations", href: "#services" },
     /*
      * LA PREUVE DANS LE PREMIER ÉCRAN depuis le 2026-09-24 (phase D). La bande
@@ -243,94 +222,23 @@ export const homeContent: HomeContent = {
   },
 
   about: {
-    // H1 DE LA PAGE D'ACCUEIL depuis le 2026-08-31, et seul h1 du document.
-    // Le hero n'en porte plus (cf. le bloc `hero` plus haut) : ce titre est le
-    // premier bloc de contenu de la page et le plus gros caractère du document,
-    // il est le titre de premier niveau naturel.
-    //
-    // « LE MOTEUR COMPTE. » EST RETIRÉ. C'était une métaphore posée en titre,
-    // et une métaphore n'annonce rien : elle illustre. Mot d'Eliott le
-    // 2026-08-31, « dis un truc plus clair avec ce que je vends ». L'image de
-    // la belle carrosserie et du moteur lent reste, mais dans le CORPS du texte,
-    // juste dessous, où elle a sa place et où elle est déjà écrite.
-    //
-    // « SITES, OUTILS, LOGICIELS. » EST RETIRÉ le 2026-09-01. Mot d'Eliott :
-    // « c'est pas assez pour un H1 ». Il a raison, et le défaut est mesurable :
-    // trois noms communs sans verbe, sans cible et sans lieu, sur la balise la
-    // plus lourde du document. Elle ne portait aucune requête qu'un client tape
-    // vraiment — personne ne cherche « sites outils logiciels », on cherche un
-    // développeur, pour un besoin, dans une zone.
-    //
-    // CE QU'IL DIT, ET POURQUOI IL A RACCOURCI LE 2026-09-02.
-    //
-    // Le titre précédent empilait le métier, la cible et la zone en quinze
-    // mots : « Sites, outils et logiciels sur mesure pour les entreprises sans
-    // équipe technique, en Normandie et partout en France. » Chaque morceau se
-    // défendait, l'ensemble se lisait comme un paragraphe. Rendu, ça faisait
-    // six lignes pleines qu'Eliott a arrêtées net (« c'est quoi ce pavé de
-    // texte illisible »). Un titre a une seconde pour être lu, pas trois.
-    //
-    // Il nomme donc le RÉSULTAT, dans les mots du vault
-    // (`copy-matiere-brute.md`) : des sites qui amènent des clients, des outils
-    // qui rendent des heures. Le corps de section, juste en dessous, explique
-    // comment on y arrive ; les pages de service détaillent quoi.
-    //
-    // LE TUTOIEMENT est une décision d'Eliott du 2026-09-02 : il travaille
-    // seul, c'est son écart avec les agences, et le vouvoiement le faisait
-    // sonner comme un cabinet. Il tient sur tout le site sauf les documents
-    // contractuels.
-    //
-    // LA ZONE ET LA CIBLE NE DISPARAISSENT PAS : elles vivent dans le titre de
-    // la page, dans la description SEO et dans `businessSchema.areaServed`,
-    // c'est-à-dire là où les moteurs les lisent, sans coûter la lisibilité de
-    // la première seconde.
-    //
-    // TEST ANTI-BULLSHIT D'ELIOTT (« si le contraire est absurde, la phrase ne
-    // dit rien ») : le contraire est un site qui impressionne sans rien
-    // rapporter et un outil qui fait perdre du temps. Ce n'est pas absurde,
-    // c'est le cas COURANT, et `body` le dit deux lignes plus bas.
-    title:
-      "Des sites qui amènent des clients, des outils qui te rendent des heures.",
-    // DÉCOUPAGE EXPLICITE, une entrée par ligne rendue. Il est ici et pas dans
-    // le composant parce qu'il coupe aux unités de sens, ce qu'aucune règle
-    // automatique ne sait faire : « sur mesure » et « sans équipe technique » ne
-    // se coupent pas en deux.
-    //
     /*
-     * SIX LIGNES SONT DEVENUES QUATRE, le 2026-09-02, et le titre a changé de
-     * nature.
+     * H2 DEPUIS LE 2026-09-24 (phase E). Sa phrase précédente, « Des sites qui
+     * amènent des clients, des outils qui te rendent des heures », est devenue
+     * le titre du héros et le seul h1 de l'accueil. La répéter un écran plus
+     * bas l'aurait affaiblie.
      *
-     * CE QU'IL DISAIT : « Sites, outils et logiciels sur mesure pour les
-     * entreprises sans équipe technique, en Normandie et partout en France. »
-     * Correct sur le fond, illisible à l'écran : six lignes pleines, quinze
-     * mots, un pavé qu'on lit comme un paragraphe et pas comme un titre. Eliott
-     * l'a arrêté net (« c'est quoi ce pavé de texte illisible »).
+     * LA SECTION RESTE, avec un titre à elle, parce qu'elle porte le seul
+     * texte de l'accueil qui dit COMMENT Eliott travaille : il part de ce que
+     * le site doit rapporter, et décide de ce qui ne se voit pas avant le
+     * code. Le titre donne le point de départ, le corps le développe dessous
+     * sans reprendre ses mots.
      *
-     * CE QU'IL DIT MAINTENANT est dans ses mots, repris de
-     * `vault/wiki/business/copy-matiere-brute.md` : des sites qui amènent des
-     * clients, des outils qui rendent des heures. Le titre nomme le RÉSULTAT,
-     * le corps de section juste en dessous explique comment on l'obtient. Son
-     * contraire n'est pas une évidence : un site qui impressionne sans rien
-     * rapporter est le cas courant, et c'est exactement ce que dit `body`.
-     *
-     * LE TUTOIEMENT vient d'une décision d'Eliott du même jour : il est seul,
-     * c'est son écart avec les agences, et le vouvoiement le faisait sonner
-     * comme un cabinet. « Te rendent des heures » plutôt que « vous rendent ».
-     *
-     * LA ZONE ET LA CIBLE NE SONT PAS PERDUES : elles vivent dans le `title` de
-     * la page, la description SEO, et le sous-titre du hero. Un h1 qui les
-     * empilait toutes tenait le référencement et perdait le lecteur.
-     *
-     * DÉCOUPAGE : quatre lignes de 13 à 20 signes. Toutes reçoivent le corps
-     * dicté par la plus large (cf. `TitleFitText`), les plus courtes laissent
-     * du blanc à droite.
+     * DÉCOUPAGE : trois lignes aux unités de sens. Toutes reçoivent le corps
+     * dicté par la plus large (cf. `TitleFitText`).
      */
-    titleLines: [
-      "Des sites qui",
-      "amènent des clients,",
-      "des outils qui te",
-      "rendent des heures.",
-    ],
+    title: "Je pars de ce que ton site doit rapporter.",
+    titleLines: ["Je pars de ce", "que ton site", "doit rapporter."],
     // FIDÉLITÉ : la section About du source n'a QU'UN paragraphe (cf.
     // framer-html/about.ts, RichText « People decide… »). Les paragraphes
     // précédemment ajoutés provenaient de showreel/numbers → retirés.
@@ -548,8 +456,9 @@ export const homeContent: HomeContent = {
   /*
    * ORDRE DES SECTIONS, refait le 2026-09-24 (phase B, puis phase C).
    *
-   * L'OFFRE SUIT LE H1 (phase B) : l'accordéon des prestations vient juste
-   * après `about`, au lieu de trois sections plus bas.
+   * L'OFFRE SUIT `about` (phase B) : l'accordéon des prestations vient juste
+   * après, au lieu de trois sections plus bas. Le h1 est dans le héros depuis
+   * la phase E.
    *
    * LES LOGOS SONT ENTRÉS DANS LE HÉROS (phase D), après être remontés sous
    * lui en phase C : sous la ligne de flottaison, ils n'étaient pas vus avant

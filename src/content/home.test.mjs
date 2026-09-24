@@ -1,6 +1,5 @@
 import { describe, expect, test } from "bun:test";
 import { homeContent } from "./home.ts";
-import { packEntree, prixPack } from "./offre.ts";
 import { siteConfig } from "./site.ts";
 import { howWeDoItStats } from "./stats.ts";
 import { uiLabels } from "./ui.ts";
@@ -46,16 +45,25 @@ describe("accueil", () => {
     expect(Math.abs(chiffres - pourquoi)).toBeGreaterThan(1);
   });
 
-  test("les prestations suivent le h1", () => {
+  test("les prestations suivent la section About", () => {
     expect(ordre.indexOf("services")).toBe(ordre.indexOf("about") + 1);
   });
 
-  test("le héros annonce le plus bas des prix d'entrée, lu dans l'offre", () => {
-    const plancher = [packEntree("vitrine"), packEntree("logiciel")].reduce(
-      (bas, pack) => (pack.prix < bas.prix ? pack : bas),
+  test("le titre du héros est la phrase de l'accueil, dite une seule fois", () => {
+    expect(homeContent.hero.title).toBe(
+      "Des sites qui amènent des clients, des outils qui te rendent des heures.",
     );
+    expect(homeContent.hero.titleLines?.join(" ")).toBe(homeContent.hero.title);
+    expect(homeContent.about.title).not.toBe(homeContent.hero.title);
+    expect(homeContent.about.titleLines?.join(" ")).toBe(homeContent.about.title);
+  });
+
+  test("le héros dit pour qui, sans prix ferme global", () => {
     const phrase = homeContent.hero.subtitleParagraphs?.[0]?.text ?? "";
-    expect(phrase).toContain(prixPack(plancher));
+    expect(phrase).toContain("TPE");
+    expect(phrase).toContain("PME");
+    expect(phrase.toLowerCase()).not.toContain("prix ferme");
+    expect(phrase).not.toMatch(/\d\s?000/u);
   });
 
   test("« 1 projet à la fois » n'est dit qu'une fois, par la section chiffres", () => {
