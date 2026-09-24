@@ -86,7 +86,8 @@ export const vueAgentContent = {
 
   /** Intertitres et textes de liaison du profil. */
   profil: {
-    titre: (nom: string, role: string) => `${nom}, ${role.toLowerCase()}`,
+    /* Sans rôle connu, le nom seul : jamais « Eliott Bouquerel, » en titre. */
+    titre: (nom: string, role: string) => (role ? `${nom}, ${role.toLowerCase()}` : nom),
     source: (url: string) => `Source : ${url}`,
     reperes: {
       zone: "Zone d’intervention",
