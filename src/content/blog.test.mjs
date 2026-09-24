@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { blogPosts, blogContent } from "./blog.ts";
+import { IDS_RENDEZ_VOUS } from "./rendez-vous.ts";
 
 /**
  * AUDIT DES ARTICLES.
@@ -134,6 +135,11 @@ describe("corps des articles", () => {
    * vers une page de prestation et d'un lien vers `/contact`, pas leur
    * formulation. Le texte du lien reste un choix d'écriture ; son existence
    * n'en est plus un.
+   *
+   * DEPUIS LE 2026-09-24, LE LIEN VERS `/contact` MÈNE À LA PRISE DE
+   * RENDEZ-VOUS, sujet compris : un `/contact` nu posait le lecteur devant un
+   * formulaire et un agenda sans rien présélectionner. Un sujet inconnu est
+   * ignoré en silence par la page, d'où la vérification contre la liste.
    */
   test("chaque article mène vers une prestation et vers le contact", () => {
     for (const [fichier, texte] of corps) {
@@ -141,7 +147,13 @@ describe("corps des articles", () => {
         fichier,
         true,
       ]);
-      expect([fichier, texte.includes("](/contact)")]).toEqual([fichier, true]);
+      const sujets = [
+        ...texte.matchAll(/\]\(\/contact\?sujet=([a-z]+)#rendez-vous\)/g),
+      ].map((m) => m[1]);
+      expect([fichier, sujets.length > 0]).toEqual([fichier, true]);
+      for (const sujet of sujets) {
+        expect([fichier, IDS_RENDEZ_VOUS.includes(sujet)]).toEqual([fichier, true]);
+      }
     }
   });
 

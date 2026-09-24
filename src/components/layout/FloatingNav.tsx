@@ -7,7 +7,7 @@ import { SwapCopies } from "@/components/ui/SwapCopies";
    donc le préchargement automatique tirait en permanence toutes les routes du
    site. Voir la note de `HoverPrefetchLink`. */
 import { HoverPrefetchLink } from "@/components/ui/HoverPrefetchLink";
-import type { Link, SiteConfig } from "@/lib/content/types";
+import type { SiteConfig } from "@/lib/content/types";
 import { uiLabels } from "@/content/ui";
 
 // useLayoutEffect côté client (avant paint), useEffect côté serveur (no-op SSR).
@@ -77,24 +77,6 @@ const REVEAL_Y = 70;
  * legal 11px blanc-60 underline `#ffffff21` offset 3px → hover blanc offset 4px ;
  * email/tel Geist 500 -0.02em 110%.
  */
-
-/**
- * Repli des liens du menu — ordre source : Home, Works, About, Blog, Contact.
- *
- * Ce tableau n'est utilisé QUE si la donnée n'expose ni `menuNav` ni `nav`. Il
- * était auparavant la seule source du menu flottant, ce qui avait deux effets :
- * les libellés restaient en anglais, et surtout le masquage de sections (voir
- * `src/content/features.ts`, qui retire « Blog » de `nav`, `menuNav` et
- * `footerNav`) ne s'appliquait pas ici — le menu flottant était le dernier
- * endroit du site à pointer vers `/blog`, qui répond 404.
- */
-const MENU_LINKS_FALLBACK: readonly Link[] = [
-  { label: "Home", href: "/" },
-  { label: "Works", href: "/realisations" },
-  { label: "About", href: "/a-propos" },
-  { label: "Blog", href: "/blog" },
-  { label: "Contact", href: "/contact" },
-];
 
 /**
  * Easing de l'ouverture du panneau — courbe en S, PAS un ease-out.
@@ -169,7 +151,7 @@ export function FloatingNav({ site }: { site: SiteConfig }) {
   const { primaryCta, contact, legalLinks } = site;
   // Le menu lit la donnée (`menuNav`, repli `nav`) : c'est elle qui porte les
   // libellés traduits ET le retrait des sections éteintes.
-  const menuLinks = site.menuNav ?? site.nav ?? MENU_LINKS_FALLBACK;
+  const menuLinks = site.menuNav ?? site.nav;
   const [open, setOpen] = useState(false);
 
   // Apparition au premier scroll, IRRÉVERSIBLE (fidèle au live).
