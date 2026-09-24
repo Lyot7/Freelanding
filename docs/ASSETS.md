@@ -62,24 +62,25 @@ fonctionne.
 | `logo-b.svg` | Monogramme | Dessiné par Eliott |
 | `logo-bouquerel.svg` | Logotype « Bouquerel », 1808 × 376 | Dessin généré par Gemini (2026-08-27), **vectorisé** ici — voir §5 |
 
-### Affiche de la section « Je construis des sites qui vendent »
+### Affiche de la section « Ton client te compare avant d'appeler »
 
 | Fichier | Photographe | Licence | Traitement |
 | --- | --- | --- | --- |
-| `images/escalier-lumiere-paysage.jpg` | Vladimir Khoteev | Unsplash (gratuite, usage commercial autorisé) | Niveaux de gris, contraste sigmoïdal, recadrage 1512 × 960 |
+| `images/telephone-et-ordinateur.jpg` | Alejandro Escamilla | CC0 (domaine public), [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Man_with_smartphone_and_laptop_(Unsplash).jpg), publiée à l'origine sur [Unsplash](https://unsplash.com/photos/Dl6jeyfihLk) | Recadrage 1512 × 960, saturation 85 %, fond assombri à 80 % hors sujet, téléphone et ordinateur détourés en lignes volt (Canny dans un masque tracé à la main), vignette vers `#0b0b0b` |
 
-Elle remplace `mecanisme-paysage.jpg` depuis le 2026-08-27, fichier supprimé
-faute d'usage restant. L'ancienne affiche était une image fixe de la boucle du
-héros : belle, mais elle montrait un rouage sous une phrase qui parle de chemin
-évident, et elle redisait le visuel du héros deux écrans plus haut. La nouvelle
-montre un escalier de béton vu de face, un rai de lumière posé en son milieu de
-la première à la dernière marche : la direction est donnée par la lumière, il
-n'y a rien à décider pour savoir où aller.
+Elle remplace `escalier-lumiere-paysage.jpg` (Vladimir Khoteev, Unsplash)
+depuis le 2026-09-24, fichier supprimé faute d'usage restant. L'escalier
+illustrait l'ancien titre de la section (« où avancer semble évident ») ; sous
+« Ton client te compare avant d'appeler », il ne disait plus rien. La nouvelle
+montre la scène du titre : un téléphone tenu devant un ordinateur ouvert, deux
+écrans côte à côte.
 
-Vérifié sur la page de la photographie avant téléchargement : « Photo gratuite
-sur Unsplash », sans marqueur Unsplash+. Les images servies depuis
-`plus.unsplash.com/premium_photo-*` relèvent d'un abonnement payant et ne sont
-jamais utilisées ici.
+Même méthode que les héros du blog et de la page Caen : photo libre, sujet
+détouré en lignes volt `#c8f24a` avec un halo, le reste de l'image légèrement
+assombri. Licence vérifiée sur la page Commons avant téléchargement (« Creative
+Commons Zero, Public Domain Dedication »), original de 5616 × 3744 téléchargé
+depuis `upload.wikimedia.org`. Aucun crédit n'est exigé par la CC0 ; il est
+tenu ici.
 
 ## 3. Captures des pages projet
 

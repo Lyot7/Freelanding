@@ -190,32 +190,26 @@ export const homeContent: HomeContent = {
     cta: { label: "VOIR LES RÉALISATIONS", href: "/realisations" },
     ctaPrefix: "↓ ",
     /*
-     * AFFICHE DE LA SECTION.
+     * AFFICHE DE LA SECTION, REMPLACÉE LE 2026-09-24 (phase E).
      *
-     * C'ÉTAIT LE MÉCANISME D'HORLOGERIE, une image fixe extraite de la boucle du
-     * héros. Elle était belle et elle ne disait rien d'ici : la section annonce
-     * « je construis des outils qu'on garde, où avancer semble évident et ne
-     * laisse aucune place à l'hésitation », et montrait un rouage. Un rouage
-     * parle de mécanique interne, pas de chemin évident, et il redisait en plus
-     * le visuel du héros deux écrans plus haut.
+     * L'ESCALIER DE BÉTON illustrait l'ancien titre (« où avancer semble
+     * évident »). Sous « Ton client te compare avant d'appeler », il ne disait
+     * plus rien. Eliott : « la photo n'est pas hyper pertinente ».
      *
-     * CE QUI LA REMPLACE dit exactement la phrase : un escalier de béton vu de
-     * face, avec un rai de lumière posé en son milieu, de la première marche à
-     * la dernière. La direction est donnée par la lumière, pas par une flèche,
-     * et il n'y a rien à décider pour savoir où aller. Frontale et symétrique,
-     * elle se lit comme une intention et non comme une image d'ambiance.
+     * CE QUI LA REMPLACE montre la scène du titre : quelqu'un tient son
+     * téléphone devant son ordinateur ouvert, deux écrans côte à côte. Le
+     * téléphone et l'ordinateur sont détourés en lignes volt, comme les sujets
+     * des héros du blog et de la page Caen ; le reste de la photo est
+     * légèrement assombri.
      *
-     * Photographie Vladimir Khoteev, licence Unsplash, passée en niveaux de gris
-     * et contrastée pour rejoindre le traitement des autres photos du site.
-     * Provenance et traitement dans `docs/ASSETS.md`.
+     * Photographie Alejandro Escamilla, CC0 (Wikimedia Commons, publiée à
+     * l'origine sur Unsplash). Provenance et traitement dans `docs/ASSETS.md`.
      *
-     * 1512 × 960, soit le double de la boîte de mise en page : l'affiche
-     * précédente faisait 756 × 480 et n'avait donc aucune réserve pour un écran
-     * à haute densité.
+     * 1512 × 960, le double de la boîte de mise en page (378 × 240 dès 1200).
      */
     poster: {
-      src: "/images/escalier-lumiere-paysage.jpg",
-      alt: "Un escalier de béton vu de face, un rai de lumière posé en son milieu de la première à la dernière marche",
+      src: "/images/telephone-et-ordinateur.jpg",
+      alt: "Une personne tient son téléphone devant son ordinateur portable ouvert",
       width: 1512,
       height: 960,
     },
