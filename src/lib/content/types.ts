@@ -272,7 +272,6 @@ export interface SiteConfig {
     subtext?: string;
     /** Fragments du sous-texte rendus en blanc plein. */
     subtextEmphasis?: readonly string[];
-    cta?: Link;
   };
   /** Formulaire de contact du footer (labels, options, disclaimer). */
   footerForm?: {
@@ -612,32 +611,11 @@ export interface ServiceItem {
   rdvHref?: string;
 }
 
-/**
- * Ce qu'Eliott sait faire au-delà du catalogue chiffré.
- *
- * IL N'Y A NI PRIX NI DÉLAI DANS CE TYPE, et c'est délibéré. Ces sujets
- * n'existent pas dans `offre.ts` : leur donner un champ `prix` ouvrirait la
- * porte à un montant écrit à la main, hors de la seule source qui en connaisse
- * la règle de construction.
- */
-export interface HorsCatalogue {
-  titre: string;
-  intro: string;
-  items: readonly { readonly nom: string; readonly corps: string }[];
-  cta: Link;
-}
-
 /** Section « Services » : intro + liste de prestations (accordéon). */
 export interface ServicesSection {
   eyebrow?: string; // « Services »
   intro?: string; // « Every project starts with understanding… »
   items: ServiceItem[];
-  /**
-   * Bloc « et aussi », posé SOUS l'accordéon. Optionnel : la page « à propos »
-   * monte le même accordéon et n'a pas à répéter ce que la page d'accueil dit
-   * déjà, deux écrans avant les tarifs.
-   */
-  horsCatalogue?: HorsCatalogue;
 }
 
 /**

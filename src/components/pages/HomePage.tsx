@@ -47,7 +47,6 @@ export async function HomePage() {
       <ServicesSection
         services={home.services.items}
         intro={home.services.intro}
-        horsCatalogue={home.services.horsCatalogue}
         /* BANDE ORANGE RETROUVÉE. Elle annonce la section des chiffres, qui
            est orange pleine page. Elle était passée en clair quand la section
            tarifs s'intercalait entre les deux ; celle-ci ayant quitté l'accueil

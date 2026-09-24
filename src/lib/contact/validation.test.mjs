@@ -13,8 +13,8 @@ import {
  */
 
 const TYPES = [
-  "Un site et de la visibilité locale",
-  "Un outil métier sur mesure",
+  "Un site",
+  "Une solution métier",
   "Je ne sais pas encore",
 ];
 

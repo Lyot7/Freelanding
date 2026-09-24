@@ -12,7 +12,7 @@ import {
   suiviMensuel,
   tauxSuivi,
 } from "./offre.ts";
-import { horsCatalogue, services } from "./services.ts";
+import { services } from "./services.ts";
 import { lienDevis, methodeLabels } from "./tarifs.ts";
 import { contentRoutes as routesTarifs } from "./routes.ts";
 import { faqItems } from "./faq.ts";
@@ -197,10 +197,9 @@ describe("le site annonce le même prix que le module", () => {
     // devis » sur la prestation qui n'a pas de montant. Les deux ont été servis.
     expect(uiLabels.services.priceLabel).not.toMatch(/(à partir de|dès|from)\s*$/i);
     for (const s of services) {
-      // Le Diagnostic n'a pas de prix : il est compris dans la prestation qui
-      // suit. Une entrée sans montant est légitime, une entrée avec un montant
-      // mal formé ne l'est pas.
-      if (s.price === undefined || s.price === "sur devis") continue;
+      // Toute ligne de l'accordéon est une prestation chiffrée depuis le
+      // 2026-09-24 : une entrée sans montant n'a plus de raison d'exister.
+      expect(s.price, `« ${s.title} » n'annonce aucun prix`).toBeDefined();
       // FORME « de X à Y », celle que produit `fourchette()`. Le test acceptait
       // « Dès X » : le garder aurait laissé passer une entrée restée au
       // plancher pendant que les autres annoncent leur fourchette.
@@ -303,11 +302,15 @@ describe("le site annonce le même prix que le module", () => {
     // la réponse : reformuler la réponse en français courant, ce qui est le
     // but, faisait alors disparaître la clause aux yeux du test au lieu de la
     // faire échouer sur le fond. La question, elle, est l'identité de l'entrée.
+    //
+    // FUSIONNÉE LE 2026-09-24 dans « Que se passe-t-il après la mise en
+    // ligne ? » : la FAQ passe à cinq entrées, la clause garde ses trois
+    // engagements.
     const question = faqItems.find((item) =>
-      /suivi peut-il augmenter/i.test(item.question),
+      /après la mise en ligne/i.test(item.question),
     );
     const clause = question?.answer;
-    expect(question, "la clause d'infrastructure a disparu de la FAQ").toBeDefined();
+    expect(question, "la clause de hausse du suivi a disparu de la FAQ").toBeDefined();
     expect(clause).toBeDefined();
     expect(clause, "la clause ne nomme pas son déclencheur").toMatch(
       /trafic|volume de données|hébergeur/i,
@@ -321,6 +324,20 @@ describe("le site annonce le même prix que le module", () => {
     expect(clause, "la clause ne laisse pas le client refuser").toMatch(
       /tant que (?:vous n’avez|tu n’as) pas dit oui|(?:vous pouvez|tu peux) refuser/i,
     );
+  });
+
+  test("la FAQ répond à la question du délai sans publier de durée", () => {
+    // La durée a quitté les forfaits le 2026-09-23 : le site ne publie plus
+    // aucun délai chiffré. La réponse dit où la date est écrite, pas combien.
+    const delai = faqItems.find((item) => /combien de temps/i.test(item.question));
+    expect(delai, "la question du délai a disparu de la FAQ").toBeDefined();
+    expect(delai.answer, "la réponse ne dit pas où la date est écrite").toMatch(/devis/i);
+    expect(
+      /\d\s*(?:jours?|semaines?|mois)\b|\b(?:jours?|semaines?|mois)\s+ouvrés?\b/iu.test(
+        delai.answer,
+      ),
+      `une durée chiffrée apparaît : ${delai.answer}`,
+    ).toBe(false);
   });
 
   test("aucun prix n'est présenté comme un tarif à la journée", () => {
@@ -395,34 +412,18 @@ describe("la section tarifs ne peut pas diverger de l'offre", () => {
 });
 
 /**
- * CE QUI EST VENDU HORS CATALOGUE — et qui n'a pas de prix.
+ * L'ACCORDÉON NE PORTE QUE LES PRESTATIONS CHIFFRÉES, depuis le 2026-09-24.
  *
- * LA RÈGLE D'ELIOTT : une promesse qui n'est pas dans son corpus n'a rien à
- * faire dans un périmètre chiffré. Ces trois sujets n'ont ni périmètre ni
- * montant ; le jour où l'un d'eux en gagne un, il rejoint `offre.ts` et il
- * n'entre pas ici par la petite porte.
+ * Le Diagnostic, l'Audit de code et le bloc « Et aussi » en sont sortis : sans
+ * prix ni page, au milieu des prestations chiffrées, ils brouillaient ce
+ * qu'Eliott vend. Une ligne qui n'est pas dans `offre.ts` n'y rentre pas par la
+ * petite porte.
  */
-describe("le bloc « et aussi » ne chiffre rien", () => {
-  test("aucun montant, aucune durée, aucun pourcentage", () => {
-    const textes = [
-      horsCatalogue.titre,
-      horsCatalogue.intro,
-      horsCatalogue.cta.label,
-      ...horsCatalogue.items.flatMap((i) => [i.nom, i.corps]),
-    ];
-    for (const texte of textes) {
-      expect(/\u20AC/u.test(texte), `un montant apparaît : ${texte}`).toBe(false);
-      expect(
-        /\bjours?\s+ouvrés?\b|\bsemaines?\b/iu.test(texte),
-        `un délai apparaît : ${texte}`,
-      ).toBe(false);
-    }
-  });
-
-  test("son bouton mène à la prise de rendez-vous, sujet compris", () => {
-    const url = new URL(horsCatalogue.cta.href, "https://exemple.fr");
-    expect(url.pathname).toBe("/contact");
-    expect(url.hash).toBe("#rendez-vous");
-    expect(IDS_RENDEZ_VOUS).toContain(url.searchParams.get(PARAM_SUJET));
+describe("l'accordéon ne porte que les deux prestations", () => {
+  test("une ligne par prestation de l'offre, numérotées dans l'ordre", () => {
+    expect(services.map((s) => s.title)).toEqual(prestations.map((p) => p.nom));
+    expect(services.map((s) => s.number)).toEqual(
+      prestations.map((_, i) => String(i + 1).padStart(2, "0")),
+    );
   });
 });

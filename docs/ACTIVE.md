@@ -40,13 +40,12 @@ c'était son palier supérieur.
 | Ligne | Périmètre 1 | Périmètre 2 | Périmètre 3 |
 |---|---|---|---|
 | Site vitrine | 5 j · 2 500 € | 8 j · 4 000 € | 12 j · 6 000 € |
-| L'Outil | 8 j · 4 000 € | 12 j · 6 000 € | 18 j · 9 000 € |
 | Le Logiciel | 20 j · 10 000 € | 40 j · 20 000 € | 60 j · 30 000 € |
 
 **Calage marché, relevé du 2026-08-27.** La grille tient 2 500 € par semaine
 livrée, ce qui est exactement le point de convergence des studios français
-productisés (2 000 à 3 000 €/semaine). Le vitrine et L'Outil sont confirmés par
-le relevé. Le Logiciel a été recalé le même jour : ses périmètres étaient à 20,
+productisés (2 000 à 3 000 €/semaine). Le vitrine est confirmé par le
+relevé. Le Logiciel a été recalé le même jour : ses périmètres étaient à 20,
 30 et 40 jours alors que les durées publiées par les agences pour le même
 livrable sont de 2-8 semaines, 6-12 semaines et 2-6 mois. Sous-estimer la durée
 d'un forfait, c'est s'engager sur une date intenable.
@@ -70,7 +69,8 @@ la taille du projet. Le plancher mord jusqu'à 7 200 € de projet.
 | 20 000 € | 250 € |
 | 30 000 € | 375 € |
 
-**Clause d'infrastructure**, entrée 07 de la FAQ. Un forfait de suivi engage un
+**Clause de hausse du suivi**, fusionnée le 2026-09-24 dans l'entrée « Que se
+passe-t-il après la mise en ligne ? » de la FAQ (cinq entrées). Un forfait de suivi engage un
 prix sur une charge qui peut bouger : trafic, volume de données, tarifs de
 l'hébergeur. Sans clause, la hausse arrive après coup, ce qui est pire que pas de
 clause. Celle-ci est bornée par quatre éléments, et un test vérifie qu'ils y sont
@@ -110,10 +110,9 @@ plus une section sur ce qui fait bouger un devis. Les routes sont DÉRIVÉES de
 `offre.ts` : publier une prestation suffit à publier sa page et à l'annoncer au
 sitemap.
 
-**Le Diagnostic** est la première entrée de l'accordéon, sans prix. Il est
-compris dans la prestation qui suit, et le mot « gratuit » est volontairement
-absent : il attire ceux qui repartent avec la note, alors que « compris » range
-le diagnostic du côté de l'achat.
+**L'accordéon n'a plus que deux lignes** depuis le 2026-09-24 : Site vitrine et
+La Solution métier. Le Diagnostic, l'Audit de code et le bloc « Et aussi » sont
+sortis de l'accueil, décision d'Eliott.
 
 ## Développement : le serveur tourne sur webpack, pas sur Turbopack
 

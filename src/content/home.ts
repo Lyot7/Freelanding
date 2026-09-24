@@ -1,7 +1,7 @@
 import type { HomeContent } from "@/lib/content/types";
 import { slugsMisEnAvant } from "@/content/blog";
 import { faqItems } from "@/content/faq";
-import { horsCatalogue, services } from "@/content/services";
+import { services } from "@/content/services";
 import { howWeDoItStats, reputationStats } from "@/content/stats";
 import { jenniferTestimonial } from "@/content/testimonials";
 
@@ -407,13 +407,6 @@ export const homeContent: HomeContent = {
     intro:
       "Je pars de ta façon de travailler, et je construis ce qui lui correspond. Pas de fonctions en trop, rien à contourner.",
     items: services,
-    /*
-     * « ET AUSSI », sous l'accordéon, depuis le 2026-09-02. L'accordéon dit ce
-     * qui est chiffré ; ce bloc dit ce qu'Eliott sait faire en plus, sans
-     * montant, parce qu'aucun de ces trois sujets n'a de périmètre arrêté.
-     * Demande d'Eliott : « montrer que je suis vraiment complet sur le sujet ».
-     */
-    horsCatalogue,
   },
 
   // section10.ts — carrousel témoignages.

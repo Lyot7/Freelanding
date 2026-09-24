@@ -14,7 +14,7 @@ import { LineReveal } from "@/components/motion/LineReveal";
 import { useParallaxLayerY } from "@/components/motion/ParallaxImage";
 import { Grain } from "@/components/effects/Grain";
 import { ToggleIcon } from "@/components/ui/ToggleIcon";
-import type { HorsCatalogue, ServiceItem } from "@/lib/content/types";
+import type { ServiceItem } from "@/lib/content/types";
 import { uiLabels } from "@/content/ui";
 import { urlImageFond } from "@/lib/image-fond";
 
@@ -385,10 +385,8 @@ function ServiceRow({
               {/* framer-11zvtfv : libellé de prix (« Price: from » dans la
                   source, preset 2okhk1, 14px, blanc 60%). Il porte le préfixe
                   du montant quand il y en a un, rien sur « sur devis ». */}
-              {/* SANS MONTANT, PAS DE LIBELLÉ. Le Diagnostic n'a pas de prix :
-                  il est compris dans la prestation qui suit. Le libellé était
-                  rendu inconditionnellement, ce qui affichait « Prix : » suivi
-                  de rien, servi en production. */}
+              {/* SANS MONTANT, PAS DE LIBELLÉ. Rendu inconditionnellement, il
+                  affichait « Prix : » suivi de rien, servi en production. */}
               {service.price ? (
                 <>
                   <span className="whitespace-pre text-[14px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground-60">
@@ -619,20 +617,10 @@ export function ServicesSection({
    * `/about` supprimait ses 30px et remontait tout le bas de page d'autant.
    */
   bottomAccent = "accent",
-  horsCatalogue,
 }: {
   services: ServiceItem[];
   intro?: string;
   bottomAccent?: "accent" | "muted";
-  /**
-   * « Et aussi » : ce qu'Eliott sait faire hors du catalogue chiffré.
-   *
-   * OPTIONNEL, ET ABSENT DE LA PAGE « À PROPOS ». Cette page monte le même
-   * accordéon pour dire ce qu'il fait ; la page d'accueil, elle, enchaîne sur
-   * la section tarifs, où le visiteur va chercher des montants. C'est là que le
-   * « ces trois-là n'ont pas de forfait » a un sens, et nulle part ailleurs.
-   */
-  horsCatalogue?: HorsCatalogue;
 }) {
   return (
     // framer-Iaj5T (section) : fond #0b0b0b, colonne [Top accent | Services | Bottom accent]
@@ -711,13 +699,9 @@ export function ServicesSection({
                 <ServiceRow
                   key={service.number}
                   service={service}
-                  /* AUCUN PANNEAU OUVERT À L'ARRIVÉE depuis le 2026-09-02.
-                     Le premier ouvert était Le Diagnostic, la seule prestation
-                     SANS prix : la section s'ouvrait donc sur la ligne qui ne
-                     chiffre rien, et masquait la fourchette des quatre autres
-                     derrière un pli. Les cinq lignes fermées, chacune portant
-                     désormais sa fourchette, donnent la carte de l'offre en une
-                     lecture. */
+                  /* AUCUN PANNEAU OUVERT À L'ARRIVÉE depuis le 2026-09-02 : les
+                     lignes fermées, chacune portant sa fourchette, donnent la
+                     carte de l'offre en une lecture. */
                   defaultOpen={false}
                 />
               ))}
@@ -726,43 +710,6 @@ export function ServicesSection({
             </div>
           </div>
 
-          {/* « ET AUSSI » — ce qui n'a pas de forfait.
-              Il reprend le partage en deux moitiés de l'en-tête de la section :
-              l'étiquette à gauche, le contenu à droite, sur la même verticale
-              que l'accordéon au-dessus. Aucun montant n'y figure, et il n'y en
-              aura pas : ces sujets n'existent pas dans `offre.ts`. */}
-          {horsCatalogue ? (
-            <div className="relative flex w-full flex-col items-start border-t border-white/10 pt-[20px] tablet:flex-row tablet:pt-[30px]">
-              <div className="relative flex w-full flex-row items-start gap-[10px] tablet:w-px tablet:flex-[1_0_0]">
-                <p className="whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60">
-                  {horsCatalogue.titre}
-                </p>
-              </div>
-              <div className="relative flex w-full flex-col items-start gap-[16px] pt-[12px] tablet:w-px tablet:flex-[1_0_0] tablet:pt-0">
-                <p className="max-w-[560px] text-[14px] font-medium leading-[1.35] tracking-[-0.01em] text-foreground-60">
-                  {horsCatalogue.intro}
-                </p>
-                <ul className="flex w-full flex-col gap-[12px] desktop:grid desktop:grid-cols-3 desktop:gap-[16px]">
-                  {horsCatalogue.items.map((item) => (
-                    <li key={item.nom} className="flex flex-col gap-[4px]">
-                      <span className="accent-room text-[14px] font-semibold leading-[1.2] tracking-[-0.01em] text-foreground">
-                        {item.nom}
-                      </span>
-                      <span className="text-[13px] font-medium leading-[1.35] tracking-[-0.01em] text-foreground-60">
-                        {item.corps}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href={horsCatalogue.cta.href}
-                  className="text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-foreground underline decoration-white/30 underline-offset-4 transition-colors hover:text-accent hover:decoration-accent motion-reduce:transition-none"
-                >
-                  <span className="accent-room">{horsCatalogue.cta.label}</span>
-                </Link>
-              </div>
-            </div>
-          ) : null}
         </div>
       </div>
 

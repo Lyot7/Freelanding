@@ -43,6 +43,7 @@ export const siteConfig: SiteConfig = {
    soulignée, pas le mot « sur mesure » qui suit. */
   taglineEmphasis: ["logiciels"],
   nav: [
+    { label: "Accueil", href: "/" },
     { label: "Réalisations", href: "/realisations" },
     { label: "Blog", href: "/blog" },
     { label: "À propos", href: "/a-propos" },
@@ -122,8 +123,9 @@ export const siteConfig: SiteConfig = {
   footerNav: [
     { label: "Accueil", href: "/" },
     { label: "Réalisations", href: "/realisations" },
-    { label: "Contact", href: "/contact" },
+    { label: "À propos", href: "/a-propos" },
     { label: "Blog", href: "/blog" },
+    { label: "Contact", href: "/contact" },
     /* Seul accès à la vue Agent entre 810 et 919 px, où l'en-tête n'a pas la
        place du sélecteur (voir `ToggleVue` dans `Header.tsx`). */
     { label: "Vue agent", href: "/agent" },
@@ -229,7 +231,6 @@ export const siteConfig: SiteConfig = {
     subtext:
       "Que tu aies un cahier des charges complet ou seulement une idée, je t’aide à lui donner forme. Pas de dossier de présentation, pas d’appel commercial, juste une prochaine étape claire.",
     subtextEmphasis: ["juste une prochaine étape claire."],
-    cta: { label: "DÉMARRER UN PROJET", href: "/contact" },
   },
   footerForm: {
     nameLabel: "Nom",
@@ -238,10 +239,8 @@ export const siteConfig: SiteConfig = {
     emailPlaceholder: "exemple@email.com",
     selectLabel: "Tu cherches quoi ?",
     selectOptions: [
-      "Un site et de la visibilité locale",
-      "Un outil métier sur mesure",
-      "Un logiciel métier complet",
-      "Un diagnostic de ma présence en ligne",
+      "Un site",
+      "Une solution métier",
       "Je ne sais pas encore",
     ],
     submitLabel: "Envoyer",

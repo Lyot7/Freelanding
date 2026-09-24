@@ -76,6 +76,18 @@ const PACK_LOGICIEL = prestation("logiciel").packs[1];
  * fonctions que les pages de service. Un montant réintroduit à la main ici
  * fait échouer `offre.test.mjs`.
  */
+/*
+ * CINQ ENTRÉES DEPUIS LE 2026-09-24, décision d'Eliott : la FAQ ne garde que
+ * ce que le client se demande avant de réserver ET dont la réponse n'est écrite
+ * nulle part ailleurs sur le site. Sont sorties : les maquettes (la section
+ * méthode le dit), le site à quelques centaines d'euros, l'agence (la page À
+ * propos le dit), la rédaction du contenu (les forfaits le disent). La hausse
+ * possible du suivi est fusionnée dans « après la mise en ligne ».
+ *
+ * LA DURÉE EST ENTRÉE, parce qu'elle a quitté les forfaits : le site ne publie
+ * plus aucun délai chiffré. La réponse dit où la date est écrite (au devis,
+ * avant signature) et de quoi elle dépend, sans inventer de nombre.
+ */
 export const faqItems: FaqItem[] = [
   {
     question: "Combien coûte un projet, et comment c’est facturé ?",
@@ -86,9 +98,9 @@ export const faqItems: FaqItem[] = [
     answer: `Un site démarre à ${prixPack(packEntree("vitrine"))}, une solution métier à ${prixPack(packEntree("logiciel"))}. Chaque prestation existe en 3 forfaits, détaillés sur sa page : ce qui change de l’un à l’autre y est écrit ligne à ligne. Le prix d’un forfait est arrêté avant que je commence, et il ne bouge plus ; au-delà du dernier, je chiffre sur mesure. Tu verses 30 % à la signature, 40 % à mi-parcours et 30 % à la livraison.`,
   },
   {
-    question: "Qu’est-ce que je vois avant la mise en ligne ?",
+    question: "Combien de temps ça prend ?",
     answer:
-      "Ton site, en train de se construire. Je ne travaille pas en maquettes : avant la signature, on cale ensemble le périmètre et la direction visuelle, tu me montres ce qui te plaît et tu m’envoies les références que tu as déjà trouvées. Le jour où tu signes, je commence à développer, et tu reçois une adresse en ligne qui se remplit au fil des jours. Tu n’attends ni captures d’écran ni dossier de présentation : tu cliques dedans pendant que ça avance.",
+      "La date de mise en ligne est écrite dans le devis, avant que tu signes. Elle dépend du forfait choisi et de la rapidité de tes retours : tes textes, tes photos, tes réponses à mes questions. Je ne mène qu’un projet à la fois : une fois le devis signé, je travaille sur le tien, et tu le vois avancer sur une adresse en ligne.",
   },
   {
     question: "Est-ce que je reste propriétaire de ce que tu construis ?",
@@ -101,51 +113,18 @@ export const faqItems: FaqItem[] = [
       "Par défaut, je construis du neuf. Reprendre du code écrit par quelqu’un d’autre est risqué, et je ne m’y engage pas à l’aveugle. La reprise reste possible si ton logiciel repose sur une base JavaScript récente et qu’il est correctement construit : je commence alors par un audit de son code, qui répond à cette question-là et à aucune autre. Sur du PHP ou du Laravel, je n’y touche pas, et je te le dis avant que ça te coûte quoi que ce soit. Dans les autres cas, je te propose un outil neuf qui vit à côté de l’ancien, sans y toucher.",
   },
   {
-    question: "Pourquoi pas un site à quelques centaines d’euros ?",
-    answer:
-      "Parce qu’à ce prix-là, personne n’a le temps de réfléchir à ton affaire et de rester rentable. Ce que tu achètes impressionne au premier coup d’œil et ne t’amène rien. Je facture au-dessus parce que je passe du temps, avant la première ligne de code, sur ce qui doit te rapporter : ton positionnement, ce que tu vends, la façon dont on te trouve, ce qui transforme un visiteur en appel ou en devis. Un site ne se juge pas à ce qu’il montre, mais à ce qu’il te rapporte.",
-  },
-  {
-    question: "Pourquoi toi plutôt qu’une agence ?",
-    answer:
-      "Une agence, ce sont des salariés, des plannings, des ressources humaines et plusieurs corps de métier : des frais qui courent que ton projet avance ou non, et une chaîne de personnes entre toi et le travail. Je vais droit au but. Je suis développeur, et je suis à l’aise avec les métiers qui gravitent autour : positionnement, marketing, design, référencement, accessibilité. Tu parles à celui qui écrit le code.",
-  },
-  {
-    question: "Tu écris le contenu ou je dois le fournir ?",
-    answer:
-      "Les deux fonctionnent. Tu peux fournir tes propres textes, ou je les rédige moi-même : un contenu professionnel, optimisé pour la recherche locale, calé sur ton métier et tes objectifs.",
-  },
-  {
     question: "Que se passe-t-il après la mise en ligne ?",
     /* Les quatre chiffres du suivi (taux, plancher, mensualité de l'exemple et
        projet de référence) sont dérivés : l'exemple se recalcule tout seul le
-       jour où le taux ou la grille bougent, au lieu de rester juste par
-       coïncidence. */
-    answer: `Je ne disparais pas. Je propose un suivi mensuel qui revient à ${tauxSuivi()} du prix du projet par an, avec un minimum de ${plancherSuivi()} : compte ${suiviMensuel(PACK_LOGICIEL.prix)} par mois pour un projet à ${prixPack(PACK_LOGICIEL)}. Il couvre ce qui existe : mises à jour, sauvegardes vérifiées, corrections. Une demande nouvelle, elle, fait l’objet d’un devis, parce qu’elle n’était pas au cadrage : tu sais toujours ce que tu paies. Et tu n’as pas besoin de ce suivi pour continuer à te servir de ce que je t’ai livré.`,
-  },
-  /*
-   * LA CLAUSE D'INFRASTRUCTURE, ajoutée le 2026-08-27.
-   *
-   * ELLE EXISTE PARCE QU'UN FORFAIT DE SUIVI EST UN ENGAGEMENT DE PRIX SUR UNE
-   * CHARGE QUI, ELLE, PEUT BOUGER. Un trafic qui décuple, un volume de données
-   * qui déborde la machine, un hébergeur qui relève ses tarifs : ces trois cas
-   * arrivent, et un forfait muet dessus se termine soit par une perte assumée en
-   * silence, soit par une hausse annoncée après coup, ce qui est pire.
-   *
-   * ELLE EST BORNÉE, ET C'EST CE QUI LA REND ACCEPTABLE. Un seul déclencheur
-   * nommé, l'annonce avant et non après, un montant et une date, et le droit de
-   * dire non. Sans ces quatre éléments, la clause se lirait comme « je peux
-   * augmenter quand je veux », ce qui vaut moins que pas de clause du tout.
-   *
-   * L'HÉBERGEMENT EST AU NOM DU CLIENT sur toutes les prestations, donc la
-   * hausse de la machine ne passe pas par la facture d'Eliott : elle passe par
-   * la sienne. Ce qui bouge côté suivi, c'est la surveillance d'une
-   * infrastructure devenue plus grosse. La réponse dit les deux, sinon elle
-   * laisserait croire qu'Eliott refacture un coût qu'il ne supporte pas.
-   */
-  {
-    question: "Le montant du suivi peut-il augmenter ?",
-    answer:
-      "Dans un seul cas : si ton site reçoit beaucoup plus de monde qu’aujourd’hui, ou si ton hébergeur augmente ses prix. Il faut alors une machine plus puissante, et deux choses bougent : ta facture d’hébergement, qui est à ton nom et que tu règles directement, et le suivi, parce qu’une installation plus grosse demande plus de surveillance. Je te préviens avant, je te donne le nouveau montant et la date, et rien ne change tant que tu n’as pas dit oui. En dehors de ce cas, tu paies ce qui était prévu au départ.",
+       jour où le taux ou la grille bougent.
+
+       LA CLAUSE DE HAUSSE, ajoutée le 2026-08-27 et fusionnée ici le
+       2026-09-24. Un forfait de suivi engage un prix sur une charge qui peut
+       bouger. Elle reste BORNÉE, et c'est ce qui la rend acceptable : un seul
+       déclencheur nommé, l'annonce avant et non après, un montant et une
+       date, et le droit de dire non. L'hébergement est au nom du client : la
+       machine plus grosse passe par SA facture, le suivi bouge parce qu'il y
+       a plus à surveiller. */
+    answer: `Je ne disparais pas. Je propose un suivi mensuel qui revient à ${tauxSuivi()} du prix du projet par an, avec un minimum de ${plancherSuivi()} : compte ${suiviMensuel(PACK_LOGICIEL.prix)} par mois pour un projet à ${prixPack(PACK_LOGICIEL)}. Il couvre ce qui existe : mises à jour, sauvegardes vérifiées, corrections. Une demande nouvelle fait l’objet d’un devis, parce qu’elle n’était pas au cadrage. Ce montant ne bouge que dans un cas : ton site reçoit beaucoup plus de monde, ou ton hébergeur augmente ses prix. Il faut alors une machine plus puissante, payée sur ta facture d’hébergement, qui est à ton nom, et un suivi plus large. Je te préviens avant, avec le nouveau montant et la date, et rien ne change tant que tu n’as pas dit oui. Tu n’as pas besoin de ce suivi pour continuer à te servir de ce que je t’ai livré.`,
   },
 ];
