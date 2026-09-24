@@ -79,7 +79,7 @@ export const services: ServiceItem[] = [
     number: "01",
     title: "Le Diagnostic",
     body: [
-      "Une heure, au téléphone ou chez toi. On regarde ce qui te fait perdre du temps chaque semaine, comment tes clients te trouvent aujourd’hui, et ce qui se règle vraiment.",
+      "Une heure, en visio. On regarde ce qui te fait perdre du temps chaque semaine, comment tes clients te trouvent aujourd’hui, et ce qui se règle vraiment.",
       "Tu repars avec une note écrite : le constat, ce qui vaut le coup d’être fait, dans quel ordre, et ce que ça coûte. Elle t’appartient, et elle est comprise dans la prestation qui suit.",
     ],
     image: {

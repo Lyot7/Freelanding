@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { ContentBlock } from "@/lib/content/types";
 import { idDeTitre } from "@/lib/blog/sommaire";
+import { SITE_URL } from "@/lib/site-url";
 
 /**
  * Adresses e-mail du corps de texte, rendues en LIEN comme sur la source.
@@ -20,7 +21,23 @@ import { idDeTitre } from "@/lib/blog/sommaire";
  */
 const EMAIL = /[\w.+-]+@[\w-]+\.[\w.-]+[\w]/g;
 
-function linkifyEmails(text: string): ReactNode[] {
+/**
+ * Adresses web, liées seulement quand l'appelant le demande (`liens`). Les
+ * pages légales et les articles n'en affichent pas en clair ; le profil de la
+ * vue Agent, lui, en est fait, parce qu'il doit rester utilisable une fois
+ * copié hors du site. La ponctuation finale reste hors du lien.
+ */
+const URL_WEB = /https?:\/\/[^\s]*[^\s.,;:!?)»]/g;
+
+/*
+ * SURVOL SUR LE SOULIGNEMENT, plus sur la couleur du texte. Le texte passait à
+ * l'accent au survol, mesuré à 1,2:1 sur le fond clair depuis que l'accent est
+ * le vert #c8f24a : illisible. Le soulignement se fonce et s'épaissit.
+ */
+const LIEN_CLS =
+  "text-background underline decoration-background/40 decoration-1 underline-offset-[3px] transition-[text-decoration-color] duration-200 ease-[cubic-bezier(0.44,0,0.56,1)] hover:decoration-background hover:decoration-2 motion-reduce:transition-none";
+
+function linkifyEmails(text: string, cle = ""): ReactNode[] {
   const parts: ReactNode[] = [];
   let cursor = 0;
   for (const m of text.matchAll(EMAIL)) {
@@ -28,14 +45,11 @@ function linkifyEmails(text: string): ReactNode[] {
     if (at > cursor) parts.push(text.slice(cursor, at));
     parts.push(
       <a
-        key={`${at}-${m[0]}`}
+        key={`${cle}${at}-${m[0]}`}
         href={`mailto:${m[0]}`}
         target="_blank"
         rel="noopener noreferrer"
-        // SOULIGNÉ : dans un paragraphe, la couleur seule ne distingue pas un
-        // lien du texte qui l'entoure (règle axe `link-in-text-block`, relevée
-        // sur les pages légales).
-        className="text-background underline decoration-background/40 underline-offset-[3px] transition-colors duration-200 ease-[cubic-bezier(0.44,0,0.56,1)] hover:text-accent hover:decoration-accent motion-reduce:transition-none"
+        className={LIEN_CLS}
       >
         {m[0]}
       </a>,
@@ -46,10 +60,50 @@ function linkifyEmails(text: string): ReactNode[] {
   return parts;
 }
 
+/**
+ * Une adresse de NOTRE site devient un chemin relatif : elle s'ouvre dans le
+ * même onglet, et reste interne quel que soit le domaine sur lequel la page
+ * est servie (en développement, `SITE_URL` ne vaut pas l'origine du serveur).
+ */
+function cibleInterne(url: string): string | null {
+  try {
+    const cible = new URL(url);
+    if (cible.origin !== new URL(SITE_URL).origin) return null;
+    return `${cible.pathname}${cible.search}${cible.hash}`;
+  } catch {
+    return null;
+  }
+}
+
+function linkify(text: string, liens: boolean): ReactNode[] {
+  if (!liens) return linkifyEmails(text);
+  const parts: ReactNode[] = [];
+  let cursor = 0;
+  for (const m of text.matchAll(URL_WEB)) {
+    const at = m.index ?? 0;
+    if (at > cursor) parts.push(...linkifyEmails(text.slice(cursor, at), `${cursor}-`));
+    const interne = cibleInterne(m[0]);
+    parts.push(
+      <a
+        key={`url-${at}`}
+        href={interne ?? m[0]}
+        {...(interne ? {} : { target: "_blank", rel: "noopener noreferrer" })}
+        className={`${LIEN_CLS} [overflow-wrap:anywhere]`}
+      >
+        {m[0]}
+      </a>,
+    );
+    cursor = at + m[0].length;
+  }
+  if (cursor < text.length) parts.push(...linkifyEmails(text.slice(cursor), `${cursor}-`));
+  return parts;
+}
+
 export function RichText({
   blocks,
   className,
   bodySize = 14,
+  liens = false,
 }: {
   blocks: readonly ContentBlock[];
   className?: string;
@@ -66,6 +120,8 @@ export function RichText({
    * imposer un 15px non mesuré serait une supposition, pas un port.
    */
   bodySize?: 14 | 15;
+  /** Lie aussi les adresses web écrites en clair (vue Agent). */
+  liens?: boolean;
 }) {
   // Interligne 1,3 et interlettrage -0,01em des deux côtés : seule la taille
   // change, les rapports sont identiques (19,5 / -0,15 à 15px, 18,2 / -0,14 à 14).
@@ -138,7 +194,7 @@ export function RichText({
             >
               {block.items.map((item) => (
                 <li key={item} className={ordered ? undefined : "pl-[19px]"}>
-                  {linkifyEmails(item)}
+                  {linkify(item, liens)}
                 </li>
               ))}
             </List>
@@ -156,7 +212,7 @@ export function RichText({
             // identiquement sous les deux valeurs.
             className={`mt-[22px] whitespace-pre-wrap ${body} font-medium leading-[1.65] tracking-[-0.005em] text-background/75 first:mt-0`}
           >
-            {linkifyEmails(block.text)}
+            {linkify(block.text, liens)}
           </p>
         );
       })}
