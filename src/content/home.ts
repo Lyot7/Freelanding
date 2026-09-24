@@ -17,6 +17,18 @@ const PACK_PLANCHER = [packEntree("vitrine"), packEntree("logiciel")].reduce(
 const PRIX_HERO = `Prix ferme dès ${prixPack(PACK_PLANCHER)} HT.`;
 const OFFRE_HERO = `Sites et logiciels sur mesure pour TPE et PME. ${PRIX_HERO}`;
 
+/** La ligne de preuve du héros, tirée du chiffre Würth de `stats.ts`. */
+function preuveWurth(): HomeContent["hero"]["proof"] {
+  const stat = howWeDoItStats.find((s) => s.label.includes("Würth"));
+  if (!stat) return undefined;
+  return {
+    // Espace fine insécable avant le signe pour cent.
+    value: `${stat.prefix ?? ""}${stat.value}\u202F${stat.suffix ?? ""}`,
+    label: stat.label,
+    href: "/realisations/wurth-creation-de-compte",
+  };
+}
+
 /**
  * Contenu de la page d'accueil — recomposé fidèlement à partir des sections de
  * l'archive Framer (src/content/framer-html/*.ts). Chaque section pointe vers sa
@@ -104,6 +116,16 @@ export const homeContent: HomeContent = {
      */
     subtitleParagraphs: [{ text: OFFRE_HERO, emphasis: [PRIX_HERO] }],
     offerLink: { label: "↓ Voir les prestations", href: "#services" },
+    /*
+     * LA PREUVE DANS LE PREMIER ÉCRAN depuis le 2026-09-24 (phase D). La bande
+     * des logos commençait sous la ligne de flottaison : à 1440 × 900, le
+     * visiteur ne voyait ni les logos ni un seul résultat avant de défiler.
+     * La ligne reprend le seul résultat mesuré du site, lu dans `stats.ts`
+     * pour ne jamais diverger de la section chiffres, et mène à l'étude de
+     * cas qui le détaille. Elle dit « chez Würth France » : rien n'y présente
+     * une entreprise comme cliente.
+     */
+    proof: preuveWurth(),
     // Fond du hero. Remplace le plan de pilote du template, dont la licence
     // n'était pas traçable, par un asset généré et possédé (Veo/Nano Banana,
     // 2026-08-10) : macro d'un mouvement d'horlogerie, qui dit « l'outil qui
@@ -529,9 +551,11 @@ export const homeContent: HomeContent = {
    * L'OFFRE SUIT LE H1 (phase B) : l'accordéon des prestations vient juste
    * après `about`, au lieu de trois sections plus bas.
    *
-   * LA BANDE DES LOGOS REMONTE SOUS LE HÉROS (phase C), sans intitulé : elle
-   * garde le libellé de la donnée, c'est-à-dire aucun, et rien ne présente ces
-   * entreprises comme des clients.
+   * LES LOGOS SONT ENTRÉS DANS LE HÉROS (phase D), après être remontés sous
+   * lui en phase C : sous la ligne de flottaison, ils n'étaient pas vus avant
+   * de défiler. `logoBand` n'est donc plus une section de l'accueil ; la
+   * donnée reste ici, lue par le héros et par `/a-propos`. Toujours sans
+   * intitulé : rien ne présente ces entreprises comme des clients.
    *
    * LES CHIFFRES PASSENT AVANT LA MÉTHODE, « POURQUOI MOI » APRÈS (phase C).
    * Les deux sections à cartes noires se suivaient et se lisaient comme une
@@ -543,7 +567,6 @@ export const homeContent: HomeContent = {
    */
   sectionOrder: [
     "hero",
-    "logoBand",
     "about",
     "services",
     "showreel",

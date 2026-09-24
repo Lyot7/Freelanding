@@ -1,6 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+  type RefObject,
+} from "react";
 import { preload } from "react-dom";
 import { estProfilLeger } from "@/lib/profil-appareil";
 import { useDepixelisation } from "@/components/motion/useDepixelisation";
@@ -339,18 +346,44 @@ function Decoration() {
   );
 }
 
-/** Barre bas : disponibilité (meter) + horloge locale live (framer-irdhqz). */
-function BottomBar({ site }: { site: SiteConfig }) {
-  const presetWwtw0z =
-    "m-0 text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em]";
+/**
+ * Barre bas (framer-irdhqz) : la ligne de preuve à gauche, les logos à droite.
+ *
+ * ELLE PORTAIT « RÉPONSE SOUS 24 HEURES OUVRÉES », seul dans le coin bas
+ * gauche, loin de tout : le délai est monté sous le bouton de rendez-vous, là
+ * où le visiteur décide (2026-09-24, phase D). La barre garde sa place et son
+ * apparition, et reçoit ce qui manquait au premier écran : un résultat mesuré
+ * et les trois logos, visibles sans défiler à 1440 × 900.
+ *
+ * Même grammaire que la barre d'origine : micro-typo 12 px en capitales, calée
+ * sur les bords du héros, contenu réparti aux deux extrémités. Seul le chiffre
+ * sort du registre des étiquettes, parce que c'est lui qu'on doit lire.
+ */
+function ProofBar({
+  proof,
+  logos,
+}: {
+  proof?: HeroContent["proof"];
+  logos?: ReactNode;
+}) {
+  if (!proof && !logos) return null;
+  const libelle =
+    "accent-room min-w-0 max-w-[300px] text-[12px] [text-wrap:balance] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60";
+  const contenu = proof ? (
+    <>
+      <span className="whitespace-pre text-[22px] font-medium leading-none tracking-[-0.02em] text-foreground tablet:text-[26px]">
+        {proof.value}
+      </span>
+      <span className={libelle}>{proof.label}</span>
+    </>
+  ) : null;
   return (
     <motion.div
-      /* `clip-room` : la barre a exactement la hauteur de son contenu, et
-         l'accent de « RÉPONSE SOUS 24 HEURES OUVRÉES » y montait 0,7 px trop
-         haut. 2 px de marge de coupe, sans rien déplacer. */
-      /* `flex-wrap` : sous 430 px la jauge et « PRENDRE RENDEZ-VOUS » ne
-         tiennent pas sur une ligne, et le lien sortait coupé en « RENDEZ- ». */
-      className="clip-room absolute bottom-[20px] left-[20px] right-[20px] z-[2] flex h-min flex-none flex-row flex-wrap items-center justify-between gap-x-[16px] gap-y-[10px] [--clip-room:2px] tablet:bottom-[30px] tablet:left-[30px] tablet:right-[30px]"
+      /* `clip-room` : la barre a exactement la hauteur de son contenu, et les
+         accents des capitales (« WÜRTH ») y montaient trop haut. 2 px de marge
+         de coupe, sans rien déplacer. `flex-wrap` : au mobile, les logos
+         passent sous la ligne de preuve. */
+      className="clip-room absolute bottom-[20px] left-[20px] right-[20px] z-[2] flex h-min flex-none flex-row flex-wrap items-center justify-between gap-x-[24px] gap-y-[14px] [--clip-room:2px] tablet:bottom-[30px] tablet:left-[30px] tablet:right-[30px]"
       {...appearReveal(
         "irdhqz",
         { opacity: 0.001, y: 50, scale: 1.3 },
@@ -358,42 +391,20 @@ function BottomBar({ site }: { site: SiteConfig }) {
         { opacity: 1, y: 0, scale: 1 },
       )}
     >
-      {/* framer-y1czug : disponibilité */}
-      <div className="relative h-auto w-auto flex-none">
-        <div className="relative flex h-min w-min flex-none flex-row items-center gap-[12px] overflow-visible">
-          {/* framer-1p44ppv + framer-3idgbx : libellé, jauge et compteur.
-              Les six barres étaient écrites en dur ici, alors que la page
-              contact en rendait cinq depuis la donnée : la même jauge affichait
-              donc deux états différents sur le même site. Source unique
-              désormais, `@/components/ui/AvailabilityMeter`. */}
-          {site.availability ? (
-            <AvailabilityMeter
-              availability={site.availability}
-              variant="hero"
-              // Même fuseau que l'horloge locale rendue quelques lignes plus
-              // bas : le mois affiché est celui d'Eliott, pas celui du visiteur.
-              timeZone={site.contact.timezone}
-              className={`${presetWwtw0z} gap-[12px] text-foreground`}
-            />
-          ) : null}
-        </div>
-      </div>
-
-      {/* LE LIEN « RÉSERVER UN APPEL » DE CETTE BARRE EST PARTI le 2026-09-24 :
-          le bouton plein du cadre porte désormais le rendez-vous, avec la même
-          destination (`decouverte`). Deux fois la même action dans le même
-          écran, en plus de l'en-tête, en affaiblissait chacune. */}
-      {/* RACCOURCI DE LA VUE AGENT (2026-09-24), entre la jauge et le rendez-
-          vous : copie en un clic un prompt qui contient tout le profil, à
-          coller dans l'assistant du visiteur. Même typo que ses voisins, seul
-          le curseur vert le distingue. Voir `DemanderAssistant`. */}
-      {/* Dès 810 px, calé 16 puis 20 px à droite de la ligne médiane du héros
-          (50 % de la barre, qui a 30 px de marge de chaque côté comme le
-          cadre) : entre deux voisins alignés sur les bords, un élément laissé
-          au milieu par `justify-between` se faisait couper par ce filet. */}
-      <DemanderAssistant
-        className={`${presetWwtw0z} tablet:absolute tablet:left-[calc(50%+16px)] tablet:top-1/2 tablet:-translate-y-1/2 desktop:left-[calc(50%+20px)]`}
-      />
+      {proof?.href ? (
+        <a
+          href={proof.href}
+          data-part="preuve"
+          className="group flex min-w-0 max-w-full items-center gap-[12px] no-underline [&>span:last-child]:transition-colors [&>span:last-child]:duration-200 hover:[&>span:last-child]:text-foreground motion-reduce:[&>span:last-child]:transition-none"
+        >
+          {contenu}
+        </a>
+      ) : proof ? (
+        <p data-part="preuve" className="m-0 flex min-w-0 max-w-full items-center gap-[12px]">
+          {contenu}
+        </p>
+      ) : null}
+      {logos}
     </motion.div>
   );
 }
@@ -537,21 +548,26 @@ function HeroContentBox({
                 en 16 px, au même poids que la carte fondateur, sous un
                 logotype de 110 px et au-dessus de trois mots en 18 px gras.
 
-                Elle reprend désormais le corps du chapô de l'accordéon
-                (22 / 26 / 32 px, même graisse, même interlettrage) et occupe
-                toute la largeur du cadre : c'est le second bloc lu après le
-                mot-symbole, et le premier qui dit quoi, pour qui et à partir
-                de combien. Le prix est lu dans `offre.ts` par `home.ts`.
+                Elle a d'abord repris le corps du chapô de l'accordéon (22 /
+                26 / 32 px). Le panel lisait encore le logotype puis le paraphe
+                avant elle : elle passe à 26 / 32 / 38 px (phase D), équilibrée
+                sur ses lignes. C'est le second bloc lu après le mot-symbole, et
+                le premier qui dit quoi, pour qui et à partir de combien. Le
+                prix est lu dans `offre.ts` par `home.ts`.
 
-                Les retraits bas (64 px, 140 dès 810) laissent la place du
-                paraphe, calé sur le bas de la colonne : plus serrés, il
-                barrait la carte fondateur.
+                Les retraits bas (64 px, 96 dès 810) laissent la place du
+                paraphe, calé dans l'angle bas droit de la colonne, à côté des
+                trois mots : 96 px couvrent sa hauteur (78 px) et sa dérive au
+                défilement sans toucher la carte fondateur.
 
                 Le bouton plein reprend celui de l'accordéon (30 px, aplat
                 accent) : c'est le seul aplat accent du cadre, le lien vers
                 les prestations reste une étiquette à côté de lui. */}
-            <div className="relative z-[2] flex h-min w-full flex-none flex-col items-start gap-[18px] overflow-hidden pt-[16px] pb-[64px] tablet:gap-[26px] tablet:pt-[26px] tablet:pb-[140px]">
-              <p className="m-0 w-full text-[22px] font-medium leading-[1.1] tracking-[-0.02em] text-foreground tablet:text-[26px] desktop:text-[32px]">
+            <div className="relative z-[2] flex h-min w-full flex-none flex-col items-start gap-[18px] overflow-hidden pt-[16px] pb-[64px] tablet:gap-[26px] tablet:pt-[26px] tablet:pb-[96px]">
+              <p
+                data-part="hero-offre"
+                className="m-0 w-full text-[26px] font-medium leading-[1.08] tracking-[-0.025em] text-foreground [text-wrap:balance] tablet:text-[32px] desktop:text-[38px]"
+              >
                 <Highlighted
                   text={subtitleText}
                   highlights={subtitleEmphasis}
@@ -559,22 +575,39 @@ function HeroContentBox({
                 />
               </p>
               <div className="relative flex w-full flex-col items-start gap-[16px] tablet:grid tablet:grid-cols-[repeat(2,minmax(50px,1fr))] tablet:items-center tablet:gap-0">
-                <div className="flex flex-row flex-wrap items-center gap-x-[20px] gap-y-[12px]">
-                  <a
-                    href={lienRendezVous("decouverte")}
-                    className="group relative flex h-[30px] flex-none flex-row items-center justify-center overflow-hidden bg-accent px-[10px] no-underline"
-                  >
-                    <span className="accent-room whitespace-pre text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-background">
-                      {uiLabels.services.rdvLabel}
-                    </span>
-                  </a>
-                  {hero.offerLink ? (
+                <div className="flex flex-col items-start gap-[10px]">
+                  <div className="flex flex-row flex-wrap items-center gap-x-[20px] gap-y-[12px]">
                     <a
-                      href={hero.offerLink.href}
-                      className="flex h-[30px] flex-none items-center text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60 no-underline transition-colors duration-200 hover:text-foreground motion-reduce:transition-none"
+                      href={lienRendezVous("decouverte")}
+                      className="group relative flex h-[30px] flex-none flex-row items-center justify-center overflow-hidden bg-accent px-[10px] no-underline"
                     >
-                      <span className="accent-room">{hero.offerLink.label}</span>
+                      <span className="accent-room whitespace-pre text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-background">
+                        {uiLabels.services.rdvLabel}
+                      </span>
                     </a>
+                    {hero.offerLink ? (
+                      <a
+                        href={hero.offerLink.href}
+                        className="flex h-[30px] flex-none items-center text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60 no-underline transition-colors duration-200 hover:text-foreground motion-reduce:transition-none"
+                      >
+                        <span className="accent-room">{hero.offerLink.label}</span>
+                      </a>
+                    ) : null}
+                  </div>
+                  {/* LE DÉLAI DE RÉPONSE SOUS LE BOUTON depuis le 2026-09-24
+                      (phase D). Il était seul dans le coin bas gauche du héros,
+                      loin de l'action qu'il rassure. Ici, il se lit au moment
+                      où l'on hésite à réserver. Même composant que la page
+                      contact : la jauge y reviendrait avec les créneaux. */}
+                  {site.availability ? (
+                    <div data-part="hero-delai">
+                      <AvailabilityMeter
+                        availability={site.availability}
+                        variant="hero"
+                        timeZone={site.contact.timezone}
+                        className="clip-room m-0 text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground [--clip-room:2px]"
+                      />
+                    </div>
                   ) : null}
                 </div>
                 <FounderCard person={hero.person} />
@@ -588,9 +621,10 @@ function HeroContentBox({
 
             {/* framer-126i1qf : paraphe (absolu dans framer-1cdgr7m).
                 ATTÉNUÉ À 40 % sur l'accueil depuis le 2026-09-24 : en volt
-                plein, ce tracé de 450 px était la plus grande surface accent
-                du cadre et tirait l'œil loin du bouton, seul autre aplat
-                accent. Il garde son apparition et sa dérive au défilement.
+                plein, ce tracé était la plus grande surface accent du cadre
+                et tirait l'œil loin du bouton, seul autre aplat accent. En
+                phase D, il est ramené à 300 px et rentré dans le cadre (voir
+                `Signature`). Il garde son apparition et sa dérive.
                 L'enveloppe n'est pas positionnée : le paraphe reste calé sur
                 la colonne interne, l'opacité ne fait que le fondre. */}
             <div className="pointer-events-none opacity-40">
@@ -886,7 +920,16 @@ export function HeroVideo({ src, poster }: { src: string; poster?: string }) {
   );
 }
 
-export function HeroSection({ hero, site }: { hero: HeroContent; site: SiteConfig }) {
+export function HeroSection({
+  hero,
+  site,
+  logos,
+}: {
+  hero: HeroContent;
+  site: SiteConfig;
+  /** Rangée de logos du bas du héros, rendue par l'appelant (composant serveur). */
+  logos?: ReactNode;
+}) {
   const media = hero.media;
   const hasVideo = media?.kind === "video" && Boolean(media.src);
   // L'affiche est l'élément LCP du mobile : préchargée en priorité haute, elle
@@ -924,7 +967,7 @@ export function HeroSection({ hero, site }: { hero: HeroContent; site: SiteConfi
 
       <HeroGlass height={boxHeight} />
       <HeroContentBox hero={hero} site={site} boxRef={boxRef} />
-      <BottomBar site={site} />
+      <ProofBar proof={hero.proof} logos={logos} />
       <NoiseTexture />
     </section>
   );

@@ -12,12 +12,9 @@ import { SignatureMark } from "@/components/sections/SignatureMark";
  * viewBox 0 0 452.12 132.867, fill rgb(255,69,0) (accent). Reproduit tel quel.
  *
  * Positionnement (container absolu dans la colonne interne framer-1cdgr7m),
- * calé sur le rendu live :8080 pour NE PAS chevaucher le texte :
- *   desktop (>=1200) : bottom 37px, right -180px, cadre 452x133
- *   tablet  (810-1199): bottom 31px, left 370px, cadre 452x133
- *   base    (<=809)  : bottom 18px, left 84px, cadre réduit 316x93
- *     -> bord gauche ~x124 sur 390px (à droite du fondateur), déborde à droite,
- *        comme le live (mesuré x=124..440 sur :8080 à 390px).
+ * sans chevaucher le texte ni sortir du cadre (voir le calage `default`) :
+ *   dès 810 : angle bas droit de la colonne, cadre 300x78
+ *   base    : bottom 24px, right 0, cadre réduit 165x43, sous la carte fondateur
  *
  * APPARITION : `appear effect` de la source (`data-framer-appear-id="126i1qf"`),
  * opacity .001 + translateX(60px) + scale(1.2) → état final, spring stiffness
@@ -140,13 +137,16 @@ export function Signature({
            nom + rôle est à `z-[3]`, il doit rester au-dessus du tracé si un
            libellé plus long venait un jour à remonter dans sa boîte. */
         "z-[2] left-[91px] top-[27px] right-auto bottom-auto h-auto w-[271px] aspect-[1250/324] tablet:top-[32px] desktop:top-[25px]"
-      : /* MESURÉ à 810 px : posé à `left-[370px]` sur 452 de large, le cadre
-         atteint 822 px alors que la section n'en fait que 810 et COUPE. La fin
-         du paraphe disparaissait donc, sur la largeur tablette uniquement.
-         Le parent décale déjà de 66 px : à 288, le bord droit tombe à 806, sous les 810, avec 4 px de garde. Le débordement
-         VOULU reste celui du desktop (`right-[-180px]`), qui sort par la droite
-         d'un cadre bien plus large. */
-        "z-[1] bottom-[57px] left-auto right-0 h-[43px] w-[165px] tablet:bottom-[31px] tablet:left-[288px] tablet:right-auto tablet:h-[133px] tablet:w-[452px] desktop:bottom-[37px] desktop:left-auto desktop:right-[-180px]";
+      : /* DANS LE CADRE depuis le 2026-09-24 (panel design, phase D). Le
+         calage hérité du template le faisait déborder par la droite
+         (`right-[-180px]` sur 452 px en desktop, 60 px de trop en tablette) :
+         il traversait le trait du cadre puis la photo de fond, et se lisait
+         comme un défaut. Dès 810, il est posé dans l'angle bas droit de la
+         colonne, sur la ligne des trois mots, à 300 px de large (la hauteur
+         suit le rapport du tracé, 1250/324). Au mobile, il descend sous la
+         carte fondateur, juste au-dessus des trois mots : posé à 57 px du
+         bas, il en barrait le rôle (« Développeur freelance »). */
+        "z-[1] bottom-[24px] left-auto right-0 h-[43px] w-[165px] tablet:bottom-0 tablet:h-[78px] tablet:w-[300px]";
   return (
     <motion.div
       aria-hidden

@@ -619,7 +619,7 @@ export async function AboutPage() {
         {siteFeatures.testimonials && about.testimonial ? (
           <TestimonialsSection testimonials={[about.testimonial]} />
         ) : null}
-        {/* Bande de logos défilante (140px) : elle sépare les témoignages du
+        {/* Bande de logos fixe (140px) : elle sépare les témoignages du
             teaser blog sur la source, elle manquait ici. */}
         {home.logoBand ? <LogoBandSection logoBand={home.logoBand} /> : null}
         {/* Retrait haut MESURÉ à 30 en mobile sur `/about` (contre 40 sur la

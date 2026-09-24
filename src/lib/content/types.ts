@@ -557,6 +557,19 @@ export interface HeroContent {
   serviceWordsSeparator?: string;
   /** Personne mise en avant à côté du sous-titre (carte fondateur). */
   person?: Person;
+  /**
+   * Ligne de preuve du bas du héros, à côté des logos : un résultat mesuré,
+   * son libellé et, quand elle existe, la page qui le détaille.
+   */
+  proof?: HeroProof;
+}
+
+/** Résultat affiché dans le bas du héros (« −92 % d'erreurs… »). */
+export interface HeroProof {
+  /** Le chiffre, signe et unité compris (« −92 % »). */
+  value: string;
+  label: string;
+  href?: string;
 }
 
 /** Bloc « Showreel » — marquee défilant + phrase manifeste + millésime. */
@@ -788,7 +801,8 @@ export interface HomeContent {
   /**
    * Ordre d'affichage des sections de la home — source unique de la composition.
    * Valeurs : hero | about | showreel | works | whyUs | services | numbers |
-   * faq | testimonials | logoBand | articles.
+   * faq | testimonials | articles. Les logos ne sont plus une section de
+   * l'accueil : ils vivent dans le bas du héros, avec la ligne de preuve.
    */
   sectionOrder: string[];
 }

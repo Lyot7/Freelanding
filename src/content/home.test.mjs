@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { homeContent } from "./home.ts";
 import { packEntree, prixPack } from "./offre.ts";
 import { siteConfig } from "./site.ts";
+import { howWeDoItStats } from "./stats.ts";
 import { uiLabels } from "./ui.ts";
 
 /**
@@ -14,8 +15,23 @@ import { uiLabels } from "./ui.ts";
 describe("accueil", () => {
   const ordre = homeContent.sectionOrder;
 
-  test("la bande des logos suit directement le héros", () => {
-    expect(ordre.slice(0, 3)).toEqual(["hero", "logoBand", "about"]);
+  test("les logos vivent dans le héros, plus dans une section à part", () => {
+    expect(ordre).not.toContain("logoBand");
+    expect(ordre.slice(0, 2)).toEqual(["hero", "about"]);
+    expect(homeContent.logoBand?.logos.length).toBeGreaterThan(0);
+  });
+
+  test("la preuve du héros est le chiffre Würth de la section chiffres", () => {
+    const stat = howWeDoItStats.find((s) => s.label.includes("Würth"));
+    const preuve = homeContent.hero.proof;
+    expect(stat).toBeDefined();
+    expect(preuve?.label).toBe(stat?.label);
+    expect(preuve?.value).toBe(`${stat?.prefix}${stat?.value}\u202F${stat?.suffix}`);
+    expect(preuve?.href).toBe("/realisations/wurth-creation-de-compte");
+  });
+
+  test("la preuve ne présente aucune entreprise comme cliente", () => {
+    expect(homeContent.hero.proof?.label.toLowerCase()).not.toContain("client");
   });
 
   test("la bande des logos ne porte aucun intitulé qui en ferait des clients", () => {

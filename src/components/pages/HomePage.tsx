@@ -38,7 +38,21 @@ export async function HomePage() {
   ).filter((post): post is NonNullable<typeof post> => Boolean(post));
 
   const sections = {
-    hero: <HeroSection hero={home.hero} site={site} />,
+    /* Les logos sont rendus DANS le héros depuis le 2026-09-24 (phase D), à
+       côté de la ligne de preuve : c'est la seule place où ils sont vus sans
+       défiler. Ils ne sont donc plus une entrée de `sections`, sinon un
+       `logoBand` remis dans l'ordre les afficherait deux fois. */
+    hero: (
+      <HeroSection
+        hero={home.hero}
+        site={site}
+        logos={
+          home.logoBand ? (
+            <LogoBandSection logoBand={home.logoBand} variant="heros" />
+          ) : null
+        }
+      />
+    ),
     about: <AboutSection about={home.about} />,
     showreel: <ShowreelSection showreel={home.showreel} />,
     works: <WorksSection works={works} />,
@@ -65,9 +79,6 @@ export async function HomePage() {
     faq: <FaqSection faq={home.faq ?? []} topAccent={false} />,
     testimonials: home.testimonials ? (
       <TestimonialsSection testimonials={home.testimonials.items} />
-    ) : null,
-    logoBand: home.logoBand ? (
-      <LogoBandSection logoBand={home.logoBand} />
     ) : null,
     articles: <ArticlesSection posts={featuredPosts} />,
   } satisfies Record<string, ReactNode>;
