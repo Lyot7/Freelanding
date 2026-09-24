@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { motion } from "motion/react";
 import { useParallaxLayerY } from "@/components/motion/ParallaxImage";
 import { useReveal } from "@/components/motion/Reveal";
@@ -8,7 +8,9 @@ import {
   MEDIA_REVEAL_FROM,
   MEDIA_REVEAL_TRANSITION,
 } from "@/components/motion/mediaReveal";
+import { useDepixelisation } from "@/components/motion/useDepixelisation";
 import { urlImageFond } from "@/lib/image-fond";
+import { EVENEMENT_PRECHARGEMENT } from "@/lib/prechargement";
 
 /**
  * Calque dérivant à IMAGE DE FOND, tel que la source le pose.
@@ -30,6 +32,14 @@ import { urlImageFond } from "@/lib/image-fond";
  * et `[inset:-7%_0]` déclarent la même propriété, la seconde se faisait écraser,
  * et le calque se retrouvait à la taille exacte de son cadre — donc sans course
  * à parcourir, ce qui a longtemps fait passer la parallaxe pour inopérante.
+ *
+ * CHARGEMENT DIFFÉRÉ ET DÉPIXELISATION. Une image de fond CSS part dès le
+ * rendu, où qu'elle soit dans la page : le navigateur ne sait pas la différer.
+ * Le calque ne pose donc son image qu'une fois chargée, à l'approche de
+ * l'écran ou quand la page est au repos (`EVENEMENT_PRECHARGEMENT`), et se
+ * dépixelise à sa première apparition comme les `<img>` (`useDepixelisation`).
+ * `prioritaire` rétablit l'image dans le HTML serveur, pour un calque visible
+ * au chargement.
  */
 export function ParallaxBackdrop({
   src,
@@ -37,6 +47,7 @@ export function ParallaxBackdrop({
   label,
   className = "",
   reveal = false,
+  prioritaire = false,
   children,
 }: {
   src: string;
@@ -51,6 +62,8 @@ export function ParallaxBackdrop({
    * `.framer-1ambeg8-container` le font.
    */
   reveal?: boolean;
+  /** Image posée dès le HTML serveur, sans différé ni dépixelisation. */
+  prioritaire?: boolean;
   children?: ReactNode;
 }) {
   const frame = useRef<HTMLDivElement>(null);
@@ -60,6 +73,52 @@ export function ParallaxBackdrop({
     ? revealProps(MEDIA_REVEAL_FROM, MEDIA_REVEAL_TRANSITION)
     : null;
   const edge = `${-overshoot * 100}%`;
+  const finale = urlImageFond(src, 1080);
+  const [pret, setPret] = useState(prioritaire);
+  const pretRef = useRef(prioritaire);
+  const chargement = useRef<Promise<HTMLImageElement | null> | null>(null);
+  const charger = useCallback(() => {
+    chargement.current ??= new Promise<HTMLImageElement | null>((fin) => {
+      const img = new window.Image();
+      img.onload = () => fin(img);
+      img.onerror = () => fin(null);
+      img.src = finale;
+    }).then((img) => {
+      pretRef.current = true;
+      setPret(true);
+      return img;
+    });
+    return chargement.current;
+  }, [finale]);
+
+  useEffect(() => {
+    const cadre = frame.current;
+    if (!cadre || prioritaire) return;
+    const approche = new IntersectionObserver(
+      (entrees) => {
+        if (!entrees.some((entree) => entree.isIntersecting)) return;
+        approche.disconnect();
+        void charger();
+      },
+      { rootMargin: "100% 0px" },
+    );
+    approche.observe(cadre);
+    const auRepos = () => void charger();
+    window.addEventListener(EVENEMENT_PRECHARGEMENT, auRepos);
+    return () => {
+      approche.disconnect();
+      window.removeEventListener(EVENEMENT_PRECHARGEMENT, auRepos);
+    };
+  }, [charger, prioritaire]);
+
+  const etape = useDepixelisation({
+    cible: frame,
+    src,
+    actif: !prioritaire,
+    estChargee: () => pretRef.current,
+    charger,
+  });
+  const fond = etape ?? (pret ? finale : null);
   const layer = (
     <motion.div
       role={label ? "img" : undefined}
@@ -68,7 +127,8 @@ export function ParallaxBackdrop({
       style={{
         top: edge,
         bottom: edge,
-        backgroundImage: `url("${urlImageFond(src, 1080)}")`,
+        backgroundImage: fond ? `url("${fond}")` : undefined,
+        imageRendering: etape ? "pixelated" : undefined,
         ...(y ? { y } : null),
       }}
     />

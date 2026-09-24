@@ -1,6 +1,6 @@
 import { SITE_URL } from "@/lib/site-url";
 import { preferredSourceUrl } from "@/lib/preferred-source";
-import Image from "next/image";
+import { ImageProgressive } from "@/components/ui/ImageProgressive";
 /* Le pied de page est sur les NEUF routes : ses liens préchargeaient toutes les
    routes du site dès qu'on descendait jusqu'à lui. Voir `HoverPrefetchLink`. */
 import { HoverPrefetchLink } from "@/components/ui/HoverPrefetchLink";
@@ -262,7 +262,7 @@ function TestimonialCard({ person }: { person: FooterPerson }) {
           <div className="relative aspect-square h-[37px] w-[37px] flex-none overflow-hidden rounded-[50px] tablet:h-[36px] tablet:w-[36px]">
             {/* 37 px à l'écran, pas les 83 du fichier : `width`/`height` sont la
                 boîte D'AFFICHAGE, c'est elle qui décide de la variante servie. */}
-            <Image
+            <ImageProgressive
               src="/images/eliott-bouquerel-avatar.jpg"
               alt=""
               width={37}
@@ -713,7 +713,7 @@ export async function Footer() {
                     {credits?.createdByAvatar ? (
                       <span className="absolute inset-0 transition-transform duration-[320ms] ease-[cubic-bezier(0.68,0,0,1)] group-hover:-translate-y-full motion-reduce:transition-none">
                           {/* 24 px à l'écran (voir la note de l'avatar plus haut). */}
-                          <Image
+                          <ImageProgressive
                             src={credits.createdByAvatar.src}
                             alt={credits.createdByAvatar.alt}
                             width={24}

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import Image from "next/image";
+import { ImageProgressive } from "@/components/ui/ImageProgressive";
 import Link from "next/link";
 import { SvgSprite } from "@/components/SvgSprite";
 import { FloatingNav, Footer, Header } from "@/components/layout";
@@ -114,7 +114,7 @@ function RelatedArticle({ post }: { post: BlogPost }) {
           {/* `.framer-1jh566n` — auteur, gap 8. */}
           <div className="flex w-full items-center gap-[8px] tablet:w-px tablet:flex-[1_0_0]">
             {post.author.avatar ? (
-              <Image
+              <ImageProgressive
                 src={post.author.avatar.src}
                 alt=""
                 width={30}
@@ -197,7 +197,7 @@ export function BlogArticlePage({
                 decorative
                 className="pointer-events-none absolute inset-0 z-0 overflow-clip"
               >
-                <Image
+                <ImageProgressive
                   src={post.cover.src}
                   alt={post.cover.alt}
                   fill
@@ -268,7 +268,7 @@ export function BlogArticlePage({
                    servions 42 partout. `width`/`height` portent la plus grande
                    des deux tailles : c'est la boîte d'AFFICHAGE qui décide de la
                    variante servie, et il ne faut pas sous-résoudre à 810. */
-                <Image
+                <ImageProgressive
                   src={post.author.avatar.src}
                   alt=""
                   width={50}

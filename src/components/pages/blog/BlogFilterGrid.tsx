@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { ImageProgressive } from "@/components/ui/ImageProgressive";
 import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
 import { motion } from "motion/react";
@@ -89,7 +89,7 @@ function BlogIndexCard({
         className="absolute inset-x-0"
         style={{ top: "-6%", height: "112%", ...(coverY ? { y: coverY } : null) }}
       >
-      <Image
+      <ImageProgressive
         src={post.cover.src}
         alt={post.cover.alt}
         fill
@@ -140,7 +140,7 @@ function BlogIndexCard({
         <div className="flex flex-col items-start gap-[40px] tablet:flex-row tablet:items-end tablet:justify-between tablet:gap-0">
           <div className="flex w-full items-center gap-[8px] tablet:w-px tablet:flex-[1_0_0]">
             {post.author.avatar ? (
-              <Image
+              <ImageProgressive
                 src={post.author.avatar.src}
                 alt=""
                 width={30}

@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { ImageProgressive } from "@/components/ui/ImageProgressive";
 
 /**
  * Avatar — image ronde (radius 100%), next/image optimisé.
@@ -21,7 +21,7 @@ export interface AvatarProps {
 export function Avatar({ src, alt, size = "md", className }: AvatarProps) {
   const px = SIZES[size];
   return (
-    <Image
+    <ImageProgressive
       src={src}
       alt={alt}
       width={px}

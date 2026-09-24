@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { ImageProgressive } from "@/components/ui/ImageProgressive";
 import Link from "next/link";
 import { Icon } from "@/components/ui";
 import { Grain } from "@/components/effects/Grain";
@@ -136,7 +136,7 @@ function FeaturedCard({ post }: { post: BlogPost }) {
                   aurait servi la couverture pleine taille — 419 KB relevés dans
                   un cadre de 50 px. `object-cover` recadre comme avant : Next ne
                   redimensionne que la largeur, il ne recadre pas. */}
-              <Image
+              <ImageProgressive
                 src={post.cover.src}
                 alt={post.cover.alt}
                 width={50}

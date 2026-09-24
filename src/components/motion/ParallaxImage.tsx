@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, type RefObject } from "react";
-import Image from "next/image";
+import { ImageProgressive } from "@/components/ui/ImageProgressive";
 import { motion, useMotionValue, useScroll, useTransform } from "motion/react";
 import {
   pourcentage,
@@ -63,7 +63,7 @@ const OVERSHOOT = 0.07;
 
 /**
  * Même calcul, exposé pour les calques de parallaxe qui ne passent pas par
- * `<Image>` : plusieurs sections posent leur visuel en `background-image` sur un
+ * `<ImageProgressive>` : plusieurs sections posent leur visuel en `background-image` sur un
  * div déjà surdimensionné, avec la bonne géométrie mais aucun mouvement.
  *
  * `overshoot` est le débord relatif du calque de chaque côté du cadre, tel qu'il
@@ -248,7 +248,7 @@ export function ParallaxImage({
       <div ref={ref} className={"relative overflow-clip " + className}>
         {/* `width/height = 0` + `sizes` : forme supportée par next/image pour une
             image de dimensions intrinsèques inconnues, dimensionnée en CSS. */}
-        <Image
+        <ImageProgressive
           src={src}
           alt={alt}
           width={0}
@@ -281,7 +281,7 @@ export function ParallaxImage({
           `translateY` de la parallaxe via framer-motion, qui écrit le
           `transform` en inline et écraserait une classe utilitaire. Deux
           éléments distincts, donc aucun conflit. */}
-      <Image
+      <ImageProgressive
         src={src}
         alt={alt}
         fill

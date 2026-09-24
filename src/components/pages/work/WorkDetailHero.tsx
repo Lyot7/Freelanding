@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { ImageProgressive } from "@/components/ui/ImageProgressive";
 import { Grain } from "@/components/effects/Grain";
 import { Reveal } from "@/components/motion/Reveal";
 import { ScrollParallax } from "@/components/motion/ScrollParallax";
@@ -37,7 +37,7 @@ export function WorkDetailHero({ work }: { work: WorkItem }) {
         decorative
         className="pointer-events-none absolute inset-0 z-0 overflow-clip"
       >
-        <Image
+        <ImageProgressive
           src={fond.src}
           alt={fond.alt}
           fill

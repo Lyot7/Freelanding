@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useReducedMotion } from "motion/react";
-import Image from "next/image";
+import { ImageProgressive } from "@/components/ui/ImageProgressive";
 import { Grain } from "@/components/effects/Grain";
 import { Ticker } from "@/components/ui/Ticker";
 import { uiLabels } from "@/content/ui";
@@ -187,7 +187,7 @@ function WorkCardMedia({
   }
 
   return (
-    <Image
+    <ImageProgressive
       src={media.image.src}
       alt={alt}
       fill

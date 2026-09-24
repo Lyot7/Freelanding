@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { ImageProgressive } from "@/components/ui/ImageProgressive";
 import { LineReveal } from "@/components/motion/LineReveal";
 import { Reveal } from "@/components/motion/Reveal";
 import type {
@@ -150,7 +150,7 @@ function Testimonial({ testimonial }: { testimonial: TestimonialContent }) {
             traitement que `MethodeSection`, qui conditionne déjà son avatar. */}
         {author.avatar ? (
           <div className="relative aspect-square h-[51px] w-[50px] overflow-hidden rounded-[50px] tablet:h-[50px]">
-            <Image
+            <ImageProgressive
               src={author.avatar.src}
               alt={author.avatar.alt}
               width={author.avatar.width ?? 83}
