@@ -2,7 +2,6 @@ import { content } from "@/lib/content";
 import type { ContentBlock, Stat } from "@/lib/content/types";
 import { absoluteUrl } from "@/lib/site-url";
 import {
-  delaiPack,
   packEntree,
   prestations,
   prixPack,
@@ -68,7 +67,7 @@ function blocsPrestation(prestation: Prestation): ContentBlock[] {
     blocs.push(
       p(
         [
-          T.offres.pack(pack.nom, prixPack(pack), delaiPack(pack)),
+          T.offres.pack(pack.nom, prixPack(pack)),
           pack.promesse,
           `${T.offres.pourQui}${DP} ${minuscule(phrase(pack.pourQui))}`,
         ].join(" "),
@@ -136,13 +135,13 @@ export async function construireProfil(): Promise<Profil> {
 
   /* Offres : l'ordre et les intitulés de l'accordéon de l'accueil, le détail
      des périmètres tiré de `offre.ts`. */
-  blocs.push(h2(T.sections.offres), p(home.services.intro ?? ""), p(T.offres.prix));
+  blocs.push(h2(T.sections.offres), p(home.services.intro ?? ""), ...T.offres.prix.map(p));
   for (const service of home.services.items) {
     const prestation = prestations.find(
       (candidate) => service.cta?.href === `/services/${candidate.slug}`,
     );
     blocs.push(
-      h3(service.price ? `${service.title} (${service.price}\u00A0HT)` : service.title),
+      h3(service.price ? T.offres.fourchette(service.title, service.price) : service.title),
       ...service.body.map(p),
       ...(prestation ? blocsPrestation(prestation) : []),
       ...(prestation
@@ -170,6 +169,7 @@ export async function construireProfil(): Promise<Profil> {
     h2(T.sections.methode),
     ...(home.numbers.title ? [p(phrase(home.numbers.title))] : []),
     liste([
+      ...T.methode.etapes,
       ...phrasesDeMethode(about.stats),
       ...(contact.responseTime
         ? [`${T.methode.reponse}${DP} ${minuscule(contact.responseTime)}`]
@@ -247,9 +247,13 @@ export async function construireProfil(): Promise<Profil> {
   );
 
   /* FAQ, réponses complètes. */
-  if (faq.length) {
+  /* La question sur l'intelligence artificielle reste sur le site, pas ici :
+     aucun argument IA côté client (vault, `offre-grille-prix.md`, 2026-09-24),
+     et l'assistant du visiteur en ferait une raison de choisir. */
+  const questions = faq.filter((item) => !/intelligence artificielle/iu.test(item.question));
+  if (questions.length) {
     blocs.push(h2(T.sections.faq));
-    for (const item of faq) blocs.push(h3(item.question), p(item.answer));
+    for (const item of questions) blocs.push(h3(item.question), p(item.answer));
   }
 
   /* Contact : chaque canal avec son lien exact. */

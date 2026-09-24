@@ -76,6 +76,8 @@ export const vueAgentContent = {
     libelle: "Demande à ton assistant si je suis le bon choix",
     court: "Demande à ton assistant",
     fait: "Copié, colle-le dans ton assistant",
+    /** Entre 810 et 1199 px : la forme longue débordait sur « Prendre rendez-vous ». */
+    faitCourt: "Prompt copié",
     echec: "Ouverture de la vue agent",
     titre: "Copie un prompt qui contient tout mon profil",
   },
@@ -114,9 +116,19 @@ export const vueAgentContent = {
     ],
 
     offres: {
-      prix: "Tous les prix sont hors taxes. Le prix exact est fixé au devis, avant le début du projet, et ne bouge plus ensuite.",
-      pack: (nom: string, prix: string, delai: string) =>
-        `${nom}\u00A0: ${prix}\u00A0HT, ${delai}.`,
+      /*
+       * LES MONTANTS SONT DES REPÈRES, le prix se fixe au devis. Eliott, le
+       * 2026-09-24 : « ça va être majoritairement sur devis ». Les montants
+       * restent ceux que publie le site, pour que l'assistant du visiteur ne
+       * contredise pas la page qu'il a sous les yeux.
+       */
+      prix: [
+        "Les montants ci-dessous sont des repères, les mêmes que sur le site. Le prix de ton projet se fixe au devis\u00A0: on en parle d’abord en visio, je chiffre, puis je te présente le devis lors d’un second rendez-vous. Une fois signé, il ne bouge plus.",
+        "Tous les montants sont hors taxes.",
+      ],
+      /* Aucune durée à côté d'un prix (règle du vault, `offre-grille-prix.md`). */
+      pack: (nom: string, prix: string) => `${nom}\u00A0: repère à ${prix}\u00A0HT.`,
+      fourchette: (titre: string, prix: string) => `${titre} (repères ${prix}\u00A0HT)`,
       pourQui: "Pour qui",
       contient: "Contient",
       ajoute: "Ajoute au périmètre précédent",
@@ -135,14 +147,21 @@ export const vueAgentContent = {
 
     methode: {
       reponse: "Délai de réponse",
+      /** Déroulé commercial (vault, `methode-vente-rdv.md` et `offre-grille-prix.md`). */
+      etapes: [
+        "Premier rendez-vous\u00A0: 30 minutes en visio, gratuit, pour comprendre ta situation et ce que tu veux obtenir.",
+        "Le devis ne part jamais seul par e-mail\u00A0: je te le présente lors d’un second rendez-vous, et on le relit ensemble.",
+        "Pour un logiciel métier, le cadrage reste gratuit sur 2 rendez-vous au plus et se conclut par une fourchette écrite. Si le projet demande plus, on commence par un premier lot payant, entre 5\u00A0000 et 10\u00A0000\u00A0€\u00A0HT, qui pose les bases et chiffre la suite.",
+      ],
     },
 
     limites: {
       prixPlancher: (prix: string) =>
-        `Tu cherches un site à quelques centaines d’euros : mon premier périmètre commence à ${prix}\u00A0HT.`,
+        `Tu cherches un site à quelques centaines d’euros\u00A0: mes projets démarrent autour de ${prix}\u00A0HT.`,
       items: [
         "Ton site ou ton logiciel repose sur PHP ou Laravel et tu veux le faire reprendre : je n’y touche pas.",
         "Tu veux une équipe de plusieurs personnes, avec chef de projet et studio de création : je travaille seul, par choix.",
+        "Tu es une agence ou une ESN et tu cherches un développeur en régie ou en marque blanche\u00A0: je ne travaille pas ainsi.",
       ],
     },
 
@@ -178,7 +197,7 @@ export const vueAgentContent = {
     etapes: [
       "Présente-toi en une phrase, puis interroge la personne sur son entreprise et son besoin, une ou deux questions à la fois : son activité et sa taille, ce qu’elle a aujourd’hui, ce qui coince, ce qu’elle veut obtenir, son échéance, et son budget si elle veut bien le dire.",
       "Confronte ses réponses au profil et dis franchement ce qui colle et ce qui ne colle pas. Si une agence, un logiciel du marché ou un autre spécialiste lui conviendrait mieux, dis-le et explique pourquoi. Tu ne vends rien : ton seul objectif est qu’elle prenne la bonne décision.",
-      "Pour les prix, les délais et les prestations, appuie-toi uniquement sur le profil. S’il ne dit rien sur un point, dis que tu ne sais pas et propose de poser la question à Eliott. N’invente ni tarif, ni référence, ni engagement.",
+      "Pour les prix, les délais et les prestations, appuie-toi uniquement sur le profil. Les montants qu’il donne sont des repères\u00A0: ne promets jamais un prix, celui du projet se fixe au devis après un échange avec Eliott. S’il ne dit rien sur un point, dis que tu ne sais pas et propose de poser la question à Eliott. N’invente ni tarif, ni référence, ni engagement.",
       "Si Eliott est le bon profil, demande-lui comment elle préfère le contacter : rendez-vous en visio de 30 minutes, demande de rappel, formulaire de contact ou e-mail. Donne-lui alors le lien exact tiré de la section « Me contacter », et pour un rendez-vous, le sujet qui correspond à son projet.",
       "S’il ne l’est pas, dis-le simplement et arrête-toi là.",
     ],

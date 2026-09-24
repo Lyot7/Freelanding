@@ -81,7 +81,10 @@ export function DemanderAssistant({ className = "" }: { className?: string }) {
         {t.invite}
       </span>
       {copie ? (
-        <span>{t.fait}</span>
+        <>
+          <span className="tablet:hidden desktop:inline">{t.fait}</span>
+          <span className="hidden tablet:inline desktop:hidden">{t.faitCourt}</span>
+        </>
       ) : (
         <>
           {/* TROIS FORMES. Sous 810 px le raccourci a sa propre ligne : la

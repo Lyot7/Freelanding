@@ -15,17 +15,22 @@ const markdown = profilEnMarkdown(profil);
 const prompt = construirePrompt(profil);
 
 describe("profil complet de la vue Agent", () => {
-  it("cite chaque pack au prix calculé par offre.ts", () => {
+  it("cite chaque pack comme un repère, au prix calculé par offre.ts, sans durée", () => {
     for (const prestation of prestations) {
       for (const pack of prestation.packs) {
-        expect(markdown).toContain(`${pack.nom}\u00A0: ${prixPack(pack)}\u00A0HT`);
+        expect(markdown).toContain(`${pack.nom}\u00A0: repère à ${prixPack(pack)}\u00A0HT.`);
       }
     }
+    expect(markdown).not.toMatch(/jours ouvrés/u);
+    expect(markdown).toMatch(/se fixe au devis/u);
   });
 
   it("cite chaque réalisation et chaque question de la FAQ", () => {
     for (const work of workItems) expect(markdown).toContain(`### ${work.title}`);
-    for (const item of faqItems) expect(markdown).toContain(item.answer);
+    for (const item of faqItems) {
+      if (/intelligence artificielle/iu.test(item.question)) expect(markdown).not.toContain(item.question);
+      else expect(markdown).toContain(item.answer);
+    }
   });
 
   it("donne le lien exact de chaque type de rendez-vous, et du formulaire", () => {
