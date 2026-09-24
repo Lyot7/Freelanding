@@ -1,7 +1,8 @@
 import { SvgSprite } from "@/components/SvgSprite";
+import { CreditHeroPhoto, HeroPhoto } from "@/components/pages/services/HeroPhoto";
+import { herosPages } from "@/content/heros-pages";
 import { FloatingNav, Footer, Header } from "@/components/layout";
 import { Reveal } from "@/components/motion/Reveal";
-import { GradientWaveBackdrop } from "@/components/effects/GradientWaveBackdrop";
 import { RichText } from "@/components/pages/RichText";
 import { TableOfContents } from "@/components/blog/TableOfContents";
 import { sommaireDesBlocs } from "@/lib/blog/sommaire";
@@ -18,6 +19,7 @@ export function LegalPageView({
   site: SiteConfig;
 }) {
   const sommaire = sommaireDesBlocs(document.body);
+  const photo = herosPages.legal[document.slug];
 
   return (
     <>
@@ -31,7 +33,7 @@ export function LegalPageView({
             90). Nous étions à 64 et 30, ce qui posait tout le héros 60 px trop
             bas en tablette et au-delà. */}
         <section className="relative flex h-[90svh] items-end overflow-hidden bg-background px-[20px] pb-[60px] pt-[140px] text-foreground tablet:px-[24px] tablet:pb-[90px] desktop:px-[30px]">
-          <GradientWaveBackdrop seed={34} />
+          {photo ? <HeroPhoto image={photo} /> : null}
           {/* RELEVÉ sur `/legal/privacy-policy` : hôte 1440 × 810, z-1,
               opacité 0,05. La page n'a que trois calques : ce héros, le grain
               plein footer et celui de la carte témoignage du footer. */}
@@ -53,7 +55,7 @@ export function LegalPageView({
               (741 au lieu de 720), il finissait 69 px trop bas (716 au lieu de
               647), et à 810 sa colonne amputée de 21 px le faisait passer de
               deux à TROIS lignes (192 px de haut au lieu de 128). */}
-          <div className="relative z-[2] mx-auto grid w-full max-w-[1440px] gap-[20px] tablet:grid-cols-2 tablet:gap-x-0 tablet:gap-y-[30px]">
+          <div className="relative z-[2] [text-shadow:0_0_18px_rgba(0,0,0,.45)] mx-auto grid w-full max-w-[1440px] gap-[20px] tablet:grid-cols-2 tablet:gap-x-0 tablet:gap-y-[30px]">
             <Reveal
               trigger="appear"
               appearId="legal-hero-titre"
@@ -81,6 +83,7 @@ export function LegalPageView({
               {document.summary}
             </p>
           </div>
+          {photo ? <CreditHeroPhoto credit={photo.credit} /> : null}
         </section>
 
         {/* Rembourrage 30 en haut / 60 en bas sur la source (pas 70/70), et la

@@ -10,6 +10,12 @@
  *     renvoyait « 404: This page could not be found. » à la place du design.
  */
 import Link from "next/link";
+import {
+  CreditHeroPhoto,
+  HeroPhoto,
+  VOILE_TEXTE,
+} from "@/components/pages/services/HeroPhoto";
+import { herosPages } from "@/content/heros-pages";
 import { SvgSprite } from "@/components/SvgSprite";
 import { FloatingNav, Footer, Header } from "@/components/layout";
 import { Reveal } from "@/components/motion/Reveal";
@@ -37,11 +43,12 @@ export async function NotFoundView() {
       {/* Cible du lien d'évitement (voir SkipLink.tsx et focus.css). */}
       <main id="main-content" tabIndex={-1}>
         <section className="relative flex min-h-[900px] items-end overflow-hidden bg-background px-[20px] pb-[46px] pt-[150px] text-foreground tablet:px-[24px] desktop:px-[30px]">
+          <HeroPhoto image={herosPages.introuvable} />
           <span className="pointer-events-none absolute inset-0 bg-[url('/images/grain.webp')] bg-repeat opacity-[0.08] [background-size:256px_256px]" />
           <span className="absolute inset-y-0 left-1/2 w-px bg-white/10" />
-          <div className="relative mx-auto grid w-full max-w-[1440px] gap-[46px] tablet:grid-cols-2 tablet:items-end">
+          <div className="relative z-[2] [text-shadow:0_0_18px_rgba(0,0,0,.45)] mx-auto grid w-full max-w-[1440px] gap-[46px] tablet:grid-cols-2 tablet:items-end">
             <div className="flex flex-col items-start gap-[64px] tablet:items-end">
-              <p className="max-w-[230px] text-[12px] font-medium uppercase leading-[1.2] text-white/60 tablet:text-right">
+              <p className={`max-w-[230px] text-[12px] font-medium uppercase leading-[1.2] text-white/60 tablet:text-right ${VOILE_TEXTE}`}>
                 {messageLine1}
                 <br />
                 {messageLine2}
@@ -83,6 +90,10 @@ export async function NotFoundView() {
               </p>
             </div>
           </div>
+          <CreditHeroPhoto
+            credit={herosPages.introuvable.credit}
+            position="bottom-[36px] right-[20px] tablet:bottom-[46px] tablet:right-[24px] desktop:right-[30px]"
+          />
         </section>
         <FaqSection faq={faq} />
       </main>

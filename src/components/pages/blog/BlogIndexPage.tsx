@@ -1,10 +1,11 @@
 import { Fragment } from "react";
+import { CreditHeroPhoto, HeroPhoto } from "@/components/pages/services/HeroPhoto";
+import { herosPages } from "@/content/heros-pages";
 import { SvgSprite } from "@/components/SvgSprite";
 import { FloatingNav, Footer, Header } from "@/components/layout";
 import type { BlogContent, SiteConfig } from "@/lib/content/types";
 import { Highlighted } from "@/components/ui";
 import { Reveal } from "@/components/motion/Reveal";
-import { GradientWaveBackdrop } from "@/components/effects/GradientWaveBackdrop";
 import { BlogFilterGrid } from "./BlogFilterGrid";
 import { Grain } from "@/components/effects/Grain";
 
@@ -24,7 +25,7 @@ export function BlogIndexPage({
       {/* Cible du lien d'évitement (voir SkipLink.tsx et focus.css). */}
       <main id="main-content" tabIndex={-1}>
         <section className="relative flex h-[90svh] items-end overflow-hidden bg-background px-[20px] pb-[20px] pt-[140px] text-foreground tablet:px-[24px] tablet:pb-[30px] desktop:px-[30px]">
-          <GradientWaveBackdrop seed={74} />
+          <HeroPhoto image={herosPages.blog} />
           {/* RELEVÉ sur `/blog` : hôte 1440 × 810, z-1, opacité 0,05. Nous
               étions à 0,08, plus le calque global inventé de 0,05. */}
           <Grain opacity={0.05} className="z-[1]" />
@@ -36,7 +37,7 @@ export function BlogIndexPage({
               `items-end`, la position du sous-titre dépendait de sa propre
               hauteur : à 1440 son bas tombait à 667 au lieu de 670.
               C'est la structure que `LegalPageView` implémente déjà. */}
-          <div className="relative z-[2] mx-auto mb-[170px] grid w-full max-w-[1440px] gap-[20px] tablet:mb-[113px] tablet:grid-cols-2 tablet:gap-x-0 tablet:gap-y-[30px]">
+          <div className="relative z-[2] [text-shadow:0_0_18px_rgba(0,0,0,.45)] mx-auto mb-[170px] grid w-full max-w-[1440px] gap-[20px] tablet:mb-[113px] tablet:grid-cols-2 tablet:gap-x-0 tablet:gap-y-[30px]">
             <Reveal
               trigger="appear"
               appearId="blog-hero-titre"
@@ -73,6 +74,7 @@ export function BlogIndexPage({
               />
             </p>
           </div>
+          <CreditHeroPhoto credit={herosPages.blog.credit} />
         </section>
         {/* Les HUIT articles sont listés. Un plafond à 6 avait été posé ici sur
             la foi d'un relevé fait en iframe à rAF gelé : la source n'affiche

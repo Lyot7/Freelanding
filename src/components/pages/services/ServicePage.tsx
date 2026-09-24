@@ -11,6 +11,7 @@ import {
   HeroPhoto,
   VOILE_TEXTE,
 } from "@/components/pages/services/HeroPhoto";
+import { herosPages } from "@/content/heros-pages";
 import { Icon } from "@/components/ui/Icon";
 import type { SiteConfig } from "@/lib/content/types";
 import {
@@ -396,7 +397,7 @@ export function ServicePage({
 
   // Photo de fond portée par la page locale ; les pages de prestation n'en ont
   // pas et gardent leur fond animé.
-  const heroImage = local?.heroImage;
+  const heroImage = local?.heroImage ?? herosPages.prestations[prestation.slug];
 
   return (
     <>

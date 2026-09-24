@@ -1,5 +1,10 @@
 import { Reveal } from "@/components/motion/Reveal";
-import { GradientWaveBackdrop } from "@/components/effects/GradientWaveBackdrop";
+import {
+  CreditHeroPhoto,
+  HeroPhoto,
+  VOILE_TEXTE,
+} from "@/components/pages/services/HeroPhoto";
+import { herosPages } from "@/content/heros-pages";
 import { Grain } from "@/components/effects/Grain";
 import { Highlighted } from "@/components/ui";
 import type { HeroContent, HeroSubtitleParagraph } from "@/lib/content";
@@ -45,7 +50,7 @@ function SubtitleParagraph({ part }: { part: HeroSubtitleParagraph }) {
   // fragments qui redescendent à 60 %.
   return (
     <p
-      className={`${PARAGRAPH_CLS} ${part.inverted ? "text-foreground" : "text-foreground-60"}`}
+      className={`${PARAGRAPH_CLS} ${VOILE_TEXTE} ${part.inverted ? "text-foreground" : "text-foreground-60"}`}
     >
       <Highlighted
         text={part.text}
@@ -64,7 +69,7 @@ export function WorkHero({ hero }: { hero: HeroContent }) {
 
   return (
     <section className={SECTION_CLS}>
-      <GradientWaveBackdrop seed={34} />
+      <HeroPhoto image={herosPages.realisations} />
       {/* MANQUANT jusqu'ici : `/work` n'avait aucun grain de section, le calque
           global inventé le masquait. RELEVÉ sur le live : hôte 1440 × 810 à
           1440 de fenêtre, z-1, opacité 0,05, motif 256 × 256. */}
@@ -74,7 +79,7 @@ export function WorkHero({ hero }: { hero: HeroContent }) {
         className="absolute inset-y-0 left-1/2 z-[1] w-px bg-white/[0.08]"
       />
 
-      <div className="relative z-[2] mx-auto flex w-full max-w-[1440px] flex-col items-center gap-[20px] tablet:gap-[30px]">
+      <div className="relative z-[2] [text-shadow:0_0_18px_rgba(0,0,0,.45)] mx-auto flex w-full max-w-[1440px] flex-col items-center gap-[20px] tablet:gap-[30px]">
         {/* Rangée titre : moitié gauche vide, titre dans la moitié droite. */}
         <div className="flex w-full flex-col tablet:flex-row tablet:items-start tablet:justify-center">
           <div aria-hidden className="hidden tablet:block tablet:w-px tablet:flex-[1_0_0]" />
@@ -118,6 +123,7 @@ export function WorkHero({ hero }: { hero: HeroContent }) {
           </div>
         ) : null}
       </div>
+      <CreditHeroPhoto credit={herosPages.realisations.credit} />
     </section>
   );
 }
