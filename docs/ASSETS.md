@@ -82,6 +82,21 @@ Commons Zero, Public Domain Dedication »), original de 5616 × 3744 télécharg
 depuis `upload.wikimedia.org`. Aucun crédit n'est exigé par la CC0 ; il est
 tenu ici.
 
+### Héros de la vue Agent (`/agent`)
+
+| Fichier | Photographe | Licence | Traitement |
+| --- | --- | --- | --- |
+| `images/heros/page-agent.jpg`, `images/og-page-agent.jpg` | Preply.com Images | CC BY 2.0, [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Learning_to_Code.jpg), publiée à l'origine sur [Flickr](https://www.flickr.com/photos/194356589@N04/51663034507/) | Ramenée à 1350 px de haut, rognée à gauche, posée sur un canevas 2400 × 1350 ; textes de l'écran, marque et carnet floutés, la main remise nette par-dessus ; saturation 75 %, fond assombri à 80 % hors sujet ; main et ordinateur détourés en lignes volt `#c8f24a` avec halo (Canny dans un masque tracé à la main, bord de l'index complété à la main) ; fondu vers `#0b0b0b` à droite et en bas. Vignette 1200 × 630 recadrée sur le sujet, sans fondu |
+
+Même méthode que les héros des pages et du blog. La scène est celle de la
+page : une personne montre du doigt une ligne sur l'écran, elle et la machine
+lisent le même texte. Licence vérifiée sur la page Commons avant
+téléchargement (« Creative Commons Attribution 2.0 Generic », revue par
+FlickreviewR le 10 novembre 2021), original de 4000 × 2667 téléchargé
+gratuitement depuis `upload.wikimedia.org`. La CC BY exige le crédit et la
+mention de la modification : le héros les affiche (`CreditHeroPhoto`), avec le
+lien vers la licence.
+
 ## 3. Captures des pages projet
 
 `work/kpsull/*`, `work/nslysium/*`, `work/wurth/*`. Les trois n'ont PAS le même

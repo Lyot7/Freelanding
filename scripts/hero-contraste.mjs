@@ -44,6 +44,7 @@ const PAGES = [
   "/creation-site-internet-caen",
   "/blog",
   "/realisations",
+  "/agent",
   "/services/site-vitrine",
   "/services/outil-metier",
   "/services/logiciel-metier",

@@ -21,6 +21,7 @@ const tous = [
   herosPages.blog,
   herosPages.realisations,
   herosPages.introuvable,
+  herosPages.agent,
   ...Object.values(herosPages.prestations),
   ...Object.values(herosPages.legal),
   pageCaen.heroImage,
