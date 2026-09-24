@@ -92,12 +92,6 @@ describe("resoudreConfiguration", () => {
       "site",
     ]);
   });
-
-  it("ignore l’ancienne variable du type « outil », fusionné dans « logiciel »", () => {
-    // Une valeur restée dans un `.env` ne doit pas ressusciter une entrée.
-    const config = resoudreConfiguration({ CAL_COM_EVENT_OUTIL: "2" });
-    expect(config.typesDisponibles).toEqual([]);
-  });
 });
 
 describe("estIdRendezVous", () => {

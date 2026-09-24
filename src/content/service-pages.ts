@@ -13,6 +13,9 @@
 import type { Prestation, PrestationId } from "./offre";
 import { lienVersPageCaen, type PageLocale } from "./page-caen";
 
+/** Libellé de tout lien vers l'ancre `#rendez-vous` d'une page de prestation. */
+const RESERVER_UN_APPEL = "Réserver un appel";
+
 /**
  * TITRE DE RECHERCHE ET TITRE DE PAGE, prestation par prestation.
  *
@@ -108,17 +111,6 @@ export const servicePageLabels = {
       ? "3 forfaits, du prix ferme au sur mesure"
       : "3 forfaits, à prix ferme",
 
-  /**
-   * Signalement du périmètre conseillé.
-   *
-   * IL DISAIT « LE PLUS CHOISI » et c'était faux : aucune mission n'a encore été
-   * livrée, donc aucun périmètre n'a jamais été choisi par personne. Une preuve
-   * sociale fabriquée est le premier signal qui décrédibilise un site quand elle
-   * se voit, et elle se voit toujours. « Recommandé » est une recommandation,
-   * pas une statistique : c'est vrai le premier jour comme le centième.
-   */
-  misEnAvant: "Recommandé",
-
   /** Amorce de la ligne « pour qui ». */
   pourQui: "Pour toi si",
 
@@ -136,13 +128,18 @@ export const servicePageLabels = {
   reassurance:
     "Le prix est fixé au devis et ne bouge plus. Tu paies 30 % à la signature, 40 % à la première version fonctionnelle et 30 % à la livraison. Le code et l’hébergement sont à ton nom.",
 
-  /** Bouton de chaque forfait. */
-  cta: "En parler",
+  /**
+   * Bouton de chaque forfait. UN SEUL LIBELLÉ pour l'ancre `#rendez-vous` sur
+   * toute la page : « En parler » et « Réserver un appel » y menaient tous
+   * deux, et deux libellés pour une même destination se lisent comme deux
+   * actions différentes.
+   */
+  cta: RESERVER_UN_APPEL,
 
   /** Amorce du montant d'un palier sur mesure : son prix est un plancher. */
   aPartirDe: "À partir de",
 
-  /** Signalement du palier sur mesure, à la place de « Recommandé ». */
+  /** Signalement du palier sur mesure : son prix est un plancher. */
   surMesure: "Sur mesure",
 
   /**
@@ -159,7 +156,7 @@ export const servicePageLabels = {
    */
   surMesureBloc: {
     titre: "Hors forfait, sur devis",
-    cta: "Réserver un appel",
+    cta: RESERVER_UN_APPEL,
     titreQuestions: "Pas sûr du forfait ?",
     introQuestions:
       "3 questions, posées quand tu réserves ton appel. Je te dis tout de suite ce que ton budget permet, et ce qu’il ne permet pas.",

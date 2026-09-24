@@ -104,7 +104,7 @@ export function euros(montant: number): string {
  * réelle de facturation d'Eliott, le MODULE : un pan de l'activité du client
  * (les devis, le planning, la facturation), chiffré autour de 6 000 € dans
  * les devis réels. L'Outil vaut un module et une connexion ; Le Logiciel, jusqu'à trois modules
- * et deux connexions. L'Infrastructure est du sur mesure : les quatre avis
+ * et deux connexions. La Plateforme est du sur mesure : les quatre avis
  * convergeaient pour refuser un prix ferme sur un périmètre sans plafond, et
  * un projet réel à cette échelle dépasse de lui-même l'ancien haut de grille.
  *
@@ -231,8 +231,8 @@ export const prestations: readonly Prestation[] = [
         ],
       },
       {
-        id: "infrastructure",
-        nom: "L’Infrastructure",
+        id: "plateforme",
+        nom: "La Plateforme",
         prix: 36000,
         surMesure: true,
         promesse: "Tes outils se parlent et restent d’accord entre eux.",
@@ -319,7 +319,7 @@ export const packHaut = (id: PrestationId): Pack =>
  * Fourchette publique d'une prestation : « de 3 000 € à 7 200 € ».
  *
  * « ET PLUS » QUAND LE HAUT DE GRILLE EST SUR MESURE. « De 6 000 € à 36 000 € »
- * annoncerait un plafond qui n'existe pas : L'Infrastructure commence à
+ * annoncerait un plafond qui n'existe pas : La Plateforme commence à
  * 36 000 €, elle ne s'y arrête pas.
  *
  * `taxe` se place DERRIÈRE LE MONTANT et avant « et plus » : ajoutée par

@@ -131,22 +131,20 @@ function FilAriane({
  * rembourrage de part et d'autre. À gauche ce que le forfait promet et à qui ;
  * à droite le prix, ce qu'il contient, et l'action.
  *
- * L'ORANGE NE SERT QU'UNE FOIS PAR FORFAIT RECOMMANDÉ : la pastille et le
- * bouton plein. Les deux autres rangées gardent le lien souligné, second
- * niveau d'action de l'accordéon. Trois boutons orange empilés se seraient
- * annulés les uns les autres.
+ * LES TROIS FORFAITS ONT LE MÊME TRAITEMENT depuis le 2026-09-24, décision
+ * d'Eliott : plus aucun palier « Recommandé ». Désigner le forfait du milieu
+ * poussait une vente au lieu d'aider à choisir. Chaque rangée porte le même
+ * bouton plein à 30 px, celui de l'accordéon d'origine, vers la même ancre.
  */
 function PackRow({
   pack,
   numero,
   precedent,
-  misEnAvant,
   href,
 }: {
   pack: Pack;
   numero: string;
   precedent?: string;
-  misEnAvant: boolean;
   /** Prise de rendez-vous, sujet déjà choisi. Composée par l'appelant. */
   href: string;
 }) {
@@ -164,11 +162,6 @@ function PackRow({
           <span className="text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-white/50">
             {numero}
           </span>
-          {misEnAvant ? (
-            <span className="bg-accent px-[8px] py-[3px] text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-background">
-              {servicePageLabels.misEnAvant}
-            </span>
-          ) : null}
           {pack.surMesure ? (
             <span className="px-[8px] py-[3px] text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-white/70 ring-1 ring-inset ring-white/25">
               {servicePageLabels.surMesure}
@@ -228,17 +221,12 @@ function PackRow({
           </ul>
         </div>
 
-        {/* LES DEUX NIVEAUX D'ACTION DE L'ACCORDÉON, à l'identique : bouton
-            plein à 30 px pour le forfait recommandé, lien souligné pour les
-            autres. Même hauteur, donc même ligne d'appui d'une rangée à
+        {/* LE BOUTON PLEIN DE L'ACCORDÉON, à 30 px, identique sur les trois
+            rangées : même hauteur, donc même ligne d'appui d'une rangée à
             l'autre. */}
         <Link
           href={href}
-          className={
-            misEnAvant
-              ? "flex h-[30px] w-fit flex-none items-center justify-center bg-accent px-[10px] text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-background no-underline transition-opacity duration-200 hover:opacity-80 motion-reduce:transition-none"
-              : "flex h-[30px] w-fit flex-none items-center text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-foreground underline decoration-white/30 underline-offset-4 transition-colors hover:text-accent hover:decoration-accent motion-reduce:transition-none"
-          }
+          className="flex h-[30px] w-fit flex-none items-center justify-center bg-accent px-[10px] text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-background no-underline transition-opacity duration-200 hover:opacity-80 motion-reduce:transition-none"
         >
           <span className="accent-room">{servicePageLabels.cta}</span>
         </Link>
@@ -336,9 +324,6 @@ export function ServicePage({
   // sur la page locale elle-même, il pointerait vers la page courante.
   const lienLocal = local ? undefined : lienLocalParPrestation[prestation.id];
 
-  // Le périmètre du milieu est celui qui se vend : il est mis en avant, comme
-  // sur la grille qu'il remplace.
-  const avant = 1;
   const { surMesureBloc } = servicePageLabels;
 
   // Photo de fond portée par la page locale ; les pages de prestation n'en ont
@@ -467,7 +452,6 @@ export function ServicePage({
                   precedent={
                     index > 0 ? prestation.packs[index - 1].nom : undefined
                   }
-                  misEnAvant={index === avant}
                   /* ANCRE LOCALE : la prise de rendez-vous est sur cette page,
                      avec le bon sujet déjà coché. */
                   href="#rendez-vous"
@@ -547,7 +531,7 @@ export function ServicePage({
               </ol>
               {/* LE BOUTON SUIT LES QUESTIONS qu'il vient d'annoncer : placé
                   à gauche, il se lisait avant elles. Plein, à l'accent, comme
-                  l'action principale de la rangée recommandée. */}
+                  le bouton de chaque forfait. */}
               <Link
                 href="#rendez-vous"
                 className="flex h-[30px] w-fit flex-none items-center justify-center bg-accent px-[10px] text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-background no-underline transition-opacity duration-200 hover:opacity-80 motion-reduce:transition-none"
