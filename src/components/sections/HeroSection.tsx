@@ -23,6 +23,7 @@ import { Signature } from "./hero/Signature";
 import { lienRendezVous } from "@/content/rendez-vous";
 import { uiLabels } from "@/content/ui";
 import { SwapText } from "@/components/ui/SwapText";
+import { DemanderAssistant } from "@/components/pages/agent/DemanderAssistant";
 
 /**
  * HeroSection — reconstruction fidèle (CSS Framer → Tailwind responsive) de la
@@ -393,6 +394,17 @@ function BottomBar({ site }: { site: SiteConfig }) {
         lui ferait choisir avant de savoir, ce que les intitulés de
         `rendez-vous.ts` évitent déjà par ailleurs.
       */}
+      {/* RACCOURCI DE LA VUE AGENT (2026-09-24), entre la jauge et le rendez-
+          vous : copie en un clic un prompt qui contient tout le profil, à
+          coller dans l'assistant du visiteur. Même typo que ses voisins, seul
+          le curseur vert le distingue. Voir `DemanderAssistant`. */}
+      {/* Dès 810 px, calé 16 puis 20 px à droite de la ligne médiane du héros
+          (50 % de la barre, qui a 30 px de marge de chaque côté comme le
+          cadre) : entre deux voisins alignés sur les bords, un élément laissé
+          au milieu par `justify-between` se faisait couper par ce filet. */}
+      <DemanderAssistant
+        className={`${presetWwtw0z} tablet:absolute tablet:left-[calc(50%+16px)] tablet:top-1/2 tablet:-translate-y-1/2 desktop:left-[calc(50%+20px)]`}
+      />
       <a
         href={lienRendezVous("decouverte")}
         // Focus : voir `src/app/focus.css` (source de vérité unique).

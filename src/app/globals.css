@@ -398,6 +398,13 @@ body {
    n'a pas ete capturee par le miroir statique :8080 ; on la restaure ici.
    Etat de REPOS (no-JS / reduced-motion) = orange plein visible (robuste).
    ============================================================ */
+/* Curseur de saisie du raccourci « Demande à ton assistant » (héros de
+   l'accueil) : allumé la moitié du temps, sans fondu, comme un vrai curseur. */
+@keyframes curseur-saisie {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
 @keyframes slot-fill {
   0%,
   100% {

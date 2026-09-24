@@ -20,6 +20,7 @@
 
 export const CHEMIN_VUE_AGENT = "/agent";
 export const CHEMIN_PROFIL_TEXTE = "/llms-full.txt";
+export const CHEMIN_PROMPT_TEXTE = "/agent/prompt.txt";
 
 export const vueAgentContent = {
   /** Sélecteur de l'en-tête. */
@@ -63,6 +64,20 @@ export const vueAgentContent = {
     suite: "C’est copié. Colle-le dans ton assistant.",
     echec: "La copie n’a pas marché. Le prompt est dans le cadre ci-dessous, déjà sélectionné.",
     zone: "Prompt complet",
+  },
+
+  /**
+   * Raccourci de la barre basse du héros de l'accueil : copie le prompt en un
+   * clic, sans quitter la page. Écrit comme une ligne de saisie, curseur
+   * compris, parce que c'est ce que le visiteur va en faire.
+   */
+  accueil: {
+    invite: ">",
+    libelle: "Demande à ton assistant si je suis le bon choix",
+    court: "Demande à ton assistant",
+    fait: "Copié, colle-le dans ton assistant",
+    echec: "Ouverture de la vue agent",
+    titre: "Copie un prompt qui contient tout mon profil",
   },
 
   sommaire: "Sur cette page",
