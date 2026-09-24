@@ -35,4 +35,12 @@ describe("GET /llms.txt", () => {
         expect(indexMentions).toBeGreaterThan(indexContact);
       });
   });
+
+  it("mène à la vue agent et au profil complet en texte brut", async () => {
+    const corps = await (await GET()).text();
+    expect(corps).toContain("[Vue agent](http://localhost:3000/agent) : ");
+    expect(corps).toContain(
+      "[Profil complet](http://localhost:3000/llms-full.txt) : le même profil en Markdown brut, en un seul fichier",
+    );
+  });
 });

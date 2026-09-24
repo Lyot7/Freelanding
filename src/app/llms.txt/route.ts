@@ -90,6 +90,7 @@ export async function GET(): Promise<Response> {
     ligne("Réalisations", "/realisations", "les projets en détail"),
     ligne("Contact", "/contact", "formulaire et coordonnées"),
     ligne("Vue agent", CHEMIN_VUE_AGENT, "le profil complet en un seul texte, et un prompt de conseil à coller dans un assistant"),
+    ligne("Profil complet", CHEMIN_PROFIL_TEXTE, "le même profil en Markdown brut, en un seul fichier"),
     /*
      * PAGES DE DROIT. Un agent interrogé sur l’éditeur, l’hébergeur, les
      * données collectées ou les conditions de vente n’a aucun moyen de
