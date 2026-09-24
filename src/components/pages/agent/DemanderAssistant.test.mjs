@@ -57,6 +57,10 @@ describe("DemanderAssistant", () => {
 
   const bouton = () => dom.conteneur.querySelector("button");
   const statut = () => dom.conteneur.querySelector('[role="status"]');
+  /** Les deux états empilés du libellé : [repos, copié]. */
+  const etats = () => [...bouton().querySelectorAll(":scope > span.grid > span")];
+  /** Texte de l'état visible (l'autre porte `invisible`). */
+  const visible = () => etats().find((etat) => !etat.classList.contains("invisible")).textContent;
 
   it("écrit le prompt chargé par ClipboardItem, dans le geste, puis revient au repos", async () => {
     dom = installerDom();
@@ -69,6 +73,7 @@ describe("DemanderAssistant", () => {
     expect(bouton().className).toContain("tablet:absolute");
     expect(bouton().getAttribute("title")).toBe(t.titre);
     expect(statut().textContent).toBe("");
+    expect(visible()).toContain(t.libelle);
 
     await dom.cliquer(bouton());
     expect(appels).toEqual(["/agent/prompt.txt"]);
@@ -77,13 +82,35 @@ describe("DemanderAssistant", () => {
     expect(blob.type).toMatch(/^text\/plain/u);
     expect(await blob.text()).toBe(PROMPT);
     expect(statut().textContent).toBe(t.fait);
-    expect(bouton().textContent).toContain(t.faitCourt);
+    expect(visible()).toBe(`${t.fait}${t.faitCourt}`);
     expect(navigations).toEqual([]);
     expect(dom.minuteries.at(-1).delai).toBe(4000);
 
     await dom.declencherMinuterie();
     expect(statut().textContent).toBe("");
-    expect(bouton().textContent).toContain(t.court);
+    expect(visible()).toContain(t.court);
+  });
+
+  it("rend toujours les deux états, empilés, pour que la copie ne change pas la largeur", async () => {
+    dom = installerDom();
+    servir();
+    globalThis.ClipboardItem = undefined;
+    dom.pressePapiers({ writeText: async () => undefined });
+    await monter();
+
+    const invisibles = () => etats().map((etat) => etat.classList.contains("invisible"));
+    expect(etats()).toHaveLength(2);
+    for (const etat of etats()) {
+      expect(etat.className).toContain("col-start-1 row-start-1");
+      // Chaque état porte son curseur, collé à son propre texte.
+      expect(etat.lastElementChild.getAttribute("aria-hidden")).toBe("true");
+      expect(etat.lastElementChild.className).toContain("bg-accent");
+    }
+    expect(invisibles()).toEqual([false, true]);
+
+    await dom.cliquer(bouton());
+    expect(etats()).toHaveLength(2);
+    expect(invisibles()).toEqual([true, false]);
   });
 
   it("sans ClipboardItem, copie le texte chargé avec writeText", async () => {

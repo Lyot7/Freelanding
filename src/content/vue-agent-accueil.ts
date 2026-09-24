@@ -25,6 +25,5 @@ export const accueilVueAgent = {
   fait: "Copié, colle-le dans ton assistant",
   /** Entre 810 et 1199 px : la forme longue débordait sur « Prendre rendez-vous ». */
   faitCourt: "Prompt copié",
-  echec: "Ouverture de la vue agent",
   titre: "Copie un prompt qui contient tout mon profil",
 } as const;
