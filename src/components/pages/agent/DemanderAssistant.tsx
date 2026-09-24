@@ -3,11 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SwapText } from "@/components/ui/SwapText";
+// Le module léger, pas `vue-agent.ts` : voir l'en-tête de `vue-agent-accueil.ts`.
 import {
   CHEMIN_PROMPT_TEXTE,
   CHEMIN_VUE_AGENT,
-  vueAgentContent,
-} from "@/content/vue-agent";
+  accueilVueAgent,
+} from "@/content/vue-agent-accueil";
 
 /**
  * Raccourci de la vue Agent dans la barre basse du héros de l'accueil.
@@ -46,7 +47,7 @@ async function copierDepuis(url: string): Promise<boolean> {
 }
 
 export function DemanderAssistant({ className = "" }: { className?: string }) {
-  const t = vueAgentContent.accueil;
+  const t = accueilVueAgent;
   const router = useRouter();
   const [copie, setCopie] = useState(false);
   const minuterie = useRef<number | undefined>(undefined);

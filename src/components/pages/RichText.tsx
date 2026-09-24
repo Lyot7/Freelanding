@@ -25,9 +25,10 @@ const EMAIL = /[\w.+-]+@[\w-]+\.[\w.-]+[\w]/g;
  * Adresses web, liées seulement quand l'appelant le demande (`liens`). Les
  * pages légales et les articles n'en affichent pas en clair ; le profil de la
  * vue Agent, lui, en est fait, parce qu'il doit rester utilisable une fois
- * copié hors du site. La ponctuation finale reste hors du lien.
+ * copié hors du site. La ponctuation finale reste hors du lien, française
+ * comprise : points de suspension, guillemet et apostrophe typographiques.
  */
-const URL_WEB = /https?:\/\/[^\s]*[^\s.,;:!?)»]/g;
+const URL_WEB = /https?:\/\/[^\s]*[^\s.,;:!?)»…”’"']/g;
 
 /*
  * SURVOL SUR LE SOULIGNEMENT, plus sur la couleur du texte. Le texte passait à
