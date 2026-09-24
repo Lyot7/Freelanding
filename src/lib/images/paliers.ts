@@ -1,36 +1,40 @@
 /**
- * Paliers de l'apparition pixelisée (voir `ImageProgressive`).
+ * Dépixelisation d'une image à sa première apparition (voir `ImageProgressive`).
  *
- * Largeurs prises dans les `imageSizes` par défaut de l'optimiseur de Next 16
- * (32, 48, 64, 96, 128, 256, 384) : une largeur hors de cette liste est refusée
- * par `/_next/image`. Un facteur 3 à 4 entre deux paliers se lit comme une
- * mise au point ; plus serré, l'œil ne voit pas la différence.
- * Poids relevés en AVIF : environ 0,3 Ko, 1,5 Ko et 12 Ko.
+ * Motif relevé sur locomotive.ca (`data-depixelate`) : l'image, une fois
+ * chargée, est redessinée en 8, 16, 32, 48, 96 puis 128 colonnes, 100 ms par
+ * étape, avant d'apparaître nette. L'effet se joue APRÈS le chargement : c'est
+ * le préchargement qui fait qu'il démarre sans attente à l'entrée dans l'écran.
  */
-export const PALIERS = [32, 96, 384] as const;
+export const COLONNES = [8, 16, 32, 48, 96, 128] as const;
+
+/** Durée d'affichage de chaque étape, en millisecondes. */
+export const DUREE_ETAPE = 100;
 
 /**
- * Temps d'affichage minimal d'un palier, en millisecondes. Sur une bonne
- * connexion les trois paliers arrivent dans la même trame : sans ce plancher
- * ils s'écraseraient et l'on ne verrait qu'un saut.
+ * Largeur servie par l'optimiseur pour l'attente, quand l'image n'est pas
+ * encore arrivée à l'entrée dans l'écran. Prise dans les `imageSizes` par
+ * défaut de Next 16 : une autre largeur serait refusée par `/_next/image`.
  */
-export const DUREE_MIN_PALIER = 110;
+export const LARGEUR_ATTENTE = 32;
 
 /**
- * Paliers utiles pour une image rendue sur `largeurPhysique` pixels d'écran.
- * Un palier doit rester au moins deux fois plus petit que l'image finale :
- * au-delà, il ne se distingue plus d'elle et coûte une requête pour rien.
- * Une vignette ne reçoit donc aucun palier.
+ * Étapes à jouer. Si l'attente a déjà montré l'image en `LARGEUR_ATTENTE`
+ * colonnes, on repart au-dessus : revenir à 8 colonnes serait un recul.
  */
-export function paliersPour(largeurPhysique: number): number[] {
-  if (!Number.isFinite(largeurPhysique) || largeurPhysique <= 0) return [];
-  return PALIERS.filter((largeur) => largeur * 2 <= largeurPhysique);
+export function etapesAJouer(dejaAffichee: number | null): number[] {
+  return COLONNES.filter((colonnes) => dejaAffichee === null || colonnes > dejaAffichee);
 }
 
-/** Attente à observer avant d'afficher un palier déjà chargé. */
-export function attenteAvantPalier(
-  ecouleDepuisPrecedent: number,
-  dureeMin: number,
-): number {
-  return Math.max(0, dureeMin - ecouleDepuisPrecedent);
+/**
+ * Taille de la miniature pour `colonnes` colonnes, au rapport de l'image.
+ * Jamais sous un pixel ; rapport inconnu (image vide) : carré.
+ */
+export function tailleMiniature(
+  colonnes: number,
+  largeur: number,
+  hauteur: number,
+): { largeur: number; hauteur: number } {
+  const rapport = largeur > 0 && hauteur > 0 ? hauteur / largeur : 1;
+  return { largeur: colonnes, hauteur: Math.max(1, Math.round(colonnes * rapport)) };
 }

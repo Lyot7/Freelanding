@@ -1,34 +1,30 @@
 import { describe, expect, test } from "bun:test";
-import { PALIERS, attenteAvantPalier, paliersPour } from "./paliers.ts";
+import { COLONNES, etapesAJouer, tailleMiniature } from "./paliers.ts";
 
-describe("paliersPour", () => {
-  test("image large : les trois paliers, du plus pixelisé au plus fin", () => {
-    expect(paliersPour(1600)).toEqual([...PALIERS]);
+describe("etapesAJouer", () => {
+  test("image déjà chargée : toutes les étapes, de la plus grossière à la plus fine", () => {
+    expect(etapesAJouer(null)).toEqual([...COLONNES]);
   });
 
-  test("écarte un palier qui ne serait pas au moins deux fois plus petit que l'image", () => {
-    expect(paliersPour(700)).toEqual([32, 96]);
-    expect(paliersPour(768)).toEqual([32, 96, 384]);
+  test("après l'attente en 32 colonnes : on repart au-dessus, jamais en arrière", () => {
+    expect(etapesAJouer(32)).toEqual([48, 96, 128]);
   });
 
-  test("vignette : aucun palier, l'image finale arrive aussi vite qu'eux", () => {
-    expect(paliersPour(50)).toEqual([]);
-  });
-
-  test("largeur inconnue, nulle ou invalide : aucun palier", () => {
-    expect(paliersPour(0)).toEqual([]);
-    expect(paliersPour(Number.NaN)).toEqual([]);
-    expect(paliersPour(-10)).toEqual([]);
+  test("attente plus fine que toutes les étapes : rien à jouer", () => {
+    expect(etapesAJouer(256)).toEqual([]);
   });
 });
 
-describe("attenteAvantPalier", () => {
-  test("palier chargé trop tôt : attend le reste de la durée minimale", () => {
-    expect(attenteAvantPalier(30, 110)).toBe(80);
+describe("tailleMiniature", () => {
+  test("garde le rapport de l'image", () => {
+    expect(tailleMiniature(16, 1600, 900)).toEqual({ largeur: 16, hauteur: 9 });
   });
 
-  test("palier chargé après la durée minimale : s'affiche aussitôt", () => {
-    expect(attenteAvantPalier(500, 110)).toBe(0);
-    expect(attenteAvantPalier(110, 110)).toBe(0);
+  test("jamais sous un pixel de haut", () => {
+    expect(tailleMiniature(8, 4000, 100)).toEqual({ largeur: 8, hauteur: 1 });
+  });
+
+  test("dimensions inconnues : carré", () => {
+    expect(tailleMiniature(8, 0, 0)).toEqual({ largeur: 8, hauteur: 8 });
   });
 });
