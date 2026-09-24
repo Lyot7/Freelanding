@@ -127,7 +127,10 @@ function Headline({
     // framer-1dj4y9g-container : conteneur du code-component (flex:none;width:100%)
     <div data-part="headline" className="relative w-full flex-none">
       {/* h2 : 52px text-left (mobile) → 68px text-right (tablette) → 92px (desktop) */}
-      <h2 className="relative m-0 flex w-full flex-col justify-center p-0 text-left text-[52px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] text-background tablet:text-right tablet:text-[68px] desktop:text-[92px]">
+      {/* 68 px PLAFONNÉS À 7,8 vw entre 810 et 1199 : à 810, « TE COMPARE »
+          mesure 399 px à 68 px pour une demi-colonne de 381, et la ligne se
+          repliait. À 7,8 vw elle en fait 371 ; dès 872 px le corps revient à 68. */}
+      <h2 className="relative m-0 flex w-full flex-col justify-center p-0 text-left text-[52px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] text-background tablet:text-right tablet:text-[min(68px,7.8vw)] desktop:text-[92px]">
         {lines.map((word, i) => (
           // span externe = masque du slide-up (overflow-hidden), l'alignement
           // du texte est hérité du h2.
@@ -209,7 +212,7 @@ export function ShowreelSection({ showreel }: { showreel: ShowreelContent }) {
           <div className="accent-room relative flex w-full flex-none flex-row items-center justify-start gap-[10px] overflow-hidden tablet:w-1/2">
             {/* framer-1rwf4d9 : phrase manifeste (max 220px), reveal opacity */}
             <Reveal
-              className="relative h-auto w-px max-w-[220px] flex-[1_0_0] whitespace-pre-wrap break-words"
+              className="relative h-auto w-px max-w-[440px] flex-[1_0_0] whitespace-pre-wrap break-words"
               initialOpacity={0.001}
               transition={framerTween(0.8, 0)}
             >
@@ -221,7 +224,10 @@ export function ShowreelSection({ showreel }: { showreel: ShowreelContent }) {
                   passe en noir 60 % et les fragments en noir plein (auparavant
                   l'inverse, exprimé par des `<span>` sur le texte courant). Le
                   rendu est strictement le même. */}
-              <p className={`${PRESET_WWTW0Z} text-[rgba(11,11,11,0.6)]`}>
+              {/* TEXTE COURANT depuis le 2026-09-24 : 16 à 18 px en casse
+                  normale, sur 440 px. En 12 px capitales sur 220 px, la phrase
+                  d'appui du titre ne se lisait pas. */}
+              <p className="m-0 text-[16px] font-medium leading-[1.4] tracking-[-0.01em] text-[rgba(11,11,11,0.6)] tablet:text-[18px]">
                 <Highlighted
                   text={statement}
                   highlights={statementEmphasis}

@@ -10,7 +10,9 @@ import { services } from "@/content/services";
 // ENGAGEMENTS tenables au présent, pas un palmarès.
 // L'ordre suit les vitesses de compteur du composant (10 / 12 / 40 / 10 ms).
 const aboutStats = [
-  { value: "1", label: "Interlocuteur : tu parles à celui qui écrit le code" },
+  // « 1 INTERLOCUTEUR » REMPLACÉ le 2026-09-24, comme sur l'accueil : le
+  // chiffre porte la règle de travail d'Eliott, pas son organigramme.
+  { value: "1", label: "Projet à la fois" },
   /* « 2h » A ÉTÉ CORRIGÉ EN « 24h » le 2026-08-31, et c'était la dernière
      survivance de la promesse retirée. Elle était annoncée à deux heures à trois
      endroits ; il n'en restait plus qu'un, ici, et il contredisait `site.ts`,

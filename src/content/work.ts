@@ -153,6 +153,7 @@ const WURTH_URL =
 export const workItems: WorkItem[] = [
   {
     slug: "kpsull",
+    sujetRendezVous: "logiciel",
     title: "Kpsull",
     /* Ligne « CLIENT » de la fiche. Elle est en capitales, sur une ligne qui
        ne se replie pas (`white-space: pre`) : à 390 il reste environ 300px
@@ -240,6 +241,7 @@ export const workItems: WorkItem[] = [
   },
   {
     slug: "wurth-creation-de-compte",
+    sujetRendezVous: "logiciel",
     title: "Création de compte, Würth",
     /*
      * LA FORME DU CONTRAT N'EST PLUS ÉCRITE, ET LE LIBELLÉ LA REMPLACE.
@@ -552,6 +554,7 @@ export const workItems: WorkItem[] = [
   },
   {
     slug: "nslysium",
+    sujetRendezVous: "site",
     title: "NSLysium",
     /* Le commanditaire du workshop était une équipe d'étudiants d'une autre
        formation. L'écrire « CLIENT : ÉTUDIANTS » laisserait croire à une

@@ -47,20 +47,19 @@ export async function HomePage() {
       <ServicesSection
         services={home.services.items}
         intro={home.services.intro}
-        /* BANDE ORANGE RETROUVÉE. Elle annonce la section des chiffres, qui
-           est orange pleine page. Elle était passée en clair quand la section
-           tarifs s'intercalait entre les deux ; celle-ci ayant quitté l'accueil
-           le 2026-09-07, l'accordéon touche de nouveau les chiffres et reprend
-           donc la bande qui les annonce. */
-        bottomAccent="accent"
+        /* BANDES ACCORDÉES AUX VOISINES depuis le 2026-09-24 : l'accordéon suit
+           désormais `about` (aplat accent) et précède le showreel (clair). La
+           bande du haut prolonge donc l'accent, celle du bas annonce le clair. */
+        topAccent="accent"
+        bottomAccent="muted"
       />
     ),
     methode: <MethodeSection />,
     numbers: <StatsSection numbers={home.numbers} />,
     faq: <FaqSection faq={home.faq ?? []} />,
-    testimonials: (
+    testimonials: home.testimonials ? (
       <TestimonialsSection testimonials={home.testimonials.items} />
-    ),
+    ) : null,
     logoBand: home.logoBand ? (
       <LogoBandSection logoBand={home.logoBand} />
     ) : null,

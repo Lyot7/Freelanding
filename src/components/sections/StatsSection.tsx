@@ -71,7 +71,16 @@ function Counter({ stat, speedMs }: { stat: Stat; speedMs: number }) {
     // framer-1kb2cqw / 1oh0ifa / obt2nj : compteur + libellé
     <div className="relative flex w-full max-w-[500px] flex-col items-start gap-[12px] self-start tablet:gap-[16px]">
       {/* framer-1njqp0m-container : conteneur nombre, hauteur réservée */}
-      <div className="relative h-[50px] w-auto tablet:h-[60px] desktop:h-[65px]">
+      <div className="relative flex h-[50px] w-auto items-center tablet:h-[60px] desktop:h-[65px]">
+        {/* Préfixe (le moins de « −92 % ») rendu HORS du compteur : celui-ci
+            monte de 0 à la valeur et ne sait pas descendre. Lu par les lecteurs
+            d'écran : sans lui, « −92 % » s'annoncerait comme un gain. */}
+        {stat.prefix ? (
+          <span className="text-[44px] font-semibold tracking-[-0.07em] leading-[normal] text-accent-ink tablet:text-[52px] desktop:text-[58px]"
+          >
+            {stat.prefix}
+          </span>
+        ) : null}
         <AnimatedCounter
           value={stat.value}
           suffix={stat.suffix}
@@ -80,13 +89,14 @@ function Counter({ stat, speedMs }: { stat: Stat; speedMs: number }) {
           className="flex items-center gap-0 text-[44px] font-semibold uppercase tracking-[-0.07em] leading-[normal] text-accent-ink tablet:text-[52px] desktop:text-[58px]"
         />
       </div>
-      {/* framer-13pncuw : libellé (preset wwtw0z, uppercase 12px, blanc 70%) */}
+      {/* framer-13pncuw : libellé. TEXTE COURANT depuis le 2026-09-24 : 16 px
+          en casse normale au lieu de 12 px capitales, qu'on ne lisait pas. */}
       {/* Le libellé apparaît en fondu sur la source, sans translation. Il était
           rendu immobile. */}
       <Reveal
         as="p"
         data-part="counter-label"
-        className="h-auto w-full max-w-[160px] text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-accent-ink/80 [text-wrap:balance]"
+        className="h-auto w-full max-w-[260px] text-[16px] font-medium leading-[1.3] tracking-[-0.01em] text-accent-ink/80 [text-wrap:balance]"
         initialOpacity={0.001}
         duration={0.8}
         delay={0.15}
@@ -236,18 +246,49 @@ export function StatsSection({ numbers }: { numbers: StatsSectionContent }) {
             <div className="relative h-auto w-full max-w-[360px] tablet:max-w-[440px] desktop:max-w-[600px]">
               {/* framer-1xsiil0 h2 (92/68/52px, ls -0.05em, lh 0.82) */}
               <h2 className="relative m-0 flex w-full max-w-full flex-col justify-center p-0 text-left text-[52px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] text-accent-ink tablet:text-[68px] desktop:text-[92px]">
-                {/* Révélé LIGNE PAR LIGNE, en décalé, comme la source. Le
-                    découpage est MESURÉ sur le rendu du navigateur et jamais
-                    écrit en dur : les retours à la ligne de ce titre dépendent
-                    de la largeur de la fenêtre. */}
-                <LineReveal
-                  text={numbers.title ?? ""}
-                  className="block w-full"
-                  lineClassName="w-full overflow-hidden"
-                  delay={0.1}
-                />
+                {numbers.titleLines?.length ? (
+                  /* LIGNES DÉCLARÉES PAR LA DONNÉE : le titre est écrit pour
+                     tomber sur ces coupures-là, à toutes les largeurs. */
+                  numbers.titleLines.map((ligne, i) => (
+                    <span
+                      key={ligne}
+                      className="accent-room descender-room block w-full overflow-hidden leading-[0.82]"
+                    >
+                      <Reveal
+                        as="span"
+                        className="inline-block whitespace-pre"
+                        initialOpacity={0.001}
+                        initialY={40}
+                        duration={0.8}
+                        delay={0.1 * i}
+                      >
+                        {ligne}
+                      </Reveal>
+                    </span>
+                  ))
+                ) : (
+                  /* Sans lignes déclarées, le découpage est MESURÉ sur le rendu
+                     du navigateur : il dépend de la largeur de la fenêtre. */
+                  <LineReveal
+                    text={numbers.title ?? ""}
+                    className="block w-full"
+                    lineClassName="w-full overflow-hidden"
+                    delay={0.1}
+                  />
+                )}
               </h2>
             </div>
+            {numbers.intro ? (
+              <Reveal
+                as="p"
+                initialOpacity={0.001}
+                duration={0.8}
+                delay={0.2}
+                className="m-0 w-full max-w-[440px] text-[16px] font-medium leading-[1.4] tracking-[-0.01em] text-accent-ink tablet:text-[18px]"
+              >
+                {numbers.intro}
+              </Reveal>
+            ) : null}
             {numbers.testimonial ? (
               <Testimonial testimonial={numbers.testimonial} />
             ) : null}

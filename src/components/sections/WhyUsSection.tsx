@@ -202,7 +202,10 @@ function SwapLink({ cta, colorClass }: { cta: LinkData; colorClass: string }) {
   );
 }
 
-/** Description d'une carte (preset 1hgnchr, max-w 160, text-wrap balance). */
+/**
+ * Description d'une carte. TEXTE COURANT depuis le 2026-09-24 : 16 px au lieu
+ * de 13, sur 260 px au lieu de 160 (text-wrap balance conservé).
+ */
 function CardDescription({
   text,
   colorClass,
@@ -216,7 +219,7 @@ function CardDescription({
       {/* framer-89gcrg / framer-12dm1do : texte (flex 1 0 0, max 160, balance) */}
       <p
         className={
-          "relative m-0 h-auto w-px max-w-[160px] flex-[1_0_0] whitespace-pre-wrap break-words text-[13px] font-medium leading-[1.2] tracking-[-0.01em] [text-wrap:balance] " +
+          "relative m-0 h-auto w-px max-w-[260px] flex-[1_0_0] whitespace-pre-wrap break-words text-[16px] font-medium leading-[1.3] tracking-[-0.01em] [text-wrap:balance] " +
           (colorClass ?? "text-foreground")
         }
       >
@@ -232,17 +235,28 @@ function CardDescription({
  * encode exactement 2 lignes (« Built on » / « reputation ») à TOUS les
  * breakpoints : le dernier mot passe seul à la ligne (hypothèse documentée).
  */
-function Title({ title }: { title: string }) {
+function Title({
+  title,
+  titleLines,
+  intro,
+}: {
+  title: string;
+  titleLines?: readonly string[];
+  intro?: string;
+}) {
   const words = title.trim().split(/\s+/);
-  const lines =
-    words.length <= 1
+  // Les lignes déclarées par la donnée priment : le titre est écrit pour
+  // tomber sur ces coupures-là. Le repli garde le découpage de la source.
+  const lines = titleLines?.length
+    ? [...titleLines]
+    : words.length <= 1
       ? [title]
       : [words.slice(0, -1).join(" "), words[words.length - 1]];
   return (
     // framer-vlbdp8 : wrapper du titre
     <div className="accent-clip-titre relative order-1 flex w-full flex-row items-start justify-start gap-0 overflow-clip tablet:order-none tablet:w-px tablet:flex-[1_0_0]">
       {/* framer-1kk4nz3-container : conteneur du code-component */}
-      <div className="relative h-auto w-px flex-[1_0_0]">
+      <div className="relative flex h-auto w-px flex-[1_0_0] flex-col gap-[20px] pb-[10px] tablet:gap-[30px] tablet:pb-[50px]">
         <h2 className="relative m-0 flex w-full max-w-full flex-col justify-center p-0 text-left text-[52px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] text-background tablet:text-[68px] desktop:text-[92px]">
           {lines.map((line, i) => (
             <span
@@ -280,6 +294,17 @@ function Title({ title }: { title: string }) {
             </span>
           ))}
         </h2>
+        {intro ? (
+          <Reveal
+            as="p"
+            initialOpacity={0.001}
+            duration={0.8}
+            delay={0.2}
+            className="m-0 w-full max-w-[440px] text-[16px] font-medium leading-[1.4] tracking-[-0.01em] text-background tablet:text-[18px]"
+          >
+            {intro}
+          </Reveal>
+        ) : null}
       </div>
     </div>
   );
@@ -287,10 +312,14 @@ function Title({ title }: { title: string }) {
 
 export function WhyUsSection({ whyUs }: { whyUs: HomeContent["whyUs"] }) {
   const eyebrow = whyUs.eyebrow ?? "";
-  const ratingStat = whyUs.stats[0];
-  const referralStat = whyUs.stats[1];
-  const reviewsCta = whyUs.ctas?.[0];
-  const projectCta = whyUs.ctas?.[1];
+  // UNE CARTE PAR CHIFFRE, le lien de même rang dessus. La première se pose
+  // dans la moitié droite, sous le titre ; la suivante dans la moitié gauche,
+  // et ainsi de suite : le zigzag de la source tient quel que soit le nombre.
+  const cards = whyUs.stats.map((stat, i) => ({
+    stat,
+    cta: whyUs.ctas?.[i],
+    sombre: i % 2 === 0,
+  }));
 
   return (
     // framer-5mbkz6 : section (fond #e9e9e9, flex col centrée)
@@ -316,66 +345,59 @@ export function WhyUsSection({ whyUs }: { whyUs: HomeContent["whyUs"] }) {
             </p>
           </div>
 
-          <Title title={whyUs.title ?? ""} />
+          <Title
+            title={whyUs.title ?? ""}
+            titleLines={whyUs.titleLines}
+            intro={whyUs.intro}
+          />
         </div>
 
         {/* framer-x6vmjd : colonne des cartes + logo */}
         <div className="relative z-[1] flex w-full flex-col items-center justify-center gap-[10px] overflow-hidden tablet:gap-0">
-          {/* framer-1oosgvg : Card container 1 (carte noire alignée vers le centre) */}
-          <div className="relative flex w-full flex-row items-center justify-start gap-0 overflow-hidden">
-            {/* framer-rwwyaz : moitié gauche, carte collée à droite */}
-            <div className="relative flex w-px flex-[1_0_0] flex-col items-end justify-end gap-[10px] overflow-hidden tablet:w-1/2 tablet:flex-none">
-              {/* framer-1mfsxcd : carte noire (fade au reveal) */}
-              <Reveal
-                as="div"
-                className="relative flex h-[220px] w-full flex-col items-center justify-between bg-background p-[20px] tablet:aspect-[1.34643] tablet:h-[280px] tablet:w-[377px]"
-                initialOpacity={0.001}
-                duration={0.8}
+          {cards.map(({ stat, cta, sombre }) => {
+            const encre = sombre ? "text-foreground" : "text-background";
+            return (
+              // framer-1oosgvg / framer-10jctn5 : conteneur de carte. La carte
+              // sombre vit à droite du filet, la claire à gauche, chacune collée
+              // au centre.
+              <div
+                key={stat.label}
+                className={`relative flex w-full flex-row items-center gap-0 overflow-hidden ${
+                  sombre ? "z-[2] justify-end" : "justify-start"
+                }`}
               >
-                <CardDescription text={ratingStat.label} />
-                {/* framer-aazft : rangée [nombre | lien] */}
-                <div className="relative flex w-full flex-row items-end justify-between overflow-hidden">
-                  <NumberCounter
-                    stat={ratingStat}
-                    prefix="/"
-                    suffix="+"
-                    colorClass="text-foreground"
-                  />
-                  {reviewsCta && (
-                    <SwapLink cta={reviewsCta} colorClass="text-foreground" />
-                  )}
+                <div
+                  className={`relative flex w-px flex-[1_0_0] flex-col gap-[10px] overflow-hidden tablet:w-1/2 tablet:flex-none ${
+                    sombre ? "items-start justify-start" : "items-end justify-end"
+                  }`}
+                >
+                  <Reveal
+                    as="div"
+                    className={`relative flex h-[220px] w-full flex-col items-center justify-between p-[20px] tablet:aspect-[1.34643] tablet:h-[280px] tablet:w-[377px] ${
+                      sombre ? "bg-background" : "bg-foreground"
+                    }`}
+                    initialOpacity={0.001}
+                    duration={0.8}
+                  >
+                    <CardDescription
+                      text={stat.label}
+                      colorClass={sombre ? undefined : DARK_60}
+                    />
+                    {/* framer-aazft / framer-7fg37k : rangée [nombre | lien] */}
+                    <div className="relative flex w-full flex-row items-end justify-between gap-[10px] overflow-hidden">
+                      <NumberCounter
+                        stat={stat}
+                        prefix={stat.prefix ?? ""}
+                        suffix={stat.suffix ?? ""}
+                        colorClass={encre}
+                      />
+                      {cta ? <SwapLink cta={cta} colorClass={encre} /> : null}
+                    </div>
+                  </Reveal>
                 </div>
-              </Reveal>
-            </div>
-          </div>
-
-          {/* framer-10jctn5 : Card container 2 (carte blanche alignée vers le centre) */}
-          <div className="relative z-[2] flex w-full flex-row items-center justify-end gap-0 overflow-hidden">
-            {/* framer-1qz9ze0 : moitié droite, carte collée à gauche */}
-            <div className="relative flex w-px flex-[1_0_0] flex-col items-start justify-start gap-[10px] overflow-hidden tablet:w-1/2 tablet:flex-none">
-              {/* framer-uo2ku2 : carte blanche (fade au reveal) */}
-              <Reveal
-                as="div"
-                className="relative flex h-[220px] w-full flex-col items-center justify-between bg-foreground p-[20px] tablet:aspect-[1.34643] tablet:h-[280px] tablet:w-[377px]"
-                initialOpacity={0.001}
-                duration={0.8}
-              >
-                <CardDescription text={referralStat.label} colorClass={DARK_60} />
-                {/* framer-7fg37k : rangée [nombre | lien] */}
-                <div className="relative flex w-full flex-row items-end justify-between overflow-hidden">
-                  <NumberCounter
-                    stat={referralStat}
-                    prefix="/"
-                    suffix="%"
-                    colorClass="text-background"
-                  />
-                  {projectCta && (
-                    <SwapLink cta={projectCta} colorClass="text-background" />
-                  )}
-                </div>
-              </Reveal>
-            </div>
-          </div>
+              </div>
+            );
+          })}
 
           {/* framer-1tkzsc8 : Logo container */}
           <div className="relative flex w-full flex-row items-center justify-start gap-0 overflow-visible">

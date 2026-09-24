@@ -362,6 +362,13 @@ export interface WorkItem extends SluggedContent {
   role?: string; // rôle du studio sur le projet
   categories: string[]; // WEB DESIGN | DEVELOPMENT | BRANDING | SEO
   services?: string[];
+  /**
+   * Sujet du rendez-vous proposé en fin de fiche (`IdRendezVous` de
+   * `content/rendez-vous.ts`) : le visiteur qui a lu une place de marché arrive
+   * sur le rendez-vous « logiciel », celui qui a lu une page produit sur
+   * « site ». Absent : « découverte ».
+   */
+  sujetRendezVous?: "site" | "logiciel" | "decouverte";
   cover: ImageAsset;
   /**
    * Fond du hero de la page projet, quand la couverture ne peut pas y servir.
@@ -540,6 +547,12 @@ export interface HeroContent {
   wordmarkCaption?: string;
   /** Prestations listées sous le logotype (« design / development / Marketing »). */
   serviceWords?: readonly string[];
+  /**
+   * Lien sobre sous le sous-titre du hero, vers la carte de l'offre. Le hero de
+   * l'accueil ne nommait aucune prestation au premier écran : ce lien mène à
+   * l'accordéon, qui porte les fourchettes.
+   */
+  offerLink?: Link;
   /** Séparateur inséré entre ces mots. */
   serviceWordsSeparator?: string;
   /** Personne mise en avant à côté du sous-titre (carte fondateur). */
@@ -626,6 +639,14 @@ export interface ServicesSection {
 export interface StatsSection {
   eyebrow?: string; // « How we do it » | « Why us? »
   title?: string; // « Built on reputation »
+  /**
+   * Découpage du titre en lignes, une entrée par ligne rendue. Les titres de
+   * ces sections sont écrits pour tomber sur des lignes précises (12 signes au
+   * plus à 92 px) : le découpage automatique les coupait ailleurs.
+   */
+  titleLines?: readonly string[];
+  /** Phrase d'appui sous le titre, en texte courant. */
+  intro?: string;
   stats: Stat[];
   /** Témoignage intégré à la section (référencé depuis testimonials.ts). */
   testimonial?: Testimonial;
@@ -751,8 +772,11 @@ export interface HomeContent {
   whyUs: StatsSection;
   /** Prestations en accordéon (section06). */
   services: ServicesSection;
-  /** Carrousel témoignages (section10). */
-  testimonials: TestimonialsSection;
+  /**
+   * Carrousel témoignages (section10). ABSENT tant qu'aucun client réel n'a
+   * parlé : la section vide n'est plus composée.
+   */
+  testimonials?: TestimonialsSection;
   /** Bande de logos (section11). */
   logoBand?: LogoBand;
   /** Articles mis en avant (référence blog.ts). */
@@ -903,6 +927,8 @@ export interface NotFoundContent {
   errorLabel: string;
   /** Lien de retour (« Back to homepage »). */
   backLink: Link;
+  /** Balise `<title>` du 404 : sans elle, il reprenait celle de l'accueil. */
+  seoTitle: string;
 }
 
 /**
@@ -1005,6 +1031,10 @@ export interface UiLabels {
     quoteOpen: string;
     quoteClose: string;
     nextProjectLabel: string; // « Next project »
+    /** Bloc « Un besoin proche ? » de fin de fiche projet. */
+    rendezVousEyebrow: string;
+    rendezVousTitleLines: readonly string[];
+    rendezVousLabel: string;
     /** Libellé du curseur d'un comparateur avant / après (`%1`, `%2`). */
     compareSliderLabel: string;
     /** Valeur annoncée par ce curseur (`%n` en plus de `%1` et `%2`). */

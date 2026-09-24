@@ -449,14 +449,14 @@ function ServiceRow({
                 {/* framer-104b0i6 : Column 1 (padding-right 26px en tablet+) */}
                 <div className="flex w-full flex-none flex-col items-center gap-[10px] overflow-hidden p-0 tablet:place-self-start tablet:pr-[26px]">
                   {/* framer-latp5o : body[0] (preset 2okhk1, 14px, blanc 60%) */}
-                  <p className="w-full whitespace-pre-wrap break-words text-[14px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground-60">
+                  <p className="w-full whitespace-pre-wrap break-words text-[16px] font-medium leading-[1.4] tracking-[-0.01em] text-foreground-60">
                     {body0}
                   </p>
                 </div>
                 {/* framer-14iaksy : Column 2 (padding-right 26px en tablet+) */}
                 <div className="flex w-full flex-none flex-row items-center gap-[10px] overflow-hidden p-0 tablet:place-self-start tablet:pr-[26px]">
                   {/* framer-b6kxyz : body[1] (preset 2okhk1, 14px, blanc 60%) */}
-                  <p className="w-px flex-[1_0_0] whitespace-pre-wrap break-words text-[14px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground-60">
+                  <p className="w-px flex-[1_0_0] whitespace-pre-wrap break-words text-[16px] font-medium leading-[1.4] tracking-[-0.01em] text-foreground-60">
                     {body1}
                   </p>
                 </div>
@@ -617,10 +617,17 @@ export function ServicesSection({
    * `/about` supprimait ses 30px et remontait tout le bas de page d'autant.
    */
   bottomAccent = "accent",
+  /**
+   * Bande de haut de section (`framer-sn2cdf`), moitié gauche. Grise par
+   * défaut (la source la pose sous une section claire) ; ACCENT sur l'accueil,
+   * où l'accordéon suit l'aplat accent de la section `about`.
+   */
+  topAccent = "muted",
 }: {
   services: ServiceItem[];
   intro?: string;
   bottomAccent?: "accent" | "muted";
+  topAccent?: "accent" | "muted";
 }) {
   return (
     // framer-Iaj5T (section) : fond #0b0b0b, colonne [Top accent | Services | Bottom accent]
@@ -638,7 +645,11 @@ export function ServicesSection({
       {/* framer-sn2cdf : Top accent (barre gris clair 50%, alignée à gauche) */}
       <div className="relative flex w-full flex-row items-center justify-start">
         {/* framer-61gm4x : Accent (h 20px phone / 30px tablet+, w 50%, #e9e9e9) */}
-        <div className="relative z-[5] h-[20px] w-1/2 flex-none overflow-hidden bg-muted tablet:h-[30px]" />
+        <div
+          className={`relative z-[5] h-[20px] w-1/2 flex-none overflow-hidden tablet:h-[30px] ${
+            topAccent === "accent" ? "bg-accent" : "bg-muted"
+          }`}
+        />
       </div>
 
       {/* framer-1tnadfl : Services (centre le conteneur 1440, padding responsive) */}

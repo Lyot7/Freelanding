@@ -8,6 +8,7 @@ import type { SiteConfig, WorkItem } from "@/lib/content";
 import { RelatedWork } from "./RelatedWork";
 import { WorkDetailHero } from "./WorkDetailHero";
 import { WorkNarrative } from "./WorkNarrative";
+import { WorkRendezVous } from "./WorkRendezVous";
 import { WorkTestimonial } from "./WorkTestimonial";
 import {
   createWorkDetailContent,
@@ -43,6 +44,7 @@ export function WorkDetailPage({
             followUp={work.testimonialFollowUp}
           />
         ) : null}
+        <WorkRendezVous work={work} />
         {nextWork ? <RelatedWork work={nextWork} /> : null}
       </main>
       <Footer />

@@ -404,7 +404,7 @@ export function AboutSection({
           {/* framer-ferzr4 : colonne gauche (paragraphe + lien), order 1 en mobile */}
           <div className="relative order-1 flex w-full flex-col items-start justify-center gap-[20px] overflow-visible tablet:order-none tablet:h-auto tablet:w-px tablet:flex-[1_0_0] tablet:justify-between tablet:gap-0 tablet:self-stretch">
             {/* framer-tvr0oh : bloc paragraphe(s) */}
-            <div className="relative flex w-full flex-col items-start gap-[16px] overflow-visible tablet:w-[60%] tablet:gap-[20px] desktop:w-[50%]">
+            <div className="relative flex w-full flex-col items-start gap-[16px] overflow-visible tablet:w-[90%] tablet:gap-[20px] desktop:w-[80%]">
               {body.map((para, i) => (
                 // framer-1t7o5wy : paragraphe (preset wwtw0z, blanc 70 %).
                 // Il apparaît en FONDU sur la source, sans translation ; il
@@ -415,7 +415,10 @@ export function AboutSection({
                   initialOpacity={0.001}
                   duration={0.8}
                   delay={0.15 + i * 0.1}
-                  className={`relative h-auto w-full max-w-[330px] whitespace-pre-wrap break-words text-accent-ink/70 tablet:max-w-none ${PRESET_WWTW0Z}`}
+                  /* TEXTE COURANT depuis le 2026-09-24 : 16 à 18 px en casse
+                     normale, sur une colonne élargie (90 % puis 80 %) pour
+                     garder une soixantaine de signes par ligne. */
+                  className="relative m-0 h-auto w-full max-w-[62ch] whitespace-pre-wrap break-words text-[16px] font-medium leading-[1.45] tracking-[-0.01em] text-accent-ink/70 tablet:text-[17px] desktop:text-[18px]"
                 >
                   <Highlighted text={para} highlights={bodyHighlights} highlightClassName="text-accent-ink" />
                 </Reveal>

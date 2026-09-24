@@ -559,13 +559,27 @@ function HeroContentBox({
             <div className="relative z-[2] flex h-min w-full flex-none flex-col items-start gap-[16px] overflow-hidden pt-[14px] pb-[40px] tablet:grid tablet:auto-rows-[minmax(0,1fr)] tablet:grid-cols-[repeat(2,minmax(50px,1fr))] tablet:grid-rows-[repeat(1,minmax(0,1fr))] tablet:justify-center tablet:gap-0 tablet:pt-[30px] tablet:pb-[130px]">
               {/* framer-1qzjqre : sous-titre (emphase blanc 60%) */}
               <div className="relative h-auto w-full max-w-[400px] flex-none self-auto whitespace-pre-wrap break-words tablet:max-w-[91%] tablet:place-self-start">
-                <p className="m-0 text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground">
+                {/* TEXTE COURANT depuis le 2026-09-24 : 16 px en casse normale.
+                    C'est la seule phrase du premier écran qui dit ce qui se
+                    vend, elle était en 12 px capitales. */}
+                <p className="m-0 text-[16px] font-medium leading-[1.35] tracking-[-0.01em] text-foreground">
                   <Highlighted
                     text={subtitleText}
                     highlights={subtitleEmphasis}
                     highlightClassName={subtitleHighlightClass}
                   />
                 </p>
+                {/* Lien sobre vers l'accordéon des prestations, même grammaire
+                    que « ↓ Voir les réalisations » du showreel : une étiquette,
+                    pas un second bouton face au rendez-vous. */}
+                {hero.offerLink ? (
+                  <a
+                    href={hero.offerLink.href}
+                    className="mt-[14px] inline-block text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60 no-underline transition-colors duration-200 hover:text-foreground motion-reduce:transition-none"
+                  >
+                    {hero.offerLink.label}
+                  </a>
+                ) : null}
               </div>
               <FounderCard person={hero.person} />
             </div>

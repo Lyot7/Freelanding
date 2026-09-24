@@ -22,6 +22,14 @@ function SearchIcon() {
   );
 }
 
+/**
+ * Nombre de projets à partir duquel les filtres par famille s'affichent. Sous
+ * ce seuil, trois onglets pour trois projets ajoutaient un choix sans rien
+ * trier (audit des parcours, 2026-09-24). La rangée garde sa place dans la
+ * grille : la recherche et le millésime ne bougent pas.
+ */
+const SEUIL_FILTRES = 6;
+
 export function WorkExplorer({
   filters,
   works,
@@ -56,15 +64,17 @@ export function WorkExplorer({
         <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-[24px] tablet:grid tablet:grid-cols-12 tablet:items-end tablet:gap-x-[4px]">
           {/* Rangée : gap 6px sous 810, 10px au-delà (unique rupture du bloc). */}
           <div className="order-2 flex flex-wrap gap-[6px] tablet:order-1 tablet:col-span-6 tablet:gap-[10px]">
-            {filters.map((filter, index) => (
-              <FilterPill
-                key={filter}
-                active={index === activeIndex}
-                onClick={() => setActiveIndex(index)}
-              >
-                {filter}
-              </FilterPill>
-            ))}
+            {works.length >= SEUIL_FILTRES
+              ? filters.map((filter, index) => (
+                  <FilterPill
+                    key={filter}
+                    active={index === activeIndex}
+                    onClick={() => setActiveIndex(index)}
+                  >
+                    {filter}
+                  </FilterPill>
+                ))
+              : null}
           </div>
 
           {/* LARGEUR FIGÉE À 250 px dès 810, et non une travée fluide de la

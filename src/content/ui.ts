@@ -129,8 +129,10 @@ export const uiLabels: UiLabels = {
      * cinq boutons qui disent tous la même chose à l'écran, et cinq noms
      * distincts pour qui navigue au lecteur d'écran ou à la liste des liens.
      */
-    rdvLabel: "Prendre rendez-vous",
-    rdvAriaPrefix: "Prendre rendez-vous à propos de : ",
+    // UN SEUL LIBELLÉ POUR LE RENDEZ-VOUS sur tout le site depuis le
+    // 2026-09-24 : les pages de prestation disaient déjà « Réserver un appel ».
+    rdvLabel: "Réserver un appel",
+    rdvAriaPrefix: "Réserver un appel à propos de : ",
   },
 
   testimonials: {
@@ -165,6 +167,11 @@ export const uiLabels: UiLabels = {
     quoteOpen: "« ",
     quoteClose: " »",
     nextProjectLabel: "Projet suivant",
+    /* Bloc de fin de fiche, avant « Projet suivant » : la fiche se terminait
+       sans aucune action, le lecteur convaincu n'avait qu'à remonter. */
+    rendezVousEyebrow: "Ton projet",
+    rendezVousTitleLines: ["Un besoin", "proche ?"],
+    rendezVousLabel: "Réserver un appel",
     /* Comparateur avant / après des pages projet. Le libellé du curseur n'est
        jamais peint : il est lu par les lecteurs d'écran, et c'est la seule
        chose qui dit à quoi sert la poignée quand on ne voit pas les images.

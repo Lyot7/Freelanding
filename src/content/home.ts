@@ -2,8 +2,13 @@ import type { HomeContent } from "@/lib/content/types";
 import { slugsMisEnAvant } from "@/content/blog";
 import { faqItems } from "@/content/faq";
 import { services } from "@/content/services";
+import { packEntree, prixPack } from "@/content/offre";
+import { lienRendezVous } from "@/content/rendez-vous";
 import { howWeDoItStats, reputationStats } from "@/content/stats";
-import { jenniferTestimonial } from "@/content/testimonials";
+
+const ENTREE_VITRINE = prixPack(packEntree("vitrine"));
+const ENTREE_LOGICIEL = prixPack(packEntree("logiciel"));
+const ACCROCHE_HERO = `Je conçois et je code ton site vitrine, à partir de ${ENTREE_VITRINE} HT, ou ta solution métier, à partir de ${ENTREE_LOGICIEL} HT. Le prix est fixé avant de commencer.`;
 
 /**
  * Contenu de la page d'accueil — recomposé fidèlement à partir des sections de
@@ -65,41 +70,26 @@ export const homeContent: HomeContent = {
     // `subtitle` est la copy de repli, non affichée ici : le hero rend le
     // paragraphe de `subtitleParagraphs`. Les deux disent désormais la même
     // chose, il n'y a plus de raison qu'elles divergent.
-    subtitle:
-      "Tu sais où tu veux emmener ton entreprise. Je construis ce qui t’y emmène. Ce qui se voit, et ce qui compte vraiment derrière : la vitesse, la structure, un code qu’on peut encore faire évoluer dans trois ans.",
+    subtitle: ACCROCHE_HERO,
+    /*
+     * LE HERO NOMME L'OFFRE depuis le 2026-09-24 (audit des parcours, phase B).
+     * Il ne disait ni ce qui se vend ni à quel prix : le visiteur devait
+     * descendre trois sections pour l'apprendre. La phrase nomme les deux
+     * prestations et leur prix d'entrée, lus dans `offre.ts` pour ne jamais
+     * diverger de l'accordéon. Corps 16 px en casse normale : c'est un texte
+     * qu'on lit, pas une étiquette.
+     *
+     * `inverted: true` ATTÉNUE les fragments listés : la seconde phrase passe à
+     * 60 %, l'offre reste en blanc plein.
+     */
     subtitleParagraphs: [
       {
-        // SEUL TEXTE DU HERO QUI DIT LE MÉTIER, depuis que le titre en est
-        // sorti. C'est ce qui tranche la question posée par Eliott le
-        // 2026-08-31 (« ce texte est utile même ? ») : sans lui, le hero ne
-        // porte plus que le nom, la photo et trois mots de discipline, et un
-        // visiteur qui arrive ne sait pas ce qui se vend ici.
-        //
-        // « Les briques sont éprouvées, l'assemblage n'existe que chez vous »
-        // est retiré : l'image demandait un effort d'interprétation à la
-        // seconde où le visiteur décide de rester, et ne nommait aucun
-        // livrable. La phrase dit maintenant ce qui est vendu (des sites, des
-        // outils métier, des logiciels sur mesure) et qui le fait (une seule
-        // personne, d'un bout à l'autre). Rien qui ne soit dans
-        // `vault/wiki/business/copy-matiere-brute.md`.
-        //
-        // PIÈGE VÉRIFIÉ AU RENDU : avec `inverted: true`, `emphasis` ATTÉNUE à
-        // 60 % au lieu de souligner. Les fragments listés sont donc les
-        // SECONDAIRES ; ce qui reste en blanc plein est la liste de ce qui est
-        // vendu et « Un seul interlocuteur », c'est-à-dire les deux seules
-        // informations que le visiteur doit emporter.
-        text: "Tu sais où tu veux emmener ton entreprise. Je construis ce qui t’y emmène. Ce qui se voit, et ce qui compte vraiment derrière : la vitesse, la structure, un code qu’on peut encore faire évoluer dans trois ans.",
-        /* `inverted: true` ATTÉNUE les fragments listés au lieu de les
-           souligner : ce qui est listé ici est donc le SECONDAIRE. La première
-           phrase pose la situation du lecteur, la seconde est ce qu'il doit
-           emporter. C'est elle qui reste en blanc plein. */
-        emphasis: [
-          "Tu sais où tu veux emmener ton entreprise.",
-          "Ce qui se voit, et ce qui compte vraiment derrière : la vitesse, la structure, un code qu’on peut encore faire évoluer dans trois ans.",
-        ],
+        text: ACCROCHE_HERO,
+        emphasis: ["Le prix est fixé avant de commencer."],
         inverted: true,
       },
     ],
+    offerLink: { label: "↓ Voir les prestations", href: "#services" },
     // Fond du hero. Remplace le plan de pilote du template, dont la licence
     // n'était pas traçable, par un asset généré et possédé (Veo/Nano Banana,
     // 2026-08-10) : macro d'un mouvement d'horlogerie, qui dit « l'outil qui
@@ -158,33 +148,23 @@ export const homeContent: HomeContent = {
     },
   },
 
-  // showreel.ts — marquee défilant + phrase manifeste + millésime.
+  // showreel.ts — titre + phrase d'appui + affiche + lien vers les réalisations.
   showreel: {
-    // « Je construis des sites et des outils. » redisait le hero : le plus gros
-    // titre de la page, en 92 px, n'apportait rien de neuf. Il nomme désormais le
-    // RÉSULTAT, pas le livrable — et il ne redit pas davantage le H1 arrivé
-    // depuis dans le hero (« sites, outils et logiciels »).
-    // « qui vendent » rangeait la page du côté e-commerce, contre la contrainte
-    // de cible large : un artisan ne vend pas en ligne. « qu’on garde » tient
-    // pour tout le monde et dit la durée de vie, pas le canal.
-    marquee: "Je construis des outils qu’on garde.",
-    // Trois lignes, comme la source. Le titre est aligné à DROITE dès 810 : les
-    // lignes vont donc du plus court au plus long, pour que le bord droit reste
-    // franc et que le bloc descende en s'élargissant.
-    //
-    // BUDGET DE LARGEUR : corps FIXE de 92 px, sans ajustement automatique, dans
-    // un conteneur mesuré à 682 px au point d'arrêt bureau. Une ligne plus large
-    // se replie et casse l'empilement. Mesuré ici : 611 / 420 / 568 px.
-    // Mesuré à 92 px : 611 / 484 / 595 px pour 683 px de conteneur.
-    marqueeLines: ["Je construis", "des outils", "qu’on garde."],
-    // Majuscule initiale : le titre se termine par un point, la phrase manifeste
-    // enchaîne comme une phrase à part entière dont le « Où » se rattache aux
-    // sites. La casse n'est pas visible au rendu (uppercase CSS), elle l'est
-    // dans la donnée et dans les flux qui la relisent sans style.
+    /*
+     * TITRE ET PHRASE CHOISIS PAR ELIOTT le 2026-09-24. « Je construis des
+     * outils qu'on garde » et « Où avancer semble évident… » parlaient d'Eliott
+     * et de style ; la section annonce les réalisations, elle dit donc pourquoi
+     * le client doit les regarder : son propre client compare avant d'appeler.
+     *
+     * LIGNES DE 12 SIGNES AU PLUS, le titre est rendu à 92 px dans une demi-
+     * colonne de 683 px, aligné à droite dès 810.
+     */
+    marquee: "Ton client te compare avant d’appeler.",
+    marqueeLines: ["Ton client", "te compare", "avant", "d’appeler."],
     statement:
-      "Où avancer semble évident, naturel, et ne laisse aucune place à l’hésitation.",
-    // Phrase rendue en noir 60 % dont ces deux fragments passent en noir plein.
-    statementEmphasis: ["évident, naturel", "aucune place à l’hésitation."],
+      "Il ouvre ton site puis celui du concurrent, et il appelle celui qui rassure. Regarde ce que j’ai livré.",
+    // Rendue en noir 60 %, ce fragment passe en noir plein.
+    statementEmphasis: ["il appelle celui qui rassure."],
     vintage: "2026©",
     /*
      * SEUL CONTRÔLE DE LA SECTION depuis le 2026-08-27, et il est enfin
@@ -333,9 +313,12 @@ export const homeContent: HomeContent = {
     launchedLabel: "Lancé en 2026",
     projectsLabel: "Développeur freelance",
     vintage: "2026©",
+    // « 1 INTERLOCUTEUR » RETIRÉ le 2026-09-24 : il ne disait rien d'utile au
+    // client. Le compteur garde sa place dans la grille (photo | chiffre) et
+    // porte la règle de travail qu'Eliott a choisie.
     counter: {
       value: "1",
-      caption: "Interlocuteur : tu parles à celui qui écrit le code",
+      caption: "Projet à la fois",
     },
     cta: { label: "À propos", href: "/a-propos" },
     // PHOTO PLEINE CADRE depuis le 2026-08-27. Ce cadre portait le portrait
@@ -366,35 +349,36 @@ export const homeContent: HomeContent = {
 
   featuredWorkSlugs: ["kpsull", "wurth-creation-de-compte", "nslysium"],
 
-  // numbers.ts — « Comment je travaille » : 3 chiffres + témoignage intégré.
+  // numbers.ts — 3 chiffres sur fond accent.
   numbers: {
     eyebrow: "Comment je travaille",
-    // TITRE REFAIT le 2026-08-31 : il ne disait rien et ne coiffait rien. La
-    // section s'appelle « comment je travaille » ; elle porte donc la seule
-    // chose qui distingue vraiment le process d'Eliott, à savoir qu'il n'y en a
-    // pas d'étape morte. Pas de maquette, pas de PDF : la signature déclenche le
-    // code et le client suit une adresse en ligne. Mesuré : 59 caractères contre
-    // 66, donc une ligne de moins dans la colonne de 600 px à 92 px.
-    title: "Pas de maquettes à valider. Une adresse en ligne qui avance.",
+    /*
+     * TITRE ET SOUS-TITRE CHOISIS PAR ELIOTT le 2026-09-24. « Pas de maquettes
+     * à valider. Une adresse en ligne qui avance. » parlait de la méthode ; le
+     * titre dit ce que le client y gagne. La phrase d'Eliott qui suivait (« Je
+     * ne cherche pas le volume… ») est sortie : elle redisait « 1 projet à la
+     * fois » avec d'autres mots.
+     */
+    title: "Ton projet n’attend personne.",
+    titleLines: ["Ton projet", "n’attend", "personne."],
+    intro:
+      "Je ne mène qu’un chantier à la fois, alors ton message a sa réponse sous 24 h ouvrées.",
     stats: howWeDoItStats,
-    testimonial: jenniferTestimonial,
   },
 
-  // number.ts — « Pourquoi moi ? » / « Bâti sur la preuve » : 2 chiffres + CTA.
-  // Le premier CTA pointait vers Trustpilot (« Our Reviews ») : lien retiré, la
-  // carte renvoie désormais vers les réalisations.
+  // number.ts — « Pourquoi moi ? » : une carte chiffrée + appel.
   whyUs: {
     eyebrow: "Pourquoi moi ?",
-    // « BÂTI SUR LA PREUVE » annonçait des preuves que les deux cartes ne
-    // fournissent pas : elles portent des engagements, pas un palmarès. Le titre
-    // dit désormais ce qu'elles sont réellement, et il ne se périmera pas à la
-    // première signature.
-    title: "Ce qui est vérifiable.",
+    // TITRE ET SOUS-TITRE CHOISIS PAR ELIOTT le 2026-09-24 (remplacent « Ce
+    // qui est vérifiable. »). La carte porte le chiffre qui le prouve.
+    title: "Personne ne te tient en otage.",
+    titleLines: ["Personne", "ne te tient", "en otage."],
+    intro:
+      "Tu as tous les accès dès la mise en ligne, et tu changes de prestataire quand tu veux.",
     stats: reputationStats,
-    ctas: [
-      { label: "Voir les réalisations", href: "/realisations" },
-      { label: "Démarrer un projet", href: "/contact" },
-    ],
+    // LE RENDEZ-VOUS EST LE CHEMIN PRINCIPAL du site. « Voir les réalisations »
+    // est parti : la section des réalisations est juste au-dessus.
+    ctas: [{ label: "Réserver un appel", href: lienRendezVous("decouverte") }],
   },
 
   // section06.ts — prestations en accordéon.
@@ -409,26 +393,9 @@ export const homeContent: HomeContent = {
     items: services,
   },
 
-  // section10.ts — carrousel témoignages.
-  // NOTE FIDÉLITÉ : l'archive statique n'expose qu'UN témoignage ; les autres
-  // slides du carrousel sont chargés en JS et absents du HTML.
-  testimonials: {
-    eyebrow: "Paroles de clients",
-    title: "Ce que disent mes clients.",
-    // Le titre est révélé ligne par ligne. L'espace finale de la première ligne
-    // sépare les deux masques : la concaténation doit redonner `title`.
-    titleLines: ["Ce que disent ", "mes clients."],
-    intro:
-      "Je laisse les résultats parler. Mais parfois, les personnes derrière ces résultats ont quelque chose à ajouter.",
-    introEmphasis: ["les résultats parler", "quelque chose à ajouter"],
-    // VIDE, et ce n'est pas un oubli. Ce tableau portait « Sophie Andersen »,
-    // un témoignage du template signé d'une personne qui n'existe pas ; il a été
-    // supprimé de `testimonials.ts` le 2026-09-01. L'habillage de la section
-    // reste écrit au-dessus pour le jour où un vrai client parlera : la section
-    // se rallume alors en remplissant ce tableau et en passant
-    // `siteFeatures.testimonials` à `true`.
-    items: [],
-  },
+  // SECTION TÉMOIGNAGES RETIRÉE le 2026-09-24 : son tableau était vide et le
+  // composant ne rendait rien. Elle reviendra avec un vrai client (le type la
+  // rend optionnelle, `HomePage` la compose si elle est présente).
 
   // section11.ts — bande défilante. RETIRÉE le 2026-08-10, RÉTABLIE le
   // 2026-09-01 sous une forme qui ne dit plus la même chose.
@@ -540,57 +507,34 @@ export const homeContent: HomeContent = {
     cta: { label: "Poser une question", href: "/contact" },
   },
 
-  // Ordre exact de composition de la home (cf. FramerHome.tsx).
   /*
-   * ORDRE DES SECTIONS DE LA PAGE D'ACCUEIL.
+   * ORDRE DES SECTIONS, refait le 2026-09-24 (audit des parcours, phase B).
    *
-   * LA SECTION TARIFS EST DE RETOUR, décision d'Eliott du 2026-09-02 : « c'est
-   * dans la section tarif que le concret il arrive ». L'accordéon des services
-   * annonce l'étendue, une fourchette par ligne ; la section tarifs porte le
-   * détail, périmètre par périmètre. Deux sections, deux rôles.
+   * L'OFFRE MONTE JUSTE SOUS LE H1. L'accordéon des prestations arrivait après
+   * le showreel, les réalisations et « Pourquoi moi » : le visiteur lisait
+   * trois sections avant d'apprendre ce qui se vend et à quel prix. Il suit
+   * maintenant `about`, qui porte le h1.
    *
-   * ELLE EST COLLÉE À L'ACCORDÉON, et c'est ce qui répond à l'objection qui
-   * avait fait retirer les deux versions précédentes. La première (« pricing »)
-   * alignait trois paliers d'UN SEUL produit : le visiteur venu pour un site
-   * tombait sur un tableau où son cas n'existait pas — le sélecteur de
-   * prestation le règle. La seconde (« tarifs ») s'étalait sur toute la largeur
-   * alors que toutes les sections sombres du site sont bâties sur deux moitiés
-   * séparées par un filet — le gabarit du template le règle. Restait le grief
-   * de fond : un tableau posé deux écrans plus bas oblige à relier de tête un
-   * montant à la prestation qu'on vient de lire. Immédiatement sous l'accordéon,
-   * il n'y a plus rien à relier.
+   * PUIS LA PREUVE, DU CONCRET AU CHIFFRÉ : les réalisations (annoncées par le
+   * showreel), « Pourquoi moi », les chiffres, la méthode, la FAQ.
    *
-   * LA BANDE ORANGE A CHANGÉ DE SECTION. Elle vivait en bas de l'accordéon et
-   * annonçait la section des chiffres, qui est orange pleine page. Celle des
-   * tarifs s'intercalant entre les deux, c'est elle qui la porte maintenant ;
-   * l'accordéon se termine sur la bande claire (voir `HomePage.tsx`).
+   * La bande des employeurs reste après la FAQ et avant les articles : ce sont
+   * des employeurs, pas des clients, et une file d'entreprises en tête de page
+   * se lirait comme un mur de références commerciales.
+   *
+   * LES TARIFS NE SONT PLUS SUR L'ACCUEIL depuis le 2026-09-07 : chaque page de
+   * prestation porte ses forfaits et sa prise de rendez-vous.
    */
   sectionOrder: [
     "hero",
     "about",
+    "services",
     "showreel",
     "works",
     "whyUs",
-    "services",
-    /* LES TARIFS NE SONT PLUS SUR L'ACCUEIL depuis le 2026-09-07.
-       Un tableau à trois colonnes comparant trois prestations obligeait le
-       visiteur à choisir son offre ET son forfait dans le même écran, sur une
-       grille qui ne tenait pas sur un téléphone. Chaque page de prestation
-       porte désormais SES forfaits et SA prise de rendez-vous : on compare
-       dans le contexte d'une offre, pas dans une grille hors sol. L'accueil
-       garde la section services, qui conduit à la bonne page, et le bloc
-       signé qui occupait l'ouverture de cette section parle désormais de la
-       façon de travailler plutôt que de la façon de facturer. */
-    "methode",
     "numbers",
+    "methode",
     "faq",
-    "testimonials",
-    // La bande des employeurs est posée APRÈS le bloc de preuve et AVANT les
-    // articles. Elle ne monte pas plus haut à dessein : ce sont des employeurs,
-    // pas des clients, et une file d'entreprises en tête de page se lit comme un
-    // mur de références commerciales quoi qu'on écrive au-dessus. À cet endroit,
-    // elle répond à « qui est ce type » une fois que la page a déjà dit ce
-    // qu'elle vend.
     "logoBand",
     "articles",
   ],

@@ -18,106 +18,68 @@ import type { Stat } from "@/lib/content/types";
  * NumberCounter) : ces valeurs sont des choix à arbitrer, pas un relevé.
  */
 
-/** Section « Comment je travaille » (numbers.ts) — grille principale « Numbers ». */
+/** Section « Ton projet n'attend personne » (numbers.ts) : grille principale. */
 export const howWeDoItStats: Stat[] = [
-  {
-    /* « 3 etapes que vous validez » RETIRE le 2026-08-31. Eliott : « les 3
-       etapes a valider c'est bullshit ». Il ne fait pas de maquette et ne
-       pouvait pas les nommer : une promesse qu'on ne sait pas enumerer est une
-       promesse qu'un client ressort un jour. Remplacee par l'echeancier reel,
-       confirme par Eliott le 2026-08-31 et deja ecrit dans les CGV : 30 / 40 / 30.
-       La cession des droits, elle, vit dans `reputationStats` : ne pas la
-       dupliquer ici, les deux grilles s'affichent sur la meme page. */
-    value: "30",
-    label: "D’acompte à la signature, 40 % à mi-parcours, 30 % à la livraison",
-    suffix: "%",
-    format: "integer",
-    highlights: ["D’acompte à la signature"],
-  },
   /*
-   * « 2,5 S DE CHARGEMENT VISÉ » A ÉTÉ RETIRÉ le 2026-08-31. Le chiffre n'était
-   * dans aucun des mots d'Eliott : c'était une cible inventée, et « visé » ne
-   * suffit pas à protéger un nombre affiché en 58 px sur la page d'accueil.
+   * LES TROIS CHIFFRES CHOISIS PAR ELIOTT LE 2026-09-24, dans cet ordre : un
+   * projet à la fois, la réponse sous 24 h ouvrées, les -92 % chez Würth.
    *
-   * CE QUI LE REMPLACE EST LE SEUL RÉSULTAT MESURÉ QU'IL POSSÈDE : le parcours
-   * de création de compte refait chez Würth France en 2024.
+   * SORT « 30 % D'ACOMPTE ». C'était une information de paiement posée comme
+   * une preuve : l'échéancier vit sur les pages de forfaits et dans les CGV, là
+   * où le client le cherche au moment de signer.
    *
-   * LA FORME DU CONTRAT A QUITTÉ LE LIBELLÉ le 2026-09-04, sur consigne
-   * d'Eliott. Elle y était écrite (« refait en stage chez Würth ») pour qu'on ne
-   * lise pas une mission facturée en indépendant ; c'était résoudre un problème
-   * de lecture en publiant une justification. Un chiffre de page d'accueil dit
-   * ce qui a été fait et où, pas sous quel contrat.
+   * « 1 PROJET À LA FOIS » ouvre la grille parce que c'est l'argument du
+   * titre : le projet du client n'attend personne. Le délai de réponse en est
+   * la conséquence mesurable, la ligne Würth la preuve que le travail rapporte.
    */
   {
-    value: "92",
-    label: "D’erreurs en moins sur un parcours d’inscription refait chez Würth France",
-    suffix: "%",
+    value: "1",
+    label: "Projet à la fois",
     format: "integer",
-    highlights: ["D’erreurs en moins"],
   },
   /**
    * DEUX CHIFFRES DE DÉLAI COEXISTENT SUR CE SITE, et c'est voulu depuis le
-   * 2026-08-28. Ailleurs (`site.ts`, `contact.ts`, `/about`), Eliott annonce
-   * répondre « sous deux heures ouvrées » : c'est son engagement courant, celui
-   * qu'il tient en pratique. Ici, c'est le PLAFOND, le pire cas qu'il garantit.
-   *
-   * L'un ne contredit l'autre que si le libellé ne dit pas lequel est lequel.
-   * Le libellé précédent annonçait « délai de réponse maximum » à 48 h pendant
-   * que trois autres endroits promettaient 2 h : le lecteur attentif y voyait
-   * deux maximums différents, et une promesse qui se contredit ne vaut rien
-   * quand elle est l'actif de vente principal. D'où « au plus tard », qui pose
-   * ce chiffre en garantie et non en concurrent de l'engagement à 2 h.
+   * 2026-08-28 : ici le PLAFOND garanti (24 h ouvrées), ailleurs l'engagement
+   * courant. Le libellé dit lequel des deux on lit.
    */
   {
     value: "24h",
-    label: "Réponse à chaque message, en heures ouvrées",
+    label: "Pour répondre à ton message, en heures ouvrées",
     suffix: "h",
     format: "integer",
-    highlights: ["Réponse à chaque message"],
+    highlights: ["Pour répondre à ton message"],
+  },
+  /*
+   * LE SEUL RÉSULTAT MESURÉ QU'ELIOTT POSSÈDE : le parcours de création de
+   * compte refait chez Würth France en 2024. La forme du contrat n'est pas
+   * dans le libellé (consigne du 2026-09-04) : un chiffre de page d'accueil dit
+   * ce qui a été fait et où.
+   *
+   * LE SIGNE MOINS EST UN PRÉFIXE et non une partie de la valeur : le compteur
+   * monte de 0 à 92, il ne sait pas descendre. Le moins typographique (U+2212)
+   * plutôt que le trait d'union, qui se lit comme une coupure.
+   */
+  {
+    value: "92",
+    label: "D’erreurs sur un parcours d’inscription refait chez Würth France",
+    prefix: "\u2212",
+    suffix: "%",
+    format: "integer",
+    highlights: ["D’erreurs"],
   },
 ];
 
 /**
- * Section « Bâti sur la preuve » (number.ts).
- * NOTE : les deux cartes encadrent leur chiffre (« / » devant, glyphe derrière).
- * Le glyphe est écrit en dur dans `WhyUsSection` (« + » sur la carte noire,
- * « % » sur la carte blanche) : la première valeur doit rester un nombre qui se
- * lit avec « + », la seconde un pourcentage.
+ * Section « Personne ne te tient en otage » (number.ts) : UNE carte depuis le
+ * 2026-09-24. « /10+ design pensé pour dix ans » est sorti (un cap de
+ * conception, pas un fait que le client peut vérifier) ; reste la propriété,
+ * vérifiable dès la mise en ligne. Préfixe et suffixe sont rendus tels quels
+ * par `WhyUsSection` : la valeur reste un nombre que le compteur fait monter.
  */
 export const reputationStats: Stat[] = [
-  /*
-   * « SCORE DE PERFORMANCE VISÉ : 95 » A ÉTÉ RETIRÉ le 2026-08-31, pour la même
-   * raison que les 2,5 s : un seuil chiffré qu'Eliott n'a jamais posé, et qu'un
-   * client peut lui ressortir au pied de la lettre.
-   *
-   * CE QUI LE REMPLACE est dans ses mots : « est-ce qu'il sera toujours au bout
-   * du jour dix ans après ? Je m'efforce à vraiment pousser là-dessus. » Le
-   * libellé écrit « pensé pour » et non « tient » : c'est un cap de conception,
-   * pas une garantie de durée. Le glyphe « + » est écrit en dur dans
-   * `WhyUsSection` (carte noire), la valeur doit donc rester un nombre qui se
-   * lit avec lui : « /10+ » se lit « dix ans et plus ».
-   */
-  {
-    value: "10",
-    label: "Un design pensé pour tenir dix ans, pas une saison",
-    prefix: "/",
-    suffix: "+",
-    format: "integer",
-  },
-  /**
-   * « 100 % réalisé par moi, sans sous-traitance » parlait de MON organisation,
-   * pas du client. La propriété du code, elle, est vérifiable à 100 % et se lit
-   * du côté de celui qui paie. Les glyphes « / » et « % » restent ceux du
-   * composant : rendu « /100 % », 2 lignes dans la boîte de 160 px, aucune ligne
-   * de `WhyUsSection.tsx` à toucher.
-   *
-   * TUTOIEMENT le 2026-09-02 (« vous appartient » → « t'appartient », cf.
-   * l'en-tête de `home.ts`). Le libellé perd trois signes : il tient toujours
-   * en 2 lignes, il n'en gagne pas une troisième.
-   */
   {
     value: "100",
-    label: "Le code que je livre t’appartient",
+    label: "Du code, de l’hébergement et des données à ton nom",
     prefix: "/",
     suffix: "%",
     format: "integer",

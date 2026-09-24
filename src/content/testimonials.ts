@@ -1,4 +1,7 @@
-import type { Testimonial } from "@/lib/content/types";
+import type {
+  Testimonial,
+  TestimonialsSection,
+} from "@/lib/content/types";
 
 /**
  * IL N'Y A PLUS DE TÉMOIGNAGE CLIENT DANS CE FICHIER, ET C'EST VOULU.
@@ -127,3 +130,20 @@ export const testimonials: Testimonial[] = [
   jenniferTestimonial,
   methodePromise,
 ];
+
+/**
+ * Habillage de la section témoignages (surtitre, titre, intro). Il vivait dans
+ * `home.ts`, qui ne compose plus cette section depuis le 2026-09-24 (aucun
+ * témoignage réel). `/a-propos` et les fiches projet la montent encore derrière
+ * `siteFeatures.testimonials` : leur habillage par défaut vient d'ici.
+ */
+export const habillageTemoignages: Omit<TestimonialsSection, "items"> = {
+  eyebrow: "Paroles de clients",
+  title: "Ce que disent mes clients.",
+  // Le titre est révélé ligne par ligne. L'espace finale de la première ligne
+  // sépare les deux masques : la concaténation doit redonner `title`.
+  titleLines: ["Ce que disent ", "mes clients."],
+  intro:
+    "Je laisse les résultats parler. Mais parfois, les personnes derrière ces résultats ont quelque chose à ajouter.",
+  introEmphasis: ["les résultats parler", "quelque chose à ajouter"],
+};

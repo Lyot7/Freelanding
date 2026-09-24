@@ -161,10 +161,13 @@ export const pageCaen: PageLocale = {
         href: "/realisations",
         description: "Les projets livrés, expliqués de bout en bout.",
       },
+      // LE RENDEZ-VOUS ET NON LE FORMULAIRE depuis le 2026-09-24 : c'est le
+      // chemin principal du site, et il est sur cette page. Écrire reste
+      // possible par « Poser une question », sous la FAQ.
       {
-        libelle: "Me contacter",
-        href: "/contact",
-        description: "Un message, une réponse sous 24 heures ouvrées.",
+        libelle: "Réserver un appel",
+        href: "#rendez-vous",
+        description: "Choisis un créneau pour parler de ton site.",
       },
     ],
     points: [

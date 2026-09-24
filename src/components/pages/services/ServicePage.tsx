@@ -175,7 +175,9 @@ function PackRow({
           {pack.promesse}
         </p>
         <div className="flex max-w-[440px] flex-col gap-[4px] pt-[6px] text-white/60">
-          <span className="text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em]">
+          {/* AMORCES EN CASSE NORMALE, 14 px, depuis le 2026-09-24 : ce sont
+              des débuts de phrase qu'on lit, pas des étiquettes. */}
+          <span className="text-[14px] font-semibold leading-[1.3] tracking-[-0.01em]">
             {servicePageLabels.pourQui}
           </span>
           <p className="text-[14px] font-medium leading-[1.4] tracking-[-0.01em]">
@@ -205,7 +207,7 @@ function PackRow({
 
         <div className="flex flex-col gap-[12px]">
           {precedent ? (
-            <p className="text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-white/50">
+            <p className="text-[14px] font-semibold leading-[1.3] tracking-[-0.01em] text-white/60">
               {servicePageLabels.toutLePrecedent(precedent)}
             </p>
           ) : null}

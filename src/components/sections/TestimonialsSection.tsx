@@ -3,7 +3,7 @@ import { ParallaxBackdrop } from "@/components/motion/ParallaxBackdrop";
 import { Reveal } from "@/components/motion/Reveal";
 import { LineReveal } from "@/components/motion/LineReveal";
 import { Highlighted } from "@/components/ui";
-import { homeContent } from "@/content/home";
+import { habillageTemoignages } from "@/content/testimonials";
 import { uiLabels } from "@/content/ui";
 import type { Testimonial } from "@/lib/content/types";
 
@@ -187,17 +187,17 @@ function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
 /**
  * Habillage de la section (surtitre, titre en deux lignes, phrase d'intro et ses
  * fragments en emphase). Il était recopié EN DUR et EN ANGLAIS dans le JSX alors
- * que `homeContent.testimonials` le porte traduit : la home et `/about`
+ * que `habillageTemoignages` (testimonials.ts) le porte traduit : la home et `/about`
  * montent la MÊME section Framer, seul le témoignage affiché change. Les props
  * restent ouvertes ; le défaut vient de la donnée, faute d'appelant modifiable
  * dans ce lot.
  */
 export function TestimonialsSection({
   testimonials,
-  eyebrow = homeContent.testimonials.eyebrow ?? "",
-  titleLines = homeContent.testimonials.titleLines ?? [],
-  intro = homeContent.testimonials.intro ?? "",
-  introEmphasis = homeContent.testimonials.introEmphasis ?? [],
+  eyebrow = habillageTemoignages.eyebrow ?? "",
+  titleLines = habillageTemoignages.titleLines ?? [],
+  intro = habillageTemoignages.intro ?? "",
+  introEmphasis = habillageTemoignages.introEmphasis ?? [],
 }: {
   testimonials: Testimonial[];
   eyebrow?: string;

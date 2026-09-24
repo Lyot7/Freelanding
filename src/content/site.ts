@@ -1,4 +1,5 @@
 import type { SiteConfig } from "@/lib/content/types";
+import { lienRendezVous } from "@/content/rendez-vous";
 
 /**
  * Configuration globale du site.
@@ -60,10 +61,17 @@ export const siteConfig: SiteConfig = {
   ],
   // `shortLabel` ne sort que sous 390 px, où le libellé complet pousse le bouton
   // hors de l'écran (mesuré : bord droit à 357 pour une fenêtre de 320).
+  /*
+   * « DÉMARRER UN PROJET » MÈNE AU RENDEZ-VOUS depuis le 2026-09-24, sujet
+   * « découverte ». Le rendez-vous est le chemin principal du site : il vivait
+   * sous le formulaire de /contact, et ce bouton, le plus visible de toutes les
+   * pages, menait au formulaire. Écrire reste possible par « Contact » dans le
+   * menu et par « Poser une question » sous la FAQ.
+   */
   primaryCta: {
     label: "DÉMARRER UN PROJET",
     shortLabel: "DÉMARRER",
-    href: "/contact",
+    href: lienRendezVous("decouverte"),
   },
   contact: {
     // Domaine arrêté : eliottbouquerel.fr (site servi sur
@@ -262,7 +270,7 @@ export const siteConfig: SiteConfig = {
     ],
   },
   // La source distingue la casse du bouton flottant de celle de la nav.
-  floatingCta: { label: "Démarrer un projet", href: "/contact" },
+  floatingCta: { label: "Démarrer un projet", href: lienRendezVous("decouverte") },
   credits: {
     // Le template créditait Framer et l'auteur du thème. Ce site est une
     // reconstruction Next.js écrite par Eliott : le crédit lui revient.

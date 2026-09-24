@@ -58,7 +58,14 @@ describe("la page de Caen est cherchable", () => {
 
   test("ses liens internes visent des pages servies", () => {
     const chemins = contentRoutes.map((r) => r.pathname);
+    // Seule ancre locale admise : la prise de rendez-vous, que le gabarit des
+    // pages de prestation rend sur cette page (`SectionRendezVous`).
+    const ancresLocales = ["#rendez-vous"];
     for (const lien of pageCaen.contexte.liens) {
+      if (lien.href.startsWith("#")) {
+        expect(ancresLocales, `${lien.href} n'existe pas sur la page`).toContain(lien.href);
+        continue;
+      }
       expect(chemins, `${lien.href} n'est pas au sitemap`).toContain(lien.href);
     }
   });
