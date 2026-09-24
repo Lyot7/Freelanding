@@ -479,6 +479,8 @@ export interface BlogPost extends SluggedContent {
   category: string;
   author: Person;
   cover: ImageAsset;
+  /** Photo du héros de l'article. Sans elle, le héros reprend `cover`. */
+  heroImage?: ImageHero;
   excerpt: string;
   readingTime?: string;
   tags?: string[];

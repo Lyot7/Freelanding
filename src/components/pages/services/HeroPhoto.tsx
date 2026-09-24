@@ -111,11 +111,19 @@ export function HeroPhoto({ image }: { image: ImageHero }) {
  * Les liens sortent du site : nouvel onglet, comme tout lien externe du site
  * (`bun run audit:liens`).
  */
-export function CreditHeroPhoto({ credit }: { credit: CreditPhoto }) {
+export function CreditHeroPhoto({
+  credit,
+  position = "bottom-[16px] right-[20px] tablet:right-[24px] desktop:right-[30px]",
+}: {
+  credit: CreditPhoto;
+  /** Place dans le héros. Un article le remonte : l'encoche claire de son corps
+   *  mord de 20 px (30 dès 810) sur la moitié droite du bas du héros. */
+  position?: string;
+}) {
   const lien =
     "underline decoration-white/30 underline-offset-2 transition-colors duration-200 hover:text-foreground hover:decoration-foreground";
   return (
-    <p className="absolute bottom-[16px] right-[20px] z-[3] w-fit text-[11px] font-medium leading-[1.2] tracking-[-0.01em] text-white/60 tablet:right-[24px] desktop:right-[30px]">
+    <p className={`absolute z-[3] w-fit text-[11px] font-medium leading-[1.2] tracking-[-0.01em] text-white/60 ${position}`}>
       {credit.prefixe}{" "}
       <a href={credit.auteur.href} target="_blank" rel="noopener noreferrer" className={lien}>
         {credit.auteur.libelle}

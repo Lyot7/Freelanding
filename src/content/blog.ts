@@ -242,10 +242,35 @@ export const blogPosts: BlogPost[] = [
     category: "Outils métier",
     author: eliott,
     cover: {
-      src: "/images/services/04-logiciel-metier.jpg",
-      alt: "Les engrenages d’une machine industrielle en prise",
-      width: 1600,
-      height: 926,
+      src: "/images/blog/fichier-client.jpg",
+      alt: "Un tiroir de fichier ouvert, plein de fiches cartonnées",
+      width: 1200,
+      height: 1114,
+    },
+    heroImage: {
+      src: "/images/heros/blog-fichier-client.jpg",
+      alt: "Un tiroir de fichier ouvert, plein de fiches cartonnées",
+      width: 2400,
+      height: 1350,
+      cadrage: { x: 30, y: 40 },
+      credit: {
+        prefixe: "Photo :",
+        auteur: {
+          libelle: "Alicia Fagerving",
+          href: "https://commons.wikimedia.org/wiki/File:GU_Library_Card_catalog_3.jpg",
+        },
+        licence: {
+          libelle: "CC BY-SA 3.0",
+          href: "https://creativecommons.org/licenses/by-sa/3.0/deed.fr",
+        },
+        modification: "retouchée",
+      },
+      og: {
+        src: "/images/og-blog-fichier-client.jpg",
+        alt: "Un tiroir de fichier ouvert, plein de fiches cartonnées",
+        width: 1200,
+        height: 630,
+      },
     },
     excerpt:
       "La question ne se pose jamais au moment de signer un abonnement logiciel. Elle se pose le jour où tu veux partir, et ce jour-là il est trop tard pour la poser.",
@@ -256,10 +281,10 @@ export const blogPosts: BlogPost[] = [
       description:
         "Export, commission sur ton activité, nom affiché à ton client : les quatre questions à poser avant de confier ton activité à un logiciel du marché, et ce que le RGPD couvre vraiment.",
       ogImage: {
-        src: "/images/services/04-logiciel-metier.jpg",
-        alt: "Les engrenages d’une machine industrielle en prise",
-        width: 1600,
-        height: 926,
+        src: "/images/og-blog-fichier-client.jpg",
+        alt: "Un tiroir de fichier ouvert, plein de fiches cartonnées",
+        width: 1200,
+        height: 630,
       },
     },
   },

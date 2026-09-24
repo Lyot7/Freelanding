@@ -34,13 +34,15 @@ const CIBLES = LARGEURS.length > 0 ? LARGEURS : [390, 810, 1440];
 
 /**
  * Pages à vérifier. Toute page projet porte le même hero ; la page de Caen
- * porte une photo derrière le titre (`HeroPhoto.tsx`).
+ * porte une photo derrière le titre (`HeroPhoto.tsx`), comme les articles
+ * qui déclarent une `heroImage`.
  */
 const PAGES = [
   "/work/kpsull",
   "/work/wurth-creation-de-compte",
   "/work/nslysium",
   "/creation-site-internet-caen",
+  "/blog/a-qui-appartient-votre-fichier-client",
 ];
 
 /**

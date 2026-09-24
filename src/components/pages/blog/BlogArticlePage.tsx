@@ -15,6 +15,11 @@ import { Grain } from "@/components/effects/Grain";
 import { TableOfContents } from "@/components/blog/TableOfContents";
 import type { EntreeSommaire } from "@/lib/blog/sommaire";
 import { formatShortDate } from "@/components/format-date";
+import {
+  CreditHeroPhoto,
+  HeroPhoto,
+  VOILE_TEXTE,
+} from "@/components/pages/services/HeroPhoto";
 // La page appelante (`src/app/(site)/blog/[slug]/page.tsx`) ne charge que
 // l'article, ses voisins et la configuration du site : le contenu de section du
 // blog (lien et titre des articles liés) est lu directement ici,
@@ -183,21 +188,27 @@ export function BlogArticlePage({
               décimale et sans borne — la même loi que le fond du hero de la home,
               d'`/about` et du média d'une page projet. Le débord est absorbé par
               l'`overflow-hidden` de la section. */}
-          <ScrollParallax
-            factor={0.15}
-            decorative
-            className="pointer-events-none absolute inset-0 z-0 overflow-clip"
-          >
-            <Image
-              src={post.cover.src}
-              alt={post.cover.alt}
-              fill
-              priority
-              sizes="100vw"
-              className="object-cover"
-            />
-          </ScrollParallax>
-          <span className="absolute inset-0 bg-black/20" />
+          {post.heroImage ? (
+            <HeroPhoto image={post.heroImage} />
+          ) : (
+            <>
+              <ScrollParallax
+                factor={0.15}
+                decorative
+                className="pointer-events-none absolute inset-0 z-0 overflow-clip"
+              >
+                <Image
+                  src={post.cover.src}
+                  alt={post.cover.alt}
+                  fill
+                  priority
+                  sizes="100vw"
+                  className="object-cover"
+                />
+              </ScrollParallax>
+              <span className="absolute inset-0 bg-black/20" />
+            </>
+          )}
           {/* RELEVÉ sur `/blog/stop-hiding-your-prices` : hôte 1440 × 810,
               z-1, opacité 0,09 (nous étions à 0,08 sans z). */}
           <Grain opacity={0.09} className="z-[1]" />
@@ -211,7 +222,7 @@ export function BlogArticlePage({
               40 px décalaient le h1 de 20 px à droite (x 740 pour 670 de large,
               contre 720 pour 690) et rentraient le chapô de 20 px à gauche de la
               médiane. `LegalPageView` fait déjà le 50/50 et le documente. */}
-          <div className="relative mx-auto grid w-full max-w-[1440px] gap-[30px] tablet:grid-cols-2 tablet:items-end tablet:gap-x-0">
+          <div className={`relative mx-auto grid w-full max-w-[1440px] gap-[30px] tablet:grid-cols-2 tablet:items-end tablet:gap-x-0${post.heroImage ? " z-[2] [text-shadow:0_0_18px_rgba(0,0,0,.45)]" : ""}`}>
             <Reveal
               trigger="appear"
               appearId="article-hero-titre"
@@ -246,7 +257,7 @@ export function BlogArticlePage({
                 interlettrage -0,01em, blanc PLEIN (et non à 80 %), et une
                 largeur de 250px constante quelle que soit la fenêtre. Nous
                 étions à 11px sans interlettrage dans une boîte de 340. */}
-            <p className="order-2 max-w-[250px] text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-white tablet:col-start-1 tablet:row-start-2 tablet:justify-self-end tablet:self-end tablet:text-right">
+            <p className={`order-2 max-w-[250px] text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-white tablet:col-start-1 tablet:row-start-2 tablet:justify-self-end tablet:self-end tablet:text-right${post.heroImage ? ` ${VOILE_TEXTE}` : ""}`}>
               {post.excerpt}
             </p>
             {/* TROISIÈME rangée, et non la seconde partagée avec le chapô.
@@ -289,6 +300,12 @@ export function BlogArticlePage({
               </div>
             </div>
           </div>
+          {post.heroImage ? (
+            <CreditHeroPhoto
+              credit={post.heroImage.credit}
+              position="bottom-[36px] right-[20px] tablet:bottom-[46px] tablet:right-[24px] desktop:right-[30px]"
+            />
+          ) : null}
         </section>
 
         {/* Rembourrages MESURÉS sur le live : 20 en haut / 10 en bas à 390,
