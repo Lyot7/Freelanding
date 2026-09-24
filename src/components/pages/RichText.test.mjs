@@ -37,6 +37,15 @@ describe("RichText : liens", () => {
     expect(doc.querySelector("p").textContent).toBe("Profil : https://github.com/Lyot7.");
   });
 
+  it("avec `liens`, laisse hors du lien la ponctuation française qui suit une adresse", () => {
+    for (const signe of ["…", "”", "’", '"', "'", "»", ")"]) {
+      const doc = rendre([paragraphe(`« Voir https://exemple.fr/page${signe} ensuite`)], { liens: true });
+      const lien = doc.querySelector("a");
+      expect(lien.getAttribute("href")).toBe("https://exemple.fr/page");
+      expect(doc.querySelector("p").textContent).toBe(`« Voir https://exemple.fr/page${signe} ensuite`);
+    }
+  });
+
   it("avec `liens`, rend une adresse du site en chemin relatif, dans le même onglet", () => {
     const doc = rendre([paragraphe(`Réserver : ${SITE_URL}/contact?sujet=site#rendez-vous`)], { liens: true });
     const lien = doc.querySelector("a");

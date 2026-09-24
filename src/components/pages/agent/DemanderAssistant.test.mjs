@@ -1,8 +1,10 @@
 import { afterEach, describe, expect, it } from "bun:test";
+import { readFileSync } from "node:fs";
 import { AppRouterContext } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { act, createElement } from "react";
 
 import { vueAgentContent } from "@/content/vue-agent";
+import { accueilVueAgent } from "@/content/vue-agent-accueil";
 import { DemanderAssistant } from "./DemanderAssistant";
 import { installerDom } from "./__tests__/dom.mjs";
 
@@ -179,5 +181,17 @@ describe("DemanderAssistant", () => {
     expect(dom.annulees.at(-1)).toBe(id);
     dom.restaurer();
     dom = undefined;
+  });
+
+  it("n'embarque pas les textes de la vue Agent dans le JavaScript de l'accueil", () => {
+    const source = readFileSync(new URL("./DemanderAssistant.tsx", import.meta.url), "utf8");
+    const imports = [...source.matchAll(/from "([^"]+)"/gu)].map((m) => m[1]);
+    expect(imports).toContain("@/content/vue-agent-accueil");
+    expect(imports).not.toContain("@/content/vue-agent");
+    // Le module léger ne porte ni les consignes du prompt ni le profil.
+    const leger = readFileSync(new URL("../../../content/vue-agent-accueil.ts", import.meta.url), "utf8");
+    expect(leger).not.toContain(vueAgentContent.prompt.consignes[0]);
+    expect(leger).not.toMatch(/from "/u);
+    expect(vueAgentContent.accueil).toBe(accueilVueAgent);
   });
 });

@@ -18,9 +18,13 @@
  * usage de l'IA. Le texte parle du projet du visiteur, jamais de l'outil.
  */
 
-export const CHEMIN_VUE_AGENT = "/agent";
-export const CHEMIN_PROFIL_TEXTE = "/llms-full.txt";
-export const CHEMIN_PROMPT_TEXTE = "/agent/prompt.txt";
+import { accueilVueAgent } from "./vue-agent-accueil";
+
+export {
+  CHEMIN_PROFIL_TEXTE,
+  CHEMIN_PROMPT_TEXTE,
+  CHEMIN_VUE_AGENT,
+} from "./vue-agent-accueil";
 
 export const vueAgentContent = {
   /** Sélecteur de l'en-tête. */
@@ -66,21 +70,8 @@ export const vueAgentContent = {
     zone: "Prompt complet",
   },
 
-  /**
-   * Raccourci de la barre basse du héros de l'accueil : copie le prompt en un
-   * clic, sans quitter la page. Écrit comme une ligne de saisie, curseur
-   * compris, parce que c'est ce que le visiteur va en faire.
-   */
-  accueil: {
-    invite: ">",
-    libelle: "Demande à ton assistant si je suis le bon choix",
-    court: "Demande à ton assistant",
-    fait: "Copié, colle-le dans ton assistant",
-    /** Entre 810 et 1199 px : la forme longue débordait sur « Prendre rendez-vous ». */
-    faitCourt: "Prompt copié",
-    echec: "Ouverture de la vue agent",
-    titre: "Copie un prompt qui contient tout mon profil",
-  },
+  /** Raccourci du héros de l'accueil : voir `vue-agent-accueil.ts`. */
+  accueil: accueilVueAgent,
 
   sommaire: "Sur cette page",
 
