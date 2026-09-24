@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState, type RefObject } from "react";
+import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import { preload } from "react-dom";
 import { estProfilLeger } from "@/lib/profil-appareil";
+import { useDepixelisation } from "@/components/motion/useDepixelisation";
 import { motion } from "motion/react";
 import type { HeroContent, SiteConfig } from "@/lib/content/types";
 import {
@@ -660,25 +661,72 @@ function HeroGlass({ height }: { height: number | null }) {
 export function HeroVideo({ src, poster }: { src: string; poster?: string }) {
   const [monter, setMonter] = useState(false);
   const [joue, setJoue] = useState(false);
+  // Téléphone en profil complet : affiche dépixelisée puis vidéo. Décidé
+  // après l'hydratation, le serveur ne connaît ni l'écran ni l'appareil.
+  const [mobile, setMobile] = useState(false);
+  const calque = useRef<HTMLDivElement>(null);
+  const affiche = useRef<Promise<HTMLImageElement | null> | null>(null);
+  const [afficheChargee, setAfficheChargee] = useState(false);
+  const afficheChargeeRef = useRef(false);
+  const chargerAffiche = useCallback(() => {
+    affiche.current ??= new Promise<HTMLImageElement | null>((fin) => {
+      const img = new window.Image();
+      img.onload = () => fin(img);
+      img.onerror = () => fin(null);
+      img.src = poster ?? "";
+    }).then((img) => {
+      afficheChargeeRef.current = true;
+      setAfficheChargee(true);
+      return img;
+    });
+    return affiche.current;
+  }, [poster]);
+  const etape = useDepixelisation({
+    cible: calque,
+    src: poster ?? "",
+    actif: mobile && Boolean(poster),
+    estChargee: () => afficheChargeeRef.current,
+    charger: chargerAffiche,
+  });
   useEffect(() => {
-    // PAS DE VIDÉO SOUS 810 PX. La boucle est quasi noire (luminance moyenne
-    // 13/255) : sur un écran de téléphone elle ne se distingue pas de son
-    // affiche, alors qu'elle coûte 234 Kio et un décodage continu au processeur
-    // le plus lent du parc. L'affiche reste, identique à la première image.
-    if (!window.matchMedia("(min-width: 810px)").matches) return;
-    // Profil léger (appareil modeste, réseau lent, économie de données) : pas
-    // de vidéo non plus sur grand écran. Voir `@/lib/profil-appareil`.
+    // Profil léger (appareil modeste, réseau lent, économie de données) : ni
+    // vidéo ni effet, sur aucun écran. Voir `@/lib/profil-appareil`.
     if (estProfilLeger()) return;
-    const lancer = () => setMonter(true);
+    // SOUS 810 PX, RIEN DANS LE HTML. L'affiche y était l'élément LCP, peinte
+    // près de 2 s après le texte par le processeur lent de PageSpeed, et la
+    // vidéo dans le HTML menait à un LCP de 10,2 s. Ici tout arrive APRÈS le
+    // premier rendu : l'affiche se dépixelise (miniatures de moins de 0,05 bit
+    // par pixel, que Chrome ne retient pas comme LCP), puis la vidéo, montée
+    // au `load` comme sur grand écran, prend le relais en fondu dès qu'elle
+    // joue. Le texte du héros reste l'élément LCP.
+    const petitEcran = !window.matchMedia("(min-width: 810px)").matches;
+    const lancer = () => {
+      if (petitEcran && poster) {
+        setMobile(true);
+        void chargerAffiche();
+      }
+      setMonter(true);
+    };
     if (document.readyState === "complete") {
       const id = window.setTimeout(lancer, 0);
       return () => window.clearTimeout(id);
     }
     window.addEventListener("load", lancer, { once: true });
     return () => window.removeEventListener("load", lancer);
-  }, []);
+  }, [chargerAffiche, poster]);
+  const fondMobile = etape ?? (afficheChargee ? poster : null);
   return (
     <>
+      {mobile ? (
+        <div
+          ref={calque}
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: fondMobile ? `url("${fondMobile}")` : undefined,
+            imageRendering: etape ? "pixelated" : undefined,
+          }}
+        />
+      ) : null}
       {poster ? (
         /* AFFICHE À PARTIR DE 810 PX SEULEMENT. Sur mobile, elle était
            l'élément LCP, peinte avec près de 2 s de retard par le processeur
@@ -701,7 +749,8 @@ export function HeroVideo({ src, poster }: { src: string; poster?: string }) {
         <video
           className={
             "absolute inset-0 h-full w-full object-cover transition-opacity duration-500 " +
-            (joue ? "opacity-100" : "opacity-0")
+            // Sur téléphone, la vidéo attend la fin de la dépixelisation.
+            (joue && !etape ? "opacity-100" : "opacity-0")
           }
           /* Décor pur, sans piste audio : sorti de l'arbre d'accessibilité pour
              qu'un lecteur d'écran n'annonce pas un lecteur vidéo vide au milieu
