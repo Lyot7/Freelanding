@@ -606,6 +606,14 @@ export async function Footer() {
                       {contact.address}
                     </p>
                   ) : null}
+                  {contact.localLink ? (
+                    <HoverPrefetchLink
+                      href={contact.localLink.href}
+                      className="relative h-auto w-auto text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground-60 underline decoration-white/30 underline-offset-4 transition-colors hover:text-foreground motion-reduce:transition-none"
+                    >
+                      {contact.localLink.label}
+                    </HoverPrefetchLink>
+                  ) : null}
                   {/* framer-vgtjiq : horaires (gap 1) */}
                   {contact.hours && contact.hours.length > 0 ? (
                     <div className="relative flex w-full flex-col items-start gap-[1px] overflow-clip">

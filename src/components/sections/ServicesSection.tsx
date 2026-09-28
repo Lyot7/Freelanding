@@ -508,6 +508,16 @@ function ServiceRow({
                       <span className="accent-room">{service.cta.label}</span>
                     </Link>
                   ) : null}
+                  {service.lienLocal ? (
+                    <Link
+                      href={service.lienLocal.href}
+                      tabIndex={open ? undefined : -1}
+                      aria-hidden={!open}
+                      className="flex h-[30px] flex-none flex-row items-center justify-center text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60 underline decoration-white/30 underline-offset-4 transition-colors hover:text-accent hover:decoration-accent motion-reduce:transition-none"
+                    >
+                      <span className="accent-room">{service.lienLocal.label}</span>
+                    </Link>
+                  ) : null}
                 </div>
               ) : null}
 

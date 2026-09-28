@@ -107,6 +107,9 @@ export const siteConfig: SiteConfig = {
     address: "Calvados, Manche, Orne, et France à distance",
     addressLabel: "Zone d’intervention",
     hours: ["Lun. au ven. : 9h - 18h"],
+    // Seul lien du pied de page vers la page locale (2026-09-28), posé sous la
+    // zone d'intervention qu'il décline.
+    localLink: { label: "Création de site internet à Caen", href: "/creation-site-internet-caen" },
     responseTime:
       "Je réponds à chaque message sous 24 heures ouvrées.",
     responseTimeLabel: "Délai de réponse",

@@ -253,6 +253,8 @@ export interface SiteConfig {
     addressLabel?: string; // "Visit Us"
     /** Horaires d'ouverture (bloc footer). */
     hours?: string[]; // ["Mon–Fri: 09:00 – 18:00", "Sat: 10:00 – 16:00"]
+    /** Page locale liée sous la zone d'intervention, dans le pied de page. */
+    localLink?: Link;
     /** Interlocuteur mis en avant dans le footer (avec note perso). */
     person: Person & { note?: string };
   };
@@ -635,6 +637,12 @@ export interface ServiceItem {
    * une seule fois pour les cinq lignes : voir la note qui l'accompagne.
    */
   rdvHref?: string;
+  /**
+   * Déclinaison locale de la prestation (`/creation-site-internet-caen`).
+   * Posée depuis le 2026-09-28 : la page locale ne recevait qu'un seul lien
+   * interne, et aucun depuis l'accueil.
+   */
+  lienLocal?: Link;
 }
 
 /** Section « Services » : intro + liste de prestations (accordéon). */

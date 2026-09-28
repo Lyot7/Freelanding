@@ -1,6 +1,7 @@
 import type { ImageAsset, ServiceItem } from "@/lib/content/types";
 import { fourchette, prestations, type PrestationId } from "@/content/offre";
 import { lienRendezVous, RDV_PAR_PRESTATION } from "@/content/rendez-vous";
+import { CHEMIN_PAGE_CAEN } from "@/content/page-caen";
 
 /**
  * Prestations de la section « Services » (section06.ts de l'archive Framer).
@@ -80,5 +81,8 @@ export const services: ServiceItem[] = prestations.map(
     // COMPOSÉE, jamais écrite à la main : `RDV_PAR_PRESTATION` est le seul
     // endroit où « vitrine » devient « site ».
     rdvHref: lienRendezVous(RDV_PAR_PRESTATION[p.id]),
+    ...(p.id === "vitrine"
+      ? { lienLocal: { label: "Création de site internet à Caen", href: CHEMIN_PAGE_CAEN } }
+      : {}),
   }),
 );
