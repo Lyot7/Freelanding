@@ -438,19 +438,18 @@ function EyebrowReveal({ children }: { children: React.ReactNode }) {
 }
 
 /**
- * APPARITION DU BLOC HERO — source unique.
+ * LE BLOC HERO N'A PLUS D'ENTRÉE PROPRE depuis le 2026-09-28.
  *
- * Deux éléments la jouent : la boîte encadrée (`framer-h0duhu`) et le calque de
- * verre dépoli posé derrière elle (`HeroGlass`). Ils ne peuvent pas être
- * imbriqués — voir l'entête de `HeroGlass` — donc ils portent chacun
- * l'animation. Les valeurs vivent ici pour qu'il soit impossible d'en modifier
- * une sans l'autre : deux entrées désynchronisées feraient glisser le verre
- * sous son cadre pendant toute la durée de l'entrée.
+ * La boîte encadrée (`framer-h0duhu`) et son verre (`HeroGlass`) jouaient une
+ * entrée `opacity 0,001 → 1`, `scale 1,5 → 1`, `rotate 2° → 0` sur 1,6 s. Le
+ * `<h1>`, élément LCP de l'accueil, est dans cette boîte : tant que l'ancêtre
+ * restait à 0,001, Chrome ne comptait pas le titre comme peint. Mesuré sur
+ * Lighthouse mobile : LCP 5,1 s, dont 4,4 s de « render delay » après le HTML.
+ * Les deux éléments sont désormais rendus dans leur état de repos dès le HTML
+ * serveur, ce qui est aussi leur état final : rien ne change une fois
+ * l'entrée finie. Les apparitions internes (mot-symbole, surtitre, paraphe)
+ * restent, elles ne portent pas le titre.
  */
-const HERO_BOX_REVEAL = {
-  from: { opacity: 0.001, scale: 1.5, rotate: 2 },
-  transition: tween(1.6, 0),
-} as const;
 
 /** Pente `translateY / scrollY` du bloc hero. Mesurée sur le live (R² = 1). */
 const HERO_BOX_PARALLAX = 0.07;
@@ -483,7 +482,7 @@ function useBoxHeight(ref: RefObject<HTMLDivElement | null>): number | null {
   return height;
 }
 
-/** Contenu principal (bloc Content encadré). framer-h0duhu = reveal scale/rotate. */
+/** Contenu principal (bloc Content encadré). framer-h0duhu, visible dès le HTML. */
 function HeroContentBox({
   hero,
   site,
@@ -512,11 +511,10 @@ function HeroContentBox({
     ? "text-foreground-60"
     : "block text-foreground";
   return (
-    // framer-h0duhu : Container — reveal scale1.5 rotate2 tween 1.6s + parallaxe
+    // framer-h0duhu : Container — parallaxe seule (plus d'entrée, voir plus haut)
     <motion.div
       className="relative z-[2] flex h-full w-px flex-[1_0_0] flex-col items-center justify-center overflow-visible"
       style={y ? { y } : undefined}
-      {...appearReveal("h0duhu", HERO_BOX_REVEAL.from, HERO_BOX_REVEAL.transition)}
     >
       {/* framer-12eo3oz : Top Line */}
       <div className="relative h-px w-px flex-[1_0_0] overflow-hidden bg-foreground opacity-[0.18]" />
@@ -699,25 +697,16 @@ function HeroContentBox({
  * `0.709` à 900 ms, plus aucun ancêtre filtrant à 2 500 ms.
  *
  * Le calque est donc monté au niveau de la SECTION, frère de la vidéo et non
- * son descendant. Sorti du sous-arbre animé, il ne pouvait plus non plus en
- * suivre le mouvement : il restait à sa taille de repos pendant que la boîte se
- * dézoomait de 1,5 à 1, et le verre flottait sous un cadre bien plus grand que
- * lui. IL REJOUE DONC LA MÊME ENTRÉE, sur lui-même : `HERO_BOX_REVEAL` est la
- * source unique des deux, et le script d'apparition les démarre au même instant
- * (un seul `performance.now()` pour toute la page), donc à l'image près.
- *
- * Porter le `scale` et le `rotate` ne coûte rien au flou : c'est un ANCÊTRE
- * transformé qui casse un `backdrop-filter`, jamais l'élément qui le porte.
- * L'`opacity`, elle, compose : à 0,001 le verre est invisible, à 0,5 le flou est
- * fondu de moitié, à 1 il est plein. Le verre apparaît donc AVEC son cadre, au
- * lieu de flotter tout seul au premier plan.
+ * son descendant. Il rejouait la même entrée que sa boîte ; depuis que la boîte
+ * n'en a plus (voir « LE BLOC HERO N'A PLUS D'ENTRÉE PROPRE »), il est lui
+ * aussi rendu à son état de repos et ne suit plus que la parallaxe.
  *
  * GÉOMÉTRIE. La largeur se déduit de la mise en page, sans mesure : plein cadre
  * moins les deux traits de 20 px en mobile, 740 px dès 810. La hauteur, elle,
  * dépend du contenu — elle est donc RELEVÉE sur la boîte (voir `useBoxHeight`),
  * la valeur des classes ne servant que de repli avant la première mesure et
  * sans JavaScript. Le centrage passe par `inset` + `margin: auto`, et non par un
- * `translate`, pour laisser le `transform` entier à l'animation.
+ * `translate`, pour laisser le `transform` entier à la parallaxe.
  */
 function HeroGlass({ height }: { height: number | null }) {
   const y = useScrollParallaxY(HERO_BOX_PARALLAX);
@@ -732,17 +721,6 @@ function HeroGlass({ height }: { height: number | null }) {
       suppressHydrationWarning
       className="pointer-events-none absolute top-[64px] bottom-[120px] left-[20px] right-[20px] z-[1] m-auto h-[367px] tablet:inset-y-0 bg-[#ffffff08] [backdrop-filter:blur(8px)] tablet:inset-x-0 tablet:h-[394px] tablet:w-[740px] desktop:w-[min(1400px,calc(100vw-200px))]"
       style={{ ...(y ? { y } : null), ...(height ? { height } : null) }}
-      {...appearReveal(
-        // Identifiant DISTINCT de celui de la boîte, alors que l'animation est
-        // la même : le démarreur inline indexe ses animations par identifiant,
-        // et deux éléments sous la même clé n'en laisseraient qu'une seule
-        // reprise par framer-motion. L'autre resterait figée sur son image
-        // finale WAAPI (`fill: both`), qui bat le style en ligne — le verre ne
-        // suivrait alors plus la parallaxe au défilement.
-        "h0duhu-verre",
-        HERO_BOX_REVEAL.from,
-        HERO_BOX_REVEAL.transition,
-      )}
     />
   );
 }
