@@ -29,6 +29,19 @@ const PERSON_ID = absoluteUrl("/#eliott");
 const BUSINESS_ID = absoluteUrl("/#service");
 
 /**
+ * Logo de l'entité, en `ImageObject` avec ses dimensions réelles. Une URL nue
+ * passe la validation schema.org mais pas le test des résultats enrichis
+ * Google pour `publisher.logo` d'un article (audit du 2026-09-28).
+ * `apple-icon.png` fait 180 x 180, au-dessus du minimum de 112 x 112.
+ */
+const LOGO = {
+  "@type": "ImageObject",
+  url: absoluteUrl("/apple-icon.png"),
+  width: 180,
+  height: 180,
+} as const;
+
+/**
  * Le numéro au format international E.164, tel que schema.org l'attend.
  *
  * La donnée est saisie une seule fois dans `site.ts`, au format français
@@ -152,10 +165,23 @@ export function businessSchema(site: SiteConfig, home: HomeContent) {
     // s'appuie sur ce qu'il a garde en cache : sur un domaine qui a deja servi
     // un autre site, c'est l'ancienne marque qui ressort. `apple-icon.png` fait
     // 180x180, au-dessus du minimum de 112x112 exige pour un logo.
-    logo: absoluteUrl("/apple-icon.png"),
-    image: absoluteUrl("/apple-icon.png"),
+    logo: LOGO,
+    image: LOGO,
     email: site.contact.email ? `mailto:${site.contact.email}` : undefined,
     telephone: telephoneE164(site.contact.phone),
+    // Trois forfaits de 3 000 à 36 000 € : le haut de l'échelle locale.
+    priceRange: "€€€",
+    // VILLE SANS RUE : l'activité se déplace chez le client ou travaille à
+    // distance, aucune adresse de local n'est publiée. Google accepte une
+    // adresse partielle pour une entreprise en zone de service, et Caen est
+    // la ville que la fiche Google Business Profile déclarera.
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Caen",
+      postalCode: "14000",
+      addressRegion: "Normandie",
+      addressCountry: "FR",
+    },
     founder: { "@id": PERSON_ID },
     areaServed: site.contact.address
       ? site.contact.address.split(/,\s*(?:et\s+)?/).map((zone) => ({
@@ -339,14 +365,17 @@ export function serviceSchema(
  * date du jour à chaque construction, annoncerait une fraîcheur que le contenu
  * n'a pas. Le jour où une date de révision existera, elle se branchera ici.
  */
-export function articleSchema(post: {
-  slug: string;
-  title: string;
-  date: string;
-  excerpt: string;
-  cover: { src: string };
-  seo?: { title?: string; description?: string };
-}) {
+export function articleSchema(
+  post: {
+    slug: string;
+    title: string;
+    date: string;
+    excerpt: string;
+    cover: { src: string };
+    seo?: { title?: string; description?: string };
+  },
+  site: SiteConfig,
+) {
   const url = absoluteUrl(`/blog/${post.slug}`);
   return [
     compact({
@@ -361,7 +390,16 @@ export function articleSchema(post: {
       dateModified: post.date,
       inLanguage: "fr-FR",
       author: { "@id": PERSON_ID },
-      publisher: { "@id": BUSINESS_ID },
+      // ÉDITEUR DÉCRIT SUR PLACE, pas seulement référencé : le nœud
+      // `#service` n'est pas publié sur les pages d'article, et Google exige
+      // `name` et `logo` (en `ImageObject`) sur l'éditeur d'un article.
+      publisher: {
+        "@type": "Organization",
+        "@id": BUSINESS_ID,
+        name: site.contact.person?.name ?? `${site.brand.name}${site.brand.mark}`,
+        url: absoluteUrl("/"),
+        logo: LOGO,
+      },
     }),
     breadcrumbSchema([
       { name: "Accueil", item: absoluteUrl("/") },

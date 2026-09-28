@@ -100,7 +100,7 @@ export default async function BlogPostPage({
        * un identifiant creux. Le nœud est déclaré ici pour que l'auteur se
        * résolve sur la page même, là où le signal compte.
        */}
-      <JsonLd data={graph(articleSchema(post), personSchema(site))} />
+      <JsonLd data={graph(articleSchema(post, site), personSchema(site))} />
       <BlogArticlePage
         post={post}
         related={related}
