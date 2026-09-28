@@ -35,8 +35,8 @@ const RESERVER_UN_APPEL = "Réserver un appel";
  *
  * LA CONTRAINTE DE LONGUEUR EST DURE : au-delà d'une soixantaine de caractères,
  * un résultat de recherche est tronqué et la marque, qui est en fin de titre,
- * disparaît la première. Les trois titres sont MESURÉS sur le rendu : 56, 58
- * et 54 caractères. `service-pages.test.mjs` refuse tout ajout au-dessus de 60.
+ * disparaît la première. Les deux titres sont MESURÉS sur le rendu : 58 et
+ * 54 caractères (2026-09-28). `service-pages.test.mjs` refuse tout ajout au-dessus de 60.
  *
  * LA ZONE N'EST ÉCRITE QUE LÀ OÙ ELLE SE CHERCHE. « Site vitrine » est une
  * requête locale : on cherche quelqu'un près de chez soi. Un outil ou un
@@ -49,6 +49,11 @@ export const servicePageSeo: Record<
     /** Balise `<title>`, marque comprise. 60 caractères, jamais plus. */
     readonly titre: string;
     /**
+     * Meta description, 140 à 155 caractères, au vouvoiement. Distincte du
+     * résumé de la prestation, qui est un texte de page et dépassait 170.
+     */
+    readonly description: string;
+    /**
      * Le H1. Il dit ce qui est vendu, avec les mots du client, et il reste
      * COURT : la typographie de la page le rend en capitales à 98 px sur une
      * colonne de 510 px, où chaque mot occupe une ligne pleine.
@@ -57,11 +62,15 @@ export const servicePageSeo: Record<
   }
 > = {
   vitrine: {
-    titre: "Création de site vitrine en Normandie · Eliott Bouquerel",
+    titre: "Création de site internet professionnel · Eliott Bouquerel",
+    description:
+      "Un site vitrine sur mesure, rapide et optimisé pour le référencement, qui convertit vos visiteurs en clients. Livré sans abonnement, à vous ensuite.",
     h1: "Site vitrine sur mesure",
   },
   logiciel: {
-    titre: "Logiciel métier sur mesure pour PME · Eliott Bouquerel",
+    titre: "Logiciel sur mesure pour entreprise · Eliott Bouquerel",
+    description:
+      "Remplacez Excel par un logiciel de gestion adapté à votre métier : devis, suivi client, stock. Développement sur mesure pour PME, sans abonnement.",
     h1: "Logiciel métier sur mesure",
   },
 };

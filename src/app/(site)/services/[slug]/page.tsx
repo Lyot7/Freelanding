@@ -38,12 +38,12 @@ export async function generateMetadata({
   // suffixe. Le titre de recherche vit dans `service-pages.ts`, avec sa
   // contrainte de longueur ; voir l'en-tête de `servicePageSeo`.
   //
-  // Le résumé reste la description : il est écrit pour être lu seul, c'est
-  // exactement ce qu'attend un extrait de résultat de recherche.
+  // La description vit à côté du titre, dans `service-pages.ts` : le résumé
+  // de la prestation dépassait 170 caractères et était tronqué en résultat.
   return pageMetadata(
     {
       title: servicePageSeo[prestation.id].titre,
-      description: prestation.resume,
+      description: servicePageSeo[prestation.id].description,
     },
     `/services/${prestation.slug}`,
   );

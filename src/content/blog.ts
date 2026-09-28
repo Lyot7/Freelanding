@@ -179,9 +179,12 @@ export const blogPosts: BlogPost[] = [
     readingTime: "7 min de lecture",
     tags: ["performance", "signaux Web essentiels", "e-commerce"],
     seo: {
-      title: "Site e-commerce lent : mesurer les Core Web Vitals et corriger",
+      // Position 4,4 sur « site e-commerce lent » et aucun clic (Search
+      // Console, 2026-09-28) : le titre promet désormais ce que l'article
+      // livre, le moyen de chiffrer la perte, plutôt qu'un intitulé technique.
+      title: "Site e-commerce lent : chiffrer ce qu’il vous coûte",
       description:
-        "Les trois seuils publiés par Google expliqués en français, comment les relever gratuitement en dix minutes, ce qui ralentit réellement une boutique, et dans quel ordre le traiter.",
+        "Au-delà de 2,5 s d’affichage, Google juge votre boutique lente. Mesurez vos 3 seuils gratuitement, chiffrez ce que la lenteur vous coûte, puis corrigez.",
       ogImage: {
         src: "/images/og-blog-site-e-commerce-lent-ce-que-ca-coute.jpg",
         alt: "Chronomètre mécanique à cadran blanc posé sur une table claire, couronne et anneau en haut à droite",

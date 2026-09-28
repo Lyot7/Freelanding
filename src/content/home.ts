@@ -482,9 +482,10 @@ export const homeContent: HomeContent = {
   ],
 
   seo: {
-    title: "Eliott Bouquerel, développeur web freelance pour TPE et PME",
+    // Mot-clé en tête, marque en fin (audit on-page du 2026-09-28).
+    title: "Développeur web freelance TPE et PME · Eliott Bouquerel",
     description:
-      "Sites rapides, référencement local et outils métier sur mesure : prise de rendez-vous, suivi client, devis. Développeur freelance en Normandie, et partout en France à distance.",
+      "Des sites qui amènent des clients et des logiciels métier sur mesure. Développeur freelance en Normandie, disponible partout en France en visio.",
     ogImage: {
       src: "/images/og.jpg",
       alt: "Eliott Bouquerel",

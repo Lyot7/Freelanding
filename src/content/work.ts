@@ -660,8 +660,8 @@ export const workContent: WorkContent = {
     // Bouquerel ») : titre posé en `absolute`, le gabarit ne s'applique pas et
     // la marque est écrite ici. Le « ® » y avait survécu au retrait du
     // 2026-08-29, qui n'avait vidé que `brand.mark`.
-    title: "Réalisations · Eliott Bouquerel",
+    title: "Réalisations web et logiciel sur mesure · Eliott Bouquerel",
     description:
-      "Une refonte du parcours de création de compte de l’eShop de Würth France, et deux projets d’école menés de bout en bout : une place de marché et une page produit 3D.",
+      "Refonte du parcours de compte de l’eShop Würth France, et deux projets d’école menés de bout en bout : une place de marché et une page produit 3D.",
   },
 };
