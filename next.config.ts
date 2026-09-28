@@ -87,6 +87,11 @@ const nextConfig: NextConfig = {
          deux 301 dilue le signal transféré et rallonge le trajet du visiteur. */
       { source: "/projets/kpsull", destination: "/realisations/kpsull", statusCode: 301 },
       { source: "/projects/kpsull", destination: "/realisations/kpsull", statusCode: 301 },
+      /* Les index sans slug répondaient 404 (Search Console, 2026-09-28). */
+      { source: "/projets", destination: "/realisations", statusCode: 301 },
+      { source: "/projects", destination: "/realisations", statusCode: 301 },
+      /* Adresse d'hébergement statique de l'ancien site, encore demandée. */
+      { source: "/index.html", destination: "/", statusCode: 301 },
       /*
        * Ancien site SvelteKit : les pages d'offre et la page locale « identité »
        * (2026-09-23). Elles répondaient 404 depuis la refonte Next.js alors que
