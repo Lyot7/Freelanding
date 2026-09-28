@@ -33,7 +33,7 @@ export function LegalPageView({
             90). Nous étions à 64 et 30, ce qui posait tout le héros 60 px trop
             bas en tablette et au-delà. */}
         <section className="relative flex h-[90svh] items-end overflow-hidden bg-background px-[20px] pb-[60px] pt-[140px] text-foreground tablet:px-[24px] tablet:pb-[90px] desktop:px-[30px]">
-          {photo ? <HeroPhoto image={photo} /> : null}
+          {photo ? <HeroPhoto image={photo} hauteur={{ mobile: "90vh", tablette: "90vh" }} /> : null}
           {/* RELEVÉ sur `/legal/privacy-policy` : hôte 1440 × 810, z-1,
               opacité 0,05. La page n'a que trois calques : ce héros, le grain
               plein footer et celui de la carte témoignage du footer. */}

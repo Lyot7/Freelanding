@@ -8,7 +8,15 @@ const nextConfig: NextConfig = {
    * l'AVIF pèse 20 à 30 % de moins sur les photos du site. Le premier encodage
    * est plus lent, puis la variante est mise en cache.
    */
-  images: { formats: ["image/avif", "image/webp"] },
+  images: {
+    formats: ["image/avif", "image/webp"],
+    /**
+     * 70 pour les photos de héros (`HeroPhoto`), 75 pour tout le reste, qui
+     * reste la valeur par défaut. Une qualité absente de cette liste est
+     * refusée par l'optimiseur.
+     */
+    qualities: [70, 75],
+  },
 
   /**
    * `.mdx` reconnu comme extension de page.

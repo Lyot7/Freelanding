@@ -69,7 +69,7 @@ export function WorkHero({ hero }: { hero: HeroContent }) {
 
   return (
     <section className={SECTION_CLS}>
-      <HeroPhoto image={herosPages.realisations} />
+      <HeroPhoto image={herosPages.realisations} hauteur={{ mobile: "90vh", tablette: "90vh" }} />
       {/* MANQUANT jusqu'ici : `/work` n'avait aucun grain de section, le calque
           global inventé le masquait. RELEVÉ sur le live : hôte 1440 × 810 à
           1440 de fenêtre, z-1, opacité 0,05, motif 256 × 256. */}

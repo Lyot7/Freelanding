@@ -25,7 +25,7 @@ export function BlogIndexPage({
       {/* Cible du lien d'évitement (voir SkipLink.tsx et focus.css). */}
       <main id="main-content" tabIndex={-1}>
         <section className="relative flex h-[90svh] items-end overflow-hidden bg-background px-[20px] pb-[20px] pt-[140px] text-foreground tablet:px-[24px] tablet:pb-[30px] desktop:px-[30px]">
-          <HeroPhoto image={herosPages.blog} />
+          <HeroPhoto image={herosPages.blog} hauteur={{ mobile: "90vh", tablette: "90vh" }} />
           {/* RELEVÉ sur `/blog` : hôte 1440 × 810, z-1, opacité 0,05. Nous
               étions à 0,08, plus le calque global inventé de 0,05. */}
           <Grain opacity={0.05} className="z-[1]" />

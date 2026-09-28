@@ -189,7 +189,7 @@ export function BlogArticlePage({
               d'`/about` et du média d'une page projet. Le débord est absorbé par
               l'`overflow-hidden` de la section. */}
           {post.heroImage ? (
-            <HeroPhoto image={post.heroImage} />
+            <HeroPhoto image={post.heroImage} hauteur={{ mobile: "max(90vh, 600px)", tablette: "max(90vh, 600px)" }} />
           ) : (
             <>
               <ScrollParallax

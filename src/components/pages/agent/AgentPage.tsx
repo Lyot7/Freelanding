@@ -56,7 +56,7 @@ export function AgentPage({
       <Header site={site} vue="agent" />
       <main id="main-content" tabIndex={-1}>
         <section className="relative flex min-h-[70svh] items-end overflow-hidden bg-background px-[20px] pb-[60px] pt-[140px] text-foreground tablet:px-[24px] tablet:pb-[90px] desktop:px-[30px]">
-          <HeroPhoto image={photo} />
+          <HeroPhoto image={photo} hauteur={{ mobile: "70vh", tablette: "70vh" }} />
           <Grain opacity={0.05} className="z-[1]" />
           <span className="absolute inset-y-0 left-1/2 z-[1] w-px bg-white/10" />
           {/* UNE SEULE COLONNE, la moitié droite, comme le titre des pages

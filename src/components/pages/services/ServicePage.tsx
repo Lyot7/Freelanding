@@ -344,7 +344,7 @@ export function ServicePage({
             au-dessus du texte. */}
         <section className={`relative flex ${heroImage ? "min-h-[85svh] tablet:min-h-[70svh]" : "min-h-[70svh]"} items-end overflow-hidden bg-background px-[20px] pb-[60px] pt-[140px] text-foreground tablet:px-[24px] tablet:pb-[90px] desktop:px-[30px]`}>
           {heroImage ? (
-            <HeroPhoto image={heroImage} />
+            <HeroPhoto image={heroImage} hauteur={{ mobile: "85vh", tablette: "70vh" }} />
           ) : (
             <GradientWaveBackdrop seed={51} />
           )}

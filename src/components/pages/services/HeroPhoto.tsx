@@ -35,9 +35,42 @@ import type { CreditPhoto, ImageHero } from "@/lib/content/types";
  * `--elargi` : débord à gauche de l'image à partir de 810 px (voir
  * `ImageHero.elargissement`). `sizes` suit la largeur RÉELLE de l'image, pas
  * celle de l'écran : sur mobile, en `object-cover` dans un cadre plus haut que
- * large, elle est peinte sur environ 1,8 fois la hauteur de l'écran, et un
- * `100vw` y servait une variante de 640 px étirée plus de deux fois.
+ * large, elle est peinte sur la hauteur du cadre multipliée par son rapport
+ * largeur / hauteur, et un `100vw` y servait une variante de 640 px étirée
+ * plus de deux fois. Voir `sizesHeroPhoto`.
  */
+/**
+ * Hauteur minimale du cadre du héros, en longueur CSS, telle que la pose la
+ * section qui l'accueille (`85vh`, `900px`…). Seule la page la connaît.
+ */
+export type HauteurHero = { mobile: string; tablette: string };
+
+/**
+ * `sizes` EXACT d'une photo de héros en `fill` + `object-cover`.
+ *
+ * La largeur peinte vaut le plus grand de deux termes : la largeur du cadre
+ * (la fenêtre, plus le débord `elargissement` à partir de 810 px) et la
+ * hauteur du cadre multipliée par le rapport de l'image. Relevé le
+ * 2026-09-28 sur la production, à 412 x 823 : cadre de 700 px de haut, image
+ * peinte sur 1 244 px, soit 151vh, là où l'ancien `180vh` fixe demandait
+ * 1 481 px. La valeur suit maintenant le rapport de chaque image et la
+ * hauteur de chaque page au lieu d'un plafond commun.
+ */
+export function sizesHeroPhoto(image: ImageHero, hauteur: HauteurHero): string {
+  const rapport = (image.width / image.height).toFixed(3);
+  const largeurTablette = 100 + (image.elargissement ?? 0);
+  return [
+    `(min-width: 810px) max(${largeurTablette}vw, calc(${hauteur.tablette} * ${rapport}))`,
+    `max(100vw, calc(${hauteur.mobile} * ${rapport}))`,
+  ].join(", ");
+}
+
+/**
+ * Qualité d'encodage des photos de héros. 70 plutôt que les 75 par défaut :
+ * sous les voiles sombres, l'écart ne se voit pas, et c'est l'élément LCP des
+ * pages de prestation. Doit figurer dans `images.qualities` de `next.config`.
+ */
+const QUALITE_HERO = 70;
 /**
  * Voile collé à un bloc de texte posé sur la photo : un aplat sombre flouté,
  * en pseudo-élément derrière le texte, qui déborde un peu de sa boîte et
@@ -49,7 +82,13 @@ import type { CreditPhoto, ImageHero } from "@/lib/content/types";
 export const VOILE_TEXTE =
   "relative w-fit before:pointer-events-none before:absolute before:-inset-x-[44px] before:-inset-y-[26px] before:-z-10 before:bg-black/80 before:blur-[32px] before:content-['']";
 
-export function HeroPhoto({ image }: { image: ImageHero }) {
+export function HeroPhoto({
+  image,
+  hauteur,
+}: {
+  image: ImageHero;
+  hauteur: HauteurHero;
+}) {
   const style = {
     "--elargi": `${image.elargissement ?? 0}%`,
   } as CSSProperties;
@@ -69,7 +108,8 @@ export function HeroPhoto({ image }: { image: ImageHero }) {
             fill
             preload
             fetchPriority="high"
-            sizes="(min-width: 1200px) 130vw, (min-width: 810px) 150vh, 180vh"
+            quality={QUALITE_HERO}
+            sizes={sizesHeroPhoto(image, hauteur)}
             className="object-cover"
             style={{ objectPosition: `${image.cadrage.x}% ${image.cadrage.y}%` }}
           />
