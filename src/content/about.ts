@@ -242,3 +242,10 @@ export const aboutContent: AboutContent = {
       "Développeur freelance en Normandie, et partout en France à distance. Je construis des sites qui amènent des clients et des outils métier qui rendent des heures.",
   },
 };
+
+/**
+ * Texte alternatif du portrait en fond du héros de `/a-propos`. La photo est
+ * le sujet de la page (« qui je suis ») : elle se décrit.
+ */
+export const aboutHeroImageAlt =
+  "Eliott Bouquerel, développeur web freelance, au bord d’un lac au crépuscule";

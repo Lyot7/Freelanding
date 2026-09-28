@@ -9,6 +9,7 @@ import { Grain } from "@/components/effects/Grain";
 import { ParallaxCover } from "@/components/effects/ParallaxCover";
 import { Highlighted } from "@/components/ui";
 import { siteFeatures } from "@/content/features";
+import { aboutHeroImageAlt } from "@/content/about";
 import { Reveal } from "@/components/motion/Reveal";
 import { LineReveal } from "@/components/motion/LineReveal";
 import { AnimatedCounter } from "@/components/motion/AnimatedCounter";
@@ -32,6 +33,8 @@ import type {
  * le conserve.
  */
 const HERO_IMAGE = "/images/eliott-nature-paysage.jpg";
+/** Le portrait est le sujet de la page : il se décrit, il n'est pas décoratif. */
+const HERO_IMAGE_ALT = aboutHeroImageAlt;
 const COUNTER_SPEEDS = [10, 12, 40, 10] as const;
 
 function AboutHero({ about }: { about: AboutContent }) {
@@ -57,12 +60,11 @@ function AboutHero({ about }: { about: AboutContent }) {
           Le débord est absorbé par l'`overflow-hidden` de la section. */}
       <ScrollParallax
         factor={0.15}
-        decorative
         className="pointer-events-none absolute inset-0 z-0 overflow-clip"
       >
         <ImageProgressive
           src={HERO_IMAGE}
-          alt=""
+          alt={HERO_IMAGE_ALT}
           fill
           preload
           fetchPriority="high"

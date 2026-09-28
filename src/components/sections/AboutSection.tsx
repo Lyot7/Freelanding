@@ -276,7 +276,7 @@ function AboutUsLink({ label, href }: { label: string; href: string }) {
 }
 
 /** Image (framer-18dve3e-container) + grain, scale-in au reveal. */
-function AboutImage({ src }: { src?: string }) {
+function AboutImage({ src, alt }: { src?: string; alt?: string }) {
   const { reveal } = useReveal();
   const parallaxFrame = useRef<HTMLDivElement>(null);
   // 0.06 : la source pose ce calque en `top:-6%; height:calc(100% + 12%)`.
@@ -307,6 +307,10 @@ function AboutImage({ src }: { src?: string }) {
         <div className="absolute inset-0 overflow-hidden grayscale">
           <motion.div
             className="absolute bottom-[-6%] left-0 right-0 top-[-6%] h-[calc(100%+12%)] w-full bg-cover bg-center"
+            /* Fond CSS et non `<img>` : le texte alternatif passe par
+               `role="img"`, sans quoi le portrait n'existe pas pour un
+               lecteur d'écran. */
+            {...(alt ? { role: "img", "aria-label": alt } : {})}
             /* L'ADRESSE VIENT DE LA DONNÉE, `about.image`, et non plus d'une
                chaîne écrite ici. Le champ existait déjà et portait la MÊME
                image du template : le composant en gardait donc une seconde
@@ -441,7 +445,7 @@ export function AboutSection({
 
           {/* framer-1b6mrgg : colonne droite (image + compteur), order 0 en mobile */}
           <div className="relative order-0 grid w-full auto-rows-[minmax(0,1fr)] grid-cols-[repeat(2,minmax(50px,1fr))] grid-rows-[repeat(1,minmax(0,1fr))] justify-center gap-0 overflow-hidden tablet:order-none tablet:w-px tablet:flex-[1_0_0]">
-            <AboutImage src={homeAbout?.image?.src} />
+            <AboutImage src={homeAbout?.image?.src} alt={homeAbout?.image?.alt} />
 
             {/* framer-1m1hc70 : bloc compteur (aligné en bas à droite) */}
             <div className="relative flex h-full w-full flex-col items-end justify-end gap-0 self-start overflow-visible pl-[20px]">

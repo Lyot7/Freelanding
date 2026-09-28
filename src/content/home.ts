@@ -278,9 +278,11 @@ export const homeContent: HomeContent = {
     // orientation), fenêtre 1430 × 2243 à +1439/+1577, rééchantillonné en
     // 1035 × 1623 — mêmes dimensions de fichier qu'avant, aucune mise en page
     // ne bouge.
+    // Portrait sans nom écrit à côté : c'est une image de contenu, elle porte
+    // un texte alternatif (audit du 2026-09-28).
     image: {
       src: "/images/eliott-nature-bloc.jpg",
-      alt: "",
+      alt: "Portrait d’Eliott Bouquerel, développeur web freelance, au bord d’un lac",
     },
   },
 
