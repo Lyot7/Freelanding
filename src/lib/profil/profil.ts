@@ -100,7 +100,7 @@ function blocsPrestation(prestation: Prestation): ContentBlock[] {
 
 /**
  * Chiffres de méthode de la page À propos, relus comme des phrases :
- * « 30 % à la signature… », « 1 interlocuteur : … ». Le délai de réponse est
+ * « 40 % à la signature… », « 1 interlocuteur : … ». Le délai de réponse est
  * écarté ici parce qu'il est déjà donné en toutes lettres juste après.
  */
 function phrasesDeMethode(stats: readonly Stat[]): string[] {
