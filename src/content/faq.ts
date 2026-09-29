@@ -30,7 +30,7 @@ const PACK_LOGICIEL = prestation("logiciel").packs[1];
  * CE QUI A ÉTÉ CORRIGÉ, ET C'ÉTAIT FAUX :
  *
  *   - « Vous versez 30 % à la signature, LE RESTE LE JOUR DE LA MISE EN LIGNE ».
- *     L'échéancier réel, celui des CGV, est 30 / 40 / 30.
+ *     L'échéancier réel, celui des CGV, est 40 / 30 / 30 depuis le 2026-09-29 (30 / 40 / 30 avant).
  *   - « Puis-je voir le design avant que vous le développiez ? Bien sûr […] le
  *     développement ne commence qu'une fois les maquettes relues et validées ».
  *     Eliott NE FAIT PAS DE MAQUETTE. Il signe et il code, et le client suit une
@@ -93,9 +93,9 @@ export const faqItems: FaqItem[] = [
     question: "Combien coûte un projet, et comment c’est facturé ?",
     /* « 3 périmètres » et non « trois » : règle posée par Eliott le 2026-09-01,
        les nombres s'écrivent en chiffres, déjà appliquée dans
-       `service-pages.ts`, `tarifs.ts` et `services.ts`. Les 30 / 40 / 30 de
+       `service-pages.ts`, `tarifs.ts` et `services.ts`. Les 40 / 30 / 30 de
        l'échéancier restent des pourcentages, pas des montants. */
-    answer: `Un site démarre à ${prixPack(packEntree("vitrine"))}, une solution métier à ${prixPack(packEntree("logiciel"))}. Chaque prestation existe en 3 forfaits, détaillés sur sa page : ce qui change de l’un à l’autre y est écrit ligne à ligne. Le prix d’un forfait est arrêté avant que je commence, et il ne bouge plus ; au-delà du dernier, je chiffre sur mesure. Tu verses 30 % à la signature, 40 % à mi-parcours et 30 % à la livraison.`,
+    answer: `Un site démarre à ${prixPack(packEntree("vitrine"))}, une solution métier à ${prixPack(packEntree("logiciel"))}. Chaque prestation existe en 3 forfaits, détaillés sur sa page : ce qui change de l’un à l’autre y est écrit ligne à ligne. Le prix d’un forfait est arrêté avant que je commence, et il ne bouge plus ; au-delà du dernier, je chiffre sur mesure. Tu verses 40 % à la signature, 30 % à mi-parcours et 30 % à la livraison.`,
   },
   {
     question: "Combien de temps ça prend ?",

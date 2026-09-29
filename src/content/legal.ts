@@ -109,7 +109,7 @@ const contactDetails = [
  * fausse sur une politique de confidentialité est un défaut de conformité à
  * elle seule (art. 12 RGPD, information « à jour »).
  */
-const lastUpdated = "2026-09-21";
+const lastUpdated = "2026-09-29";
 
 export const legalDocuments: readonly LegalDocument[] = [
   {
@@ -484,8 +484,8 @@ export const legalDocuments: readonly LegalDocument[] = [
         type: "list",
         style: "unordered",
         items: [
-          "30 % à la signature du devis, avant le démarrage des travaux ;",
-          "40 % à la remise de la première version fonctionnelle en recette ;",
+          "40 % à la signature du devis, avant le démarrage des travaux ;",
+          "30 % à la remise de la première version fonctionnelle en recette ;",
           "30 % à la livraison.",
         ],
       },

@@ -135,7 +135,7 @@ export const servicePageLabels = {
 
   /** En vis-à-vis du titre des forfaits : comment on paie, et que le prix tient. */
   reassurance:
-    "Le prix est fixé au devis et ne bouge plus. Tu paies 30 % à la signature, 40 % à la première version fonctionnelle et 30 % à la livraison. Le code et l’hébergement sont à ton nom.",
+    "Le prix est fixé au devis et ne bouge plus. Tu paies 40 % à la signature, 30 % à la première version fonctionnelle et 30 % à la livraison. Le code et l’hébergement sont à ton nom.",
 
   /**
    * Bouton de chaque forfait. UN SEUL LIBELLÉ pour l'ancre `#rendez-vous` sur

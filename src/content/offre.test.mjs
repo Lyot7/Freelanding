@@ -243,7 +243,7 @@ describe("le site annonce le même prix que le module", () => {
     // du suivi : le dernier endroit du site où un prix existait en double.
     //
     // Le motif ne vise QUE les montants en euros. Les pourcentages restent
-    // permis : l'échéancier 30 / 40 / 30 est une règle de facturation, pas un
+    // permis : l'échéancier 40 / 30 / 30 est une règle de facturation, pas un
     // prix, et il ne dérive de rien.
     const source = readFileSync(
       fileURLToPath(new URL("./faq.ts", import.meta.url)),

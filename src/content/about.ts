@@ -25,7 +25,7 @@ const aboutStats = [
      part ailleurs est l'ASSEMBLAGE, pas chaque ligne. Le premier était une
      formule sans contenu. Les deux sont remplacés par des engagements écrits
      ailleurs et vérifiables : l'échéancier des CGV et la cession des droits. */
-  { value: "30 %", label: "À la signature, 40 % à mi-parcours, 30 % à la livraison" },
+  { value: "40 %", label: "À la signature, 30 % à mi-parcours, 30 % à la livraison" },
   { value: "100 %", label: "Du code livré t’appartient" },
 ] as const;
 
