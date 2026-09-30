@@ -221,6 +221,25 @@ describe("documents légaux", () => {
     expect(texte).not.toContain("ni à résiliation");
   });
 
+  test("les CGV concèdent une licence au solde sans céder le code", () => {
+    // Décision d'Eliott du 2026-09-30 : le code reste chez lui jusqu'au solde
+    // (levier de paiement, art. 1219 C. civ.), et il garde le droit de le
+    // réutiliser et de le revendre. Sans écrit, aucun droit n'est cédé
+    // (CPI L111-1 al. 3, L131-3) : une « cession exclusive » qui réapparaîtrait
+    // lui retirerait cette liberté.
+    const cgv = legalDocuments.find(
+      ({ slug }) => slug === "conditions-generales-de-vente",
+    );
+    const texte = bodyText([cgv]);
+
+    expect(texte).toContain("licence non exclusive et irrévocable");
+    expect(texte).toContain("ni de vendre les livrables");
+    expect(texte).toContain("À l’encaissement du solde");
+    expect(texte).toContain("Je reste titulaire des droits d’auteur");
+    expect(texte).not.toContain("à titre exclusif");
+    expect(texte).not.toContain("cession exclusive");
+  });
+
   test("la politique couvre transferts, décision automatisée et journaux", () => {
     // Trois manquements distincts du RGPD, relevés le 2026-08-29 :
     //   - art. 13.1.f : citer les clauses contractuelles types ne suffit pas,

@@ -109,7 +109,7 @@ const contactDetails = [
  * fausse sur une politique de confidentialité est un défaut de conformité à
  * elle seule (art. 12 RGPD, information « à jour »).
  */
-const lastUpdated = "2026-09-29";
+const lastUpdated = "2026-09-30";
 
 export const legalDocuments: readonly LegalDocument[] = [
   {
@@ -568,50 +568,54 @@ export const legalDocuments: readonly LegalDocument[] = [
         type: "paragraph",
         text: "Un défaut de conformité au devis n’est pas un retour : il est corrigé sans supplément, quel que soit le moment où il apparaît.",
       },
-      { type: "heading", level: 2, text: "8. Droits sur les livrables" },
+      { type: "heading", level: 2, text: "8. Code source et droits sur les livrables" },
       {
         type: "paragraph",
-        text: "Tant que le prix n’est pas intégralement encaissé, aucun droit ne vous est cédé : les livrables restent ma propriété et leur exploitation n’est pas autorisée.",
+        text: "Pendant le projet, le code reste sur mes outils. Vous suivez l’avancement sur une version de démonstration en ligne, à une adresse que je vous communique, et vous y validez chaque étape.",
       },
       {
         type: "paragraph",
-        text: "À compter de l’encaissement du solde, je vous cède à titre exclusif les droits patrimoniaux d’auteur sur les développements spécifiques réalisés pour vous, dans les termes suivants :",
+        text: "À l’encaissement du solde, je mets le logiciel en production sur votre nom de domaine et je vous remets le code source complet, son historique et la documentation d’installation. Jusque-là, aucun droit ne vous est concédé : l’usage se limite aux tests sur la version de démonstration.",
+      },
+      {
+        type: "paragraph",
+        text: "Au solde, je vous concède une licence d’exploitation sur les livrables, dans les termes suivants :",
       },
       {
         type: "list",
         style: "unordered",
         items: [
-          "Droits cédés, distinctement : le droit de reproduction, soit reproduire, enregistrer, stocker et dupliquer le code source, le code exécutable, les gabarits et la documentation sur tout support connu ; le droit de représentation, soit diffuser, communiquer au public et exécuter les livrables sur tout réseau ; le droit d’adaptation, soit modifier, corriger, faire évoluer, traduire, refondre et décompiler les livrables ; le droit de les intégrer à un ensemble plus large et de les associer à d’autres éléments.",
-          "Étendue : cession exclusive, avec faculté de sous-licencier et de céder les droits à un tiers, notamment en cas de cession de votre fonds de commerce, de votre activité ou de votre société.",
-          "Destination : tout usage lié à votre activité professionnelle, à titre commercial ou non, sur tout support numérique ou imprimé, en ligne comme hors ligne.",
+          "Droits concédés, distinctement : le droit de reproduction, soit reproduire, stocker et dupliquer le code source, le code exécutable et la documentation sur tout support ; le droit de représentation, soit exécuter les livrables et les diffuser sur tout réseau ; le droit d’adaptation, soit les modifier, les corriger, les faire évoluer et les intégrer à d’autres éléments, vous-même ou par le prestataire de votre choix.",
+          "Étendue : licence non exclusive et irrévocable, transmise avec votre entreprise en cas de cession de votre fonds de commerce, de votre activité ou de votre société.",
+          "Destination : les besoins de votre activité professionnelle. La licence ne permet ni de vendre les livrables, ni de les concéder ou de les mettre à disposition d’une autre entreprise.",
           "Lieu : le monde entier.",
-          "Durée : la durée légale de protection du droit d’auteur, prorogations comprises.",
+          "Durée : la durée légale de protection du droit d’auteur.",
         ],
       },
       {
         type: "paragraph",
-        text: "Le prix de cette cession est compris dans le prix de la prestation figurant au devis. Le dépôt de code, son historique et la documentation de déploiement vous sont transmis au moment où la cession prend effet.",
+        text: "Le prix de cette licence est compris dans le prix de la prestation. Une exclusivité peut se prévoir au devis.",
       },
       {
         type: "paragraph",
-        text: "Deux réserves, et elles sont classiques. D’abord, mon droit moral d’auteur reste attaché à ma personne : il est incessible, et je ne l’exercerai pas d’une manière qui gênerait votre exploitation. Ensuite, la cession ne porte que sur ce que j’ai écrit pour vous.",
+        text: "Je reste titulaire des droits d’auteur sur le code et je peux le réutiliser pour d’autres clients. Vos données, vos contenus, votre marque et les informations confidentielles de votre activité restent à vous et n’entrent dans aucune réutilisation.",
       },
       {
         type: "list",
         style: "unordered",
         items: [
           "Les composants tiers (bibliothèques ouvertes, polices, visuels sous licence, services par abonnement) restent régis par leur propre licence, dont je vous remets la liste et dont vous faites votre affaire.",
-          "Mes briques réutilisables et mes outils internes, antérieurs à la mission ou non spécifiques à votre projet, restent ma propriété. Je vous en concède un droit d’usage non exclusif, gratuit, mondial et pour la durée de protection, dans la seule mesure nécessaire à l’exploitation des livrables.",
+          "Mon droit moral d’auteur reste attaché à ma personne. Je ne l’exercerai pas d’une manière qui gênerait votre exploitation.",
         ],
       },
       { type: "heading", level: 2, text: "9. Hébergement et mise en ligne" },
       {
         type: "paragraph",
-        text: "La prestation livre le code et sa documentation de déploiement. Elle ne comprend ni l’hébergement, ni la supervision, ni les mises à jour dans la durée : c’est une formule distincte, avec son prix et sa durée propres.",
+        text: "La version de démonstration tourne sur mon infrastructure jusqu’au paiement du solde. La mise en production se fait ensuite au choix : sur votre infrastructure, sur un serveur ouvert à votre nom chez l’hébergeur de votre choix, que je configure, ou dans le cadre de ma formule d’hébergement.",
       },
       {
         type: "paragraph",
-        text: "Un déploiement sur votre infrastructure ou sur celle d’un prestataire que vous avez choisi est possible : il se chiffre séparément, parce que le travail dépend entièrement de l’environnement rencontré.",
+        text: "La prestation ne comprend ni l’hébergement, ni la supervision, ni les mises à jour dans la durée : c’est une formule distincte, avec son prix et sa durée propres.",
       },
       { type: "heading", level: 2, text: "10. Références" },
       {
@@ -697,7 +701,7 @@ export const legalDocuments: readonly LegalDocument[] = [
     seo: {
       title: "Conditions générales de vente · Eliott Bouquerel",
       description:
-        "Devis, échéancier de paiement, délais, recette, cession des droits d’auteur et responsabilité : les conditions applicables à mes prestations.",
+        "Devis, échéancier de paiement, délais, recette, code source, droits sur les livrables et responsabilité : les conditions applicables à mes prestations.",
     },
   },
 ];
