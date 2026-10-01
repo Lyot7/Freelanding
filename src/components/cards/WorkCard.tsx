@@ -5,6 +5,7 @@ import { useReducedMotion } from "motion/react";
 import { ImageProgressive } from "@/components/ui/ImageProgressive";
 import { Grain } from "@/components/effects/Grain";
 import { Ticker } from "@/components/ui/Ticker";
+import { useAfficheDepixelisee } from "@/components/motion/useDepixelisation";
 import { uiLabels } from "@/content/ui";
 import { urlImageFond } from "@/lib/image-fond";
 import { estProfilLeger } from "@/lib/profil-appareil";
@@ -67,16 +68,29 @@ function padIndex(n: number): string {
   return `(${String(n).padStart(2, "0")})`;
 }
 
+// Affiche servie par l'optimiseur : le fichier fait 1376 px pour une vignette
+// de 384 à 950 px, 70 Ko partaient pour rien.
+const LARGEUR_AFFICHE = 1080;
+const CLASSE_VIDEO = "absolute inset-0 block h-full w-full object-cover object-center";
+
 function WorkCardVideo({
   src,
   poster,
   reducedMotion,
 }: {
   src: string;
+  /** Chemin du fichier, pas l'adresse optimisée. */
   poster: string;
   reducedMotion: boolean;
 }) {
   const ref = useRef<HTMLVideoElement>(null);
+  const urlAffiche = urlImageFond(poster, LARGEUR_AFFICHE);
+  const pixelise = useAfficheDepixelisee({
+    video: ref,
+    src: poster,
+    url: urlAffiche,
+    className: CLASSE_VIDEO,
+  });
 
   useEffect(() => {
     const video = ref.current;
@@ -144,7 +158,8 @@ function WorkCardVideo({
       loop
       playsInline
       preload="none"
-      poster={poster}
+      poster={urlAffiche}
+      style={pixelise ?? undefined}
       /* `absolute inset-0`, et c'est le CŒUR du réglage, pas une préférence.
          Le cadre parent déclare `aspect-[1.73678]` et son enfant direct prend
          `h-full`. Une hauteur en pourcentage contre une hauteur DÉDUITE d'un
@@ -157,7 +172,7 @@ function WorkCardVideo({
          Le chemin IMAGE n'avait pas le défaut parce que `next/image fill` pose
          `position: absolute` : il n'apporte aucune hauteur intrinsèque, donc le
          rapport déclaré tient. On aligne donc la vidéo sur l'image. */
-      className="absolute inset-0 block h-full w-full object-cover object-center"
+      className={CLASSE_VIDEO}
     />
     /* Pas de `<source>` : l'adresse est posée par l'effet, à l'approche. */
   );
@@ -178,9 +193,7 @@ function WorkCardMedia({
     return (
       <WorkCardVideo
         src={media.src}
-        // Affiche servie par l'optimiseur : le fichier fait 1376 px pour une
-        // vignette de 384 à 950 px, 70 Ko partaient pour rien.
-        poster={urlImageFond(media.poster.src, 1080)}
+        poster={media.poster.src}
         reducedMotion={reducedMotion}
       />
     );

@@ -130,6 +130,49 @@ export function chargementImg(
   });
 }
 
+/** Charge une image par son adresse ; `null` si elle échoue. */
+export function chargementUrl(url: string): Promise<HTMLImageElement | null> {
+  return new Promise((fin) => {
+    const img = new window.Image();
+    img.onload = () => fin(img);
+    img.onerror = () => fin(null);
+    img.src = url;
+  });
+}
+
+/**
+ * Affiche d'une `<video>` dépixelisée à sa première apparition, comme une
+ * `<ImageProgressive>`. `src` est le chemin du fichier (clé de l'effet, et
+ * source de l'attente en 32 px), `url` l'adresse réellement posée en `poster` :
+ * c'est elle qu'on charge, pour ne rien télécharger deux fois.
+ *
+ * Même mécanique que `styleEtape` : `object-position` pousse l'affiche et les
+ * images de la vidéo hors de la boîte, le fond pixelisé se voit. Si la vidéo
+ * démarre pendant l'effet, elle n'apparaît qu'à la dernière étape.
+ */
+export function useAfficheDepixelisee({
+  video,
+  src,
+  url,
+  className,
+  actif = true,
+}: {
+  video: RefObject<HTMLVideoElement | null>;
+  src: string;
+  url: string;
+  className?: string;
+  actif?: boolean;
+}): CSSProperties | null {
+  const etape = useDepixelisation({
+    cible: video,
+    src,
+    actif,
+    estChargee: () => false,
+    charger: () => chargementUrl(url),
+  });
+  return styleEtape(etape, className);
+}
+
 /**
  * Style d'un `<img>` pendant l'effet : l'étape en fond pixelisé, et le contenu
  * de l'image poussé hors de sa boîte par `object-position` pour que seul le

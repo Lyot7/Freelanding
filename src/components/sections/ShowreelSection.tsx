@@ -8,6 +8,12 @@ import type { ShowreelContent } from "@/lib/content/types";
 import { Highlighted } from "@/components/ui";
 import { Reveal, framerTween } from "@/components/motion/Reveal";
 import { useParallaxLayerY } from "@/components/motion/ParallaxImage";
+import {
+  chargementImg,
+  imgChargee,
+  styleEtape,
+  useDepixelisation,
+} from "@/components/motion/useDepixelisation";
 
 /**
  * ShowreelSection — reconstruction fidèle (CSS Framer → Tailwind responsive) de
@@ -163,6 +169,15 @@ export function ShowreelSection({ showreel }: { showreel: ShowreelContent }) {
   const posterFrame = useRef<HTMLDivElement>(null);
   // 0.06 : la source pose ce calque en `top:-6%; height:calc(100% + 12%)`.
   const posterY = useParallaxLayerY(posterFrame, 0.06);
+  // Dépixelisation à la première apparition, comme les `<ImageProgressive>`.
+  const posterImg = useRef<HTMLImageElement>(null);
+  const etape = useDepixelisation({
+    cible: posterImg,
+    src: showreel.poster?.src ?? "",
+    actif: Boolean(showreel.poster?.src),
+    estChargee: () => imgChargee(posterImg.current),
+    charger: () => chargementImg(posterImg.current),
+  });
   const { marquee, vintage, cta, statement } = showreel;
   const statementEmphasis = showreel.statementEmphasis
     ? [...showreel.statementEmphasis]
@@ -266,6 +281,7 @@ export function ShowreelSection({ showreel }: { showreel: ShowreelContent }) {
                         Sur-cadrée top/bottom -6 % comme la source, et DÉRIVANT
                         au scroll : le sur-cadrage était là, le mouvement non. */}
                     <motion.img
+                      ref={posterImg}
                       src={posterSrc}
                       srcSet={posterSrcSet}
                       sizes={POSTER_SIZES}
@@ -280,7 +296,10 @@ export function ShowreelSection({ showreel }: { showreel: ShowreelContent }) {
                       aria-hidden={posterAlt ? undefined : true}
                       decoding="async"
                       className="pointer-events-none absolute inset-x-0 top-[-6%] h-[calc(100%+12%)] w-full select-none object-cover object-center"
-                      style={posterY ? { y: posterY } : undefined}
+                      style={{
+                        ...(posterY ? { y: posterY } : null),
+                        ...styleEtape(etape, undefined),
+                      }}
                     />
                   </div>
                 </Reveal>
