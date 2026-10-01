@@ -4,14 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SwapText } from "@/components/ui/SwapText";
 // Le module léger, pas `vue-agent.ts` : voir l'en-tête de `vue-agent-accueil.ts`.
-import {
-  CHEMIN_PROMPT_TEXTE,
-  CHEMIN_VUE_AGENT,
-  accueilVueAgent,
-} from "@/content/vue-agent-accueil";
+import { CHEMIN_PROMPT_TEXTE, accueilVueAgent } from "@/content/vue-agent-accueil";
 
 /**
- * Raccourci de la vue Agent dans la barre basse du héros de l'accueil.
+ * Raccourci « Demande à ton assistant IA » de la barre basse du héros.
  *
  * UN CLIC, LE PROMPT EST COPIÉ. Le texte n'est pas dans la page : il est
  * cherché au clic sur `/agent/prompt.txt`, pour ne rien ajouter au poids de
@@ -23,9 +19,10 @@ import {
  * dans le geste et attend la réponse. Les navigateurs sans `ClipboardItem`
  * passent par `writeText` après le chargement.
  *
- * ÉCHEC = LA VUE AGENT. Si la copie échoue, on n'affiche pas une erreur au
- * milieu du héros : on emmène le visiteur sur `/agent`, où le bouton a un
- * repli complet.
+ * ÉCHEC = LE PROMPT EN TEXTE BRUT. Si la copie échoue, on n'affiche pas une
+ * erreur au milieu du héros : on ouvre `/agent/prompt.txt`, que le visiteur
+ * copie à la main. Le routeur y fait une navigation complète, la route ne
+ * rendant pas de page React.
  */
 async function copierDepuis(url: string): Promise<boolean> {
   const texte = () =>
@@ -66,7 +63,7 @@ export function DemanderAssistant({ className = "" }: { className?: string }) {
       window.clearTimeout(minuterie.current);
       minuterie.current = window.setTimeout(() => setCopie(false), 4000);
     } else {
-      router.push(CHEMIN_VUE_AGENT);
+      router.push(CHEMIN_PROMPT_TEXTE);
     }
   };
 

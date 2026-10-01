@@ -139,7 +139,7 @@ describe("DemanderAssistant", () => {
     expect(copies).toEqual([PROMPT]);
   });
 
-  it("mène à la vue agent quand le prompt ne se charge pas", async () => {
+  it("ouvre le prompt en texte brut quand la copie échoue", async () => {
     dom = installerDom();
     servir(new Response("introuvable", { status: 404 }));
     globalThis.ClipboardItem = undefined;
@@ -149,11 +149,11 @@ describe("DemanderAssistant", () => {
 
     await dom.cliquer(bouton());
     expect(copies).toEqual([]);
-    expect(navigations).toEqual(["/agent"]);
+    expect(navigations).toEqual(["/agent/prompt.txt"]);
     expect(statut().textContent).toBe("");
   });
 
-  it("mène à la vue agent quand le navigateur n'a pas de presse-papiers", async () => {
+  it("ouvre le prompt en texte brut sans presse-papiers", async () => {
     dom = installerDom();
     servir();
     globalThis.ClipboardItem = FauxClipboardItem;
@@ -161,7 +161,7 @@ describe("DemanderAssistant", () => {
     await monter();
 
     await dom.cliquer(bouton());
-    expect(navigations).toEqual(["/agent"]);
+    expect(navigations).toEqual(["/agent/prompt.txt"]);
   });
 
   it("ignore un second clic pendant le chargement", async () => {

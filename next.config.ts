@@ -82,6 +82,7 @@ const nextConfig: NextConfig = {
       { source: "/cgv", destination: "/legal/conditions-generales-de-vente", statusCode: 301 },
       /* Ancien site : la prise de rendez-vous est devenue la page contact. */
       { source: "/rendez-vous", destination: "/contact", statusCode: 301 },
+      { source: "/agent", destination: "/", statusCode: 301 },
       /* Ancien site : les études de cas, dans les deux langues d'URL.
          Elles visent la destination FINALE, pas `/work/kpsull` : enchaîner
          deux 301 dilue le signal transféré et rallonge le trajet du visiteur. */

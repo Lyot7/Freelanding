@@ -9,7 +9,7 @@ import {
   type Prestation,
 } from "@/content/offre";
 import { lienRendezVous, rendezVousContent } from "@/content/rendez-vous";
-import { CHEMIN_VUE_AGENT, vueAgentContent } from "@/content/vue-agent";
+import { CHEMIN_PROFIL_TEXTE, vueAgentContent } from "@/content/vue-agent";
 
 /**
  * Profil complet d'Eliott, en un seul texte, pour la vue Agent (`/agent`), sa
@@ -139,7 +139,7 @@ export async function construireProfil(
       ...(horaires ? [`${T.reperes.horaires}${DP} ${horaires}`] : []),
       `${T.reperes.site}${DP} ${absoluteUrl("/")}`,
     ]),
-    p(T.source(absoluteUrl(CHEMIN_VUE_AGENT))),
+    p(T.source(absoluteUrl(CHEMIN_PROFIL_TEXTE))),
   );
 
   /* Ce que je fais. */

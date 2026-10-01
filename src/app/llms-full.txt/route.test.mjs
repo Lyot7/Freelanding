@@ -27,7 +27,7 @@ describe("GET /llms-full.txt", () => {
 
   it("cite la page source et le formulaire en adresses absolues", async () => {
     const corps = await (await GET()).text();
-    expect(corps).toContain(absoluteUrl("/agent"));
+    expect(corps).toContain(absoluteUrl("/llms-full.txt"));
     expect(corps).toContain(absoluteUrl("/contact"));
     expect(corps).not.toContain("—");
   });

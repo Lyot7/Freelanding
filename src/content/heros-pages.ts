@@ -14,7 +14,6 @@ export const herosPages: {
   readonly blog: ImageHero;
   readonly realisations: ImageHero;
   readonly introuvable: ImageHero;
-  readonly agent: ImageHero;
   readonly prestations: Readonly<Record<string, ImageHero | undefined>>;
   readonly legal: Readonly<Record<string, ImageHero | undefined>>;
 } = {
@@ -89,31 +88,6 @@ export const herosPages: {
     og: {
       src: "/images/og-page-page-404.jpg",
       alt: "Boussole ancienne en laiton, ouverte, posée sur une carte papier dans la lumière du jour",
-      width: 1200,
-      height: 630,
-    },
-  },
-  agent: {
-    src: "/images/heros/page-agent.jpg",
-    alt: "Une main pointe une ligne sur l’écran d’un ordinateur portable ouvert, posé sur un bureau en bois",
-    width: 2400,
-    height: 1350,
-    cadrage: { x: 28, y: 40 },
-    credit: {
-      prefixe: "Photo :",
-      auteur: {
-        libelle: "Preply.com Images",
-        href: "https://commons.wikimedia.org/wiki/File:Learning_to_Code.jpg",
-      },
-      licence: {
-        libelle: "CC BY 2.0",
-        href: "https://creativecommons.org/licenses/by/2.0/deed.fr",
-      },
-      modification: "retouchée",
-    },
-    og: {
-      src: "/images/og-page-agent.jpg",
-      alt: "Une main pointe une ligne sur l’écran d’un ordinateur portable ouvert, posé sur un bureau en bois",
       width: 1200,
       height: 630,
     },

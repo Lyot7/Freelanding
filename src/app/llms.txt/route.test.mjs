@@ -36,9 +36,10 @@ describe("GET /llms.txt", () => {
       });
   });
 
-  it("mène à la vue agent et au profil complet en texte brut", async () => {
+  it("mène au prompt de conseil et au profil complet en texte brut", async () => {
     const corps = await (await GET()).text();
-    expect(corps).toContain("[Vue agent](http://localhost:3000/agent) : ");
+    expect(corps).toContain("[Prompt de conseil](http://localhost:3000/agent/prompt.txt) : ");
+    expect(corps).not.toContain("http://localhost:3000/agent)");
     expect(corps).toContain(
       "[Profil complet](http://localhost:3000/llms-full.txt) : le même profil en Markdown brut, en un seul fichier",
     );

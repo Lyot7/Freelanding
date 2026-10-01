@@ -1,6 +1,6 @@
 /**
- * Textes de la vue Agent : le sélecteur « Humain / Agent » de l'en-tête, la
- * page `/agent`, les intertitres du profil complet et le prompt à copier.
+ * Textes du profil complet (`/llms-full.txt`) et du prompt copié par le
+ * bouton « Demande à ton assistant IA » du héros (`/agent/prompt.txt`).
  *
  * CE FICHIER NE PORTE QUE LA CHARPENTE. Le profil lui-même (offres, prix,
  * réalisations, questions fréquentes, rendez-vous) est assemblé par
@@ -21,60 +21,11 @@
 import { accueilVueAgent } from "./vue-agent-accueil";
 import { uiLabels } from "./ui";
 
-export {
-  CHEMIN_PROFIL_TEXTE,
-  CHEMIN_PROMPT_TEXTE,
-  CHEMIN_VUE_AGENT,
-} from "./vue-agent-accueil";
+export { CHEMIN_PROFIL_TEXTE, CHEMIN_PROMPT_TEXTE } from "./vue-agent-accueil";
 
 export const vueAgentContent = {
-  /** Sélecteur de l'en-tête. */
-  toggle: {
-    libelle: "Choisir la vue",
-    humain: "Humain",
-    agent: "Agent",
-    /** Préfixe lu par les lecteurs d'écran devant la forme courte. */
-    prefixe: "Vue ",
-  },
-
-  seo: {
-    title: "Profil complet d’Eliott Bouquerel, à lire ou à donner à ton IA",
-    description:
-      "Tout ce que fait Eliott Bouquerel, développeur freelance, en un seul texte : offres et prix, méthode, réalisations, contact. Et un prompt à coller dans ton assistant pour savoir si Eliott est la bonne personne pour ton projet.",
-  },
-
-  hero: {
-    /** Dit l'offre avant l'action : qui, quoi, pour qui. */
-    surtitre: (nom: string, baseline: string) =>
-      `${nom} · ${baseline.toLocaleLowerCase("fr")} pour TPE et PME`,
-    titre: "Demande à ton assistant si je suis le bon choix.",
-    resume:
-      "Tout ce que je fais tient dans ce texte. Copie le prompt et colle-le dans ton assistant habituel : il te pose des questions sur ton projet, puis te dit si je suis la bonne personne.",
-  },
-
-  mode: {
-    titre: "Comment ça marche",
-    etapes: [
-      "Copie le prompt. Il contient ce profil en entier.",
-      "Colle-le dans ton assistant habituel (ChatGPT, Claude ou un autre).",
-      "Il te pose des questions sur ton entreprise et ton besoin, puis te dit si je suis le bon choix. Si c’est le cas, il te donne le lien pour me joindre de la façon qui te va.",
-    ],
-    voirPrompt: "Lire les consignes données à l’assistant",
-    lienTexte: "Version texte brut",
-  },
-
-  copier: {
-    action: "Copier le prompt",
-    fait: "Prompt copié",
-    suite: "C’est copié. Colle-le dans ton assistant.",
-    echec: "La copie n’a pas marché. Le prompt est dans le cadre ci-dessous, déjà sélectionné.",
-    zone: "Prompt complet",
-  },
-
   /** Raccourci du héros de l'accueil : voir `vue-agent-accueil.ts`. */
   accueil: accueilVueAgent,
-
-  sommaire: "Sur cette page",
 
   /** Intertitres et textes de liaison du profil. */
   profil: {

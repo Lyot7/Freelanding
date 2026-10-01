@@ -2,7 +2,6 @@ import type { ContentRoute } from "@/lib/content/types";
 import { blogPosts } from "./blog";
 import { prestations } from "./offre";
 import { CHEMIN_PAGE_CAEN } from "./page-caen";
-import { CHEMIN_VUE_AGENT } from "./vue-agent";
 
 /**
  * Manifest public, dans l'ordre exact du sitemap Framer live.
@@ -50,7 +49,6 @@ export const contentRoutes: readonly ContentRoute[] = [
    * VUE AGENT (2026-09-23) : le profil complet en un seul texte, et le prompt
    * que le visiteur colle dans son propre assistant. Voir `vue-agent.ts`.
    */
-  { pathname: CHEMIN_VUE_AGENT, kind: "page" },
   // Trois projets réels depuis le 2026-08-10, à la place des cinq études de cas
   // inventées du template. Les anciens chemins ne sont pas redirigés : ils n'ont
   // jamais été publiés sous ce domaine, personne n'a de lien vers eux.

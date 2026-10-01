@@ -2,7 +2,7 @@ import { content } from "@/lib/content";
 import { absoluteUrl } from "@/lib/site-url";
 import { fourchette, prestations as offre, prixPack } from "@/content/offre";
 import { pageCaen } from "@/content/page-caen";
-import { CHEMIN_PROFIL_TEXTE, CHEMIN_VUE_AGENT } from "@/content/vue-agent";
+import { CHEMIN_PROFIL_TEXTE, CHEMIN_PROMPT_TEXTE } from "@/content/vue-agent";
 
 /**
  * `/llms.txt` — fiche d'identité du site à destination des assistants.
@@ -95,7 +95,7 @@ export async function GET(): Promise<Response> {
     ligne("À propos", "/a-propos", "parcours et façon de travailler"),
     ligne("Réalisations", "/realisations", "les projets en détail"),
     ligne("Contact", "/contact", "formulaire et coordonnées"),
-    ligne("Vue agent", CHEMIN_VUE_AGENT, "le profil complet en un seul texte, et un prompt de conseil à coller dans un assistant"),
+    ligne("Prompt de conseil", CHEMIN_PROMPT_TEXTE, "le profil complet et des consignes, à coller dans un assistant IA"),
     ligne("Profil complet", CHEMIN_PROFIL_TEXTE, "le même profil en Markdown brut, en un seul fichier"),
     /*
      * PAGES DE DROIT. Un agent interrogé sur l’éditeur, l’hébergeur, les

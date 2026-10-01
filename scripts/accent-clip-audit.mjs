@@ -92,7 +92,6 @@ const ROUTES = [
   "/services/logiciel-metier",
   "/contact",
   // Vue agent (2026-09-23) : le profil y écrit ses liens en clair.
-  "/agent",
   "/legal/mentions-legales",
   "/legal/politique-de-confidentialite",
   "/legal/conditions-generales-de-vente",

@@ -139,9 +139,6 @@ export const siteConfig: SiteConfig = {
     { label: "À propos", href: "/a-propos" },
     { label: "Blog", href: "/blog" },
     { label: "Contact", href: "/contact" },
-    /* Seul accès à la vue Agent entre 810 et 919 px, où l'en-tête n'a pas la
-       place du sélecteur (voir `ToggleVue` dans `Header.tsx`). */
-    { label: "Vue agent", href: "/agent" },
   ],
   /*
    * RÉSEAUX DU PIED DE PAGE.
