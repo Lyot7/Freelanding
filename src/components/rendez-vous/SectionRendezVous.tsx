@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { Grain } from "@/components/effects/Grain";
+import { Icon } from "@/components/ui";
 import { ReservationAvecSujet } from "@/components/rendez-vous/ReservationAvecSujet";
 import { ReservationRendezVous } from "@/components/rendez-vous/ReservationRendezVous";
 import { rendezVousContent } from "@/content/rendez-vous";
@@ -108,6 +109,17 @@ export function SectionRendezVous({
           <p className="max-w-[380px] text-[15px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground-60">
             {rendezVousContent.chapeau}
           </p>
+          <ul className="m-0 mt-[8px] flex max-w-[380px] list-none flex-col p-0">
+            {rendezVousContent.garanties.map((garantie) => (
+              <li
+                key={garantie}
+                className="flex items-center gap-[12px] border-t border-border py-[12px] text-[14px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground last:border-b"
+              >
+                <Icon name="check" size={14} className="flex-none text-accent" />
+                {garantie}
+              </li>
+            ))}
+          </ul>
         </div>
 
         <div className="tablet:pl-[40px]">

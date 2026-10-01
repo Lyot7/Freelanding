@@ -136,7 +136,9 @@ et un booléen `filled`, jamais son contenu.
 Six événements dédiés, parce que le parcours de réservation ne se ramène pas à
 un formulaire : `rdv_type_selected` (`preselected` distingue le clic du sujet
 imposé par `/services/*` ou `?sujet=`), `rdv_slots_loaded` (`slots_count` à zéro
-= agenda vide, ce qui n'est pas une panne), `rdv_slots_failed`
+= agenda vide, ce qui n'est pas une panne ; depuis le 2026-10-01 il compte un
+MOIS et non plus une semaine, et repart à chaque changement de durée,
+`duration_min` à l'appui : les courbes antérieures ne se comparent pas), `rdv_slots_failed`
 (`non_configure` = Cal.com absent ou mal réglé, `reseau` = appel échoué),
 `rdv_slot_selected` (`days_ahead`, jamais l'horaire, qui identifierait la
 personne une fois croisé avec l'agenda), `rdv_confirmed`, `rdv_failed`.

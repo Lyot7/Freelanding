@@ -192,9 +192,10 @@ export async function POST(requete: Request): Promise<Response> {
     );
   }
 
-  // DURÉE VÉRIFIÉE CONTRE CAL.COM, pas contre ce que le client a cru voir. Des
-  // durées illisibles retirent `lengthInMinutes` : la réservation part à la
-  // durée par défaut plutôt que d'échouer.
+  // DURÉE VÉRIFIÉE CONTRE CAL.COM, pas contre ce que le client a cru voir.
+  // Durées illisibles : la durée demandée part quand même, et c'est Cal.com
+  // qui la refuse s'il ne la propose pas. La retirer en silence réserverait
+  // une autre durée que celle affichée au prospect.
   const durees = await obtenirDurees(cible);
   if (
     reservation.duree !== undefined &&
@@ -213,7 +214,7 @@ export async function POST(requete: Request): Promise<Response> {
   const creation = await creerReservation({
     cible,
     debutUtc: reservation.debutUtc,
-    ...(durees && reservation.duree !== undefined ? { duree: reservation.duree } : {}),
+    ...(reservation.duree !== undefined ? { duree: reservation.duree } : {}),
     nom: reservation.nom,
     email: reservation.email,
     notes: composerNotes(reservation),

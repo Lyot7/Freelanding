@@ -53,6 +53,8 @@ export interface ContenuRendezVous {
   readonly titre: string;
   readonly chapeau: string;
   readonly noteFuseau: string;
+  /** Faits courts posés sous le chapeau : ce que le visiteur engage en réservant. */
+  readonly garanties: readonly string[];
   readonly types: readonly TypeRendezVous[];
   readonly etapes: {
     readonly sujet: string;
@@ -76,6 +78,8 @@ export interface ContenuRendezVous {
     readonly libelleGrille: string;
     readonly libelleCalendrier: string;
     readonly libelleDuree: string;
+    /** Annonce au lecteur d'écran de ce que montre la colonne des heures. */
+    readonly annonce: (jour: string, nombre: number) => string;
     /** Une durée Cal.com, en minutes, telle qu'affichée sur sa pastille. */
     readonly duree: (minutes: number) => string;
   };
@@ -151,6 +155,11 @@ export const rendezVousContent: ContenuRendezVous = {
   chapeau:
     "Choisis un sujet, une durée et une heure, puis réponds à trois questions sur ton projet : tu sais avant l’appel ce que ton budget permet. Le lien de visioconférence part par e-mail dans la foulée.",
   noteFuseau: "Heures affichées à l’heure de Paris.",
+  garanties: [
+    "Gratuit et sans engagement",
+    "En visio, lien envoyé par e-mail",
+    "Annulable ou déplaçable en un clic",
+  ],
 
   /*
    * LES INTITULÉS SONT DES INVITATIONS, PAS DES CATÉGORIES, depuis le
@@ -242,6 +251,8 @@ export const rendezVousContent: ContenuRendezVous = {
     libelleGrille: "Heures libres",
     libelleCalendrier: "Jour du rendez-vous",
     libelleDuree: "Durée de l’appel",
+    annonce: (jour, nombre) =>
+      `${nombre} ${nombre > 1 ? "créneaux libres" : "créneau libre"} le ${jour}.`,
     duree: (minutes) => `${minutes} min`,
   },
 

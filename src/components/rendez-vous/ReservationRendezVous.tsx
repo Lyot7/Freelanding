@@ -135,7 +135,7 @@ const CLASSE_LIBELLE =
   "text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60";
 
 const CLASSE_CHAMP =
-  "h-[50px] w-full border border-border bg-transparent px-[16px] text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground transition-colors placeholder:text-white/25 focus:border-b-accent tablet:text-[14px]";
+  "h-[50px] w-full border border-border bg-transparent px-[16px] text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground transition-colors placeholder:text-white/50 focus:border-b-accent tablet:text-[14px]";
 
 const CLASSE_TEXTE =
   "text-[14px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground-60";
@@ -180,7 +180,7 @@ function Progression({
                 faite || courante ? "bg-accent" : "bg-white/15"
               }`}
             />
-            <span className="flex flex-col gap-[4px] pt-[10px] text-[11px] font-medium uppercase leading-[1.2] tracking-[-0.01em]">
+            <span className="flex flex-col gap-[4px] pt-[10px] text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em]">
               <span className={faite || courante ? "text-accent" : "text-foreground-60"}>
                 {numero(index)}
               </span>
@@ -270,10 +270,10 @@ function ChoixType({
               <span className="text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground">
                 {type.nom}
               </span>
-              <span className="text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-accent">
+              <span className="text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60">
                 {type.duree}
               </span>
-              <span className="text-[12px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground-60">
+              <span className="text-[13px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground-60">
                 {type.description}
               </span>
             </span>
@@ -426,8 +426,9 @@ function RetourEspere({ retour }: { retour: RetourBudget | undefined }) {
 }
 
 /**
- * Calendrier d'un mois : les jours qui ont au moins un créneau sont
- * cliquables et marqués d'un point, les autres restent lisibles mais grisés.
+ * Calendrier d'un mois : les jours qui ont au moins un créneau sont des
+ * cases bordées cliquables, les autres restent lisibles mais grisés et sans
+ * cadre.
  *
  * UN MOIS ENTIER ET NON UNE BANDE DE JOURS : le prospect voit d'un coup d'œil
  * quand il y a de la place, et un jour sans créneau se lit comme tel au lieu
@@ -448,8 +449,13 @@ function Calendrier({
 }) {
   const disponibles = new Map(donnees.jours.map((jour) => [jour.jour, jour]));
   const cases = grilleMois(donnees.fenetre.mois);
+  // `aria-disabled` et non `disabled` : un bouton désactivé perd le focus, et
+  // il le perdrait au moment précis où le clavier vient de l'actionner (le
+  // chargement du mois suivant, ou l'arrivée au bout de la fenêtre).
   const classeNavigation =
-    "flex size-[36px] items-center justify-center border border-border text-foreground transition-colors hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:border-border disabled:hover:text-foreground motion-reduce:transition-none";
+    "flex size-[36px] items-center justify-center border border-border text-foreground transition-colors hover:border-accent hover:text-accent aria-disabled:cursor-not-allowed aria-disabled:opacity-30 aria-disabled:hover:border-border aria-disabled:hover:text-foreground motion-reduce:transition-none";
+  const precedentBloque = donnees.fenetre.premiere || chargement;
+  const suivantBloque = donnees.fenetre.derniere || chargement;
 
   return (
     <div className="flex flex-col gap-[14px]">
@@ -461,8 +467,10 @@ function Calendrier({
           <button
             type="button"
             className={classeNavigation}
-            disabled={donnees.fenetre.premiere || chargement}
-            onClick={() => onDecaler(-1)}
+            aria-disabled={precedentBloque}
+            onClick={() => {
+              if (!precedentBloque) onDecaler(-1);
+            }}
           >
             <Icon
               name="arrow"
@@ -474,8 +482,10 @@ function Calendrier({
           <button
             type="button"
             className={classeNavigation}
-            disabled={donnees.fenetre.derniere || chargement}
-            onClick={() => onDecaler(1)}
+            aria-disabled={suivantBloque}
+            onClick={() => {
+              if (!suivantBloque) onDecaler(1);
+            }}
           >
             <Icon name="arrow" size={16} label={contenu.actions.moisSuivant} />
           </button>
@@ -511,21 +521,15 @@ function Calendrier({
               aria-pressed={disponible ? actif : undefined}
               aria-label={disponible ? disponible.libelle : formaterJour(jour)}
               onClick={() => onChoisirJour(jour)}
-              className={`relative flex h-[44px] items-center justify-center border text-[14px] font-medium leading-none tracking-[-0.01em] transition-colors motion-reduce:transition-none ${
+              className={`flex h-[44px] items-center justify-center border text-[14px] font-medium leading-none tracking-[-0.01em] transition-colors motion-reduce:transition-none ${
                 actif
                   ? "border-accent bg-accent text-accent-ink"
                   : disponible
                     ? "border-border text-foreground hover:border-accent hover:text-accent"
-                    : "cursor-default border-transparent text-white/25"
+                    : "cursor-default border-transparent text-white/40"
               }`}
             >
               {numeroDuJour(jour)}
-              {disponible && !actif ? (
-                <span
-                  aria-hidden
-                  className="absolute bottom-[6px] left-1/2 size-[4px] -translate-x-1/2 rounded-full bg-accent"
-                />
-              ) : null}
             </button>
           );
         })}
@@ -560,7 +564,7 @@ function Heures({
         role="group"
         aria-label={`${contenu.creneaux.libelleGrille} ${jour.libelle}`}
         data-lenis-prevent
-        className="grid grid-cols-4 content-start gap-[6px] desktop:absolute desktop:inset-x-0 desktop:bottom-0 desktop:top-[50px] desktop:grid-cols-3 desktop:overflow-y-auto desktop:overscroll-contain desktop:pr-[6px] [scrollbar-color:rgba(255,255,255,0.2)_transparent] [scrollbar-width:thin]"
+        className="grid grid-cols-4 content-start gap-[6px] desktop:absolute desktop:inset-x-0 desktop:bottom-0 desktop:top-[50px] desktop:grid-cols-3 desktop:overflow-y-auto desktop:overscroll-contain desktop:pb-[28px] desktop:pr-[6px] desktop:[mask-image:linear-gradient(to_bottom,black_calc(100%-40px),transparent)] [scrollbar-color:rgba(255,255,255,0.2)_transparent] [scrollbar-width:thin]"
       >
         {jour.creneaux.map((creneau) => {
           const actif = creneau.debut === choisi?.debut;
@@ -569,6 +573,9 @@ function Heures({
               key={creneau.debut}
               type="button"
               aria-pressed={actif}
+              // Anneau INTÉRIEUR : la colonne défile, et un anneau extérieur y
+              // serait rogné par le bord du conteneur.
+              data-focus-ring="inset"
               onClick={() => onChoisir(creneau)}
               className={`h-[44px] border text-[13px] font-medium leading-[1.2] tracking-[-0.01em] transition-colors motion-reduce:transition-none ${
                 actif
@@ -728,6 +735,15 @@ export function ReservationRendezVous({
       noeud.scrollIntoView({ block: "start", behavior: reduit ? "auto" : "smooth" });
     }
   }, [etape]);
+
+  /**
+   * Le succès REMPLACE le formulaire, bouton d'envoi compris : sans ce focus,
+   * le clavier retomberait sur le document et rien ne serait annoncé.
+   */
+  const refSucces = useRef<HTMLParagraphElement | null>(null);
+  useEffect(() => {
+    if (etatEnvoi === "succes") refSucces.current?.focus();
+  }, [etatEnvoi]);
 
   /*
    * UN SUJET PRÉSÉLECTIONNÉ FRANCHIT LA MÊME MARCHE QU'UN SUJET CHOISI.
@@ -1057,7 +1073,11 @@ export function ReservationRendezVous({
   if (etatEnvoi === "succes") {
     return (
       <div className="flex flex-col gap-[16px] border border-accent bg-accent/[0.07] p-[20px]">
-        <p className="text-[22px] font-medium leading-[1.1] tracking-[-0.02em] text-foreground">
+        <p
+          ref={refSucces}
+          tabIndex={-1}
+          className="text-[22px] font-medium leading-[1.1] tracking-[-0.02em] text-foreground outline-none"
+        >
           {contenu.succes.titre}
         </p>
         {creneau ? (
@@ -1098,7 +1118,7 @@ export function ReservationRendezVous({
       <Progression etape={etape} onAller={setEtape} />
 
       {etape > ETAPE_SUJET && recapitulatif.length > 0 ? (
-        <div className="flex flex-col gap-[6px] border-l-2 border-accent pl-[14px]">
+        <div className="flex flex-col gap-[6px] border border-border bg-white/[0.03] px-[16px] py-[12px]">
           <p className={CLASSE_LIBELLE}>{contenu.recapitulatif}</p>
           <p className="m-0 text-[14px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground">
             {recapitulatif.join(" · ")}
@@ -1291,7 +1311,7 @@ export function ReservationRendezVous({
                     onChange={(evenement) => setMessage(evenement.target.value)}
                     placeholder={contenu.formulaire.messagePlaceholder}
                     aria-invalid={champEnErreur === "message" || undefined}
-                    className="min-h-[90px] w-full resize-y border border-border bg-transparent p-[16px] text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground transition-colors placeholder:text-white/25 focus:border-b-accent tablet:text-[14px]"
+                    className="min-h-[90px] w-full resize-y border border-border bg-transparent p-[16px] text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground transition-colors placeholder:text-white/50 focus:border-b-accent tablet:text-[14px]"
                   />
                 </label>
               </div>
@@ -1302,13 +1322,6 @@ export function ReservationRendezVous({
                   {enCours ? contenu.formulaire.envoiEnCours : contenu.formulaire.envoyer}
                 </button>
               </div>
-
-              <MessageEtat
-                etat={etatEnvoi}
-                message={messageEnvoi}
-                ton="clair"
-                className="max-w-[420px]"
-              />
 
               <p className="text-[12px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground-60">
                 {contenu.formulaire.mention}{" "}
@@ -1328,6 +1341,28 @@ export function ReservationRendezVous({
           <ChampsProtection refConteneur={protection.refConteneur} />
         </form>
       ) : null}
+
+      {/* HORS DES ÉTAPES, toujours monté : un refus du serveur peut renvoyer
+          au calendrier ou au questionnaire, et le message doit s'y lire et
+          s'y annoncer aussi. */}
+      <MessageEtat etat={etatEnvoi} message={messageEnvoi} ton="clair" className="max-w-[420px]" />
+
+      {/* Ce que montre la colonne des heures, dit au lecteur d'écran. Région
+          montée en permanence : une région qui apparaît déjà remplie n'est
+          pas annoncée. */}
+      <p aria-live="polite" className="sr-only">
+        {etape !== ETAPE_CRENEAU
+          ? ""
+          : chargement
+            ? contenu.creneaux.chargement
+            : etatCreneaux === "reseau"
+              ? contenu.creneaux.erreur
+              : jourActif
+                ? contenu.creneaux.annonce(jourActif.libelle, jourActif.creneaux.length)
+                : donnees
+                  ? contenu.creneaux.vide
+                  : ""}
+      </p>
     </div>
   );
 }

@@ -23,10 +23,12 @@ import { obtenirDurees, recupererCreneaux } from "@/lib/rendez-vous/cal-com";
 import { estIdRendezVous, resoudreConfiguration } from "@/lib/rendez-vous/config";
 import {
   estDernierMois,
+  estJourValide,
   estPremierMois,
   fenetreMois,
   formaterMois,
   lireCreneaux,
+  moisDe,
 } from "@/lib/rendez-vous/creneaux";
 import { resoudreDuree } from "@/lib/rendez-vous/durees";
 import { LIMITE_CRENEAUX } from "@/lib/rendez-vous/limites";
@@ -69,7 +71,13 @@ export async function GET(requete: Request): Promise<Response> {
   // Le mois demandé n'est qu'une suggestion : `fenetreMois` le ramène entre
   // aujourd'hui et l'horizon. La durée, elle, n'est retenue que si Cal.com la
   // propose. Rien de ce que le client écrit n'atteint Cal.com tel quel.
-  const fenetre = fenetreMois(parametres.get("mois") ?? "", maintenant);
+  // `debut` (un jour) est l'ancien paramètre, encore envoyé par un onglet
+  // ouvert avant le passage au mois : il désigne le mois qui le contient.
+  const debutHerite = parametres.get("debut") ?? "";
+  const fenetre = fenetreMois(
+    parametres.get("mois") ?? (estJourValide(debutHerite) ? moisDe(debutHerite) : ""),
+    maintenant,
+  );
   const durees = await obtenirDurees(cible);
   const duree = resoudreDuree(parametres.get("duree"), durees);
 
