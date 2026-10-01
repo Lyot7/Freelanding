@@ -19,15 +19,16 @@
  */
 import { creerJournal, empreinte, json, origineEtrangere } from "@/lib/api/reponse";
 import { adresseAppelante, creerLimiteur } from "@/lib/contact/rate-limit";
-import { recupererCreneaux } from "@/lib/rendez-vous/cal-com";
+import { obtenirDurees, recupererCreneaux } from "@/lib/rendez-vous/cal-com";
 import { estIdRendezVous, resoudreConfiguration } from "@/lib/rendez-vous/config";
 import {
-  estDerniereSemaine,
-  estPremiereSemaine,
-  fenetreSemaine,
-  formaterFenetre,
+  estDernierMois,
+  estPremierMois,
+  fenetreMois,
+  formaterMois,
   lireCreneaux,
 } from "@/lib/rendez-vous/creneaux";
+import { resoudreDuree } from "@/lib/rendez-vous/durees";
 import { LIMITE_CRENEAUX } from "@/lib/rendez-vous/limites";
 
 /** `node:crypto` (empreinte de journal) et limiteur en mémoire : donc Node. */
@@ -65,11 +66,14 @@ export async function GET(requete: Request): Promise<Response> {
   }
 
   const maintenant = new Date();
-  // Le jour demandé n'est qu'une suggestion : `fenetreSemaine` le ramène entre
-  // aujourd'hui et l'horizon. Rien de ce que le client écrit n'atteint Cal.com.
-  const fenetre = fenetreSemaine(parametres.get("debut") ?? "", maintenant);
+  // Le mois demandé n'est qu'une suggestion : `fenetreMois` le ramène entre
+  // aujourd'hui et l'horizon. La durée, elle, n'est retenue que si Cal.com la
+  // propose. Rien de ce que le client écrit n'atteint Cal.com tel quel.
+  const fenetre = fenetreMois(parametres.get("mois") ?? "", maintenant);
+  const durees = await obtenirDurees(cible);
+  const duree = resoudreDuree(parametres.get("duree"), durees);
 
-  const resultat = await recupererCreneaux(cible, fenetre.debut, fenetre.fin);
+  const resultat = await recupererCreneaux(cible, fenetre.debut, fenetre.fin, duree);
   if (!resultat.ok) {
     journaliser("creneaux_indisponibles", {
       type,
@@ -88,10 +92,13 @@ export async function GET(requete: Request): Promise<Response> {
       fenetre: {
         debut: fenetre.debut,
         fin: fenetre.fin,
-        libelle: formaterFenetre(fenetre),
-        premiere: estPremiereSemaine(fenetre.debut, maintenant),
-        derniere: estDerniereSemaine(fenetre.debut, maintenant),
+        mois: fenetre.mois,
+        libelle: formaterMois(fenetre.mois),
+        premiere: estPremierMois(fenetre.mois, maintenant),
+        derniere: estDernierMois(fenetre.mois, maintenant),
       },
+      durees: durees ?? null,
+      duree: duree ?? null,
       jours: lireCreneaux(resultat.donnees, maintenant),
     },
     200,

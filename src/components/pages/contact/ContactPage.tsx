@@ -411,11 +411,14 @@ export async function ContactPage() {
       {/* Cible du lien d'évitement (voir SkipLink.tsx et focus.css). */}
       <main id="main-content" tabIndex={-1}>
         <ContactHero contact={contact} timeZone={site.contact.timezone} />
-        <ContactBody contact={contact} />
-        {/* Entre le corps clair et la FAQ claire : l'alternance sombre/clair du
-            reste du site est ainsi conservée, et le bloc tombe juste après le
-            formulaire, pour qui préfère parler plutôt qu'écrire. */}
+        {/* JUSTE SOUS LE HÉROS depuis le 2026-10-01. Placée après le
+            formulaire, la réservation arrivait trois écrans plus bas, derrière
+            son concurrent direct ; Eliott : « les créneaux arrivent assez loin
+            dans la page contact ». Réserver est l'action la plus engageante de
+            la page, elle passe donc en premier, et le formulaire suit pour qui
+            préfère écrire. */}
         <SectionRendezVous emailContact={contact.contactCard.email} />
+        <ContactBody contact={contact} />
         {/* Bloc FAQ standard, comme la home, `/work`, `/blog` et les pages
             légales. Une variante locale divergeait : questions en 18px casse
             normale au lieu de 11px capitales, ni numérotation 01-04, ni filets,

@@ -2,11 +2,15 @@ import { describe, expect, it } from "bun:test";
 import {
   ajouterJours,
   ecartEnJours,
-  estDerniereSemaine,
+  ajouterMois,
+  dernierJourDuMois,
+  estDernierMois,
   estJourValide,
-  estPremiereSemaine,
-  fenetreSemaine,
-  formaterFenetre,
+  estPremierMois,
+  fenetreMois,
+  formaterMois,
+  grilleMois,
+  JOURS_SEMAINE,
   formaterHeure,
   formaterJour,
   formaterJourCourt,
@@ -68,38 +72,73 @@ describe("ajouterJours et ecartEnJours", () => {
   });
 });
 
-describe("fenetreSemaine", () => {
-  it("rend sept jours, bornes comprises", () => {
-    const fenetre = fenetreSemaine("2026-09-07", MAINTENANT);
-    expect(fenetre).toEqual({ debut: "2026-09-07", fin: "2026-09-13" });
+describe("ajouterMois et dernierJourDuMois", () => {
+  it("traverse les années et les mois courts", () => {
+    expect(ajouterMois("2026-12", 1)).toBe("2027-01");
+    expect(ajouterMois("2026-01", -1)).toBe("2025-12");
+    expect(dernierJourDuMois("2026-02")).toBe("2026-02-28");
+    expect(dernierJourDuMois("2028-02")).toBe("2028-02-29");
+    expect(dernierJourDuMois("2026-10")).toBe("2026-10-31");
+  });
+});
+
+describe("fenetreMois", () => {
+  it("couvre le mois demandé, du premier au dernier jour", () => {
+    expect(fenetreMois("2026-10", MAINTENANT)).toEqual({
+      mois: "2026-10",
+      debut: "2026-10-01",
+      fin: "2026-10-31",
+    });
   });
 
-  it("ramène une demande passée à aujourd’hui", () => {
-    expect(fenetreSemaine("2020-01-01", MAINTENANT).debut).toBe("2026-09-01");
+  it("commence aujourd’hui pour le mois courant", () => {
+    const fenetre = fenetreMois("2026-09", new Date("2026-09-15T08:00:00Z"));
+    expect(fenetre.debut).toBe("2026-09-15");
+    expect(fenetre.fin).toBe("2026-09-30");
   });
 
-  it("ramène une demande au-delà de l’horizon", () => {
-    const fenetre = fenetreSemaine("2099-01-01", MAINTENANT);
-    expect(fenetre.debut).toBe(ajouterJours("2026-09-01", HORIZON_JOURS));
+  it("ramène un mois passé au mois courant", () => {
+    expect(fenetreMois("2020-01", MAINTENANT).mois).toBe("2026-09");
   });
 
-  it("ignore une valeur qui n’est pas une date", () => {
-    expect(fenetreSemaine("", MAINTENANT).debut).toBe("2026-09-01");
-    expect(fenetreSemaine("hier", MAINTENANT).debut).toBe("2026-09-01");
-    expect(fenetreSemaine("../../etc", MAINTENANT).debut).toBe("2026-09-01");
+  it("ramène un mois trop lointain au mois de l’horizon, coupé à l’horizon", () => {
+    const dernier = ajouterJours("2026-09-01", HORIZON_JOURS);
+    const fenetre = fenetreMois("2099-01", MAINTENANT);
+    expect(fenetre.mois).toBe(dernier.slice(0, 7));
+    expect(fenetre.fin).toBe(dernier);
+  });
+
+  it("ignore une valeur qui n’est pas un mois", () => {
+    expect(fenetreMois("", MAINTENANT).mois).toBe("2026-09");
+    expect(fenetreMois("2026-13", MAINTENANT).mois).toBe("2026-09");
+    expect(fenetreMois("../../etc", MAINTENANT).mois).toBe("2026-09");
   });
 });
 
 describe("bornes de navigation", () => {
-  it("interdit de reculer avant aujourd’hui", () => {
-    expect(estPremiereSemaine("2026-09-01", MAINTENANT)).toBe(true);
-    expect(estPremiereSemaine("2026-09-08", MAINTENANT)).toBe(false);
+  it("interdit de reculer avant le mois courant", () => {
+    expect(estPremierMois("2026-09", MAINTENANT)).toBe(true);
+    expect(estPremierMois("2026-10", MAINTENANT)).toBe(false);
   });
 
   it("interdit d’avancer au-delà de l’horizon", () => {
-    expect(estDerniereSemaine("2026-09-01", MAINTENANT)).toBe(false);
+    expect(estDernierMois("2026-09", MAINTENANT)).toBe(false);
     const dernier = ajouterJours("2026-09-01", HORIZON_JOURS);
-    expect(estDerniereSemaine(dernier, MAINTENANT)).toBe(true);
+    expect(estDernierMois(dernier.slice(0, 7), MAINTENANT)).toBe(true);
+  });
+});
+
+describe("grilleMois", () => {
+  it("aligne le premier du mois sur sa colonne, lundi en tête", () => {
+    // 1er octobre 2026 : un jeudi, donc trois cases vides avant.
+    const cases = grilleMois("2026-10");
+    expect(cases.slice(0, 4)).toEqual([null, null, null, "2026-10-01"]);
+    expect(cases.at(-1)).toBe("2026-10-31");
+    expect(cases.length).toBe(3 + 31);
+  });
+
+  it("ne laisse aucune case vide quand le mois commence un lundi", () => {
+    expect(grilleMois("2026-06")[0]).toBe("2026-06-01");
   });
 });
 
@@ -119,13 +158,10 @@ describe("formatage", () => {
     expect(formaterJourCourt("2026-09-02")).toBe("mer. 2");
   });
 
-  it("écrit la fenêtre en deux dates courtes", () => {
-    expect(formaterFenetre({ debut: "2026-08-31", fin: "2026-09-06" })).toBe(
-      "31 août au 6 sept.",
-    );
-    expect(formaterFenetre({ debut: "2026-09-01", fin: "2026-09-07" })).toBe(
-      "1er sept. au 7 sept.",
-    );
+  it("écrit le mois et les en-têtes de colonnes en français", () => {
+    expect(formaterMois("2026-10")).toBe("octobre 2026");
+    expect(JOURS_SEMAINE[0]).toBe("lun.");
+    expect(JOURS_SEMAINE[6]).toBe("dim.");
   });
 });
 
@@ -214,11 +250,14 @@ describe("lireReponseCreneaux", () => {
   const reponse = {
     fenetre: {
       debut: "2026-09-01",
-      fin: "2026-09-07",
-      libelle: "1 sept. au 7 sept.",
+      fin: "2026-09-30",
+      mois: "2026-09",
+      libelle: "septembre 2026",
       premiere: true,
       derniere: false,
     },
+    durees: { options: [15, 30, 45], defaut: 30 },
+    duree: 30,
     jours: [
       {
         jour: "2026-09-01",
@@ -238,7 +277,16 @@ describe("lireReponseCreneaux", () => {
   it("relit une réponse complète", () => {
     const lue = lireReponseCreneaux(reponse);
     expect(lue?.fenetre.premiere).toBe(true);
+    expect(lue?.fenetre.mois).toBe("2026-09");
+    expect(lue?.durees).toEqual({ options: [15, 30, 45], defaut: 30 });
+    expect(lue?.duree).toBe(30);
     expect(lue?.jours[0].creneaux[0].heure).toBe("17:00");
+  });
+
+  it("tolère des durées absentes : le sélecteur disparaît, rien ne casse", () => {
+    const lue = lireReponseCreneaux({ ...reponse, durees: null, duree: null });
+    expect(lue?.durees).toBeNull();
+    expect(lue?.duree).toBeNull();
   });
 
   it("refuse une réponse amputée plutôt que de rendre du vide trompeur", () => {

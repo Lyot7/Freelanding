@@ -22,7 +22,7 @@ import { creerJournal, empreinte, json, origineEtrangere } from "@/lib/api/repon
 import { resoudreVerificateur } from "@/lib/contact/captcha";
 import { EMAIL_CONTACT_PAR_DEFAUT } from "@/lib/contact/mailer";
 import { adresseAppelante, creerLimiteur } from "@/lib/contact/rate-limit";
-import { creerReservation } from "@/lib/rendez-vous/cal-com";
+import { creerReservation, obtenirDurees } from "@/lib/rendez-vous/cal-com";
 import { resoudreConfiguration } from "@/lib/rendez-vous/config";
 import { LIMITE_RESERVATION } from "@/lib/rendez-vous/limites";
 import { composerNotes } from "@/lib/rendez-vous/questionnaire";
@@ -67,6 +67,11 @@ function messageRejet(motif: MotifRejetReservation): {
           message:
             "Ce créneau n’est plus proposé. Choisis-en un autre dans la liste.",
           champ: "creneau",
+        };
+      case "duree":
+        return {
+          message: "Cette durée n’est plus proposée. Choisis-en une autre.",
+          champ: "duree",
         };
       case "type":
         return { message: "Ce type de rendez-vous n’est pas proposé.", champ: "type" };
@@ -187,9 +192,28 @@ export async function POST(requete: Request): Promise<Response> {
     );
   }
 
+  // DURÉE VÉRIFIÉE CONTRE CAL.COM, pas contre ce que le client a cru voir. Des
+  // durées illisibles retirent `lengthInMinutes` : la réservation part à la
+  // durée par défaut plutôt que d'échouer.
+  const durees = await obtenirDurees(cible);
+  if (
+    reservation.duree !== undefined &&
+    durees &&
+    !durees.options.includes(reservation.duree)
+  ) {
+    journaliser("rejet_validation", { motif: "duree_hors_liste" });
+    const { message, champ } = messageRejet({
+      type: "champ_invalide",
+      champ: "duree",
+      raison: "hors_liste",
+    });
+    return json({ message, champ }, 400);
+  }
+
   const creation = await creerReservation({
     cible,
     debutUtc: reservation.debutUtc,
+    ...(durees && reservation.duree !== undefined ? { duree: reservation.duree } : {}),
     nom: reservation.nom,
     email: reservation.email,
     notes: composerNotes(reservation),

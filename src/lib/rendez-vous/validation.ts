@@ -26,6 +26,7 @@ import {
 } from "@/lib/contact/validation";
 import { estIdRendezVous } from "./config";
 import { HORIZON_JOURS } from "./creneaux";
+import { estDureePlausible } from "./durees";
 import { OPTIONS_ECHEANCE, optionsObjectif, tranchesBudget } from "./questionnaire";
 import type { OptionQuestion } from "@/content/rendez-vous";
 import type { IdRendezVous } from "@/content/rendez-vous";
@@ -47,6 +48,8 @@ export interface ReservationValide {
   readonly type: IdRendezVous;
   /** Instant de début, normalisé en ISO 8601 UTC (ce qu'attend Cal.com). */
   readonly debutUtc: string;
+  /** Minutes demandées ; absente = durée par défaut du type chez Cal.com. */
+  readonly duree?: number;
   readonly nom: string;
   readonly email: string;
   /** Absent quand le prospect n'a rien écrit. */
@@ -72,6 +75,7 @@ export type MotifRejetReservation =
       readonly champ:
         | "type"
         | "creneau"
+        | "duree"
         | "nom"
         | "email"
         | "message"
@@ -182,6 +186,16 @@ export function validerReservation(
     };
   }
 
+  // La durée n'est vérifiée ici qu'en forme : seule la route connaît les
+  // options du type, lues chez Cal.com, et c'est elle qui tranche.
+  const duree = champs.duree;
+  if (duree !== undefined && duree !== null && !estDureePlausible(duree)) {
+    return {
+      ok: false,
+      motif: { type: "champ_invalide", champ: "duree", raison: "format" },
+    };
+  }
+
   const nom = surUneLigne(lireChaine(champs, "nom"));
   if (nom.length < LIMITES.nom.min || nom.length > LIMITES.nom.max) {
     return {
@@ -230,6 +244,7 @@ export function validerReservation(
       // Cal.com exige l'instant en UTC. `toISOString` le garantit quel que soit
       // le décalage écrit par le client (`+02:00` comme `Z`).
       debutUtc: instant.toISOString(),
+      ...(estDureePlausible(duree) ? { duree } : {}),
       nom,
       email,
       ...(message.length > 0 ? { message } : {}),

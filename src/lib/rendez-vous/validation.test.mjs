@@ -205,3 +205,19 @@ describe("validerReservation — le questionnaire", () => {
     expect(resultat.ok).toBe(true);
   });
 });
+
+describe("validerReservation — la durée", () => {
+  it("garde une durée plausible et la laisse absente sinon", () => {
+    expect(valider({ duree: 45 }).reservation.duree).toBe(45);
+    expect(valider().reservation.duree).toBeUndefined();
+    expect(valider({ duree: null }).reservation.duree).toBeUndefined();
+  });
+
+  it("refuse une durée qui n'est pas un entier de minutes raisonnable", () => {
+    for (const duree of ["45", 2.5, 0, 10_000]) {
+      const resultat = valider({ duree });
+      expect(resultat.ok).toBe(false);
+      expect(resultat.motif.champ).toBe("duree");
+    }
+  });
+});

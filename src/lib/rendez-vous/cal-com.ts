@@ -26,6 +26,8 @@
  */
 import type { CibleEvenement } from "./config";
 import { FUSEAU } from "./creneaux";
+import { lireDurees } from "./durees";
+import type { Durees } from "./durees";
 
 const BASE = "https://api.cal.com/v2";
 
@@ -33,6 +35,8 @@ const BASE = "https://api.cal.com/v2";
 export const VERSION_CRENEAUX = "2024-09-04";
 /** Version d'en-tête de `POST /v2/bookings`. Vérifiée le 2026-08-31. */
 export const VERSION_RESERVATIONS = "2024-08-13";
+/** Version d'en-tête de `GET /v2/event-types`. Vérifiée le 2026-10-01. */
+export const VERSION_TYPES = "2024-06-14";
 
 /**
  * Délais maximaux.
@@ -97,18 +101,23 @@ async function lireJson(reponse: Response): Promise<unknown> {
 /**
  * Créneaux libres d'un type d'événement, sur une fenêtre de jours civils.
  *
- * @param debut Jour `AAAA-MM-JJ` inclus, déjà borné par `fenetreSemaine`.
+ * @param debut Jour `AAAA-MM-JJ` inclus, déjà borné par `fenetreMois`.
  * @param fin Jour `AAAA-MM-JJ` inclus.
+ * @param duree Minutes, parmi les options du type ; absente = durée par défaut.
+ *   Elle change les créneaux rendus : un appel de 45 minutes ne tient plus à
+ *   18 h 30 quand la disponibilité s'arrête à 19 h.
  */
 export async function recupererCreneaux(
   cible: CibleEvenement,
   debut: string,
   fin: string,
+  duree?: number,
 ): Promise<ResultatCalCom<unknown>> {
   const parametres = new URLSearchParams();
   poserCible(parametres, cible);
   parametres.set("start", debut);
   parametres.set("end", fin);
+  if (duree !== undefined) parametres.set("duration", String(duree));
   // Sans ce paramètre, Cal.com répond en UTC : l'affichage serait juste à une
   // ou deux heures près, ce qui est exactement le genre d'erreur qui ne se voit
   // qu'après un rendez-vous manqué.
@@ -141,10 +150,62 @@ export async function recupererCreneaux(
   }
 }
 
+/**
+ * Durées lues chez Cal.com, gardées cinq minutes en mémoire.
+ *
+ * Elles changent quelques fois par an, et chaque page de calendrier comme
+ * chaque réservation les consulte : sans ce cache, un visiteur qui feuillette
+ * trois mois doublerait nos appels à l'API publique.
+ */
+const CACHE_DUREES_MS = 5 * 60 * 1000;
+const cacheDurees = new Map<string, { readonly expire: number; readonly durees: Durees }>();
+
+/**
+ * Durées proposées par un type d'événement, `undefined` quand on ne les a pas.
+ *
+ * SEULE LA FORME SLUG LES DONNE SANS CLEF. `GET /v2/event-types?username=…
+ * &eventSlug=…` répond sans autorisation ; `GET /v2/event-types/{id}` exige
+ * une clef (403, vérifié le 2026-10-01). Une cible par identifiant n'a donc
+ * pas de sélecteur de durée : Cal.com applique sa durée par défaut.
+ *
+ * UN ÉCHEC N'EST PAS UNE PANNE : il fait disparaître le sélecteur, et le
+ * rendez-vous reste réservable à la durée par défaut. Il n'est pas mis en
+ * cache, pour que la requête suivante retente.
+ */
+export async function obtenirDurees(
+  cible: CibleEvenement,
+  maintenantMs: number = Date.now(),
+): Promise<Durees | undefined> {
+  if (cible.par !== "slug") return undefined;
+  const clef = `${cible.username}/${cible.eventTypeSlug}`;
+  const enCache = cacheDurees.get(clef);
+  if (enCache && enCache.expire > maintenantMs) return enCache.durees;
+
+  const parametres = new URLSearchParams({
+    username: cible.username,
+    eventSlug: cible.eventTypeSlug,
+  });
+  try {
+    const reponse = await fetch(`${BASE}/event-types?${parametres.toString()}`, {
+      headers: { "cal-api-version": VERSION_TYPES },
+      cache: "no-store",
+      signal: AbortSignal.timeout(DELAI_LECTURE_MS),
+    });
+    if (!reponse.ok) return undefined;
+    const durees = lireDurees(await lireJson(reponse));
+    if (durees) cacheDurees.set(clef, { expire: maintenantMs + CACHE_DUREES_MS, durees });
+    return durees;
+  } catch {
+    return undefined;
+  }
+}
+
 export interface DemandeReservation {
   readonly cible: CibleEvenement;
   /** Instant de début en ISO 8601 UTC. */
   readonly debutUtc: string;
+  /** Minutes, déjà vérifiées parmi les options du type ; absente = défaut Cal.com. */
+  readonly duree?: number;
   readonly nom: string;
   readonly email: string;
   /** Texte composé par `composerNotes` : réponses au questionnaire, puis message libre. */
@@ -170,6 +231,7 @@ export async function creerReservation(
   const corps: Record<string, unknown> = {
     ...corpsCible(demande.cible),
     start: demande.debutUtc,
+    ...(demande.duree !== undefined ? { lengthInMinutes: demande.duree } : {}),
     attendee: {
       name: demande.nom,
       email: demande.email,

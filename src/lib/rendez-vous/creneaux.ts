@@ -21,6 +21,9 @@
  * niveau du créneau, jamais du jour entier : une entrée mal formée ne doit pas
  * effacer les vingt qui l'entourent.
  */
+import { lireDurees } from "./durees";
+import type { Durees } from "./durees";
+
 /**
  * Fuseau de référence de TOUTE la prise de rendez-vous.
  *
@@ -57,9 +60,6 @@ export interface JourDeCreneaux {
   readonly libelleCourt: string;
   readonly creneaux: readonly Creneau[];
 }
-
-/** Largeur de la fenêtre interrogée, en jours. Une semaine, bornes comprises. */
-export const JOURS_PAR_FENETRE = 7;
 
 /**
  * Horizon maximal de réservation, en jours.
@@ -125,31 +125,90 @@ export interface Fenetre {
   readonly fin: string;
 }
 
+/** Mois civil, `AAAA-MM`. */
+const MOTIF_MOIS = /^\d{4}-(0[1-9]|1[0-2])$/;
+
+/** Mois civil d'un jour `AAAA-MM-JJ`. */
+export function moisDe(jour: string): string {
+  return jour.slice(0, 7);
+}
+
+/** Vrai si la chaîne est un mois civil bien formé (`2026-10`). */
+export function estMoisValide(valeur: unknown): valeur is string {
+  return typeof valeur === "string" && MOTIF_MOIS.test(valeur);
+}
+
+/** Décale un mois civil de `n` mois. */
+export function ajouterMois(mois: string, n: number): string {
+  const annee = Number(mois.slice(0, 4));
+  const index = Number(mois.slice(5, 7)) - 1 + n;
+  const date = new Date(Date.UTC(annee, index, 1));
+  return date.toISOString().slice(0, 7);
+}
+
+/** Dernier jour d'un mois civil, `AAAA-MM-JJ`. */
+export function dernierJourDuMois(mois: string): string {
+  return ajouterJours(`${ajouterMois(mois, 1)}-01`, -1);
+}
+
 /**
- * Fenêtre d'une semaine, BORNÉE des deux côtés.
+ * Fenêtre d'un mois civil, BORNÉE des deux côtés.
  *
- * Le jour demandé vient du client : il est donc traité comme une suggestion.
- * Antérieur à aujourd'hui, il est ramené à aujourd'hui ; au-delà de l'horizon,
- * il y est ramené aussi. Rien ne remonte tel quel jusqu'à l'API de Cal.com.
+ * UN MOIS ET NON PLUS UNE SEMAINE depuis le 2026-10-01 : le calendrier montre
+ * un mois entier, et un jour sans créneau doit s'y lire grisé plutôt
+ * qu'absent. Une seule requête par mois suffit à le peindre.
+ *
+ * Le mois demandé vient du client : il est donc traité comme une suggestion.
+ * Antérieur au mois courant, il y est ramené ; au-delà de l'horizon, il est
+ * ramené au mois de l'horizon. Les deux bords sont ensuite coupés à
+ * aujourd'hui et à l'horizon : rien ne remonte tel quel jusqu'à Cal.com.
  */
-export function fenetreSemaine(jourDemande: string, maintenant: Date): Fenetre {
+export function fenetreMois(
+  moisDemande: string,
+  maintenant: Date,
+): Fenetre & { readonly mois: string } {
   const aujourdHui = jourParis(maintenant);
   const dernier = ajouterJours(aujourdHui, HORIZON_JOURS);
-  let debut = estJourValide(jourDemande) ? jourDemande : aujourdHui;
-  if (ecartEnJours(aujourdHui, debut) < 0) debut = aujourdHui;
-  if (ecartEnJours(debut, dernier) < 0) debut = dernier;
-  return { debut, fin: ajouterJours(debut, JOURS_PAR_FENETRE - 1) };
+  let mois = estMoisValide(moisDemande) ? moisDemande : moisDe(aujourdHui);
+  if (mois < moisDe(aujourdHui)) mois = moisDe(aujourdHui);
+  if (mois > moisDe(dernier)) mois = moisDe(dernier);
+  const premier = `${mois}-01`;
+  const fin = dernierJourDuMois(mois);
+  return {
+    mois,
+    debut: premier < aujourdHui ? aujourdHui : premier,
+    fin: fin > dernier ? dernier : fin,
+  };
 }
 
-/** Vrai quand la semaine affichée est la première : pas de « précédente ». */
-export function estPremiereSemaine(debut: string, maintenant: Date): boolean {
-  return ecartEnJours(jourParis(maintenant), debut) <= 0;
+/** Vrai quand le mois affiché est le mois courant : pas de « précédent ». */
+export function estPremierMois(mois: string, maintenant: Date): boolean {
+  return mois <= moisDe(jourParis(maintenant));
 }
 
-/** Vrai quand reculer d'une semaine sortirait de l'horizon autorisé. */
-export function estDerniereSemaine(debut: string, maintenant: Date): boolean {
-  const suivante = ajouterJours(debut, JOURS_PAR_FENETRE);
-  return ecartEnJours(jourParis(maintenant), suivante) > HORIZON_JOURS;
+/** Vrai quand le mois suivant sortirait de l'horizon autorisé. */
+export function estDernierMois(mois: string, maintenant: Date): boolean {
+  const dernier = ajouterJours(jourParis(maintenant), HORIZON_JOURS);
+  return ajouterMois(mois, 1) > moisDe(dernier);
+}
+
+/**
+ * Cases du calendrier d'un mois, semaine commençant le LUNDI.
+ *
+ * `null` pour les cases vides avant le premier du mois : la grille garde ses
+ * sept colonnes alignées sur les jours de la semaine. Pas de cases de fin, la
+ * dernière rangée s'arrête simplement au dernier jour.
+ */
+export function grilleMois(mois: string): readonly (string | null)[] {
+  const premier = `${mois}-01`;
+  // `getUTCDay` : 0 = dimanche. Décalé pour que lundi vaille 0.
+  const decalage = (new Date(`${premier}T12:00:00Z`).getUTCDay() + 6) % 7;
+  const cases: (string | null)[] = Array.from({ length: decalage }, () => null);
+  const dernier = dernierJourDuMois(mois);
+  for (let jour = premier; jour <= dernier; jour = ajouterJours(jour, 1)) {
+    cases.push(jour);
+  }
+  return cases;
 }
 
 const FORMAT_HEURE = new Intl.DateTimeFormat("fr-FR", {
@@ -171,11 +230,6 @@ const FORMAT_SEMAINE_COURT = new Intl.DateTimeFormat("fr-FR", {
 const FORMAT_MOIS = new Intl.DateTimeFormat("fr-FR", {
   timeZone: FUSEAU,
   month: "long",
-});
-
-const FORMAT_MOIS_COURT = new Intl.DateTimeFormat("fr-FR", {
-  timeZone: FUSEAU,
-  month: "short",
 });
 
 /**
@@ -218,11 +272,31 @@ export function formaterJourCourt(jour: string): string {
   return `${FORMAT_SEMAINE_COURT.format(instantDeJour(jour))} ${quantieme(jour)}`;
 }
 
-/** Libellé d'une fenêtre (« 31 août au 6 sept. »), pour l'en-tête de semaine. */
-export function formaterFenetre(fenetre: Fenetre): string {
-  const mois = (jour: string): string =>
-    FORMAT_MOIS_COURT.format(instantDeJour(jour));
-  return `${quantieme(fenetre.debut)} ${mois(fenetre.debut)} au ${quantieme(fenetre.fin)} ${mois(fenetre.fin)}`;
+const FORMAT_MOIS_ANNEE = new Intl.DateTimeFormat("fr-FR", {
+  timeZone: FUSEAU,
+  month: "long",
+  year: "numeric",
+});
+
+/** Libellé d'un mois (« octobre 2026 »), pour l'en-tête du calendrier. */
+export function formaterMois(mois: string): string {
+  return FORMAT_MOIS_ANNEE.format(instantDeJour(`${mois}-01`));
+}
+
+/**
+ * En-têtes de colonnes du calendrier, du lundi au dimanche (« lun. »…).
+ *
+ * Calculés par `Intl` sur une semaine connue (lundi 5 janvier 2026) plutôt
+ * qu'écrits à la main : `audit:textes` refuse tout libellé écrit dans un
+ * composant, et ces sept mots n'ont rien à faire dans le contenu éditorial.
+ */
+export const JOURS_SEMAINE: readonly string[] = Array.from({ length: 7 }, (_, i) =>
+  FORMAT_SEMAINE_COURT.format(instantDeJour(ajouterJours("2026-01-05", i))),
+);
+
+/** Quantième seul (« 1 », « 24 »), pour une case de calendrier. */
+export function numeroDuJour(jour: string): string {
+  return String(Number(jour.slice(8, 10)));
 }
 
 /** Extrait l'instant de début d'une entrée de créneau, sous ses deux formes. */
@@ -279,15 +353,21 @@ export function lireCreneaux(
 
 /** Fenêtre telle que la route la renvoie, avec ses libellés déjà calculés. */
 export interface FenetreAffichee extends Fenetre {
+  /** Mois civil affiché, `AAAA-MM`. */
+  readonly mois: string;
   readonly libelle: string;
-  /** Vrai quand il n'y a pas de semaine antérieure atteignable. */
+  /** Vrai quand il n'y a pas de mois antérieur atteignable. */
   readonly premiere: boolean;
-  /** Vrai quand il n'y a pas de semaine ultérieure atteignable. */
+  /** Vrai quand il n'y a pas de mois ultérieur atteignable. */
   readonly derniere: boolean;
 }
 
 export interface ReponseCreneaux {
   readonly fenetre: FenetreAffichee;
+  /** Durées proposées par Cal.com ; `null` quand elles n'ont pas pu être lues. */
+  readonly durees: Durees | null;
+  /** Durée des créneaux renvoyés ; `null` = durée par défaut de Cal.com. */
+  readonly duree: number | null;
   readonly jours: readonly JourDeCreneaux[];
 }
 
@@ -346,6 +426,7 @@ export function lireReponseCreneaux(charge: unknown): ReponseCreneaux | undefine
   if (
     typeof f.debut !== "string" ||
     typeof f.fin !== "string" ||
+    typeof f.mois !== "string" ||
     typeof f.libelle !== "string" ||
     typeof f.premiere !== "boolean" ||
     typeof f.derniere !== "boolean"
@@ -364,10 +445,13 @@ export function lireReponseCreneaux(charge: unknown): ReponseCreneaux | undefine
     fenetre: {
       debut: f.debut,
       fin: f.fin,
+      mois: f.mois,
       libelle: f.libelle,
       premiere: f.premiere,
       derniere: f.derniere,
     },
+    durees: lireDurees(objet.durees) ?? null,
+    duree: typeof objet.duree === "number" ? objet.duree : null,
     jours,
   };
 }

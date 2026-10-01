@@ -82,6 +82,32 @@ Tu aurais un taux de réservation plus haut et des rendez-vous où tu passerais
 les cinq dernières minutes à dire « il faudrait qu'on se reparle ». C'est un
 rendez-vous de plus à caler, pas un de gagné.
 
+### Plusieurs durées par type (depuis le 2026-10-01)
+
+Chaque type d'événement peut proposer plusieurs durées (`Setup > Duration >
+Allow booker to select duration`) et en désigner une par défaut. Le site les lit
+chez Cal.com à chaque affichage du calendrier (cache de cinq minutes,
+`obtenirDurees` dans `src/lib/rendez-vous/cal-com.ts`) : la durée par défaut est
+présélectionnée, le visiteur peut en choisir une autre, et la réservation part
+avec `lengthInMinutes`. Rien à déployer quand une durée change chez Cal.com.
+
+**Condition : la variable doit porter un SLUG.** `GET /v2/event-types/{id}`
+exige une clef d'API ; seule la recherche par `username` + `eventSlug` répond
+sans. Une variable en identifiant numérique fonctionne toujours, mais sans
+sélecteur de durée : Cal.com applique alors sa durée par défaut.
+
+Correspondance en place au 2026-10-01 :
+
+| Variable | Slug | Durées |
+| -------- | ---- | ------ |
+| `CAL_COM_EVENT_SITE` | `parle-moi-de-ton-projet-de-site` | 15, **30**, 45 |
+| `CAL_COM_EVENT_LOGICIEL` | `explique-moi-ton-projet-de-logiciel` | 30, **45**, 60 |
+| `CAL_COM_EVENT_DECOUVERTE` | `30min` | 15, **30**, 45 |
+
+La fourchette affichée sur chaque carte de sujet (`duree` dans
+`src/content/rendez-vous.ts`) reste un texte : la mettre à jour si les options
+changent chez Cal.com.
+
 ---
 
 ## 3. Créer les trois types d'événements, étape par étape
@@ -318,8 +344,10 @@ Dans l'ordre, et sans créer une seule vraie réservation avant le point 5 :
    pas lue (serveur non redémarré, la plupart du temps).
 3. Cliquer une entrée, vérifier que les créneaux affichés correspondent à ta
    disponibilité **en heure de Paris**, et que la semaine suivante fonctionne.
-4. Vérifier les bornes : le bouton « semaine précédente » est désactivé sur la
-   semaine en cours, « semaine suivante » l'est au bout de la fenêtre autorisée.
+4. Vérifier les bornes : le bouton « mois précédent » est désactivé sur le
+   mois en cours, « mois suivant » l'est au bout de la fenêtre autorisée.
+   Changer de durée doit recharger les heures (moins de créneaux en fin de
+   journée sur une durée longue).
 5. **Réserver un créneau toi-même, une fois.** Vérifier l'e-mail de
    confirmation, la présence du lien de visioconférence, la reprise du message
    libre dans la note, et l'apparition dans ton agenda. **Puis annuler.**
@@ -335,11 +363,12 @@ Dans l'ordre, et sans créer une seule vraie réservation avant le point 5 :
 | ------- | ---- |
 | `src/content/rendez-vous.ts` | Les quatre entrées et tout le texte affiché. Seul endroit à toucher pour changer un libellé ou une durée affichée. |
 | `src/lib/rendez-vous/config.ts` | Lecture de l'environnement, résolution slug/identifiant. |
-| `src/lib/rendez-vous/creneaux.ts` | Dates, fuseau, bornes de fenêtre, lecture des créneaux. Module pur. |
+| `src/lib/rendez-vous/creneaux.ts` | Dates, fuseau, fenêtre d'un mois, grille du calendrier, lecture des créneaux. Module pur. |
+| `src/lib/rendez-vous/durees.ts` | Lecture et choix des durées proposées par Cal.com. Module pur. |
 | `src/lib/rendez-vous/validation.ts` | Validation serveur d'une réservation. Module pur. |
 | `src/lib/rendez-vous/cal-com.ts` | Le client HTTP, et les deux versions d'en-tête. |
 | `src/lib/rendez-vous/limites.ts` | Débits autorisés par adresse. |
 | `src/app/api/rendez-vous/creneaux/route.ts` | `GET` — créneaux d'une semaine. |
 | `src/app/api/rendez-vous/route.ts` | `POST` — création de la réservation. |
 | `src/components/rendez-vous/SectionRendezVous.tsx` | Composant serveur : décide si la section existe. |
-| `src/components/rendez-vous/ReservationRendezVous.tsx` | Composant client : les trois étapes. |
+| `src/components/rendez-vous/ReservationRendezVous.tsx` | Composant client : le stepper en quatre étapes (sujet, créneau, projet, coordonnées). |

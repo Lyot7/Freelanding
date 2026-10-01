@@ -61,19 +61,26 @@ export interface ContenuRendezVous {
     readonly coordonnees: string;
   };
   readonly actions: {
-    readonly changer: string;
     readonly reessayer: string;
-    readonly semainePrecedente: string;
-    readonly semaineSuivante: string;
+    readonly moisPrecedent: string;
+    readonly moisSuivant: string;
+    readonly continuer: string;
+    readonly retour: string;
   };
   readonly creneaux: {
     readonly chargement: string;
     readonly erreur: string;
     readonly vide: string;
     readonly indisponible: string;
+    /** Titre de la colonne des heures, suivi du jour choisi. */
     readonly libelleGrille: string;
-    readonly libelleJours: string;
+    readonly libelleCalendrier: string;
+    readonly libelleDuree: string;
+    /** Une durée Cal.com, en minutes, telle qu'affichée sur sa pastille. */
+    readonly duree: (minutes: number) => string;
   };
+  /** Titre du récapitulatif affiché au-dessus de chaque étape franchie. */
+  readonly recapitulatif: string;
   readonly formulaire: {
     readonly nomLabel: string;
     readonly nomPlaceholder: string;
@@ -142,7 +149,7 @@ export const rendezVousContent: ContenuRendezVous = {
   eyebrow: "Prendre rendez-vous",
   titre: "Réserver un créneau",
   chapeau:
-    "Choisis un sujet et une heure, puis réponds à trois questions sur ton projet : tu sais avant l’appel ce que ton budget permet. Le lien de visioconférence part par e-mail dans la foulée.",
+    "Choisis un sujet, une durée et une heure, puis réponds à trois questions sur ton projet : tu sais avant l’appel ce que ton budget permet. Le lien de visioconférence part par e-mail dans la foulée.",
   noteFuseau: "Heures affichées à l’heure de Paris.",
 
   /*
@@ -178,6 +185,11 @@ export const rendezVousContent: ContenuRendezVous = {
    * les quatre, ce qui évite au visiteur de croire que son sujet vaut moins de
    * temps que celui d'à côté.
    *
+   * LE VISITEUR CHOISIT SA DURÉE depuis le 2026-10-01. Chaque type d'événement
+   * Cal.com propose plusieurs durées et en désigne une par défaut, présélectionnée
+   * sur le site. Le sélecteur les lit chez Cal.com (`src/lib/rendez-vous/durees.ts`) ;
+   * le champ `duree` ci-dessous ne fait qu'annoncer la fourchette sur la carte.
+   *
    * CETTE DURÉE EST UN AFFICHAGE. L'autorité reste le type d'événement Cal.com :
    * si les deux divergent, c'est Cal.com qui fait foi et le site qui ment.
    */
@@ -185,21 +197,21 @@ export const rendezVousContent: ContenuRendezVous = {
     {
       id: "site",
       nom: "Parle-moi de ton projet de site",
-      duree: "30 minutes",
+      duree: "15, 30 ou 45 minutes",
       description:
         "On regarde ce que tu as aujourd’hui, ce que tu veux que le site rapporte, et à quoi ressemblerait la bonne version. Tu repars avec un ordre de grandeur de budget et de délai, et on cale la suite.",
     },
     {
       id: "logiciel",
       nom: "Explique-moi ce qui coince dans ton métier",
-      duree: "30 minutes",
+      duree: "30, 45 ou 60 minutes",
       description:
         "Une tâche que tu refais à la main, un tableur qui déborde, des outils qui ne se parlent pas, ou un logiciel entier à construire. On regarde où passe le temps et ce qui existe déjà. Tu repars avec un ordre de grandeur et une prochaine étape.",
     },
     {
       id: "decouverte",
       nom: "Décris-moi ton projet",
-      duree: "30 minutes",
+      duree: "15, 30 ou 45 minutes",
       description:
         "Tu vois le problème, pas encore la solution. On en parle sans que tu aies à choisir une case avant. Si ce n’est pas pour moi, je te le dis pendant l’appel, ça t’évite de perdre du temps.",
     },
@@ -213,22 +225,27 @@ export const rendezVousContent: ContenuRendezVous = {
   },
 
   actions: {
-    changer: "Changer",
     reessayer: "Réessayer",
-    semainePrecedente: "Semaine précédente",
-    semaineSuivante: "Semaine suivante",
+    moisPrecedent: "Mois précédent",
+    moisSuivant: "Mois suivant",
+    continuer: "Continuer",
+    retour: "Retour",
   },
 
   creneaux: {
     chargement: "Recherche des créneaux libres…",
     erreur:
-      "Les créneaux n’ont pas pu être chargés. Réessaie, ou écris-moi par le formulaire ci-dessus.",
-    vide: "Aucun créneau libre sur cette semaine. Essaie la suivante.",
+      "Les créneaux n’ont pas pu être chargés. Réessaie, ou écris-moi par le formulaire de contact.",
+    vide: "Aucun créneau libre ce mois-ci. Essaie le suivant.",
     indisponible:
-      "La prise de rendez-vous en ligne est momentanément indisponible. Le formulaire ci-dessus reste le chemin le plus direct.",
-    libelleGrille: "Créneaux disponibles",
-    libelleJours: "Jour du rendez-vous",
+      "La prise de rendez-vous en ligne est momentanément indisponible. Le formulaire de contact reste le chemin le plus direct.",
+    libelleGrille: "Heures libres",
+    libelleCalendrier: "Jour du rendez-vous",
+    libelleDuree: "Durée de l’appel",
+    duree: (minutes) => `${minutes} min`,
   },
+
+  recapitulatif: "Ton rendez-vous",
 
   formulaire: {
     nomLabel: "Ton nom",
