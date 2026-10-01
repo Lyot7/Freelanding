@@ -91,18 +91,19 @@ chez Cal.com à chaque affichage du calendrier (cache de cinq minutes,
 présélectionnée, le visiteur peut en choisir une autre, et la réservation part
 avec `lengthInMinutes`. Rien à déployer quand une durée change chez Cal.com.
 
-**Condition : la variable doit porter un SLUG.** `GET /v2/event-types/{id}`
-exige une clef d'API ; seule la recherche par `username` + `eventSlug` répond
-sans. Une variable en identifiant numérique fonctionne toujours, mais sans
-sélecteur de durée : Cal.com applique alors sa durée par défaut.
+**Condition : `CAL_COM_USERNAME` doit être posé**, même avec des identifiants
+numériques. `GET /v2/event-types/{id}` exige une clef d'API ; la liste des types
+d'un utilisateur (`GET /v2/event-types?username=…`) répond sans, et le site y
+retrouve chaque type par son slug ou son identifiant. Sans nom d'utilisateur, la
+réservation fonctionne toujours, sans sélecteur de durée.
 
-Correspondance en place au 2026-10-01 :
+Correspondance en production au 2026-10-01 :
 
-| Variable | Slug | Durées |
-| -------- | ---- | ------ |
-| `CAL_COM_EVENT_SITE` | `parle-moi-de-ton-projet-de-site` | 15, **30**, 45 |
-| `CAL_COM_EVENT_LOGICIEL` | `explique-moi-ton-projet-de-logiciel` | 30, **45**, 60 |
-| `CAL_COM_EVENT_DECOUVERTE` | `30min` | 15, **30**, 45 |
+| Variable | Type Cal.com | Durées (défaut en gras) |
+| -------- | ------------ | ----------------------- |
+| `CAL_COM_EVENT_SITE` | `6913210`, « Parle-moi de ton projet de site » | 15, **30**, 45 |
+| `CAL_COM_EVENT_LOGICIEL` | `6913033`, « Explique-moi ton projet de logiciel » | 30, **45**, 60 |
+| `CAL_COM_EVENT_DECOUVERTE` | `4271696`, slug `30min` | 15, **30**, 45 |
 
 La fourchette affichée sur chaque carte de sujet (`duree` dans
 `src/content/rendez-vous.ts`) reste un texte : la mettre à jour si les options

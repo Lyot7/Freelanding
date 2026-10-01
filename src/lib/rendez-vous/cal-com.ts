@@ -163,10 +163,12 @@ const cacheDurees = new Map<string, { readonly expire: number; readonly durees: 
 /**
  * Durées proposées par un type d'événement, `undefined` quand on ne les a pas.
  *
- * SEULE LA FORME SLUG LES DONNE SANS CLEF. `GET /v2/event-types?username=…
- * &eventSlug=…` répond sans autorisation ; `GET /v2/event-types/{id}` exige
- * une clef (403, vérifié le 2026-10-01). Une cible par identifiant n'a donc
- * pas de sélecteur de durée : Cal.com applique sa durée par défaut.
+ * LA LISTE PAR UTILISATEUR, JAMAIS LE TYPE PAR IDENTIFIANT.
+ * `GET /v2/event-types?username=…` répond sans autorisation ;
+ * `GET /v2/event-types/{id}` exige une clef (403, vérifié le 2026-10-01). Une
+ * cible par identifiant est donc retrouvée dans la liste de son utilisateur ;
+ * sans `CAL_COM_USERNAME`, elle n'a pas de sélecteur de durée et Cal.com
+ * applique sa durée par défaut.
  *
  * UN ÉCHEC N'EST PAS UNE PANNE : il fait disparaître le sélecteur, et le
  * rendez-vous reste réservable à la durée par défaut. Il n'est pas mis en
@@ -176,15 +178,14 @@ export async function obtenirDurees(
   cible: CibleEvenement,
   maintenantMs: number = Date.now(),
 ): Promise<Durees | undefined> {
-  if (cible.par !== "slug") return undefined;
-  const clef = `${cible.username}/${cible.eventTypeSlug}`;
+  if (!cible.username) return undefined;
+  const designation = cible.par === "slug" ? cible.eventTypeSlug : String(cible.eventTypeId);
+  const clef = `${cible.username}/${designation}`;
   const enCache = cacheDurees.get(clef);
   if (enCache && enCache.expire > maintenantMs) return enCache.durees;
 
-  const parametres = new URLSearchParams({
-    username: cible.username,
-    eventSlug: cible.eventTypeSlug,
-  });
+  const parametres = new URLSearchParams({ username: cible.username });
+  if (cible.par === "slug") parametres.set("eventSlug", cible.eventTypeSlug);
   try {
     const reponse = await fetch(`${BASE}/event-types?${parametres.toString()}`, {
       headers: { "cal-api-version": VERSION_TYPES },
@@ -192,12 +193,28 @@ export async function obtenirDurees(
       signal: AbortSignal.timeout(DELAI_LECTURE_MS),
     });
     if (!reponse.ok) return undefined;
-    const durees = lireDurees(await lireJson(reponse));
+    const charge = await lireJson(reponse);
+    const durees = lireDurees(
+      cible.par === "slug" ? charge : { data: [typeParIdentifiant(charge, cible.eventTypeId)] },
+    );
     if (durees) cacheDurees.set(clef, { expire: maintenantMs + CACHE_DUREES_MS, durees });
     return durees;
   } catch {
     return undefined;
   }
+}
+
+/** Le type d'événement d'identifiant donné dans une liste `GET /v2/event-types`. */
+function typeParIdentifiant(charge: unknown, eventTypeId: number): unknown {
+  if (typeof charge !== "object" || charge === null) return undefined;
+  const data = (charge as Record<string, unknown>).data;
+  if (!Array.isArray(data)) return undefined;
+  return data.find(
+    (entree: unknown) =>
+      typeof entree === "object" &&
+      entree !== null &&
+      (entree as Record<string, unknown>).id === eventTypeId,
+  );
 }
 
 export interface DemandeReservation {

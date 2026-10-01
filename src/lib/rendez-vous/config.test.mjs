@@ -22,6 +22,12 @@ describe("resoudreCible", () => {
     });
   });
 
+  it("garde le nom d’utilisateur à côté d’un identifiant, pour lire les durées", () => {
+    expect(
+      resoudreCible("site", { CAL_COM_EVENT_SITE: "1234567", CAL_COM_USERNAME: "eliott" }),
+    ).toEqual({ par: "id", eventTypeId: 1234567, username: "eliott" });
+  });
+
   it("lit un slug, mais seulement accompagné du nom d’utilisateur", () => {
     const env = { CAL_COM_EVENT_SITE: "site-20min" };
     expect(resoudreCible("site", env)).toBeUndefined();
@@ -73,7 +79,11 @@ describe("resoudreConfiguration", () => {
     });
     expect(config.typesDisponibles).toEqual(["site", "decouverte"]);
     expect(config.cibles.logiciel).toBeUndefined();
-    expect(config.cibles.decouverte).toEqual({ par: "id", eventTypeId: 9876543 });
+    expect(config.cibles.decouverte).toEqual({
+      par: "id",
+      eventTypeId: 9876543,
+      username: "eliott",
+    });
   });
 
   it("garde l’ordre du contenu, pas celui des variables", () => {

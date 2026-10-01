@@ -26,7 +26,16 @@ import type { IdRendezVous } from "@/content/rendez-vous";
 
 /** Désignation d'un type d'événement Cal.com, sous l'une de ses deux formes. */
 export type CibleEvenement =
-  | { readonly par: "id"; readonly eventTypeId: number }
+  | {
+      readonly par: "id";
+      readonly eventTypeId: number;
+      /**
+       * Facultatif ici, mais c'est lui qui donne accès aux durées : Cal.com
+       * ne sert un type par identifiant qu'avec une clef d'API, alors que la
+       * liste des types d'un utilisateur se lit sans (`obtenirDurees`).
+       */
+      readonly username?: string;
+    }
   | {
       readonly par: "slug";
       readonly eventTypeSlug: string;
@@ -71,13 +80,15 @@ export function resoudreCible(
   // Un identifiant Cal.com est un entier positif. `Number("12abc")` vaut NaN,
   // mais `Number(" 12 ")` vaut 12 : la valeur est déjà rognée plus haut, et le
   // motif ci-dessous refuse tout ce qui n'est pas une suite de chiffres.
+  const username = lire(env, "CAL_COM_USERNAME");
   if (/^\d+$/.test(valeur)) {
     const eventTypeId = Number(valeur);
     if (!Number.isSafeInteger(eventTypeId) || eventTypeId <= 0) return undefined;
-    return { par: "id", eventTypeId };
+    return username.length > 0
+      ? { par: "id", eventTypeId, username }
+      : { par: "id", eventTypeId };
   }
 
-  const username = lire(env, "CAL_COM_USERNAME");
   if (username.length === 0) return undefined;
   return { par: "slug", eventTypeSlug: valeur, username };
 }
