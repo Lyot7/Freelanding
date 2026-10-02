@@ -42,6 +42,15 @@ export const CHEMIN_PAGE_CAEN = "/creation-site-internet-caen";
  * fichier ne dépend pas de l'autre, l'autre dépend de lui.
  */
 export const CHEMIN_PAGE_LOGICIEL_CAEN = "/logiciel-sur-mesure-caen";
+/*
+ * LIENS VERS LA PAGE DE PRIX ET LES ARTICLES. Le chemin du prix se compose ici
+ * au lieu d'être importé de `page-prix-site.ts`, qui importe déjà ce fichier :
+ * l'import croisé figerait l'un des deux modules avant son initialisation. Le
+ * test vérifie que les deux chemins sont identiques.
+ */
+const CHEMIN_PRIX_SITE = `/services/${VITRINE.slug}/prix`;
+const CHEMIN_ARTICLE_REFONTE = "/blog/refonte-site-internet-pme";
+const CHEMIN_ARTICLE_WORDPRESS = "/blog/site-sur-mesure-ou-wordpress";
 
 /** Un lien interne de la page, avec la phrase qui dit où il mène. */
 export interface LienLocal {
@@ -88,8 +97,8 @@ export interface PageLocale {
   };
   /**
    * Sections supplémentaires, après le contexte et avant les forfaits, dans
-   * le gabarit des pages secteur. La page de Caen n'en a pas ; celle de la
-   * solution métier à Caen, qui se vend sur un texte plus long, en porte.
+   * le gabarit des pages secteur : sur la page de Caen, la refonte, les sites
+   * d'artisans et de commerces, le référencement local.
    */
   readonly sections?: readonly SectionSecteur[];
   /** Titre de la section des forfaits, à la place du titre générique. */
@@ -167,6 +176,12 @@ export const pageCaen: PageLocale = {
         description: "Les 3 forfaits, ce que chacun contient et son prix.",
       },
       {
+        libelle: "Prix d’un site internet sur mesure",
+        href: CHEMIN_PRIX_SITE,
+        description:
+          "Ce qui fait varier le devis et ce qui se paie après la mise en ligne.",
+      },
+      {
         libelle: "Une solution métier sur mesure",
         href: "/services/logiciel-metier",
         description:
@@ -213,6 +228,115 @@ export const pageCaen: PageLocale = {
       },
     ],
   },
+  sections: [
+    {
+      id: "refonte",
+      titre: "Refonte de site internet à Caen : que devient ton référencement ?",
+      paragraphes: [
+        `Ton site actuel a peut-être 10 ans, un thème qui s’affiche mal sur téléphone, ou un prestataire qui ne répond plus. Le refaire coûte le prix d’un site neuf, ${fourchette("vitrine")} HT. Le vrai risque est de perdre les pages que Google montre déjà quand on cherche ton métier dans le Calvados.`,
+        "Avant d’écrire une ligne, je relève les adresses de ton site actuel et celles qui reçoivent des visites. Chaque ancienne adresse pointe ensuite vers la nouvelle page qui traite le même sujet, et les textes qui se classent bien sont repris puis complétés.",
+      ],
+      liens: {
+        titre: "Pour aller plus loin",
+        items: [
+          {
+            libelle: "Refonte de site internet : prix et méthode",
+            href: CHEMIN_ARTICLE_REFONTE,
+            description:
+              "Quand refaire son site, et comment garder les visites acquises.",
+          },
+        ],
+      },
+      points: [
+        {
+          titre: "L’inventaire des adresses",
+          corps:
+            "Chaque page de l’ancien site, ses visites et les recherches qui y mènent, relevées avant le premier coup de crayon.",
+        },
+        {
+          titre: "Les redirections 301",
+          corps:
+            "Une ancienne adresse renvoie vers la page qui la remplace, sujet pour sujet. L’accueil ne sert jamais de destination par défaut.",
+        },
+        {
+          titre: "Le contenu qui se classe",
+          corps:
+            "Une page qui sort déjà sur « menuisier Caen » garde son sujet et ses mots. Elle gagne en clarté, en photos et en preuves.",
+        },
+        {
+          titre: "Le contrôle après la bascule",
+          corps:
+            "La Search Console montre si Google explore les nouvelles adresses et si les anciennes redirigent sans erreur. Une baisse de quelques semaines est normale ; une chute qui dure se corrige.",
+        },
+      ],
+    },
+    {
+      id: "artisans-commerces",
+      titre: "Quel site pour un artisan ou un commerce du Calvados ?",
+      paragraphes: [
+        "Un artisan est appelé depuis un téléphone, souvent par quelqu’un qui a un problème à régler dans la semaine. Son site doit répondre en 1 écran : ce que tu fais, où tu interviens, comment te joindre. Un commerce doit donner ses horaires, son adresse et l’envie de passer la porte.",
+        `Pour ces métiers, ${LANDING.nom} suffit souvent au départ. ${SITE.nom} devient utile quand tu proposes plusieurs prestations ou que tu interviens dans plusieurs villes : chaque recherche trouve alors la page qui lui répond.`,
+      ],
+      liens: {
+        titre: "Pour comparer",
+        items: [
+          {
+            libelle: "Site sur mesure ou WordPress",
+            href: CHEMIN_ARTICLE_WORDPRESS,
+            description:
+              "Maintenance, vitesse, coût sur 3 ans, et les cas où WordPress suffit.",
+          },
+        ],
+      },
+      points: [
+        {
+          titre: "Ton numéro à portée de pouce",
+          corps:
+            "Sur téléphone, le numéro se touche pour appeler, en haut de chaque page. Ton client n’a rien à recopier.",
+        },
+        {
+          titre: "Ta zone écrite en clair",
+          corps:
+            "Les communes où tu interviens figurent sur le site. Le client sait tout de suite si tu couvres son secteur.",
+        },
+        {
+          titre: "Ton travail en images",
+          corps:
+            "Un chantier avant et après, une vitrine refaite, l’assiette du jour : tes photos montrent ce qu’une description ne dit pas.",
+        },
+        {
+          titre: "Une demande qui arrive complète",
+          corps:
+            "Un formulaire court demande la commune et la nature du besoin, puis arrive dans ta boîte mail. Tu rappelles avec une réponse.",
+        },
+      ],
+    },
+    {
+      id: "referencement-local",
+      titre: "Référencement local : que faire en plus du site ?",
+      paragraphes: [
+        "Quand quelqu’un cherche « électricien Caen », Google affiche souvent, au-dessus des sites, une carte avec quelques établissements. Cette carte vient des fiches d’établissement Google, appelées Google Business Profile. Ta fiche et ton site travaillent ensemble : la fiche renvoie vers le site, et le site confirme ce que dit la fiche.",
+        "La fiche se crée gratuitement et reste à ton nom. Sa remise d’aplomb ne fait partie d’aucun forfait : je la reprends en plus, sur devis. Tu peux aussi t’en charger toi-même, à partir des 3 points ci-contre.",
+      ],
+      points: [
+        {
+          titre: "Une fiche complète",
+          corps:
+            "La bonne catégorie principale, ta zone d’intervention, tes horaires, des photos récentes et le lien vers ton site.",
+        },
+        {
+          titre: "Les annuaires de ton métier",
+          corps:
+            "Pages Jaunes et les annuaires de ta profession reprennent tes coordonnées. Un numéro faux, recopié d’annuaire en annuaire, brouille le signal que Google recoupe.",
+        },
+        {
+          titre: "Des avis, et tes réponses",
+          corps:
+            "Demande un avis à la fin d’un travail réussi, avec le lien direct vers ta fiche. Réponds aux avis, critiques comprises : les prochains clients lisent tes réponses.",
+        },
+      ],
+    },
+  ],
   titrePacks: "Prix d’un site internet à Caen, en 3 forfaits",
   faq: {
     eyebrow: "FAQ",
@@ -223,6 +347,15 @@ export const pageCaen: PageLocale = {
         answer: `Le site coûte ${fourchette("vitrine")} HT, en 3 forfaits à prix ferme : ${prixPack(LANDING)} pour ${LANDING.nom}, ${prixPack(SITE)} pour ${SITE.nom}, ${prixPack(SIGNATURE)} pour ${SIGNATURE.nom}. Ce qui change de l’un à l’autre : le nombre de pages, le travail sur les textes et la mesure de ce que le site rapporte. Le prix du forfait choisi ne bouge plus.`,
       },
       {
+        question: "Combien coûte la refonte d’un site à Caen ?",
+        answer: `Une refonte entre dans l’un des 3 forfaits, de ${prixPack(LANDING)} à ${prixPack(SIGNATURE)} HT, comme un site neuf. Le relevé des anciennes adresses et leurs redirections font partie du travail : ton référencement acquis suit le nouveau site.`,
+      },
+      {
+        question: "Mon site est sur Wix ou WordPress : peut-on le refaire ?",
+        answer:
+          "Oui. Je reconstruis le site sur mesure, je reprends tes textes et tes photos, et les anciennes adresses redirigent vers les nouvelles. Ton nom de domaine reste le tien : seul l’endroit où il pointe change.",
+      },
+      {
         question: "Faut-il se rencontrer pour lancer le projet ?",
         answer:
           "Non. Le premier échange se fait en visio, comme la suite : tu réserves un créneau sur cette page et le lien part par e-mail. Pendant le développement, tu suis ton site sur une adresse en ligne, depuis ton bureau ou ton téléphone.",
@@ -230,6 +363,16 @@ export const pageCaen: PageLocale = {
       {
         question: "Mon site sortira-t-il dans les recherches à Caen ?",
         answer: `Chaque site part avec les bases du référencement posées et son indexation vérifiée. À partir de ${SITE.nom}, il vise les mots que tapent tes clients et déclare ta zone d’intervention à Google. Personne ne peut te garantir une position : le référencement local prend plusieurs mois, et ta fiche d’établissement Google pèse lourd dans les résultats.`,
+      },
+      {
+        question: "Une fiche Google suffit-elle, sans site internet ?",
+        answer:
+          "Elle te rend visible sur la carte, avec ton numéro et tes horaires. Le client qui hésite entre 2 artisans clique ensuite vers leur site pour voir leurs réalisations et leurs prestations. Sans site, il ne trouve que la fiche pour te juger.",
+      },
+      {
+        question: "Comment obtenir des avis Google pour mon entreprise ?",
+        answer:
+          "Demande-les au moment où le travail est fini et le client satisfait, avec le lien court que Google fournit dans ta fiche. Envoyé par SMS ou glissé dans la facture, il évite à ton client de chercher ta fiche.",
       },
       {
         question: "Tu travailles seulement avec des entreprises de Caen ?",
@@ -246,13 +389,13 @@ export const pageCaen: PageLocale = {
 };
 
 /**
- * LE SEUL LIEN QUI MÈNE À CETTE PAGE DEPUIS LE RESTE DU SITE, posé sous les
- * trois périmètres de `/services/site-vitrine`. C'est l'endroit où le lecteur
- * vient de lire « une page par métier ou par ville si ton marché est local » :
- * la page Caen en est l'exemple, et elle lui parle directement s'il est du coin.
+ * LIEN VERS CETTE PAGE, posé sous les trois périmètres de
+ * `/services/site-vitrine`, sur sa propre ligne après celle du prix. C'est
+ * l'endroit où le lecteur vient de lire « une page par métier ou par ville si
+ * ton marché est local » : la page Caen en est l'exemple.
  */
 export const lienVersPageCaen = {
-  avant: "Ton entreprise est à Caen ou dans le Calvados :",
+  avant: "Ton entreprise est à Caen ou dans le Calvados :",
   libelle: "création de site internet à Caen",
   href: CHEMIN_PAGE_CAEN,
 } as const;
