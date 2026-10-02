@@ -80,11 +80,12 @@ const BASE = process.env.SITE_URL ?? "http://localhost:3000";
  */
 const ROUTES = [
   "/",
-  "/about",
-  "/work",
-  "/work/kpsull",
-  "/work/nslysium",
-  "/work/wurth-creation-de-compte",
+  "/a-propos",
+  "/realisations",
+  "/realisations/kpsull",
+  "/realisations/nslysium",
+  "/realisations/wurth-creation-de-compte",
+  "/creation-site-internet-caen",
   "/blog",
   ...blogPosts.map(({ slug }) => `/blog/${slug}`),
   // Pages de prestation, ajoutées le 2026-08-27 avec la refonte de l'offre.

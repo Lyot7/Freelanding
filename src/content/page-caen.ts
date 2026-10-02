@@ -197,7 +197,7 @@ export const pageCaen: PageLocale = {
   titrePacks: "Prix d’un site internet à Caen, en 3 forfaits",
   faq: {
     eyebrow: "FAQ",
-    titleLines: ["Site internet", "à Caen, tes questions."],
+    titleLines: ["Ton site", "sur Caen."],
     items: [
       {
         question: "Combien coûte un site internet à Caen ?",
