@@ -79,6 +79,83 @@ const eliott = {
 
 export const blogPosts: BlogPost[] = [
 
+  /*
+   * ÉTUDE DE DONNÉES ORIGINALES (2026-10-02). Chaque chiffre du corps vient de
+   * `marque/seo-2026-10-02/etude-pme-normandes/donnees.json`, avec sa valeur
+   * exacte et son effectif. Le périmètre est celui des entreprises et commerces
+   * de proximité présents sur Google Maps : aucune donnée d'effectif, donc
+   * jamais le mot « PME ». Les trois visuels sont calculés à partir des mêmes
+   * chiffres par `scripts/visuel-etude-normandie.mjs` : aucune photo tierce.
+   */
+  {
+    slug: "etat-des-sites-des-entreprises-normandes-2026",
+    title: "Sites internet des entreprises normandes : l’étude 2026",
+    date: "2026-10-02",
+    dateSource: "editorial",
+    listedInIndex: true,
+    category: "Étude",
+    author: eliott,
+    cover: {
+      src: "/images/blog/etat-des-sites-des-entreprises-normandes-2026.jpg",
+      alt: "Un champ de points sur fond noir, un par fiche Google Maps : près de trois sur dix sont en vert, la part des fiches sans site renseigné",
+      width: 1200,
+      height: 1114,
+    },
+    heroImage: {
+      src: "/images/heros/blog-etat-des-sites-des-entreprises-normandes-2026.jpg",
+      alt: "Un champ de 25 736 points sur fond noir, un par fiche Google Maps relevée : les 7 631 fiches sans site renseigné sont en vert",
+      width: 2400,
+      height: 1350,
+      cadrage: { x: 50, y: 50 },
+      credit: {
+        prefixe: "Visuel :",
+        auteur: { libelle: "Eliott Bouquerel", href: "/a-propos" },
+        licence: {
+          libelle: "CC BY 4.0",
+          href: "https://creativecommons.org/licenses/by/4.0/deed.fr",
+        },
+      },
+      og: {
+        src: "/images/og-blog-etat-des-sites-des-entreprises-normandes-2026.jpg",
+        alt: "Un champ de points sur fond noir, un par fiche Google Maps : près de trois sur dix sont en vert, la part des fiches sans site renseigné",
+        width: 1200,
+        height: 630,
+      },
+    },
+    excerpt:
+      "25 736 fiches Google Maps et 6 631 sites relevés dans 35 villes normandes : qui a un site, avec quel outil, et ce que ça change pour ton commerce.",
+    readingTime: "9 min de lecture",
+    tags: ["étude", "Normandie", "site internet", "Google Maps"],
+    seo: {
+      title: "Sites internet des entreprises normandes : l’étude 2026",
+      description:
+        "29,65 % des fiches Google Maps d’entreprises normandes n’ont aucun site renseigné. Consultez l’étude sur 25 736 fiches et 6 631 sites, et sa méthode complète.",
+      ogImage: {
+        src: "/images/og-blog-etat-des-sites-des-entreprises-normandes-2026.jpg",
+        alt: "Un champ de points sur fond noir, un par fiche Google Maps : près de trois sur dix sont en vert, la part des fiches sans site renseigné",
+        width: 1200,
+        height: 630,
+      },
+    },
+    dataset: {
+      name: "Présence web des entreprises et commerces de proximité normands en 2026",
+      description:
+        "Indicateurs agrégés relevés sur 25 736 fiches Google Maps d’entreprises et de commerces de proximité de 35 villes du Calvados, de l’Eure, de la Manche, de l’Orne et de la Seine-Maritime, et sur la page d’accueil de 6 631 sites : site renseigné ou non, outil de création, année de copyright, signaux techniques et temps de réponse du serveur.",
+      license: "https://creativecommons.org/licenses/by/4.0/deed.fr",
+      temporalCoverage: "2026-07-19/2026-09-01",
+      spatialCoverage: "Normandie, France (départements 14, 27, 50, 61 et 76)",
+      variableMeasured: [
+        "Part des fiches Google Maps sans site web renseigné",
+        "Part des fiches Google Maps sans site web propre",
+        "Fiches sans site par secteur d’activité et par département",
+        "Répartition des outils de création de site (CMS)",
+        "Année de copyright affichée sur la page d’accueil",
+        "Part des sites sans HTTPS, sans balise viewport, en tableaux ou chargeant jQuery 1.x/2.x ou Flash",
+        "Temps de réponse du serveur jusqu’au premier octet",
+      ],
+    },
+  },
+
   {
     slug: "landing-page-ou-page-produit",
     title: "Landing page ou page produit : laquelle convertit le mieux",

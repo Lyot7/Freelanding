@@ -57,6 +57,7 @@ const PAGES = [
   "/blog/shopify-ou-site-sur-mesure",
   "/blog/outil-sur-mesure-ou-abonnements-saas",
   "/blog/synchroniser-catalogue-stock-et-commandes",
+  "/blog/etat-des-sites-des-entreprises-normandes-2026",
 ];
 
 /**

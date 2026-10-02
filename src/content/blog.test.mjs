@@ -188,3 +188,54 @@ describe("corps des articles", () => {
     }
   });
 });
+
+/*
+ * L'ÉTUDE CHIFFRÉE. Ses chiffres sont repris tels quels par la presse et par
+ * les moteurs de réponse : l'extrait, la description et le corps doivent dire
+ * la même chose, et le périmètre (des fiches Google Maps, aucune donnée
+ * d'effectif) interdit le mot « PME » partout où un lecteur le verrait.
+ */
+describe("étude des sites des entreprises normandes", () => {
+  const slug = "etat-des-sites-des-entreprises-normandes-2026";
+  const etude = blogPosts.find((p) => p.slug === slug);
+  const texte = readFileSync(join(DOSSIER, `${slug}.mdx`), "utf8");
+  /** Les nombres d'un texte, espaces fines et insécables retirées. */
+  const nombres = (t) =>
+    [...t.matchAll(/\d{1,3}(?:[\s\u202f\u00a0]\d{3})+(?:,\d+)?|\d+(?:,\d+)?/g)].map(
+      ([n]) => n.replace(/[\s\u202f\u00a0]/g, ""),
+    );
+  const dansLeCorps = new Set(nombres(texte));
+
+  test("déclare son jeu de données sous licence CC BY 4.0", () => {
+    expect(etude?.dataset?.license).toBe(
+      "https://creativecommons.org/licenses/by/4.0/deed.fr",
+    );
+    expect(etude?.dataset?.variableMeasured.length).toBeGreaterThan(0);
+  });
+
+  test("chaque chiffre de l'extrait et de la description figure dans le corps", () => {
+    for (const champ of [etude?.excerpt ?? "", etude?.seo?.description ?? ""]) {
+      for (const n of nombres(champ)) {
+        expect([n, dansLeCorps.has(n)]).toEqual([n, true]);
+      }
+    }
+  });
+
+  test("le corps publie sa méthode et ses limites", () => {
+    expect(texte).toMatch(/^## Méthodologie et limites$/m);
+    expect(texte).toMatch(/^### Limites$/m);
+  });
+
+  test("jamais le mot PME : l'étude ne mesure pas la taille des entreprises", () => {
+    const visibles = [
+      texte,
+      etude?.title,
+      etude?.excerpt,
+      etude?.seo?.title,
+      etude?.seo?.description,
+      etude?.dataset?.name,
+      etude?.dataset?.description,
+    ].join("\n");
+    expect(/\bPME\b/.test(visibles)).toBe(false);
+  });
+});
