@@ -3,6 +3,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { blogPosts, blogContent } from "./blog.ts";
 import { IDS_RENDEZ_VOUS } from "./rendez-vous.ts";
+import { prestation, prixPack } from "./offre.ts";
 
 /**
  * AUDIT DES ARTICLES.
@@ -237,5 +238,104 @@ describe("étude des sites des entreprises normandes", () => {
       etude?.dataset?.description,
     ].join("\n");
     expect(/\bPME\b/.test(visibles)).toBe(false);
+  });
+});
+
+/*
+ * LES ARTICLES DE DÉCISION ET DE PRIX (lot 4 SEO, 2026-10-02).
+ *
+ * Ils visent une requête précise (« odoo ou logiciel sur mesure », « refonte
+ * site internet prix »…) et leur forme est la même : réponse directe en tête,
+ * tableau ou calcul à hypothèses affichées, FAQ, et un lien vers la prestation
+ * ET vers sa page de prix. Les prix d'Eliott n'y sont jamais écrits à la main :
+ * le bloc `<Prix>` les lit dans `offre.ts`.
+ */
+describe("articles de décision et de prix", () => {
+  const ARTICLES = {
+    "logiciel-sur-mesure-ou-odoo": "logiciel",
+    "remplacer-excel-par-un-logiciel": "logiciel",
+    "refonte-site-internet-pme": "vitrine",
+    "site-sur-mesure-ou-wordpress": "vitrine",
+  };
+  const CHEMINS = {
+    logiciel: ["/services/logiciel-metier", "/services/logiciel-metier/prix"],
+    vitrine: ["/services/site-vitrine", "/services/site-vitrine/prix"],
+  };
+  const corps = (slug) => readFileSync(join(DOSSIER, `${slug}.mdx`), "utf8");
+  const mots = (texte) =>
+    texte
+      .replace(/<Prix[^>]*\/>/g, "prix")
+      .replace(/<Steps items=\{\[|\]\} \/>/g, " ")
+      .replace(/\]\([^)]*\)/g, "]")
+      .split(/\s+/u)
+      .filter((m) => /[\p{L}\d]/u.test(m)).length;
+
+  for (const [slug, offre] of Object.entries(ARTICLES)) {
+    describe(slug, () => {
+      const post = blogPosts.find((p) => p.slug === slug);
+      const texte = corps(slug);
+
+      test("est publié le 2026-10-02 et listé", () => {
+        expect(post?.date).toBe("2026-10-02");
+        expect(post?.listedInIndex).toBe(true);
+      });
+
+      test("titre de recherche de 60 caractères au plus", () => {
+        expect(post.seo.title.length).toBeLessThanOrEqual(60);
+      });
+
+      test("description de 150 à 160 caractères, au vouvoiement", () => {
+        const { description } = post.seo;
+        expect(description.length).toBeGreaterThanOrEqual(150);
+        expect(description.length).toBeLessThanOrEqual(160);
+        expect(/\b(tu|ton|ta|tes|toi)\b/iu.test(description)).toBe(false);
+      });
+
+      test("1 200 à 1 800 mots", () => {
+        const total = mots(texte);
+        expect(total).toBeGreaterThanOrEqual(1200);
+        expect(total).toBeLessThanOrEqual(1800);
+      });
+
+      test("tableau comparatif, FAQ et titres en questions", () => {
+        expect(/^\| --- \|/m.test(texte)).toBe(true);
+        expect(texte).toContain("## Questions fréquentes");
+        const h2 = [...texte.matchAll(/^## (.+)$/gm)].map((m) => m[1]);
+        expect(h2.filter((t) => t.endsWith("?")).length).toBeGreaterThanOrEqual(3);
+      });
+
+      test("lie la prestation et sa page de prix", () => {
+        for (const chemin of CHEMINS[offre]) {
+          expect(texte).toContain(`](${chemin})`);
+        }
+      });
+
+      test("aucun prix d'Eliott écrit à la main, forfaits cités existants", () => {
+        const montants = prestation(offre).packs.map((p) => prixPack(p));
+        for (const montant of montants) {
+          expect(texte.replace(/ /gu, " ")).not.toContain(montant.replace(/ /gu, " "));
+        }
+        for (const [, id] of texte.matchAll(/<Prix offre="[a-z]+" forfait="([a-z]+)"/g)) {
+          expect(prestation(offre).packs.map((p) => p.id)).toContain(id);
+        }
+      });
+
+      test("rendez-vous en visio, jamais sur place", () => {
+        expect(/sur place|en personne|présentiel|déplac/iu.test(texte)).toBe(false);
+      });
+    });
+  }
+
+  test("aucun paragraphe n'est partagé entre deux articles", () => {
+    const vus = new Map();
+    for (const slug of Object.keys(ARTICLES)) {
+      for (const bloc of corps(slug).split(/\n\s*\n/)) {
+        const cle = bloc.trim();
+        if (cle.length < 80) continue;
+        const autre = vus.get(cle);
+        expect(autre === undefined || autre === slug, `paragraphe partagé : ${cle}`).toBe(true);
+        vus.set(cle, slug);
+      }
+    }
   });
 });
