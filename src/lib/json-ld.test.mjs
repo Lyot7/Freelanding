@@ -1,5 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { articleSchema, businessSchema } from "./json-ld.ts";
+import {
+  articleSchema,
+  businessSchema,
+  personSchema,
+  profilePageSchema,
+} from "./json-ld.ts";
 import { homeContent } from "../content/home.ts";
 import { siteConfig } from "../content/site.ts";
 
@@ -45,5 +50,14 @@ describe("JSON-LD d'un article", () => {
     expect(article.publisher.name).toBe(siteConfig.contact.person.name);
     expect(article.publisher.logo["@type"]).toBe("ImageObject");
     expect(article.publisher.logo.url).toMatch(/^https?:\/\/.+\/apple-icon\.png$/);
+  });
+});
+
+describe("JSON-LD de la page à propos", () => {
+  test("désigne la personne du site, profils externes compris", () => {
+    const person = personSchema(siteConfig);
+    expect(profilePageSchema().mainEntity).toEqual({ "@id": person["@id"] });
+    expect(person.sameAs).toContain("https://www.linkedin.com/in/eliott-bouquerel");
+    expect(person.sameAs).toContain("https://github.com/Lyot7");
   });
 });

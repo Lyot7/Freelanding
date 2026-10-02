@@ -433,9 +433,10 @@ export function ServicePage({
           <div className="relative mx-auto flex w-full max-w-[1440px] flex-col">
             <div className="grid gap-[16px] pb-[30px] tablet:grid-cols-2 tablet:items-end tablet:gap-0 tablet:pb-[40px]">
               <h2 className="accent-room max-w-[460px] text-[26px] font-semibold uppercase leading-[0.95] tracking-[-0.04em] tablet:pr-[30px] tablet:text-[34px] desktop:pr-[40px]">
-                {servicePageLabels.titrePacks(
-                  prestation.packs[2].surMesure === true,
-                )}
+                {local?.titrePacks ??
+                  servicePageLabels.titrePacks(
+                    prestation.packs[2].surMesure === true,
+                  )}
               </h2>
               {/* LA RÉASSURANCE SE LIT AU MOMENT DU CHOIX, en vis-à-vis du
                   titre et sur sa ligne d'appui, comme le chapô du héros :

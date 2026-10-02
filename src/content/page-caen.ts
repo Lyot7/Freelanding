@@ -78,6 +78,8 @@ export interface PageLocale {
     readonly liens: readonly LienLocal[];
     readonly points: readonly { readonly titre: string; readonly corps: string }[];
   };
+  /** Titre de la section des forfaits, à la place du titre générique. */
+  readonly titrePacks?: string;
   readonly faq: {
     readonly eyebrow: string;
     readonly titleLines: readonly string[];
@@ -140,7 +142,7 @@ export const pageCaen: PageLocale = {
     departements: ["Calvados"],
   },
   contexte: {
-    titre: "Un site pour les entreprises de Caen et du Calvados",
+    titre: "Site vitrine et refonte pour les entreprises de Caen",
     intro:
       "Artisans, commerçants, professions libérales, PME de services ou d’industrie : tes clients te cherchent sur Google avec ton métier et le nom de leur ville. Le site se construit autour de ces recherches, de Caen à Hérouville-Saint-Clair, Bayeux, Lisieux, Falaise, Vire ou Honfleur.",
     titreLiens: "Pour aller plus loin",
@@ -192,9 +194,10 @@ export const pageCaen: PageLocale = {
       },
     ],
   },
+  titrePacks: "Prix d’un site internet à Caen, en 3 forfaits",
   faq: {
     eyebrow: "FAQ",
-    titleLines: ["Questions", "locales."],
+    titleLines: ["Site internet", "à Caen, tes questions."],
     items: [
       {
         question: "Combien coûte un site internet à Caen ?",

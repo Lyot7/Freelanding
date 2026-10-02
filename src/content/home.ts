@@ -485,9 +485,9 @@ export const homeContent: HomeContent = {
 
   seo: {
     // Mot-clé en tête, marque en fin (audit on-page du 2026-09-28).
-    title: "Développeur web freelance TPE et PME · Eliott Bouquerel",
+    title: "Développeur web freelance à Caen · Eliott Bouquerel",
     description:
-      "Des sites qui amènent des clients et des logiciels métier sur mesure. Développeur freelance en Normandie, disponible partout en France en visio.",
+      "Des sites qui amènent des clients et des logiciels métier sur mesure. Développeur freelance basé à Caen, disponible partout en France en visio.",
     ogImage: {
       src: "/images/og.jpg",
       alt: "Eliott Bouquerel",

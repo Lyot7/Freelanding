@@ -237,9 +237,9 @@ export const aboutContent: AboutContent = {
     // gabarit ne s'applique donc pas et la marque doit être écrite ici. C'est
     // exactement pourquoi le « ® » y avait survécu au retrait du 2026-08-29 :
     // `brand.mark` ne passe pas par là.
-    title: "À propos · Eliott Bouquerel",
+    title: "Eliott Bouquerel, développeur full stack freelance à Caen",
     description:
-      "Développeur freelance en Normandie, et partout en France à distance. Je construis des sites qui amènent des clients et des outils métier qui rendent des heures.",
+      "Développeur full stack freelance à Caen, et partout en France à distance. Je construis des sites qui amènent des clients et des outils métier qui rendent des heures.",
   },
 };
 

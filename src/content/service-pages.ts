@@ -62,16 +62,16 @@ export const servicePageSeo: Record<
   }
 > = {
   vitrine: {
-    titre: "Création de site internet professionnel · Eliott Bouquerel",
+    titre: "Création de site internet sur mesure · Eliott Bouquerel",
     description:
       "Un site vitrine sur mesure, rapide et optimisé pour le référencement, qui convertit vos visiteurs en clients. Livré sans abonnement, à vous ensuite.",
-    h1: "Site vitrine sur mesure",
+    h1: "Site internet sur mesure",
   },
   logiciel: {
-    titre: "Logiciel sur mesure pour entreprise · Eliott Bouquerel",
+    titre: "Logiciel métier sur mesure pour PME · Eliott Bouquerel",
     description:
       "Remplacez Excel par un logiciel de gestion adapté à votre métier : devis, suivi client, stock. Développement sur mesure pour PME, sans abonnement.",
-    h1: "Logiciel métier sur mesure",
+    h1: "Logiciel métier sur mesure pour PME",
   },
 };
 

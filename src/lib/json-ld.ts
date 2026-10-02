@@ -81,6 +81,18 @@ export function personSchema(site: SiteConfig) {
 }
 
 /**
+ * La page `/a-propos` comme page de profil : c'est elle que Google et les
+ * assistants rattachent à la personne quand on cherche son nom ou son métier.
+ */
+export function profilePageSchema() {
+  return {
+    "@type": "ProfilePage",
+    url: absoluteUrl("/a-propos"),
+    mainEntity: { "@id": PERSON_ID },
+  };
+}
+
+/**
  * Les deux bornes d'un prix affiché, telles que schema.org les attend.
  *
  * CE QUE ÇA RÉPARE. `fourchette()` rend « de 3 000 € à 7 200 € ». La version
