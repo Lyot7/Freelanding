@@ -26,7 +26,8 @@ import {
   servicePageSeo,
   type MarcheFilAriane,
 } from "@/content/service-pages";
-import type { PageLocale } from "@/content/page-caen";
+import type { LienLocal, PageLocale } from "@/content/page-caen";
+import type { PageSecteur } from "@/content/pages-secteur";
 import { RDV_PAR_PRESTATION } from "@/content/rendez-vous";
 import { SectionRendezVous } from "@/components/rendez-vous/SectionRendezVous";
 
@@ -238,65 +239,117 @@ function PackRow({
 }
 
 /**
- * LE CONTEXTE LOCAL D'UNE PAGE DE VILLE, entre le héros et les périmètres.
+ * UNE SECTION EN DEUX MOITIÉS, entre le héros et les périmètres.
  *
- * MÊME DÉCOUPE QUE LA SECTION `#devis` : fond clair, deux moitiés, filet sur
- * l'axe, gouttière reportée en rembourrage. Aucun gabarit neuf : une page
- * locale reprend la grammaire de la page de prestation qu'elle décline.
+ * MÊME DÉCOUPE QUE LA SECTION `#devis` : deux moitiés, filet sur l'axe,
+ * gouttière reportée en rembourrage. À gauche le titre, les paragraphes et des
+ * liens ; à droite des points courts. Aucun gabarit neuf : une page locale ou
+ * une page secteur reprend la grammaire de la page de prestation qu'elle
+ * décline.
  *
- * Placée AVANT les prix : le visiteur arrivé sur « création site internet
- * Caen » doit lire d'abord ce qui le concerne, lui, à Caen. Les périmètres
- * viennent ensuite, identiques à ceux du site vitrine.
+ * DEUX TONS, CLAIR ET SOMBRE, ceux des sections `#devis` et des forfaits. Une
+ * page secteur enchaîne cinq sections : sur un seul ton, elles se fondaient en
+ * un seul bloc de texte, et l'alternance redonne la découpe sans rien inventer.
  */
-function ContexteLocal({ contexte }: { contexte: PageLocale["contexte"] }) {
+type Ton = "clair" | "sombre";
+
+const TONS: Record<
+  Ton,
+  {
+    section: string;
+    filet: string;
+    attenue: string;
+    etiquette: string;
+    lien: string;
+  }
+> = {
+  clair: {
+    section: "bg-muted text-background",
+    filet: "bg-black/[0.08]",
+    attenue: "text-background/70",
+    etiquette: "text-background/60",
+    lien: "decoration-black/25 hover:decoration-black",
+  },
+  sombre: {
+    section: "bg-background text-foreground",
+    filet: "bg-white/10",
+    attenue: "text-white/70",
+    etiquette: "text-white/60",
+    lien: "decoration-white/30 hover:decoration-white",
+  },
+};
+
+function SectionDeuxMoities({
+  dataSection,
+  titre,
+  paragraphes,
+  liens,
+  points,
+  ton = "clair",
+}: {
+  dataSection: string;
+  titre: string;
+  paragraphes: readonly string[];
+  liens?: { readonly titre: string; readonly items: readonly LienLocal[] };
+  points: readonly { readonly titre: string; readonly corps: string }[];
+  ton?: Ton;
+}) {
+  const t = TONS[ton];
   return (
     <section
-      data-section="contexte-local"
-      className="relative bg-muted px-[20px] py-[60px] text-background tablet:px-[24px] tablet:py-[90px] desktop:px-[30px]"
+      data-section={dataSection}
+      className={`relative px-[20px] py-[60px] tablet:px-[24px] tablet:py-[90px] desktop:px-[30px] ${t.section}`}
     >
       <span
         aria-hidden
-        className="absolute inset-y-0 left-1/2 hidden w-px bg-black/[0.08] tablet:block"
+        className={`absolute inset-y-0 left-1/2 hidden w-px tablet:block ${t.filet}`}
       />
       <div className="relative mx-auto grid w-full max-w-[1440px] gap-[30px] tablet:grid-cols-2 tablet:gap-x-0 tablet:gap-y-[30px]">
         <div className="flex flex-col gap-[16px] tablet:pr-[30px] desktop:pr-[40px]">
           <h2 className="accent-room max-w-[460px] text-[26px] font-semibold uppercase leading-[0.95] tracking-[-0.04em] tablet:text-[34px]">
-            {contexte.titre}
+            {titre}
           </h2>
-          <p className="max-w-[460px] text-[15px] font-medium leading-[1.45] tracking-[-0.01em] text-background/70">
-            {contexte.intro}
-          </p>
-          <nav
-            aria-label={contexte.titreLiens}
-            className="mt-[14px] flex max-w-[460px] flex-col gap-[12px]"
-          >
-            <p className="text-[12px] font-semibold uppercase leading-[1.2] tracking-[0.02em] text-background/60">
-              {contexte.titreLiens}
+          {paragraphes.map((paragraphe) => (
+            <p
+              key={paragraphe}
+              className={`max-w-[460px] text-[15px] font-medium leading-[1.45] tracking-[-0.01em] ${t.attenue}`}
+            >
+              {paragraphe}
             </p>
-            <ul className="flex flex-col gap-[12px]">
-              {contexte.liens.map((lien) => (
-                <li key={lien.href} className="flex flex-col gap-[2px]">
-                  <Link
-                    href={lien.href}
-                    className="w-fit text-[15px] font-semibold leading-[1.3] tracking-[-0.01em] underline decoration-black/25 underline-offset-[3px] transition-[text-decoration-color,text-underline-offset] duration-200 hover:decoration-black hover:underline-offset-[4px]"
-                  >
-                    {lien.libelle}
-                  </Link>
-                  <span className="text-[14px] font-medium leading-[1.4] tracking-[-0.01em] text-background/70">
-                    {lien.description}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </nav>
+          ))}
+          {liens ? (
+            <nav
+              aria-label={liens.titre}
+              className="mt-[14px] flex max-w-[460px] flex-col gap-[12px]"
+            >
+              <p className={`text-[12px] font-semibold uppercase leading-[1.2] tracking-[0.02em] ${t.etiquette}`}>
+                {liens.titre}
+              </p>
+              <ul className="flex flex-col gap-[12px]">
+                {liens.items.map((lien) => (
+                  <li key={lien.href} className="flex flex-col gap-[2px]">
+                    <Link
+                      href={lien.href}
+                      className={`w-fit text-[15px] font-semibold leading-[1.3] tracking-[-0.01em] underline underline-offset-[3px] transition-[text-decoration-color,text-underline-offset] duration-200 hover:underline-offset-[4px] ${t.lien}`}
+                    >
+                      {lien.libelle}
+                    </Link>
+                    <span className={`text-[14px] font-medium leading-[1.4] tracking-[-0.01em] ${t.attenue}`}>
+                      {lien.description}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ) : null}
         </div>
         <ul className="flex flex-col gap-[18px] tablet:pl-[30px] desktop:pl-[40px]">
-          {contexte.points.map((point) => (
+          {points.map((point) => (
             <li key={point.titre} className="flex flex-col gap-[6px]">
               <h3 className="text-[15px] font-semibold leading-[1.3] tracking-[-0.01em]">
                 {point.titre}
               </h3>
-              <p className="text-[14px] font-medium leading-[1.45] tracking-[-0.01em] text-background/70">
+              <p className={`text-[14px] font-medium leading-[1.45] tracking-[-0.01em] ${t.attenue}`}>
                 {point.corps}
               </p>
             </li>
@@ -304,6 +357,47 @@ function ContexteLocal({ contexte }: { contexte: PageLocale["contexte"] }) {
         </ul>
       </div>
     </section>
+  );
+}
+
+/**
+ * LE CONTEXTE LOCAL D'UNE PAGE DE VILLE, placé AVANT les prix : le visiteur
+ * arrivé sur « création site internet Caen » doit lire d'abord ce qui le
+ * concerne, lui, à Caen. Les périmètres viennent ensuite, identiques à ceux du
+ * site vitrine.
+ */
+function ContexteLocal({ contexte }: { contexte: PageLocale["contexte"] }) {
+  return (
+    <SectionDeuxMoities
+      dataSection="contexte-local"
+      titre={contexte.titre}
+      paragraphes={[contexte.intro]}
+      liens={{ titre: contexte.titreLiens, items: contexte.liens }}
+      points={contexte.points}
+    />
+  );
+}
+
+/**
+ * LES SECTIONS D'UNE PAGE SECTEUR (`/services/logiciel-metier/<secteur>`) :
+ * le métier, les modules, le calcul, le choix face au marché, la méthode. Elles
+ * précèdent les forfaits pour la même raison que le contexte local.
+ */
+function SectionsSecteur({ sections }: { sections: PageSecteur["sections"] }) {
+  return (
+    <>
+      {sections.map((section, index) => (
+        <SectionDeuxMoities
+          key={section.id}
+          dataSection={`secteur-${section.id}`}
+          titre={section.titre}
+          paragraphes={section.paragraphes}
+          liens={section.liens}
+          points={section.points}
+          ton={index % 2 === 0 ? "clair" : "sombre"}
+        />
+      ))}
+    </>
   );
 }
 
@@ -315,12 +409,12 @@ export function ServicePage({
   prestation: Prestation;
   site: SiteConfig;
   /**
-   * Page locale qui décline la prestation (`/creation-site-internet-caen`).
-   * Elle remplace le H1, le chapô, la FAQ et prolonge le fil d'Ariane ; les
-   * périmètres, les prix et la prise de rendez-vous restent ceux de la
-   * prestation.
+   * Page qui décline la prestation : une ville (`/creation-site-internet-caen`)
+   * ou un secteur (`/services/logiciel-metier/btp`). Elle remplace le H1, le
+   * chapô, la FAQ et prolonge le fil d'Ariane ; les périmètres, les prix et la
+   * prise de rendez-vous restent ceux de la prestation.
    */
-  local?: PageLocale;
+  local?: PageLocale | PageSecteur;
 }) {
   // Le lien vers la page locale ne s'affiche que sur la page de prestation :
   // sur la page locale elle-même, il pointerait vers la page courante.
@@ -328,9 +422,11 @@ export function ServicePage({
 
   const { surMesureBloc } = servicePageLabels;
 
-  // Photo de fond portée par la page locale ; les pages de prestation n'en ont
-  // pas et gardent leur fond animé.
-  const heroImage = local?.heroImage ?? herosPages.prestations[prestation.slug];
+  // Photo de fond portée par la page locale ; une page secteur garde celle de
+  // sa prestation.
+  const heroImage =
+    (local && "heroImage" in local ? local.heroImage : undefined) ??
+    herosPages.prestations[prestation.slug];
 
   return (
     <>
@@ -416,7 +512,12 @@ export function ServicePage({
           {heroImage ? <CreditHeroPhoto credit={heroImage.credit} /> : null}
         </section>
 
-        {local ? <ContexteLocal contexte={local.contexte} /> : null}
+        {local && "contexte" in local ? (
+          <ContexteLocal contexte={local.contexte} />
+        ) : null}
+        {local && "sections" in local ? (
+          <SectionsSecteur sections={local.sections} />
+        ) : null}
 
         {/* LES FORFAITS. Même rembourrage que les sections voisines (60 / 90)
             et même filet médian que le héros : la page garde un seul rythme
@@ -462,15 +563,21 @@ export function ServicePage({
               ))}
             </ol>
             {lienLocal ? (
-              <p className="border-t border-white/10 pt-[30px] text-[14px] font-medium leading-[1.4] tracking-[-0.01em] text-white/60 tablet:pt-[40px]">
-                {lienLocal.avant}{" "}
-                <Link
-                  href={lienLocal.href}
-                  className="text-foreground underline decoration-white/30 underline-offset-[3px] transition-[text-decoration-color,text-underline-offset] duration-200 hover:decoration-white hover:underline-offset-[4px]"
-                >
-                  {lienLocal.libelle}
-                </Link>
-              </p>
+              <div className="flex flex-wrap items-baseline gap-x-[20px] gap-y-[8px] border-t border-white/10 pt-[30px] text-[14px] font-medium leading-[1.4] tracking-[-0.01em] text-white/60 tablet:pt-[40px]">
+                <p>{lienLocal.avant}</p>
+                <ul className="flex flex-wrap gap-x-[20px] gap-y-[8px]">
+                  {lienLocal.liens.map((lien) => (
+                    <li key={lien.href}>
+                      <Link
+                        href={lien.href}
+                        className="text-foreground underline decoration-white/30 underline-offset-[3px] transition-[text-decoration-color,text-underline-offset] duration-200 hover:decoration-white hover:underline-offset-[4px]"
+                      >
+                        {lien.libelle}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ) : null}
           </div>
         </section>

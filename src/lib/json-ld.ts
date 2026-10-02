@@ -311,11 +311,12 @@ export function serviceSchema(
   prestation: Prestation,
   description: string,
   local?: {
-    /** Nom de la page locale (son H1), qui devient le nom du service. */
+    /** Nom de la page locale ou secteur (son H1), qui devient le nom du service. */
     nom: string;
-    /** Chemin de la page locale, qui remplace `/services/<slug>`. */
+    /** Chemin de la page, qui remplace `/services/<slug>`. */
     chemin: string;
-    zones: { villes: readonly string[]; departements: readonly string[] };
+    /** Absentes sur une page secteur : le service vaut alors pour la France. */
+    zones?: { villes: readonly string[]; departements: readonly string[] };
   },
 ) {
   return compact({
@@ -327,8 +328,9 @@ export function serviceSchema(
     provider: { "@id": BUSINESS_ID },
     // UNE PAGE LOCALE DÉCLARE SA VILLE, et rien qu'elle. La même prestation
     // vendue à distance vaut pour la France ; la page de Caen, elle, existe
-    // pour la recherche « … Caen », et c'est cette zone qu'elle déclare.
-    areaServed: local
+    // pour la recherche « … Caen », et c'est cette zone qu'elle déclare. Une
+    // page secteur, vendue à distance, garde la France.
+    areaServed: local?.zones
       ? [
           ...local.zones.villes.map((name) => ({ "@type": "City", name })),
           ...local.zones.departements.map((name) => ({

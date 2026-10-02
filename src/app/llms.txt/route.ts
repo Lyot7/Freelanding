@@ -2,6 +2,7 @@ import { content } from "@/lib/content";
 import { absoluteUrl } from "@/lib/site-url";
 import { fourchette, prestations as offre, prixPack } from "@/content/offre";
 import { pageCaen } from "@/content/page-caen";
+import { pagesSecteur } from "@/content/pages-secteur";
 import { CHEMIN_PROFIL_TEXTE, CHEMIN_PROMPT_TEXTE } from "@/content/vue-agent";
 
 /**
@@ -92,6 +93,8 @@ export async function GET(): Promise<Response> {
       pageCaen.chemin,
       "le site vitrine pour les entreprises de Caen et du Calvados",
     ),
+    /* PAGES SECTEUR de la solution métier, dérivées de `pages-secteur.ts`. */
+    ...pagesSecteur.map((p) => ligne(p.h1, p.chemin, p.noteLlms)),
     ligne("À propos", "/a-propos", "parcours et façon de travailler"),
     ligne("Réalisations", "/realisations", "les projets en détail"),
     ligne("Contact", "/contact", "formulaire et coordonnées"),

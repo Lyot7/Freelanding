@@ -11,7 +11,8 @@
  * `offre.ts`, seule source des montants.
  */
 import type { Prestation, PrestationId } from "./offre";
-import { lienVersPageCaen, type PageLocale } from "./page-caen";
+import { lienVersPageCaen } from "./page-caen";
+import { avantLiensSecteur, pagesSecteur } from "./pages-secteur";
 
 /** Libellé de tout lien vers l'ancre `#rendez-vous` d'une page de prestation. */
 const RESERVER_UN_APPEL = "Réserver un appel";
@@ -200,12 +201,13 @@ export interface MarcheFilAriane {
  * et pour le `BreadcrumbList` émis par la route : deux listes écrites
  * séparément finissent toujours par diverger.
  *
- * Une page locale se range SOUS sa prestation : le nom de catalogue redevient
- * un lien vers `/services/<slug>`, et la ville devient la dernière marche.
+ * Une page locale ou une page secteur se range SOUS sa prestation : le nom de
+ * catalogue redevient un lien vers `/services/<slug>`, et la ville ou le
+ * secteur devient la dernière marche.
  */
 export function marchesFilAriane(
   prestation: Prestation,
-  local?: PageLocale,
+  local?: { readonly marcheFilAriane: string },
 ): readonly MarcheFilAriane[] {
   const { filAriane } = servicePageLabels;
   const base: MarcheFilAriane[] = [
@@ -222,11 +224,20 @@ export function marchesFilAriane(
 }
 
 /**
- * LIEN VERS UNE PAGE LOCALE, posé sous les périmètres de la prestation qu'elle
- * décline. Un seul aujourd'hui : le site vitrine mène à la page de Caen.
+ * LIENS VERS LES DÉCLINAISONS D'UNE PRESTATION, posés sous ses périmètres : le
+ * site vitrine mène à la page de Caen, la solution métier à ses pages secteur.
+ * Une ligne sobre, une amorce et des liens : la page pilier ne devient pas un
+ * sommaire.
  */
-export const lienLocalParPrestation: Partial<
-  Record<PrestationId, { readonly avant: string; readonly libelle: string; readonly href: string }>
-> = {
-  vitrine: lienVersPageCaen,
+export interface LiensDeclinaisons {
+  readonly avant: string;
+  readonly liens: readonly { readonly libelle: string; readonly href: string }[];
+}
+
+export const lienLocalParPrestation: Partial<Record<PrestationId, LiensDeclinaisons>> = {
+  vitrine: { avant: lienVersPageCaen.avant, liens: [lienVersPageCaen] },
+  logiciel: {
+    avant: avantLiensSecteur,
+    liens: pagesSecteur.map((p) => ({ libelle: p.libelleLien, href: p.chemin })),
+  },
 };
