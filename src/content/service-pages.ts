@@ -12,6 +12,8 @@
  */
 import type { Prestation, PrestationId } from "./offre";
 import { lienVersPageCaen } from "./page-caen";
+import { lienVersPageLogicielCaen } from "./page-logiciel-caen";
+import { avantLienPrix, pagePrixLogiciel } from "./page-prix-logiciel";
 import { avantLiensSecteur, pagesSecteur } from "./pages-secteur";
 
 /** Libellé de tout lien vers l'ancre `#rendez-vous` d'une page de prestation. */
@@ -225,19 +227,28 @@ export function marchesFilAriane(
 
 /**
  * LIENS VERS LES DÉCLINAISONS D'UNE PRESTATION, posés sous ses périmètres : le
- * site vitrine mène à la page de Caen, la solution métier à ses pages secteur.
- * Une ligne sobre, une amorce et des liens : la page pilier ne devient pas un
- * sommaire.
+ * site vitrine mène à la page de Caen, la solution métier à ses pages secteur,
+ * à sa page de prix et à sa page de Caen. Une ligne sobre par famille, une
+ * amorce et des liens : la page pilier ne devient pas un sommaire.
  */
 export interface LiensDeclinaisons {
   readonly avant: string;
   readonly liens: readonly { readonly libelle: string; readonly href: string }[];
 }
 
-export const lienLocalParPrestation: Partial<Record<PrestationId, LiensDeclinaisons>> = {
-  vitrine: { avant: lienVersPageCaen.avant, liens: [lienVersPageCaen] },
-  logiciel: {
-    avant: avantLiensSecteur,
-    liens: pagesSecteur.map((p) => ({ libelle: p.libelleLien, href: p.chemin })),
-  },
+export const lienLocalParPrestation: Partial<
+  Record<PrestationId, readonly LiensDeclinaisons[]>
+> = {
+  vitrine: [{ avant: lienVersPageCaen.avant, liens: [lienVersPageCaen] }],
+  logiciel: [
+    {
+      avant: avantLiensSecteur,
+      liens: pagesSecteur.map((p) => ({ libelle: p.libelleLien, href: p.chemin })),
+    },
+    {
+      avant: avantLienPrix,
+      liens: [{ libelle: pagePrixLogiciel.libelleLien, href: pagePrixLogiciel.chemin }],
+    },
+    { avant: lienVersPageLogicielCaen.avant, liens: [lienVersPageLogicielCaen] },
+  ],
 };

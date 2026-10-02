@@ -27,7 +27,8 @@ import {
   type MarcheFilAriane,
 } from "@/content/service-pages";
 import type { LienLocal, PageLocale } from "@/content/page-caen";
-import type { PageSecteur } from "@/content/pages-secteur";
+import type { PagePrix } from "@/content/page-prix-logiciel";
+import type { PageSecteur, SectionSecteur } from "@/content/pages-secteur";
 import { RDV_PAR_PRESTATION } from "@/content/rendez-vous";
 import { SectionRendezVous } from "@/components/rendez-vous/SectionRendezVous";
 
@@ -381,9 +382,20 @@ function ContexteLocal({ contexte }: { contexte: PageLocale["contexte"] }) {
 /**
  * LES SECTIONS D'UNE PAGE SECTEUR (`/services/logiciel-metier/<secteur>`) :
  * le métier, les modules, le calcul, le choix face au marché, la méthode. Elles
- * précèdent les forfaits pour la même raison que le contexte local.
+ * précèdent les forfaits pour la même raison que le contexte local. La page de
+ * prix et la page de Caen de la solution métier en portent aussi.
+ *
+ * `premierTon` : derrière le contexte local, qui est clair, la première section
+ * part sur le ton sombre pour que l'alternance ne casse pas.
  */
-function SectionsSecteur({ sections }: { sections: PageSecteur["sections"] }) {
+function SectionsSecteur({
+  sections,
+  premierTon = "clair",
+}: {
+  sections: readonly SectionSecteur[];
+  premierTon?: Ton;
+}) {
+  const decalage = premierTon === "clair" ? 0 : 1;
   return (
     <>
       {sections.map((section, index) => (
@@ -394,7 +406,7 @@ function SectionsSecteur({ sections }: { sections: PageSecteur["sections"] }) {
           paragraphes={section.paragraphes}
           liens={section.liens}
           points={section.points}
-          ton={index % 2 === 0 ? "clair" : "sombre"}
+          ton={(index + decalage) % 2 === 0 ? "clair" : "sombre"}
         />
       ))}
     </>
@@ -409,16 +421,17 @@ export function ServicePage({
   prestation: Prestation;
   site: SiteConfig;
   /**
-   * Page qui décline la prestation : une ville (`/creation-site-internet-caen`)
-   * ou un secteur (`/services/logiciel-metier/btp`). Elle remplace le H1, le
-   * chapô, la FAQ et prolonge le fil d'Ariane ; les périmètres, les prix et la
-   * prise de rendez-vous restent ceux de la prestation.
+   * Page qui décline la prestation : une ville (`/creation-site-internet-caen`),
+   * un secteur (`/services/logiciel-metier/btp`) ou les prix
+   * (`/services/logiciel-metier/prix`). Elle remplace le H1, le chapô, la FAQ
+   * et prolonge le fil d'Ariane ; les périmètres, les prix et la prise de
+   * rendez-vous restent ceux de la prestation.
    */
-  local?: PageLocale | PageSecteur;
+  local?: PageLocale | PageSecteur | PagePrix;
 }) {
   // Le lien vers la page locale ne s'affiche que sur la page de prestation :
   // sur la page locale elle-même, il pointerait vers la page courante.
-  const lienLocal = local ? undefined : lienLocalParPrestation[prestation.id];
+  const liensDeclinaisons = local ? undefined : lienLocalParPrestation[prestation.id];
 
   const { surMesureBloc } = servicePageLabels;
 
@@ -515,8 +528,11 @@ export function ServicePage({
         {local && "contexte" in local ? (
           <ContexteLocal contexte={local.contexte} />
         ) : null}
-        {local && "sections" in local ? (
-          <SectionsSecteur sections={local.sections} />
+        {local?.sections ? (
+          <SectionsSecteur
+            sections={local.sections}
+            premierTon={"contexte" in local ? "sombre" : "clair"}
+          />
         ) : null}
 
         {/* LES FORFAITS. Même rembourrage que les sections voisines (60 / 90)
@@ -562,8 +578,11 @@ export function ServicePage({
                 />
               ))}
             </ol>
-            {lienLocal ? (
-              <div className="flex flex-wrap items-baseline gap-x-[20px] gap-y-[8px] border-t border-white/10 pt-[30px] text-[14px] font-medium leading-[1.4] tracking-[-0.01em] text-white/60 tablet:pt-[40px]">
+            {liensDeclinaisons?.map((lienLocal, index) => (
+              <div
+                key={lienLocal.avant}
+                className={`flex flex-wrap items-baseline gap-x-[20px] gap-y-[8px] text-[14px] font-medium leading-[1.4] tracking-[-0.01em] text-white/60 ${index === 0 ? "border-t border-white/10 pt-[30px] tablet:pt-[40px]" : "pt-[12px]"}`}
+              >
                 <p>{lienLocal.avant}</p>
                 <ul className="flex flex-wrap gap-x-[20px] gap-y-[8px]">
                   {lienLocal.liens.map((lien) => (
@@ -578,7 +597,7 @@ export function ServicePage({
                   ))}
                 </ul>
               </div>
-            ) : null}
+            ))}
           </div>
         </section>
 

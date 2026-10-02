@@ -3,6 +3,8 @@ import { absoluteUrl } from "@/lib/site-url";
 import { blogPosts } from "@/content/blog";
 import { fourchette, prestations as offre, prixPack } from "@/content/offre";
 import { pageCaen } from "@/content/page-caen";
+import { pageLogicielCaen } from "@/content/page-logiciel-caen";
+import { pagePrixLogiciel } from "@/content/page-prix-logiciel";
 import { pagesSecteur } from "@/content/pages-secteur";
 import { CHEMIN_PROFIL_TEXTE, CHEMIN_PROMPT_TEXTE } from "@/content/vue-agent";
 
@@ -99,8 +101,14 @@ export async function GET(): Promise<Response> {
       pageCaen.chemin,
       "le site vitrine pour les entreprises de Caen et du Calvados",
     ),
+    ligne(
+      pageLogicielCaen.h1,
+      pageLogicielCaen.chemin,
+      "le logiciel métier sur mesure pour les PME de Caen, du Calvados, de la Manche et de l’Orne",
+    ),
     /* PAGES SECTEUR de la solution métier, dérivées de `pages-secteur.ts`. */
     ...pagesSecteur.map((p) => ligne(p.h1, p.chemin, p.noteLlms)),
+    ligne(pagePrixLogiciel.h1, pagePrixLogiciel.chemin, pagePrixLogiciel.noteLlms),
     ligne("À propos", "/a-propos", "parcours et façon de travailler"),
     ligne("Réalisations", "/realisations", "les projets en détail"),
     ligne("Contact", "/contact", "formulaire et coordonnées"),

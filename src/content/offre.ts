@@ -284,9 +284,17 @@ export const PLANCHER_SUIVI = 90;
 export const tauxSuivi = (): string =>
   `${Math.round(TAUX_SUIVI * 100)} %`;
 
-/** Suivi mensuel d'un projet donné, arrondi à l'euro, plancher compris. */
+/**
+ * Suivi mensuel d'un projet donné, en NOMBRE d'euros HT, arrondi à l'euro,
+ * plancher compris. Sert aux calculs de la page de prix, qui additionne le
+ * suivi sur plusieurs années.
+ */
+export const suiviMensuelHT = (prixProjet: number): number =>
+  Math.max(PLANCHER_SUIVI, Math.round((prixProjet * TAUX_SUIVI) / 12));
+
+/** Le même suivi, formaté pour une phrase. */
 export const suiviMensuel = (prixProjet: number): string =>
-  euros(Math.max(PLANCHER_SUIVI, Math.round((prixProjet * TAUX_SUIVI) / 12)));
+  euros(suiviMensuelHT(prixProjet));
 
 /** « 90 € » — le plancher, tel qu'il s'écrit dans une phrase. */
 export const plancherSuivi = (): string => euros(PLANCHER_SUIVI);

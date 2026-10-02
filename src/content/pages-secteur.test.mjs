@@ -75,7 +75,7 @@ describe("chaque page secteur est cherchable", () => {
       });
 
       test("la page pilier la lie", () => {
-        const liens = lienLocalParPrestation.logiciel?.liens ?? [];
+        const liens = (lienLocalParPrestation.logiciel ?? []).flatMap((l) => l.liens);
         expect(liens.map((l) => l.href)).toContain(page.chemin);
       });
 

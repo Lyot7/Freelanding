@@ -1,8 +1,8 @@
 import type { ContentRoute } from "@/lib/content/types";
 import { blogPosts } from "./blog";
 import { prestations } from "./offre";
-import { CHEMIN_PAGE_CAEN } from "./page-caen";
-import { pagesSecteur } from "./pages-secteur";
+import { CHEMIN_PAGE_CAEN, CHEMIN_PAGE_LOGICIEL_CAEN } from "./page-caen";
+import { CHEMIN_PRIX_LOGICIEL, pagesSecteur } from "./pages-secteur";
 
 /**
  * Manifest public, dans l'ordre exact du sitemap Framer live.
@@ -47,12 +47,19 @@ export const contentRoutes: readonly ContentRoute[] = [
    */
   { pathname: CHEMIN_PAGE_CAEN, kind: "local" },
   /*
+   * LA SOLUTION MÉTIER À CAEN (2026-10-02), pendant de la page précédente pour
+   * le logiciel ; voir `page-logiciel-caen.ts`.
+   */
+  { pathname: CHEMIN_PAGE_LOGICIEL_CAEN, kind: "local" },
+  /*
    * PAGES SECTEUR de la solution métier (2026-10-02), dérivées de
    * `pages-secteur.ts` : ajouter un secteur suffit à l'annoncer au sitemap.
    */
   ...pagesSecteur.map(
     (p): ContentRoute => ({ pathname: p.chemin, kind: "secteur", contentSlug: p.slug }),
   ),
+  /* LES PRIX DE LA SOLUTION MÉTIER (2026-10-02) ; voir `page-prix-logiciel.ts`. */
+  { pathname: CHEMIN_PRIX_LOGICIEL, kind: "page" },
   /*
    * VUE AGENT (2026-09-23) : le profil complet en un seul texte, et le prompt
    * que le visiteur colle dans son propre assistant. Voir `vue-agent.ts`.

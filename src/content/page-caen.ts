@@ -29,11 +29,19 @@
  */
 import type { FaqItem, ImageHero } from "@/lib/content/types";
 import { fourchette, prestation, prixPack } from "./offre";
+import type { SectionSecteur } from "./pages-secteur";
 
 const VITRINE = prestation("vitrine");
 const [LANDING, SITE, SIGNATURE] = VITRINE.packs;
 
 export const CHEMIN_PAGE_CAEN = "/creation-site-internet-caen";
+
+/**
+ * La page locale de la solution métier (`page-logiciel-caen.ts`). Son chemin
+ * vit ici pour que les 2 pages de Caen se lient sans boucle d'imports : ce
+ * fichier ne dépend pas de l'autre, l'autre dépend de lui.
+ */
+export const CHEMIN_PAGE_LOGICIEL_CAEN = "/logiciel-sur-mesure-caen";
 
 /** Un lien interne de la page, avec la phrase qui dit où il mène. */
 export interface LienLocal {
@@ -78,6 +86,12 @@ export interface PageLocale {
     readonly liens: readonly LienLocal[];
     readonly points: readonly { readonly titre: string; readonly corps: string }[];
   };
+  /**
+   * Sections supplémentaires, après le contexte et avant les forfaits, dans
+   * le gabarit des pages secteur. La page de Caen n'en a pas ; celle de la
+   * solution métier à Caen, qui se vend sur un texte plus long, en porte.
+   */
+  readonly sections?: readonly SectionSecteur[];
   /** Titre de la section des forfaits, à la place du titre générique. */
   readonly titrePacks?: string;
   readonly faq: {
@@ -157,6 +171,11 @@ export const pageCaen: PageLocale = {
         href: "/services/logiciel-metier",
         description:
           "Quand il te faut une réservation, un espace client ou une tâche automatisée.",
+      },
+      {
+        libelle: "Un logiciel sur mesure à Caen",
+        href: CHEMIN_PAGE_LOGICIEL_CAEN,
+        description: "Le logiciel métier, pour les PME du Calvados, de la Manche et de l’Orne.",
       },
       {
         libelle: "Les réalisations",

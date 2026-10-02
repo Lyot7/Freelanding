@@ -24,10 +24,14 @@
  *   - aucune affirmation réglementaire datée (facture électronique, seuils) :
  *     le vocabulaire est exact, les obligations restent celles du contrat.
  *
- * AJOUTER UN SECTEUR (location de matériel, négoce, maintenance,
- * agroalimentaire) : un objet de plus dans `pagesSecteur`, et son slug dans
- * `SecteurSlug`. La route, le sitemap, `llms.txt` et le lien depuis la page
- * pilier en sont dérivés.
+ * AJOUTER UN SECTEUR (maintenance, agroalimentaire) : un objet de plus dans
+ * `pagesSecteur`, et son slug dans `SecteurSlug`. La route, le sitemap,
+ * `llms.txt` et le lien depuis la page pilier en sont dérivés.
+ *
+ * LOCATION DE MATÉRIEL ET NÉGOCE (lot 3, 2026-10-02). Pour la location, comme
+ * pour le BTP et le transport, Eliott n'a aucun client : Würth y reste un
+ * autre secteur. Pour le négoce, Würth France EST la distribution : la page le
+ * présente comme une preuve directe, avec le seul chiffre de `work.ts`.
  */
 import type { FaqItem } from "@/lib/content/types";
 import { euros, fourchette, prestation, prixPack } from "./offre";
@@ -41,7 +45,26 @@ const CHEMIN_WURTH = "/realisations/wurth-creation-de-compte";
 const CHEMIN_ARTICLE_SAAS = "/blog/outil-sur-mesure-ou-abonnements-saas";
 const CHEMIN_PILIER = `/services/${LOGICIEL.slug}`;
 
-export type SecteurSlug = "btp" | "transport";
+export type SecteurSlug =
+  | "btp"
+  | "transport"
+  | "location-materiel"
+  | "negoce-distribution";
+
+/**
+ * LA PAGE DE PRIX DE LA SOLUTION MÉTIER. Son chemin est composé ici, et non
+ * dans `page-prix-logiciel.ts`, parce que chaque page secteur la lie : la page
+ * de prix importe déjà ce fichier, l'inverse ferait une boucle d'imports.
+ */
+export const CHEMIN_PRIX_LOGICIEL = `${CHEMIN_PILIER}/prix`;
+
+/** Le lien vers la page de prix, posé dans la méthode de chaque secteur. */
+const LIEN_PRIX: LienLocal = {
+  libelle: "Le prix d’un logiciel sur mesure",
+  href: CHEMIN_PRIX_LOGICIEL,
+  description:
+    "Ce qui fait varier le prix, et la comparaison avec un abonnement sur 3 ans.",
+};
 
 /** Un point de la moitié droite d'une section : un titre court, une phrase. */
 export interface PointSecteur {
@@ -96,6 +119,11 @@ export interface PageSecteur {
   readonly libelleLien: string;
   /** Note de la ligne `llms.txt`. */
   readonly noteLlms: string;
+  /**
+   * Ce que la page couvre, en une phrase : la description du lien posé vers
+   * elle depuis la page de Caen et la page de prix.
+   */
+  readonly accroche: string;
   readonly sections: readonly SectionSecteur[];
   readonly calcul: CalculSecteur;
   readonly titrePacks: string;
@@ -139,6 +167,7 @@ const pageBtp: PageSecteur = {
   libelleLien: "logiciel de gestion de chantier BTP",
   noteLlms:
     "logiciel de gestion de chantier sur mesure pour les PME du BTP : devis, suivi de chantier, situations de travaux, pointage",
+  accroche: "Devis, situations de travaux et pointage des équipes.",
   sections: [
     {
       id: "metier",
@@ -294,6 +323,7 @@ const pageBtp: PageSecteur = {
             href: CHEMIN_PILIER,
             description: "Les 3 forfaits, ce que chacun contient et son prix.",
           },
+          LIEN_PRIX,
           {
             libelle: "Le projet Würth France",
             href: CHEMIN_WURTH,
@@ -400,6 +430,7 @@ const pageTransport: PageSecteur = {
   libelleLien: "logiciel de gestion de transport",
   noteLlms:
     "TMS sur mesure pour les PME du transport routier : ordres de transport, tournées, lettres de voiture et CMR, facturation",
+  accroche: "Ordres, tournées, preuves de livraison et facturation.",
   sections: [
     {
       id: "metier",
@@ -559,6 +590,7 @@ const pageTransport: PageSecteur = {
             href: CHEMIN_PILIER,
             description: "Ce que contient chaque forfait, ligne à ligne, et son prix.",
           },
+          LIEN_PRIX,
           {
             libelle: "Le cas Würth France",
             href: CHEMIN_WURTH,
@@ -633,8 +665,526 @@ const pageTransport: PageSecteur = {
   },
 };
 
+/* ------------------------------------------------------------------------ */
+/* LOCATION DE MATÉRIEL                                                      */
+/* ------------------------------------------------------------------------ */
+
+/*
+ * HYPOTHÈSES DU CALCUL LOCATION : 24 mouvements par jour (départs et retours),
+ * 5 minutes de ressaisie par mouvement, 250 jours d'ouverture, 34 € de l'heure
+ * chargée. L'unité est le mouvement de machine, celle du dépôt.
+ */
+const LOC_MOUVEMENTS_JOUR = 24;
+const LOC_MINUTES = 5;
+const LOC_JOURS = 250;
+const LOC_COUT_HORAIRE = 34;
+const LOC_HEURES_AN = ((LOC_MOUVEMENTS_JOUR * LOC_MINUTES) / 60) * LOC_JOURS;
+const LOC_COUT_AN = LOC_HEURES_AN * LOC_COUT_HORAIRE;
+
+const pageLocation: PageSecteur = {
+  slug: "location-materiel",
+  chemin: cheminSecteur("location-materiel"),
+  seo: {
+    titre: "Logiciel de gestion location de matériel · Eliott Bouquerel",
+    description: `Logiciel de location de matériel sur mesure : votre parc, vos contrats, disponibilités, états des lieux et facturation. Prix : ${fourchette("logiciel", " HT")}.`,
+  },
+  h1: "Logiciel de gestion de location de matériel",
+  resume: `Un logiciel de gestion de location de matériel sur mesure suit ton parc machine par machine, te dit ce qui est disponible demain, et édite le contrat, l’état des lieux et la facture à la journée. Il vise les loueurs et les entreprises de BTP ou de TP qui gèrent leur parc sur un tableur ou un planning mural. Compte ${fourchette("logiciel", " HT")} selon les modules retenus.`,
+  marcheFilAriane: "Location de matériel",
+  libelleLien: "logiciel de gestion de location de matériel",
+  noteLlms:
+    "logiciel de gestion de location de matériel sur mesure : parc, contrats, disponibilités, états des lieux, maintenance préventive, facturation à la journée",
+  accroche: "Parc, contrats, états des lieux et facturation à la journée.",
+  sections: [
+    {
+      id: "metier",
+      titre: "Quand le planning mural ne suit plus le parc",
+      paragraphes: [
+        "Chez un loueur, une même machine change de mains plusieurs fois par mois. Le commercial la réserve au téléphone, le dépôt la prépare, le chauffeur la livre sur le chantier, le client prolonge d’une semaine par SMS, puis elle revient avec des heures au compteur, des rayures et un réservoir à moitié vide. Chaque étape laisse sa trace sur un support différent : planning mural, carnet de bons, tableur, photos dans un téléphone.",
+        "Le jour où 2 commerciaux promettent la même minipelle pour le lundi, ou qu’une prolongation n’arrive jamais sur la facture, tu paies le prix de ces supports qui ne se parlent pas.",
+      ],
+      points: [
+        {
+          titre: "Disponibilités",
+          corps:
+            "Savoir si une nacelle est libre du 12 au 19 oblige à appeler le dépôt, qui regarde le planning, puis la cour.",
+        },
+        {
+          titre: "Contrats et prolongations",
+          corps:
+            "Un contrat signé sur papier, une prolongation accordée au téléphone, un retour anticipé : la facture part sur la durée prévue au lieu de la durée réelle.",
+        },
+        {
+          titre: "États des lieux",
+          corps:
+            "Les photos du départ restent dans le téléphone du chauffeur. Au retour, la casse se discute sans preuve, et la franchise ne se refacture pas.",
+        },
+        {
+          titre: "Entretien du parc",
+          corps:
+            "Vidanges et révisions dépendent du compteur d’heures, que personne ne relève tant que la machine travaille dehors.",
+        },
+      ],
+    },
+    {
+      id: "modules",
+      titre: "Ce que fait ton logiciel de location",
+      paragraphes: [
+        "Le logiciel part de ton parc tel qu’il est : tes familles de matériel, tes numéros de série, tes tarifs à la journée, à la semaine et au mois, tes conditions par client. Tu choisis les modules, et leur nombre fixe le forfait.",
+        "Chaque mouvement alimente le suivant : la réservation bloque la machine sur le planning, le départ ouvre le contrat, le retour clôt la période facturée et relève le compteur qui déclenche l’entretien.",
+      ],
+      points: [
+        {
+          titre: "Planning du parc",
+          corps:
+            "Chaque machine sur sa ligne, réservée, sortie, à l’atelier ou disponible, et la recherche par famille et par dates.",
+        },
+        {
+          titre: "Contrats de location",
+          corps:
+            "Le contrat édité depuis la réservation, avec ou sans opérateur, signé sur tablette, et ses prolongations rattachées au contrat d’origine.",
+        },
+        {
+          titre: "États des lieux départ et retour",
+          corps:
+            "Photos, compteur, niveau de carburant et réserves saisis depuis un téléphone, puis comparés au retour sur le même écran.",
+        },
+        {
+          titre: "Facturation à la durée",
+          corps:
+            "Le tarif dégressif appliqué à la durée réelle, avec tes règles pour les jours non ouvrés, et le carburant, le nettoyage et le transport ajoutés.",
+        },
+        {
+          titre: "Maintenance préventive",
+          corps:
+            "Les entretiens programmés au compteur d’heures ou à la date, la machine retirée du planning le temps de l’atelier, et l’historique de chaque intervention.",
+        },
+      ],
+    },
+    {
+      id: "calcul",
+      titre: "Les mouvements du dépôt, chiffrés sur une année",
+      paragraphes: [
+        `Prends un dépôt qui enregistre ${LOC_MOUVEMENTS_JOUR} mouvements par jour, départs et retours confondus. Pour chacun, ${LOC_MINUTES} minutes partent à recopier le bon de sortie, à reporter le compteur et à corriger la durée pour la facture. Sur ${LOC_JOURS} jours d’ouverture, le total atteint ${LOC_HEURES_AN} heures par an.`,
+        `À ${euros(LOC_COUT_HORAIRE)} l’heure, salaire chargé et frais compris, ces heures coûtent ${euros(LOC_COUT_AN)} par an. ${LE_LOGICIEL.nom} coûte ${prixPack(LE_LOGICIEL)} HT, payé une fois. Ces 4 chiffres sont des hypothèses : remplace-les par ceux de ton dépôt.`,
+      ],
+      points: [
+        {
+          titre: `Hypothèse 1 : ${LOC_MOUVEMENTS_JOUR} mouvements par jour`,
+          corps:
+            "Les machines qui sortent du dépôt et celles qui y reviennent, livrées par ton chauffeur ou enlevées par le client.",
+        },
+        {
+          titre: `Hypothèse 2 : ${LOC_MINUTES} minutes par mouvement`,
+          corps:
+            "Le bon recopié, le compteur et le carburant reportés, la date de retour corrigée dans le tableur.",
+        },
+        {
+          titre: `Hypothèse 3 : ${euros(LOC_COUT_HORAIRE)} l’heure`,
+          corps:
+            "Le coût complet d’une heure au comptoir ou au dépôt : salaire, charges patronales et frais de structure.",
+        },
+        {
+          titre: `Hypothèse 4 : ${LOC_JOURS} jours par an`,
+          corps: "Les jours d’ouverture du dépôt, fermetures et jours fériés retirés.",
+        },
+      ],
+    },
+    {
+      id: "marche",
+      titre: "Sur mesure ou logiciel de location du marché ?",
+      paragraphes: [
+        "Des éditeurs vendent des logiciels de location complets, souvent pensés pour un type de parc : l’outillage, les engins de TP, l’événementiel. Si ton activité ressemble à celle qu’ils ont modélisée, commence par eux : la mise en place est rapide et l’abonnement reste lisible.",
+        "Le sur mesure prend le relais quand tes règles sortent de leurs paramètres : un parc partagé entre la location et tes propres chantiers, des tarifs négociés par client, ou des compteurs déjà relevés par un boîtier télématique qu’il faut faire entrer dans le planning.",
+      ],
+      liens: {
+        titre: "Pour trancher",
+        items: [
+          {
+            libelle: "Outil sur mesure ou abonnements SaaS",
+            href: CHEMIN_ARTICLE_SAAS,
+            description:
+              "Comparer un abonnement par utilisateur et un outil qui t’appartient.",
+          },
+        ],
+      },
+      points: [
+        {
+          titre: "Le logiciel du marché suffit",
+          corps:
+            "Un seul dépôt, un parc homogène, des tarifs publics et des contrats types.",
+        },
+        {
+          titre: "Le sur mesure se justifie",
+          corps:
+            "Plusieurs dépôts, du matériel loué avec opérateur, de la sous-location chez des confrères, ou un parc qui sert aussi tes chantiers.",
+        },
+        {
+          titre: "Entre les deux",
+          corps: `${OUTIL.nom}, à ${prixPack(OUTIL)} HT, ajoute à ton outil actuel la pièce qui lui manque : l’état des lieux photo sur téléphone, ou le relevé de compteurs qui déclenche l’entretien.`,
+        },
+      ],
+    },
+    {
+      id: "methode",
+      titre: "Le projet, du premier appel à la première location",
+      paragraphes: [
+        "Je commence par suivre une machine sur toute sa boucle, de la réservation à la facture, en notant chaque endroit où l’information est recopiée. Chez Würth France, dans la distribution de fournitures professionnelles, ce relevé appliqué au parcours de création de compte a conduit à −92 % d’erreurs, mesuré en interne.",
+      ],
+      liens: {
+        titre: "Pour aller plus loin",
+        items: [
+          {
+            libelle: "La solution métier",
+            href: CHEMIN_PILIER,
+            description: "Les 3 forfaits et la liste de ce que chacun contient.",
+          },
+          LIEN_PRIX,
+          {
+            libelle: "Le projet Würth France",
+            href: CHEMIN_WURTH,
+            description:
+              "Un parcours de création de compte refait à partir des erreurs relevées.",
+          },
+          {
+            libelle: "Réserver un appel",
+            href: "#rendez-vous",
+            description: "Choisis un créneau en visio pour parler de ton parc.",
+          },
+        ],
+      },
+      points: [
+        {
+          titre: "1. Un appel en visio",
+          corps:
+            "Gratuit. Tu me décris ton parc, ton dépôt et ta façon de facturer, et je te dis dès l’appel quel forfait y correspond.",
+        },
+        {
+          titre: "2. Un devis à prix ferme",
+          corps:
+            "Les modules, le prix et la date de mise en service, présentés lors d’un second rendez-vous et écrits avant toute signature.",
+        },
+        {
+          titre: "3. Testé sur tes vraies machines",
+          corps:
+            "Chaque module arrive sur une adresse en ligne. Ton équipe de dépôt l’essaie sur de vrais départs avant la mise en service.",
+        },
+        {
+          titre: "4. À ton nom",
+          corps:
+            "Le code dans ton dépôt Git, l’hébergement à ton nom, et une documentation qu’un autre développeur sait reprendre.",
+        },
+      ],
+    },
+  ],
+  calcul: {
+    heuresParAn: LOC_HEURES_AN,
+    coutHoraire: LOC_COUT_HORAIRE,
+    coutAnnuel: LOC_COUT_AN,
+  },
+  titrePacks: "Prix d’un logiciel de location, en 3 forfaits",
+  faq: {
+    eyebrow: "FAQ",
+    titleLines: ["Ton logiciel", "de location."],
+    items: [
+      {
+        question: "Combien coûte un logiciel de gestion de location de matériel ?",
+        answer: `${OUTIL.nom}, à ${prixPack(OUTIL)} HT, règle une tâche, par exemple l’état des lieux photo. ${LE_LOGICIEL.nom}, à ${prixPack(LE_LOGICIEL)} HT, couvre jusqu’à 3 modules, comme le planning du parc, les contrats et la facturation. ${PLATEFORME.nom} commence à ${prixPack(PLATEFORME)} HT, pour plusieurs dépôts ou plusieurs systèmes à accorder entre eux.`,
+      },
+      {
+        question: "Le logiciel gère-t-il les tarifs dégressifs et les prolongations ?",
+        answer:
+          "Oui. Tu poses tes grilles à la journée, à la semaine et au mois, et tes remises par client. Une prolongation s’ajoute au contrat en cours, et la facture reprend la durée réelle sans ressaisie.",
+      },
+      {
+        question: "Peut-on signer le contrat et faire l’état des lieux sur une tablette ?",
+        answer:
+          "Oui, dans le navigateur de la tablette ou du téléphone, sans application à installer. Photos, compteur, carburant et signature du client s’enregistrent sur le contrat. Si ton dépôt ou tes chantiers captent mal, la saisie hors connexion entre au devis.",
+      },
+      {
+        question: "Le logiciel peut-il suivre l’entretien de mes engins ?",
+        answer:
+          "Oui, avec le module de maintenance. Chaque machine porte ses entretiens, déclenchés par le compteur d’heures ou par une date, et ses vérifications périodiques avec leurs rapports. Une machine à l’atelier sort du planning de location jusqu’à sa remise en service.",
+      },
+      {
+        question: "As-tu déjà travaillé pour un loueur de matériel ?",
+        answer:
+          "Non, pas encore. Le projet que je peux te montrer chiffres à l’appui vient de la distribution : le parcours de création de compte de l’eShop de Würth France. J’en reprends la méthode : observer le terrain avant de coder, livrer module par module, faire tester par ceux qui s’en servent.",
+      },
+    ],
+  },
+};
+
+/* ------------------------------------------------------------------------ */
+/* NÉGOCE ET DISTRIBUTION                                                    */
+/* ------------------------------------------------------------------------ */
+
+/*
+ * HYPOTHÈSES DU CALCUL NÉGOCE : 90 lignes de devis et de commande par jour,
+ * 2 minutes de recherche par ligne (remise, prix net, stock d'un autre dépôt),
+ * 225 jours ouvrés, 38 € de l'heure chargée. L'unité est la ligne de vente,
+ * celle du comptoir.
+ */
+const NEG_LIGNES_JOUR = 90;
+const NEG_MINUTES_LIGNE = 2;
+const NEG_JOURS = 225;
+const NEG_COUT_HORAIRE = 38;
+const NEG_HEURES_AN = ((NEG_LIGNES_JOUR * NEG_MINUTES_LIGNE) / 60) * NEG_JOURS;
+const NEG_COUT_AN = NEG_HEURES_AN * NEG_COUT_HORAIRE;
+
+const pageNegoce: PageSecteur = {
+  slug: "negoce-distribution",
+  chemin: cheminSecteur("negoce-distribution"),
+  seo: {
+    titre: "Logiciel de gestion de négoce sur mesure · Eliott Bouquerel",
+    description: `Logiciel de négoce sur mesure pour votre distribution : stock, tarifs clients, remises, comptoir, reliquats, achats. Prix : ${fourchette("logiciel", " HT")}.`,
+  },
+  h1: "Logiciel de gestion de négoce",
+  resume: `Un logiciel de gestion de négoce sur mesure réunit ton stock, tes tarifs clients, tes commandes et tes achats fournisseurs dans un seul outil, comptoir compris. Il s’adresse aux négociants et aux distributeurs techniques dont l’ERP ne suit plus les conditions commerciales, ou qui travaillent encore sur tableur. Son prix va ${fourchette("logiciel", " HT")}.`,
+  marcheFilAriane: "Négoce et distribution",
+  libelleLien: "logiciel de gestion de négoce",
+  noteLlms:
+    "logiciel de gestion de négoce et de distribution technique sur mesure : stock multi-dépôts, tarifs clients et remises, comptoir, reliquats, achats fournisseurs",
+  accroche: "Tarifs clients, comptoir, stock multi-dépôts et reliquats.",
+  sections: [
+    {
+      id: "metier",
+      titre: "Quand chaque client a son prix",
+      paragraphes: [
+        "Dans le négoce, la marge tient dans les conditions commerciales : un tarif fournisseur qui change 2 fois par an, des remises par famille de produits, des prix nets négociés avec les gros comptes. Quand ces règles vivent dans la tête des commerciaux et dans un tableur à côté de l’ERP, chaque devis commence par une recherche.",
+        "Au comptoir, la question est plus courte et plus pressante : le produit est-il en stock, dans quel dépôt, et à quel prix pour ce client ? Chaque minute de recherche fait attendre un artisan qui a un chantier en cours.",
+      ],
+      points: [
+        {
+          titre: "Tarifs et remises",
+          corps:
+            "Le tarif fournisseur à jour, la remise de la famille, le prix net du client : 3 sources à recouper avant de chiffrer une ligne.",
+        },
+        {
+          titre: "Stock multi-dépôts",
+          corps:
+            "Le stock affiché ignore les commandes en préparation et les transferts entre dépôts, et la rupture se découvre au moment de préparer.",
+        },
+        {
+          titre: "Reliquats",
+          corps:
+            "Une commande livrée en partie laisse un reliquat que personne ne relance, jusqu’au coup de fil du client.",
+        },
+        {
+          titre: "Achats fournisseurs",
+          corps:
+            "Les seuils de réapprovisionnement se fixent à l’œil, les accusés de réception arrivent par mail, et le prix d’achat réel n’atteint jamais la fiche produit.",
+        },
+      ],
+    },
+    {
+      id: "modules",
+      titre: "Ce que fait ton logiciel de négoce",
+      paragraphes: [
+        "Le logiciel reprend ton catalogue, tes familles de produits, tes dépôts et tes conditions par client, tels que tu les pratiques. Tu retiens les modules qui te coûtent le plus aujourd’hui, et leur nombre décide du forfait.",
+        "Une condition saisie une fois s’applique partout : le prix calculé au devis est celui de la commande, du bon de livraison et de la facture, et chaque vente décompte le stock du bon dépôt.",
+      ],
+      points: [
+        {
+          titre: "Tarifs clients",
+          corps:
+            "Tarifs fournisseurs importés, coefficients de vente, remises par famille et prix nets par client, appliqués à la ligne sans calcul à la main.",
+        },
+        {
+          titre: "Devis et commandes",
+          corps:
+            "Le devis transformé en commande en un clic, les reliquats suivis ligne par ligne, et l’accusé de réception envoyé au client.",
+        },
+        {
+          titre: "Vente au comptoir",
+          corps:
+            "Un écran de vente rapide : recherche par référence ou par désignation, stock de chaque dépôt, prix du client, bon de livraison imprimé.",
+        },
+        {
+          titre: "Stock et dépôts",
+          corps:
+            "Le stock physique, réservé et disponible, les transferts entre dépôts et les inventaires tournants.",
+        },
+        {
+          titre: "Achats et réapprovisionnement",
+          corps:
+            "Les propositions de commande calculées depuis les ventes et les seuils, et les réceptions rapprochées des commandes fournisseurs.",
+        },
+        {
+          titre: "Espace client professionnel",
+          corps:
+            "Tes clients consultent leurs prix, leurs commandes et leurs factures en ligne, et commandent sans appeler le comptoir.",
+        },
+      ],
+    },
+    {
+      id: "calcul",
+      titre: "La recherche de prix, chiffrée sur une année",
+      paragraphes: [
+        `Prends une équipe de vente qui saisit ${NEG_LIGNES_JOUR} lignes de devis et de commande par jour. Pour chaque ligne, ${NEG_MINUTES_LIGNE} minutes partent à retrouver la remise du client dans un tableur, à vérifier le stock d’un autre dépôt ou à recalculer un prix net. Sur ${NEG_JOURS} jours ouvrés, le total atteint ${NEG_HEURES_AN} heures par an.`,
+        `À ${euros(NEG_COUT_HORAIRE)} l’heure, salaire chargé et frais compris, ces heures coûtent ${euros(NEG_COUT_AN)} par an. ${LE_LOGICIEL.nom} coûte ${prixPack(LE_LOGICIEL)} HT, payé une fois. Ces 4 chiffres sont des hypothèses : mets les tiens à leur place avant de conclure.`,
+      ],
+      points: [
+        {
+          titre: `Hypothèse 1 : ${NEG_LIGNES_JOUR} lignes par jour`,
+          corps:
+            "Les lignes de devis et de commande saisies par le comptoir et par les commerciaux sédentaires.",
+        },
+        {
+          titre: `Hypothèse 2 : ${NEG_MINUTES_LIGNE} minutes par ligne`,
+          corps:
+            "Le temps de retrouver la bonne condition commerciale et de confirmer la disponibilité.",
+        },
+        {
+          titre: `Hypothèse 3 : ${euros(NEG_COUT_HORAIRE)} l’heure`,
+          corps:
+            "Le coût complet d’une heure de vendeur : salaire, charges patronales et frais de structure.",
+        },
+        {
+          titre: `Hypothèse 4 : ${NEG_JOURS} jours par an`,
+          corps: "Les jours ouvrés, une fois retirés les congés et les jours fériés.",
+        },
+      ],
+    },
+    {
+      id: "marche",
+      titre: "Sur mesure ou ERP négoce du marché ?",
+      paragraphes: [
+        "Les ERP pour le négoce couvrent la gestion commerciale, le stock, les achats et la comptabilité, avec des années de cas particuliers derrière eux. Si tu démarres ou si tes conditions restent classiques, un ERP du marché te coûtera moins cher qu’un développement.",
+        "Le sur mesure trouve souvent sa place autour de l’ERP : le portail de commande que tes clients attendent, le calcul de prix que l’ERP ne sait pas faire, la liaison avec la plateforme d’un fournisseur. Ton ERP garde la comptabilité, et le module développé échange avec lui.",
+      ],
+      liens: {
+        titre: "Pour trancher",
+        items: [
+          {
+            libelle: "Outil sur mesure ou abonnements SaaS",
+            href: CHEMIN_ARTICLE_SAAS,
+            description:
+              "Mettre en face un abonnement par utilisateur et un outil à toi.",
+          },
+          {
+            libelle: "Synchroniser catalogue, stock et commandes",
+            href: "/blog/synchroniser-catalogue-stock-et-commandes",
+            description:
+              "Quand le site, l’ERP et le stock doivent rester d’accord.",
+          },
+        ],
+      },
+      points: [
+        {
+          titre: "L’ERP du marché suffit",
+          corps:
+            "Un seul dépôt, des tarifs fournisseurs standards, des remises simples et peu de vente en ligne.",
+        },
+        {
+          titre: "Le sur mesure se justifie",
+          corps:
+            "Des conditions par client et par famille que l’ERP gère mal, plusieurs dépôts, ou des clients professionnels qui veulent commander en ligne à leur prix.",
+        },
+        {
+          titre: "Entre les deux",
+          corps: `${OUTIL.nom}, à ${prixPack(OUTIL)} HT, relie ton ERP à ce qui lui manque : l’import automatique d’un tarif fournisseur, ou un écran de comptoir plus rapide.`,
+        },
+      ],
+    },
+    {
+      id: "methode",
+      titre: "Le projet, du premier appel au premier bon de livraison",
+      paragraphes: [
+        "Würth France distribue des fournitures aux professionnels. En 2024, j’y ai refait le parcours de création de compte de l’eShop : relevé des erreurs réellement commises, contraintes affichées avant la saisie, SIRET vérifié auprès des données de l’INSEE. Résultat : −92 % d’erreurs à la création de compte, mesuré en interne.",
+        "Ton logiciel de négoce se construit de la même façon : je cherche où l’erreur naît avant de dessiner un écran.",
+      ],
+      liens: {
+        titre: "Pour aller plus loin",
+        items: [
+          {
+            libelle: "Le projet Würth France",
+            href: CHEMIN_WURTH,
+            description:
+              "Le parcours de création de compte de l’eShop, expliqué de bout en bout.",
+          },
+          {
+            libelle: "La solution métier en 3 forfaits",
+            href: CHEMIN_PILIER,
+            description: "Ce que chaque forfait ajoute au précédent, et son prix.",
+          },
+          LIEN_PRIX,
+          {
+            libelle: "Réserver un appel",
+            href: "#rendez-vous",
+            description: "Choisis un créneau en visio pour parler de ton comptoir.",
+          },
+        ],
+      },
+      points: [
+        {
+          titre: "1. Un appel en visio",
+          corps:
+            "Gratuit. Tu me montres ton écran de commande et tes grilles de remises, et je te dis dès l’appel ce que ton budget permet.",
+        },
+        {
+          titre: "2. Le devis, prix ferme compris",
+          corps:
+            "Présenté lors d’un second rendez-vous : les modules, les raccordements à ton ERP ou à ta comptabilité, le prix et la date de mise en ligne.",
+        },
+        {
+          titre: "3. Testé sur de vraies commandes",
+          corps:
+            "Chaque module arrive sur une adresse en ligne. Ton comptoir le compare à l’outil actuel sur des commandes réelles avant la bascule.",
+        },
+        {
+          titre: "4. Livré avec ses règles écrites",
+          corps:
+            "Le code et la base t’appartiennent dès la livraison, et la documentation décrit chaque règle de prix pour qu’un autre développeur puisse reprendre.",
+        },
+      ],
+    },
+  ],
+  calcul: {
+    heuresParAn: NEG_HEURES_AN,
+    coutHoraire: NEG_COUT_HORAIRE,
+    coutAnnuel: NEG_COUT_AN,
+  },
+  titrePacks: "Prix d’un logiciel de négoce, en 3 forfaits",
+  faq: {
+    eyebrow: "FAQ",
+    titleLines: ["Ton logiciel", "de distribution."],
+    items: [
+      {
+        question: "Combien coûte un logiciel de gestion de négoce sur mesure ?",
+        answer: `${OUTIL.nom}, à ${prixPack(OUTIL)} HT, règle une tâche, comme l’import des tarifs fournisseurs. ${LE_LOGICIEL.nom}, à ${prixPack(LE_LOGICIEL)} HT, réunit jusqu’à 3 modules, par exemple tarifs clients, commandes et stock. ${PLATEFORME.nom} démarre à ${prixPack(PLATEFORME)} HT, quand le logiciel doit rester d’accord avec ton ERP, ta comptabilité et ton site dans les 2 sens.`,
+      },
+      {
+        question: "Faut-il remplacer mon ERP ?",
+        answer:
+          "Pas forcément. Si ton ERP tient correctement la comptabilité et le stock, je développe la partie qui manque et je la raccorde à lui.",
+      },
+      {
+        question: "Le logiciel gère-t-il les remises en cascade et les prix nets ?",
+        answer:
+          "Oui. Tu fixes l’ordre d’application : tarif de base, remise de la famille, remise du client, puis le prix net négocié qui prend le dessus. Chaque ligne affiche le détail du calcul, et le commercial voit sa marge avant de valider.",
+      },
+      {
+        question: "Mes clients pourront-ils commander en ligne à leur prix ?",
+        answer:
+          "Oui, avec le module d’espace client : chaque compte professionnel voit ses prix, le stock disponible et ses commandes en cours, reliquats compris. La commande arrive dans le logiciel sans ressaisie.",
+      },
+      {
+        question: "As-tu déjà travaillé dans la distribution ?",
+        answer:
+          "Oui. En 2024, chez Würth France, distributeur de fournitures pour les professionnels, j’ai refait le parcours de création de compte de l’eShop : −92 % d’erreurs, mesuré en interne. Je n’ai pas encore développé de logiciel de gestion complet pour un négociant.",
+      },
+    ],
+  },
+};
+
 /** Toutes les pages secteur, dans l'ordre où la page pilier les liste. */
-export const pagesSecteur: readonly PageSecteur[] = [pageBtp, pageTransport];
+export const pagesSecteur: readonly PageSecteur[] = [
+  pageBtp,
+  pageTransport,
+  pageLocation,
+  pageNegoce,
+];
 
 /** Résolution par slug. `undefined` plutôt qu'une exception : la route 404. */
 export const pageSecteur = (slug: string): PageSecteur | undefined =>
