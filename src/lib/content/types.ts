@@ -476,6 +476,19 @@ export interface WorkItem extends SluggedContent {
   nextProject: string; // slug du projet suivant
 }
 
+/** Description schema.org d'un jeu de données publié dans un article. */
+export interface BlogDataset {
+  readonly name: string;
+  readonly description: string;
+  /** URL de la licence, par exemple CC BY 4.0. */
+  readonly license: string;
+  /** Intervalle ISO 8601 des relevés (`2026-07-19/2026-09-01`). */
+  readonly temporalCoverage: string;
+  /** Zone couverte, en clair. */
+  readonly spatialCoverage: string;
+  readonly variableMeasured: readonly string[];
+}
+
 export interface BlogPost extends SluggedContent {
   title: string;
   /** Date de publication ISO. */
@@ -493,6 +506,12 @@ export interface BlogPost extends SluggedContent {
   readingTime?: string;
   tags?: string[];
   related?: string[]; // slugs d'articles liés
+  /**
+   * Jeu de données publié par l'article (étude chiffrée). Présent, il ajoute
+   * un nœud `Dataset` au JSON-LD de la page ; absent, l'article reste un
+   * simple `BlogPosting`.
+   */
+  dataset?: BlogDataset;
   /*
    * PAS DE CORPS ICI. Le texte de l'article vit dans
    * `src/content/articles/<slug>.mdx`, chargé par la page `blog/[slug]`. Le

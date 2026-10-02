@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import {
   articleSchema,
   businessSchema,
+  datasetSchema,
   personSchema,
   profilePageSchema,
 } from "./json-ld.ts";
@@ -59,5 +60,41 @@ describe("JSON-LD de la page à propos", () => {
     expect(profilePageSchema().mainEntity).toEqual({ "@id": person["@id"] });
     expect(person.sameAs).toContain("https://www.linkedin.com/in/eliott-bouquerel");
     expect(person.sameAs).toContain("https://github.com/Lyot7");
+  });
+});
+
+describe("JSON-LD d'une étude chiffrée", () => {
+  const dataset = {
+    name: "Jeu d'exemple",
+    description: "Indicateurs agrégés",
+    license: "https://creativecommons.org/licenses/by/4.0/deed.fr",
+    temporalCoverage: "2026-07-19/2026-09-01",
+    spatialCoverage: "Normandie",
+    variableMeasured: ["Part des fiches sans site"],
+  };
+  const auteur = { name: siteConfig.contact.person.name };
+
+  test("un article sans jeu de données n'ajoute aucun nœud", () => {
+    expect(datasetSchema({ slug: "exemple", author: auteur })).toEqual([]);
+  });
+
+  test("le jeu de données est relié à l'article et à la personne du site", () => {
+    const [noeud] = datasetSchema({ slug: "exemple", author: auteur, dataset });
+    const [article] = articleSchema(
+      {
+        slug: "exemple",
+        title: "Exemple",
+        date: "2026-10-02",
+        excerpt: "Résumé",
+        cover: { src: "/images/exemple.jpg" },
+      },
+      siteConfig,
+    );
+    expect(noeud["@type"]).toBe("Dataset");
+    expect(noeud.subjectOf).toEqual({ "@id": article["@id"] });
+    expect(noeud.creator["@id"]).toBe(personSchema(siteConfig)["@id"]);
+    expect(noeud.license).toBe(dataset.license);
+    expect(noeud.isAccessibleForFree).toBe(true);
+    expect(noeud.spatialCoverage).toEqual({ "@type": "Place", name: "Normandie" });
   });
 });

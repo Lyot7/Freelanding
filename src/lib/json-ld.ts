@@ -1,4 +1,10 @@
-import type { FaqItem, HomeContent, SiteConfig, WorkItem } from "@/lib/content/types";
+import type {
+  BlogDataset,
+  FaqItem,
+  HomeContent,
+  SiteConfig,
+  WorkItem,
+} from "@/lib/content/types";
 import { prixPackHT, type Prestation } from "@/content/offre";
 import { absoluteUrl } from "@/lib/site-url";
 
@@ -420,6 +426,41 @@ export function articleSchema(
       { name: "Blog", item: absoluteUrl("/blog") },
       { name: post.title },
     ]),
+  ];
+}
+
+/**
+ * Jeu de données publié par un article, quand il en déclare un.
+ *
+ * Renvoie un tableau vide sinon, pour s'insérer tel quel dans `graph`, qui
+ * aplatit ses nœuds. Le créateur est la personne du site, désignée par le même
+ * `@id` que l'auteur de l'article.
+ */
+export function datasetSchema(post: {
+  slug: string;
+  author: { name: string };
+  dataset?: BlogDataset;
+}) {
+  if (!post.dataset) return [];
+  const url = absoluteUrl(`/blog/${post.slug}`);
+  const { name, description, license, temporalCoverage, spatialCoverage, variableMeasured } =
+    post.dataset;
+  return [
+    {
+      "@type": "Dataset",
+      "@id": `${url}#donnees`,
+      name,
+      description,
+      url,
+      license,
+      isAccessibleForFree: true,
+      inLanguage: "fr-FR",
+      creator: { "@type": "Person", "@id": PERSON_ID, name: post.author.name },
+      temporalCoverage,
+      spatialCoverage: { "@type": "Place", name: spatialCoverage },
+      variableMeasured: [...variableMeasured],
+      subjectOf: { "@id": `${url}#article` },
+    },
   ];
 }
 

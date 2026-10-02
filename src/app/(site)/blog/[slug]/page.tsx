@@ -3,7 +3,12 @@ import { notFound } from "next/navigation";
 import { BlogArticlePage } from "@/components/pages/blog/BlogArticlePage";
 import { JsonLd } from "@/components/JsonLd";
 import { content } from "@/lib/content";
-import { articleSchema, graph, personSchema } from "@/lib/json-ld";
+import {
+  articleSchema,
+  datasetSchema,
+  graph,
+  personSchema,
+} from "@/lib/json-ld";
 import { absoluteUrl } from "@/lib/site-url";
 import { sommaireDeLArticle } from "@/lib/blog/sommaire";
 
@@ -100,7 +105,13 @@ export default async function BlogPostPage({
        * un identifiant creux. Le nœud est déclaré ici pour que l'auteur se
        * résolve sur la page même, là où le signal compte.
        */}
-      <JsonLd data={graph(articleSchema(post, site), personSchema(site))} />
+      <JsonLd
+        data={graph(
+          articleSchema(post, site),
+          datasetSchema(post),
+          personSchema(site),
+        )}
+      />
       <BlogArticlePage
         post={post}
         related={related}
