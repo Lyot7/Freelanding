@@ -1,0 +1,116 @@
+Remplacer Excel par un logiciel se justifie quand le fichier sert à plusieurs personnes, qu’il porte des règles de gestion et que ses erreurs coûtent de l’argent. La migration se fait en 4 temps : comprendre le fichier, nettoyer les données, construire les écrans, puis basculer avec une courte période en parallèle. Pour une PME, compte <Prix offre="logiciel" /> selon le nombre de modules, et commence par chiffrer ce que le tableur te coûte déjà.
+
+Excel est un excellent outil de calcul. Il devient un mauvais logiciel de gestion le jour où toute l’entreprise en dépend. Cet article t’aide à repérer ce moment, à préparer la sortie et à chiffrer les deux options.
+
+## À quoi vois-tu qu’Excel ne suffit plus ?
+
+Un seul de ces signes ne suffit pas. À partir de 3, ton fichier est devenu un logiciel de gestion sans en avoir les protections.
+
+<Steps items={[
+  "Plusieurs personnes modifient le même fichier, et des copies nommées « version finale 2 » circulent par e-mail.",
+  "Une formule cassée passe inaperçue pendant des semaines, et personne ne sait qui a changé quoi, ni quand.",
+  "Les mêmes informations sont recopiées d’un onglet à l’autre, ou d’un fichier vers un autre outil, à la main.",
+  "Le fichier contient des règles de gestion, comme une grille de remises ou des statuts de commande, que seule une personne comprend.",
+  "Tout le monde voit tout : marges, salaires, coordonnées de clients, faute de droits par rôle.",
+  "Tes équipes sur le terrain ne peuvent ni consulter ni saisir depuis un téléphone, et rappellent le bureau pour avoir une information."
+]} />
+
+Le quatrième signe est le plus coûteux. Le jour où la personne qui maîtrise le fichier part en congés ou quitte l’entreprise, la règle part avec elle.
+
+## Combien te coûte le tableur que tu gardes ?
+
+Le tableur paraît gratuit parce que son coût ne figure sur aucune facture. Il se paie en heures de ressaisie, de rapprochement et de correction. Voici un calcul sur une année, avec ses hypothèses affichées : remplace-les par les tiens.
+
+| Hypothèse | Valeur |
+| --- | --- |
+| Personnes qui tiennent ou corrigent le fichier | 4 |
+| Heures par semaine et par personne | 3 |
+| Semaines travaillées par an | 46 |
+| Coût complet d’une heure, charges comprises | 35 € |
+
+4 personnes × 3 heures × 46 semaines donnent 552 heures par an. À 35 € l’heure, le tableur coûte 19 320 € par an, sans compter les erreurs : une remise mal appliquée, une commande oubliée, un stock faux au moment de promettre une date.
+
+En face, L’Outil coûte <Prix offre="logiciel" forfait="outil" /> pour une tâche et un raccordement, et Le Logiciel <Prix offre="logiciel" forfait="logiciel" /> pour jusqu’à 3 modules. Les deux se paient une fois et t’appartiennent à la livraison.
+
+## Logiciel du marché ou logiciel sur mesure ?
+
+Regarde ce que ton fichier reproduit. S’il fait de la facturation, de la comptabilité ou un suivi de prospects classique, un logiciel du marché le remplace très bien, souvent pour quelques dizaines d’euros par mois. Prends-le.
+
+Si ton fichier décrit ton métier lui-même, avec tes étapes, tes calculs et tes exceptions, aucun logiciel standard ne le reprendra sans que tu changes ta façon de travailler. C’est le cas où le sur mesure se justifie. Pour un progiciel complet comme Odoo, j’ai comparé les deux options dans [Odoo ou logiciel sur mesure](/blog/logiciel-sur-mesure-ou-odoo).
+
+## Comment migrer les données d’Excel vers un logiciel ?
+
+La migration se prépare avant d’écrire une ligne de code, en 5 étapes. C’est elle qui décide si ton équipe adopte le logiciel ou retourne au fichier.
+
+### 1. Faire l’inventaire
+
+Liste chaque fichier, chaque onglet, et qui s’en sert pour quoi. Tu découvriras des onglets abandonnés, et parfois un second fichier caché qui fait le même travail.
+
+### 2. Écrire le dictionnaire des colonnes
+
+Pour chaque colonne : ce qu’elle veut dire, les valeurs autorisées, qui la remplit. « Statut » peut contenir « livré », « Livré », « OK » et une cellule verte sans texte. Le logiciel, lui, aura une liste fermée.
+
+### 3. Nettoyer
+
+Doublons de clients, dates saisies comme du texte, cellules fusionnées, totaux tapés à la main au lieu d’être calculés : chaque défaut se corrige une fois, avant l’import, et la règle de correction est notée.
+
+### 4. Importer et comparer
+
+Un premier import sur une copie, puis la comparaison des totaux : nombre de clients, chiffre d’affaires par mois, quantités en stock. Les écarts disent ce qui a été mal compris.
+
+### 5. Basculer
+
+Quelques semaines en parallèle, puis le fichier passe en lecture seule. Garder les deux ouverts trop longtemps recrée le problème de départ : deux vérités qui divergent.
+
+## Quelles erreurs font échouer la sortie d’Excel ?
+
+3 erreurs reviennent dans ces projets, et aucune n’est technique.
+
+**Reproduire le fichier à l’identique.** Le logiciel n’a pas à copier chaque onglet. Certains existent pour compenser une limite du tableur, comme un onglet de calcul intermédiaire ou une copie de sauvegarde, et disparaissent avec lui.
+
+**Oublier la personne qui tient le fichier.** Elle connaît les exceptions que personne n’a écrites. Si elle découvre le logiciel le jour de la bascule, elle gardera son fichier à côté.
+
+**Laisser deux sources vivre ensemble.** Tant qu’une donnée peut se modifier dans le fichier et dans le logiciel, l’équipe choisira le chemin le plus court, et les deux divergeront.
+
+## Quelles sont les étapes du projet ?
+
+Le projet suit le même chemin, quelle que soit sa taille.
+
+<Steps items={[
+  "Un appel en visio, gratuit. Tu me montres ton fichier en partage d’écran, et je te dis tout de suite si un logiciel du marché suffit.",
+  "Le devis : les modules retenus, le prix ferme et la date de mise en ligne, écrits avant que tu signes.",
+  "La construction, module par module, sur une adresse en ligne où ton équipe essaie chaque écran avec ses vraies données.",
+  "La reprise de l’historique et la bascule, puis la livraison : le code dans ton dépôt et l’hébergement à ton nom."
+]} />
+
+## Que garder d’Excel une fois le logiciel en place ?
+
+L’analyse. Excel reste le meilleur outil pour croiser des chiffres, tester une hypothèse ou préparer une présentation. La différence : il devient un outil de lecture. Les données vivent dans le logiciel, avec leurs règles et leurs droits, et tu les exportes vers Excel quand tu veux les analyser. Le forfait Le Logiciel comprend cet export, à tout moment.
+
+## Questions fréquentes
+
+### Mes fichiers sont en désordre : faut-il les ranger avant de m’appeler ?
+
+Non. Le désordre fait partie du travail, et c’est en le regardant que je comprends tes règles de gestion. Envoie-les tels qu’ils sont ; le nettoyage est prévu dans le projet.
+
+### Un tableur en ligne ne suffirait-il pas ?
+
+Un tableur en ligne règle le partage et les versions. Il ne règle ni les droits par rôle, ni les règles de gestion protégées, ni la saisie fiable depuis un téléphone. C’est une bonne étape si ton seul problème est la copie qui circule par e-mail.
+
+### Combien de temps prend la migration ?
+
+La date de mise en ligne est écrite dans le devis. Elle dépend surtout de l’état de tes fichiers et de la disponibilité de la personne qui les connaît le mieux : prévois-lui du temps pour répondre aux questions.
+
+### Qui doit suivre le projet de mon côté ?
+
+La personne qui utilise le fichier tous les jours, plus que son responsable. Elle répond aux questions sur les cas particuliers, essaie les écrans avec ses vraies données et valide la bascule. Une heure par semaine de sa part suffit à éviter la plupart des allers-retours.
+
+### Combien coûte un logiciel pour remplacer Excel ?
+
+<Prix offre="logiciel" />, selon le nombre de modules et d’outils à relier. Le détail des 3 forfaits est sur la [page des prix du logiciel sur mesure](/services/logiciel-metier/prix).
+
+## Ce que je retiens
+
+Garde Excel pour calculer et analyser. Sors-en ce qui fait tourner l’entreprise dès que plusieurs personnes en dépendent, et commence par chiffrer les heures que le fichier te prend déjà : c’est ce montant qui dit si le projet se justifie.
+
+Si ton fichier coche plusieurs des signes plus haut, montre-le-moi. La [solution métier](/services/logiciel-metier) part de ce que ton tableur fait déjà, et tout commence par [un appel en visio](/contact?sujet=logiciel#rendez-vous).

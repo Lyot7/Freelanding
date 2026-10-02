@@ -1,0 +1,86 @@
+WordPress suffit quand tu veux publier toi-même souvent, qu’un thème existant te convient et que quelqu’un tient les mises à jour de ses extensions chaque mois. Un site sur mesure, construit avec un outil comme Next.js, se justifie quand le site doit vendre : vitesse, image qui ne ressemble à aucun concurrent, formulaires branchés sur tes outils, et le moins de maintenance possible. Sur 3 ans, l’écart de prix se joue moins sur la création que sur ce que coûte l’entretien.
+
+Je construis des sites sur mesure, donc je ne suis pas neutre. Cet article dit aussi dans quels cas WordPress est le meilleur choix, et je te le dirai pendant l’appel si c’est le tien.
+
+## Qu’est-ce qui distingue un site WordPress d’un site sur mesure ?
+
+WordPress est un système de gestion de contenu écrit en PHP. Tu choisis un thème pour l’apparence, tu ajoutes des extensions pour les fonctions, et tu gères tes pages depuis une interface d’administration. Selon [W3Techs](https://w3techs.com/technologies/details/cm-wordpress), relevé le 2 octobre 2026, il fait tourner 40,2 % de tous les sites du web. Cette popularité a un avantage : un vaste choix de thèmes, d’extensions et de prestataires.
+
+Un site sur mesure part d’une page blanche. Avec Next.js, l’outil que j’emploie, les pages sont produites à l’avance et servies telles quelles : le visiteur reçoit du HTML prêt à afficher, sans base de données interrogée à chaque visite. Le code ne contient que ce dont ton site se sert, et le design part de ton entreprise au lieu d’un thème partagé avec d’autres sites.
+
+| Critère | WordPress | Site sur mesure |
+| --- | --- | --- |
+| Modifier un texte soi-même | Simple, depuis l’administration | Passe par le développeur, sauf interface d’édition prévue au devis |
+| Apparence | Un thème, plus ou moins adapté | Dessinée pour ton entreprise |
+| Fonctions | Une extension par besoin | Développées pour ton besoin |
+| Maintenance | Cœur, thème et extensions à mettre à jour | Dépendances moins nombreuses, mises à jour plus rares |
+| Surface d’attaque | Administration, base de données, extensions | Pages statiques, pas d’administration publique |
+| Vitesse | Bonne avec un thème léger, lourde avec un constructeur de pages | Ne charge que ce que la page affiche |
+
+## Que coûtent la maintenance et la sécurité d’un WordPress ?
+
+Chaque extension est un morceau de code écrit par quelqu’un d’autre, avec son propre rythme de mises à jour. Le rapport de Patchstack sur [l’état de la sécurité WordPress en 2025](https://patchstack.com/whitepaper/state-of-wordpress-security-in-2025/) a recensé 7 966 nouvelles vulnérabilités dans l’écosystème WordPress en 2024, dont 96 % dans les extensions et seulement 7 dans le cœur du logiciel. Le cœur de WordPress est solide ; le risque vient des extensions ajoutées par-dessus.
+
+Concrètement, un site WordPress demande une mise à jour régulière de ses extensions, une vérification que rien ne casse après chaque mise à jour, et des sauvegardes. Ce travail se fait toi-même ou par un prestataire, et il ne s’arrête pas tant que le site est en ligne.
+
+Un site sur mesure a aussi des dépendances à tenir à jour. Elles sont moins nombreuses, et un site dont les pages sont produites à l’avance n’expose ni base de données ni page de connexion à attaquer. La maintenance se résume alors à un suivi régulier.
+
+## Lequel est le plus rapide ?
+
+Un WordPress bien construit, avec un thème léger, peu d’extensions et un bon cache, peut être rapide. Les constructeurs de pages visuels, eux, chargent beaucoup de code pour afficher peu de chose, et c’est souvent là qu’un site WordPress lent perd son temps.
+
+Un site sur mesure part avec un avantage structurel : il ne contient que ce qu’il affiche. Je mesure sa vitesse sur mobile et sur ordinateur avant la mise en ligne, c’est inclus dans chaque forfait. Pour comprendre ce qu’une page lente coûte, lis [site e-commerce lent : ce que ça coûte](/blog/site-e-commerce-lent-ce-que-ca-coute).
+
+## Combien coûte chaque option sur 3 ans ?
+
+Compare les deux options poste par poste, sur la durée de vie du site. Côté WordPress, les montants ci-dessous sont des hypothèses rondes pour un site de 5 à 7 pages réalisé par un prestataire : remplace-les par les devis que tu reçois. Côté sur mesure, ce sont mes prix pour Le Site.
+
+| Poste sur 3 ans | WordPress avec prestataire | Site sur mesure, Le Site |
+| --- | --- | --- |
+| Création | Hypothèse : 3 500 € | <Prix offre="vitrine" forfait="site" /> |
+| Thème et extensions payantes | Hypothèse : 150 € par an, soit 450 € | Aucun |
+| Maintenance | Hypothèse : 60 € par mois, soit 2 160 € | Suivi facultatif : <Prix offre="vitrine" forfait="site" suivi /> |
+| Hébergement | Un hébergement compatible PHP et base de données | À ton nom, au tarif de ton hébergeur |
+
+Avec ces hypothèses, le WordPress revient à 6 110 € sur 3 ans hors hébergement. Le sur mesure peut coûter plus cher sur la même période si tu prends le suivi. Il peut aussi coûter moins cher si tu t’en passes : un site sans extensions à mettre à jour continue de fonctionner sans intervention mensuelle.
+
+L’écart de prix compte moins que ce que tu achètes. Le WordPress achète l’autonomie sur les textes. Le sur mesure achète un site qui ne ressemble qu’à toi, rapide, avec peu d’entretien. La page sur le [prix d’un site internet sur mesure](/services/site-vitrine/prix) détaille les 3 forfaits et les coûts après la mise en ligne.
+
+## Quand WordPress est-il le bon choix ?
+
+<Steps items={[
+  "Tu publies toi-même plusieurs fois par mois : actualités, articles, nouvelles réalisations, et tu veux le faire sans passer par personne.",
+  "Un thème existant correspond à ton image, et ton budget de départ est serré.",
+  "Une extension reconnue fait exactement ce dont tu as besoin, comme une billetterie ou un catalogue de formations.",
+  "Tu as quelqu’un, en interne ou chez un prestataire, pour tenir les mises à jour chaque mois."
+]} />
+
+Dans ces cas, prends WordPress avec un prestataire spécialisé. Je ne reprends pas de code PHP, WordPress compris : un spécialiste te servira mieux que moi.
+
+## Quand le site sur mesure se justifie-t-il ?
+
+Le sur mesure se justifie quand ton site sert d’outil commercial. Tes prospects te comparent à tes concurrents avant d’appeler, et un thème partagé avec eux ne t’aide pas à te distinguer. Il se justifie aussi quand la vitesse sur mobile compte, quand tes formulaires doivent arriver dans ta boîte mail, ton agenda ou ton CRM sans extension intermédiaire, et quand tu préfères payer une fois un site qui tourne seul plutôt qu’entretenir une pile d’extensions.
+
+## Questions fréquentes
+
+### Puis-je modifier mon site sur mesure moi-même ?
+
+Les textes et les images d’un site sur mesure vivent dans le code. Pour un site vitrine qui change peu, une modification de temps en temps passe par moi. Si tu publies souvent, dis-le dès le premier appel : c’est un critère qui peut faire pencher vers WordPress.
+
+### Next.js est-il bon pour le référencement ?
+
+Oui. Les pages sont servies en HTML complet, lisibles par les moteurs dès la première visite, et les balises, les données structurées et le plan du site se règlent page par page. Le référencement dépend ensuite du contenu, comme sur WordPress.
+
+### Mon site WordPress peut-il passer en sur mesure sans perdre son référencement ?
+
+Oui, à condition de préparer la migration : inventaire des adresses, redirections 301 et reprise du contenu qui se classe. La méthode complète est dans [refonte de site internet : prix et méthode](/blog/refonte-site-internet-pme).
+
+### Un site Wix ou Squarespace est-il une option ?
+
+Pour démarrer seul avec un petit budget, oui. Tu paies un abonnement, tu restes sur leur plateforme, et tu ne pourras pas emporter ton site ailleurs tel quel. Le même raisonnement vaut pour une boutique, développé dans [Shopify ou site sur mesure](/blog/shopify-ou-site-sur-mesure).
+
+## Ce que je retiens
+
+Choisis WordPress si tu veux publier toi-même et que tu as de quoi l’entretenir. Choisis le sur mesure si ton site doit te distinguer et vendre, avec le moins de maintenance possible. Dans les deux cas, compare sur 3 ans, maintenance comprise.
+
+Si tu hésites, décris-moi ton site idéal et la fréquence à laquelle tu le modifierais. La [création de site sur mesure](/services/site-vitrine) détaille ce que je construis, et tout commence par [un appel en visio](/contact?sujet=site#rendez-vous).

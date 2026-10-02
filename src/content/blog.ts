@@ -75,6 +75,11 @@ const eliott = {
  * les deux articles sur la dépendance aux outils partagent les engrenages, les
  * deux articles sur la conception partagent les ciseaux à bois. La provenance
  * de chaque fichier est dans `docs/ASSETS.md`.
+ *
+ * LE 2026-10-02, quatre articles de plus reprennent chacun la couverture d'un
+ * article de même sujet, sans fichier nouveau : Odoo le rabot (outil sur
+ * mesure), Excel le tiroir de fiches (données), la refonte le chronomètre
+ * (vitesse), WordPress le buste de couture (sur mesure contre prêt-à-porter).
  */
 
 export const blogPosts: BlogPost[] = [
@@ -153,6 +158,230 @@ export const blogPosts: BlogPost[] = [
         "Part des sites sans HTTPS, sans balise viewport, en tableaux ou chargeant jQuery 1.x/2.x ou Flash",
         "Temps de réponse du serveur jusqu’au premier octet",
       ],
+    },
+  },
+
+  {
+    slug: "logiciel-sur-mesure-ou-odoo",
+    title: "Odoo ou logiciel sur mesure : comment choisir",
+    date: "2026-10-02",
+    dateSource: "editorial",
+    listedInIndex: true,
+    category: "Outils métier",
+    author: eliott,
+    cover: {
+      src: "/images/blog/outil-sur-mesure-ou-abonnements-saas.jpg",
+      alt: "Rabot à main en métal posé sur une planche de pin, au milieu des copeaux",
+      width: 1200,
+      height: 1114,
+    },
+    heroImage: {
+      src: "/images/heros/blog-outil-sur-mesure-ou-abonnements-saas.jpg",
+      alt: "Rabot à main en métal posé sur une planche de pin, au milieu des copeaux",
+      width: 2400,
+      height: 1350,
+      cadrage: { x: 30, y: 40 },
+      credit: {
+        prefixe: "Photo :",
+        auteur: {
+          libelle: "Phil Gradwell",
+          href: "https://commons.wikimedia.org/wiki/File:Stanley_jack_plane.jpg",
+        },
+        licence: {
+          libelle: "CC BY 2.0",
+          href: "https://creativecommons.org/licenses/by/2.0/deed.fr",
+        },
+        modification: "retouchée",
+      },
+      og: {
+        src: "/images/og-blog-outil-sur-mesure-ou-abonnements-saas.jpg",
+        alt: "Rabot à main en métal posé sur une planche de pin, au milieu des copeaux",
+        width: 1200,
+        height: 630,
+      },
+    },
+    excerpt:
+      "Odoo gagne sur un périmètre standard et une petite équipe. Le sur mesure prend l’avantage quand ton métier sort du cadre, ou quand la licence suit ta croissance.",
+    readingTime: "7 min de lecture",
+    tags: ["Odoo", "ERP", "logiciel sur mesure"],
+    seo: {
+      title: "Odoo ou logiciel sur mesure : quand choisir l’un ou l’autre",
+      description:
+        "Odoo ou logiciel sur mesure : licences par utilisateur, intégrateur, personnalisation, coût sur 3 ans, et les cas où Odoo reste le bon choix pour votre PME.",
+      ogImage: {
+        src: "/images/og-blog-outil-sur-mesure-ou-abonnements-saas.jpg",
+        alt: "Rabot à main en métal posé sur une planche de pin, au milieu des copeaux",
+        width: 1200,
+        height: 630,
+      },
+    },
+  },
+
+  {
+    slug: "remplacer-excel-par-un-logiciel",
+    title: "Remplacer Excel par un logiciel : signes, étapes et coût",
+    date: "2026-10-02",
+    dateSource: "editorial",
+    listedInIndex: true,
+    category: "Outils métier",
+    author: eliott,
+    cover: {
+      src: "/images/blog/fichier-client.jpg",
+      alt: "Un tiroir de fichier ouvert, plein de fiches cartonnées",
+      width: 1200,
+      height: 1114,
+    },
+    heroImage: {
+      src: "/images/heros/blog-fichier-client.jpg",
+      alt: "Un tiroir de fichier ouvert, plein de fiches cartonnées",
+      width: 2400,
+      height: 1350,
+      cadrage: { x: 30, y: 40 },
+      credit: {
+        prefixe: "Photo :",
+        auteur: {
+          libelle: "Alicia Fagerving",
+          href: "https://commons.wikimedia.org/wiki/File:GU_Library_Card_catalog_3.jpg",
+        },
+        licence: {
+          libelle: "CC BY-SA 3.0",
+          href: "https://creativecommons.org/licenses/by-sa/3.0/deed.fr",
+        },
+        modification: "retouchée",
+      },
+      og: {
+        src: "/images/og-blog-fichier-client.jpg",
+        alt: "Un tiroir de fichier ouvert, plein de fiches cartonnées",
+        width: 1200,
+        height: 630,
+      },
+    },
+    excerpt:
+      "Un tableur partagé coûte des heures que personne ne facture. Les signes qu’Excel ne suffit plus, la migration des données en 5 étapes, et le calcul pour décider.",
+    readingTime: "6 min de lecture",
+    tags: ["Excel", "migration", "logiciel sur mesure"],
+    seo: {
+      title: "Remplacer Excel par un logiciel de gestion : méthode et coût",
+      description:
+        "Les signes qu’Excel ne suffit plus, la migration de vos données en 5 étapes, le coût d’un tableur partagé et le prix d’un logiciel sur mesure pour votre PME.",
+      ogImage: {
+        src: "/images/og-blog-fichier-client.jpg",
+        alt: "Un tiroir de fichier ouvert, plein de fiches cartonnées",
+        width: 1200,
+        height: 630,
+      },
+    },
+  },
+
+  {
+    slug: "refonte-site-internet-pme",
+    title: "Refonte de site internet : prix et méthode",
+    date: "2026-10-02",
+    dateSource: "editorial",
+    listedInIndex: true,
+    category: "Méthode",
+    author: eliott,
+    cover: {
+      src: "/images/blog/site-e-commerce-lent-ce-que-ca-coute.jpg",
+      alt: "Chronomètre mécanique à cadran blanc posé sur une table claire, couronne et anneau en haut à droite",
+      width: 1200,
+      height: 1114,
+    },
+    heroImage: {
+      src: "/images/heros/blog-site-e-commerce-lent-ce-que-ca-coute.jpg",
+      alt: "Chronomètre mécanique à cadran blanc posé sur une table claire, couronne et anneau en haut à droite",
+      width: 2400,
+      height: 1350,
+      cadrage: { x: 28, y: 40 },
+      credit: {
+        prefixe: "Photo :",
+        auteur: {
+          libelle: "Tim Reckmann",
+          href: "https://commons.wikimedia.org/wiki/File:Stoppuhr_I_(12163259433).jpg",
+        },
+        licence: {
+          libelle: "CC BY 2.0",
+          href: "https://creativecommons.org/licenses/by/2.0/deed.fr",
+        },
+        modification: "retouchée",
+      },
+      og: {
+        src: "/images/og-blog-site-e-commerce-lent-ce-que-ca-coute.jpg",
+        alt: "Chronomètre mécanique à cadran blanc posé sur une table claire, couronne et anneau en haut à droite",
+        width: 1200,
+        height: 630,
+      },
+    },
+    excerpt:
+      "Une refonte se justifie quand le site ne rapporte plus. Son risque principal est de perdre le référencement acquis, et il se protège avant de dessiner la moindre page.",
+    readingTime: "6 min de lecture",
+    tags: ["refonte", "référencement", "redirections"],
+    seo: {
+      title: "Refonte site internet : prix et méthode pour garder son SEO",
+      description:
+        "Quand refondre votre site, comment garder votre référencement avec un plan de redirections 301, et ce que coûte la refonte d’un site internet pour une PME.",
+      ogImage: {
+        src: "/images/og-blog-site-e-commerce-lent-ce-que-ca-coute.jpg",
+        alt: "Chronomètre mécanique à cadran blanc posé sur une table claire, couronne et anneau en haut à droite",
+        width: 1200,
+        height: 630,
+      },
+    },
+  },
+
+  {
+    slug: "site-sur-mesure-ou-wordpress",
+    title: "Site sur mesure ou WordPress : comment choisir",
+    date: "2026-10-02",
+    dateSource: "editorial",
+    listedInIndex: true,
+    category: "Méthode",
+    author: eliott,
+    cover: {
+      src: "/images/blog/shopify-ou-site-sur-mesure.jpg",
+      alt: "Buste de couture habillé d’un tissu à fines rayures, un mètre ruban autour du cou, dans un atelier",
+      width: 1200,
+      height: 1114,
+    },
+    heroImage: {
+      src: "/images/heros/blog-shopify-ou-site-sur-mesure.jpg",
+      alt: "Buste de couture habillé d’un tissu à fines rayures, un mètre ruban autour du cou, dans un atelier",
+      width: 2400,
+      height: 1350,
+      cadrage: { x: 26, y: 40 },
+      credit: {
+        prefixe: "Photo :",
+        auteur: {
+          libelle: "Igor Ovsyannykov",
+          href: "https://commons.wikimedia.org/wiki/File:Igor_Ovsyannykov_2017-05-08_(Unsplash).jpg",
+        },
+        licence: {
+          libelle: "CC0",
+          href: "https://creativecommons.org/publicdomain/zero/1.0/deed.fr",
+        },
+        modification: "retouchée",
+      },
+      og: {
+        src: "/images/og-blog-shopify-ou-site-sur-mesure.jpg",
+        alt: "Buste de couture habillé d’un tissu à fines rayures, un mètre ruban autour du cou, dans un atelier",
+        width: 1200,
+        height: 630,
+      },
+    },
+    excerpt:
+      "WordPress achète l’autonomie sur tes textes, le sur mesure achète un site rapide qui ne ressemble qu’à toi. Sur 3 ans, l’écart se joue sur la maintenance.",
+    readingTime: "6 min de lecture",
+    tags: ["WordPress", "Next.js", "site sur mesure"],
+    seo: {
+      title: "Site sur mesure ou WordPress : coût, sécurité et vitesse",
+      description:
+        "WordPress ou site sur mesure en Next.js : maintenance des extensions, sécurité, vitesse, coût sur 3 ans, et les cas où WordPress suffit pour votre entreprise.",
+      ogImage: {
+        src: "/images/og-blog-shopify-ou-site-sur-mesure.jpg",
+        alt: "Buste de couture habillé d’un tissu à fines rayures, un mètre ruban autour du cou, dans un atelier",
+        width: 1200,
+        height: 630,
+      },
     },
   },
 
