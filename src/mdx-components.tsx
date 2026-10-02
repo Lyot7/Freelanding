@@ -3,6 +3,7 @@ import type { MDXComponents } from "mdx/types";
 import {
   Callout,
   Figure,
+  Prix,
   Quote,
   Stat,
   Steps,
@@ -222,6 +223,7 @@ const components: MDXComponents = {
   Figure,
   Video,
   Callout,
+  Prix,
   Stat,
   Steps,
   Quote,
