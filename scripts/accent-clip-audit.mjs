@@ -91,6 +91,9 @@ const ROUTES = [
   // Pages de prestation, ajoutées le 2026-08-27 avec la refonte de l'offre.
   "/services/site-vitrine",
   "/services/logiciel-metier",
+  // Pages secteur de la solution métier (lot 2 SEO, 2026-10-02).
+  "/services/logiciel-metier/btp",
+  "/services/logiciel-metier/transport",
   "/contact",
   // Vue agent (2026-09-23) : le profil y écrit ses liens en clair.
   "/legal/mentions-legales",
