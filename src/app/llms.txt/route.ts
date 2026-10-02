@@ -1,5 +1,6 @@
 import { content } from "@/lib/content";
 import { absoluteUrl } from "@/lib/site-url";
+import { blogPosts } from "@/content/blog";
 import { fourchette, prestations as offre, prixPack } from "@/content/offre";
 import { pageCaen } from "@/content/page-caen";
 import { pagesSecteur } from "@/content/pages-secteur";
@@ -50,6 +51,11 @@ export async function GET(): Promise<Response> {
     (item) => `### ${item.question}\n\n${item.answer}`,
   );
 
+  const etudes = blogPosts.flatMap((p) =>
+    p.dataset
+      ? [ligne(p.title, `/blog/${p.slug}`, `${p.dataset.name}, données sous licence CC BY 4.0`)]
+      : [],
+  );
   const corps = [
     `# ${site.brand.name}${site.brand.mark}`,
     "",
@@ -110,6 +116,12 @@ export async function GET(): Promise<Response> {
     ligne("Politique de confidentialité", "/legal/politique-de-confidentialite", "données collectées, bases légales, durées, droits RGPD"),
     ligne("Conditions générales de vente", "/legal/conditions-generales-de-vente", "vente aux professionnels : devis, paiement, délais, droits sur le livrable"),
     "",
+    /*
+     * DONNÉES ORIGINALES. Les articles qui publient un jeu de données sont
+     * ceux qu'un assistant a le plus de raisons de citer : il les trouve ici
+     * sans parcourir le blog.
+     */
+    ...(etudes.length ? ["## Données originales", "", ...etudes, ""] : []),
     ...(questions.length ? ["## Questions fréquentes", "", ...questions] : []),
   ].join("\n");
 

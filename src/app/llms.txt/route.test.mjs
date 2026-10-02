@@ -44,4 +44,13 @@ describe("GET /llms.txt", () => {
       "[Profil complet](http://localhost:3000/llms-full.txt) : le même profil en Markdown brut, en un seul fichier",
     );
   });
+
+  it("liste l'étude chiffrée dans « Données originales », avec sa licence", async () => {
+    const corps = await (await GET()).text();
+    const section = corps.split("## Données originales")[1]?.split("\n## ")[0] ?? "";
+    expect(section).toContain(
+      "(http://localhost:3000/blog/etat-des-sites-des-entreprises-normandes-2026)",
+    );
+    expect(section).toContain("CC BY 4.0");
+  });
 });
