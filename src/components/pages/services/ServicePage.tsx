@@ -29,6 +29,7 @@ import {
 import type { LienLocal, PageLocale } from "@/content/page-caen";
 import type { PagePrix } from "@/content/page-prix-logiciel";
 import type { PageSecteur, SectionSecteur } from "@/content/pages-secteur";
+import type { PagePrixSite } from "@/content/page-prix-site";
 import { RDV_PAR_PRESTATION } from "@/content/rendez-vous";
 import { SectionRendezVous } from "@/components/rendez-vous/SectionRendezVous";
 
@@ -423,11 +424,12 @@ export function ServicePage({
   /**
    * Page qui décline la prestation : une ville (`/creation-site-internet-caen`),
    * un secteur (`/services/logiciel-metier/btp`) ou les prix
-   * (`/services/logiciel-metier/prix`). Elle remplace le H1, le chapô, la FAQ
-   * et prolonge le fil d'Ariane ; les périmètres, les prix et la prise de
-   * rendez-vous restent ceux de la prestation.
+   * (`/services/logiciel-metier/prix`, `/services/site-vitrine/prix`). Elle
+   * remplace le H1, le chapô, la FAQ et prolonge le fil d'Ariane ; les
+   * périmètres, les prix et la prise de rendez-vous restent ceux de la
+   * prestation.
    */
-  local?: PageLocale | PageSecteur | PagePrix;
+  local?: PageLocale | PageSecteur | PagePrix | PagePrixSite;
 }) {
   // Le lien vers la page locale ne s'affiche que sur la page de prestation :
   // sur la page locale elle-même, il pointerait vers la page courante.

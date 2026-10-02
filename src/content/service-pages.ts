@@ -14,6 +14,7 @@ import type { Prestation, PrestationId } from "./offre";
 import { lienVersPageCaen } from "./page-caen";
 import { lienVersPageLogicielCaen } from "./page-logiciel-caen";
 import { avantLienPrix, pagePrixLogiciel } from "./page-prix-logiciel";
+import { lienVersPagePrixSite } from "./page-prix-site";
 import { avantLiensSecteur, pagesSecteur } from "./pages-secteur";
 
 /** Libellé de tout lien vers l'ancre `#rendez-vous` d'une page de prestation. */
@@ -239,7 +240,10 @@ export interface LiensDeclinaisons {
 export const lienLocalParPrestation: Partial<
   Record<PrestationId, readonly LiensDeclinaisons[]>
 > = {
-  vitrine: [{ avant: lienVersPageCaen.avant, liens: [lienVersPageCaen] }],
+  vitrine: [
+    { avant: avantLienPrix, liens: [lienVersPagePrixSite] },
+    { avant: lienVersPageCaen.avant, liens: [lienVersPageCaen] },
+  ],
   logiciel: [
     {
       avant: avantLiensSecteur,

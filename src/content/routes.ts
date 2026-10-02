@@ -2,6 +2,7 @@ import type { ContentRoute } from "@/lib/content/types";
 import { blogPosts } from "./blog";
 import { prestations } from "./offre";
 import { CHEMIN_PAGE_CAEN, CHEMIN_PAGE_LOGICIEL_CAEN } from "./page-caen";
+import { CHEMIN_PRIX_SITE } from "./page-prix-site";
 import { CHEMIN_PRIX_LOGICIEL, pagesSecteur } from "./pages-secteur";
 
 /**
@@ -51,6 +52,11 @@ export const contentRoutes: readonly ContentRoute[] = [
    * le logiciel ; voir `page-logiciel-caen.ts`.
    */
   { pathname: CHEMIN_PAGE_LOGICIEL_CAEN, kind: "local" },
+  /*
+   * PRIX D'UN SITE INTERNET (2026-10-02) : les forfaits du site vitrine,
+   * expliqués. Voir `page-prix-site.ts`.
+   */
+  { pathname: CHEMIN_PRIX_SITE, kind: "page" },
   /*
    * PAGES SECTEUR de la solution métier (2026-10-02), dérivées de
    * `pages-secteur.ts` : ajouter un secteur suffit à l'annoncer au sitemap.

@@ -6,6 +6,7 @@ import { pageCaen } from "@/content/page-caen";
 import { pageLogicielCaen } from "@/content/page-logiciel-caen";
 import { pagePrixLogiciel } from "@/content/page-prix-logiciel";
 import { pagesSecteur } from "@/content/pages-secteur";
+import { pagePrixSite } from "@/content/page-prix-site";
 import { CHEMIN_PROFIL_TEXTE, CHEMIN_PROMPT_TEXTE } from "@/content/vue-agent";
 
 /**
@@ -106,6 +107,7 @@ export async function GET(): Promise<Response> {
       pageLogicielCaen.chemin,
       "le logiciel métier sur mesure pour les PME de Caen, du Calvados, de la Manche et de l’Orne",
     ),
+    ligne(pagePrixSite.h1, pagePrixSite.chemin, pagePrixSite.noteLlms),
     /* PAGES SECTEUR de la solution métier, dérivées de `pages-secteur.ts`. */
     ...pagesSecteur.map((p) => ligne(p.h1, p.chemin, p.noteLlms)),
     ligne(pagePrixLogiciel.h1, pagePrixLogiciel.chemin, pagePrixLogiciel.noteLlms),
