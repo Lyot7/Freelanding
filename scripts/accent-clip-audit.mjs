@@ -94,6 +94,10 @@ const ROUTES = [
   // Pages secteur de la solution métier (lot 2 SEO, 2026-10-02).
   "/services/logiciel-metier/btp",
   "/services/logiciel-metier/transport",
+  "/services/logiciel-metier/location-materiel",
+  "/services/logiciel-metier/negoce-distribution",
+  "/services/logiciel-metier/prix",
+  "/logiciel-sur-mesure-caen",
   "/contact",
   // Vue agent (2026-09-23) : le profil y écrit ses liens en clair.
   "/legal/mentions-legales",
