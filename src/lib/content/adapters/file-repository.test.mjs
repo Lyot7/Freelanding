@@ -31,6 +31,7 @@ const PAGES_FIXES = [
   "/realisations",
   "/creation-site-internet-caen",
   "/logiciel-sur-mesure-caen",
+  "/services/site-vitrine/prix",
   "/services/logiciel-metier/prix",
   "/realisations/kpsull",
   "/realisations/wurth-creation-de-compte",

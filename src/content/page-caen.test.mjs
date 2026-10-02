@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync, statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { CHEMIN_PAGE_CAEN, pageCaen } from "./page-caen.ts";
+import { pagePrixSite } from "./page-prix-site.ts";
 import { contentRoutes } from "./routes.ts";
 import { siteConfig } from "./site.ts";
 
@@ -27,6 +28,12 @@ function textes() {
     contexte.intro,
     ...contexte.liens.flatMap((l) => [l.libelle, l.description]),
     ...contexte.points.flatMap((p) => [p.titre, p.corps]),
+    ...(pageCaen.sections ?? []).flatMap((section) => [
+      section.titre,
+      ...section.paragraphes,
+      ...(section.liens?.items ?? []).flatMap((l) => [l.libelle, l.description]),
+      ...section.points.flatMap((p) => [p.titre, p.corps]),
+    ]),
     ...faq.titleLines,
     ...faq.items.flatMap((i) => [i.question, i.answer]),
     pageCaen.heroImage?.alt ?? "",
@@ -62,13 +69,57 @@ describe("la page de Caen est cherchable", () => {
     // Seule ancre locale admise : la prise de rendez-vous, que le gabarit des
     // pages de prestation rend sur cette page (`SectionRendezVous`).
     const ancresLocales = ["#rendez-vous"];
-    for (const lien of pageCaen.contexte.liens) {
+    const liens = [
+      ...pageCaen.contexte.liens,
+      ...(pageCaen.sections ?? []).flatMap((section) => section.liens?.items ?? []),
+    ];
+    for (const lien of liens) {
       if (lien.href.startsWith("#")) {
         expect(ancresLocales, `${lien.href} n'existe pas sur la page`).toContain(lien.href);
         continue;
       }
       expect(chemins, `${lien.href} n'est pas au sitemap`).toContain(lien.href);
     }
+  });
+});
+
+/*
+ * LA PAGE DE CAEN DOIT SE SUFFIRE (lot 4 SEO, 2026-10-02). Google l'avait
+ * explorée sans l'indexer : contenu jugé trop mince. Elle porte désormais les
+ * réponses locales (refonte, artisans et commerces, référencement local) et
+ * mène à la page de prix et aux articles qui les détaillent.
+ */
+describe("la page de Caen répond aux recherches locales", () => {
+  const mots = (texte) => texte.split(/\s+/u).filter((m) => /[\p{L}\d]/u.test(m)).length;
+
+  test("le contenu principal fait 1 100 à 1 500 mots", () => {
+    const total = textes().reduce((n, t) => n + mots(t), 0);
+    expect(total).toBeGreaterThanOrEqual(1100);
+    expect(total).toBeLessThanOrEqual(1500);
+  });
+
+  test("elle traite la refonte, les artisans et commerces, et le référencement local", () => {
+    const ids = (pageCaen.sections ?? []).map((s) => s.id);
+    expect(ids).toEqual(["refonte", "artisans-commerces", "referencement-local"]);
+    const tout = textes().join(" ");
+    expect(tout).toMatch(/redirections? 301/u);
+    expect(tout).toContain("Google Business Profile");
+    expect(tout).toMatch(/avis/u);
+  });
+
+  test("elle mène à la page de prix et aux articles refonte et WordPress", () => {
+    const hrefs = [
+      ...pageCaen.contexte.liens,
+      ...(pageCaen.sections ?? []).flatMap((s) => s.liens?.items ?? []),
+    ].map((l) => l.href);
+    expect(hrefs).toContain(pagePrixSite.chemin);
+    expect(hrefs).toContain("/blog/refonte-site-internet-pme");
+    expect(hrefs).toContain("/blog/site-sur-mesure-ou-wordpress");
+  });
+
+  test("la FAQ compte 7 à 9 questions", () => {
+    expect(pageCaen.faq.items.length).toBeGreaterThanOrEqual(7);
+    expect(pageCaen.faq.items.length).toBeLessThanOrEqual(9);
   });
 });
 

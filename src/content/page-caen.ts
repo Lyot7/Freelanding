@@ -256,7 +256,7 @@ export const pageCaen: PageLocale = {
         {
           titre: "Les redirections 301",
           corps:
-            "Une ancienne adresse renvoie vers la page qui la remplace, sujet pour sujet. L’accueil ne sert jamais de destination par défaut.",
+            "Une ancienne adresse renvoie vers la page qui la remplace, sujet pour sujet.",
         },
         {
           titre: "Le contenu qui se classe",
@@ -292,7 +292,7 @@ export const pageCaen: PageLocale = {
         {
           titre: "Ton numéro à portée de pouce",
           corps:
-            "Sur téléphone, le numéro se touche pour appeler, en haut de chaque page. Ton client n’a rien à recopier.",
+            "Sur téléphone, le numéro se touche pour appeler, en haut de chaque page.",
         },
         {
           titre: "Ta zone écrite en clair",
@@ -316,7 +316,7 @@ export const pageCaen: PageLocale = {
       titre: "Référencement local : que faire en plus du site ?",
       paragraphes: [
         "Quand quelqu’un cherche « électricien Caen », Google affiche souvent, au-dessus des sites, une carte avec quelques établissements. Cette carte vient des fiches d’établissement Google, appelées Google Business Profile. Ta fiche et ton site travaillent ensemble : la fiche renvoie vers le site, et le site confirme ce que dit la fiche.",
-        "La fiche se crée gratuitement et reste à ton nom. Sa remise d’aplomb ne fait partie d’aucun forfait : je la reprends en plus, sur devis. Tu peux aussi t’en charger toi-même, à partir des 3 points ci-contre.",
+        "La fiche se crée gratuitement et reste à ton nom. Sa remise d’aplomb ne fait partie d’aucun forfait : je la reprends en plus, sur devis.",
       ],
       points: [
         {

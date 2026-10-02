@@ -98,6 +98,11 @@ const ROUTES = [
   "/services/logiciel-metier/negoce-distribution",
   "/services/logiciel-metier/prix",
   "/logiciel-sur-mesure-caen",
+  "/services/site-vitrine/prix",
+  "/blog/logiciel-sur-mesure-ou-odoo",
+  "/blog/remplacer-excel-par-un-logiciel",
+  "/blog/refonte-site-internet-pme",
+  "/blog/site-sur-mesure-ou-wordpress",
   "/contact",
   // Vue agent (2026-09-23) : le profil y écrit ses liens en clair.
   "/legal/mentions-legales",
