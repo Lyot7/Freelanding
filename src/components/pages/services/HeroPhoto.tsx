@@ -148,8 +148,9 @@ export function HeroPhoto({
 /**
  * Crédit de la photo, en petit dans le coin bas du héros.
  *
- * Les liens sortent du site : nouvel onglet, comme tout lien externe du site
- * (`bun run audit:liens`).
+ * Les liens qui sortent du site s'ouvrent dans un nouvel onglet, comme tout lien
+ * externe du site (`bun run audit:liens`). Un auteur interne (un visuel fait
+ * pour le site, dont l'auteur est la page à propos) reste dans l'onglet.
  */
 export function CreditHeroPhoto({
   credit,
@@ -165,7 +166,13 @@ export function CreditHeroPhoto({
   return (
     <p className={`absolute z-[3] w-fit text-[11px] font-medium leading-[1.2] tracking-[-0.01em] text-white/60 ${position}`}>
       {credit.prefixe}{" "}
-      <a href={credit.auteur.href} target="_blank" rel="noopener noreferrer" className={lien}>
+      <a
+        href={credit.auteur.href}
+        {...(credit.auteur.href.startsWith("/")
+          ? {}
+          : { target: "_blank", rel: "noopener noreferrer" })}
+        className={lien}
+      >
         {credit.auteur.libelle}
       </a>
       ,{" "}
