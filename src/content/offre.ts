@@ -14,7 +14,7 @@
  * CE QUI A DISPARU AVEC LES PALIERS :
  *  - les neuf noms de forfait (trois par offre) et leurs prix fermes. Le prix
  *    ferme existe toujours : c'est celui du DEVIS signé, il ne bouge plus ;
- *  - le délai affiché, y compris dans le simulateur. La date se fixe au devis ;
+ *  - le délai affiché. La date se fixe au devis ;
  *  - la fourchette « de X à Y ». Une borne haute publiée devient un prix que
  *    le visiteur s'attend à payer.
  *
@@ -162,8 +162,9 @@ export const prestations: readonly Prestation[] = [
  * HORS DE `prestations`, ET C'EST VOULU. Les automatisations IA restent au
  * second rang (`offre-grille-prix.md` du vault) : elles se vendent, elles ne
  * se mettent pas en avant. Dans `prestations`, l'offre gagnerait d'office une
- * page `/services/…`, une ligne d'accordéon et une entrée au sitemap. Le
- * simulateur de prix la lit ; sa page et `llms.txt` en citent le plancher.
+ * page `/services/…`, une ligne d'accordéon et une entrée au sitemap. Elle ne
+ * s'affiche plus sur le site depuis le retrait du simulateur de prix
+ * (2026-10-05) : elle se chiffre au devis.
  *
  * Les lignes reprennent les périmètres validés : 1 usage dans 1 outil ; les
  * règles du métier ; plusieurs outils ; le modèle d'IA payé par le client, à

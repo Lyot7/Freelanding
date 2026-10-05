@@ -361,34 +361,6 @@ export function serviceSchema(
 }
 
 /**
- * LE SIMULATEUR DE PRIX, déclaré comme un outil en ligne gratuit.
- *
- * `WebApplication` ET NON `Service` : la page ne vend rien en propre, elle
- * calcule. Les planchers qu'elle lit sont déjà déclarés en `Offer` sur les pages
- * de prestation ; les redéclarer ici ferait deux sources pour un même prix.
- */
-export function simulateurSchema(page: {
-  nom: string;
-  description: string;
-  chemin: string;
-}) {
-  return {
-    "@type": "WebApplication",
-    "@id": absoluteUrl(`${page.chemin}#outil`),
-    name: page.nom,
-    description: page.description,
-    url: absoluteUrl(page.chemin),
-    applicationCategory: "BusinessApplication",
-    operatingSystem: "Web",
-    inLanguage: "fr-FR",
-    isAccessibleForFree: true,
-    offers: { "@type": "Offer", price: 0, priceCurrency: "EUR" },
-    author: { "@id": PERSON_ID },
-    provider: { "@id": BUSINESS_ID },
-  };
-}
-
-/**
  * UN ARTICLE, ET LE FIL D'ARIANE QUI LE SITUE.
  *
  * POURQUOI CE NŒUD EXISTE. L'accueil déclarait cinq types de données

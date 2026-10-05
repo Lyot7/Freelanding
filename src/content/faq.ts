@@ -70,8 +70,7 @@ import type { FaqItem } from "@/lib/content/types";
  * propos le dit), la rédaction du contenu (les pages de prestation le disent). La hausse
  * possible du suivi est fusionnée dans « après la mise en ligne ».
  *
- * LA DURÉE EST ENTRÉE, parce que le site ne publie aucun délai chiffré, pas
- * même le simulateur depuis le 2026-10-05. La réponse dit où la date est
+ * LA DURÉE EST ENTRÉE, parce que le site ne publie aucun délai chiffré. La réponse dit où la date est
  * écrite (au devis, avant signature) et de quoi elle dépend, sans inventer de
  * nombre.
  */

@@ -73,7 +73,6 @@ dépôt.
 | `work_index_viewed` / `work_page_viewed` | `/work` et `/work/<slug>` |
 | `blog_index_viewed` / `article_viewed` | `/blog` et `/blog/<slug>` |
 | `about_viewed`, `contact_page_viewed`, `legal_page_viewed` | pages correspondantes |
-| `simulator_viewed` | `/simulateur-prix` |
 
 Les vues nommées doublent `$pageview` à dessein : un entonnoir monté sur
 `$pageview` oblige à filtrer sur `$current_url` et casse dès qu'un chemin change.
@@ -102,7 +101,6 @@ de la section (`hero`, `about`, `showreel`, `works`, `whyus`, `services`,
 |---|---|
 | `service_expanded` / `service_collapsed` | Ouverture/fermeture d'une ligne de l'accordéon Services (la grille tarifaire est dedans) |
 | `pricing_viewed` | Ouverture d'une ligne, ou section `packs` d'une page prestation entrée dans le champ |
-| `simulator_completed` | Toutes les questions d'un type répondues dans le simulateur, une fois par type ; `type`, `nb_facteurs` (nombre de réponses qui font monter le prix au-dessus du plancher, depuis le 2026-10-05 ; avant : `palier_bas`, `palier_haut`). Le bouton du résultat remonte en `cta_clicked`, `cta_id = simulateur-<type>` |
 
 ### Engagement
 

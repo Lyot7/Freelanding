@@ -33,7 +33,6 @@ export const ANALYTICS_EVENTS = {
   aboutViewed: "about_viewed",
   contactPageViewed: "contact_page_viewed",
   legalPageViewed: "legal_page_viewed",
-  simulatorViewed: "simulator_viewed",
 
   /* --- Intentions commerciales ------------------------------------------- */
   ctaClicked: "cta_clicked",
@@ -51,9 +50,6 @@ export const ANALYTICS_EVENTS = {
   pricingViewed: "pricing_viewed",
   serviceExpanded: "service_expanded",
   serviceCollapsed: "service_collapsed",
-  /* Toutes les questions d'un type répondues. Propriétés : `type`,
-     `nb_facteurs`, des identifiants, jamais une saisie. */
-  simulatorCompleted: "simulator_completed",
 
   /* --- Formulaires (point d'accroche, cf. docs/ANALYTICS.md) --------------- */
   formStarted: "form_started",
@@ -112,7 +108,6 @@ export type PageType =
   | "about"
   | "contact"
   | "legal"
-  | "simulator"
   | "not_found";
 
 /**
@@ -134,7 +129,6 @@ export function pageTypeFromPathname(pathname: string): PageType {
   if (path.startsWith("/blog/")) return "article";
   if (path.startsWith("/services/")) return "service";
   if (path.startsWith("/legal/")) return "legal";
-  if (path === "/simulateur-prix") return "simulator";
   return "not_found";
 }
 
@@ -167,8 +161,6 @@ export function viewEventForPageType(
       return ANALYTICS_EVENTS.contactPageViewed;
     case "legal":
       return ANALYTICS_EVENTS.legalPageViewed;
-    case "simulator":
-      return ANALYTICS_EVENTS.simulatorViewed;
     case "not_found":
       return null;
   }

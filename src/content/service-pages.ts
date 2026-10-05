@@ -197,21 +197,6 @@ export function marchesFilAriane(
 }
 
 /**
- * Le simulateur de prix sert toutes les prestations : il se range sous
- * « Prestations », sans prestation intermédiaire.
- */
-export function marchesSimulateur(page: {
-  readonly marcheFilAriane: string;
-}): readonly MarcheFilAriane[] {
-  const { filAriane } = servicePageLabels;
-  return [
-    { libelle: filAriane.accueil, href: "/" },
-    { libelle: filAriane.prestations, href: "/#services" },
-    { libelle: page.marcheFilAriane },
-  ];
-}
-
-/**
  * LIENS VERS LES DÉCLINAISONS D'UNE PRESTATION, posés sous ses périmètres : le
  * site vitrine mène à la page de Caen, la solution métier à ses pages secteur,
  * à sa page de prix et à sa page de Caen. Une ligne sobre par famille, une

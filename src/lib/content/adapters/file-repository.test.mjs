@@ -33,7 +33,6 @@ const PAGES_FIXES = [
   "/logiciel-sur-mesure-caen",
   "/services/site-vitrine/prix",
   "/services/logiciel-metier/prix",
-  "/simulateur-prix",
   "/realisations/kpsull",
   "/realisations/wurth-creation-de-compte",
   "/realisations/nslysium",

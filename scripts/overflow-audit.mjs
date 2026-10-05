@@ -54,7 +54,6 @@ const ROUTES = [
   "/logiciel-sur-mesure-caen",
   "/creation-site-internet-caen",
   "/services/site-vitrine/prix",
-  "/simulateur-prix",
   "/blog/logiciel-sur-mesure-ou-odoo",
   "/blog/remplacer-excel-par-un-logiciel",
   "/blog/refonte-site-internet-pme",

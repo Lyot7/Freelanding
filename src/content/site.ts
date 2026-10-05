@@ -138,8 +138,6 @@ export const siteConfig: SiteConfig = {
     { label: "Réalisations", href: "/realisations" },
     { label: "À propos", href: "/a-propos" },
     { label: "Blog", href: "/blog" },
-    // Outil d'acquisition (2026-10-05), lié depuis chaque page.
-    { label: "Simulateur de prix", href: "/simulateur-prix" },
     { label: "Contact", href: "/contact" },
   ],
   /*

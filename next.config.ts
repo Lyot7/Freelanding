@@ -83,6 +83,8 @@ const nextConfig: NextConfig = {
       /* Ancien site : la prise de rendez-vous est devenue la page contact. */
       { source: "/rendez-vous", destination: "/contact", statusCode: 301 },
       { source: "/agent", destination: "/", statusCode: 301 },
+      /* Simulateur de prix, retiré le 2026-10-05. */
+      { source: "/simulateur-prix", destination: "/#services", statusCode: 301 },
       /* Ancien site : les études de cas, dans les deux langues d'URL.
          Elles visent la destination FINALE, pas `/work/kpsull` : enchaîner
          deux 301 dilue le signal transféré et rallonge le trajet du visiteur. */
