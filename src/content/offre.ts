@@ -285,7 +285,8 @@ export interface GrilleSecondRang {
  * second rang (`offre-grille-prix.md` du vault) : elles se vendent, elles ne
  * se mettent pas en avant. Dans `prestations`, la grille gagnerait d'office une
  * page `/services/…`, une ligne d'accordéon et une entrée au sitemap. Seul le
- * simulateur de prix la lit.
+ * simulateur de prix la lit ; sa page et sa ligne de `llms.txt` en citent la
+ * fourchette, publique sur la page.
  *
  * Les lignes reprennent mot pour mot les périmètres validés : 1 usage dans 1
  * outil ; jusqu'à 3 usages et les règles du métier ; plusieurs outils, sur

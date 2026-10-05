@@ -327,8 +327,8 @@ describe("le site annonce le même prix que le module", () => {
   });
 
   test("la FAQ répond à la question du délai sans publier de durée", () => {
-    // La durée a quitté les forfaits le 2026-09-23 : le site ne publie plus
-    // aucun délai chiffré. La réponse dit où la date est écrite, pas combien.
+    // La durée a quitté les forfaits le 2026-09-23 : seul le simulateur de prix
+    // annonce un délai chiffré (2026-10-05). La FAQ dit où la date est écrite.
     const delai = faqItems.find((item) => /combien de temps/i.test(item.question));
     expect(delai, "la question du délai a disparu de la FAQ").toBeDefined();
     expect(delai.answer, "la réponse ne dit pas où la date est écrite").toMatch(/devis/i);

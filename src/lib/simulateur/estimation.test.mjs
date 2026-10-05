@@ -16,6 +16,7 @@ import {
 } from "../../content/simulateur.ts";
 import { pageSimulateur } from "../../content/simulateur-prix.ts";
 import { estimer } from "./estimation.ts";
+import { pageTypeFromPathname, viewEventForPageType } from "../analytics/events.ts";
 
 /**
  * LE SIMULATEUR DE PRIX : un calcul fixe sur les grilles d'`offre.ts`.
@@ -258,3 +259,17 @@ describe("la page", () => {
     expect(/sur place|en personne|présentiel|déplac/iu.test(textes)).toBe(false);
   });
 });
+
+describe("la mesure", () => {
+  test("une visite du simulateur a son type de page et sa vue nommée", () => {
+    expect(pageTypeFromPathname(CHEMIN_SIMULATEUR)).toBe("simulator");
+    expect(viewEventForPageType("simulator")).toBe("simulator_viewed");
+  });
+
+  test("les événements du simulateur sont documentés", () => {
+    const doc = readFileSync(fileURLToPath(new URL("../../../docs/ANALYTICS.md", import.meta.url)), "utf8");
+    expect(doc).toContain("`simulator_viewed`");
+    expect(doc).toContain("`simulator_completed`");
+  });
+});
+

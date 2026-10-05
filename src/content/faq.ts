@@ -84,8 +84,9 @@ const PACK_LOGICIEL = prestation("logiciel").packs[1];
  * propos le dit), la rédaction du contenu (les forfaits le disent). La hausse
  * possible du suivi est fusionnée dans « après la mise en ligne ».
  *
- * LA DURÉE EST ENTRÉE, parce qu'elle a quitté les forfaits : le site ne publie
- * plus aucun délai chiffré. La réponse dit où la date est écrite (au devis,
+ * LA DURÉE EST ENTRÉE, parce qu'elle a quitté les forfaits : les pages de
+ * prestation ne publient aucun délai chiffré (seul le simulateur de prix en
+ * annonce un, en semaines, depuis le 2026-10-05). La réponse dit où la date est écrite (au devis,
  * avant signature) et de quoi elle dépend, sans inventer de nombre.
  */
 export const faqItems: FaqItem[] = [
