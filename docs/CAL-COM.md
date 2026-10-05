@@ -168,8 +168,7 @@ sont posés par le site (`src/lib/rendez-vous/questionnaire.ts`), vérifiés par
 la route, puis écrits en clair dans `notes`, par exemple :
 
 ```
-Budget HT : De 4 800 € à 7 200 €
-Forfait atteignable : Le Site, 4 800 € HT
+Budget HT : De 3 000 € à 6 000 €
 Objectif : Être trouvé sur Google
 Échéance : Dans les trois mois
 

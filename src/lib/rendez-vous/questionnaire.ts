@@ -110,6 +110,37 @@ export function tranchesBudget(id: IdRendezVous): readonly TrancheBudget[] {
   return tranches;
 }
 
+/**
+ * LES TRANCHES DES FORFAITS À PRIX FERME, publiées jusqu'au 2026-10-05 avec
+ * leur borne basse. Un onglet ouvert avant le passage aux planchers les envoie
+ * encore, et son ancien bundle ne propose qu'elles : les refuser bloquerait la
+ * réservation jusqu'au rechargement. Retirables quand plus aucun onglet de
+ * cette époque ne peut être ouvert.
+ */
+const TRANCHES_RETIREES: Readonly<Record<string, number>> = {
+  "3000-4800": 3000,
+  "4800-7200": 4800,
+  "plus-7200": 7200,
+  "6000-18000": 6000,
+  "18000-36000": 18000,
+  "plus-36000": 36000,
+};
+
+/**
+ * Ramène une tranche retirée à la tranche actuelle qui contient sa borne
+ * basse. Toute autre valeur revient telle quelle, à valider par la liste.
+ */
+export function rattacherTranche(id: IdRendezVous, valeur: string): string {
+  if (!Object.hasOwn(TRANCHES_RETIREES, valeur)) return valeur;
+  const tranches = tranchesBudget(id);
+  if (tranches.some((t) => t.id === valeur)) return valeur;
+  const montant = TRANCHES_RETIREES[valeur];
+  const tranche = tranches.find(
+    (t) => t.id !== BUDGET_INCONNU && (t.bas ?? 0) <= montant && (t.haut === undefined || montant < t.haut),
+  );
+  return tranche?.id ?? valeur;
+}
+
 /** Objectifs proposés pour un type de rendez-vous. */
 export function optionsObjectif(id: IdRendezVous): readonly OptionQuestion[] {
   return questions.objectif.options[id];

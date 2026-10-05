@@ -183,6 +183,11 @@ describe("validerReservation — le questionnaire", () => {
     });
   });
 
+  it("rattache une tranche des anciens forfaits à la tranche actuelle", () => {
+    expect(valider({ budget: "4800-7200" }).reservation.budget).toBe("3000-6000");
+    expect(valider({ budget: "plus-7200" }).reservation.budget).toBe("6000-12000");
+  });
+
   it("accepte « je ne sais pas encore » comme budget", () => {
     expect(valider({ budget: "inconnu" }).ok).toBe(true);
   });

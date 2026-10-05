@@ -27,7 +27,7 @@ import {
 import { estIdRendezVous } from "./config";
 import { HORIZON_JOURS } from "./creneaux";
 import { estDureePlausible } from "./durees";
-import { OPTIONS_ECHEANCE, optionsObjectif, tranchesBudget } from "./questionnaire";
+import { OPTIONS_ECHEANCE, optionsObjectif, rattacherTranche, tranchesBudget } from "./questionnaire";
 import type { OptionQuestion } from "@/content/rendez-vous";
 import type { IdRendezVous } from "@/content/rendez-vous";
 
@@ -226,7 +226,12 @@ export function validerReservation(
     };
   }
 
-  const budget = lireChoix(champs, "budget", tranchesBudget(type), true);
+  const budget = lireChoix(
+    { ...champs, budget: rattacherTranche(type, lireChaine(champs, "budget").trim()) },
+    "budget",
+    tranchesBudget(type),
+    true,
+  );
   if (!budget.ok) return budget;
   const objectif = lireChoix(champs, "objectif", optionsObjectif(type), true);
   if (!objectif.ok) return objectif;

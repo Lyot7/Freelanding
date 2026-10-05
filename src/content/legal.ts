@@ -439,7 +439,8 @@ export const legalDocuments: readonly LegalDocument[] = [
     title: "Conditions générales de vente",
     summary:
       "Comment on travaille ensemble : devis, paiement, délais, droits sur le livrable. Écrites pour être lues.",
-    lastUpdated,
+    // Barème réécrit en prix de départ le 2026-10-05.
+    lastUpdated: "2026-10-05",
     body: [
       { type: "heading", level: 2, text: "1. Objet et champ d’application" },
       {
