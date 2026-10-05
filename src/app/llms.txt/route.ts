@@ -7,6 +7,7 @@ import { pageLogicielCaen } from "@/content/page-logiciel-caen";
 import { pagePrixLogiciel } from "@/content/page-prix-logiciel";
 import { pagesSecteur } from "@/content/pages-secteur";
 import { pagePrixSite } from "@/content/page-prix-site";
+import { pageSimulateur } from "@/content/simulateur-prix";
 import { CHEMIN_PROFIL_TEXTE, CHEMIN_PROMPT_TEXTE } from "@/content/vue-agent";
 
 /**
@@ -111,6 +112,7 @@ export async function GET(): Promise<Response> {
     /* PAGES SECTEUR de la solution métier, dérivées de `pages-secteur.ts`. */
     ...pagesSecteur.map((p) => ligne(p.h1, p.chemin, p.noteLlms)),
     ligne(pagePrixLogiciel.h1, pagePrixLogiciel.chemin, pagePrixLogiciel.noteLlms),
+    ligne(pageSimulateur.h1, pageSimulateur.chemin, pageSimulateur.noteLlms),
     ligne("À propos", "/a-propos", "parcours et façon de travailler"),
     ligne("Réalisations", "/realisations", "les projets en détail"),
     ligne("Contact", "/contact", "formulaire et coordonnées"),

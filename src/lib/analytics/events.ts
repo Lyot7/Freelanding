@@ -50,6 +50,9 @@ export const ANALYTICS_EVENTS = {
   pricingViewed: "pricing_viewed",
   serviceExpanded: "service_expanded",
   serviceCollapsed: "service_collapsed",
+  /* Toutes les questions d'un type répondues. Propriétés : `type`,
+     `palier_bas`, `palier_haut`, des identifiants, jamais une saisie. */
+  simulatorCompleted: "simulator_completed",
 
   /* --- Formulaires (point d'accroche, cf. docs/ANALYTICS.md) --------------- */
   formStarted: "form_started",

@@ -14,7 +14,9 @@
  *    du site ;
  *  - la durée affichée. « Environ 5 jours ouvrés » à côté de 3 000 € redonnait
  *    le taux en une division : un prix ferme vend un résultat, la date vit au
- *    devis ;
+ *    devis. EXCEPTION DU 2026-10-05, décision d'Eliott : le simulateur de prix
+ *    annonce un délai en SEMAINES, marge comprise (`Pack.delai`). Les pages de
+ *    prestation et de prix n'en affichent toujours aucun ;
  *  - L'Outil comme prestation à part. Il devient le premier palier de La
  *    Solution métier : un outil simple et un logiciel complet répondent au même
  *    besoin, à deux tailles différentes, et deux pages voisines forçaient le
@@ -29,6 +31,12 @@
 
 /** Identifiants stables des prestations chiffrées. */
 export type PrestationId = "vitrine" | "logiciel";
+
+/** Délai annoncé, en semaines entières. */
+export interface Delai {
+  readonly min: number;
+  readonly max: number;
+}
 
 /** Un forfait : un périmètre et son prix. */
 export interface Pack {
@@ -46,6 +54,12 @@ export interface Pack {
    * devis et ne descend jamais sous `prix`. Réservé au dernier palier.
    */
   readonly surMesure?: true;
+  /**
+   * Délai de mise en ligne annoncé par le simulateur, en semaines, marge
+   * comprise (règle du 2026-08-28 : on annonce large). Absent sur un palier
+   * `surMesure` : sa date se fixe au devis.
+   */
+  readonly delai?: Delai;
   /** Une phrase : ce que le client obtient, pas ce que je fais. */
   readonly promesse: string;
   /** Le cas de figure qui doit faire choisir ce forfait plutôt qu'un autre. */
@@ -139,6 +153,7 @@ export const prestations: readonly Prestation[] = [
         id: "landing",
         nom: "La Landing",
         prix: 3000,
+        delai: { min: 3, max: 4 },
         promesse: "Une page qui dit ce que tu fais, et qui fait appeler.",
         pourQui:
           "Tu n’as rien en ligne, ou une page qui date, et il te faut une adresse.",
@@ -156,6 +171,7 @@ export const prestations: readonly Prestation[] = [
         id: "site",
         nom: "Le Site",
         prix: 4800,
+        delai: { min: 4, max: 6 },
         promesse:
           "Un site qu’on ne confond avec aucun autre, et que Google sait lire.",
         pourQui:
@@ -172,6 +188,7 @@ export const prestations: readonly Prestation[] = [
         id: "signature",
         nom: "Le Site Signature",
         prix: 7200,
+        delai: { min: 6, max: 8 },
         promesse:
           "Un site dont tu sais ce qu’il rapporte, chiffres à l’appui.",
         pourQui:
@@ -204,6 +221,7 @@ export const prestations: readonly Prestation[] = [
         id: "outil",
         nom: "L’Outil",
         prix: 6000,
+        delai: { min: 4, max: 6 },
         promesse: "La tâche que tu refais à la main disparaît.",
         pourQui:
           "1 tâche répétitive, 1 outil à relier, une personne s’en sert.",
@@ -218,6 +236,7 @@ export const prestations: readonly Prestation[] = [
         id: "logiciel",
         nom: "Le Logiciel",
         prix: 18000,
+        delai: { min: 10, max: 16 },
         promesse:
           "Le métier quitte le tableur partagé pour un outil à lui.",
         pourQui:
@@ -250,6 +269,69 @@ export const prestations: readonly Prestation[] = [
     ],
   },
 ];
+
+/** Une grille vendue sans page dédiée : un nom, trois forfaits, son hors-forfait. */
+export interface GrilleSecondRang {
+  readonly nom: string;
+  readonly horsPack: string;
+  readonly packs: readonly [Pack, Pack, Pack];
+}
+
+/*
+ * L'INTÉGRATION IA DANS UN OUTIL EXISTANT, grille arrêtée par Eliott le
+ * 2026-10-05 (« entrée basse ») : 2 500 / 5 000 / à partir de 8 000.
+ *
+ * HORS DE `prestations`, ET C'EST VOULU. Les automatisations IA restent au
+ * second rang (`offre-grille-prix.md` du vault) : elles se vendent, elles ne
+ * se mettent pas en avant. Dans `prestations`, la grille gagnerait d'office une
+ * page `/services/…`, une ligne d'accordéon et une entrée au sitemap. Seul le
+ * simulateur de prix la lit.
+ *
+ * Les lignes reprennent mot pour mot les périmètres validés : 1 usage dans 1
+ * outil ; jusqu'à 3 usages et les règles du métier ; plusieurs outils, sur
+ * devis ; le modèle d'IA payé par le client, à son nom.
+ */
+export const integrationIA: GrilleSecondRang = {
+  nom: "L’intégration IA",
+  horsPack:
+    "L’abonnement au modèle d’IA est ouvert à ton nom, et tu le paies directement à son éditeur.",
+  packs: [
+    {
+      id: "assistant",
+      nom: "L’Assistant",
+      prix: 2500,
+      delai: { min: 1, max: 2 },
+      promesse: "Une tâche de lecture ou de rédaction confiée à l’IA, dans ton outil.",
+      pourQui: "1 usage, dans 1 outil que tu utilises déjà.",
+      ajoute: [
+        "1 usage : résumer, classer ou rédiger",
+        "Branché sur 1 outil que tu utilises déjà",
+        "Code source dans ton dépôt, et sa documentation",
+      ],
+    },
+    {
+      id: "integration",
+      nom: "L’Intégration",
+      prix: 5000,
+      delai: { min: 3, max: 4 },
+      promesse: "L’IA travaille avec les règles et le vocabulaire de ton métier.",
+      pourQui: "Jusqu’à 3 usages, avec les règles de ton métier.",
+      ajoute: [
+        "Jusqu’à 3 usages",
+        "Les règles et le vocabulaire de ton métier appliqués",
+      ],
+    },
+    {
+      id: "automatisation",
+      nom: "L’Automatisation",
+      prix: 8000,
+      surMesure: true,
+      promesse: "Tes outils échangent entre eux, et l’IA fait le lien.",
+      pourQui: "Plusieurs outils à relier.",
+      ajoute: ["Plusieurs outils reliés entre eux"],
+    },
+  ],
+};
 
 /**
  * SUIVI MENSUEL — part annuelle du prix du projet.

@@ -33,7 +33,7 @@ import {
   tauxSuivi,
 } from "./offre";
 import { CHEMIN_PAGE_CAEN } from "./page-caen";
-import type { SectionSecteur } from "./pages-secteur";
+import { CHEMIN_SIMULATEUR, type SectionSecteur } from "./pages-secteur";
 
 const VITRINE = prestation("vitrine");
 const [LANDING, SITE, SIGNATURE] = VITRINE.packs;
@@ -253,6 +253,11 @@ export const pagePrixSite: PagePrixSite = {
             href: CHEMIN_PAGE_CAEN,
             description:
               "Le référencement local pour les entreprises de Caen et du Calvados.",
+          },
+          {
+            libelle: "Simulateur de prix",
+            href: CHEMIN_SIMULATEUR,
+            description: "Estime le prix de ton site en 5 questions, délai compris.",
           },
           {
             libelle: "Les réalisations",

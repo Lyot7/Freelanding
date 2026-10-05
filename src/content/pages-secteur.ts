@@ -58,6 +58,12 @@ export type SecteurSlug =
  */
 export const CHEMIN_PRIX_LOGICIEL = `${CHEMIN_PILIER}/prix`;
 
+/**
+ * LE SIMULATEUR DE PRIX (2026-10-05). Même raison : les 2 pages de prix le
+ * lient, et `simulateur-prix.ts` les importe à son tour.
+ */
+export const CHEMIN_SIMULATEUR = "/simulateur-prix";
+
 /** Le lien vers la page de prix, posé dans la méthode de chaque secteur. */
 const LIEN_PRIX: LienLocal = {
   libelle: "Le prix d’un logiciel sur mesure",

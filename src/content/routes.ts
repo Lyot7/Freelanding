@@ -3,7 +3,7 @@ import { blogPosts } from "./blog";
 import { prestations } from "./offre";
 import { CHEMIN_PAGE_CAEN, CHEMIN_PAGE_LOGICIEL_CAEN } from "./page-caen";
 import { CHEMIN_PRIX_SITE } from "./page-prix-site";
-import { CHEMIN_PRIX_LOGICIEL, pagesSecteur } from "./pages-secteur";
+import { CHEMIN_PRIX_LOGICIEL, CHEMIN_SIMULATEUR, pagesSecteur } from "./pages-secteur";
 
 /**
  * Manifest public, dans l'ordre exact du sitemap Framer live.
@@ -66,6 +66,8 @@ export const contentRoutes: readonly ContentRoute[] = [
   ),
   /* LES PRIX DE LA SOLUTION MÉTIER (2026-10-02) ; voir `page-prix-logiciel.ts`. */
   { pathname: CHEMIN_PRIX_LOGICIEL, kind: "page" },
+  /* LE SIMULATEUR DE PRIX (2026-10-05) ; voir `simulateur-prix.ts`. */
+  { pathname: CHEMIN_SIMULATEUR, kind: "page" },
   /*
    * VUE AGENT (2026-09-23) : le profil complet en un seul texte, et le prompt
    * que le visiteur colle dans son propre assistant. Voir `vue-agent.ts`.

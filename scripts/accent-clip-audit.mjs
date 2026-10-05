@@ -99,6 +99,7 @@ const ROUTES = [
   "/services/logiciel-metier/prix",
   "/logiciel-sur-mesure-caen",
   "/services/site-vitrine/prix",
+  "/simulateur-prix",
   "/blog/logiciel-sur-mesure-ou-odoo",
   "/blog/remplacer-excel-par-un-logiciel",
   "/blog/refonte-site-internet-pme",

@@ -31,6 +31,7 @@ import {
 import { CHEMIN_PAGE_LOGICIEL_CAEN } from "./page-caen";
 import {
   CHEMIN_PRIX_LOGICIEL,
+  CHEMIN_SIMULATEUR,
   pagesSecteur,
   type SectionSecteur,
 } from "./pages-secteur";
@@ -229,6 +230,11 @@ export const pagePrixLogiciel: PagePrix = {
             libelle: "La solution métier",
             href: CHEMIN_PILIER,
             description: "La page de l’offre, avec la prise de rendez-vous.",
+          },
+          {
+            libelle: "Simulateur de prix",
+            href: CHEMIN_SIMULATEUR,
+            description: "Situe ton projet dans les forfaits, délai compris.",
           },
           {
             libelle: "Un logiciel sur mesure à Caen",

@@ -78,7 +78,7 @@ import { SectionRendezVous } from "@/components/rendez-vous/SectionRendezVous";
  * avec le voile collé au texte (`VOILE_TEXTE`), le blanc à 80 % restait à
  * 4,35:1. À 90 %, il passe sans assombrir davantage la photo.
  */
-function FilAriane({
+export function FilAriane({
   marches,
   surPhoto = false,
 }: {
@@ -281,7 +281,7 @@ const TONS: Record<
   },
 };
 
-function SectionDeuxMoities({
+export function SectionDeuxMoities({
   dataSection,
   titre,
   paragraphes,
