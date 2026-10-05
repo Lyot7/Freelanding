@@ -24,7 +24,7 @@ function textes() {
     pageCaen.h1,
     pageCaen.resume,
     contexte.titre,
-    pageCaen.titrePacks ?? "",
+    pageCaen.titreOffre ?? "",
     contexte.intro,
     ...contexte.liens.flatMap((l) => [l.libelle, l.description]),
     ...contexte.points.flatMap((p) => [p.titre, p.corps]),

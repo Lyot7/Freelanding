@@ -5,7 +5,7 @@ import type {
   SiteConfig,
   WorkItem,
 } from "@/lib/content/types";
-import { prixPackHT, type Prestation } from "@/content/offre";
+import type { Prestation } from "@/content/offre";
 import { absoluteUrl } from "@/lib/site-url";
 
 /**
@@ -101,18 +101,17 @@ export function profilePageSchema() {
 /**
  * Les deux bornes d'un prix affiché, telles que schema.org les attend.
  *
- * CE QUE ÇA RÉPARE. `fourchette()` rend « de 3 000 € à 7 200 € ». La version
+ * CE QUE ÇA RÉPARE. L'ancienne fourchette rendait « de 3 000 € à 7 200 € ». La version
  * précédente en retirait tout ce qui n'était pas un chiffre, ce qui collait les
  * deux montants l'un derrière l'autre : `minPrice: 30007200`. Le site vitrine
  * était donc balisé à trente millions d'euros, et les trois prestations
  * chiffrées annonçaient chacune un montant absurde aux moteurs — Google, Bing
  * et les assistants lisent ce champ, pas le texte à côté.
  *
- * POURQUOI DEUX BORNES ET NON UNE. Depuis le passage des en-têtes à la
- * fourchette entière (2026-09-02), la page affiche un bas ET un haut. Ne
- * baliser que `minPrice` redirait « dès X » quand la page dit « de X à Y » :
- * un balisage qui affirme autre chose que la page est une déclaration
- * trompeuse. Les deux bornes, ou aucune.
+ * UNE OU DEUX BORNES, SELON CE QUE LA PAGE AFFICHE. Depuis le 2026-10-05,
+ * l'accordéon n'annonce plus qu'un plancher (« à partir de 3 000 € ») : seul
+ * `minPrice` est déclaré. Un balisage qui affirme autre chose que la page est
+ * une déclaration trompeuse.
  *
  * LE DÉCOUPAGE EST FAIT SUR LES GROUPES DE CHIFFRES, pas sur le mot « à » :
  * `euros()` insère des insécables dans les milliers, et le séparateur lui-même
@@ -187,7 +186,7 @@ export function businessSchema(site: SiteConfig, home: HomeContent) {
     image: LOGO,
     email: site.contact.email ? `mailto:${site.contact.email}` : undefined,
     telephone: telephoneE164(site.contact.phone),
-    // Trois forfaits de 3 000 à 36 000 € : le haut de l'échelle locale.
+    // Prix de départ de 3 000 et 6 000 €, devis au-dessus : le haut de l'échelle locale.
     priceRange: "€€€",
     // VILLE SANS RUE : l'activité se déplace chez le client ou travaille à
     // distance, aucune adresse de local n'est publiée. Google accepte une
@@ -304,10 +303,11 @@ export function workSchema(work: WorkItem) {
  * donc les trois pages se rattachent à l'entité de l'accueil au lieu de
  * décrire une quatrième activité anonyme.
  *
- * LES PRIX VIENNENT DE `offre.ts`, JAMAIS ÉCRITS ICI. Un montant recopié
- * aurait divergé au premier changement de grille, et SANS être visible à
- * l'écran, donc sans que personne le voie jamais. Un palier sur mesure déclare
- * un `minPrice` : son montant est un plancher, pas un prix.
+ * LE PRIX VIENT DE `offre.ts`, JAMAIS ÉCRIT ICI. Un montant recopié aurait
+ * divergé au premier changement, et SANS être visible à l'écran, donc sans
+ * que personne le voie jamais. UNE `Offer` PAR PRESTATION depuis le
+ * 2026-10-05 : le plancher, déclaré en `minPrice`, puisque le prix final se
+ * fixe au devis.
  *
  * `priceSpecification` PLUTÔT QUE `price` : le montant est un prix HORS TAXES.
  * Le déclarer en `price` nu laisserait entendre un prix toutes taxes comprises,
@@ -345,20 +345,18 @@ export function serviceSchema(
           })),
         ]
       : { "@type": "Country", name: "France" },
-    offers: prestation.packs.map((pack) => ({
+    offers: {
       "@type": "Offer",
-      name: pack.nom,
-      description: pack.promesse,
+      name: prestation.nom,
+      description: prestation.resume,
       priceCurrency: "EUR",
       priceSpecification: {
         "@type": "PriceSpecification",
         priceCurrency: "EUR",
-        ...(pack.surMesure
-          ? { minPrice: prixPackHT(pack) }
-          : { price: prixPackHT(pack) }),
+        minPrice: prestation.plancher,
         valueAddedTaxIncluded: false,
       },
-    })),
+    },
   });
 }
 
@@ -366,7 +364,7 @@ export function serviceSchema(
  * LE SIMULATEUR DE PRIX, déclaré comme un outil en ligne gratuit.
  *
  * `WebApplication` ET NON `Service` : la page ne vend rien en propre, elle
- * calcule. Les forfaits qu'elle lit sont déjà déclarés en `Offer` sur les pages
+ * calcule. Les planchers qu'elle lit sont déjà déclarés en `Offer` sur les pages
  * de prestation ; les redéclarer ici ferait deux sources pour un même prix.
  */
 export function simulateurSchema(page: {

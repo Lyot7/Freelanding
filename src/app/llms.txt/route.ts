@@ -1,7 +1,7 @@
 import { content } from "@/lib/content";
 import { absoluteUrl } from "@/lib/site-url";
 import { blogPosts } from "@/content/blog";
-import { fourchette, prestations as offre, prixPack } from "@/content/offre";
+import { aPartirDe, prestations as offre } from "@/content/offre";
 import { pageCaen } from "@/content/page-caen";
 import { pageLogicielCaen } from "@/content/page-logiciel-caen";
 import { pagePrixLogiciel } from "@/content/page-prix-logiciel";
@@ -39,9 +39,6 @@ export async function GET(): Promise<Response> {
     content.getWorks(),
   ]);
 
-  /* Les paliers sans prix ferme, lus dans l'offre : La Plateforme aujourd'hui. */
-  const surMesure = offre.flatMap((p) => p.packs.filter((pack) => pack.surMesure));
-
   const prestations = home.services.items.map(
     (service) =>
       `- **${service.title}**${service.price ? ` (${service.price})` : ""} : ${service.body[0]}`,
@@ -72,11 +69,7 @@ export async function GET(): Promise<Response> {
     "",
     ...prestations,
     "",
-    `Chaque fourchette va du premier au troisième forfait, tous à prix ferme${surMesure.length ? "" : "."}`,
-    ...surMesure.map(
-      (pack) => `sauf ${pack.nom}, sur mesure à partir de ${prixPack(pack)} HT.`,
-    ),
-    "Le prix est repris dans le devis, avant le début du projet, et ne varie plus.",
+    "Chaque prix est un prix de départ, hors taxes. Le prix final dépend du projet et se fixe au devis, avant le début du projet ; une fois signé, il ne varie plus.",
     "",
     "## Réalisations",
     "",
@@ -95,7 +88,7 @@ export async function GET(): Promise<Response> {
       ligne(
         p.nom,
         `/services/${p.slug}`,
-        `3 forfaits, ${fourchette(p.id, " HT")}`,
+        `${aPartirDe(p, " HT")} : ce qui est compris, et ce qui fait varier le prix`,
       ),
     ),
     ligne(

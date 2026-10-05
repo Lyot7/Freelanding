@@ -379,22 +379,18 @@ function RetourEspere({ retour }: { retour: RetourBudget | undefined }) {
         <div className="mt-[12px] flex flex-col gap-[14px] border border-border p-[16px]">
           <p className={CLASSE_LIBELLE}>{contenu.retour.titre}</p>
 
-          {retour.type === "forfaits"
+          {retour.type === "aPortee"
             ? retour.lignes.map((ligne) => (
-                <div key={ligne.forfait} className="flex flex-col gap-[6px]">
-                  {ligne.prestation ? (
-                    <p className={CLASSE_LIBELLE}>{ligne.prestation}</p>
-                  ) : null}
+                <div key={ligne.prestation} className="flex flex-col gap-[6px]">
                   <p className="flex flex-wrap items-baseline justify-between gap-x-[12px] gap-y-[4px]">
                     <span className="text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground">
-                      {ligne.forfait}
+                      {ligne.prestation}
                     </span>
                     <span className="text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-accent">
                       {ligne.prix}
                     </span>
                   </p>
-                  <p className={texte}>{ligne.promesse}</p>
-                  {ligne.complement ? <p className={texte}>{ligne.complement}</p> : null}
+                  <p className={texte}>{ligne.texte}</p>
                 </div>
               ))
             : null}

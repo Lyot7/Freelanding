@@ -125,9 +125,9 @@ function priceParts(price: string | undefined, label: string): {
   amount: string;
 } {
   if (!price) return { label, amount: "" };
-  // « from » est la donnée du template, « dès » celle du site traduit. « à
-  // partir de » a disparu de l'offre le 2026-08-27 mais reste accepté ici :
-  // une donnée qui repasse par cette forme doit s'afficher, pas se doubler.
+  // « from » est la donnée du template, « dès » celle du site traduit, « à
+  // partir de » celle de l'offre depuis le 2026-10-05 : le préfixe rejoint le
+  // libellé gris, le montant reste seul en blanc.
   const parts = price.match(/^\s*(from|à partir de|dès)\s+(.+)$/i);
   if (!parts) return { label, amount: price };
   return { label: `${label} ${parts[1].toLowerCase()}`, amount: parts[2] };

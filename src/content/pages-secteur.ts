@@ -34,11 +34,10 @@
  * présente comme une preuve directe, avec le seul chiffre de `work.ts`.
  */
 import type { FaqItem } from "@/lib/content/types";
-import { euros, fourchette, prestation, prixPack } from "./offre";
+import { aPartirDe, euros, prestation, prixPlancher } from "./offre";
 import type { LienLocal } from "./page-caen";
 
 const LOGICIEL = prestation("logiciel");
-const [OUTIL, LE_LOGICIEL, PLATEFORME] = LOGICIEL.packs;
 
 /** Le cas Würth, seule preuve de méthode citée : un autre secteur. */
 const CHEMIN_WURTH = "/realisations/wurth-creation-de-compte";
@@ -121,7 +120,7 @@ export interface PageSecteur {
   readonly resume: string;
   /** Dernière marche du fil d'Ariane. */
   readonly marcheFilAriane: string;
-  /** Libellé du lien posé sur la page pilier, sous les forfaits. */
+  /** Libellé du lien posé sur la page pilier, sous l’offre. */
   readonly libelleLien: string;
   /** Note de la ligne `llms.txt`. */
   readonly noteLlms: string;
@@ -132,7 +131,7 @@ export interface PageSecteur {
   readonly accroche: string;
   readonly sections: readonly SectionSecteur[];
   readonly calcul: CalculSecteur;
-  readonly titrePacks: string;
+  readonly titreOffre: string;
   readonly faq: {
     readonly eyebrow: string;
     readonly titleLines: readonly string[];
@@ -165,10 +164,10 @@ const pageBtp: PageSecteur = {
   chemin: cheminSecteur("btp"),
   seo: {
     titre: "Logiciel de gestion de chantier BTP · Eliott Bouquerel",
-    description: `Logiciel de gestion de chantier sur mesure pour votre PME du BTP : devis, situations, pointage, sous-traitants. Prix : ${fourchette("logiciel", " HT")}.`,
+    description: `Logiciel de gestion de chantier sur mesure pour votre PME du BTP : devis, situations, pointage, sous-traitants. Prix : ${aPartirDe(LOGICIEL, " HT")}, au devis.`,
   },
   h1: "Logiciel de gestion de chantier BTP",
-  resume: `Un logiciel de gestion de chantier sur mesure réunit tes devis, l’avancement, les situations de travaux et les heures de tes équipes dans un seul outil. Il s’adresse aux PME du BTP que le tableur ou un logiciel standard ne suit plus. Compte ${fourchette("logiciel", " HT")} selon le périmètre.`,
+  resume: `Un logiciel de gestion de chantier sur mesure réunit tes devis, l’avancement, les situations de travaux et les heures de tes équipes dans un seul outil. Il s’adresse aux PME du BTP que le tableur ou un logiciel standard ne suit plus. Compte ${aPartirDe(LOGICIEL, " HT")}, selon le périmètre.`,
   marcheFilAriane: "BTP",
   libelleLien: "logiciel de gestion de chantier BTP",
   noteLlms:
@@ -209,7 +208,7 @@ const pageBtp: PageSecteur = {
       id: "modules",
       titre: "Ce que fait ton logiciel de chantier",
       paragraphes: [
-        "Le logiciel reprend tes lots, ta bibliothèque d’ouvrages et tes règles de facturation. Tu retiens les modules qui règlent ton problème, et leur nombre décide du forfait.",
+        "Le logiciel reprend tes lots, ta bibliothèque d’ouvrages et tes règles de facturation. Tu retiens les modules qui règlent ton problème, et leur nombre fait l’essentiel du prix.",
         "Une donnée saisie une fois sert partout : le métré alimente le devis, le devis signé devient le budget, le pointage nourrit le coût réel, l’avancement produit la situation du mois.",
       ],
       points: [
@@ -250,7 +249,7 @@ const pageBtp: PageSecteur = {
       titre: "La ressaisie, chiffrée sur une année",
       paragraphes: [
         `Prends une PME avec ${BTP_CONDUCTEURS} conducteurs de travaux. Par personne, ${BTP_HEURES_SEMAINE} heures par semaine partent à recopier des pointages, à tenir un tableur d’avancement et à refaire les situations. Sur ${BTP_SEMAINES} semaines travaillées, le total atteint ${BTP_HEURES_AN} heures par an.`,
-        `À ${euros(BTP_COUT_HORAIRE)} l’heure, salaire chargé et frais compris, ces heures coûtent ${euros(BTP_COUT_AN)} par an. ${LE_LOGICIEL.nom} coûte ${prixPack(LE_LOGICIEL)} HT, payé une fois. Ces 4 chiffres sont des hypothèses : remplace-les par les tiens avant d’en tirer une conclusion.`,
+        `À ${euros(BTP_COUT_HORAIRE)} l’heure, salaire chargé et frais compris, ces heures coûtent ${euros(BTP_COUT_AN)} par an. Un logiciel de chantier sur mesure démarre à ${prixPlancher(LOGICIEL)} HT, payé une fois. Ces 4 chiffres sont des hypothèses : remplace-les par les tiens avant d’en tirer une conclusion.`,
       ],
       points: [
         {
@@ -306,7 +305,7 @@ const pageBtp: PageSecteur = {
         },
         {
           titre: "Entre les deux",
-          corps: `${OUTIL.nom}, à ${prixPack(OUTIL)} HT, ajoute à ton logiciel actuel la fonction qui lui manque : un pointage mobile, un export vers la paie, un tableau de marge par chantier.`,
+          corps: `À partir de ${prixPlancher(LOGICIEL)} HT, j’ajoute à ton logiciel actuel la fonction qui lui manque : un pointage mobile, un export vers la paie, un tableau de marge par chantier.`,
         },
         {
           titre: "À qui appartient l’outil",
@@ -327,7 +326,7 @@ const pageBtp: PageSecteur = {
           {
             libelle: "La solution métier en détail",
             href: CHEMIN_PILIER,
-            description: "Les 3 forfaits, ce que chacun contient et son prix.",
+            description: "Ce qui est compris, et ce qui fait varier le prix.",
           },
           LIEN_PRIX,
           {
@@ -372,14 +371,14 @@ const pageBtp: PageSecteur = {
     coutHoraire: BTP_COUT_HORAIRE,
     coutAnnuel: BTP_COUT_AN,
   },
-  titrePacks: "Prix d’un logiciel de chantier, en 3 forfaits",
+  titreOffre: "Prix d’un logiciel de chantier : ce qui le fait varier",
   faq: {
     eyebrow: "FAQ",
     titleLines: ["Ton logiciel", "de chantier."],
     items: [
       {
         question: "Combien coûte un logiciel de gestion de chantier sur mesure ?",
-        answer: `${OUTIL.nom}, à ${prixPack(OUTIL)} HT, règle une tâche, comme le pointage mobile. ${LE_LOGICIEL.nom}, à ${prixPack(LE_LOGICIEL)} HT, couvre jusqu’à 3 modules : devis, suivi de chantier, situations. ${PLATEFORME.nom} démarre à ${prixPack(PLATEFORME)} HT quand plusieurs sociétés doivent rester d’accord. Le prix est fixé au devis et ne bouge plus.`,
+        answer: `Le prix démarre à ${prixPlancher(LOGICIEL)} HT et suit le nombre de modules : le pointage mobile seul, ou devis, suivi de chantier et situations réunis. Il monte aussi quand plusieurs sociétés doivent rester d’accord. Je le fixe au devis, et il ne bouge plus.`,
       },
       {
         question:
@@ -394,7 +393,8 @@ const pageBtp: PageSecteur = {
       },
       {
         question: "Peut-on reprendre mes devis et mes chantiers en cours ?",
-        answer: `Oui, la reprise de ton historique fait partie de ${LE_LOGICIEL.nom} : tes tableurs et les exports de ton logiciel actuel sont nettoyés et chargés avant la mise en ligne, chantiers ouverts compris.`,
+        answer:
+          "Oui. Tes tableurs et les exports de ton logiciel actuel sont nettoyés et chargés avant la mise en ligne, chantiers ouverts compris. Cette reprise est chiffrée au devis.",
       },
       {
         question: "As-tu déjà travaillé pour une entreprise du BTP ?",
@@ -428,10 +428,10 @@ const pageTransport: PageSecteur = {
   chemin: cheminSecteur("transport"),
   seo: {
     titre: "Logiciel de gestion de transport (TMS) · Eliott Bouquerel",
-    description: `TMS sur mesure pour votre entreprise de transport routier : ordres, tournées, CMR, preuves de livraison, facturation. Prix : ${fourchette("logiciel", " HT")}.`,
+    description: `TMS sur mesure pour votre entreprise de transport routier : ordres, tournées, CMR, preuves de livraison, facturation. Prix : ${aPartirDe(LOGICIEL, " HT")}, au devis.`,
   },
   h1: "Logiciel de gestion de transport",
-  resume: `Un logiciel de gestion de transport sur mesure, ou TMS, reçoit tes ordres de transport, organise les tournées, suit chaque livraison jusqu’à la preuve signée et prépare la facture. Il vise les PME du transport routier que les mails et les tableurs ne suivent plus. Son prix va ${fourchette("logiciel", " HT")}, selon le nombre de modules.`,
+  resume: `Un logiciel de gestion de transport sur mesure, ou TMS, reçoit tes ordres de transport, organise les tournées, suit chaque livraison jusqu’à la preuve signée et prépare la facture. Il vise les PME du transport routier que les mails et les tableurs ne suivent plus. Son prix démarre à ${prixPlancher(LOGICIEL)} HT, et suit le nombre de modules.`,
   marcheFilAriane: "Transport",
   libelleLien: "logiciel de gestion de transport",
   noteLlms:
@@ -482,7 +482,7 @@ const pageTransport: PageSecteur = {
       id: "modules",
       titre: "Ce que fait ton TMS sur mesure",
       paragraphes: [
-        "Un TMS sur mesure suit ton exploitation telle qu’elle tourne : tes chargeurs, tes grilles tarifaires, ton affrètement. Le nombre de modules retenus fixe le forfait.",
+        "Un TMS sur mesure suit ton exploitation telle qu’elle tourne : tes chargeurs, tes grilles tarifaires, ton affrètement. Le nombre de modules retenus fait l’essentiel du prix.",
         "L’ordre importé ou saisi une seule fois devient la mission du conducteur, puis la ligne de facture, sans nouvelle frappe entre les deux.",
       ],
       points: [
@@ -518,7 +518,7 @@ const pageTransport: PageSecteur = {
       titre: "Le prix d’une ressaisie de 4 minutes",
       paragraphes: [
         `Prends une exploitation qui reçoit ${TR_ORDRES_JOUR} ordres de transport par jour. Recopier un ordre du mail vers le planning, puis vers la lettre de voiture et la facture, prend ${TR_MINUTES_ORDRE} minutes au total. La ressaisie occupe ${TR_HEURES_JOUR} heures par jour, soit ${TR_HEURES_AN} heures sur ${TR_JOURS} jours ouvrés.`,
-        `À ${euros(TR_COUT_HORAIRE)} l’heure chargée, elle coûte ${euros(TR_COUT_AN)} par an, sans compter les lignes oubliées à la facturation. ${LE_LOGICIEL.nom} coûte ${prixPack(LE_LOGICIEL)} HT, payé une fois. Remplace ces hypothèses par tes chiffres : si le résultat tombe loin sous le prix du forfait, garde tes outils actuels.`,
+        `À ${euros(TR_COUT_HORAIRE)} l’heure chargée, elle coûte ${euros(TR_COUT_AN)} par an, sans compter les lignes oubliées à la facturation. Un TMS sur mesure démarre à ${prixPlancher(LOGICIEL)} HT, payé une fois. Remplace ces hypothèses par tes chiffres : si le résultat tombe loin sous le prix de ton devis, garde tes outils actuels.`,
       ],
       points: [
         {
@@ -573,7 +573,7 @@ const pageTransport: PageSecteur = {
         },
         {
           titre: "Garder ton TMS",
-          corps: `${OUTIL.nom}, à ${prixPack(OUTIL)} HT, branche la pièce manquante sur ton TMS actuel : l’import des ordres d’un gros chargeur, ou le calcul de l’indexation gazole.`,
+          corps: `À partir de ${prixPlancher(LOGICIEL)} HT, je branche la pièce manquante sur ton TMS actuel : l’import des ordres d’un gros chargeur, ou le calcul de l’indexation gazole.`,
         },
         {
           titre: "Ton outil, tes données",
@@ -592,9 +592,9 @@ const pageTransport: PageSecteur = {
         titre: "Pour aller plus loin",
         items: [
           {
-            libelle: "Les forfaits de la solution métier",
+            libelle: "La solution métier",
             href: CHEMIN_PILIER,
-            description: "Ce que contient chaque forfait, ligne à ligne, et son prix.",
+            description: "Ce qui est compris, ligne à ligne, et ce qui fait varier le prix.",
           },
           LIEN_PRIX,
           {
@@ -639,18 +639,18 @@ const pageTransport: PageSecteur = {
     coutHoraire: TR_COUT_HORAIRE,
     coutAnnuel: TR_COUT_AN,
   },
-  titrePacks: "Prix d’un TMS sur mesure, en 3 forfaits",
+  titreOffre: "Prix d’un TMS sur mesure : ce qui le fait varier",
   faq: {
     eyebrow: "FAQ",
     titleLines: ["Ton TMS", "sur mesure."],
     items: [
       {
         question: "Combien coûte un TMS sur mesure ?",
-        answer: `${OUTIL.nom}, à ${prixPack(OUTIL)} HT, règle une tâche, comme l’import des ordres d’un chargeur. ${LE_LOGICIEL.nom}, à ${prixPack(LE_LOGICIEL)} HT, réunit jusqu’à 3 modules : prise d’ordres, planning, facturation. ${PLATEFORME.nom} commence à ${prixPack(PLATEFORME)} HT, quand le TMS dialogue dans les 2 sens avec tes autres systèmes.`,
+        answer: `Le prix démarre à ${prixPlancher(LOGICIEL)} HT et monte avec les modules retenus, de l’import des ordres d’un chargeur jusqu’à la prise d’ordres, le planning et la facturation réunis. Un TMS qui dialogue dans les 2 sens avec tes autres systèmes coûte davantage. Le devis fixe le montant.`,
       },
       {
         question: "Le logiciel peut-il importer les ordres de mes clients ?",
-        answer: `Oui, quand le chargeur envoie un fichier ou dispose d’une interface d’échange : chaque format compte comme un raccordement, et ${LE_LOGICIEL.nom} en inclut 2. Un ordre rédigé en texte libre passe par un formulaire qui contrôle adresses et créneaux.`,
+        answer: `Oui, quand le chargeur envoie un fichier ou dispose d’une interface d’échange : chaque format compte comme un raccordement, chiffré au devis. Un ordre rédigé en texte libre passe par un formulaire qui contrôle adresses et créneaux.`,
       },
       {
         question: "Mes conducteurs devront-ils installer une application ?",
@@ -692,10 +692,10 @@ const pageLocation: PageSecteur = {
   chemin: cheminSecteur("location-materiel"),
   seo: {
     titre: "Logiciel de gestion location de matériel · Eliott Bouquerel",
-    description: `Logiciel de location de matériel sur mesure : votre parc, vos contrats, disponibilités, états des lieux et facturation. Prix : ${fourchette("logiciel", " HT")}.`,
+    description: `Logiciel de location de matériel sur mesure : votre parc, vos contrats, disponibilités, états des lieux et facturation. Prix : ${aPartirDe(LOGICIEL, " HT")}, au devis.`,
   },
   h1: "Logiciel de gestion de location de matériel",
-  resume: `Un logiciel de gestion de location de matériel sur mesure suit ton parc machine par machine, te dit ce qui est disponible demain, et édite le contrat, l’état des lieux et la facture à la journée. Il vise les loueurs et les entreprises de BTP ou de TP qui gèrent leur parc sur un tableur ou un planning mural. Compte ${fourchette("logiciel", " HT")} selon les modules retenus.`,
+  resume: `Un logiciel de gestion de location de matériel sur mesure suit ton parc machine par machine, te dit ce qui est disponible demain, et édite le contrat, l’état des lieux et la facture à la journée. Il vise les loueurs et les entreprises de BTP ou de TP qui gèrent leur parc sur un tableur ou un planning mural. Compte ${aPartirDe(LOGICIEL, " HT")}, selon les modules retenus.`,
   marcheFilAriane: "Location de matériel",
   libelleLien: "logiciel de gestion de location de matériel",
   noteLlms:
@@ -736,7 +736,7 @@ const pageLocation: PageSecteur = {
       id: "modules",
       titre: "Ce que fait ton logiciel de location",
       paragraphes: [
-        "Le logiciel part de ton parc tel qu’il est : tes familles de matériel, tes numéros de série, tes tarifs à la journée, à la semaine et au mois, tes conditions par client. Tu choisis les modules, et leur nombre fixe le forfait.",
+        "Le logiciel part de ton parc tel qu’il est : tes familles de matériel, tes numéros de série, tes tarifs à la journée, à la semaine et au mois, tes conditions par client. Tu choisis les modules, et leur nombre fait l’essentiel du prix.",
         "Chaque mouvement alimente le suivant : la réservation bloque la machine sur le planning, le départ ouvre le contrat, le retour clôt la période facturée et relève le compteur qui déclenche l’entretien.",
       ],
       points: [
@@ -772,7 +772,7 @@ const pageLocation: PageSecteur = {
       titre: "Les mouvements du dépôt, chiffrés sur une année",
       paragraphes: [
         `Prends un dépôt qui enregistre ${LOC_MOUVEMENTS_JOUR} mouvements par jour, départs et retours confondus. Pour chacun, ${LOC_MINUTES} minutes partent à recopier le bon de sortie, à reporter le compteur et à corriger la durée pour la facture. Sur ${LOC_JOURS} jours d’ouverture, le total atteint ${LOC_HEURES_AN} heures par an.`,
-        `À ${euros(LOC_COUT_HORAIRE)} l’heure, salaire chargé et frais compris, ces heures coûtent ${euros(LOC_COUT_AN)} par an. ${LE_LOGICIEL.nom} coûte ${prixPack(LE_LOGICIEL)} HT, payé une fois. Ces 4 chiffres sont des hypothèses : remplace-les par ceux de ton dépôt.`,
+        `À ${euros(LOC_COUT_HORAIRE)} l’heure, salaire chargé et frais compris, ces heures coûtent ${euros(LOC_COUT_AN)} par an. Un logiciel de location sur mesure démarre à ${prixPlancher(LOGICIEL)} HT, payé une fois. Ces 4 chiffres sont des hypothèses : remplace-les par ceux de ton dépôt.`,
       ],
       points: [
         {
@@ -827,7 +827,7 @@ const pageLocation: PageSecteur = {
         },
         {
           titre: "Entre les deux",
-          corps: `${OUTIL.nom}, à ${prixPack(OUTIL)} HT, ajoute à ton outil actuel la pièce qui lui manque : l’état des lieux photo sur téléphone, ou le relevé de compteurs qui déclenche l’entretien.`,
+          corps: `À partir de ${prixPlancher(LOGICIEL)} HT, j’ajoute à ton outil actuel la pièce qui lui manque : l’état des lieux photo sur téléphone, ou le relevé de compteurs qui déclenche l’entretien.`,
         },
       ],
     },
@@ -843,7 +843,7 @@ const pageLocation: PageSecteur = {
           {
             libelle: "La solution métier",
             href: CHEMIN_PILIER,
-            description: "Les 3 forfaits et la liste de ce que chacun contient.",
+            description: "Ce qui est compris, et la liste de ce qui fait varier le prix.",
           },
           LIEN_PRIX,
           {
@@ -863,7 +863,7 @@ const pageLocation: PageSecteur = {
         {
           titre: "1. Un appel en visio",
           corps:
-            "Gratuit. Tu me décris ton parc, ton dépôt et ta façon de facturer, et je te dis dès l’appel quel forfait y correspond.",
+            "Gratuit. Tu me décris ton parc, ton dépôt et ta façon de facturer, et je te dis dès l’appel ce que ton projet demande.",
         },
         {
           titre: "2. Un devis à prix ferme",
@@ -888,14 +888,14 @@ const pageLocation: PageSecteur = {
     coutHoraire: LOC_COUT_HORAIRE,
     coutAnnuel: LOC_COUT_AN,
   },
-  titrePacks: "Prix d’un logiciel de location, en 3 forfaits",
+  titreOffre: "Prix d’un logiciel de location : ce qui le fait varier",
   faq: {
     eyebrow: "FAQ",
     titleLines: ["Ton logiciel", "de location."],
     items: [
       {
         question: "Combien coûte un logiciel de gestion de location de matériel ?",
-        answer: `${OUTIL.nom}, à ${prixPack(OUTIL)} HT, règle une tâche, par exemple l’état des lieux photo. ${LE_LOGICIEL.nom}, à ${prixPack(LE_LOGICIEL)} HT, couvre jusqu’à 3 modules, comme le planning du parc, les contrats et la facturation. ${PLATEFORME.nom} commence à ${prixPack(PLATEFORME)} HT, pour plusieurs dépôts ou plusieurs systèmes à accorder entre eux.`,
+        answer: `Le prix démarre à ${prixPlancher(LOGICIEL)} HT, par exemple pour l’état des lieux photo. Il monte avec les modules, comme le planning du parc, les contrats et la facturation, et avec plusieurs dépôts ou plusieurs systèmes à accorder entre eux. Je le fixe au devis.`,
       },
       {
         question: "Le logiciel gère-t-il les tarifs dégressifs et les prolongations ?",
@@ -943,10 +943,10 @@ const pageNegoce: PageSecteur = {
   chemin: cheminSecteur("negoce-distribution"),
   seo: {
     titre: "Logiciel de gestion de négoce sur mesure · Eliott Bouquerel",
-    description: `Logiciel de négoce sur mesure pour votre distribution : stock, tarifs clients, remises, comptoir, reliquats, achats. Prix : ${fourchette("logiciel", " HT")}.`,
+    description: `Logiciel de négoce sur mesure pour votre distribution : stock, tarifs clients, remises, comptoir, reliquats, achats. Prix : ${aPartirDe(LOGICIEL, " HT")}, au devis.`,
   },
   h1: "Logiciel de gestion de négoce",
-  resume: `Un logiciel de gestion de négoce sur mesure réunit ton stock, tes tarifs clients, tes commandes et tes achats fournisseurs dans un seul outil, comptoir compris. Il s’adresse aux négociants et aux distributeurs techniques dont l’ERP ne suit plus les conditions commerciales, ou qui travaillent encore sur tableur. Son prix va ${fourchette("logiciel", " HT")}.`,
+  resume: `Un logiciel de gestion de négoce sur mesure réunit ton stock, tes tarifs clients, tes commandes et tes achats fournisseurs dans un seul outil, comptoir compris. Il s’adresse aux négociants et aux distributeurs techniques dont l’ERP ne suit plus les conditions commerciales, ou qui travaillent encore sur tableur. Son prix démarre à ${prixPlancher(LOGICIEL)} HT.`,
   marcheFilAriane: "Négoce et distribution",
   libelleLien: "logiciel de gestion de négoce",
   noteLlms:
@@ -987,7 +987,7 @@ const pageNegoce: PageSecteur = {
       id: "modules",
       titre: "Ce que fait ton logiciel de négoce",
       paragraphes: [
-        "Le logiciel reprend ton catalogue, tes familles de produits, tes dépôts et tes conditions par client, tels que tu les pratiques. Tu retiens les modules qui te coûtent le plus aujourd’hui, et leur nombre décide du forfait.",
+        "Le logiciel reprend ton catalogue, tes familles de produits, tes dépôts et tes conditions par client, tels que tu les pratiques. Tu retiens les modules qui te coûtent le plus aujourd’hui, et leur nombre pèse le plus dans le prix.",
         "Une condition saisie une fois s’applique partout : le prix calculé au devis est celui de la commande, du bon de livraison et de la facture, et chaque vente décompte le stock du bon dépôt.",
       ],
       points: [
@@ -1028,7 +1028,7 @@ const pageNegoce: PageSecteur = {
       titre: "La recherche de prix, chiffrée sur une année",
       paragraphes: [
         `Prends une équipe de vente qui saisit ${NEG_LIGNES_JOUR} lignes de devis et de commande par jour. Pour chaque ligne, ${NEG_MINUTES_LIGNE} minutes partent à retrouver la remise du client dans un tableur, à vérifier le stock d’un autre dépôt ou à recalculer un prix net. Sur ${NEG_JOURS} jours ouvrés, le total atteint ${NEG_HEURES_AN} heures par an.`,
-        `À ${euros(NEG_COUT_HORAIRE)} l’heure, salaire chargé et frais compris, ces heures coûtent ${euros(NEG_COUT_AN)} par an. ${LE_LOGICIEL.nom} coûte ${prixPack(LE_LOGICIEL)} HT, payé une fois. Ces 4 chiffres sont des hypothèses : mets les tiens à leur place avant de conclure.`,
+        `À ${euros(NEG_COUT_HORAIRE)} l’heure, salaire chargé et frais compris, ces heures coûtent ${euros(NEG_COUT_AN)} par an. Un logiciel de négoce sur mesure démarre à ${prixPlancher(LOGICIEL)} HT, payé une fois. Ces 4 chiffres sont des hypothèses : mets les tiens à leur place avant de conclure.`,
       ],
       points: [
         {
@@ -1089,7 +1089,7 @@ const pageNegoce: PageSecteur = {
         },
         {
           titre: "Entre les deux",
-          corps: `${OUTIL.nom}, à ${prixPack(OUTIL)} HT, relie ton ERP à ce qui lui manque : l’import automatique d’un tarif fournisseur, ou un écran de comptoir plus rapide.`,
+          corps: `À partir de ${prixPlancher(LOGICIEL)} HT, je relie ton ERP à ce qui lui manque : l’import automatique d’un tarif fournisseur, ou un écran de comptoir plus rapide.`,
         },
       ],
     },
@@ -1110,9 +1110,9 @@ const pageNegoce: PageSecteur = {
               "Le parcours de création de compte de l’eShop, expliqué de bout en bout.",
           },
           {
-            libelle: "La solution métier en 3 forfaits",
+            libelle: "La solution métier en détail",
             href: CHEMIN_PILIER,
-            description: "Ce que chaque forfait ajoute au précédent, et son prix.",
+            description: "Ce qui est compris dès le plancher, et ce qui fait monter le prix.",
           },
           LIEN_PRIX,
           {
@@ -1151,14 +1151,14 @@ const pageNegoce: PageSecteur = {
     coutHoraire: NEG_COUT_HORAIRE,
     coutAnnuel: NEG_COUT_AN,
   },
-  titrePacks: "Prix d’un logiciel de négoce, en 3 forfaits",
+  titreOffre: "Prix d’un logiciel de négoce : ce qui le fait varier",
   faq: {
     eyebrow: "FAQ",
     titleLines: ["Ton logiciel", "de distribution."],
     items: [
       {
         question: "Combien coûte un logiciel de gestion de négoce sur mesure ?",
-        answer: `${OUTIL.nom}, à ${prixPack(OUTIL)} HT, règle une tâche, comme l’import des tarifs fournisseurs. ${LE_LOGICIEL.nom}, à ${prixPack(LE_LOGICIEL)} HT, réunit jusqu’à 3 modules, par exemple tarifs clients, commandes et stock. ${PLATEFORME.nom} démarre à ${prixPack(PLATEFORME)} HT, quand le logiciel doit rester d’accord avec ton ERP, ta comptabilité et ton site dans les 2 sens.`,
+        answer: `Le prix démarre à ${prixPlancher(LOGICIEL)} HT, pour une pièce comme l’import des tarifs fournisseurs, et monte avec les modules réunis, par exemple tarifs clients, commandes et stock. Il monte encore quand le logiciel doit rester d’accord avec ton ERP, ta comptabilité et ton site dans les 2 sens. Le devis fixe le montant.`,
       },
       {
         question: "Faut-il remplacer mon ERP ?",
@@ -1196,5 +1196,5 @@ export const pagesSecteur: readonly PageSecteur[] = [
 export const pageSecteur = (slug: string): PageSecteur | undefined =>
   pagesSecteur.find((p) => p.slug === slug);
 
-/** Amorce de la liste des pages secteur, sous les forfaits de la page pilier. */
+/** Amorce de la liste des pages secteur, sous l’offre de la page pilier. */
 export const avantLiensSecteur = "Par métier :";

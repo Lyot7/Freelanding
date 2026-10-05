@@ -2,11 +2,11 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import {
+  aPartirDe,
   euros,
-  fourchette,
   plancherSuivi,
   prestation,
-  prixPack,
+  prixPlancher,
   suiviMensuelHT,
   tauxSuivi,
 } from "./offre.ts";
@@ -22,7 +22,7 @@ import { siteConfig } from "./site.ts";
  * LA PAGE DE PRIX DE LA SOLUTION MÉTIER, et ce que l'œil ne vérifie pas.
  *
  * Une page qui répond « combien ça coûte » ne tient que si ses chiffres sont
- * justes : les forfaits et le suivi viennent de `offre.ts`, et la comparaison
+ * justes : le plancher et le suivi viennent de `offre.ts`, et la comparaison
  * avec un abonnement est recalculée ici depuis ses hypothèses.
  *
  * En fin de fichier, l'unicité des 7 pages déclinées (4 secteurs, 2 pages de
@@ -31,7 +31,6 @@ import { siteConfig } from "./site.ts";
  */
 
 const LOGICIEL = prestation("logiciel");
-const LE_LOGICIEL = LOGICIEL.packs[1];
 const page = pagePrixLogiciel;
 
 /** Toutes les chaînes affichées ou déclarées par la page, à plat. */
@@ -41,7 +40,7 @@ function textes() {
     page.seo.description,
     page.h1,
     page.resume,
-    page.titrePacks,
+    page.titreOffre,
     ...page.sections.flatMap((s) => [
       s.titre,
       ...s.paragraphes,
@@ -112,16 +111,25 @@ describe("la page de prix est cherchable", () => {
 });
 
 describe("les prix de la page sont ceux d'offre.ts", () => {
-  test("la réponse directe donne la fourchette et les 3 forfaits", () => {
-    expect(page.resume).toContain(fourchette("logiciel", " HT"));
-    for (const pack of LOGICIEL.packs) expect(page.resume).toContain(prixPack(pack));
+  test("la réponse directe donne le plancher et renvoie au devis", () => {
+    expect(page.resume).toContain(prixPlancher(LOGICIEL));
+    expect(page.resume).toMatch(/devis/u);
+    expect(page.seo.description).toContain(aPartirDe(LOGICIEL, " HT"));
+  });
+
+  test("aucun forfait, aucune fourchette, aucun délai chiffré", () => {
+    for (const texte of textes()) {
+      expect(/\bforfaits?\b|\bpaliers?\b/iu.test(texte), texte).toBe(false);
+      expect(/de \d[\d\u00A0\u202F ]*\u20AC à \d/u.test(texte), texte).toBe(false);
+      expect(/\d\s*(?:jours?|semaines?)\b/iu.test(texte), texte).toBe(false);
+    }
   });
 
   test("le suivi mensuel est celui d'offre.ts", () => {
     const tout = textes().join("\n");
     expect(tout).toContain(tauxSuivi());
     expect(tout).toContain(plancherSuivi());
-    expect(page.comparaison.suiviMensuel).toBe(suiviMensuelHT(LE_LOGICIEL.prix));
+    expect(page.comparaison.suiviMensuel).toBe(suiviMensuelHT(LOGICIEL.plancher));
   });
 
   test("aucun montant en euros n'est écrit à la main dans page-prix-logiciel.ts", () => {
@@ -140,8 +148,10 @@ describe("la comparaison avec un abonnement tombe juste", () => {
   const section = page.sections.find((s) => s.id === "comparaison");
   const corps = section?.paragraphes.join(" ") ?? "";
 
-  test("les coûts sont le produit de leurs hypothèses", () => {
-    expect(c.prixProjet).toBe(LE_LOGICIEL.prix);
+  test("les coûts sont le produit de leurs hypothèses, au plancher", () => {
+    // Plus de prix ferme de projet depuis le 2026-10-05 : la comparaison part
+    // du plancher, hypothèse affichée comme telle.
+    expect(c.prixProjet).toBe(LOGICIEL.plancher);
     expect(c.coutAbonnement).toBe(c.utilisateurs * c.prixParUtilisateur * c.mois);
     expect(c.coutSurMesure).toBe(c.prixProjet + c.suiviMensuel * c.mois);
   });
@@ -152,7 +162,16 @@ describe("la comparaison avec un abonnement tombe juste", () => {
     expect(abonnement(c.seuilUtilisateurs - 1)).toBeLessThanOrEqual(c.coutSurMesure);
   });
 
+  test("le budget équivalent est le plus haut prix de projet, à la centaine, qui reste sous l'abonnement", () => {
+    const cout = (prix) => prix + suiviMensuelHT(prix) * c.mois;
+    expect(c.budgetEquivalent % 100).toBe(0);
+    expect(cout(c.budgetEquivalent)).toBeLessThanOrEqual(c.coutAbonnement);
+    expect(cout(c.budgetEquivalent + 100)).toBeGreaterThan(c.coutAbonnement);
+    expect(c.budgetEquivalent).toBeGreaterThan(c.prixProjet);
+  });
+
   test("le texte affiche les chiffres calculés et les dit hypothèses", () => {
+    expect(corps).toContain(euros(c.budgetEquivalent));
     expect(section).toBeDefined();
     expect(corps).toContain(euros(c.coutAbonnement));
     expect(corps).toContain(euros(c.coutSurMesure));
@@ -191,7 +210,7 @@ function fiche(p, nom) {
     titre: p.seo.titre,
     description: p.seo.description,
     h1: p.h1,
-    titrePacks: p.titrePacks ?? nom,
+    titreOffre: p.titreOffre ?? nom,
     questions: p.faq.items.map((i) => i.question),
     blocs: [
       p.resume,
@@ -214,7 +233,7 @@ describe("les 7 pages déclinées ne se recopient pas", () => {
     expect(SEPT.length).toBe(7);
   });
 
-  for (const champ of ["titre", "description", "h1", "titrePacks"]) {
+  for (const champ of ["titre", "description", "h1", "titreOffre"]) {
     test(`aucun ${champ} n'est partagé`, () => {
       const valeurs = SEPT.map((f) => f[champ]);
       expect(new Set(valeurs).size).toBe(valeurs.length);

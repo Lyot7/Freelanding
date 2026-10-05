@@ -24,8 +24,8 @@ import type { PrestationId } from "@/content/offre";
 /**
  * Les trois entrées du sélecteur, et l'ordre dans lequel elles s'affichent.
  *
- * « outil » a disparu le 2026-09-23 avec la prestation du même nom : L'Outil
- * est devenu le premier palier de La Solution métier, et le rendez-vous
+ * « outil » a disparu le 2026-09-23 avec la prestation du même nom : l'outil
+ * est entré dans La Solution métier, et le rendez-vous
  * « logiciel » couvre les deux tailles. Un ancien lien `?sujet=outil` est
  * redirigé vers « logiciel » par `resoudreSujet` (`src/lib/rendez-vous/config.ts`).
  */
@@ -123,12 +123,12 @@ export interface ContenuRendezVous {
     readonly titre: string;
     readonly aucun: (prixEntree: string) => string;
     readonly inconnu: string;
-    readonly repere: (prestation: string, fourchette: string) => string;
-    readonly prixFerme: (prix: string) => string;
+    readonly repere: (prestation: string, prix: string) => string;
     readonly prixPlancher: (prix: string) => string;
-    readonly surMesure: string;
-    readonly surMesureSuivant: (forfait: string, prix: string) => string;
-    readonly horsForfait: string;
+    /** Le plancher tient dans la tranche. */
+    readonly aPortee: string;
+    /** La tranche est ouverte vers le haut. */
+    readonly large: string;
   };
   /**
    * Intitulés des lignes déposées dans les notes Cal.com. Lus par Eliott dans
@@ -174,7 +174,7 @@ export const rendezVousContent: ContenuRendezVous = {
    * TROIS ENTRÉES DEPUIS LE 2026-09-23. « logiciel » absorbe l'ancien « outil » :
    * son intitulé part du problème (ce qui coince) et non de la taille de la
    * réponse, parce que c'est le budget du questionnaire qui dira ensuite s'il
-   * s'agit de L'Outil ou du Logiciel.
+   * s'agit d'un outil ou d'un logiciel complet.
    *
    * ILS NE SONT PAS CE QU'ELIOTT LIT DANS SON AGENDA, et c'est voulu. Le nom de
    * l'événement dans Google Agenda est réglé chez Cal.com, sobre et scannable
@@ -279,7 +279,7 @@ export const rendezVousContent: ContenuRendezVous = {
    * c'est de l'OR, sinon ce qu'ils veulent et leur dire si c'est possible ou non
    * et ce qu'ils peuvent espérer à ce prix ». Trois questions, deux obligatoires.
    *
-   * AUCUN MONTANT ICI. Les tranches de budget sont calculées depuis la grille de
+   * AUCUN MONTANT ICI. Les tranches de budget sont calculées depuis les planchers de
    * `offre.ts` par `src/lib/rendez-vous/questionnaire.ts` : un prix qui change
    * là-bas déplace les tranches sans qu'on touche à ce fichier.
    *
@@ -335,23 +335,22 @@ export const rendezVousContent: ContenuRendezVous = {
   retour: {
     titre: "Ce que tu peux espérer à ce budget",
     aucun: (prixEntree) =>
-      `Mes forfaits commencent à ${prixEntree} HT, et aucun ne tient à ce budget. Réserve quand même : on regarde ensemble ce qui est faisable, et par quoi commencer.`,
+      `Mes projets commencent à ${prixEntree} HT, et ce budget n’y suffit pas. Réserve quand même : on regarde ensemble ce qui est faisable, et par quoi commencer.`,
     inconnu: "On le cale ensemble pendant l’appel. Pour te situer :",
-    repere: (prestation, fourchette) => `${prestation}, ${fourchette} HT.`,
-    prixFerme: (prix) => `${prix} HT`,
+    repere: (prestation, prix) => `${prestation}, ${prix}.`,
     prixPlancher: (prix) => `À partir de ${prix} HT`,
-    surMesure: "Le périmètre n’a pas de plafond : on le fixe ensemble, au devis.",
-    surMesureSuivant: (forfait, prix) =>
-      `Au-delà, ${forfait} se chiffre sur mesure, à partir de ${prix} HT.`,
-    horsForfait: "Au-delà, ce que tu veux ajouter se chiffre sur mesure, au devis.",
+    aPortee:
+      "Ton budget couvre le prix de départ. Ce qu’il permet d’ajouter, je te le dis pendant l’appel, et le devis le fixe.",
+    large:
+      "Ton budget laisse de la place à un projet complet. On fixe le périmètre ensemble, au devis.",
   },
 
   notes: {
     budget: "Budget HT",
-    forfait: "Forfait atteignable",
+    forfait: "À portée",
     objectif: "Objectif",
     echeance: "Échéance",
-    aucunForfait: "aucun à ce budget",
+    aucunForfait: "rien à ce budget",
     aCaler: "à caler pendant l’appel",
   },
 

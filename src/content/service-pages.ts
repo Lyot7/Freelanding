@@ -25,14 +25,14 @@ const RESERVER_UN_APPEL = "Réserver un appel";
  *
  * CE QUI ÉTAIT SERVI, ET POURQUOI C'ÉTAIT UN DÉFAUT SANS CONTREPARTIE. La
  * balise `<title>` de ces trois pages valait `prestation.nom` : « Site
- * vitrine », « L'Outil », « Le Logiciel ». Deux d'entre elles sont des NOMS
+ * vitrine » et deux noms de palier aujourd'hui disparus. Ces deux-là étaient des NOMS
  * INTERNES DE CATALOGUE — personne ne tape « le logiciel » pour chercher un
  * développeur — et aucune ne portait la marque, alors que toutes les autres
  * pages du site suivent « … · Eliott Bouquerel ». Une page de vente sans mot
  * cherchable dans son titre est une page qui ne se trouve pas.
  *
- * POURQUOI ÇA VIT ICI ET NON DANS `offre.ts`. `nom` est le nom commercial du
- * palier : il porte l'accordéon de l'accueil, la matrice tarifaire et le
+ * POURQUOI ÇA VIT ICI ET NON DANS `offre.ts`. `nom` est le nom commercial de
+ * l'offre : il porte l'accordéon de l'accueil, la matrice tarifaire et le
  * contrôle de cohérence de `offre.test.mjs` (`services.title === prestation.nom`).
  * Le titre de recherche est un autre objet, avec une autre contrainte, la
  * longueur. Les confondre revient à faire dépendre le catalogue du référencement.
@@ -89,7 +89,7 @@ export const servicePageLabels = {
   /**
    * FIL D'ARIANE, repris du motif déjà en place sur `/work/*`.
    *
-   * La dernière marche porte `prestation.nom` — « L'Outil », « Le Logiciel » —
+   * La dernière marche porte `prestation.nom` — « Site vitrine », « La Solution métier » —
    * et c'est elle qui garde le nom de catalogue lisible sur la page, une fois
    * que le H1 est passé aux mots que le client tape.
    *
@@ -106,83 +106,53 @@ export const servicePageLabels = {
     separateur: "/",
   },
 
-  /** Chapô de la fourchette, en tête de page. */
-  fourchette: "Selon le forfait,",
+  /** Chapô du prix, en tête de page : le plancher, et où le prix se fixe. */
+  chapoPrix: (plancher: string) => `À partir de ${plancher}, prix fixé au devis`,
 
   /** Suffixe des montants. Toujours séparé du chiffre : jamais « 5 000 €HT ». */
   horsTaxes: "HT",
 
-  /**
-   * Titre de la section des trois périmètres.
-   *
-   * « 3 » ET NON « TROIS », règle posée par Eliott le 2026-09-01 et appliquée à
-   * tout le site : un nombre écrit en chiffres s'accroche à l'œil, le même
-   * nombre écrit en lettres se lit comme un mot de plus.
-   */
-  titrePacks: (hautSurMesure: boolean) =>
-    hautSurMesure
-      ? "3 forfaits, du prix ferme au sur mesure"
-      : "3 forfaits, à prix ferme",
+  /** Titre de la section de l'offre. */
+  titreOffre: "Ce qui est compris, ce qui fait varier le prix",
 
-  /** Amorce de la ligne « pour qui ». */
-  pourQui: "Pour toi si",
+  /** Amorce de la liste de ce que comprend le plancher. */
+  inclus: "Compris dès le plancher",
 
-  /**
-   * Phrase d'enchaînement entre deux périmètres.
-   *
-   * ELLE EST OBLIGATOIRE, et pas décorative. À partir du deuxième périmètre, la
-   * liste n'énumère que ce qui S'AJOUTE : sans cette phrase, le lecteur voit une
-   * liste plus courte en face d'un prix plus élevé et en conclut l'inverse de ce
-   * qui est vrai.
-   */
-  toutLePrecedent: (precedent: string) => `Tout ce que contient ${precedent}, plus :`,
+  /** Amorce de la liste de ce qui fait monter le prix. */
+  faitMonter: "Ce qui fait monter le prix",
 
-  /** En vis-à-vis du titre des forfaits : comment on paie, et que le prix tient. */
+  /** En vis-à-vis du titre de l'offre : comment on paie, et que le prix tient. */
   reassurance:
     "Le prix est fixé au devis et ne bouge plus. Tu paies 40 % à la signature, 30 % à la première version fonctionnelle et 30 % à la livraison. Le code et l’hébergement sont à ton nom.",
 
-  /**
-   * Bouton de chaque forfait. UN SEUL LIBELLÉ pour l'ancre `#rendez-vous` sur
-   * toute la page : « En parler » et « Réserver un appel » y menaient tous
-   * deux, et deux libellés pour une même destination se lisent comme deux
-   * actions différentes.
-   */
+  /** Bouton de l'offre, vers l'ancre `#rendez-vous` de la page. */
   cta: RESERVER_UN_APPEL,
 
-  /** Amorce du montant d'un palier sur mesure : son prix est un plancher. */
+  /** Amorce du plancher. */
   aPartirDe: "À partir de",
 
-  /** Signalement du palier sur mesure : son prix est un plancher. */
-  surMesure: "Sur mesure",
-
   /**
-   * LE BLOC « SUR MESURE, SUR DEVIS », qui remplace depuis le 2026-09-23 la
-   * section « Pourquoi un devis ne tombe jamais pile sur ces montants ». Un
-   * forfait à prix ferme qui explique pourquoi il ne l'est pas se contredit :
-   * la section est partie, décision d'Eliott.
-   *
-   * CE QU'IL FAIT À LA PLACE : il dit ce qui sort des forfaits (`horsPack` de
-   * la prestation) et il prépare le visiteur aux trois questions du
-   * questionnaire de rendez-vous. Eliott veut des demandes déjà cadrées, budget
-   * compris : le lecteur apprend ici que le budget se pose d'entrée, et
-   * pourquoi il l'aide, lui, à choisir.
+   * LE BLOC « SUR DEVIS » : ce qui sort de l'offre (`horsOffre` de la
+   * prestation), et les trois questions du questionnaire de rendez-vous. Eliott
+   * veut des demandes déjà cadrées, budget compris : le lecteur apprend ici que
+   * le budget se pose d'entrée, et pourquoi il l'aide, lui, à cadrer.
    */
   surMesureBloc: {
-    titre: "Hors forfait, sur devis",
+    titre: "Hors offre, sur devis",
     cta: RESERVER_UN_APPEL,
-    titreQuestions: "Pas sûr du forfait ?",
+    titreQuestions: "Pas sûr de ce qu’il te faut ?",
     introQuestions:
       "3 questions, posées quand tu réserves ton appel. Je te dis tout de suite ce que ton budget permet, et ce qu’il ne permet pas.",
     questions: [
       {
         titre: "Ton budget",
         corps:
-          "Le repère le plus utile des trois. À budget connu, je te montre le forfait qu’il paie et ce que tu obtiens avec.",
+          "Le repère le plus utile des trois. À budget connu, je te dis ce qu’il permet de construire, et ce qui attendra.",
       },
       {
         titre: "Ton objectif",
         corps:
-          "Le résultat que tu attends décide du forfait. Dis-le avec tes mots, je le traduis en périmètre.",
+          "Le résultat que tu attends décide de ce qu’on construit. Dis-le avec tes mots, je le traduis en périmètre.",
       },
       {
         titre: "Ton échéance",

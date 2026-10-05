@@ -1,16 +1,16 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { integrationIA, prestation, prestations, prixPack } from "../../content/offre.ts";
+import { integrationIA, prestation, prestations, prixPlancher } from "../../content/offre.ts";
 import { pagePrixLogiciel } from "../../content/page-prix-logiciel.ts";
 import { pagePrixSite } from "../../content/page-prix-site.ts";
 import { CHEMIN_SIMULATEUR } from "../../content/pages-secteur.ts";
 import { contentRoutes } from "../../content/routes.ts";
 import { siteConfig } from "../../content/site.ts";
 import {
-  delaiEstime,
   libellesSimulateur,
-  prixEstime,
+  plancherEstime,
+  suiviEstime,
   typeProjet,
   typesProjet,
 } from "../../content/simulateur.ts";
@@ -19,62 +19,42 @@ import { estimer } from "./estimation.ts";
 import { pageTypeFromPathname, viewEventForPageType } from "../analytics/events.ts";
 
 /**
- * LE SIMULATEUR DE PRIX : un calcul fixe sur les grilles d'`offre.ts`.
+ * LE SIMULATEUR DE PRIX, OUTIL DE CADRAGE DEPUIS LE 2026-10-05 : le plancher
+ * de l'offre, « prix au devis », et ce qui fera monter le prix selon les
+ * réponses.
  *
- * Ce qui est gardé : la grille lue est celle de l'offre (jamais une copie),
- * chaque réponse ne peut que resserrer la fourchette, les bornes sont atteintes,
- * et les montants et délais arrêtés par Eliott le 2026-10-05 sont ceux publiés.
+ * Ce qui est gardé : l'offre lue est celle d'`offre.ts` (jamais une copie), le
+ * résultat ne rend ni fourchette, ni délai, ni nom de forfait, et chaque
+ * réponse ne peut qu'ajouter un facteur, jamais en retirer un.
  */
 
-const premiere = (q) => q.options.find((o) => o.palier === 0 && o.palierMax === undefined);
-const plusHaute = (q) =>
-  q.options.reduce((a, b) => ((b.palierMax ?? b.palier) > (a.palierMax ?? a.palier) ? b : a));
+const premiere = (q) => q.options.find((o) => !o.facteur && !o.horsForfait);
+const avecFacteur = (q) => q.options.filter((o) => o.facteur);
 
 const reponsesMin = (type) =>
   Object.fromEntries(type.questions.map((q) => [q.id, premiere(q).id]));
-const reponsesMax = (type) =>
-  Object.fromEntries(type.questions.map((q) => [q.id, plusHaute(q).id]));
-const palierMaxType = (type) =>
-  Math.max(...type.questions.flatMap((q) => q.options.map((o) => o.palierMax ?? o.palier)));
 
-describe("les grilles sont lues dans offre.ts", () => {
-  test("site vitrine, logiciel et outil interne reprennent les forfaits publiés", () => {
-    expect(typeProjet("vitrine").packs).toBe(prestation("vitrine").packs);
-    expect(typeProjet("logiciel").packs).toBe(prestation("logiciel").packs);
-    expect(typeProjet("outil-interne").packs).toBe(prestation("logiciel").packs);
+describe("les offres sont lues dans offre.ts", () => {
+  test("site vitrine, logiciel et outil interne reprennent les offres publiées", () => {
+    expect(typeProjet("vitrine").offre).toBe(prestation("vitrine"));
+    expect(typeProjet("logiciel").offre).toBe(prestation("logiciel"));
+    expect(typeProjet("outil-interne").offre).toBe(prestation("logiciel"));
   });
 
-  test("l'intégration IA lit sa grille, hors des prestations à page dédiée", () => {
-    expect(typeProjet("integration-ia").packs).toBe(integrationIA.packs);
-    expect(prestations.some((p) => p.packs === integrationIA.packs)).toBe(false);
+  test("l'intégration IA lit son offre, hors des prestations à page dédiée", () => {
+    expect(typeProjet("integration-ia").offre).toBe(integrationIA);
+    expect(prestations.some((p) => p === integrationIA)).toBe(false);
   });
 
-  test("la grille IA arrêtée par Eliott le 2026-10-05", () => {
-    expect(integrationIA.packs.map((p) => p.prix)).toEqual([2500, 5000, 8000]);
-    expect(integrationIA.packs.map((p) => p.surMesure === true)).toEqual([false, false, true]);
+  test("le plancher IA arrêté par Eliott le 2026-10-05", () => {
+    expect(integrationIA.plancher).toBe(2500);
   });
 
-  test("les délais arrêtés le 2026-10-05, en semaines", () => {
-    const delais = Object.fromEntries(
-      [...prestations.flatMap((p) => p.packs), ...integrationIA.packs].map((p) => [p.id, p.delai]),
-    );
-    expect(delais).toEqual({
-      landing: { min: 3, max: 4 },
-      site: { min: 4, max: 6 },
-      signature: { min: 6, max: 8 },
-      outil: { min: 4, max: 6 },
-      logiciel: { min: 10, max: 16 },
-      plateforme: undefined,
-      assistant: { min: 1, max: 2 },
-      integration: { min: 3, max: 4 },
-      automatisation: undefined,
-    });
-  });
-
-  test("un palier sur mesure n'a pas de délai, les autres en ont un", () => {
-    for (const pack of [...prestations.flatMap((p) => p.packs), ...integrationIA.packs]) {
-      expect(pack.delai === undefined, pack.nom).toBe(pack.surMesure === true);
-      if (pack.delai) expect(pack.delai.min < pack.delai.max, pack.nom).toBe(true);
+  test("plus aucun délai ni palier dans les offres lues", () => {
+    for (const type of typesProjet) {
+      for (const champ of ["packs", "delai"]) {
+        expect(champ in type.offre, `${type.id} : ${champ}`).toBe(false);
+      }
     }
   });
 
@@ -120,49 +100,46 @@ describe("4 à 6 questions par type, toutes répondables", () => {
       for (const q of type.questions) {
         expect(q.options.length, q.id).toBeGreaterThanOrEqual(2);
         expect(new Set(q.options.map((o) => o.id)).size, q.id).toBe(q.options.length);
-        expect(premiere(q), `${q.id} n'a pas de réponse au premier palier`).toBeDefined();
-        for (const o of q.options) {
-          expect((o.palierMax ?? o.palier) >= o.palier, `${q.id}/${o.id}`).toBe(true);
-        }
+        expect(premiere(q), `${q.id} n'a pas de réponse qui reste au plancher`).toBeDefined();
       }
+      // Chaque type a au moins une réponse qui fait monter le prix.
+      expect(type.questions.some((q) => avecFacteur(q).length > 0)).toBe(true);
     });
   }
 });
 
-describe("le calcul", () => {
+describe("le cadrage", () => {
   for (const type of typesProjet) {
     describe(type.libelle, () => {
-      test("sans réponse, la fourchette couvre tout ce que les questions permettent", () => {
+      test("sans réponse, aucun facteur, toutes les questions restantes", () => {
         const e = estimer(type, {});
-        expect(e.palierBas).toBe(0);
-        expect(e.palierHaut).toBe(palierMaxType(type));
+        expect(e.facteurs).toEqual([]);
         expect(e.restantes).toBe(type.questions.length);
-        expect(e.bas).toBe(type.packs[0]);
+        expect(e.horsForfait).toEqual([type.offre.horsOffre]);
       });
 
-      test("les réponses les plus simples donnent le premier forfait, prix ferme", () => {
+      test("les réponses les plus simples restent au plancher, sans facteur", () => {
         const e = estimer(type, reponsesMin(type));
-        expect(e.bas).toBe(type.packs[0]);
-        expect(e.haut).toBe(type.packs[0]);
+        expect(e.facteurs).toEqual([]);
         expect(e.restantes).toBe(0);
-        expect(prixEstime(e.bas, e.haut)).toBe(`${prixPack(type.packs[0])} HT`);
       });
 
-      test("les réponses les plus lourdes atteignent le haut de la grille", () => {
-        const e = estimer(type, reponsesMax(type));
-        expect(e.palierHaut).toBe(palierMaxType(type));
-        expect(e.haut).toBe(type.packs[palierMaxType(type)]);
+      test("chaque réponse à facteur l'ajoute, et seulement lui", () => {
+        for (const q of type.questions) {
+          for (const o of avecFacteur(q)) {
+            const e = estimer(type, { ...reponsesMin(type), [q.id]: o.id });
+            expect(e.facteurs, `${q.id}/${o.id}`).toEqual([o.facteur]);
+          }
+        }
       });
 
-      test("une réponse ne fait que resserrer la fourchette", () => {
+      test("une réponse ne peut qu'ajouter un facteur, jamais en retirer", () => {
         const vide = estimer(type, {});
         for (const q of type.questions) {
           for (const o of q.options) {
             const e = estimer(type, { [q.id]: o.id });
-            expect(e.palierBas >= vide.palierBas, `${q.id}/${o.id}`).toBe(true);
-            expect(e.palierHaut <= vide.palierHaut, `${q.id}/${o.id}`).toBe(true);
-            expect(e.palierBas <= e.palierHaut, `${q.id}/${o.id}`).toBe(true);
-            expect(e.bas.prix <= e.haut.prix, `${q.id}/${o.id}`).toBe(true);
+            expect(e.facteurs.length >= vide.facteurs.length, `${q.id}/${o.id}`).toBe(true);
+            expect(e.restantes, `${q.id}/${o.id}`).toBe(vide.restantes - 1);
           }
         }
       });
@@ -174,17 +151,6 @@ describe("le calcul", () => {
     });
   }
 
-  test("ce qui est inclus : le forfait atteint, en plus du précédent", () => {
-    const vitrine = typeProjet("vitrine");
-    const premier = estimer(vitrine, reponsesMin(vitrine));
-    expect(premier.inclus).toBe(vitrine.packs[0].ajoute);
-    expect(premier.precedent).toBeUndefined();
-    const e = estimer(vitrine, { ...reponsesMin(vitrine), pages: "plusieurs" });
-    expect(e.bas).toBe(vitrine.packs[1]);
-    expect(e.inclus).toBe(vitrine.packs[1].ajoute);
-    expect(e.precedent).toBe(vitrine.packs[0]);
-  });
-
   test("le lien de la page de prix du site annonce le bon nombre de questions", () => {
     const lien = pagePrixSite.sections
       .flatMap((s) => s.liens?.items ?? [])
@@ -192,40 +158,61 @@ describe("le calcul", () => {
     expect(lien.description).toContain(`${typeProjet("vitrine").questions.length} questions`);
   });
 
-  test("un besoin hors forfait est signalé, sinon le hors-forfait de la grille", () => {
+  test("un besoin hors offre est signalé, sinon le hors-offre de l'offre", () => {
     const logiciel = typeProjet("logiciel");
-    expect(estimer(logiciel, reponsesMin(logiciel)).horsForfait).toEqual([logiciel.horsPack]);
+    expect(estimer(logiciel, reponsesMin(logiciel)).horsForfait).toEqual([
+      logiciel.offre.horsOffre,
+    ]);
     const e = estimer(logiciel, { ...reponsesMin(logiciel), depart: "reprise" });
     expect(e.horsForfait).toHaveLength(1);
     expect(e.horsForfait[0]).toMatch(/audit/u);
-    expect(e.palierBas).toBe(0);
+    expect(e.facteurs).toEqual([]);
   });
 
-  test("l'incertitude sur une question élargit jusqu'à son plafond", () => {
+  test("l'incertitude se dit comme un facteur à arrêter ensemble", () => {
     const logiciel = typeProjet("logiciel");
     const e = estimer(logiciel, { ...reponsesMin(logiciel), modules: "inconnu" });
-    expect([e.palierBas, e.palierHaut]).toEqual([0, 2]);
+    expect(e.facteurs).toHaveLength(1);
+    expect(e.facteurs[0]).toMatch(/ensemble/u);
   });
 });
 
-describe("le résultat s'écrit comme les pages de prix", () => {
-  const [outil, leLogiciel, plateforme] = prestation("logiciel").packs;
-
-  test("une fourchette, et « et plus » derrière un palier sur mesure", () => {
-    expect(prixEstime(outil, leLogiciel)).toBe(`de ${prixPack(outil)} à ${prixPack(leLogiciel)} HT`);
-    expect(prixEstime(outil, plateforme)).toBe(
-      `de ${prixPack(outil)} à ${prixPack(plateforme)} HT et plus`,
-    );
-    expect(prixEstime(plateforme, plateforme)).toBe(`à partir de ${prixPack(plateforme)} HT`);
+describe("le résultat : un plancher, au devis, ni fourchette ni délai", () => {
+  test("le plancher est celui de l'offre, HT", () => {
+    for (const type of typesProjet) {
+      expect(plancherEstime(type.offre)).toBe(`${prixPlancher(type.offre)} HT`);
+    }
   });
 
-  test("le délai va du plus court du palier bas au plus long du palier haut", () => {
-    expect(delaiEstime(outil, outil)).toBe("4 à 6 semaines");
-    expect(delaiEstime(outil, leLogiciel)).toBe("4 à 16 semaines");
-    expect(delaiEstime(leLogiciel, plateforme)).toBe("10 semaines au moins, date exacte au devis");
-    expect(delaiEstime(plateforme, plateforme)).toBe("fixé au devis");
-    const [assistant, , automatisation] = integrationIA.packs;
-    expect(delaiEstime(assistant, automatisation)).toBe("1 semaine au moins, date exacte au devis");
+  test("le suivi part du plancher", () => {
+    expect(suiviEstime(integrationIA)).toMatch(/^à partir de .+ HT par mois$/u);
+  });
+
+  test("aucun libellé du résultat ne parle de forfait, de fourchette ou de délai", () => {
+    // Les VALEURS seulement : `horsForfait` reste un nom de champ.
+    const valeurs = [];
+    const relever = (v) => {
+      if (typeof v === "string") valeurs.push(v);
+      else if (typeof v === "function") valeurs.push(String(v(2)));
+      else if (v && typeof v === "object") Object.values(v).forEach(relever);
+    };
+    relever({ libellesSimulateur, typesProjet });
+    for (const texte of valeurs) {
+      expect(/forfait|fourchette|palier|mise en ligne\s*:|semaines?\b/iu.test(texte), texte).toBe(false);
+    }
+    expect(libellesSimulateur.prixAuDevis).toMatch(/devis/u);
+    for (const champ of ["libelleForfait", "libelleDelai", "toutLePrecedent"]) {
+      expect(champ in libellesSimulateur, champ).toBe(false);
+    }
+  });
+
+  test("le composant n'affiche ni délai ni forfait", () => {
+    const source = readFileSync(
+      fileURLToPath(new URL("../../components/pages/simulateur/SimulateurPrix.tsx", import.meta.url)),
+      "utf8",
+    );
+    expect(source).not.toMatch(/delaiEstime|forfaitEstime|prixEstime|palier_/u);
+    expect(source).toContain("plancherEstime(type.offre)");
   });
 });
 
@@ -255,6 +242,8 @@ describe("la page", () => {
 
   test("aucun tiret long, aucune promesse de présentiel", () => {
     const textes = JSON.stringify({ pageSimulateur, libellesSimulateur, typesProjet, ia: integrationIA });
+    expect(/\d\s*(?:jours?|semaines?)\b/iu.test(textes)).toBe(false);
+    expect(/de \d[\d\u00A0\u202F ]*\u20AC à \d/u.test(textes)).toBe(false);
     expect(/[–—]/u.test(textes)).toBe(false);
     expect(/sur place|en personne|présentiel|déplac/iu.test(textes)).toBe(false);
   });

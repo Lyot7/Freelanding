@@ -7,10 +7,8 @@ import { capture } from "@/lib/analytics/posthog";
 import { estimer } from "@/lib/simulateur/estimation";
 import { lienRendezVous } from "@/content/rendez-vous";
 import {
-  delaiEstime,
-  forfaitEstime,
   libellesSimulateur,
-  prixEstime,
+  plancherEstime,
   suiviEstime,
   typesProjet,
   type IdTypeProjet,
@@ -18,12 +16,16 @@ import {
 
 /**
  * LE SIMULATEUR : deux moitiés, comme le reste du site. À gauche le type de
- * projet et ses questions ; à droite l'estimation, recalculée à chaque réponse
- * et collante à partir de 810 px pour rester sous les yeux pendant qu'on
+ * projet et ses questions ; à droite le cadrage, recalculé à chaque réponse
+ * et collant à partir de 810 px pour rester sous les yeux pendant qu'on
  * répond.
  *
+ * UN OUTIL DE CADRAGE DEPUIS LE 2026-10-05 : le résultat affiche le plancher
+ * du type, « prix au devis », et ce qui fera monter le prix selon les
+ * réponses. Ni fourchette, ni délai, ni nom de forfait.
+ *
  * LE PREMIER TYPE EST CHOISI D'OFFICE : la page rendue côté serveur porte donc
- * déjà une estimation complète, lisible par un moteur comme par le visiteur
+ * déjà un cadrage complet, lisible par un moteur comme par le visiteur
  * qui n'a encore rien coché.
  *
  * LE BOUTON ET LA MENTION SUIVENT LE PRIX, avant le détail : le panneau
@@ -49,7 +51,6 @@ export function SimulateurPrix() {
   const type = typesProjet.find((t) => t.id === typeId) ?? typesProjet[0];
   const reponsesType = reponses[type.id] ?? {};
   const estimation = estimer(type, reponsesType);
-  const { bas, haut } = estimation;
 
   /* UNE MESURE PAR TYPE TERMINÉ, et une seule : changer une réponse ensuite
      ne compte pas un second simulateur rempli. */
@@ -58,10 +59,9 @@ export function SimulateurPrix() {
     signales.current.add(type.id);
     capture(ANALYTICS_EVENTS.simulatorCompleted, {
       type: type.id,
-      palier_bas: estimation.palierBas,
-      palier_haut: estimation.palierHaut,
+      nb_facteurs: estimation.facteurs.length,
     });
-  }, [estimation.restantes, estimation.palierBas, estimation.palierHaut, type.id]);
+  }, [estimation.restantes, estimation.facteurs.length, type.id]);
 
   const repondre = (questionId: string, optionId: string) =>
     setReponses((r) => ({ ...r, [type.id]: { ...r[type.id], [questionId]: optionId } }));
@@ -159,24 +159,19 @@ export function SimulateurPrix() {
 
         <div className="min-w-0 tablet:pl-[30px] desktop:pl-[40px]">
           <div className="flex flex-col gap-[22px] bg-muted px-[20px] py-[26px] text-background tablet:sticky tablet:top-[100px] tablet:max-h-[calc(100svh-120px)] tablet:overflow-y-auto tablet:px-[28px] tablet:py-[32px]">
-            <div className="flex flex-col gap-[8px]">
-              <p className="text-[12px] font-semibold uppercase leading-[1.2] tracking-[0.02em] text-background/60">
-                {LIBELLE.eyebrowResultat(type.libelle)}
-              </p>
-              <p className="text-[14px] font-semibold leading-[1.3] tracking-[-0.01em]">
-                {LIBELLE.libelleForfait} {forfaitEstime(bas, haut)}
-              </p>
-            </div>
+            <p className="text-[12px] font-semibold uppercase leading-[1.2] tracking-[0.02em] text-background/60">
+              {LIBELLE.eyebrowResultat(type.libelle)}
+            </p>
 
             <div aria-live="polite" aria-atomic="true" className="flex flex-col gap-[6px]">
               <p className="text-[12px] font-semibold uppercase leading-[1.2] tracking-[0.02em] text-background/60">
                 {LIBELLE.libellePrix}
               </p>
               <p className="text-[30px] font-semibold leading-[1.05] tracking-[-0.04em] desktop:text-[40px]">
-                {prixEstime(bas, haut)}
+                {plancherEstime(type.offre)}
               </p>
               <p className="text-[14px] font-medium leading-[1.4] tracking-[-0.01em] text-background/70">
-                {LIBELLE.libelleDelai} {delaiEstime(bas, haut)}
+                {LIBELLE.prixAuDevis}
               </p>
               {estimation.restantes > 0 ? (
                 <p className="text-[13px] font-medium leading-[1.4] tracking-[-0.01em] text-background/60">
@@ -209,26 +204,13 @@ export function SimulateurPrix() {
                 {LIBELLE.mention}
               </p>
             </div>
-            <div className="flex flex-col gap-[10px] border-t border-black/[0.08] pt-[18px]">
-              <p className="text-[14px] font-semibold leading-[1.3] tracking-[-0.01em]">
-                {LIBELLE.libelleInclus}
-              </p>
-              {estimation.precedent ? (
-                <p className="text-[14px] font-medium leading-[1.3] tracking-[-0.01em] text-background/60">
-                  {LIBELLE.toutLePrecedent(estimation.precedent.nom)}
-                </p>
-              ) : null}
-              <ul className="flex flex-col gap-[8px]">
-                {estimation.inclus.map((ligne) => (
-                  <li
-                    key={ligne}
-                    className="text-[14px] font-medium leading-[1.35] tracking-[-0.01em] text-background/75"
-                  >
-                    {ligne}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <ListeResultat
+              titre={LIBELLE.libelleFacteurs}
+              lignes={estimation.facteurs}
+              vide={LIBELLE.aucunFacteur}
+              annoncee
+            />
+            <ListeResultat titre={LIBELLE.libelleInclus} lignes={type.offre.inclus} />
 
             <div className="flex flex-col gap-[8px] border-t border-black/[0.08] pt-[18px]">
               <p className="text-[14px] font-semibold leading-[1.3] tracking-[-0.01em]">
@@ -243,7 +225,7 @@ export function SimulateurPrix() {
                 </p>
               ))}
               <p className="text-[14px] font-medium leading-[1.4] tracking-[-0.01em] text-background/75">
-                {LIBELLE.libelleSuivi} {suiviEstime(bas)}
+                {LIBELLE.libelleSuivi} {suiviEstime(type.offre)}
               </p>
             </div>
 
@@ -251,5 +233,47 @@ export function SimulateurPrix() {
         </div>
       </div>
     </section>
+  );
+}
+
+/**
+ * Une liste du résultat, sous un filet : ce qui fera monter le prix, puis ce
+ * qui est compris dès le plancher. `vide` s'affiche quand la liste l'est.
+ * `annoncee` : la liste change à chaque réponse, un lecteur d'écran l'annonce.
+ */
+function ListeResultat({
+  titre,
+  lignes,
+  vide,
+  annoncee = false,
+}: {
+  titre: string;
+  lignes: readonly string[];
+  vide?: string;
+  annoncee?: boolean;
+}) {
+  return (
+    <div
+      aria-live={annoncee ? "polite" : undefined}
+      className="flex flex-col gap-[10px] border-t border-black/[0.08] pt-[18px]"
+    >
+      <p className="text-[14px] font-semibold leading-[1.3] tracking-[-0.01em]">{titre}</p>
+      {lignes.length === 0 && vide ? (
+        <p className="text-[14px] font-medium leading-[1.4] tracking-[-0.01em] text-background/60">
+          {vide}
+        </p>
+      ) : (
+        <ul className="flex flex-col gap-[8px]">
+          {lignes.map((ligne) => (
+            <li
+              key={ligne}
+              className="text-[14px] font-medium leading-[1.35] tracking-[-0.01em] text-background/75"
+            >
+              {ligne}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }

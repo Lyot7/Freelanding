@@ -61,25 +61,20 @@ export const vueAgentContent = {
 
     offres: {
       /*
-       * PRIX FERMES DEPUIS LE 2026-09-23, comme sur le site (`offre.ts`).
-       * Chaque forfait a un prix arrêté pour son périmètre ; le palier marqué
-       * `surMesure` (La Plateforme) et ce qui dépasse le dernier forfait se
-       * chiffrent au devis. Aucun montant ne s'écrit ici : ils viennent tous
-       * de `offre.ts`, par `profil.ts`.
+       * UN PLANCHER PAR OFFRE DEPUIS LE 2026-10-05, comme sur le site
+       * (`offre.ts`) : le prix se fixe au devis. Aucun montant ne s'écrit
+       * ici : ils viennent tous de `offre.ts`, par `profil.ts`.
        */
       prix: [
-        "Chaque forfait a un prix ferme pour le périmètre qu’il décrit\u00A0: il est repris tel quel dans le devis, qui ne bouge plus une fois signé. Le palier sur mesure et tout ce qui dépasse le dernier forfait se chiffrent au devis, après un échange.",
+        "Chaque offre a un prix de départ. Au-dessus, le prix dépend du projet et se fixe au devis, après un échange\u00A0; une fois signé, il ne bouge plus.",
         "Tous les montants sont hors taxes.",
       ],
       /* Aucune durée à côté d'un prix (règle du vault, `offre-grille-prix.md`). */
-      pack: (nom: string, prix: string) => `${nom}\u00A0: ${prix}\u00A0HT, prix ferme.`,
-      packSurMesure: (nom: string, prix: string) =>
-        `${nom}\u00A0: sur mesure, à partir de ${prix}\u00A0HT, prix fixé au devis.`,
-      fourchette: (titre: string, fourchette: string) => `${titre} (${fourchette})`,
-      pourQui: "Pour qui",
-      contient: "Contient",
-      ajoute: "Ajoute au périmètre précédent",
-      horsPack: "Hors périmètre",
+      plancher: (prix: string) => `À partir de ${prix}\u00A0HT, prix fixé au devis.`,
+      aPartirDe: (titre: string, prix: string) => `${titre} (${prix})`,
+      inclus: "Compris dès le plancher",
+      faitMonter: "Ce qui fait monter le prix",
+      horsOffre: "Hors offre",
       detail: "Détail",
       rendezVous: uiLabels.services.rdvLabel,
     },
@@ -107,7 +102,7 @@ export const vueAgentContent = {
 
     limites: {
       prixPlancher: (prix: string) =>
-        `Tu cherches un site à quelques centaines d’euros\u00A0: mon premier forfait est à ${prix}\u00A0HT.`,
+        `Tu cherches un site à quelques centaines d’euros\u00A0: mes prix commencent à ${prix}\u00A0HT.`,
       items: [
         "Ton site ou ton logiciel repose sur PHP ou Laravel et tu veux le faire reprendre : je n’y touche pas.",
         "Tu veux une équipe de plusieurs personnes, avec chef de projet et studio de création : je travaille seul, par choix.",
@@ -147,7 +142,7 @@ export const vueAgentContent = {
     etapes: [
       "Présente-toi en une phrase, puis interroge la personne sur son entreprise et son besoin, une ou deux questions à la fois : son activité et sa taille, ce qu’elle a aujourd’hui, ce qui coince, ce qu’elle veut obtenir, son échéance, et son budget si elle veut bien le dire.",
       "Confronte ses réponses au profil et dis franchement ce qui colle et ce qui ne colle pas. Si une agence, un logiciel du marché ou un autre spécialiste lui conviendrait mieux, dis-le et explique pourquoi. Tu ne vends rien : ton seul objectif est qu’elle prenne la bonne décision.",
-      "Pour les prix et les prestations, appuie-toi uniquement sur le profil. Les forfaits ont un prix ferme pour le périmètre qu’ils décrivent\u00A0; le palier sur mesure et ce qui dépasse les forfaits se chiffrent au devis. Ne promets jamais qu’un projet entre dans un forfait\u00A0: c’est Eliott qui le confirme après un échange. Le profil ne donne aucun délai\u00A0: la date se fixe au devis. S’il ne dit rien sur un point, dis que tu ne sais pas et propose de poser la question à Eliott. N’invente ni tarif, ni délai, ni référence, ni engagement.",
+      "Pour les prix et les prestations, appuie-toi uniquement sur le profil. Chaque offre a un prix de départ, et le prix final se fixe au devis. N’annonce jamais un montant au-dessus de ce prix de départ\u00A0: c’est Eliott qui le chiffre après un échange. Le profil ne donne aucun délai\u00A0: la date se fixe au devis. S’il ne dit rien sur un point, dis que tu ne sais pas et propose de poser la question à Eliott. N’invente ni tarif, ni délai, ni référence, ni engagement.",
       "Si Eliott est le bon profil, demande-lui comment elle préfère le contacter : appel en visio, demande de rappel, formulaire de contact ou e-mail. Donne-lui alors le lien exact tiré de la section « Me contacter », et pour un rendez-vous, le sujet qui correspond à son projet.",
       "S’il ne l’est pas, dis-le simplement et arrête-toi là.",
     ],

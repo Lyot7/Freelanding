@@ -3,7 +3,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { blogPosts, blogContent } from "./blog.ts";
 import { IDS_RENDEZ_VOUS } from "./rendez-vous.ts";
-import { prestation, prixPack } from "./offre.ts";
+import { prestation, prixPlancher } from "./offre.ts";
 
 /**
  * AUDIT DES ARTICLES.
@@ -310,14 +310,13 @@ describe("articles de décision et de prix", () => {
         }
       });
 
-      test("aucun prix d'Eliott écrit à la main, forfaits cités existants", () => {
-        const montants = prestation(offre).packs.map((p) => prixPack(p));
-        for (const montant of montants) {
-          expect(texte.replace(/ /gu, " ")).not.toContain(montant.replace(/ /gu, " "));
-        }
-        for (const [, id] of texte.matchAll(/<Prix offre="[a-z]+" forfait="([a-z]+)"/g)) {
-          expect(prestation(offre).packs.map((p) => p.id)).toContain(id);
-        }
+      test("aucun prix d'Eliott écrit à la main, aucun forfait cité", () => {
+        const montant = prixPlancher(prestation(offre));
+        expect(texte.replace(/ /gu, " ")).not.toContain(montant.replace(/ /gu, " "));
+        // Les paliers et la propriété `forfait` de <Prix> sont partis le
+        // 2026-10-05 : seul le plancher se cite.
+        expect(texte).not.toMatch(/<Prix[^>]*forfait=/u);
+        expect(/\bforfaits?\b/iu.test(texte)).toBe(false);
       });
 
       test("rendez-vous en visio, jamais sur place", () => {

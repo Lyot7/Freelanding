@@ -8,23 +8,23 @@
  * levier 6), et ses réponses disent à Eliott quel projet le visiteur porte
  * avant le premier appel.
  *
- * AUCUN MONTANT NE S'ÉCRIT ICI : tout vient d'`offre.ts`.
+ * UN OUTIL DE CADRAGE DEPUIS LE 2026-10-05 : le résultat donne le plancher
+ * du type de projet et ce qui fera monter le prix, jamais une fourchette ni
+ * un délai. La FAQ et « Pourquoi ces prix » le disent sans chiffre de
+ * résultat client.
+ *
+ * AUCUN MONTANT NE S'ÉCRIT ICI : tout vient d'`offre.ts`, et l'exemple face à
+ * un abonnement vient de `page-prix-logiciel.ts`, qui le calcule.
  */
-import { euros, fourchette, integrationIA, prestation, prixPack } from "./offre";
+import { aPartirDe, euros, integrationIA, prestation, prixPlancher } from "./offre";
 import { pagePrixLogiciel } from "./page-prix-logiciel";
 import { CHEMIN_PRIX_SITE } from "./page-prix-site";
 import { CHEMIN_PRIX_LOGICIEL, CHEMIN_SIMULATEUR } from "./pages-secteur";
-import { delaiEstime, prixEstime, typesProjet } from "./simulateur";
+import { typesProjet } from "./simulateur";
 
 const VITRINE = prestation("vitrine");
 const LOGICIEL = prestation("logiciel");
-const [OUTIL, LE_LOGICIEL, PLATEFORME] = LOGICIEL.packs;
-const SIGNATURE = VITRINE.packs[2];
-const [ASSISTANT, INTEGRATION, AUTOMATISATION] = integrationIA.packs;
 const CHEMIN_ARTICLE_SAAS = "/blog/outil-sur-mesure-ou-abonnements-saas";
-
-/** « de 2 500 € à 8 000 € HT et plus », dans le format de `fourchette()`. */
-const fourchetteIA = prixEstime(ASSISTANT, AUTOMATISATION);
 
 const nombresQuestions = [...new Set(typesProjet.map((t) => t.questions.length))].sort();
 
@@ -35,19 +35,19 @@ export const pageSimulateur = {
   seo: {
     titre: "Simulateur de prix site et logiciel · Eliott Bouquerel",
     description:
-      "Estimez en quelques clics le prix de votre site vitrine, logiciel métier, outil interne ou intégration IA : fourchette de prix, contenu inclus et délai.",
+      "Estimez le prix de votre site vitrine, logiciel métier, outil interne ou intégration IA : le prix de départ, ce qui est inclus et ce qui fait varier le devis.",
   },
   h1: "Simulateur de prix",
-  resume: `Site vitrine\u00a0: ${fourchette("vitrine", " HT")}. Logiciel métier ou outil interne\u00a0: ${fourchette("logiciel", " HT")}. Intégration IA\u00a0: ${fourchetteIA}. Réponds à ${nombresQuestions.join(" ou ")} questions pour situer ton projet.`,
+  resume: `Site vitrine\u00a0: ${aPartirDe(VITRINE, " HT")}. Logiciel métier ou outil interne\u00a0: ${aPartirDe(LOGICIEL, " HT")}. Intégration IA\u00a0: ${aPartirDe(integrationIA, " HT")}. Réponds à ${nombresQuestions.join(" ou ")} questions : tu vois ce qui fera monter le prix, et le devis le fixe.`,
   marcheFilAriane: "Simulateur de prix",
   libelleLien: "Simulateur de prix",
-  noteLlms: `simulateur de prix pour un site vitrine, un logiciel métier, un outil interne ou une intégration IA dans un outil existant (${fourchetteIA}) : une fourchette tirée des forfaits publiés, le contenu inclus et le délai, par un calcul fixe`,
+  noteLlms: `simulateur de prix pour un site vitrine, un logiciel métier, un outil interne ou une intégration IA dans un outil existant (${aPartirDe(integrationIA, " HT")}) : le prix de départ publié, le contenu inclus et ce qui fera monter le prix selon les réponses, par un calcul fixe`,
   pourquoi: {
     id: "pourquoi",
     titre: "Pourquoi ces prix",
     paragraphes: [
-      "Un forfait se compare à ce qu’il te rend.",
-      `Un exemple, à hypothèses affichées\u00a0: pour ${comparaison.utilisateurs} utilisateurs à ${euros(comparaison.prixParUtilisateur)} HT par mois, un abonnement coûte ${euros(comparaison.coutAbonnement)} HT sur ${comparaison.mois} mois. ${LE_LOGICIEL.nom} et son suivi coûtent ${euros(comparaison.coutSurMesure)} HT sur la même durée. À partir de ${comparaison.seuilUtilisateurs} utilisateurs, le sur mesure revient moins cher, et l’écart grandit chaque année.`,
+      "Un prix se compare à ce qu’il te rend.",
+      `Un exemple, à hypothèses affichées\u00a0: pour ${comparaison.utilisateurs} utilisateurs à ${euros(comparaison.prixParUtilisateur)} HT par mois, un abonnement coûte ${euros(comparaison.coutAbonnement)} HT sur ${comparaison.mois} mois. Un projet sur mesure jusqu’à ${euros(comparaison.budgetEquivalent)} HT, suivi compris, revient moins cher sur la même durée, et l’écart grandit chaque année.`,
     ],
     liens: {
       titre: "Le détail",
@@ -55,12 +55,12 @@ export const pageSimulateur = {
         {
           libelle: "Prix d’un site internet",
           href: CHEMIN_PRIX_SITE,
-          description: "Les 3 forfaits du site vitrine, et ce qui fait varier le prix.",
+          description: "Ce que comprend le site vitrine, et ce qui fait varier le prix.",
         },
         {
           libelle: "Prix d’un logiciel sur mesure",
           href: CHEMIN_PRIX_LOGICIEL,
-          description: "Les 3 forfaits de la solution métier, et le calcul complet face à un abonnement.",
+          description: "Ce qui fait varier le prix, et le calcul complet face à un abonnement.",
         },
         {
           libelle: "Outil sur mesure ou abonnements SaaS",
@@ -72,11 +72,13 @@ export const pageSimulateur = {
     points: [
       {
         titre: "Du temps rendu chaque semaine",
-        corps: `${OUTIL.nom} fait disparaître une tâche que tu refais à la main. Le temps gagné revient chaque semaine, sans licence à renouveler.`,
+        corps:
+          "Un outil sur mesure fait disparaître une tâche que tu refais à la main. Le temps gagné revient chaque semaine, sans licence à renouveler.",
       },
       {
         titre: "Des visites que tu sais suivre",
-        corps: `${SIGNATURE.nom} installe la mesure\u00a0: tu sais d’où viennent les visites et ce qui déclenche un contact, puis une passe de correction suit les chiffres.`,
+        corps:
+          "Avec la mesure installée, tu sais d’où viennent les visites et ce qui déclenche un contact, puis une passe de correction suit les chiffres.",
       },
       {
         titre: "Aucune licence par utilisateur",
@@ -87,7 +89,7 @@ export const pageSimulateur = {
         corps: "Livré dans ton dépôt, avec sa documentation, sur un hébergement à ton nom.",
       },
       {
-        titre: "Un prix ferme",
+        titre: "Un prix ferme au devis",
         corps: "Le montant signé ne bouge plus. Si je me trompe sur le temps nécessaire, c’est à moi de l’absorber.",
       },
     ],
@@ -99,24 +101,25 @@ export const pageSimulateur = {
       {
         question: "Comment le simulateur calcule-t-il le prix ?",
         answer:
-          "Chaque réponse situe ton projet dans un de mes 3 forfaits, aux montants publiés sur mes pages de prix. Une question sans réponse élargit la fourchette, une réponse la resserre.",
+          "Il part du prix de départ publié pour ton type de projet, et chaque réponse ajoute, ou non, un point qui fera monter le prix. Il ne donne pas de montant final : le périmètre exact se chiffre au devis.",
       },
       {
         question: "Le prix affiché est-il celui du devis ?",
         answer:
-          "C’est une estimation. Le devis fixe le prix ferme après un premier échange en visio, et une fois signé, le montant ne bouge plus.",
+          "C’est le prix de départ : aucun projet de ce type ne coûte moins. Le devis fixe le prix ferme après un premier échange en visio, et une fois signé, le montant ne bouge plus.",
       },
       {
         question: "Combien coûte une intégration IA dans un outil existant ?",
-        answer: `De ${prixPack(ASSISTANT)} HT pour ${ASSISTANT.nom}, 1 usage dans 1 outil, à ${prixPack(INTEGRATION)} HT pour ${INTEGRATION.nom}, jusqu’à 3 usages avec les règles de ton métier. ${AUTOMATISATION.nom}, qui relie plusieurs outils, démarre à ${prixPack(AUTOMATISATION)} HT, sur devis. ${integrationIA.horsPack}`,
+        answer: `Une intégration IA démarre à ${prixPlancher(integrationIA)} HT, pour 1 usage dans 1 outil que tu utilises déjà. Le prix monte avec le nombre d’usages, les règles de ton métier et le nombre d’outils à relier. ${integrationIA.horsOffre}`,
       },
       {
         question: "Combien coûte un outil interne ?",
-        answer: `${OUTIL.nom} coûte ${prixPack(OUTIL)} HT\u00a0: 1 tâche répétitive, 1 outil à relier. Dès que plusieurs personnes s’en servent avec des droits différents, ou qu’il couvre jusqu’à 3 tâches, c’est ${LE_LOGICIEL.nom}, à ${prixPack(LE_LOGICIEL)} HT. Au-delà, ${PLATEFORME.nom} se chiffre au devis.`,
+        answer: `Un outil interne se chiffre comme la solution métier, à partir de ${prixPlancher(LOGICIEL)} HT. Le prix monte quand il remplace plusieurs tâches, quand il relie plusieurs logiciels, ou quand plusieurs personnes s’en servent avec des droits différents.`,
       },
       {
         question: "En combien de temps mon projet est-il en ligne ?",
-        answer: `${VITRINE.packs[0].nom} se met en ligne en ${delaiEstime(VITRINE.packs[0], VITRINE.packs[0])}, ${LE_LOGICIEL.nom} en ${delaiEstime(LE_LOGICIEL, LE_LOGICIEL)}. La date exacte est écrite au devis, et je ne mène qu’un projet à la fois pour la tenir.`,
+        answer:
+          "La date de mise en ligne est écrite au devis, avec le prix. Elle dépend de ce que ton projet demande et de la rapidité de tes retours. Je ne mène qu’un projet à la fois pour la tenir.",
       },
     ],
   },

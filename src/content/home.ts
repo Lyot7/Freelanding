@@ -2,13 +2,13 @@ import type { HomeContent } from "@/lib/content/types";
 import { slugsMisEnAvant } from "@/content/blog";
 import { faqItems } from "@/content/faq";
 import { services } from "@/content/services";
-import { packEntree, prixPack } from "@/content/offre";
+import { prestation, prixPlancher } from "@/content/offre";
 import { lienRendezVous } from "@/content/rendez-vous";
 import { howWeDoItStats, reputationStats } from "@/content/stats";
 
-const ENTREE_VITRINE = prixPack(packEntree("vitrine"));
-const ENTREE_LOGICIEL = prixPack(packEntree("logiciel"));
-const ACCROCHE_HERO = `Je conçois et je code ton site vitrine, à partir de ${ENTREE_VITRINE} HT, ou ta solution métier, à partir de ${ENTREE_LOGICIEL} HT. Le prix est fixé avant de commencer.`;
+const ENTREE_VITRINE = prixPlancher(prestation("vitrine"));
+const ENTREE_LOGICIEL = prixPlancher(prestation("logiciel"));
+const ACCROCHE_HERO = `Je conçois et je code ton site vitrine, à partir de ${ENTREE_VITRINE} HT, ou ta solution métier, à partir de ${ENTREE_LOGICIEL} HT. Le prix est fixé au devis, avant de commencer.`;
 
 /*
  * LE TITRE DU HÉROS, ET LE SEUL H1 DE L'ACCUEIL, depuis le 2026-09-24 (phase E).
@@ -22,8 +22,8 @@ const TITRE_ACCUEIL =
 /*
  * LA LIGNE « POUR QUI », SANS PRIX, depuis la même date. « Prix ferme dès
  * 3 000 € HT » est parti : il affirmait un prix ferme pour toute l'offre alors
- * que La Plateforme et ce qui dépasse les forfaits se chiffrent sur mesure. Les
- * prix restent dans l'accordéon et sur les pages de prestation.
+ * que le haut de l'offre se chiffre sur mesure. Les planchers restent dans
+ * l'accordéon et sur les pages de prestation.
  */
 const POUR_QUI_HERO = "Sites vitrines et solutions métier pour les TPE et les PME.";
 
@@ -90,7 +90,7 @@ export const homeContent: HomeContent = {
     subtitle: ACCROCHE_HERO,
     /*
      * SOUS LE TITRE, LA CIBLE ET LES DEUX PRESTATIONS, en corps de lecture et
-     * sans prix (voir `POUR_QUI_HERO`). Le détail des forfaits est dans
+     * sans prix (voir `POUR_QUI_HERO`). Le détail de l'offre est dans
      * l'accordéon, un clic plus bas.
      */
     subtitleParagraphs: [{ text: POUR_QUI_HERO }],
@@ -468,7 +468,7 @@ export const homeContent: HomeContent = {
    * finit sur le rendez-vous juste avant la FAQ.
    *
    * LES TARIFS NE SONT PLUS SUR L'ACCUEIL depuis le 2026-09-07 : chaque page de
-   * prestation porte ses forfaits et sa prise de rendez-vous.
+   * prestation porte son offre et sa prise de rendez-vous.
    */
   sectionOrder: [
     "hero",

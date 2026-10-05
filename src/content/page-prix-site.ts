@@ -4,57 +4,41 @@
  * POURQUOI CETTE PAGE. « Combien coûte un site internet professionnel » et
  * « prix site internet sur mesure » sont des requêtes de comparaison de budget,
  * tenues par des annuaires d'agences qui donnent des fourchettes sans rien
- * vendre. La page pilier `/services/site-vitrine` montre les forfaits ; celle-ci
+ * vendre. La page pilier `/services/site-vitrine` montre l'offre ; celle-ci
  * répond à la question du prix elle-même : ce qui le fait varier, ce qui coûte
  * après la mise en ligne, et comment se situent les autres options. Plan du
  * 2026-10-02 (`marque/seo-2026-10-02/00-plan-seo-maximal.md`, lot 4).
  *
- * MÊME GABARIT QUE LES PAGES SECTEUR : des sections en deux moitiés, puis les
- * forfaits, le bloc sur devis, la prise de rendez-vous et une FAQ propre. Le
+ * MÊME GABARIT QUE LES PAGES SECTEUR : des sections en deux moitiés, puis
+ * l'offre, le bloc sur devis, la prise de rendez-vous et une FAQ propre. Le
  * type reprend `SectionSecteur` plutôt que d'en déclarer un second identique.
  *
  * CE QUI N'Y FIGURE PAS, VOLONTAIREMENT :
- *   - aucun montant écrit à la main : prix, fourchette et suivi viennent de
+ *   - aucun montant écrit à la main : plancher et suivi viennent de
  *     `offre.ts`. Le test le vérifie sur la source ;
  *   - aucun coût d'hébergement ni de nom de domaine chiffré : le site ne les
  *     facture pas, ils sont au nom du client et à son tarif ;
  *   - aucun chiffre de marché attribué à une source : les repères agence,
  *     WordPress et créateurs en ligne sont des ordres de grandeur d'Eliott,
  *     présentés comme tels ;
- *   - aucune durée à côté d'un prix (règle de `offre.ts`) et aucun présentiel.
+ *   - aucune durée chiffrée (règle de `offre.ts`) et aucun présentiel.
  */
 import type { FaqItem } from "@/lib/content/types";
 import {
-  fourchette,
+  aPartirDe,
   plancherSuivi,
   prestation,
-  prixPack,
-  suiviMensuel,
+  prixPlancher,
   tauxSuivi,
 } from "./offre";
 import { CHEMIN_PAGE_CAEN } from "./page-caen";
 import { CHEMIN_SIMULATEUR, type SectionSecteur } from "./pages-secteur";
 
 const VITRINE = prestation("vitrine");
-const [LANDING, SITE, SIGNATURE] = VITRINE.packs;
-
 export const CHEMIN_PRIX_SITE = `/services/${VITRINE.slug}/prix`;
 const CHEMIN_PILIER_LOGICIEL = `/services/${prestation("logiciel").slug}`;
 const CHEMIN_ARTICLE_REFONTE = "/blog/refonte-site-internet-pme";
 const CHEMIN_ARTICLE_WORDPRESS = "/blog/site-sur-mesure-ou-wordpress";
-
-/**
- * LE SUIVI D'UN SITE VITRINE, en une phrase juste quelle que soit la grille.
- * Aujourd'hui le plancher mord sur les 3 forfaits et la mensualité est la
- * même ; si la grille bouge et que les montants divergent, la phrase les
- * détaille au lieu d'en affirmer un seul.
- */
-function suiviDuSite(): string {
-  const montants = VITRINE.packs.map((p) => suiviMensuel(p.prix));
-  return new Set(montants).size === 1
-    ? `${montants[0]} HT par mois, quel que soit le forfait`
-    : VITRINE.packs.map((p, i) => `${montants[i]} HT par mois pour ${p.nom}`).join(", ");
-}
 
 export interface PagePrixSite {
   readonly chemin: string;
@@ -74,7 +58,7 @@ export interface PagePrixSite {
   /** Note de la ligne `llms.txt`. */
   readonly noteLlms: string;
   readonly sections: readonly SectionSecteur[];
-  readonly titrePacks: string;
+  readonly titreOffre: string;
   readonly faq: {
     readonly eyebrow: string;
     readonly titleLines: readonly string[];
@@ -86,37 +70,37 @@ export const pagePrixSite: PagePrixSite = {
   chemin: CHEMIN_PRIX_SITE,
   seo: {
     titre: "Prix d’un site internet sur mesure · Eliott Bouquerel",
-    description: `Combien coûte un site internet professionnel ? Comptez ${fourchette("vitrine", " HT")}, 3 forfaits fermes : ce qui fait varier le devis, ce qui se paie ensuite.`,
+    description: `Combien coûte un site internet professionnel ? Comptez ${aPartirDe(VITRINE, " HT")} : ce qui fait varier le prix du devis, et ce qui se paie après la mise en ligne.`,
   },
   h1: "Prix d’un site internet sur mesure",
-  resume: `Un site internet professionnel sur mesure coûte ${fourchette("vitrine", " HT")}, en 3 forfaits à prix ferme : ${prixPack(LANDING)} pour une page, ${prixPack(SITE)} pour 5 à 7 pages, ${prixPack(SIGNATURE)} avec la mesure de ce qu’il rapporte. Une fois livré, il est à toi, sans abonnement.`,
+  resume: `Un site internet professionnel sur mesure démarre à ${prixPlancher(VITRINE)} HT, textes compris. Le prix final dépend du nombre de pages, du travail de référencement et de la mesure de ce que le site rapporte, et il est fixé au devis. Une fois livré, le site est à toi, sans abonnement.`,
   marcheFilAriane: "Prix",
   libelleLien: "prix d’un site internet sur mesure",
   noteLlms:
-    "prix d’un site internet sur mesure : les 3 forfaits, ce qui fait varier le devis, les coûts après la mise en ligne, repères agence, freelance et WordPress",
+    "prix d’un site internet sur mesure : le plancher, ce qui fait varier le devis, les coûts après la mise en ligne, repères agence, freelance et WordPress",
   sections: [
     {
       id: "reponse",
       titre: "Combien coûte un site internet professionnel ?",
       paragraphes: [
-        `Chez moi, un site internet sur mesure coûte ${fourchette("vitrine", " HT")}. Le montant dépend du forfait, et le forfait dépend de ce que le site doit faire pour toi : exister en ligne, être trouvé par tes clients, ou rapporter des contacts que tu peux compter.`,
-        "Chaque forfait comprend la conception, le développement, la mise en ligne et une mesure de la vitesse sur mobile et sur ordinateur avant la livraison. Aucun ne retire le sur mesure : ce qui change d’un palier à l’autre, c’est la profondeur du travail sur les textes, sur le référencement et sur la mesure.",
+        `Chez moi, un site internet sur mesure démarre à ${prixPlancher(VITRINE)} HT. Au-dessus, le montant dépend de ce que le site doit faire pour toi : exister en ligne, être trouvé par tes clients, ou rapporter des contacts que tu peux compter. Je le fixe au devis, et il ne bouge plus.`,
+        "Tout site comprend la conception, les textes, le développement, la mise en ligne et une mesure de la vitesse sur mobile et sur ordinateur avant la livraison. Ce qui fait monter le prix, c’est la profondeur du travail : le nombre de pages, le référencement et la mesure.",
       ],
       points: [
         {
-          titre: `${LANDING.nom} : ${prixPack(LANDING)} HT`,
+          titre: "Exister en ligne",
           corps:
             "1 page longue qui présente ton activité et donne envie d’appeler. Le bon point de départ pour une première présence en ligne ou une offre unique.",
         },
         {
-          titre: `${SITE.nom} : ${prixPack(SITE)} HT`,
+          titre: "Être trouvé par tes clients",
           corps:
-            "5 à 7 pages, des textes réécrits avec toi et les recherches de tes clients étudiées avant d’écrire. Le choix courant quand tes prospects comparent avant de te contacter.",
+            "Plusieurs pages, et les recherches de tes clients étudiées avant d’écrire. Le choix courant quand tes prospects comparent avant de te contacter.",
         },
         {
-          titre: `${SIGNATURE.nom} : ${prixPack(SIGNATURE)} HT`,
+          titre: "Rapporter des contacts",
           corps:
-            "Le site complet, plus un parcours dessiné pour une action précise et la mesure de ce qui déclenche un contact. Pour transformer des visites existantes en demandes.",
+            "Un parcours dessiné pour une action précise, et la mesure de ce qui déclenche un contact. Pour transformer des visites existantes en demandes.",
         },
       ],
     },
@@ -124,8 +108,8 @@ export const pagePrixSite: PagePrixSite = {
       id: "variation",
       titre: "Qu’est-ce qui fait varier le prix d’un site ?",
       paragraphes: [
-        "Le nombre de pages pèse moins lourd que le travail sur les textes et sur les recherches de tes clients. 5 postes décident du forfait, ou font sortir le projet des forfaits.",
-        "Ces postes se tranchent pendant le premier appel. Le devis tombe ensuite sur un forfait, et son montant reste celui de la grille.",
+        "Le nombre de pages pèse moins lourd que le travail sur le référencement et sur la mesure. 5 postes font varier le prix, ou font sortir le projet du site vitrine.",
+        "Ces postes se tranchent pendant le premier appel. Le devis les reprend un par un, avec le prix qui en découle.",
       ],
       liens: {
         titre: "Pour aller plus loin",
@@ -147,19 +131,23 @@ export const pagePrixSite: PagePrixSite = {
       points: [
         {
           titre: "Le nombre de pages",
-          corps: `1 page pour ${LANDING.nom}, 5 à 7 pages à partir de ${SITE.nom}, avec une page par métier ou par ville quand ton marché est local.`,
+          corps:
+            "Une page longue au départ, plusieurs pages ensuite, avec une page par métier ou par ville quand ton marché est local.",
         },
         {
           titre: "Les textes",
-          corps: `Avec ${LANDING.nom}, je mets en page les textes que tu fournis. À partir de ${SITE.nom}, nous les réécrivons ensemble pour qu’ils soient lus et trouvés.`,
+          corps:
+            "Je les écris pour qu’ils soient lus et trouvés, et c’est compris dans le prix : tu n’as rien à rédiger. Leur volume suit le nombre de pages.",
         },
         {
           titre: "Les mots que tapent tes clients",
-          corps: `Chercher les requêtes de ton marché avant d’écrire, puis baliser chaque page en conséquence. Ce travail commence avec ${SITE.nom}.`,
+          corps:
+            "Je cherche les requêtes de ton marché avant d’écrire. Le balisage complet, les données structurées et la Search Console branchée font monter le prix.",
         },
         {
           titre: "La mesure",
-          corps: `Savoir d’où viennent les visites et ce qui déclenche un contact demande d’installer la mesure et de corriger le site après sa mise en ligne. C’est le travail de ${SIGNATURE.nom}.`,
+          corps:
+            "Savoir d’où viennent les visites et ce qui déclenche un contact demande d’installer la mesure et de corriger le site après sa mise en ligne. Ce travail s’ajoute au plancher.",
         },
         {
           titre: "Les fonctions",
@@ -188,7 +176,7 @@ export const pagePrixSite: PagePrixSite = {
         },
         {
           titre: "Le suivi mensuel",
-          corps: `${tauxSuivi()} du prix du projet par an, avec un minimum de ${plancherSuivi()} par mois : pour un site vitrine, ${suiviDuSite()}. Il couvre les mises à jour, les sauvegardes vérifiées et les corrections.`,
+          corps: `${tauxSuivi()} du prix du projet par an, avec un minimum de ${plancherSuivi()} par mois. Il couvre les mises à jour, les sauvegardes vérifiées et les corrections.`,
         },
         {
           titre: "Les évolutions",
@@ -202,7 +190,7 @@ export const pagePrixSite: PagePrixSite = {
       titre: "Agence, freelance ou Wix : quel budget prévoir ?",
       paragraphes: [
         "Les prix d’un site internet s’étalent sur une large plage, selon ce qui est livré et la structure de celui qui le livre. Les ordres de grandeur ci-contre servent de repères pour lire les devis que tu reçois.",
-        `Je me situe sur le sur mesure, sans la structure d’une agence : ${fourchette("vitrine", " HT")}, avec la personne qui écrit le code comme seul interlocuteur.`,
+        `Je me situe sur le sur mesure, sans la structure d’une agence : ${aPartirDe(VITRINE, " HT")}, avec la personne qui écrit le code comme seul interlocuteur.`,
       ],
       liens: {
         titre: "Pour comparer",
@@ -242,8 +230,8 @@ export const pagePrixSite: PagePrixSite = {
       id: "devis",
       titre: "Comment obtenir un devis de site internet ?",
       paragraphes: [
-        "Le devis part d’un appel en visio. En réservant ton créneau, tu réponds à 3 questions sur ton budget, ton objectif et ton échéance : je sais avant l’appel quel forfait se dessine.",
-        "Le devis écrit reprend le forfait, son prix et la date de mise en ligne. Rien n’est dû tant que tu ne l’as pas signé.",
+        "Le devis part d’un appel en visio. En réservant ton créneau, tu réponds à 3 questions sur ton budget, ton objectif et ton échéance : je sais avant l’appel quel projet se dessine.",
+        "Le devis écrit reprend ce que contient ton site, son prix et la date de mise en ligne. Rien n’est dû tant que tu ne l’as pas signé.",
       ],
       liens: {
         titre: "Pour aller plus loin",
@@ -257,7 +245,7 @@ export const pagePrixSite: PagePrixSite = {
           {
             libelle: "Simulateur de prix",
             href: CHEMIN_SIMULATEUR,
-            description: "Estime le prix de ton site en 4 questions, délai compris.",
+            description: "Situe ton site en 4 questions : le plancher, et ce qui fera monter le prix.",
           },
           {
             libelle: "Les réalisations",
@@ -280,7 +268,7 @@ export const pagePrixSite: PagePrixSite = {
         {
           titre: "2. Le devis écrit",
           corps:
-            "Le forfait retenu, ce qu’il contient, son prix ferme et la date de mise en ligne, avant toute signature.",
+            "Ce que contient ton site, son prix ferme et la date de mise en ligne, avant toute signature.",
         },
         {
           titre: "3. La construction",
@@ -295,7 +283,7 @@ export const pagePrixSite: PagePrixSite = {
       ],
     },
   ],
-  titrePacks: "Les 3 forfaits, leur prix et leur contenu",
+  titreOffre: "Ce qui est compris, ce qui fait varier le prix",
   faq: {
     eyebrow: "FAQ",
     titleLines: ["Le prix", "de ton site."],
@@ -322,18 +310,19 @@ export const pagePrixSite: PagePrixSite = {
       },
       {
         question: "Combien coûte la refonte d’un site existant ?",
-        answer: `Le même prix qu’un site neuf, ${fourchette("vitrine", " HT")} : je reconstruis le site au lieu de retoucher l’ancien code. Le contenu qui se classe déjà sur Google est repris, et le devis liste les anciennes adresses à rediriger vers les nouvelles.`,
+        answer: `Le même prix qu’un site neuf, ${aPartirDe(VITRINE, " HT")} : je reconstruis le site au lieu de retoucher l’ancien code. Le contenu qui se classe déjà sur Google est repris, et le devis liste les anciennes adresses à rediriger vers les nouvelles.`,
       },
       {
         question: "Le référencement est-il compris dans le prix ?",
-        answer: `Les bases du référencement sont posées dans chaque forfait, et l’indexation est vérifiée. À partir de ${SITE.nom}, le site vise les mots que tapent tes clients, avec balisage et données structurées. Personne ne peut te garantir une position : le classement prend plusieurs mois et dépend aussi de tes concurrents.`,
+        answer:
+          "Les bases du référencement sont posées sur chaque site, et l’indexation est vérifiée. Les textes visent les mots que tapent tes clients. Le balisage complet et les données structurées s’ajoutent au devis. Personne ne peut te garantir une position : le classement prend plusieurs mois et dépend aussi de tes concurrents.",
       },
     ],
   },
 };
 
 /**
- * LIEN VERS CETTE PAGE, posé sous les forfaits de `/services/site-vitrine` et
+ * LIEN VERS CETTE PAGE, posé sous l'offre de `/services/site-vitrine` et
  * dans les liens de la page de Caen.
  */
 export const lienVersPagePrixSite = {

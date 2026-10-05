@@ -1,13 +1,14 @@
 import { describe, expect, test } from "bun:test";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
+  aPartirDe,
   euros,
-  fourchette,
-  packEntree,
+  integrationIA,
   prestation,
   prestations,
-  prixPack,
+  prixPlancher,
   plancherSuivi,
   suiviMensuel,
   tauxSuivi,
@@ -26,119 +27,147 @@ import {
 } from "./rendez-vous.ts";
 
 /**
- * L'OFFRE NE DOIT ANNONCER QU'UN PRIX PAR FORFAIT, ET CE PRIX NE S'ÉCRIT QU'À
- * UN ENDROIT.
+ * L'OFFRE N'ANNONCE QU'UN PRIX PAR PRESTATION, SON PLANCHER, ET CE PRIX NE
+ * S'ÉCRIT QU'À UN ENDROIT.
  *
  * CE QUI EST ARRIVÉ SANS CE TEST. L'accordéon des services annonçait « à partir
  * de 5 000 € » pour l'outil métier pendant que la grille comparative affichait
  * « 5 000 à 15 000 € » pour la même prestation, à deux écrans d'intervalle. Rien
  * ne le signalait : deux fichiers, deux chaînes de caractères, aucun lien.
  *
- * Depuis le 2026-09-23, les forfaits sont à PRIX FERME : chaque montant s'écrit
- * une fois dans `offre.ts`, et tout le reste du site le lit de là.
+ * Depuis le 2026-10-05, décision d'Eliott : un plancher « à partir de » par
+ * offre, tout le reste sur devis. Les paliers à prix ferme du 2026-09-23 sont
+ * supprimés.
  */
 
-describe("les forfaits sont à prix ferme, écrits une seule fois", () => {
-  test("chaque prestation a trois forfaits, ordonnés du moins cher au plus cher", () => {
+/** Les noms des neuf paliers supprimés le 2026-10-05. */
+const PALIERS_SUPPRIMES = [
+  "La Landing",
+  "Le Site Signature",
+  "Site Signature",
+  "L’Outil",
+  "L'Outil",
+  "Le Logiciel",
+  "La Plateforme",
+  "L’Assistant",
+  "L’Intégration",
+  "L’Automatisation",
+];
+
+describe("un plancher par offre, écrit une seule fois", () => {
+  test("deux prestations à page dédiée, slugs uniques", () => {
     expect(prestations.map((p) => p.id)).toEqual(["vitrine", "logiciel"]);
     const slugs = prestations.map((p) => p.slug);
     expect(new Set(slugs).size).toBe(slugs.length);
-
-    for (const p of prestations) {
-      expect(p.packs.length, `« ${p.nom} » doit avoir trois forfaits`).toBe(3);
-      const prix = p.packs.map((k) => k.prix);
-      for (const montant of prix) {
-        expect(Number.isInteger(montant) && montant > 0).toBe(true);
-      }
-      expect(prix, `les forfaits de « ${p.nom} » doivent monter`).toEqual(
-        [...prix].sort((a, b) => a - b),
-      );
-      expect(new Set(prix).size, `deux forfaits de « ${p.nom} » au même prix`).toBe(
-        prix.length,
-      );
-      const packIds = p.packs.map((k) => k.id);
-      expect(new Set(packIds).size).toBe(packIds.length);
-    }
   });
 
-  test("la grille arrêtée par Eliott le 2026-09-23", () => {
+  test("les planchers arrêtés par Eliott le 2026-10-05", () => {
     // Montants de décision, pas de calcul : les figer ici fait échouer toute
     // modification involontaire, et oblige une modification voulue à passer
     // par ce test.
-    expect(prestation("vitrine").packs.map((k) => k.prix)).toEqual([3000, 4800, 7200]);
-    expect(prestation("logiciel").packs.map((k) => k.prix)).toEqual([6000, 18000, 36000]);
+    expect(prestation("vitrine").plancher).toBe(3000);
+    expect(prestation("logiciel").plancher).toBe(6000);
+    expect(integrationIA.plancher).toBe(2500);
   });
 
-  test("seul le dernier palier peut être sur mesure", () => {
-    for (const p of prestations) {
-      p.packs.slice(0, -1).forEach((pack) => {
-        expect(pack.surMesure, `« ${pack.nom} » ne peut pas être sur mesure`).toBeUndefined();
-      });
-    }
-    expect(prestation("logiciel").packs[2].surMesure).toBe(true);
-    expect(prestation("vitrine").packs[2].surMesure).toBeUndefined();
-  });
-
-  test("le prix affiché est le montant du forfait, formaté", () => {
-    for (const p of prestations) {
-      for (const pack of p.packs) {
-        expect(prixPack(pack)).toBe(euros(pack.prix));
+  test("plus aucun palier : ni forfaits, ni prix ferme par forfait, ni délai", () => {
+    for (const offre of [...prestations, integrationIA]) {
+      expect(Number.isInteger(offre.plancher) && offre.plancher > 0).toBe(true);
+      for (const champ of ["packs", "delai", "prix", "surMesure"]) {
+        expect(champ in offre, `« ${offre.nom} » porte encore « ${champ} »`).toBe(false);
       }
     }
   });
 
-  test("chaque forfait est décrit, et ne redit pas ce que le précédent contient", () => {
-    for (const p of prestations) {
-      for (const pack of p.packs) {
-        expect(pack.promesse.length).toBeGreaterThan(15);
-        expect(pack.pourQui.length).toBeGreaterThan(20);
-        expect(
-          pack.ajoute.length,
-          `« ${pack.nom} » n'ajoute rien`,
-        ).toBeGreaterThan(2);
-      }
-      // Le premier forfait liste tout, les suivants ne listent que le delta :
-      // une ligne identique d'un forfait à l'autre est une erreur de rédaction.
-      const vues = new Set();
-      for (const pack of p.packs) {
-        for (const ligne of pack.ajoute) {
-          expect(
-            vues.has(ligne),
-            `ligne répétée dans « ${p.nom} » : ${ligne}`,
-          ).toBe(false);
-          vues.add(ligne);
-        }
-      }
+  test("le prix affiché est le plancher, formaté, précédé de « à partir de »", () => {
+    for (const offre of [...prestations, integrationIA]) {
+      expect(prixPlancher(offre)).toBe(euros(offre.plancher));
+      expect(aPartirDe(offre)).toBe(`à partir de ${euros(offre.plancher)}`);
+    }
+    // La taxe se place derrière le montant.
+    expect(aPartirDe(prestation("logiciel"), " HT")).toMatch(/\u20AC HT$/u);
+  });
+
+  test("chaque offre dit ce qui est compris et ce qui fait monter le prix", () => {
+    for (const offre of [...prestations, integrationIA]) {
+      expect(offre.inclus.length, `« ${offre.nom} » ne dit rien de ce qui est compris`).toBeGreaterThan(2);
+      expect(offre.faitMonter.length, `« ${offre.nom} » ne dit pas ce qui fait varier le prix`).toBeGreaterThan(2);
+      expect(offre.horsOffre.length).toBeGreaterThan(20);
+      // Une ligne ne peut pas être à la fois comprise et facteur de hausse.
+      const lignes = [...offre.inclus, ...offre.faitMonter];
+      expect(new Set(lignes).size, `ligne répétée dans « ${offre.nom} »`).toBe(lignes.length);
     }
   });
 
-  test("aucune durée n'est annoncée à côté d'un prix", () => {
-    // Un prix ferme accolé à « environ 5 jours ouvrés » redonnait le taux
-    // journalier en une division. La date vit au devis.
-    const textes = prestations.flatMap((p) => [
-      p.resume,
-      p.horsPack,
-      ...p.packs.flatMap((k) => [k.promesse, k.pourQui, ...k.ajoute]),
+  test("les textes du site vitrine sont écrits par Eliott, et compris", () => {
+    // Décision d'Eliott du 2026-10-05 : « je prépare des textes préfaits pour
+    // qu'ils soient optimisés SEO […] Donc c'est dans mon prix. » Le site
+    // disait « Tes textes mis en page » : le visiteur comprenait qu'il devait
+    // les écrire.
+    const vitrine = prestation("vitrine");
+    expect(vitrine.inclus.some((l) => /textes écrits par moi/iu.test(l))).toBe(true);
+    const tout = [vitrine.resume, vitrine.horsOffre, ...vitrine.inclus, ...vitrine.faitMonter];
+    for (const texte of tout) {
+      expect(/textes mis en page|textes que tu fournis/iu.test(texte), texte).toBe(false);
+    }
+  });
+
+  test("aucune durée n'est annoncée dans l'offre", () => {
+    // La date vit au devis. Un délai chiffré à côté d'un prix redonnait le
+    // taux journalier en une division, et il engageait sur une durée que
+    // la complexité du projet décide.
+    const textes = [...prestations, integrationIA].flatMap((p) => [
+      p.resume ?? "",
+      p.horsOffre,
+      ...p.inclus,
+      ...p.faitMonter,
     ]);
     for (const texte of textes) {
-      expect(/jours? ouvrés?|semaines?\b/iu.test(texte), texte).toBe(false);
+      expect(/\d\s*(?:jours?|semaines?|mois)\b|jours? ouvrés?/iu.test(texte), texte).toBe(false);
     }
   });
 });
 
+/**
+ * LES PALIERS SUPPRIMÉS NE REVIENNENT PAS, ni dans le code, ni dans les textes.
+ * Le test lit `src/` entier, commentaires retirés : un nom de palier resté dans
+ * une chaîne (une FAQ, un article, un libellé) promettrait au visiteur un
+ * forfait qui n'existe plus.
+ */
+describe("aucun nom de palier ne reste dans src/", () => {
+  const racine = fileURLToPath(new URL("../", import.meta.url));
+  const fichiers = readdirSync(racine, { recursive: true })
+    .map(String)
+    .filter((f) => /\.(ts|tsx|mdx)$/u.test(f));
+
+  test("les fichiers sources sont bien lus", () => {
+    expect(fichiers.length).toBeGreaterThan(50);
+  });
+
+  test("aucun des neuf noms de palier, hors commentaires", () => {
+    const fautifs = [];
+    for (const f of fichiers) {
+      const source = readFileSync(join(racine, f), "utf8")
+        .replace(/\/\*[\s\S]*?\*\//g, " ")
+        .replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+      for (const nom of PALIERS_SUPPRIMES) {
+        if (source.includes(nom)) fautifs.push(`${f} : ${nom}`);
+      }
+    }
+    expect(fautifs).toEqual([]);
+  });
+});
+
 describe("le site annonce le même prix que le module", () => {
-  test("l'accordéon reprend la fourchette calculée, jamais une copie", () => {
-    // L'EN-TÊTE ANNONÇAIT UN PLANCHER (« Dès 3 000 € ») jusqu'au 2026-09-02, et
-    // ne disait donc rien du haut de gamme. Il porte maintenant la fourchette
-    // entière : cinq lignes fermées donnent la carte de l'offre en une lecture.
-    // Ce qui ne change pas : le montant reste CALCULÉ, jamais recopié.
+  test("l'accordéon reprend le plancher calculé, jamais une copie", () => {
+    // L'EN-TÊTE A PORTÉ UNE FOURCHETTE du 2026-09-02 au 2026-10-05. Il revient
+    // au plancher avec la suppression des paliers. Ce qui ne change pas : le
+    // montant reste CALCULÉ, jamais recopié.
     for (const p of prestations) {
       const presta = services.find((s) => s.title === p.nom);
       expect(presta, `prestation « ${p.nom} » absente de services.ts`).toBeDefined();
-      expect(presta.price).toBe(fourchette(p.id));
-      // La borne basse de la fourchette EST le prix du pack d'entrée : les deux
-      // formulations doivent rester d'accord, quoi qu'il arrive au TJM.
-      expect(presta.price).toContain(prixPack(packEntree(p.id)));
+      expect(presta.price).toBe(aPartirDe(p));
+      expect(presta.price).toContain(prixPlancher(p));
     }
   });
 
@@ -200,15 +229,16 @@ describe("le site annonce le même prix que le module", () => {
       // Toute ligne de l'accordéon est une prestation chiffrée depuis le
       // 2026-09-24 : une entrée sans montant n'a plus de raison d'exister.
       expect(s.price, `« ${s.title} » n'annonce aucun prix`).toBeDefined();
-      // FORME « de X à Y », celle que produit `fourchette()`. Le test acceptait
-      // « Dès X » : le garder aurait laissé passer une entrée restée au
-      // plancher pendant que les autres annoncent leur fourchette.
-      expect(s.price, `« ${s.title} » doit annoncer sa fourchette`).toMatch(
-        /^de .+ à .+$/u,
+      // FORME « à partir de X », celle que produit `aPartirDe()`, et une
+      // seule fois : `priceParts()` découpe ce préfixe vers le libellé gris.
+      expect(s.price, `« ${s.title} » doit annoncer son plancher`).toMatch(
+        /^à partir de \d/u,
       );
       expect(s.price, `« ${s.title} » ne doit pas doubler le préfixe`).not.toMatch(
-        /^(dès|à partir de|from)\b/i,
+        /à partir de .*(à partir de|dès)/iu,
       );
+      // Plus de fourchette : une borne haute publiée se lit comme un prix.
+      expect(s.price).not.toMatch(/^de .+ à .+$/u);
     }
   });
 
@@ -224,7 +254,7 @@ describe("le site annonce le même prix que le module", () => {
       expect(
         reponsePrix,
         `le montant d'entrée de « ${p.nom} » manque dans la réponse prix de la FAQ`,
-      ).toContain(prixPack(packEntree(p.id)));
+      ).toContain(prixPlancher(p));
     }
   });
 
@@ -254,7 +284,7 @@ describe("le site annonce le même prix que le module", () => {
     expect(
       trouves,
       `un montant en euros est écrit à la main dans faq.ts : ${trouves.join(", ")}. ` +
-        "Passer par `prixPack(packEntree(...))`, `plancherSuivi()` ou `suiviMensuel(...)`.",
+        "Passer par `prixPlancher(...)`, `plancherSuivi()` ou `suiviMensuel(...)`.",
     ).toEqual([]);
   });
 
@@ -273,21 +303,19 @@ describe("le site annonce le même prix que le module", () => {
     expect(suivi, "le plancher du suivi a divergé du module").toContain(
       plancherSuivi(),
     );
-    /* L'exemple chiffré doit rester juste : il est recalculé, pas relu. Le
-       projet de référence est Le Logiciel, palier du milieu de La Solution
-       métier, lu dans le module. */
-    const projetReference = prestation("logiciel").packs[1].prix;
-    expect(
-      suivi,
-      "l'exemple chiffré du suivi ne correspond plus au taux",
-    ).toContain(suiviMensuel(projetReference));
-    // Le plancher mord sur tout le bas de grille : aucun projet ne doit
-    // pouvoir sortir un suivi inférieur, ce qui arriverait si le pourcentage
-    // était appliqué seul.
-    for (const p of prestations) {
-      for (const pack of p.packs) {
-        expect(suiviMensuel(pack.prix)).not.toBe(euros(0));
-      }
+    /* L'EXEMPLE CHIFFRÉ EST PARTI LE 2026-10-05 avec le prix ferme du palier
+       qui lui servait de projet de référence. Ce qui reste gardé : aucun
+       autre montant que le plancher du suivi n'apparaît dans la réponse, sans
+       quoi un montant de projet reviendrait par la petite porte. */
+    const montants = suivi.match(/\d[\d\u00A0\u202F ]*\u20AC/gu) ?? [];
+    expect(montants.map((m) => m.replace(/[\s]/gu, " "))).toEqual([
+      plancherSuivi().replace(/[\s]/gu, " "),
+    ]);
+    // Le plancher mord sur le bas de l'offre : aucun projet ne doit pouvoir
+    // sortir un suivi inférieur, ce qui arriverait si le pourcentage était
+    // appliqué seul.
+    for (const offre of [...prestations, integrationIA]) {
+      expect(suiviMensuel(offre.plancher)).toBe(plancherSuivi());
     }
     expect(suiviMensuel(1)).toBe(plancherSuivi());
   });
@@ -347,11 +375,7 @@ describe("le site annonce le même prix que le module", () => {
     const textes = [
       ...services.flatMap((s) => [s.title, s.price ?? "", ...s.body]),
       ...faqItems.flatMap((f) => [f.question, f.answer]),
-      ...prestations.flatMap((p) => [
-        p.resume,
-        p.horsPack,
-        ...p.packs.flatMap((k) => [k.promesse, k.pourQui, ...k.ajoute]),
-      ]),
+      ...prestations.flatMap((p) => [p.resume, p.horsOffre, ...p.inclus, ...p.faitMonter]),
       ...Object.values(methodeLabels).filter((v) => typeof v === "string"),
     ];
     for (const texte of textes) {
@@ -362,16 +386,14 @@ describe("le site annonce le même prix que le module", () => {
     }
   });
 
-  test("la fourchette publique encadre bien les trois forfaits", () => {
+  test("aucune fourchette ni « et plus » ne reste dans l'offre publiée", () => {
+    // La fourchette « de X à Y et plus » a quitté le site le 2026-10-05. Une
+    // borne haute publiée devenait le prix attendu par le visiteur.
     for (const p of prestations) {
-      const rendu = fourchette(p.id);
-      expect(rendu).toContain(prixPack(p.packs[0]));
-      expect(rendu).toContain(prixPack(p.packs[2]));
-      // Un haut de grille sur mesure n'a pas de plafond : la fourchette le dit.
-      expect(rendu.endsWith(" et plus")).toBe(p.packs[2].surMesure === true);
+      const presta = services.find((s) => s.title === p.nom);
+      expect(presta.price).not.toMatch(/ et plus$/u);
+      for (const ligne of presta.body) expect(ligne).not.toMatch(/\bforfaits?\b/iu);
     }
-    // La taxe se place derrière le montant, jamais après « et plus ».
-    expect(fourchette("logiciel", " HT")).toMatch(/\u20AC HT et plus$/u);
   });
 
   test("prestation() refuse un identifiant inconnu au lieu de rendre indéfini", () => {

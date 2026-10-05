@@ -13,12 +13,7 @@ import {
 } from "@/components/pages/services/HeroPhoto";
 import { herosPages } from "@/content/heros-pages";
 import type { SiteConfig } from "@/lib/content/types";
-import {
-  fourchette,
-  prixPack,
-  type Pack,
-  type Prestation,
-} from "@/content/offre";
+import { prixPlancher, type Prestation } from "@/content/offre";
 import {
   lienLocalParPrestation,
   marchesFilAriane,
@@ -43,13 +38,11 @@ import { SectionRendezVous } from "@/components/rendez-vous/SectionRendezVous";
  * un périmètre coûte plus cher qu'un autre. Il montre une différence, il ne
  * l'explique pas.
  *
- * Ici, chaque périmètre porte sa promesse, le cas de figure qui doit le faire
- * choisir, et ce qu'il ajoute au précédent. Le prix vient ensuite, et il vient
- * comme une conséquence.
+ * Ici, l'offre dit ce qui est compris dès son plancher et ce qui fait monter
+ * le prix. Le montant final se fixe au devis.
  *
- * PRIX FERMES, SANS DURÉE NI TAUX JOURNALIER, depuis le 2026-09-23 : le
- * périmètre est l'argument, et un montant accolé à des jours se divise. Voir
- * l'en-tête de `offre.ts`.
+ * UN PLANCHER, SANS PALIER NI DURÉE, depuis le 2026-10-05 : voir l'en-tête de
+ * `offre.ts`.
  */
 
 /**
@@ -69,7 +62,7 @@ import { SectionRendezVous } from "@/components/rendez-vous/SectionRendezVous";
  *
  * LA DERNIÈRE MARCHE N'EST PAS UN LIEN. C'est la page courante : `aria-current`
  * le dit aux lecteurs d'écran, et elle garde le nom de CATALOGUE de la
- * prestation (« L'Outil », « Le Logiciel ») lisible sur la page, maintenant que
+ * prestation (« La Solution métier ») lisible sur la page, maintenant que
  * le titre principal porte les mots que le client tape.
  *
  * SUR UNE PHOTO, LE FIL EST PLUS CLAIR ET PORTE SON VOILE. Le blanc à 50 % tient
@@ -120,115 +113,52 @@ export function FilAriane({
 }
 
 /**
- * UN FORFAIT, EN RANGÉE ET NON EN CARTE, depuis le 2026-09-23.
+ * L'OFFRE, EN UNE RANGÉE, depuis le 2026-10-05 : les trois forfaits sont
+ * partis avec leurs prix fermes (voir l'en-tête de `offre.ts`).
  *
- * CE QU'IL REMPLACE. Trois cartes côte à côte, dont celle du milieu inversée
- * en blanc plein, titres à 28 px, prix à 34 px : la seule section de la page
- * qui ne parlait pas la langue du gabarit. Eliott l'a jugée « vraiment pas
- * belle », et c'était mesurable : aucune autre section du site ne pose de
- * carte pleine, toutes découpent l'espace par des filets.
+ * LA GRAMMAIRE EST CELLE DES ANCIENS FORFAITS, et de l'accordéon des
+ * prestations : un filet haut, deux moitiés séparées par le filet médian de la
+ * section, gouttière nulle reportée en rembourrage de part et d'autre. À
+ * gauche le plancher et ce qu'il comprend ; à droite ce qui fait monter le
+ * prix, puis l'action.
  *
- * LA GRAMMAIRE REPRISE EST CELLE DE L'ACCORDÉON DES PRESTATIONS ET DU HÉROS :
- * un filet haut par rangée, le numéro à 12 px en demi-teinte, deux moitiés
- * séparées par le filet médian de la section, gouttière nulle reportée en
- * rembourrage de part et d'autre. À gauche ce que le forfait promet et à qui ;
- * à droite le prix, ce qu'il contient, et l'action.
- *
- * LES TROIS FORFAITS ONT LE MÊME TRAITEMENT depuis le 2026-09-24, décision
- * d'Eliott : plus aucun palier « Recommandé ». Désigner le forfait du milieu
- * poussait une vente au lieu d'aider à choisir. Chaque rangée porte le même
- * bouton plein à 30 px, celui de l'accordéon d'origine, vers la même ancre.
+ * LE PLANCHER OUVRE LA MOITIÉ GAUCHE : le visiteur venu pour un prix le trouve
+ * en premier, et la liste qui suit dit ce qu'il paie à ce montant.
  */
-function PackRow({
-  pack,
-  numero,
-  precedent,
+function OffreDetail({
+  offre,
   href,
 }: {
-  pack: Pack;
-  numero: string;
-  precedent?: string;
+  offre: Prestation;
   /** Prise de rendez-vous, sujet déjà choisi. Composée par l'appelant. */
   href: string;
 }) {
   return (
-    <li
-      data-part="pack"
-      className="relative grid grid-cols-1 gap-[24px] py-[30px] tablet:grid-cols-2 tablet:gap-x-0 tablet:py-[40px]"
+    <div
+      data-part="offre"
+      className="relative grid grid-cols-1 gap-[30px] py-[30px] tablet:grid-cols-2 tablet:gap-x-0 tablet:py-[40px]"
     >
       <span
         aria-hidden
         className="absolute left-0 right-0 top-0 h-px bg-[rgba(255,255,255,0.1)]"
       />
-      <div className="flex flex-col gap-[14px] tablet:pr-[30px] desktop:pr-[40px]">
-        <div className="flex h-[20px] items-center gap-[10px]">
-          <span className="text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-white/50">
-            {numero}
-          </span>
-          {pack.surMesure ? (
-            <span className="px-[8px] py-[3px] text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-white/70 ring-1 ring-inset ring-white/25">
-              {servicePageLabels.surMesure}
-            </span>
-          ) : null}
-        </div>
-        <h3 className="accent-room text-[26px] font-semibold uppercase leading-[0.95] tracking-[-0.04em] tablet:text-[32px]">
-          {pack.nom}
-        </h3>
-        <p className="max-w-[440px] text-[16px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground">
-          {pack.promesse}
-        </p>
-        <div className="flex max-w-[440px] flex-col gap-[4px] pt-[6px] text-white/60">
-          {/* AMORCES EN CASSE NORMALE, 14 px, depuis le 2026-09-24 : ce sont
-              des débuts de phrase qu'on lit, pas des étiquettes. */}
-          <span className="text-[14px] font-semibold leading-[1.3] tracking-[-0.01em]">
-            {servicePageLabels.pourQui}
-          </span>
-          <p className="text-[14px] font-medium leading-[1.4] tracking-[-0.01em]">
-            {pack.pourQui}
-          </p>
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-[20px] tablet:pl-[30px] desktop:pl-[40px]">
-        {/* LE MONTANT EST LE PREMIER ÉLÉMENT DE LA MOITIÉ DROITE, sur la
-            ligne du numéro et du nom : l'œil qui descend la colonne de droite
-            compare trois prix alignés, sans lire le reste. La durée n'y est
-            plus : à côté d'un prix ferme, elle ne servait qu'à le diviser. */}
+      <div className="flex flex-col gap-[20px] tablet:pr-[30px] desktop:pr-[40px]">
         <p className="flex flex-col gap-[6px]">
-          {pack.surMesure ? (
-            <span className="text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-white/60">
-              {servicePageLabels.aPartirDe}
-            </span>
-          ) : null}
+          <span className="text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-white/60">
+            {servicePageLabels.aPartirDe}
+          </span>
           <span className="text-[32px] font-semibold leading-[1] tracking-[-0.04em] desktop:text-[44px]">
-            {prixPack(pack)}
+            {prixPlancher(offre)}
             <span className="ml-[8px] align-baseline text-[13px] font-medium uppercase tracking-[-0.01em] text-white/50">
               {servicePageLabels.horsTaxes}
             </span>
           </span>
         </p>
+        <ListeOffre titre={servicePageLabels.inclus} lignes={offre.inclus} />
+      </div>
 
-        <div className="flex flex-col gap-[12px]">
-          {precedent ? (
-            <p className="text-[14px] font-semibold leading-[1.3] tracking-[-0.01em] text-white/60">
-              {servicePageLabels.toutLePrecedent(precedent)}
-            </p>
-          ) : null}
-          <ul className="flex max-w-[520px] flex-col gap-[10px]">
-            {pack.ajoute.map((ligne) => (
-              <li
-                key={ligne}
-                className="text-[14px] font-medium leading-[1.35] tracking-[-0.01em] text-white/70"
-              >
-                {ligne}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* LE BOUTON PLEIN DE L'ACCORDÉON, à 30 px, identique sur les trois
-            rangées : même hauteur, donc même ligne d'appui d'une rangée à
-            l'autre. */}
+      <div className="flex flex-col gap-[20px] tablet:pl-[30px] desktop:pl-[40px]">
+        <ListeOffre titre={servicePageLabels.faitMonter} lignes={offre.faitMonter} />
         <Link
           href={href}
           className="flex h-[30px] w-fit flex-none items-center justify-center bg-accent px-[10px] text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-background no-underline transition-opacity duration-200 hover:opacity-80 motion-reduce:transition-none"
@@ -236,7 +166,34 @@ function PackRow({
           <span className="accent-room">{servicePageLabels.cta}</span>
         </Link>
       </div>
-    </li>
+    </div>
+  );
+}
+
+/** Une des deux listes de l'offre : un titre en amorce, une ligne par point. */
+function ListeOffre({
+  titre,
+  lignes,
+}: {
+  titre: string;
+  lignes: readonly string[];
+}) {
+  return (
+    <div className="flex flex-col gap-[12px]">
+      <p className="text-[14px] font-semibold leading-[1.3] tracking-[-0.01em] text-white/60">
+        {titre}
+      </p>
+      <ul className="flex max-w-[520px] flex-col gap-[10px]">
+        {lignes.map((ligne) => (
+          <li
+            key={ligne}
+            className="text-[14px] font-medium leading-[1.35] tracking-[-0.01em] text-white/70"
+          >
+            {ligne}
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
@@ -493,9 +450,9 @@ export function ServicePage({
               className="accent-room overflow-hidden [--accent-room:26px] tablet:col-start-2 tablet:row-start-2"
             >
               {/* LE H1 N'EST PLUS `prestation.nom`, et c'est le seul endroit du
-                  site où l'écart entre les deux se voit. « L'Outil » et « Le
-                  Logiciel » sont des noms de catalogue : ils rangent l'offre en
-                  interne et ne correspondent à aucune requête. Le titre porte
+                  site où l'écart entre les deux se voit. « La Solution métier »
+                  est un nom de catalogue : il range l'offre en
+                  interne et ne correspond à aucune requête. Le titre porte
                   maintenant ce que le client cherche ; le nom de catalogue,
                   lui, reste affiché sur la dernière marche du fil d'Ariane, à
                   quelques centimètres au-dessus. */}
@@ -520,8 +477,9 @@ export function ServicePage({
                 donc sans ce retrait les deux textes se collent au pixel près et
                 se lisent comme une seule phrase cassée en deux. */}
             <p className={`text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-white/50 tablet:col-start-2 tablet:row-start-3 tablet:pl-[30px] desktop:pl-[40px]${heroImage ? ` ${VOILE_TEXTE}` : ""}`}>
-              {servicePageLabels.fourchette}{" "}
-              {fourchette(prestation.id, ` ${servicePageLabels.horsTaxes}`)}
+              {servicePageLabels.chapoPrix(
+                `${prixPlancher(prestation)} ${servicePageLabels.horsTaxes}`,
+              )}
             </p>
           </div>
           {heroImage ? <CreditHeroPhoto credit={heroImage.credit} /> : null}
@@ -537,7 +495,8 @@ export function ServicePage({
           />
         ) : null}
 
-        {/* LES FORFAITS. Même rembourrage que les sections voisines (60 / 90)
+        {/* L'OFFRE. `data-section="packs"` est gardé : `pricing_viewed` le
+            lit (docs/ANALYTICS.md). Même rembourrage que les sections voisines (60 / 90)
             et même filet médian que le héros : la page garde un seul rythme
             vertical et une seule découpe du haut en bas. Le titre tient dans
             la moitié gauche, comme le H1 tient dans la droite. */}
@@ -552,34 +511,19 @@ export function ServicePage({
           <div className="relative mx-auto flex w-full max-w-[1440px] flex-col">
             <div className="grid gap-[16px] pb-[30px] tablet:grid-cols-2 tablet:items-end tablet:gap-0 tablet:pb-[40px]">
               <h2 className="accent-room max-w-[460px] text-[26px] font-semibold uppercase leading-[0.95] tracking-[-0.04em] tablet:pr-[30px] tablet:text-[34px] desktop:pr-[40px]">
-                {local?.titrePacks ??
-                  servicePageLabels.titrePacks(
-                    prestation.packs[2].surMesure === true,
-                  )}
+                {local?.titreOffre ?? servicePageLabels.titreOffre}
               </h2>
               {/* LA RÉASSURANCE SE LIT AU MOMENT DU CHOIX, en vis-à-vis du
                   titre et sur sa ligne d'appui, comme le chapô du héros :
-                  devant 18 000 €, le lecteur cherche d'abord comment il paie
+                  devant un plancher, le lecteur cherche d'abord comment le prix se fixe
                   et si le montant peut bouger. */}
               <p className="max-w-[440px] text-[15px] font-medium leading-[1.45] tracking-[-0.01em] text-white/80 tablet:pl-[30px] desktop:pl-[40px]">
                 {servicePageLabels.reassurance}
               </p>
             </div>
-            <ol className="flex flex-col">
-              {prestation.packs.map((pack, index) => (
-                <PackRow
-                  key={pack.id}
-                  pack={pack}
-                  numero={String(index + 1).padStart(2, "0")}
-                  precedent={
-                    index > 0 ? prestation.packs[index - 1].nom : undefined
-                  }
-                  /* ANCRE LOCALE : la prise de rendez-vous est sur cette page,
-                     avec le bon sujet déjà coché. */
-                  href="#rendez-vous"
-                />
-              ))}
-            </ol>
+            {/* ANCRE LOCALE : la prise de rendez-vous est sur cette page,
+                avec le bon sujet déjà coché. */}
+            <OffreDetail offre={prestation} href="#rendez-vous" />
             {liensDeclinaisons?.map((lienLocal, index) => (
               <div
                 key={lienLocal.avant}
@@ -605,7 +549,7 @@ export function ServicePage({
 
         {/* SUR MESURE, SUR DEVIS. Même découpe que le contexte local des pages
             de ville : fond clair, deux moitiés, filet sur l'axe. À gauche ce
-            qui sort des forfaits, à droite les trois questions du
+            qui sort de l'offre, à droite les trois questions du
             questionnaire de rendez-vous, pour que le visiteur arrive à
             l'agenda en sachant ce qu'on va lui demander.
 
@@ -625,7 +569,7 @@ export function ServicePage({
                 {surMesureBloc.titre}
               </h2>
               <p className="max-w-[460px] text-[15px] font-medium leading-[1.45] tracking-[-0.01em] text-background/70">
-                {prestation.horsPack}
+                {prestation.horsOffre}
               </p>
             </div>
             <div className="flex flex-col gap-[20px] tablet:pl-[30px] desktop:pl-[40px]">
@@ -662,7 +606,7 @@ export function ServicePage({
               </ol>
               {/* LE BOUTON SUIT LES QUESTIONS qu'il vient d'annoncer : placé
                   à gauche, il se lisait avant elles. Plein, à l'accent, comme
-                  le bouton de chaque forfait. */}
+                  le bouton de l'offre. */}
               <Link
                 href="#rendez-vous"
                 className="flex h-[30px] w-fit flex-none items-center justify-center bg-accent px-[10px] text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-background no-underline transition-opacity duration-200 hover:opacity-80 motion-reduce:transition-none"

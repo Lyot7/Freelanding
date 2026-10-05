@@ -38,10 +38,10 @@ import { siteConfig } from "@/content/site";
  * Cinq manquements étaient constitués, chacun corrigé dans ce fichier :
  *   - CGV, art. L. 441-1 I C. com. : ni barème de prix, ni méthode de calcul,
  *     ni mention d'escompte. Amende administrative jusqu'à 75 000 €. Depuis le
- *     2026-09-23, le barème est la grille des forfaits à prix ferme publiée
- *     sur les pages de prestation (`offre.ts`) ; le hors-périmètre se chiffre
- *     à la charge estimée, détail communicable sur demande (III du même
- *     article).
+ *     2026-10-05, le barème est le prix de départ de chaque prestation,
+ *     publié sur les pages de prestation (`offre.ts`) ; chaque projet se
+ *     chiffre au devis, à la charge estimée, détail communicable sur demande
+ *     (III du même article). Le prix ferme est celui du devis signé.
  *   - Mentions légales, art. 1-1 I 5° LCEN, créé par la loi SREN : les tiers
  *     qui stockent des données traitées dans le cadre de l'édition du service
  *     doivent être nommés et adressés. Seul l'hébergeur l'était. Les cinq
@@ -466,7 +466,7 @@ export const legalDocuments: readonly LegalDocument[] = [
       { type: "heading", level: 2, text: "3. Prix, échéancier et paiement" },
       {
         type: "paragraph",
-        text: "Les forfaits de chaque prestation sont publiés sur ce site, à prix ferme et hors taxes pour le périmètre décrit, et constituent le barème applicable. Un besoin qui sort de ces périmètres, ou un forfait signalé « à partir de », fait l’objet d’un devis détaillé, établi à partir de la charge de travail estimée et jamais inférieur au montant affiché. Le détail du calcul et le devis correspondant sont communiqués sur simple demande à tout client professionnel, sur support durable.",
+        text: "Le prix de départ de chaque prestation est publié sur ce site, hors taxes, et constitue le barème applicable : aucun devis ne lui est inférieur. Chaque projet fait l’objet d’un devis détaillé, établi à partir du périmètre décrit et de la charge de travail estimée. Le prix inscrit au devis signé est un prix ferme. Le détail du calcul et le devis correspondant sont communiqués sur simple demande à tout client professionnel, sur support durable.",
       },
       {
         type: "paragraph",

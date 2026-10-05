@@ -1,19 +1,5 @@
-import {
-  packEntree,
-  plancherSuivi,
-  prestation,
-  prixPack,
-  suiviMensuel,
-  tauxSuivi,
-} from "@/content/offre";
+import { plancherSuivi, prestation, prixPlancher, tauxSuivi } from "@/content/offre";
 import type { FaqItem } from "@/lib/content/types";
-
-/**
- * Le projet de référence de l'exemple de suivi : Le Logiciel, palier du milieu
- * de La Solution métier. Nommé une fois pour que la mensualité et le prix du
- * projet cités dans la même phrase ne puissent pas diverger.
- */
-const PACK_LOGICIEL = prestation("logiciel").packs[1];
 
 /**
  * Source unique de la FAQ. Rendue à l'identique sur la page d'accueil, sur
@@ -81,27 +67,25 @@ const PACK_LOGICIEL = prestation("logiciel").packs[1];
  * ce que le client se demande avant de réserver ET dont la réponse n'est écrite
  * nulle part ailleurs sur le site. Sont sorties : les maquettes (la section
  * méthode le dit), le site à quelques centaines d'euros, l'agence (la page À
- * propos le dit), la rédaction du contenu (les forfaits le disent). La hausse
+ * propos le dit), la rédaction du contenu (les pages de prestation le disent). La hausse
  * possible du suivi est fusionnée dans « après la mise en ligne ».
  *
- * LA DURÉE EST ENTRÉE, parce qu'elle a quitté les forfaits : les pages de
- * prestation ne publient aucun délai chiffré (seul le simulateur de prix en
- * annonce un, en semaines, depuis le 2026-10-05). La réponse dit où la date est écrite (au devis,
- * avant signature) et de quoi elle dépend, sans inventer de nombre.
+ * LA DURÉE EST ENTRÉE, parce que le site ne publie aucun délai chiffré, pas
+ * même le simulateur depuis le 2026-10-05. La réponse dit où la date est
+ * écrite (au devis, avant signature) et de quoi elle dépend, sans inventer de
+ * nombre.
  */
 export const faqItems: FaqItem[] = [
   {
     question: "Combien coûte un projet, et comment c’est facturé ?",
-    /* « 3 périmètres » et non « trois » : règle posée par Eliott le 2026-09-01,
-       les nombres s'écrivent en chiffres, déjà appliquée dans
-       `service-pages.ts`, `tarifs.ts` et `services.ts`. Les 40 / 30 / 30 de
+    /* Les planchers sont lus dans `offre.ts`. Les 40 / 30 / 30 de
        l'échéancier restent des pourcentages, pas des montants. */
-    answer: `Un site démarre à ${prixPack(packEntree("vitrine"))}, une solution métier à ${prixPack(packEntree("logiciel"))}. Chaque prestation existe en 3 forfaits, détaillés sur sa page : ce qui change de l’un à l’autre y est écrit ligne à ligne. Le prix d’un forfait est arrêté avant que je commence, et il ne bouge plus ; au-delà du dernier, je chiffre sur mesure. Tu verses 40 % à la signature, 30 % à mi-parcours et 30 % à la livraison.`,
+    answer: `Un site démarre à ${prixPlancher(prestation("vitrine"))} HT, une solution métier à ${prixPlancher(prestation("logiciel"))} HT. Au-delà, le prix dépend de ton projet : le nombre de pages ou de modules, les outils à relier, la reprise de tes données. Chaque page de prestation dit ce qui est compris et ce qui fait monter le prix. Je fixe le montant au devis, avant de commencer, et il ne bouge plus. Tu verses 40 % à la signature, 30 % à mi-parcours et 30 % à la livraison.`,
   },
   {
     question: "Combien de temps ça prend ?",
     answer:
-      "La date de mise en ligne est écrite dans le devis, avant que tu signes. Elle dépend du forfait choisi et de la rapidité de tes retours : tes textes, tes photos, tes réponses à mes questions. Je ne mène qu’un projet à la fois : une fois le devis signé, je travaille sur le tien, et tu le vois avancer sur une adresse en ligne.",
+      "La date de mise en ligne est écrite dans le devis, avant que tu signes. Elle dépend de ton projet et de la rapidité de tes retours : tes photos, ta relecture des textes, tes réponses à mes questions. Je ne mène qu’un projet à la fois : une fois le devis signé, je travaille sur le tien, et tu le vois avancer sur une adresse en ligne.",
   },
   {
     question: "Est-ce que je reste propriétaire de ce que tu construis ?",
@@ -115,9 +99,10 @@ export const faqItems: FaqItem[] = [
   },
   {
     question: "Que se passe-t-il après la mise en ligne ?",
-    /* Les quatre chiffres du suivi (taux, plancher, mensualité de l'exemple et
-       projet de référence) sont dérivés : l'exemple se recalcule tout seul le
-       jour où le taux ou la grille bougent.
+    /* Le taux et le plancher du suivi sont lus dans `offre.ts`. L'exemple
+       chiffré (mensualité d'un projet de référence) est parti le 2026-10-05
+       avec le prix ferme du palier du milieu : aucun projet de référence ne tient
+       sans palier publié.
 
        LA CLAUSE DE HAUSSE, ajoutée le 2026-08-27 et fusionnée ici le
        2026-09-24. Un forfait de suivi engage un prix sur une charge qui peut
@@ -126,6 +111,6 @@ export const faqItems: FaqItem[] = [
        date, et le droit de dire non. L'hébergement est au nom du client : la
        machine plus grosse passe par SA facture, le suivi bouge parce qu'il y
        a plus à surveiller. */
-    answer: `Je ne disparais pas. Je propose un suivi mensuel qui revient à ${tauxSuivi()} du prix du projet par an, avec un minimum de ${plancherSuivi()} : compte ${suiviMensuel(PACK_LOGICIEL.prix)} par mois pour un projet à ${prixPack(PACK_LOGICIEL)}. Il couvre ce qui existe : mises à jour, sauvegardes vérifiées, corrections. Une demande nouvelle fait l’objet d’un devis, parce qu’elle n’était pas au cadrage. Ce montant ne bouge que dans un cas : ton site reçoit beaucoup plus de monde, ou ton hébergeur augmente ses prix. Il faut alors une machine plus puissante, payée sur ta facture d’hébergement, qui est à ton nom, et un suivi plus large. Je te préviens avant, avec le nouveau montant et la date, et rien ne change tant que tu n’as pas dit oui. Tu n’as pas besoin de ce suivi pour continuer à te servir de ce que je t’ai livré.`,
+    answer: `Je ne disparais pas. Je propose un suivi mensuel qui revient à ${tauxSuivi()} du prix du projet par an, avec un minimum de ${plancherSuivi()} par mois. Il couvre ce qui existe : mises à jour, sauvegardes vérifiées, corrections. Une demande nouvelle fait l’objet d’un devis, parce qu’elle n’était pas au cadrage. Ce montant ne bouge que dans un cas : ton site reçoit beaucoup plus de monde, ou ton hébergeur augmente ses prix. Il faut alors une machine plus puissante, payée sur ta facture d’hébergement, qui est à ton nom, et un suivi plus large. Je te préviens avant, avec le nouveau montant et la date, et rien ne change tant que tu n’as pas dit oui. Tu n’as pas besoin de ce suivi pour continuer à te servir de ce que je t’ai livré.`,
   },
 ];

@@ -21,10 +21,10 @@
  * sections en plus, rendues dans le gabarit des pages secteur.
  */
 import {
-  fourchette,
+  aPartirDe,
   plancherSuivi,
   prestation,
-  prixPack,
+  prixPlancher,
   tauxSuivi,
 } from "./offre";
 import {
@@ -35,17 +35,16 @@ import {
 import { CHEMIN_PRIX_LOGICIEL, pagesSecteur } from "./pages-secteur";
 
 const LOGICIEL = prestation("logiciel");
-const [OUTIL, LE_LOGICIEL, PLATEFORME] = LOGICIEL.packs;
 const CHEMIN_PILIER = `/services/${LOGICIEL.slug}`;
 
 export const pageLogicielCaen: PageLocale = {
   chemin: CHEMIN_PAGE_LOGICIEL_CAEN,
   seo: {
     titre: "Logiciel sur mesure à Caen · Eliott Bouquerel",
-    description: `Votre logiciel métier ou votre application web sur mesure, par un développeur basé à Caen, pour les PME de Normandie : ${fourchette("logiciel")} HT.`,
+    description: `Votre logiciel métier ou votre application web sur mesure, par un développeur basé à Caen, pour les PME de Normandie : ${aPartirDe(LOGICIEL, " HT")}, prix au devis.`,
   },
   h1: "Logiciel sur mesure à Caen",
-  resume: `Je développe des logiciels métier et des applications web sur mesure pour les PME de Caen, du Calvados, de la Manche et de l’Orne. Basé à Caen, je mène chaque projet en visio, du premier appel à la livraison. Compte ${fourchette("logiciel", " HT")}, en 3 forfaits à prix ferme.`,
+  resume: `Je développe des logiciels métier et des applications web sur mesure pour les PME de Caen, du Calvados, de la Manche et de l’Orne. Basé à Caen, je mène chaque projet en visio, du premier appel à la livraison. Compte ${aPartirDe(LOGICIEL, " HT")}, prix fixé au devis.`,
   marcheFilAriane: "Caen",
   zones: {
     villes: ["Caen"],
@@ -60,7 +59,7 @@ export const pageLogicielCaen: PageLocale = {
       {
         libelle: "La solution métier",
         href: CHEMIN_PILIER,
-        description: "Les 3 forfaits, et ce que chacun ajoute au précédent.",
+        description: "Ce qui est compris, et ce qui fait varier le prix.",
       },
       {
         libelle: "Le prix d’un logiciel sur mesure",
@@ -169,22 +168,22 @@ export const pageLogicielCaen: PageLocale = {
       id: "budget",
       titre: "Ce que ton budget permet",
       paragraphes: [
-        `Le prix se compte en modules, un module étant un pan de ton activité : les devis, le planning, la facturation. ${OUTIL.nom} en couvre 1, ${LE_LOGICIEL.nom} jusqu’à 3, ${PLATEFORME.nom} autant que ton activité en demande.`,
-        "Le nombre de personnes qui s’en servent ne change rien : à 3 comme à 40, tu paies le même forfait, et aucune licence ne s’ajoute chaque mois.",
+        "Le prix se compte surtout en modules, un module étant un pan de ton activité : les devis, le planning, la facturation. S’y ajoutent les outils à relier et la reprise de ton historique.",
+        "Le nombre de personnes qui s’en servent ne change rien : à 3 comme à 40, tu paies le même prix, et aucune licence ne s’ajoute chaque mois.",
       ],
       points: [
         {
-          titre: `${OUTIL.nom} : ${prixPack(OUTIL)} HT`,
+          titre: "1 module",
           corps:
             "Par exemple, le bon d’intervention rempli sur téléphone, qui arrive tout seul dans ta facturation.",
         },
         {
-          titre: `${LE_LOGICIEL.nom} : ${prixPack(LE_LOGICIEL)} HT`,
+          titre: "Plusieurs modules",
           corps:
             "Par exemple, devis, planning et facturation réunis, avec un compte par personne et la reprise de ton historique.",
         },
         {
-          titre: `${PLATEFORME.nom} : à partir de ${prixPack(PLATEFORME)} HT`,
+          titre: "Plusieurs systèmes",
           corps:
             "Par exemple, ton logiciel, ton ERP et ton site marchand qui échangent dans les 2 sens et restent d’accord.",
         },
@@ -231,14 +230,14 @@ export const pageLogicielCaen: PageLocale = {
       ],
     },
   ],
-  titrePacks: "Prix d’un logiciel sur mesure à Caen, en 3 forfaits",
+  titreOffre: "Prix d’un logiciel sur mesure à Caen : ce qui le fait varier",
   faq: {
     eyebrow: "FAQ",
     titleLines: ["Ton logiciel", "sur Caen."],
     items: [
       {
         question: "Combien coûte un logiciel sur mesure à Caen ?",
-        answer: `Le prix va ${fourchette("logiciel", " HT")}, en 3 forfaits : ${prixPack(OUTIL)} pour ${OUTIL.nom}, ${prixPack(LE_LOGICIEL)} pour ${LE_LOGICIEL.nom}, et à partir de ${prixPack(PLATEFORME)} pour ${PLATEFORME.nom}, chiffrée au devis. Être à Caen ne change pas le prix : la grille est la même pour toute la France.`,
+        answer: `Le prix démarre à ${prixPlancher(LOGICIEL)} HT, puis il suit le nombre de modules, les outils à relier et la reprise de ton historique. Je le fixe au devis. Être à Caen ne change pas le prix : il se calcule de la même façon pour toute la France.`,
       },
       {
         question: "Faut-il se rencontrer pour lancer un logiciel sur mesure ?",
@@ -269,7 +268,7 @@ export const pageLogicielCaen: PageLocale = {
 };
 
 /**
- * LE LIEN DEPUIS LA PAGE PILIER, posé sous ses forfaits par
+ * LE LIEN DEPUIS LA PAGE PILIER, posé sous son offre par
  * `lienLocalParPrestation`, comme la page de Caen l'est depuis le site vitrine.
  */
 export const lienVersPageLogicielCaen = {

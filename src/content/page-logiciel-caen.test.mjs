@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { fourchette, prestation, prixPack } from "./offre.ts";
+import { prestation, prixPlancher } from "./offre.ts";
 import { CHEMIN_PAGE_LOGICIEL_CAEN, pageCaen } from "./page-caen.ts";
 import { lienVersPageLogicielCaen, pageLogicielCaen } from "./page-logiciel-caen.ts";
 import { pagesSecteur } from "./pages-secteur.ts";
@@ -30,7 +30,7 @@ function textes() {
     page.h1,
     page.resume,
     contexte.titre,
-    page.titrePacks ?? "",
+    page.titreOffre ?? "",
     contexte.intro,
     ...contexte.liens.flatMap((l) => [l.libelle, l.description]),
     ...contexte.points.flatMap((p) => [p.titre, p.corps]),
@@ -136,10 +136,13 @@ describe("la page du logiciel à Caen ne promet que ce qui est vrai", () => {
     }
   });
 
-  test("la réponse directe et la FAQ donnent les prix lus dans offre.ts", () => {
-    expect(page.resume).toContain(fourchette("logiciel", " HT"));
-    const tout = textes().join("\n");
-    for (const pack of LOGICIEL.packs) expect(tout).toContain(prixPack(pack));
+  test("la réponse directe et la FAQ donnent le plancher lu dans offre.ts, sans forfait", () => {
+    expect(page.resume).toContain(prixPlancher(LOGICIEL));
+    expect(page.faq.items[0].answer).toContain(prixPlancher(LOGICIEL));
+    for (const texte of textes()) {
+      expect(/\bforfaits?\b|\bpaliers?\b/iu.test(texte), texte).toBe(false);
+      expect(/de \d[\d\u00A0\u202F ]*\u20AC à \d/u.test(texte), texte).toBe(false);
+    }
   });
 
   test("aucun montant en euros n'est écrit à la main dans page-logiciel-caen.ts", () => {

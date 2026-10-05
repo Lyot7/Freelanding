@@ -33,7 +33,7 @@ export async function generateMetadata({
   }
 
   // LE TITRE N'EST PLUS `prestation.nom`. Ce champ est le nom de CATALOGUE du
-  // palier (« L'Outil », « Le Logiciel ») : il range l'offre, il ne se cherche
+  // l'offre (« La Solution métier ») : il range l'offre, il ne se cherche
   // pas, et il ne portait pas la marque que toutes les autres pages ont en
   // suffixe. Le titre de recherche vit dans `service-pages.ts`, avec sa
   // contrainte de longueur ; voir l'en-tête de `servicePageSeo`.

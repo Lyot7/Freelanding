@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { euros, fourchette, prestation, prixPack } from "./offre.ts";
+import { euros, prestation, prixPlancher } from "./offre.ts";
 import { cheminSecteur, pagesSecteur } from "./pages-secteur.ts";
 import { contentRoutes } from "./routes.ts";
 import { lienLocalParPrestation } from "./service-pages.ts";
@@ -25,7 +25,7 @@ function textes(page) {
     page.seo.description,
     page.h1,
     page.resume,
-    page.titrePacks,
+    page.titreOffre,
     ...page.sections.flatMap((s) => [
       s.titre,
       ...s.paragraphes,
@@ -142,17 +142,21 @@ describe("les pages secteur ne promettent que ce qui est vrai", () => {
     }
   });
 
-  test("la réponse directe en tête donne le prix lu dans offre.ts", () => {
+  test("la réponse directe en tête donne le plancher lu dans offre.ts", () => {
     for (const page of pagesSecteur) {
-      expect(page.resume).toContain(fourchette("logiciel", " HT"));
+      expect(page.resume).toContain(prixPlancher(LOGICIEL));
     }
   });
 
-  test("les 3 forfaits sont cités avec leur prix lu dans offre.ts", () => {
+  test("aucun forfait ni fourchette : le plancher, puis le devis", () => {
+    // Paliers supprimés le 2026-10-05. Chaque page cite le plancher dans sa
+    // FAQ et renvoie au devis, sans nom de forfait ni borne haute.
     for (const page of pagesSecteur) {
       const tout = textes(page).join("\n");
-      for (const pack of LOGICIEL.packs) {
-        expect(tout).toContain(prixPack(pack));
+      expect(tout).toMatch(/devis/u);
+      for (const texte of textes(page)) {
+        expect(/\bpaliers?\b|forfaits? (?:de la|à prix)|\d forfaits/iu.test(texte), texte).toBe(false);
+        expect(/de \d[\d\u00A0\u202F ]*\u20AC à \d/u.test(texte), texte).toBe(false);
       }
     }
   });
@@ -207,7 +211,7 @@ describe("les secteurs ne se recopient pas", () => {
       (p) => p.seo.titre,
       (p) => p.seo.description,
       (p) => p.h1,
-      (p) => p.titrePacks,
+      (p) => p.titreOffre,
       (p) => p.calcul.coutAnnuel,
     ];
     for (const champ of champs) {

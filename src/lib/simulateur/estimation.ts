@@ -1,68 +1,43 @@
-import type { Pack } from "@/content/offre";
-import type { Palier, TypeProjet } from "@/content/simulateur";
+import type { TypeProjet } from "@/content/simulateur";
 
 /**
- * L'ESTIMATION DU SIMULATEUR DE PRIX : un calcul fixe, sans modèle.
+ * LE CADRAGE DU SIMULATEUR DE PRIX : un relevé fixe, sans modèle.
  *
- * Chaque question donne un plancher et un plafond de palier : ceux de la
- * réponse choisie, ou, sans réponse, le plus bas et le plus haut de ses
- * options. La fourchette va du plus haut des planchers au plus haut des
- * plafonds. Répondre ne peut donc que la resserrer.
+ * Depuis le 2026-10-05, il ne calcule plus de fourchette : le prix part du
+ * plancher de l'offre et se fixe au devis. Chaque réponse ajoute, ou non, ce
+ * qui fera monter le prix (`facteur`) et ce qui sort de l'offre
+ * (`horsForfait`). Les listes suivent l'ordre des questions.
  */
 export interface Estimation {
-  readonly palierBas: Palier;
-  readonly palierHaut: Palier;
-  readonly bas: Pack;
-  readonly haut: Pack;
-  /**
-   * Ce que le forfait du palier bas ajoute au précédent, comme sur les pages
-   * de prestation : la liste cumulée faisait lire « 1 page longue » puis
-   * « 5 à 7 pages » dans le même résultat.
-   */
-  readonly inclus: readonly string[];
-  /** Le forfait précédent, que `inclus` complète. Absent au premier palier. */
-  readonly precedent?: Pack;
-  /** Les besoins signalés hors forfait, ou à défaut le hors-forfait de la grille. */
+  /** Ce qui fera monter le prix au-dessus du plancher, selon les réponses. */
+  readonly facteurs: readonly string[];
+  /** Les besoins signalés hors de l'offre, ou à défaut le hors-offre de l'offre. */
   readonly horsForfait: readonly string[];
   /** Questions encore sans réponse. */
   readonly restantes: number;
 }
 
-const plafond = (option: { palier: Palier; palierMax?: Palier }): Palier =>
-  option.palierMax ?? option.palier;
-
-const plusHaut = (a: Palier, b: Palier): Palier => (a >= b ? a : b);
-const plusBas = (a: Palier, b: Palier): Palier => (a <= b ? a : b);
-
 export function estimer(
   type: TypeProjet,
   reponses: Readonly<Record<string, string>>,
 ): Estimation {
-  let palierBas: Palier = 0;
-  let palierHaut: Palier = 0;
-  let restantes = 0;
+  const facteurs: string[] = [];
   const notes: string[] = [];
+  let restantes = 0;
 
   for (const question of type.questions) {
     const choisie = question.options.find((o) => o.id === reponses[question.id]);
-    const bas = choisie
-      ? choisie.palier
-      : question.options.map((o) => o.palier).reduce(plusBas);
-    const haut = choisie ? plafond(choisie) : question.options.map(plafond).reduce(plusHaut);
-    if (!choisie) restantes += 1;
-    if (choisie?.horsForfait) notes.push(choisie.horsForfait);
-    palierBas = plusHaut(palierBas, bas);
-    palierHaut = plusHaut(palierHaut, haut);
+    if (!choisie) {
+      restantes += 1;
+      continue;
+    }
+    if (choisie.facteur && !facteurs.includes(choisie.facteur)) facteurs.push(choisie.facteur);
+    if (choisie.horsForfait) notes.push(choisie.horsForfait);
   }
 
   return {
-    palierBas,
-    palierHaut,
-    bas: type.packs[palierBas],
-    haut: type.packs[palierHaut],
-    inclus: type.packs[palierBas].ajoute,
-    precedent: palierBas > 0 ? type.packs[palierBas - 1] : undefined,
-    horsForfait: notes.length > 0 ? notes : [type.horsPack],
+    facteurs,
+    horsForfait: notes.length > 0 ? notes : [type.offre.horsOffre],
     restantes,
   };
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { prestations, prixPack } from "@/content/offre";
+import { prestations, prixPlancher } from "@/content/offre";
 import { IDS_RENDEZ_VOUS, lienRendezVous } from "@/content/rendez-vous";
 import { workItems } from "@/content/work";
 import { faqItems } from "@/content/faq";
@@ -17,16 +17,17 @@ const markdown = profilEnMarkdown(profil);
 const prompt = construirePrompt(profil);
 
 describe("profil complet de la vue Agent", () => {
-  it("cite chaque forfait au prix ferme d'offre.ts, le palier sur mesure en plancher, sans durée", () => {
+  it("cite le plancher de chaque offre, ce qui est compris et ce qui fait monter le prix, sans durée", () => {
     for (const prestation of prestations) {
-      for (const pack of prestation.packs) {
-        expect(markdown).toContain(
-          pack.surMesure
-            ? `${pack.nom}\u00A0: sur mesure, à partir de ${prixPack(pack)}\u00A0HT, prix fixé au devis.`
-            : `${pack.nom}\u00A0: ${prixPack(pack)}\u00A0HT, prix ferme.`,
-        );
+      expect(markdown).toContain(
+        `À partir de ${prixPlancher(prestation)}\u00A0HT, prix fixé au devis.`,
+      );
+      for (const ligne of [...prestation.inclus, ...prestation.faitMonter]) {
+        expect(markdown).toContain(ligne);
       }
     }
+    // Paliers supprimés le 2026-10-05 : ni forfait, ni prix ferme par forfait.
+    expect(markdown).not.toMatch(/prix ferme\.|\bforfaits?\b|\bpaliers?\b/iu);
     expect(markdown).not.toMatch(/jours ouvrés|repère/u);
     expect(markdown).not.toMatch(/\bTJM\b|taux journalier|par jour/iu);
   });
@@ -36,8 +37,9 @@ describe("profil complet de la vue Agent", () => {
     expect(consignesDuPrompt()).not.toMatch(/repères|30 minutes/u);
   });
 
-  it("met « HT » avant « et plus » dans la fourchette d'un palier sur mesure", () => {
-    expect(markdown).not.toMatch(/et plus\u00A0HT|et plus HT/u);
+  it("n'annonce plus de fourchette : ni « et plus », ni « de X à Y »", () => {
+    expect(markdown).not.toMatch(/et plus\u00A0HT|et plus HT| et plus\)/u);
+    expect(markdown).not.toMatch(/de \d[\d\u00A0\u202F ]*\u20AC à \d/u);
   });
 
   it("nomme le rendez-vous avec le libellé unique du site", () => {
@@ -203,11 +205,9 @@ describe("profil : contenu facultatif absent", () => {
 
   it("donne le même prix plancher quel que soit l'ordre des prestations", async () => {
     const inverse = profilEnMarkdown(await construireProfil(sourcesDepouillees));
-    const [plancher] = prestations
-      .map((prestation) => prestation.packs[0])
-      .sort((a, b) => a.prix - b.prix);
-    expect(inverse).toContain(`mon premier forfait est à ${prixPack(plancher)}\u00A0HT`);
-    expect(markdown).toContain(`mon premier forfait est à ${prixPack(plancher)}\u00A0HT`);
+    const [plancher] = [...prestations].sort((a, b) => a.plancher - b.plancher);
+    expect(inverse).toContain(`mes prix commencent à ${prixPlancher(plancher)}\u00A0HT`);
+    expect(markdown).toContain(`mes prix commencent à ${prixPlancher(plancher)}\u00A0HT`);
   });
 
   it("titre au nom de la marque sans rôle, et le téléphone sans horaires", async () => {

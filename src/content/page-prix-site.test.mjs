@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { prestation, prixPack } from "./offre.ts";
+import { prestation, prixPlancher } from "./offre.ts";
 import { pageCaen } from "./page-caen.ts";
 import { CHEMIN_PRIX_SITE, pagePrixSite } from "./page-prix-site.ts";
 import { pagesSecteur } from "./pages-secteur.ts";
@@ -89,10 +89,25 @@ describe("la page de prix est cherchable", () => {
 });
 
 describe("la page de prix ne dit que ce qui est vrai", () => {
-  test("la réponse directe donne les 3 forfaits avec leur prix calculé", () => {
-    for (const pack of VITRINE.packs) {
-      expect(page.resume).toContain(prixPack(pack));
+  test("la réponse directe donne le plancher calculé, et dit que le prix se fixe au devis", () => {
+    expect(page.resume).toContain(prixPlancher(VITRINE));
+    expect(page.resume).toMatch(/devis/u);
+  });
+
+  test("aucun forfait, aucune fourchette, aucun délai chiffré", () => {
+    // Paliers supprimés le 2026-10-05 : une borne haute ou un nom de forfait
+    // deviendrait le prix attendu par le visiteur.
+    for (const texte of [...textesDe(page), page.seo.description, page.titreOffre]) {
+      expect(/\bforfaits?\b|\bpaliers?\b/iu.test(texte), texte).toBe(false);
+      expect(/de \d[\d\u00A0\u202F ]*\u20AC à \d/u.test(texte), texte).toBe(false);
+      expect(/\d\s*(?:jours?|semaines?)\b/iu.test(texte), texte).toBe(false);
     }
+  });
+
+  test("les textes sont écrits par Eliott et compris dans le prix", () => {
+    const tout = textesDe(page).join(" ");
+    expect(tout).not.toMatch(/textes que tu fournis|mets en page les textes/iu);
+    expect(tout).toMatch(/tu n’as rien à rédiger/u);
   });
 
   test("aucun montant en euros n'est écrit à la main dans page-prix-site.ts", () => {

@@ -1,12 +1,6 @@
 import { ImageProgressive } from "@/components/ui/ImageProgressive";
 import type { ReactNode } from "react";
-import {
-  fourchette,
-  prestation,
-  prixPack,
-  suiviMensuel,
-  type PrestationId,
-} from "@/content/offre";
+import { aPartirDe, prestation, suiviMensuel, type PrestationId } from "@/content/offre";
 
 /**
  * PALETTE FERMÉE des blocs d'article.
@@ -246,29 +240,25 @@ export function Quote({
  * PRIX D'UNE PRESTATION, lu dans `offre.ts` au moment du rendu.
  *
  * POURQUOI CE BLOC. Les articles sur le coût d'un site ou d'un logiciel doivent
- * citer les forfaits, et un article ne peut rien importer. Écrire « 3 000 € »
+ * citer les prix, et un article ne peut rien importer. Écrire « 3 000 € »
  * à la main dans le MDX reproduirait la classe d'erreur que `offre.ts` existe
- * pour empêcher : un montant qui diverge de la grille sans que rien ne le
- * signale. Ici le montant se calcule, et un forfait inconnu fait échouer le
- * build au lieu de publier un prix faux.
+ * pour empêcher : un montant qui diverge de l'offre sans que rien ne le
+ * signale. Ici le montant se calcule.
  *
- * Sans `forfait`, la fourchette de la prestation ; avec, le prix du forfait ;
- * avec `suivi` en plus, la mensualité du suivi de ce forfait, plancher compris.
+ * Rend le plancher de la prestation, « à partir de 3 000 € HT » ; avec `suivi`,
+ * la mensualité du suivi à partir de ce plancher. Les paliers, et la propriété
+ * `forfait` qui les désignait, sont partis le 2026-10-05.
  * « HT » est toujours ajouté : un montant d'Eliott n'existe pas hors taxes
  * implicites.
  */
 export function Prix({
   offre,
-  forfait,
   suivi = false,
 }: {
   offre: PrestationId;
-  forfait?: string;
   suivi?: boolean;
 }) {
-  if (!forfait) return <>{fourchette(offre, " HT")}</>;
-  const pack = prestation(offre).packs.find((p) => p.id === forfait);
-  if (!pack) throw new Error(`Forfait inconnu : ${offre}/${forfait}`);
-  if (suivi) return <>{`${suiviMensuel(pack.prix)} HT par mois`}</>;
-  return <>{`${prixPack(pack)} HT`}</>;
+  const p = prestation(offre);
+  if (suivi) return <>{`à partir de ${suiviMensuel(p.plancher)} HT par mois`}</>;
+  return <>{aPartirDe(p, " HT")}</>;
 }

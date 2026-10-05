@@ -1,27 +1,33 @@
 /**
- * L'OFFRE — source unique des prestations, de leurs forfaits et de leurs prix.
+ * L'OFFRE — source unique des prestations, de ce qu'elles comprennent et de
+ * leur prix plancher.
  *
- * DES FORFAITS À PRIX FERME, DEPUIS LE 2026-09-23. Décision d'Eliott : chaque
- * périmètre porte un montant arrêté, et ce qui dépasse le dernier périmètre se
- * traite sur mesure, sur devis. Le site n'explique plus « pourquoi un devis ne
- * tombe jamais pile » : un prix ferme qui s'excuse de ne pas l'être se
- * contredit à l'écran.
+ * UN PLANCHER PAR OFFRE, TOUT LE RESTE SUR DEVIS, DEPUIS LE 2026-10-05.
+ * Décision d'Eliott, qui remplace les forfaits à prix ferme du 2026-09-23. Ses
+ * mots : « le temps estimé en développement, ça peut être très très subjectif
+ * en fonction des différentes fonctionnalités, de la complexité des outils
+ * avec lesquels connecter », et il ne veut pas qu'un visiteur arrive avec
+ * « j'ai fait l'estimation, on est à 7000, pourquoi est-ce que c'est plus ».
+ * Les projets lourds (sept modules, plusieurs systèmes) n'entraient dans aucun
+ * palier publié.
  *
- * CE QUI A DISPARU AVEC LE PASSAGE AU PRIX FERME :
- *  - le taux journalier comme règle de construction. Les montants s'écrivent
- *    désormais ici, pack par pack. Le taux reste un outil interne de chiffrage
- *    (vault, `offre-grille-prix.md`), il n'a plus aucune existence dans le code
- *    du site ;
- *  - la durée affichée. « Environ 5 jours ouvrés » à côté de 3 000 € redonnait
- *    le taux en une division : un prix ferme vend un résultat, la date vit au
- *    devis. EXCEPTION DU 2026-10-05, décision d'Eliott : le simulateur de prix
- *    annonce un délai en SEMAINES, marge comprise (`Pack.delai`). Les pages de
- *    prestation et de prix n'en affichent toujours aucun ;
- *  - L'Outil comme prestation à part. Il devient le premier palier de La
- *    Solution métier : un outil simple et un logiciel complet répondent au même
- *    besoin, à deux tailles différentes, et deux pages voisines forçaient le
- *    visiteur à se ranger avant d'avoir compris le rangement. L'ancienne adresse
- *    `/services/outil-metier` redirige en 301 (`next.config.ts`).
+ * CE QUI A DISPARU AVEC LES PALIERS :
+ *  - les neuf noms de forfait (trois par offre) et leurs prix fermes. Le prix
+ *    ferme existe toujours : c'est celui du DEVIS signé, il ne bouge plus ;
+ *  - le délai affiché, y compris dans le simulateur. La date se fixe au devis ;
+ *  - la fourchette « de X à Y ». Une borne haute publiée devient un prix que
+ *    le visiteur s'attend à payer.
+ *
+ * CE QUI LES REMPLACE : pour chaque offre, ce qui est compris dès le plancher
+ * (`inclus`) et ce qui fait monter le prix (`faitMonter`). Règle d'Eliott du
+ * 2026-09-01, toujours en vigueur : une promesse qu'il n'a jamais faite n'a
+ * rien à faire sur le site. Chaque ligne vient donc des anciens périmètres,
+ * redistribuée entre les deux listes ; aucune n'a été inventée.
+ *
+ * LES TEXTES DU SITE VITRINE SONT ÉCRITS PAR ELIOTT, optimisés pour le
+ * référencement, et compris dans le prix : « Moi je prépare des textes
+ * préfaits pour qu'ils soient optimisés SEO justement et pour qu'ils n'aient
+ * pas à le faire. Donc c'est dans mon prix. » (2026-10-05).
  *
  * POURQUOI CE FICHIER EXISTE. Les prix vivaient à deux endroits, `services.ts`
  * et `pricing.ts`, et ils ont divergé à deux écrans d'intervalle sans que rien
@@ -29,61 +35,32 @@
  * aucun montant ne s'écrit ailleurs qu'ici.
  */
 
-/** Identifiants stables des prestations chiffrées. */
+/** Identifiants stables des prestations à page dédiée. */
 export type PrestationId = "vitrine" | "logiciel";
 
-/** Délai annoncé, en semaines entières. */
-export interface Delai {
-  readonly min: number;
-  readonly max: number;
-}
-
-/** Un forfait : un périmètre et son prix. */
-export interface Pack {
-  /** Identifiant stable, unique à l'intérieur d'une prestation. */
-  readonly id: string;
-  /** Nom commercial du forfait. */
+/** Une offre : son plancher, ce qu'elle comprend, ce qui en fait monter le prix. */
+export interface Offre {
   readonly nom: string;
   /**
-   * Prix HT, en euros. Ferme pour le périmètre décrit ; pour un palier
-   * `surMesure`, c'est le PLANCHER du devis, affiché « à partir de ».
+   * Prix plancher HT, en euros, affiché « à partir de ». Le devis ne descend
+   * jamais dessous ; il le dépasse selon `faitMonter`.
    */
-  readonly prix: number;
-  /**
-   * Palier sur mesure : le périmètre n'a pas de plafond, le prix se fixe au
-   * devis et ne descend jamais sous `prix`. Réservé au dernier palier.
-   */
-  readonly surMesure?: true;
-  /**
-   * Délai de mise en ligne annoncé par le simulateur, en semaines, marge
-   * comprise (règle du 2026-08-28 : on annonce large). Absent sur un palier
-   * `surMesure` : sa date se fixe au devis.
-   */
-  readonly delai?: Delai;
-  /** Une phrase : ce que le client obtient, pas ce que je fais. */
-  readonly promesse: string;
-  /** Le cas de figure qui doit faire choisir ce forfait plutôt qu'un autre. */
-  readonly pourQui: string;
-  /**
-   * Ce que le forfait ajoute AU PRÉCÉDENT. Le premier liste tout ; les suivants
-   * ne listent que le delta, et la page affiche « tout le précédent, plus ».
-   * Écrire trois listes complètes ferait relire trois fois la même chose et
-   * masquerait précisément ce qui justifie l'écart de prix.
-   */
-  readonly ajoute: readonly string[];
+  readonly plancher: number;
+  /** Ce que comprend tout projet de l'offre, dès le plancher. */
+  readonly inclus: readonly string[];
+  /** Ce qui fait monter le prix au-dessus du plancher. Chiffré au devis. */
+  readonly faitMonter: readonly string[];
+  /** Ce qui sort de l'offre, chiffré à part. */
+  readonly horsOffre: string;
 }
 
-/** Une prestation vendable : un nom, une page dédiée, trois forfaits. */
-export interface Prestation {
+/** Une prestation vendable : une offre, une page dédiée. */
+export interface Prestation extends Offre {
   readonly id: PrestationId;
-  readonly nom: string;
   /** Segment d'URL de sa page dédiée, sous `/services/`. */
   readonly slug: string;
   /** Une phrase, affichée en tête de la page dédiée et dans l'accordéon. */
   readonly resume: string;
-  /** Ce qui sort des forfaits, vers le devis sur mesure. */
-  readonly horsPack: string;
-  readonly packs: readonly [Pack, Pack, Pack];
 }
 
 /**
@@ -106,35 +83,10 @@ export function euros(montant: number): string {
 }
 
 /*
- * LES MONTANTS, ARRÊTÉS PAR ELIOTT LE 2026-09-23.
- *
- * LE SITE : 3 000 / 4 800 / 7 200. Les montants déjà publiés, confirmés par un
- * panel de quatre avis contradictoires (positionnement, dirigeant de PME,
- * agence concurrente, recul à cinq ans) : trois sur quatre les gardent tels
- * quels. Le troisième palier s'appelle « Signature » : il dit le haut de gamme
- * sans jargon, et c'est celui qui porte le travail marketing.
- *
- * LA SOLUTION MÉTIER : 6 000 / 18 000 / à partir de 36 000. Calés sur l'unité
- * réelle de facturation d'Eliott, le MODULE : un pan de l'activité du client
- * (les devis, le planning, la facturation), chiffré autour de 6 000 € dans
- * les devis réels. L'Outil vaut un module et une connexion ; Le Logiciel, jusqu'à trois modules
- * et deux connexions. La Plateforme est du sur mesure : les quatre avis
- * convergeaient pour refuser un prix ferme sur un périmètre sans plafond, et
- * un projet réel à cette échelle dépasse de lui-même l'ancien haut de grille.
- *
- * CE QUI NE BAISSE PAS AVEC LE PRIX : le sur-mesure, la performance et le fait
- * que le référencement soit pensé. Ce qui baisse, c'est la PROFONDEUR. Règle
- * d'Eliott, vérifiable en lisant les périmètres : aucun palier ne retire la
- * vitesse ni le sur-mesure.
- */
-/*
- * LA RÈGLE DU CORPUS, posée par Eliott le 2026-09-01 : une promesse qu'il n'a
- * jamais faite n'a rien à faire dans un périmètre chiffré. Sa peur, mot pour
- * mot : « que le client ne me sorte pas "y'a écrit ça sur le site" alors que
- * j'suis pas au courant ». La refonte du 2026-09-23 n'a donc RIEN inventé : les
- * lignes ci-dessous sont celles des neuf anciens périmètres, redistribuées sur
- * six paliers. Un tableau de bord de suivi du trafic, la fiche établissement
- * Google et la prise en main des équipes restent hors forfait, sur devis.
+ * LES PLANCHERS, ARRÊTÉS PAR ELIOTT LE 2026-10-05 : les prix d'entrée des
+ * anciennes grilles. Site vitrine dès 3 000 € HT ; La Solution métier, qui
+ * couvre aussi l'outil interne, dès 6 000 € HT ; intégration IA dans un outil
+ * existant dès 2 500 € HT. Rien d'autre n'est chiffré sur le site.
  *
  * LE SITE TUTOIE, et Eliott dit « je » : il est seul, c'est son argument face
  * aux agences. Le « nous » n'existe nulle part.
@@ -144,194 +96,94 @@ export const prestations: readonly Prestation[] = [
     id: "vitrine",
     nom: "Site vitrine",
     slug: "site-vitrine",
+    plancher: 3000,
     resume:
       "Une adresse qui dit ce que tu fais, pour qui, et comment te joindre. Écrite et développée sur mesure. Une fois livrée, elle est à toi, sans abonnement pour continuer à l’utiliser.",
-    horsPack:
-      "Boutique en ligne, espace client, réservation avec paiement : ces fonctions sortent du site, et je les chiffre avec La Solution métier. Un tableau de bord de suivi du trafic et la remise d’aplomb de ta fiche établissement Google ne sont dans aucun forfait : je les fais en plus, sur devis.",
-    packs: [
-      {
-        id: "landing",
-        nom: "La Landing",
-        prix: 3000,
-        delai: { min: 3, max: 4 },
-        promesse: "Une page qui dit ce que tu fais, et qui fait appeler.",
-        pourQui:
-          "Tu n’as rien en ligne, ou une page qui date, et il te faut une adresse.",
-        ajoute: [
-          "1 page longue, développée sur mesure",
-          "Tes textes mis en page, tes photos recadrées et compressées",
-          "Un formulaire qui arrive dans ta boîte mail",
-          "Vitesse mesurée avant la mise en ligne, mobile et ordinateur",
-          "Les bases du référencement posées, indexation vérifiée",
-          "Mentions légales, politique de confidentialité et bandeau cookies",
-          "Hébergement à ton nom, code dans ton dépôt",
-        ],
-      },
-      {
-        id: "site",
-        nom: "Le Site",
-        prix: 4800,
-        delai: { min: 4, max: 6 },
-        promesse:
-          "Un site qu’on ne confond avec aucun autre, et que Google sait lire.",
-        pourQui:
-          "Tu es comparé à tes concurrents avant même d’être appelé.",
-        ajoute: [
-          "5 à 7 pages, direction visuelle tirée de ton univers",
-          "Tes textes réécrits avec toi, pour être lus et trouvés",
-          "Les mots que tapent tes clients, cherchés avant d’écrire",
-          "Balisage, données structurées, Search Console branchée",
-          "Une page par métier ou par ville si ton marché est local",
-        ],
-      },
-      {
-        id: "signature",
-        nom: "Le Site Signature",
-        prix: 7200,
-        delai: { min: 6, max: 8 },
-        promesse:
-          "Un site dont tu sais ce qu’il rapporte, chiffres à l’appui.",
-        pourQui:
-          "Tu as des visites, et tu veux qu’elles deviennent des appels.",
-        ajoute: [
-          "Un parcours dessiné pour une action décidée avec toi",
-          "La mesure installée : d’où viennent les visites, ce qui déclenche un contact",
-          "Tes formulaires branchés sur ta boîte mail, ton agenda ou ton CRM",
-          "7 jours après la mise en ligne, une passe de correction sur ce que les chiffres montrent",
-        ],
-      },
+    inclus: [
+      "Un site développé sur mesure, direction visuelle tirée de ton univers",
+      "Tes textes écrits par moi, pour être lus et trouvés",
+      "Les mots que tapent tes clients, cherchés avant d’écrire",
+      "Tes photos recadrées et compressées",
+      "Un formulaire qui arrive dans ta boîte mail",
+      "Vitesse mesurée avant la mise en ligne, mobile et ordinateur",
+      "Les bases du référencement posées, indexation vérifiée",
+      "Mentions légales, politique de confidentialité et bandeau cookies",
+      "Hébergement à ton nom, code dans ton dépôt",
     ],
+    faitMonter: [
+      "Le nombre de pages, d’une page longue à un site complet",
+      "Une page par métier ou par ville si ton marché est local",
+      "Balisage, données structurées, Search Console branchée",
+      "Un parcours dessiné pour une action décidée avec toi",
+      "La mesure installée : d’où viennent les visites, ce qui déclenche un contact",
+      "Tes formulaires branchés sur ton agenda ou ton CRM",
+      "Une passe de correction après la mise en ligne, sur ce que les chiffres montrent",
+    ],
+    horsOffre:
+      "Boutique en ligne, espace client, réservation avec paiement : ces fonctions sortent du site, et je les chiffre avec La Solution métier. Un tableau de bord de suivi du trafic et la remise d’aplomb de ta fiche établissement Google se font en plus, sur devis.",
   },
 
   {
     id: "logiciel",
     nom: "La Solution métier",
     slug: "logiciel-metier",
+    plancher: 6000,
     resume:
       "La réponse à un problème précis de ton métier : une tâche que tu refais à la main, un tableur qui déborde, des outils qui ne se parlent pas. Des écrans, une base de données et une mise en production, à la taille de ce que tu dois résoudre.",
+    inclus: [
+      "Les écrans nécessaires, la base de données et la mise en production sur ton hébergement",
+      "Le raccordement à l’outil qui porte déjà tes données",
+      "Un export de tout ce que le logiciel contient, à tout moment",
+      "Code source dans ton dépôt, et sa documentation",
+    ],
+    faitMonter: [
+      "Le nombre de modules, comme les devis, le planning et la facturation",
+      "Le nombre d’outils à relier, et les échanges dans les deux sens",
+      "Un compte par personne, et des droits différenciés par rôle",
+      "La reprise de ton historique",
+      "Les cas particuliers de ton métier, traités un par un",
+      "La règle écrite : qui gagne quand deux sources se contredisent",
+      "Supervision, alertes et journal des échanges",
+      "Sauvegardes vérifiées, reprise après incident testée en conditions réelles",
+    ],
     /*
      * La reprise d'un logiciel existant : possible sur une base JavaScript
      * récente et bien construite, refusée sur PHP et Laravel, et toujours
      * précédée d'un audit du code, lui-même prestation à part entière.
      */
-    horsPack:
-      "Un existant non documenté ou plusieurs sociétés à servir : je chiffre le cadrage à part, je te le remets écrit, et il t’appartient. La prise en main de tes équipes n’est dans aucun forfait : je la fais en plus, sur devis. Reprendre un logiciel déjà en place se tranche par un audit de son code, et la réponse est non sur PHP et sur Laravel.",
-    packs: [
-      {
-        id: "outil",
-        nom: "L’Outil",
-        prix: 6000,
-        delai: { min: 4, max: 6 },
-        promesse: "La tâche que tu refais à la main disparaît.",
-        pourQui:
-          "1 tâche répétitive, 1 outil à relier, une personne s’en sert.",
-        ajoute: [
-          "La fonction qui te manque, en ligne sur ton hébergement",
-          "Le raccordement à l’outil qui porte déjà tes données",
-          "Les écrans nécessaires à cette fonction, et rien de plus",
-          "Code source dans ton dépôt, et sa documentation",
-        ],
-      },
-      {
-        id: "logiciel",
-        nom: "Le Logiciel",
-        prix: 18000,
-        delai: { min: 10, max: 16 },
-        promesse:
-          "Le métier quitte le tableur partagé pour un outil à lui.",
-        pourQui:
-          "Jusqu’à 3 modules, comme les devis, le planning et la facturation, et 2 outils à relier.",
-        ajoute: [
-          "Jusqu’à 3 modules : les écrans du quotidien, la base et la mise en production",
-          "Jusqu’à 2 raccordements à tes outils existants",
-          "Un compte par personne, et des droits différenciés par rôle",
-          "La reprise de ton historique, et les cas particuliers de ton métier traités un par un",
-          "Un export de tout ce que le logiciel contient, à tout moment",
-        ],
-      },
-      {
-        id: "plateforme",
-        nom: "La Plateforme",
-        prix: 36000,
-        surMesure: true,
-        promesse: "Tes outils se parlent et restent d’accord entre eux.",
-        pourQui:
-          "Plusieurs métiers, plusieurs systèmes, et un écart silencieux te coûte cher.",
-        ajoute: [
-          "Autant de modules que ton activité en demande",
-          "Le raccordement de tes autres systèmes, dans les deux sens",
-          "La règle écrite : qui gagne quand deux sources se contredisent",
-          "Tes circuits mis à plat par écrit : qui fait quoi, et ce qui circule",
-          "Supervision, alertes et journal des échanges",
-          "Sauvegardes vérifiées, reprise après incident testée en conditions réelles",
-        ],
-      },
-    ],
+    horsOffre:
+      "Un existant non documenté ou plusieurs sociétés à servir : je chiffre le cadrage à part, je te le remets écrit, et il t’appartient. La prise en main de tes équipes se fait en plus, sur devis. Reprendre un logiciel déjà en place se tranche par un audit de son code, et la réponse est non sur PHP et sur Laravel.",
   },
 ];
 
-/** Une grille vendue sans page dédiée : un nom, trois forfaits, son hors-forfait. */
-export interface GrilleSecondRang {
-  readonly nom: string;
-  readonly horsPack: string;
-  readonly packs: readonly [Pack, Pack, Pack];
-}
-
 /*
- * L'INTÉGRATION IA DANS UN OUTIL EXISTANT, grille arrêtée par Eliott le
- * 2026-10-05 (« entrée basse ») : 2 500 / 5 000 / à partir de 8 000.
+ * L'INTÉGRATION IA DANS UN OUTIL EXISTANT, dès 2 500 € HT (2026-10-05).
  *
  * HORS DE `prestations`, ET C'EST VOULU. Les automatisations IA restent au
  * second rang (`offre-grille-prix.md` du vault) : elles se vendent, elles ne
- * se mettent pas en avant. Dans `prestations`, la grille gagnerait d'office une
- * page `/services/…`, une ligne d'accordéon et une entrée au sitemap. Seul le
- * simulateur de prix la lit ; sa page et sa ligne de `llms.txt` en citent la
- * fourchette, publique sur la page.
+ * se mettent pas en avant. Dans `prestations`, l'offre gagnerait d'office une
+ * page `/services/…`, une ligne d'accordéon et une entrée au sitemap. Le
+ * simulateur de prix la lit ; sa page et `llms.txt` en citent le plancher.
  *
- * Les lignes reprennent mot pour mot les périmètres validés : 1 usage dans 1
- * outil ; jusqu'à 3 usages et les règles du métier ; plusieurs outils, sur
- * devis ; le modèle d'IA payé par le client, à son nom.
+ * Les lignes reprennent les périmètres validés : 1 usage dans 1 outil ; les
+ * règles du métier ; plusieurs outils ; le modèle d'IA payé par le client, à
+ * son nom.
  */
-export const integrationIA: GrilleSecondRang = {
+export const integrationIA: Offre = {
   nom: "L’intégration IA",
-  horsPack:
-    "L’abonnement au modèle d’IA est ouvert à ton nom, et tu le paies directement à son éditeur.",
-  packs: [
-    {
-      id: "assistant",
-      nom: "L’Assistant",
-      prix: 2500,
-      delai: { min: 1, max: 2 },
-      promesse: "Une tâche de lecture ou de rédaction confiée à l’IA, dans ton outil.",
-      pourQui: "1 usage, dans 1 outil que tu utilises déjà.",
-      ajoute: [
-        "1 usage : résumer, classer ou rédiger",
-        "Branché sur 1 outil que tu utilises déjà",
-        "Code source dans ton dépôt, et sa documentation",
-      ],
-    },
-    {
-      id: "integration",
-      nom: "L’Intégration",
-      prix: 5000,
-      delai: { min: 3, max: 4 },
-      promesse: "L’IA travaille avec les règles et le vocabulaire de ton métier.",
-      pourQui: "Jusqu’à 3 usages, avec les règles de ton métier.",
-      ajoute: [
-        "Jusqu’à 3 usages",
-        "Les règles et le vocabulaire de ton métier appliqués",
-      ],
-    },
-    {
-      id: "automatisation",
-      nom: "L’Automatisation",
-      prix: 8000,
-      surMesure: true,
-      promesse: "Tes outils échangent entre eux, et l’IA fait le lien.",
-      pourQui: "Plusieurs outils à relier.",
-      ajoute: ["Plusieurs outils reliés entre eux"],
-    },
+  plancher: 2500,
+  inclus: [
+    "1 usage : résumer, classer ou rédiger",
+    "Branché sur 1 outil que tu utilises déjà",
+    "Code source dans ton dépôt, et sa documentation",
   ],
+  faitMonter: [
+    "Le nombre d’usages confiés à l’IA",
+    "Les règles et le vocabulaire de ton métier appliqués",
+    "Plusieurs outils reliés entre eux",
+  ],
+  horsOffre:
+    "L’abonnement au modèle d’IA est ouvert à ton nom, et tu le paies directement à son éditeur.",
 };
 
 /**
@@ -389,34 +241,12 @@ export const prestation = (id: PrestationId): Prestation => {
   return trouve;
 };
 
-/** Montant d'un forfait, formaté. Plancher du devis pour un palier sur mesure. */
-export const prixPack = (pack: Pack): string => euros(pack.prix);
+/** Le plancher d'une offre, formaté : « 3 000 € ». */
+export const prixPlancher = (offre: Offre): string => euros(offre.plancher);
 
 /**
- * Le même prix, en NOMBRE, pour les données structurées : `schema.org` attend
- * un nombre, pas « 18 000 € » avec ses espaces insécables.
+ * « à partir de 3 000 € », avec la taxe derrière le montant si l'appelant la
+ * demande. En minuscule : la phrase ou le composant décide de la capitale.
  */
-export const prixPackHT = (pack: Pack): number => pack.prix;
-
-/** Le forfait le moins cher d'une prestation, donc la borne basse de sa fourchette. */
-export const packEntree = (id: PrestationId): Pack =>
-  prestation(id).packs.reduce((a, b) => (a.prix <= b.prix ? a : b));
-
-/** Le forfait le plus cher, donc la borne haute (ou le plancher du sur-mesure). */
-export const packHaut = (id: PrestationId): Pack =>
-  prestation(id).packs.reduce((a, b) => (a.prix >= b.prix ? a : b));
-
-/**
- * Fourchette publique d'une prestation : « de 3 000 € à 7 200 € ».
- *
- * « ET PLUS » QUAND LE HAUT DE GRILLE EST SUR MESURE. « De 6 000 € à 36 000 € »
- * annoncerait un plafond qui n'existe pas : La Plateforme commence à
- * 36 000 €, elle ne s'y arrête pas.
- *
- * `taxe` se place DERRIÈRE LE MONTANT et avant « et plus » : ajoutée par
- * l'appelant en fin de chaîne, elle donnait « 36 000 € et plus HT ».
- */
-export const fourchette = (id: PrestationId, taxe = ""): string => {
-  const haut = packHaut(id);
-  return `de ${prixPack(packEntree(id))} à ${prixPack(haut)}${taxe}${haut.surMesure ? " et plus" : ""}`;
-};
+export const aPartirDe = (offre: Offre, taxe = ""): string =>
+  `à partir de ${prixPlancher(offre)}${taxe}`;

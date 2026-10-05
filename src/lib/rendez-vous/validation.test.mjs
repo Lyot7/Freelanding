@@ -23,7 +23,7 @@ function valider(surcharge = {}) {
       debut: new Date(MAINTENANT + 48 * 3600 * 1000).toISOString(),
       nom: "Camille Renard",
       email: "camille@exemple.fr",
-      budget: "4800-7200",
+      budget: "3000-6000",
       objectif: "google",
       debutMs: DEBUT_HUMAIN,
       ...surcharge,
@@ -160,7 +160,7 @@ describe("validerReservation — le questionnaire", () => {
   it("garde les trois réponses, échéance comprise", () => {
     const resultat = valider({ echeance: "trimestre" });
     expect(resultat.ok).toBe(true);
-    expect(resultat.reservation.budget).toBe("4800-7200");
+    expect(resultat.reservation.budget).toBe("3000-6000");
     expect(resultat.reservation.objectif).toBe("google");
     expect(resultat.reservation.echeance).toBe("trimestre");
   });
@@ -188,8 +188,8 @@ describe("validerReservation — le questionnaire", () => {
   });
 
   it("refuse une réponse hors de la liste du type choisi", () => {
-    // `6000-18000` est une tranche du rendez-vous « logiciel », pas du « site ».
-    expect(valider({ budget: "6000-18000" }).motif).toEqual({
+    // `12000-24000` est une tranche du rendez-vous « logiciel », pas du « site ».
+    expect(valider({ budget: "12000-24000" }).motif).toEqual({
       type: "champ_invalide",
       champ: "budget",
       raison: "hors_liste",
@@ -197,11 +197,11 @@ describe("validerReservation — le questionnaire", () => {
     // `tableur` est un objectif du « logiciel », pas du « site ».
     expect(valider({ objectif: "tableur" }).motif.champ).toBe("objectif");
     expect(valider({ echeance: "demain" }).motif.champ).toBe("echeance");
-    expect(valider({ budget: 4800 }).motif.raison).toBe("requis");
+    expect(valider({ budget: 3000 }).motif.raison).toBe("requis");
   });
 
   it("lit les tranches du type réellement demandé", () => {
-    const resultat = valider({ type: "decouverte", budget: "6000-18000", objectif: "tache" });
+    const resultat = valider({ type: "decouverte", budget: "12000-24000", objectif: "tache" });
     expect(resultat.ok).toBe(true);
   });
 });
