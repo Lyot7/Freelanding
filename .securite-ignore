@@ -1,0 +1,2 @@
+# Avis de dépendances écartés par scan-securite.sh. Un identifiant par ligne, justification obligatoire.
+GHSA-vfj7-8cjw-p6xm # braces <= 3.0.3, aucune version corrigée publiée (2026-10-05). Dépendance de développement seule (eslint-config-next > fast-glob > micromatch), absente du serveur de production ; les motifs viennent de la config ESLint, jamais d'une saisie. À retirer dès qu'une version corrigée sort.
