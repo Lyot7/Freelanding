@@ -82,14 +82,6 @@ export const typesProjet: readonly TypeProjet[] = [
         ],
       },
       {
-        id: "textes",
-        intitule: "Tes textes sont-ils prêts ?",
-        options: [
-          { id: "prets", libelle: "Oui, je les fournis", palier: 0 },
-          { id: "a-ecrire", libelle: "Non, à écrire avec toi", palier: 1 },
-        ],
-      },
-      {
         id: "recherche",
         intitule: "Comment tes clients te trouvent-ils ?",
         options: [

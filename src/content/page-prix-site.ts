@@ -257,7 +257,7 @@ export const pagePrixSite: PagePrixSite = {
           {
             libelle: "Simulateur de prix",
             href: CHEMIN_SIMULATEUR,
-            description: "Estime le prix de ton site en 5 questions, délai compris.",
+            description: "Estime le prix de ton site en 4 questions, délai compris.",
           },
           {
             libelle: "Les réalisations",
