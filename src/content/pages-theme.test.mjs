@@ -133,3 +133,11 @@ describe("les calculs suivent leurs hypothèses", () => {
     expect((calculArtisans.chantiersPourPayer - 1) * calculArtisans.margeChantier).toBeLessThan(prestation("vitrine").plancher);
   });
 });
+
+describe("accès par identifiant", () => {
+  test("une page inconnue lève une erreur au lieu de rendre une page vide", async () => {
+    const { pageTheme } = await import("./pages-theme.ts");
+    expect(() => pageTheme("inconnue")).toThrow("Page thématique inconnue");
+    expect(pageTheme("artisans").chemin).toBe("/services/site-vitrine/artisans");
+  });
+});
