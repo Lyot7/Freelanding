@@ -84,7 +84,15 @@ export function buildSiteMetadata(site: SiteConfig): Metadata {
  */
 export const SITE_METADATA: Metadata = buildSiteMetadata(siteConfig);
 
-export function SiteDocument({ children }: Readonly<{ children: ReactNode }>) {
+/**
+ * `sansMesure` : l'aperçu d'un article dans le cockpit (`app/(apercu)`). Ni
+ * bannière de consentement par-dessus le texte à relire, ni mesure d'audience
+ * sur une page que seul Eliott voit, ni préchargement des pages suivantes.
+ */
+export function SiteDocument({
+  children,
+  sansMesure = false,
+}: Readonly<{ children: ReactNode; sansMesure?: boolean }>) {
   return (
     // `suppressHydrationWarning` : `data-profil` est posé par le script inline
     // ci-dessous avant l'hydratation, donc absent du rendu serveur par nature.
@@ -133,9 +141,9 @@ export function SiteDocument({ children }: Readonly<{ children: ReactNode }>) {
             route sans que `layout/Footer.tsx` ait à être touché, et la bannière
             arrive en fin d'ordre de tabulation. Sans clé PostHog configurée,
             l'ensemble ne rend rien et ne pose aucun écouteur. */}
-        <SiteAnalytics />
+        {sansMesure ? null : <SiteAnalytics />}
         {/* Images et pages suivantes chargées d'avance, page finie et au repos. */}
-        <PrechargementDiffere />
+        {sansMesure ? null : <PrechargementDiffere />}
         {/* Démarreur des apparitions, DERNIER nœud du body : il lit les
             éléments animés dans le DOM, ils doivent donc être déjà analysés.
             Script nu et non `next/script` : il ne doit dépendre d'aucun module

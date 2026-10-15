@@ -28,22 +28,89 @@ compiler le moindre MDX, ce dont se servent l'index, le sitemap et les tests.
 Le `slug` de l'entrée et le nom du fichier doivent coïncider : c'est ce que
 vérifie le premier test, et c'est par le slug que la page charge le corps.
 
-## Publier un article validé dans le cockpit
+## Publier un article validé dans le cockpit : c'est automatique
 
-Depuis le 2026-10-15, la routine du blog rédige, Eliott valide dans le cockpit
-(hub Blog, `admin.eliottbouquerel.fr/revue/blog`), et le site publie :
+Depuis le 2026-10-15, la routine du blog rédige, Eliott lit l'article dans le
+cockpit (hub Blog, `admin.eliottbouquerel.fr/revue/blog`) et le valide. **Sa
+validation vaut feu vert** : personne n'a de PR à ouvrir ni de bouton à pousser.
 
-1. `bun scripts/publier-articles.ts` : chaque article validé et pas encore
-   présent part dans `src/content/articles/<slug>.mdx`, ses métadonnées dans
-   `src/content/articles-cockpit.json` (lues par `src/content/blog-cockpit.ts`).
-   Son visuel est le SVG que le rédacteur a conçu pour le sujet et qu'Eliott a
-   vu dans l'aperçu du cockpit : `scripts/visuel-article.mjs` le rend en héros
-   2400 × 1350, vignette 1200 × 1114 et partage 1200 × 630. Un article sans
-   visuel ne part pas.
-   Pour régler un SVG hors circuit : `bun scripts/visuel-article.mjs <fichier.svg> <dossier>`.
-2. `bun run test`, puis PR, merge et déploiement Coolify.
-3. `bun scripts/publier-articles.ts --confirmer` : chaque article qui répond
-   en ligne est marqué « Publié » dans le cockpit, avec son adresse.
+### Ce qui se passe après la validation
+
+Le travail planifié `.github/workflows/publier-article.yml` tourne du lundi au
+vendredi, chaque heure de 8 h à 18 h (heure de Paris en été), sur un runner
+hébergé par GitHub, gratuit pour un dépôt public. Il lance
+`bun scripts/publier-articles.ts --auto` (`scripts/publication.ts`), qui :
+
+1. marque « Publié » au cockpit tout article récent du registre qui répond en
+   ligne sans l'avoir encore été ;
+2. s'arrête le week-end, et dès qu'un article est déjà parti aujourd'hui :
+   **un article par jour ouvré**, le plus anciennement validé d'abord ;
+3. écrit l'article dans le site : `src/content/articles/<slug>.mdx`, son entrée
+   dans `src/content/articles-cockpit.json`, et son visuel (le SVG que le
+   rédacteur a conçu et qu'Eliott a vu dans l'aperçu) rendu en trois JPG par
+   `scripts/visuel-article.mjs` : héros 2400 × 1350, vignette 1200 × 1114,
+   partage 1200 × 630. Un article sans visuel attend son visuel ;
+4. passe les contrôles du site, du moins cher au plus cher :
+   `bun run typecheck`, `bun run lint`, `bun run test`, `bun run build` ;
+5. pousse un commit sur `main`. Coolify déploie seul à chaque poussée ;
+6. attend que `https://eliottbouquerel.fr/blog/<slug>` réponde 200 (20 minutes
+   au plus, un relevé toutes les 10 secondes), puis marque l'article « Publié »
+   au cockpit avec son adresse, et le signale à IndexNow.
+
+Il faut au dépôt un seul secret, `COCKPIT_BLOG_TOKEN` : le jeton `blog` du
+cockpit, limité à deux routes (`GET /api/agents/articles`,
+`POST /api/agents/articles/:id/publication`). Il ne lit ni mails ni messages.
+
+### Quand ça échoue
+
+**Le site en ligne ne casse jamais.** Un contrôle rouge à l'étape 4 : rien
+n'est poussé, le dossier revient à son état, l'article reste « Validé » et sa
+carte au cockpit affiche le motif (la commande et ses dernières lignes). Il
+repart dès qu'Eliott corrige son texte, sinon le lendemain, et il ne bloque pas
+les articles suivants. Un build Coolify en échec à l'étape 6 laisse le site sur
+sa version précédente ; la carte le dit, et l'article est marqué publié dès que
+sa page répond. Chaque exécution reste lisible dans l'onglet Actions du dépôt.
+
+### À la main, pour rejouer une étape
+
+- `bun scripts/publier-articles.ts --max 1` écrit l'article validé le plus
+  ancien, sans contrôle ni poussée.
+- `bun scripts/publier-articles.ts --confirmer` marque publiés ceux du registre
+  qui répondent en ligne.
+- Onglet Actions, « Publier l'article validé », « Run workflow » : la chaîne
+  complète, sans attendre l'heure suivante.
+- Régler un SVG hors circuit : `bun scripts/visuel-article.mjs <fichier.svg> <dossier>`.
+
+### Après la publication
+
+Le sitemap (`src/app/(site)/sitemap.ts`) se régénère à chaque build : l'article
+y entre avec sa date. IndexNow prévient Bing, Yandex et les autres moteurs qui
+le lisent. Google n'a pas d'API d'indexation pour un article ordinaire (son
+Indexing API ne vaut que pour les offres d'emploi et les diffusions en direct) :
+il découvre l'article par le sitemap. Une demande d'indexation à la main dans
+la Search Console reste possible, jamais nécessaire.
+
+## L'aperçu dans le cockpit
+
+La carte d'un article au cockpit montre la page telle qu'elle sera publiée,
+rendue par le site lui-même : `/apercu/blog/<id>` (`src/app/(apercu)`), avec
+`BlogArticlePage`, les composants de `mdx-components.tsx`, les blocs de
+`blocks.tsx` et le sommaire. Seul le chemin du corps change.
+
+**Un article non validé n'est jamais compilé.** Le MDX peut porter du
+JavaScript ; l'aperçu lit donc le corps comme des données
+(`src/lib/blog/mdx-sur.ts` : l'analyseur markdown de remark, et les six blocs
+reconnus par motif, attributs lus comme des valeurs) et le rend avec les mêmes
+composants (`src/components/blog/CorpsSur.tsx`). `CorpsSur.test.mjs` prouve
+l'équivalence : chaque article du site rendu ainsi donne le même HTML, à
+l'octet près, que sa compilation MDX.
+
+Le site ne détient aucun secret : le cockpit signe l'adresse (dix minutes de
+validité), le site transmet la signature au cockpit qui la vérifie et rend
+l'article. La page n'est pas indexable (`robots`, `X-Robots-Tag`, `robots.txt`)
+et ne s'affiche en cadre que dans `admin.eliottbouquerel.fr`
+(`Content-Security-Policy: frame-ancestors`, `next.config.ts`). Ni bannière de
+consentement ni mesure d'audience n'y tournent.
 
 ## Ce qu'un article peut contenir
 

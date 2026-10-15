@@ -63,7 +63,14 @@ export function sommaireDeLArticle(slug: string): EntreeSommaire[] {
   } catch {
     return [];
   }
+  return sommaireDuTexte(source);
+}
 
+/**
+ * Le même sommaire, depuis le texte : l'aperçu du cockpit le calcule sur un
+ * article qui n'est pas encore un fichier du site.
+ */
+export function sommaireDuTexte(source: string): EntreeSommaire[] {
   const entrees: EntreeSommaire[] = [];
   let dansUnBlocDeCode = false;
 

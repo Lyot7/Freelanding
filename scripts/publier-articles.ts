@@ -1,57 +1,37 @@
 /**
  * Publie sur le blog les articles qu'Eliott a validés dans le cockpit.
  *
- *   bun scripts/publier-articles.ts              écrit les articles validés pas encore publiés
- *   bun scripts/publier-articles.ts --max 1      n'en écrit que le plus anciennement validé
- *   bun scripts/publier-articles.ts --confirmer  marque publiés ceux qui répondent en ligne
+ *   bun scripts/publier-articles.ts --auto       la chaîne complète, un article au plus (scripts/publication.ts)
+ *   bun scripts/publier-articles.ts --max 1      écrit seulement le plus anciennement validé, sans rien pousser
+ *   bun scripts/publier-articles.ts --confirmer  marque publiés ceux du registre qui répondent en ligne
  *
- * Premier temps, avant la PR : pour chaque validation `ARTICLE_BLOG` au statut
- * VALIDE, le corps (corrigé par Eliott s'il l'a touché) part dans
- * `src/content/articles/<slug>.mdx` et les métadonnées dans
- * `src/content/articles-cockpit.json`. Rien n'est publié ici : la PR, la CI
- * locale (`bun run test`) et le déploiement restent à la routine.
+ * `--auto` est ce que lance le travail planifié `.github/workflows/publier-article.yml`
+ * chaque heure ouvrée ; les deux autres modes servent à la main, pour rejouer
+ * une étape. Le détail est dans `docs/BLOG.md`.
  *
- * Second temps, après le déploiement : chaque article du JSON qui répond 200
- * sur eliottbouquerel.fr est déclaré ENVOYE au cockpit, avec son adresse. Le
- * cockpit refuse une transition déjà faite (409) : relancer ne double rien.
- *
- * Jeton : `COCKPIT_AGENT_TOKEN`, sinon `secret get cockpit-agent-token`.
+ * Jeton : `COCKPIT_AGENT_TOKEN` (le jeton `blog` du cockpit, ou le jeton
+ * complet des agents), sinon `secret get cockpit-agent-token`.
  */
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import type { ArticleCockpit } from "../src/content/blog-cockpit";
-import { rendreVisuel } from "./visuel-article.mjs";
+import { entreeDuCockpit, type ArticleCockpit } from "../src/content/blog-cockpit";
+import {
+  type ArticleAPublier,
+  type Outils,
+  choisir,
+  clientCockpit,
+  jourDeParis,
+  publierAuto,
+  repondEnLigne,
+  signalerIndexNow,
+  urlArticle,
+} from "./publication";
 
 const RACINE = join(import.meta.dirname, "..");
 const REGISTRE = join(RACINE, "src/content/articles-cockpit.json");
 const ARTICLES = join(RACINE, "src/content/articles");
 const COCKPIT = process.env.COCKPIT_URL ?? "https://admin.eliottbouquerel.fr";
-const SITE = process.env.SITE_URL ?? "https://eliottbouquerel.fr";
-
-/** Ce que le cockpit rend d'une validation d'article : on ne lit que ces champs. */
-type Validation = {
-  id: string;
-  type: string;
-  statut: string;
-  titre: string | null;
-  contenu: string;
-  contenuCorrige: string | null;
-  creeLe: string;
-  decideLe: string | null;
-  contexte: {
-    article?: {
-      slug: string;
-      description: string;
-      categorie?: string;
-      motCle: { requete: string };
-      motsCles?: { requete: string }[];
-      pageServie: { url: string };
-      /** Le SVG conçu pour l'article par le rédacteur, contrôlé par le cockpit. */
-      visuel?: { svg: string; alt: string };
-    };
-  } | null;
-};
 
 function jeton(): string {
   const env = process.env.COCKPIT_AGENT_TOKEN;
@@ -65,36 +45,55 @@ function jeton(): string {
   throw new Error("Jeton du cockpit introuvable (COCKPIT_AGENT_TOKEN ou secret cockpit-agent-token)");
 }
 
-const entetes = () => ({ authorization: `Bearer ${jeton()}`, "content-type": "application/json" });
-
 function lireRegistre(): ArticleCockpit[] {
   const brut: unknown = JSON.parse(readFileSync(REGISTRE, "utf8"));
   if (!Array.isArray(brut)) throw new Error("articles-cockpit.json doit être un tableau");
   return brut as ArticleCockpit[];
 }
 
-/** Jour de Paris, `AAAA-MM-JJ`. */
-const aujourdhui = () => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris" }).format(new Date());
+const existe = (slug: string) => existsSync(join(ARTICLES, `${slug}.mdx`));
 
-/** 200 mots par minute, arrondi au-dessus : l'ordre de grandeur des autres articles. */
-function dureeLecture(corps: string): string {
-  const mots = corps.split(/\s+/).filter((m) => /[\p{L}\d]/u.test(m)).length;
-  return `${Math.max(1, Math.ceil(mots / 200))} min de lecture`;
+/** Le corps, l'entrée du registre et les trois JPG du visuel. */
+async function ecrire(a: ArticleAPublier, date: string): Promise<void> {
+  if (!a.article.visuel) throw new Error(`${a.article.slug} : pas de visuel`);
+  // sharp n'est chargé que pour écrire : les autres modes tournent sans lui.
+  const { rendreVisuel } = await import("./visuel-article.mjs");
+  await rendreVisuel(a.article.slug, a.article.visuel.svg, RACINE);
+  writeFileSync(join(ARTICLES, `${a.article.slug}.mdx`), `${a.corps.trim()}\n`);
+  const registre = lireRegistre();
+  registre.unshift(entreeDuCockpit({ ...a, corps: a.corps.trim() }, date));
+  writeFileSync(REGISTRE, `${JSON.stringify(registre, null, 2)}\n`);
 }
 
-/** La rubrique suit l'offre que l'article sert, quand le rédacteur n'en a pas donné. */
-function rubriquePour(pageServie: string): string {
-  return pageServie.includes("logiciel") ? "Outils métier" : "Méthode";
+function executer(commande: string, args: readonly string[]) {
+  const r = spawnSync(commande, args, { cwd: RACINE, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+  return { ok: r.status === 0, sortie: `${r.stdout ?? ""}${r.stderr ?? ""}${r.error?.message ?? ""}` };
 }
 
-async function validesDuCockpit(): Promise<Validation[]> {
-  const r = await fetch(`${COCKPIT}/api/agents/validations?statut=VALIDE`, { headers: entetes() });
-  if (!r.ok) throw new Error(`Cockpit : ${r.status} sur la lecture des validations`);
-  const { validations } = (await r.json()) as { validations: Validation[] };
-  // Le plus anciennement validé d'abord : c'est lui qui part au prochain jour de publication.
-  return validations
-    .filter((v) => v.type === "ARTICLE_BLOG" && v.statut === "VALIDE")
-    .sort((a, b) => (a.decideLe ?? a.creeLe).localeCompare(b.decideLe ?? b.creeLe));
+/** Le dossier tel qu'au lancement : commit local, rebase en cours et fichiers écrits compris. */
+function annulerVers(tete: string) {
+  return () => {
+    executer("git", ["rebase", "--abort"]);
+    executer("git", ["reset", "--hard", tete]);
+    executer("git", ["clean", "-fd", "src/content", "public/images"]);
+  };
+}
+
+function outils(): Outils {
+  const tete = executer("git", ["rev-parse", "HEAD"]).sortie.trim();
+  return {
+    cockpit: clientCockpit(COCKPIT, jeton()),
+    registre: lireRegistre,
+    existe,
+    ecrire,
+    annuler: annulerVers(tete),
+    executer,
+    enLigne: (url) => repondEnLigne(url),
+    indexNow: (url) => signalerIndexNow(url),
+    attendre: (ms) => new Promise((ok) => setTimeout(ok, ms)),
+    maintenant: () => new Date(),
+    journal: (m) => console.log(m),
+  };
 }
 
 /** `--max N` : combien d'articles écrire au plus ; sans lui, tous. */
@@ -106,70 +105,42 @@ function maximum(): number {
   return n;
 }
 
-async function ecrire(): Promise<void> {
-  const registre = lireRegistre();
-  const connus = new Set(registre.map((a) => a.slug));
+/** À la main : écrit les articles validés, sans contrôle ni poussée. */
+async function ecrireSeulement(o: Outils): Promise<void> {
   const ecrits: string[] = [];
   const ignores: string[] = [];
-  const max = maximum();
-  for (const v of await validesDuCockpit()) {
-    if (ecrits.length >= max) break;
-    const article = v.contexte?.article;
-    if (!article || !v.titre) {
-      ignores.push(`${v.id} : ni titre ni slug`);
-      continue;
-    }
-    if (!article.visuel) {
-      ignores.push(`${article.slug} : pas encore de visuel, le rédacteur le pose au cockpit`);
-      continue;
-    }
-    const chemin = join(ARTICLES, `${article.slug}.mdx`);
-    if (connus.has(article.slug) || existsSync(chemin)) {
-      ignores.push(`${article.slug} : déjà présent sur le site`);
-      continue;
-    }
-    const corps = (v.contenuCorrige ?? v.contenu).trim();
-    await rendreVisuel(article.slug, article.visuel.svg, RACINE);
-    writeFileSync(chemin, `${corps}\n`);
-    registre.unshift({
-      slug: article.slug,
-      title: v.titre,
-      date: aujourdhui(),
-      category: article.categorie ?? rubriquePour(article.pageServie.url),
-      description: article.description,
-      readingTime: dureeLecture(corps),
-      tags: [article.motCle.requete, ...(article.motsCles ?? []).map((m) => m.requete)].slice(0, 5),
-      alt: article.visuel.alt,
-      validationId: v.id,
-    });
-    connus.add(article.slug);
-    ecrits.push(article.slug);
+  let restants = await o.cockpit.articles();
+  while (ecrits.length < maximum()) {
+    const { article, ignores: ecartes } = choisir(restants, o, o.maintenant());
+    ignores.push(...ecartes);
+    if (!article) break;
+    await o.ecrire(article, jourDeParis(o.maintenant()));
+    ecrits.push(article.article.slug);
+    restants = restants.slice(restants.indexOf(article) + 1);
   }
-  writeFileSync(REGISTRE, `${JSON.stringify(registre, null, 2)}\n`);
   console.log(JSON.stringify({ ecrits, ignores }, null, 2));
 }
 
-async function confirmer(): Promise<void> {
+async function confirmer(o: Outils): Promise<void> {
   const publies: string[] = [];
   const attente: string[] = [];
-  for (const a of lireRegistre()) {
-    const url = `${SITE}/blog/${a.slug}`;
-    const enLigne = await fetch(url, { redirect: "manual" }).then((r) => r.status === 200, () => false);
-    if (!enLigne) {
-      attente.push(`${a.slug} : pas encore en ligne`);
-      continue;
-    }
-    const r = await fetch(`${COCKPIT}/api/agents/validations/${a.validationId}`, {
-      method: "PATCH",
-      headers: entetes(),
-      body: JSON.stringify({ statut: "ENVOYE", urlPublication: url }),
-    });
-    // 409 : déjà déclaré publié (ou plus validé) ; le cockpit dit lequel, rien à refaire ici.
-    if (r.ok) publies.push(url);
-    else if (r.status !== 409) attente.push(`${a.slug} : cockpit ${r.status}`);
+  for (const a of o.registre()) {
+    const url = urlArticle(a.slug);
+    if (!(await o.enLigne(url))) attente.push(`${a.slug} : pas encore en ligne`);
+    else if (await o.cockpit.publie(a.validationId, url)) publies.push(url);
+    else attente.push(`${a.slug} : refusé par le cockpit`);
   }
   console.log(JSON.stringify({ publies, attente }, null, 2));
   if (attente.length > 0) process.exitCode = 1;
 }
 
-await (process.argv.includes("--confirmer") ? confirmer() : ecrire());
+const o = outils();
+if (process.argv.includes("--auto")) {
+  const issue = await publierAuto(o);
+  console.log(JSON.stringify(issue, null, 2));
+  if (issue.etat === "echec") process.exitCode = 1;
+} else if (process.argv.includes("--confirmer")) {
+  await confirmer(o);
+} else {
+  await ecrireSeulement(o);
+}
