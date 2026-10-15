@@ -189,6 +189,12 @@ function controlerEtPousser(o: Outils, slug: string): string | null {
 
 /** La chaîne complète, un article au plus. */
 export async function publierAuto(o: Outils): Promise<Issue> {
+  // L'annulation remet le dossier à son état de départ (`reset --hard`, `clean`) :
+  // sur un dossier déjà modifié, elle effacerait un travail en cours. Rien ne part.
+  const etat = o.executer("git", ["status", "--porcelain"]);
+  if (!etat.ok || etat.sortie.trim()) {
+    return { etat: "echec", motif: "Dossier du site modifié ou illisible : publication automatique refusée.", confirmes: [], ignores: [] };
+  }
   const confirmes = await confirmerEnLigne(o);
   const maintenant = o.maintenant();
   const date = jourDeParis(maintenant);

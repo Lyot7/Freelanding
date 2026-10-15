@@ -66,6 +66,7 @@ function monde(o) {
     annuler: () => traces.push("annuler"),
     executer: (commande, args) => {
       const ligne = `${commande} ${args.join(" ")}`;
+      if (ligne === "git status --porcelain") return { ok: true, sortie: o.sale ? " M src/content/blog.ts\n" : "" };
       traces.push(ligne);
       return { ok: !o.echoue?.(ligne), sortie: `sortie de ${ligne}\nerreur détaillée` };
     },
@@ -162,6 +163,14 @@ describe("publierAuto : la validation d'Eliott vaut feu vert", () => {
     expect(traces.filter((t) => t.startsWith("publie"))).toEqual([]);
     expect(traces.some((t) => t.startsWith("echec id-lent Poussé sur le site"))).toBe(true);
     expect(RELEVES_DEPLOIEMENT * 10).toBe(1200);
+  });
+});
+
+describe("dossier modifié", () => {
+  it("ne touche à rien sur un dossier déjà modifié", async () => {
+    const { outils, traces } = monde({ articles: [article("a")], sale: true });
+    expect(await publierAuto(outils)).toMatchObject({ etat: "echec" });
+    expect(traces).toEqual([]);
   });
 });
 
