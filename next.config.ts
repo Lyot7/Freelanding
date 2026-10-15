@@ -75,6 +75,26 @@ const nextConfig: NextConfig = {
    * `/legal/[slug]` a `dynamicParams = false` : sans ces règles, les anciens
    * slugs répondraient 404 au lieu de conduire au document renommé.
    */
+  /**
+   * L'APERÇU DES ARTICLES (`app/(apercu)`) ne s'affiche que dans le cockpit :
+   * `frame-ancestors` refuse tout autre site qui voudrait l'encadrer, et
+   * `X-Robots-Tag` double la balise `robots` pour qu'aucun moteur ne garde un
+   * brouillon. Pas de cache : chaque affichage relit l'article au cockpit.
+   */
+  async headers() {
+    return [
+      {
+        source: "/apercu/:chemin*",
+        headers: [
+          { key: "Content-Security-Policy", value: "frame-ancestors https://admin.eliottbouquerel.fr" },
+          { key: "X-Robots-Tag", value: "noindex, nofollow" },
+          { key: "Cache-Control", value: "private, no-store" },
+          { key: "Referrer-Policy", value: "no-referrer" },
+        ],
+      },
+    ];
+  },
+
   async redirects() {
     return [
       /* Ancien site : les pages légales vivaient à la racine. */

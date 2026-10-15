@@ -15,8 +15,9 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      // Lien et logo suivis des e-mails de prospection (`src/app/r/[id]`, `src/app/o/[id]`).
-      disallow: ["/r/", "/o/"],
+      // Lien et logo suivis des e-mails de prospection (`src/app/r/[id]`, `src/app/o/[id]`),
+      // et l'aperçu des articles montré dans le cockpit (`src/app/(apercu)`).
+      disallow: ["/r/", "/o/", "/apercu/"],
     },
     sitemap: absoluteUrl("/sitemap.xml"),
   };

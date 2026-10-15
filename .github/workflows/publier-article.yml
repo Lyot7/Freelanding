@@ -1,0 +1,44 @@
+# Publication automatique des articles qu'Eliott valide dans le cockpit.
+# Le détail, et ce qui se passe en cas d'échec : docs/BLOG.md, « Publication automatique ».
+#
+# Runner hébergé par GitHub : gratuit sans limite sur un dépôt public, et il ne
+# fait tourner aucun code de ce dépôt public sur la machine d'Eliott. Aucun
+# déclencheur de pull request : le jeton du cockpit ne sert qu'aux exécutions
+# planifiées ou lancées à la main par le propriétaire.
+name: Publier l'article validé
+
+on:
+  schedule:
+    # Du lundi au vendredi, chaque heure de 8 h à 18 h à Paris (heure d'été ; une
+    # heure plus tôt l'hiver). Le script s'arrête seul le week-end et dès qu'un
+    # article est parti dans la journée.
+    - cron: "17 6-16 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publication-blog
+  cancel-in-progress: false
+
+jobs:
+  publier:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.3
+      - run: bun install --frozen-lockfile
+      - name: Publier
+        env:
+          COCKPIT_AGENT_TOKEN: ${{ secrets.COCKPIT_BLOG_TOKEN }}
+          NEXT_TELEMETRY_DISABLED: "1"
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          bun scripts/publier-articles.ts --auto

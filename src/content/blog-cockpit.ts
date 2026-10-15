@@ -76,3 +76,49 @@ export function articlesDuCockpit(
     };
   });
 }
+
+/**
+ * Ce que le cockpit dit d'un article validé ou en attente : le script de
+ * publication et l'aperçu le lisent de la même façon, pour qu'un article
+ * prévisualisé ait exactement les métadonnées qu'il aura une fois publié.
+ */
+export interface ArticleDuCockpit {
+  slug: string;
+  description: string;
+  categorie?: string;
+  motCle: { requete: string };
+  motsCles?: { requete: string }[];
+  pageServie: { url: string };
+  /** Le SVG conçu pour l'article par le rédacteur, contrôlé par le cockpit. */
+  visuel?: { svg: string; alt: string };
+}
+
+/** 200 mots par minute, arrondi au-dessus : l'ordre de grandeur des autres articles. */
+export function dureeLecture(corps: string): string {
+  const mots = corps.split(/\s+/).filter((m) => /[\p{L}\d]/u.test(m)).length;
+  return `${Math.max(1, Math.ceil(mots / 200))} min de lecture`;
+}
+
+/** La rubrique suit l'offre que l'article sert, quand le rédacteur n'en a pas donné. */
+export function rubriquePour(pageServie: string): string {
+  return pageServie.includes("logiciel") ? "Outils métier" : "Méthode";
+}
+
+/** L'entrée du registre qu'un article du cockpit reçoit à sa publication, datée de `date`. */
+export function entreeDuCockpit(
+  v: { id: string; titre: string; corps: string; article: ArticleDuCockpit },
+  date: string,
+): ArticleCockpit {
+  const { article } = v;
+  return {
+    slug: article.slug,
+    title: v.titre,
+    date,
+    category: article.categorie ?? rubriquePour(article.pageServie.url),
+    description: article.description,
+    readingTime: dureeLecture(v.corps),
+    tags: [article.motCle.requete, ...(article.motsCles ?? []).map((m) => m.requete)].slice(0, 5),
+    alt: article.visuel?.alt ?? "",
+    validationId: v.id,
+  };
+}

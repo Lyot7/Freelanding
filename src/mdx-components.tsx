@@ -115,7 +115,13 @@ function AncreH2({ children }: { children: ReactNode }) {
   );
 }
 
-const components: MDXComponents = {
+/**
+ * L'HABILLAGE DU MARKDOWN, exporté pour l'aperçu du cockpit
+ * (`components/blog/CorpsSur.tsx`) : un article pas encore validé n'est jamais
+ * compilé, mais ses titres, paragraphes et listes sortent par ces mêmes
+ * composants, donc exactement comme sur la page publiée.
+ */
+export const habillage = {
   // Un article n'a qu'un seul h1, et c'est le titre rendu par le gabarit de
   // page. Un `#` dans le corps produirait donc un second h1 : il est rétrogradé
   // en h2 plutôt qu'ignoré, pour que l'article reste lisible et le plan valide.
@@ -200,7 +206,10 @@ const components: MDXComponents = {
     const { src, alt } = props as { src?: string; alt?: string };
     return <Figure src={src ?? ""} alt={alt ?? ""} />;
   },
+} satisfies MDXComponents;
 
+const components: MDXComponents = {
+  ...habillage,
   // La palette, disponible sans import dans tous les articles.
   Figure,
   Video,
