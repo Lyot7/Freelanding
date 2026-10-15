@@ -86,7 +86,7 @@ export const pageAutomatisation: PageTheme = {
   chemin: CHEMIN_AUTOMATISATION,
   seo: {
     titre: "Automatisation et IA pour PME · Eliott Bouquerel",
-    description: `Automatisation et IA pour votre PME : mails triés, commandes saisies, factures relancées, branchées sur vos outils. Vous reprenez des heures, ${aPartirDe(integrationIA, " HT")}.`,
+    description: `Automatisation et IA pour votre PME : mails triés, commandes saisies, factures relancées, sur vos outils. Vous reprenez des heures, ${aPartirDe(integrationIA, " HT")}.`,
   },
   h1: "Automatisation et IA pour PME",
   resume: `J’installe l’IA dans les outils que vous utilisez déjà, sur les tâches que votre équipe refait chaque semaine : trier les mails, saisir les commandes, relancer les factures. Vous reprenez des heures pour le travail qui demande quelqu’un. Comptez ${aPartirDe(integrationIA, " HT")} pour un premier usage.`,

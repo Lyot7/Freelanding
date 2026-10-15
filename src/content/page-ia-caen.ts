@@ -24,7 +24,7 @@ export const pageIaCaen: PageTheme = {
   chemin: CHEMIN_IA_CAEN,
   seo: {
     titre: "Automatisation et IA à Caen · Eliott Bouquerel",
-    description: `Automatisation et IA pour les PME de Caen et de Normandie : je choisis la tâche avec vous, je code l’outil et je le branche sur vos logiciels, ${aPartirDe(integrationIA, " HT")}.`,
+    description: `Automatisation et IA pour les PME de Caen et de Normandie : je choisis la tâche, je code l’outil et je le branche sur vos logiciels, ${aPartirDe(integrationIA, " HT")}.`,
   },
   h1: "Automatisation et IA à Caen",
   resume: `Basé à Caen, j’installe l’IA dans les outils des PME du Calvados, de la Manche et de l’Orne. Je choisis la tâche avec vous, je code l’automatisation et je la branche moi-même sur vos logiciels. Rendez-vous en visio, ${aPartirDe(integrationIA, " HT")} pour un premier usage.`,

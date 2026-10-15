@@ -45,7 +45,7 @@ export const pageGmao: PageTheme = {
   chemin: CHEMIN_GMAO,
   seo: {
     titre: "Logiciel GMAO pour PME de maintenance · Eliott Bouquerel",
-    description: `Logiciel GMAO et SAV sur mesure pour votre PME : contrats, préventif, dépannages, bons d’intervention signés sur mobile et facturés le soir, ${aPartirDe(LOGICIEL, " HT")}.`,
+    description: `Logiciel GMAO sur mesure pour votre PME : contrats, préventif, dépannages, bons d’intervention signés sur mobile et facturés le soir, ${aPartirDe(LOGICIEL, " HT")}.`,
   },
   h1: "Logiciel GMAO et SAV pour PME",
   resume: `Un logiciel de GMAO sur mesure suit votre parc installé, planifie le préventif à partir de vos contrats, envoie les dépannages au bon technicien et fait partir le bon d’intervention signé en facturation le soir même. Comptez ${aPartirDe(LOGICIEL, " HT")}, prix fixé au devis.`,

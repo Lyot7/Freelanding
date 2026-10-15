@@ -50,7 +50,7 @@ export const pageArtisans: PageTheme = {
   chemin: CHEMIN_ARTISANS,
   seo: {
     titre: "Création de site internet pour artisan · Eliott Bouquerel",
-    description: `Création de site internet pour artisan : zone d’intervention, chantiers en photos, numéro qui appelle d’un geste. Conçu et écrit pour vous, ${aPartirDe(VITRINE, " HT")}.`,
+    description: `Création de site internet pour artisan : zone d’intervention, chantiers en photos, numéro qui appelle d’un geste. Textes compris, ${aPartirDe(VITRINE, " HT")}.`,
   },
   h1: "Site internet pour artisans",
   resume: `Votre site doit faire une chose : qu’un client qui cherche votre métier dans sa commune vous appelle, vous plutôt qu’un autre. Je le conçois, je l’écris et je le code avec le soin d’une agence, ${aPartirDe(VITRINE, " HT")}, prix fixé au devis.`,

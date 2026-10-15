@@ -84,7 +84,7 @@ describe("chaque page thématique est cherchable", () => {
         for (const texte of textes(page)) {
           expect(texte).not.toMatch(/—/u);
           expect(texte).not.toMatch(/\bTJM\b|taux journalier/iu);
-          expect(texte).not.toMatch(/\b(tu|toi|ta|tes)\b/u);
+          expect(texte).not.toMatch(/(?<!\p{L})(tu|toi|ta|tes)(?!\p{L})/u);
         }
       });
     });
