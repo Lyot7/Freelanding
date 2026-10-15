@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { mkdtempSync } from "node:fs";
+import { mkdirSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import sharp from "sharp";
@@ -35,9 +35,7 @@ describe("visuel d'un article du cockpit", () => {
   test("rend héros, vignette et partage aux tailles du site", async () => {
     const { rendreVisuel } = await import("../../scripts/visuel-article.mjs");
     const racine = mkdtempSync(join(tmpdir(), "visuel-"));
-    for (const d of ["public/images/heros", "public/images/blog"]) {
-      await Bun.write(join(racine, d, ".garde"), "");
-    }
+    for (const d of ["public/images/heros", "public/images/blog"]) mkdirSync(join(racine, d), { recursive: true });
     const chemins = await rendreVisuel("essai", svg(""), racine);
     const tailles = await Promise.all(chemins.map(async (c) => {
       const { width, height } = await sharp(c).metadata();
