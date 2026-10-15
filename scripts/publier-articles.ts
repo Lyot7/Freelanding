@@ -20,7 +20,8 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import type { ArticleCockpit } from "../src/content/blog-cockpit";
+import type { ArticleCockpit, Motif } from "../src/content/blog-cockpit";
+import { DESSINS, fabriquerVisuels } from "./visuel-articles-decision.mjs";
 
 const RACINE = join(import.meta.dirname, "..");
 const REGISTRE = join(RACINE, "src/content/articles-cockpit.json");
@@ -79,13 +80,20 @@ function dureeLecture(corps: string): string {
   return `${Math.max(1, Math.ceil(mots / 200))} min de lecture`;
 }
 
-/** Le visuel emprunté suit l'offre que l'article sert. */
-function visuelPour(pageServie: string): { visuelDe: string; categorie: string } {
-  if (pageServie.includes("logiciel")) return { visuelDe: "logiciel-sur-mesure-ou-odoo", categorie: "Outils métier" };
+/** Le motif du visuel et la rubrique suivent l'offre que l'article sert. */
+function visuelPour(pageServie: string): { motif: Motif; categorie: string } {
+  if (pageServie.includes("logiciel")) return { motif: "odoo", categorie: "Outils métier" };
   if (pageServie.includes("site-vitrine") || pageServie.includes("creation-site")) {
-    return { visuelDe: "site-sur-mesure-ou-wordpress", categorie: "Méthode" };
+    return { motif: "wordpress", categorie: "Méthode" };
   }
-  return { visuelDe: "refonte-site-internet-pme", categorie: "Méthode" };
+  return { motif: "refonte", categorie: "Méthode" };
+}
+
+/** Graine tirée du slug (FNV-1a) : le même article redonne la même image. */
+function graine(slug: string): number {
+  let h = 0x811c9dc5;
+  for (const c of slug) h = Math.imul(h ^ c.charCodeAt(0), 0x01000193) >>> 0;
+  return h;
 }
 
 async function validesDuCockpit(): Promise<Validation[]> {
@@ -126,8 +134,9 @@ async function ecrire(): Promise<void> {
       continue;
     }
     const corps = (v.contenuCorrige ?? v.contenu).trim();
-    const { visuelDe, categorie } = visuelPour(article.pageServie.url);
+    const { motif, categorie } = visuelPour(article.pageServie.url);
     writeFileSync(chemin, `${corps}\n`);
+    await fabriquerVisuels(article.slug, DESSINS[motif], graine(article.slug), RACINE);
     registre.unshift({
       slug: article.slug,
       title: v.titre,
@@ -136,7 +145,7 @@ async function ecrire(): Promise<void> {
       description: article.description,
       readingTime: dureeLecture(corps),
       tags: [article.motCle.requete, ...(article.motsCles ?? []).map((m) => m.requete)].slice(0, 5),
-      visuelDe,
+      motif,
       validationId: v.id,
     });
     connus.add(article.slug);

@@ -15,10 +15,11 @@ import entrees from "./articles-cockpit.json";
  * résultat (corps présent, description bornée, liens vers une prestation et la
  * prise de rendez-vous, aucun tiret cadratin).
  *
- * LE VISUEL EST EMPRUNTÉ, comme les couvertures qui se répètent déjà : chaque
- * entrée nomme l'article publié dont elle reprend couverture, héros et image de
- * partage (`visuelDe`). Un nom inconnu casse le build, il ne laisse pas un cadre
- * vide en ligne.
+ * CHAQUE ARTICLE A SON VISUEL, calculé à la publication par un des quatre
+ * motifs de `scripts/visuel-articles-decision.mjs`, avec une graine tirée du
+ * slug : une photo de héros ne sert qu'une fois (`heros-pages.test.mjs`).
+ * Les fichiers suivent le slug : `heros/blog-<slug>.jpg`, `blog/<slug>.jpg`,
+ * `og-blog-<slug>.jpg`.
  */
 export interface ArticleCockpit {
   slug: string;
@@ -30,21 +31,32 @@ export interface ArticleCockpit {
   description: string;
   readingTime: string;
   tags?: string[];
-  /** Slug de l'article publié dont l'entrée reprend les visuels. */
-  visuelDe: string;
+  /** Le motif du visuel calculé, choisi d'après l'offre que l'article sert. */
+  motif: Motif;
   /** La validation du cockpit, marquée publiée une fois l'article en ligne. */
   validationId: string;
 }
+
+export type Motif = "odoo" | "excel" | "refonte" | "wordpress";
+
+/** Ce que montre chaque motif, pour le texte de remplacement. */
+export const ALT_MOTIF: Record<Motif, string> = {
+  odoo: "Une grille de modules carrés identiques sur fond noir, et un groupe de forme libre qui ressort en vert",
+  excel: "Une grille de tableur sur fond noir, une colonne de cellules surlignée en vert",
+  refonte: "Deux colonnes d’adresses sur fond noir, reliées une à une par des courbes vertes",
+  wordpress: "Sur fond noir, un bloc unique cerné de vert face à une pile de petits blocs gris",
+};
 
 export function articlesDuCockpit(
   base: readonly BlogPost[],
   liste: readonly ArticleCockpit[] = entrees as ArticleCockpit[],
 ): BlogPost[] {
+  const auteur = base[0]?.author;
+  if (!auteur) throw new Error("Registre du blog vide : aucun auteur à reprendre");
   return liste.map((a) => {
-    const modele = base.find((p) => p.slug === a.visuelDe);
-    if (!modele) {
-      throw new Error(`Article ${a.slug} : visuel emprunté à ${a.visuelDe}, introuvable`);
-    }
+    const alt = ALT_MOTIF[a.motif];
+    if (!alt) throw new Error(`Article ${a.slug} : motif ${a.motif} inconnu`);
+    const og = { src: `/images/og-blog-${a.slug}.jpg`, alt, width: 1200, height: 630 };
     return {
       slug: a.slug,
       title: a.title,
@@ -52,13 +64,25 @@ export function articlesDuCockpit(
       dateSource: "editorial",
       listedInIndex: true,
       category: a.category,
-      author: modele.author,
-      cover: modele.cover,
-      heroImage: modele.heroImage,
+      author: auteur,
+      cover: { src: `/images/blog/${a.slug}.jpg`, alt, width: 1200, height: 1114 },
+      heroImage: {
+        src: `/images/heros/blog-${a.slug}.jpg`,
+        alt,
+        width: 2400,
+        height: 1350,
+        cadrage: { x: 50, y: 50 },
+        credit: {
+          prefixe: "Visuel :",
+          auteur: { libelle: "Eliott Bouquerel", href: "/a-propos" },
+          licence: { libelle: "CC BY 4.0", href: "https://creativecommons.org/licenses/by/4.0/deed.fr" },
+        },
+        og,
+      },
       excerpt: a.description,
       readingTime: a.readingTime,
       tags: a.tags,
-      seo: { title: a.title, description: a.description, ogImage: modele.seo?.ogImage },
+      seo: { title: a.title, description: a.description, ogImage: og },
     };
   });
 }
