@@ -2,6 +2,7 @@
  * Publie sur le blog les articles qu'Eliott a validés dans le cockpit.
  *
  *   bun scripts/publier-articles.ts              écrit les articles validés pas encore publiés
+ *   bun scripts/publier-articles.ts --max 1      n'en écrit que le plus anciennement validé
  *   bun scripts/publier-articles.ts --confirmer  marque publiés ceux qui répondent en ligne
  *
  * Premier temps, avant la PR : pour chaque validation `ARTICLE_BLOG` au statut
@@ -35,6 +36,8 @@ type Validation = {
   titre: string | null;
   contenu: string;
   contenuCorrige: string | null;
+  creeLe: string;
+  decideLe: string | null;
   contexte: {
     article?: {
       slug: string;
@@ -89,7 +92,19 @@ async function validesDuCockpit(): Promise<Validation[]> {
   const r = await fetch(`${COCKPIT}/api/agents/validations?statut=VALIDE`, { headers: entetes() });
   if (!r.ok) throw new Error(`Cockpit : ${r.status} sur la lecture des validations`);
   const { validations } = (await r.json()) as { validations: Validation[] };
-  return validations.filter((v) => v.type === "ARTICLE_BLOG" && v.statut === "VALIDE");
+  // Le plus anciennement validé d'abord : c'est lui qui part au prochain jour de publication.
+  return validations
+    .filter((v) => v.type === "ARTICLE_BLOG" && v.statut === "VALIDE")
+    .sort((a, b) => (a.decideLe ?? a.creeLe).localeCompare(b.decideLe ?? b.creeLe));
+}
+
+/** `--max N` : combien d'articles écrire au plus ; sans lui, tous. */
+function maximum(): number {
+  const i = process.argv.indexOf("--max");
+  if (i < 0) return Number.POSITIVE_INFINITY;
+  const n = Number(process.argv[i + 1]);
+  if (!Number.isInteger(n) || n < 1) throw new Error("--max attend un entier positif");
+  return n;
 }
 
 async function ecrire(): Promise<void> {
@@ -97,7 +112,9 @@ async function ecrire(): Promise<void> {
   const connus = new Set(registre.map((a) => a.slug));
   const ecrits: string[] = [];
   const ignores: string[] = [];
+  const max = maximum();
   for (const v of await validesDuCockpit()) {
+    if (ecrits.length >= max) break;
     const article = v.contexte?.article;
     if (!article || !v.titre) {
       ignores.push(`${v.id} : ni titre ni slug`);
