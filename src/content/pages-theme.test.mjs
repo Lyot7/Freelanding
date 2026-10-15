@@ -10,7 +10,7 @@ import { siteConfig } from "./site.ts";
 
 /**
  * LES PAGES THÉMATIQUES, et ce que l'œil ne vérifie pas : longueur du titre et
- * de la description, présence au sitemap et au pied de page, et surtout
+ * de la description, présence au sitemap, absence du pied de page, et surtout
  * l'unicité. Google laisse hors de l'index les pages secteur qui se
  * ressemblent : aucun paragraphe ne se retrouve sur deux pages.
  */
@@ -72,8 +72,8 @@ describe("chaque page thématique est cherchable", () => {
         expect(contentRoutes.some((r) => r.pathname === page.chemin)).toBe(true);
       });
 
-      test("la page est reliée depuis le pied de page", () => {
-        expect(siteConfig.contact.localLinks.some((l) => l.href === page.chemin)).toBe(true);
+      test("la page n'est pas listée dans le pied de page", () => {
+        expect((siteConfig.contact.localLinks ?? []).some((l) => l.href === page.chemin)).toBe(false);
       });
 
       test("au moins un bloc qui n'est pas une section en deux moitiés", () => {
