@@ -16,6 +16,13 @@ import { lienVersPageLogicielCaen } from "./page-logiciel-caen";
 import { avantLienPrix, pagePrixLogiciel } from "./page-prix-logiciel";
 import { lienVersPagePrixSite } from "./page-prix-site";
 import { avantLiensSecteur, pagesSecteur } from "./pages-secteur";
+import { pageTheme } from "./pages-theme";
+
+/** Lien vers une page thématique, sous l’offre de son pilier. */
+const lienTheme = (id: Parameters<typeof pageTheme>[0]) => {
+  const page = pageTheme(id);
+  return { libelle: page.libelleLien, href: page.chemin };
+};
 
 /** Libellé de tout lien vers l'ancre `#rendez-vous` d'une page de prestation. */
 const RESERVER_UN_APPEL = "Réserver un appel";
@@ -212,12 +219,17 @@ export const lienLocalParPrestation: Partial<
 > = {
   vitrine: [
     { avant: avantLienPrix, liens: [lienVersPagePrixSite] },
+    { avant: avantLiensSecteur, liens: [lienTheme("artisans")] },
     { avant: lienVersPageCaen.avant, liens: [lienVersPageCaen] },
   ],
   logiciel: [
     {
       avant: avantLiensSecteur,
       liens: pagesSecteur.map((p) => ({ libelle: p.libelleLien, href: p.chemin })),
+    },
+    {
+      avant: "Par besoin :",
+      liens: [lienTheme("erp-sur-mesure"), lienTheme("maintenance-sav"), lienTheme("automatisation")],
     },
     {
       avant: avantLienPrix,

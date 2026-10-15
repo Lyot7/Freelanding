@@ -1114,7 +1114,9 @@ export type ContentRouteKind =
   /** Prestation déclinée pour une ville (`/creation-site-internet-caen`). */
   | "local"
   /** Solution métier déclinée pour un secteur (`/services/logiciel-metier/btp`). */
-  | "secteur";
+  | "secteur"
+  /** Page thématique (`/services/automatisation`), voir `page-theme.ts`. */
+  | "theme";
 
 /** Route publique issue du sitemap live, sans hypothèse sur le routeur entrant. */
 export interface ContentRoute {
