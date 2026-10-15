@@ -8,7 +8,7 @@ import * as runtime from "react/jsx-runtime";
 import { renderToStaticMarkup } from "react-dom/server";
 import remarkGfm from "remark-gfm";
 import { useMDXComponents } from "../../mdx-components.tsx";
-import { CorpsSur } from "./CorpsSur.tsx";
+import { BlocMarkdown, CorpsSur, rendreEnLigne } from "./CorpsSur.tsx";
 
 const ARTICLES = fileURLToPath(new URL("../../content/articles", import.meta.url));
 /** Les blancs entre balises ne s'affichent pas : seuls les éléments et le texte comptent. */
@@ -114,5 +114,16 @@ describe("CorpsSur : un texte qui n'a pas été relu reste du texte", () => {
     for (const attendu of ["Légende", "<video", "Seuil", "Un client", "2,5 s", "Deux"]) {
       expect(sortie).toContain(attendu);
     }
+  });
+});
+
+describe("CorpsSur : nœuds sans attribut facultatif", () => {
+  it("une image sans texte de remplacement, une liste sans départ, un nœud inconnu", () => {
+    expect(html(rendreEnLigne({ type: "image", url: "/images/a.jpg" }))).toContain('alt=""');
+    expect(rendreEnLigne({ type: "image", url: "javascript:x" })).toBe("");
+    expect(rendreEnLigne({ type: "imageReference", identifier: "x", referenceType: "full" })).toBe("");
+    expect(rendreEnLigne({ type: "footnoteReference", identifier: "1" })).toBeNull();
+    expect(html(createElement(BlocMarkdown, { n: { type: "list", ordered: true, children: [] } }))).toContain("<ol");
+    expect(html(createElement(BlocMarkdown, { n: { type: "definition", identifier: "x", url: "/" } }))).toBe("");
   });
 });

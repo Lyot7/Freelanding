@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test";
 import { blogPosts } from "../../content/blog.ts";
 import { dureeLecture, entreeDuCockpit, rubriquePour } from "../../content/blog-cockpit.ts";
-import { sommaireDuTexte } from "./sommaire.ts";
+import { sommaireDeLArticle, sommaireDuTexte } from "./sommaire.ts";
 import { articleDApercu, chargerApercu, demandeApercu, lireReponse, uriSvg } from "./apercu.ts";
 
 const ID = "51250e11-5b57-4399-b845-f62846b0484b";
@@ -109,6 +109,8 @@ describe("métadonnées partagées avec la publication", () => {
     });
   });
   it("le sommaire se lit sur le texte comme sur le fichier", () => {
+    expect(sommaireDeLArticle("maintenance-site-internet-prix").length).toBeGreaterThan(2);
+    expect(sommaireDeLArticle("n-existe-pas")).toEqual([]);
     expect(sommaireDuTexte("## Un **titre**\n```\n## pas un titre\n```\n## Deux")).toEqual([
       { id: "un-titre", titre: "Un **titre**" },
       { id: "deux", titre: "Deux" },

@@ -66,6 +66,7 @@ describe("decouper : les six blocs de la palette, lus comme des données", () =>
       '<Steps items={["ouvert]} />',
       "<Figure",
       '<Figure alt="sans source" />',
+      '<Video poster="/p.jpg" />',
     ];
     for (const ligne of brut) {
       expect(types(decouper(ligne))).toEqual(["markdown"]);
@@ -106,6 +107,7 @@ describe("lireAttributs", () => {
       lireAttributs(` a="1" b='2' c={3} d={-1.5} e={true} f={false} g={'x'} h={"y\\"z"} i={"\\u"} j={\`k\`} drapeau`),
     ).toEqual({ a: "1", b: "2", c: 3, d: -1.5, e: true, f: false, g: "x", h: 'y"z', i: "\\u", j: "k", drapeau: true });
     expect(lireAttributs('x={appel()} y={"a" + "b"}')).toEqual({});
+    expect(lireAttributs("x={}")).toEqual({});
     expect(lireAttributs("x=")).toBeNull();
     expect(lireAttributs('x="ouvert')).toBeNull();
     expect(lireAttributs("x={ouvert")).toBeNull();

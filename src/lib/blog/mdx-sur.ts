@@ -134,7 +134,7 @@ function lireExpression(brute: string): Valeur | null {
   if (/^-?\d+(?:\.\d+)?$/.test(e)) return Number(e);
   if (e === "true" || e === "false") return e === "true";
   if (e.startsWith("[") && e.endsWith("]")) return lireTableau(e);
-  if (GUILLEMETS.includes(e[0] ?? "") && finChaine(e, 0) === e.length - 1) return lireChaine(e);
+  if (e.length > 1 && GUILLEMETS.includes(e[0]) && finChaine(e, 0) === e.length - 1) return lireChaine(e);
   return null;
 }
 
