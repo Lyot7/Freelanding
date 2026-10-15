@@ -21,6 +21,6 @@ export const pagesTheme: readonly PageTheme[] = [
 /** Une page par identifiant, pour que les routes ne dépendent pas de l'ordre. */
 export const pageTheme = (id: IdPageTheme): PageTheme => {
   const trouvee = pagesTheme.find((p) => p.id === id);
-  if (!trouvee) throw new Error(`Page thématique inconnue : ${id}`);
+  if (!trouvee) throw new Error(`Page thématique inconnue : ${id}`);
   return trouvee;
 };

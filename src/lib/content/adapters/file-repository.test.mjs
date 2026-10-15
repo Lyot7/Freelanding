@@ -52,7 +52,7 @@ describe("file content repository", () => {
     // ici : elles ont chacune leur propre test d'invariant
     // (`pages-secteur.test.mjs` pour les secteurs). Ce qui reste doit
     // correspondre, dans l'ordre, aux pages écrites à la main dans le manifeste.
-    const derivees = new Set(["post", "service", "secteur"]);
+    const derivees = new Set(["post", "service", "secteur", "theme"]);
     const fixes = routes
       .filter(({ kind }) => !derivees.has(kind))
       .map(({ pathname }) => pathname);

@@ -13,7 +13,7 @@ import {
 } from "@/components/pages/services/HeroPhoto";
 import { herosPages } from "@/content/heros-pages";
 import type { SiteConfig } from "@/lib/content/types";
-import { prixPlancher, type Prestation } from "@/content/offre";
+import { prixPlancher, type Offre, type Prestation } from "@/content/offre";
 import {
   lienLocalParPrestation,
   marchesFilAriane,
@@ -125,11 +125,11 @@ export function FilAriane({
  * LE PLANCHER OUVRE LA MOITIÉ GAUCHE : le visiteur venu pour un prix le trouve
  * en premier, et la liste qui suit dit ce qu'il paie à ce montant.
  */
-function OffreDetail({
+export function OffreDetail({
   offre,
   href,
 }: {
-  offre: Prestation;
+  offre: Offre;
   /** Prise de rendez-vous, sujet déjà choisi. Composée par l'appelant. */
   href: string;
 }) {
@@ -210,9 +210,9 @@ function ListeOffre({
  * page secteur enchaîne cinq sections : sur un seul ton, elles se fondaient en
  * un seul bloc de texte, et l'alternance redonne la découpe sans rien inventer.
  */
-type Ton = "clair" | "sombre";
+export type Ton = "clair" | "sombre";
 
-const TONS: Record<
+export const TONS: Record<
   Ton,
   {
     section: string;

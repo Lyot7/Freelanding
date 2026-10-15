@@ -26,7 +26,7 @@ export const pageErp: PageTheme = {
   chemin: CHEMIN_ERP,
   seo: {
     titre: "ERP sur mesure pour PME · Eliott Bouquerel",
-    description: `ERP sur mesure pour votre PME : devis, commandes, stock, fabrication et factures dans un seul outil, construit module par module, ${aPartirDe(LOGICIEL, " HT")}.`,
+    description: `ERP sur mesure pour votre PME : devis, commandes, stock, fabrication et factures dans un seul outil, construit module par module, ${aPartirDe(LOGICIEL, " HT")}.`,
   },
   h1: "ERP sur mesure",
   resume: `Un ERP sur mesure relie vos devis, vos commandes, votre stock, votre production et vos factures dans un seul outil, avec vos règles. Je le construis module par module, en commençant par celui qui vous coûte le plus d’heures. Le premier module démarre ${aPartirDe(LOGICIEL, " HT")}, prix fixé au devis.`,
@@ -41,15 +41,15 @@ export const pageErp: PageTheme = {
   libelleLien: "ERP sur mesure",
   accroche: "Devis, commandes, stock et factures reliés dans un seul outil.",
   noteLlms:
-    "ERP sur mesure pour PME, construit module par module : devis, commandes, stock, fabrication, facturation, relances",
+    "ERP sur mesure pour PME, construit module par module : devis, commandes, stock, fabrication, facturation, relances",
   blocs: [
     {
       type: "section",
       id: "symptomes",
       titre: "Cinq outils pour une commande, et vos équipes au milieu",
       paragraphes: [
-        "Une PME qui grandit empile ses outils : un logiciel de devis, un tableur de stock, un planning d’atelier, le logiciel du comptable. Chacun fait bien son travail. Entre eux, ce sont vos équipes qui recopient.",
-        "Un ERP sur mesure devient le référentiel unique de l’entreprise : un article, un client, une commande n’y existent qu’une fois, et les outils que vous gardez lisent la même donnée.",
+        "Une PME qui grandit empile ses outils : un logiciel de devis, un tableur de stock, un planning d’atelier, le logiciel du comptable. Chacun fait bien son travail. Entre eux, ce sont vos équipes qui recopient.",
+        "Un ERP sur mesure devient le référentiel unique de l’entreprise : un article, un client, une commande n’y existent qu’une fois, et les outils que vous gardez lisent la même donnée.",
       ],
       points: [
         {
@@ -65,7 +65,7 @@ export const pageErp: PageTheme = {
         {
           titre: "La marge se calcule à la main",
           corps:
-            "Les prix d’achat dans un fichier, les prix de vente dans un autre, les remises au cas par cas : la marge réelle par client se découvre au bilan.",
+            "Les prix d’achat dans un fichier, les prix de vente dans un autre, les remises au cas par cas : la marge réelle par client se découvre au bilan.",
         },
         {
           titre: "Une seule personne sait",
@@ -156,11 +156,11 @@ export const pageErp: PageTheme = {
         [
           "Si le prestataire s’arrête",
           "L’éditeur continue",
-          "Le code documenté est dans votre dépôt : un autre développeur reprend",
+          "Le code documenté est dans votre dépôt : un autre développeur reprend",
           "Chacun reprend sa partie",
         ],
       ],
-      note: `Pour situer le prix : ${AGENCE.source.nom} relève une médiane de ${euros(AGENCE.mediane)} pour un projet logiciel en agence (${AGENCE.source.releve}). Un premier module démarre chez moi à ${prixPlancher(LOGICIEL)} HT.`,
+      note: `Pour situer le prix : ${AGENCE.source.nom} relève une médiane de ${euros(AGENCE.mediane)} pour un projet logiciel en agence (${AGENCE.source.releve}). Un premier module démarre chez moi à ${prixPlancher(LOGICIEL)} HT.`,
       liens: {
         titre: "Pour trancher",
         items: [
@@ -178,7 +178,7 @@ export const pageErp: PageTheme = {
       titre: "Un ERP qui se construit par morceaux",
       paragraphes: [
         "Un ERP livré d’un bloc après un an de travail arrive souvent décalé de l’entreprise qu’il devait servir. Je commence par le module qui vous coûte le plus d’heures, vos équipes s’en servent, et le suivant s’appuie sur la même base.",
-        "Avant chaque module, je relève où l’information se perd. Chez Würth France, sur le parcours de création de compte de l’eShop professionnel, ce relevé a mené à −92 % d’erreurs, mesuré en interne.",
+        "Avant chaque module, je relève où l’information se perd. Chez Würth France, sur le parcours de création de compte de l’eShop professionnel, ce relevé a mené à −92 % d’erreurs, mesuré en interne.",
       ],
       liens: {
         titre: "Pour aller plus loin",
@@ -204,7 +204,7 @@ export const pageErp: PageTheme = {
         {
           titre: "Votre historique repris",
           corps:
-            "Clients, articles, commandes passées : la reprise se prépare dès le premier module, pour démarrer avec vos données.",
+            "Clients, articles, commandes passées : la reprise se prépare dès le premier module, pour démarrer avec vos données.",
         },
         {
           titre: "Des droits par rôle",
@@ -214,7 +214,7 @@ export const pageErp: PageTheme = {
         {
           titre: "Relié à ce que vous gardez",
           corps:
-            "Le logiciel du comptable, la banque, la boutique en ligne : l’ERP leur envoie et en reçoit les données, sans ressaisie.",
+            "Le logiciel du comptable, la banque, la boutique en ligne : l’ERP leur envoie et en reçoit les données, sans ressaisie.",
         },
         {
           titre: "Vos données sortent quand vous voulez",
@@ -224,32 +224,32 @@ export const pageErp: PageTheme = {
       ],
     },
   ],
-  titreOffre: "Prix d’un ERP sur mesure : le premier module",
+  titreOffre: "Prix d’un ERP sur mesure : le premier module",
   faq: {
     eyebrow: "FAQ",
     titleLines: ["Votre ERP", "sur mesure."],
     items: [
       {
-        question: "Combien coûte un ERP sur mesure ?",
+        question: "Combien coûte un ERP sur mesure ?",
         answer: `Le premier module démarre à ${prixPlancher(LOGICIEL)} HT. Le total dépend du nombre de modules, des outils à relier et de la reprise de votre historique, et se fixe au devis. Pour comparer, ${AGENCE.source.nom} relève une médiane de ${euros(AGENCE.mediane)} pour un projet logiciel en agence (${AGENCE.source.releve}).`,
       },
       {
-        question: "Faut-il remplacer tous nos logiciels ?",
+        question: "Faut-il remplacer tous nos logiciels ?",
         answer:
           "Gardez ce qui marche, comme la paie ou le logiciel du comptable. L’ERP sur mesure prend la place des tableurs et des ressaisies, et se branche sur le reste.",
       },
       {
-        question: "Odoo ou un ERP sur mesure ?",
+        question: "Odoo ou un ERP sur mesure ?",
         answer:
           "Si Odoo couvre votre métier avec un paramétrage raisonnable, prenez Odoo. Le sur mesure se justifie quand les développements spécifiques à commander dans Odoo coûtent plus qu’un outil construit pour vous, ou quand vos règles changent souvent.",
       },
       {
-        question: "Avez-vous déjà construit un ERP ?",
+        question: "Avez-vous déjà construit un ERP ?",
         answer:
-          "Pas sous ce nom. Mes projets touchent les mêmes briques : comptes clients, catalogue, commandes, droits. Chez Würth France, j’ai refait le parcours de création de compte de l’eShop réservé aux professionnels. Le détail est sur la page Réalisations.",
+          "Pas sous ce nom. Mes projets touchent les mêmes briques : comptes clients, catalogue, commandes, droits. Chez Würth France, j’ai refait le parcours de création de compte de l’eShop réservé aux professionnels. Le détail est sur la page Réalisations.",
       },
       {
-        question: "Que devient l’ERP si vous arrêtez ?",
+        question: "Que devient l’ERP si vous arrêtez ?",
         answer:
           "Le code et sa documentation sont dans votre dépôt, la base sur votre hébergement. Un autre développeur reprend l’outil sans repartir de zéro.",
       },

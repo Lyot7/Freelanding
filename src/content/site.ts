@@ -115,6 +115,11 @@ export const siteConfig: SiteConfig = {
       { label: "Logiciel sur mesure à Caen", href: "/logiciel-sur-mesure-caen" },
       { label: "Prix d’un site internet", href: "/services/site-vitrine/prix" },
       { label: "Prix d’un logiciel sur mesure", href: "/services/logiciel-metier/prix" },
+      { label: "ERP sur mesure", href: "/services/logiciel-metier/erp-sur-mesure" },
+      { label: "Logiciel GMAO et SAV", href: "/services/logiciel-metier/maintenance-sav" },
+      { label: "Automatisation et IA pour PME", href: "/services/automatisation" },
+      { label: "Automatisation et IA à Caen", href: "/automatisation-ia-caen" },
+      { label: "Site internet pour artisans", href: "/services/site-vitrine/artisans" },
     ],
     responseTime:
       "Je réponds à chaque message sous 24 heures ouvrées.",

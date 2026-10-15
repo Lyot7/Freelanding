@@ -4,6 +4,7 @@ import { prestations } from "./offre";
 import { CHEMIN_PAGE_CAEN, CHEMIN_PAGE_LOGICIEL_CAEN } from "./page-caen";
 import { CHEMIN_PRIX_SITE } from "./page-prix-site";
 import { CHEMIN_PRIX_LOGICIEL, pagesSecteur } from "./pages-secteur";
+import { pagesTheme } from "./pages-theme";
 
 /**
  * Manifest public, dans l'ordre exact du sitemap Framer live.
@@ -66,6 +67,11 @@ export const contentRoutes: readonly ContentRoute[] = [
   ),
   /* LES PRIX DE LA SOLUTION MÉTIER (2026-10-02) ; voir `page-prix-logiciel.ts`. */
   { pathname: CHEMIN_PRIX_LOGICIEL, kind: "page" },
+  /*
+   * PAGES THÉMATIQUES (2026-10-15) : ERP, GMAO, automatisation, artisans, IA à
+   * Caen, dérivées de `pages-theme.ts`. Voir `page-theme.ts`.
+   */
+  ...pagesTheme.map((p): ContentRoute => ({ pathname: p.chemin, kind: "theme" })),
   /*
    * VUE AGENT (2026-09-23) : le profil complet en un seul texte, et le prompt
    * que le visiteur colle dans son propre assistant. Voir `vue-agent.ts`.

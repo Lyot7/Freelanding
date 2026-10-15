@@ -24,7 +24,7 @@ export const pageIaCaen: PageTheme = {
   chemin: CHEMIN_IA_CAEN,
   seo: {
     titre: "Automatisation et IA à Caen · Eliott Bouquerel",
-    description: `Automatisation et IA pour les PME de Caen et de Normandie : je choisis la tâche, je code l’outil et je le branche sur vos logiciels, ${aPartirDe(integrationIA, " HT")}.`,
+    description: `Automatisation et IA pour les PME de Caen et de Normandie : je choisis la tâche, je code l’outil et je le branche sur vos logiciels, ${aPartirDe(integrationIA, " HT")}.`,
   },
   h1: "Automatisation et IA à Caen",
   resume: `Basé à Caen, j’installe l’IA dans les outils des PME du Calvados, de la Manche et de l’Orne. Je choisis la tâche avec vous, je code l’automatisation et je la branche moi-même sur vos logiciels. Rendez-vous en visio, ${aPartirDe(integrationIA, " HT")} pour un premier usage.`,
@@ -44,8 +44,8 @@ export const pageIaCaen: PageTheme = {
       id: "conseil-et-code",
       titre: "Du conseil jusqu’à l’outil qui tourne",
       paragraphes: [
-        "Autour de Caen, beaucoup d’offres d’IA s’arrêtent au conseil ou à la formation : vous savez ce que l’IA pourrait faire, et il reste à trouver qui l’installe. Je mène les deux dans la même mission.",
-        "Je travaille depuis Caen, et tous mes rendez-vous se font en visio : un appel pour choisir la tâche, un autre pour vous montrer les résultats sur vos propres documents.",
+        "Autour de Caen, beaucoup d’offres d’IA s’arrêtent au conseil ou à la formation : vous savez ce que l’IA pourrait faire, et il reste à trouver qui l’installe. Je mène les deux dans la même mission.",
+        "Je travaille depuis Caen, et tous mes rendez-vous se font en visio : un appel pour choisir la tâche, un autre pour vous montrer les résultats sur vos propres documents.",
       ],
       liens: {
         titre: "Pour aller plus loin",
@@ -86,7 +86,7 @@ export const pageIaCaen: PageTheme = {
         {
           titre: "Un outil qui vous reste",
           corps:
-            "Code et documentation dans votre dépôt : l’automatisation continue de tourner sans moi.",
+            "Code et documentation dans votre dépôt : l’automatisation continue de tourner sans moi.",
         },
       ],
     },
@@ -139,23 +139,23 @@ export const pageIaCaen: PageTheme = {
     titleLines: ["L’IA à Caen", "et en Normandie."],
     items: [
       {
-        question: "Combien coûte une automatisation IA pour une PME caennaise ?",
+        question: "Combien coûte une automatisation IA pour une PME caennaise ?",
         answer: `Un premier usage démarre à ${prixPlancher(integrationIA)} HT, branché sur un outil que vous utilisez déjà. Le prix suit le nombre d’usages et d’outils à relier, et se fixe au devis. Être à Caen ne change pas le calcul.`,
       },
       {
-        question: "Vous déplacez-vous dans nos locaux ?",
+        question: "Vous déplacez-vous dans nos locaux ?",
         answer:
           "Tous mes rendez-vous se font en visio, du premier appel à la mise en service. L’automatisation se branche sur vos outils à distance, avec des accès que vous ouvrez et fermez vous-même.",
       },
       {
-        question: "Avez-vous des clients à Caen pour l’IA ?",
+        question: "Avez-vous des clients à Caen pour l’IA ?",
         answer:
-          "Pas encore. Je l’utilise pour ma propre activité : chaque mail que je reçois est classé, rattaché au bon dossier et sa réponse préparée par un modèle de langage, sous ma relecture.",
+          "Pas encore. Je l’utilise pour ma propre activité : chaque mail que je reçois est classé, rattaché au bon dossier et sa réponse préparée par un modèle de langage, sous ma relecture.",
       },
       {
-        question: "Consultant IA ou développeur ?",
+        question: "Consultant IA ou développeur ?",
         answer:
-          "Développeur, qui fait aussi le travail du consultant : choisir la tâche, mesurer le temps qu’elle rendra, puis écrire et maintenir le code qui l’automatise.",
+          "Développeur, qui fait aussi le travail du consultant : choisir la tâche, mesurer le temps qu’elle rendra, puis écrire et maintenir le code qui l’automatise.",
       },
     ],
   },

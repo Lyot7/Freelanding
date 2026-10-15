@@ -86,10 +86,10 @@ export const pageAutomatisation: PageTheme = {
   chemin: CHEMIN_AUTOMATISATION,
   seo: {
     titre: "Automatisation et IA pour PME · Eliott Bouquerel",
-    description: `Automatisation et IA pour votre PME : mails triés, commandes saisies, factures relancées, sur vos outils. Vous reprenez des heures, ${aPartirDe(integrationIA, " HT")}.`,
+    description: `Automatisation et IA pour votre PME : mails triés, commandes saisies, factures relancées, sur vos outils. Vous reprenez des heures, ${aPartirDe(integrationIA, " HT")}.`,
   },
   h1: "Automatisation et IA pour PME",
-  resume: `J’installe l’IA dans les outils que vous utilisez déjà, sur les tâches que votre équipe refait chaque semaine : trier les mails, saisir les commandes, relancer les factures. Vous reprenez des heures pour le travail qui demande quelqu’un. Comptez ${aPartirDe(integrationIA, " HT")} pour un premier usage.`,
+  resume: `J’installe l’IA dans les outils que vous utilisez déjà, sur les tâches que votre équipe refait chaque semaine : trier les mails, saisir les commandes, relancer les factures. Vous reprenez des heures pour le travail qui demande quelqu’un. Comptez ${aPartirDe(integrationIA, " HT")} pour un premier usage.`,
   prestation: "logiciel",
   offre: integrationIA,
   filAriane: [
@@ -100,7 +100,7 @@ export const pageAutomatisation: PageTheme = {
   libelleLien: "automatisation et IA",
   accroche: "Mails triés, commandes saisies, factures relancées sans y penser.",
   noteLlms:
-    "automatisation et intégration de l’IA dans les outils d’une PME : tri des mails, saisie des commandes, relances de factures, comptes rendus",
+    "automatisation et intégration de l’IA dans les outils d’une PME : tri des mails, saisie des commandes, relances de factures, comptes rendus",
   blocs: [
     {
       type: "tableau",
@@ -113,7 +113,7 @@ export const pageAutomatisation: PageTheme = {
       colonnes: ["Tâche", "Aujourd’hui", "Avec l’automatisation", "Temps rendu par semaine"],
       lignes: TACHES.map((t) => [t.tache, t.avant, t.apres, duree(t.minutes)]),
       total: ["Total", "", "", duree(MINUTES_SEMAINE)],
-      note: `Hypothèses : une PME d’une dizaine de personnes au bureau, ${SEMAINES} semaines travaillées, ${euros(COUT_HORAIRE)} l’heure chargée. Sur une année, ${nombre(HEURES_AN)} heures, soit ${euros(COUT_AN)}. Remplacez ces minutes par les vôtres : une seule de ces tâches suffit souvent à payer le projet.`,
+      note: `Hypothèses : une PME d’une dizaine de personnes au bureau, ${SEMAINES} semaines travaillées, ${euros(COUT_HORAIRE)} l’heure chargée. Sur une année, ${nombre(HEURES_AN)} heures, soit ${euros(COUT_AN)}. Remplacez ces minutes par les vôtres : une seule de ces tâches suffit souvent à payer le projet.`,
     },
     {
       type: "section",
@@ -121,7 +121,7 @@ export const pageAutomatisation: PageTheme = {
       titre: "Je m’en sers d’abord pour mon activité",
       paragraphes: [
         "Chaque mail qui arrive dans mes boîtes est classé par un modèle de langage, rattaché à la bonne fiche client, et sa réponse est rédigée en brouillon. Les noms et les coordonnées sont masqués avant l’envoi au modèle. Rien ne part sans que je l’aie relu.",
-        "C’est le même montage que j’installe chez vous : un modèle choisi pour la tâche, branché sur vos outils, avec un plafond de dépense et un journal de tout ce qu’il fait.",
+        "C’est le même montage que j’installe chez vous : un modèle choisi pour la tâche, branché sur vos outils, avec un plafond de dépense et un journal de tout ce qu’il fait.",
       ],
       points: [
         {
@@ -137,7 +137,7 @@ export const pageAutomatisation: PageTheme = {
         {
           titre: "Un journal lisible",
           corps:
-            "Chaque décision de l’IA est enregistrée : quel mail, quel classement, quelle réponse proposée.",
+            "Chaque décision de l’IA est enregistrée : quel mail, quel classement, quelle réponse proposée.",
         },
         {
           titre: "Une relecture là où elle compte",
@@ -151,7 +151,7 @@ export const pageAutomatisation: PageTheme = {
       id: "methode",
       titre: "De la tâche choisie à l’outil qui tourne",
       paragraphes: [
-        "Le premier usage se choisit sur un critère : le temps qu’il rend. Le reste attend qu’il ait fait ses preuves.",
+        "Le premier usage se choisit sur un critère : le temps qu’il rend. Le reste attend qu’il ait fait ses preuves.",
       ],
       etapes: [
         {
@@ -167,7 +167,7 @@ export const pageAutomatisation: PageTheme = {
         {
           titre: "La brancher sur vos outils",
           corps:
-            "Messagerie, logiciel de gestion, tableur partagé : l’automatisation lit et écrit là où vous travaillez déjà.",
+            "Messagerie, logiciel de gestion, tableur partagé : l’automatisation lit et écrit là où vous travaillez déjà.",
         },
         {
           titre: "La surveiller",
@@ -197,27 +197,27 @@ export const pageAutomatisation: PageTheme = {
       },
     },
   ],
-  titreOffre: "Prix d’une automatisation IA : le premier usage",
+  titreOffre: "Prix d’une automatisation IA : le premier usage",
   faq: {
     eyebrow: "FAQ",
     titleLines: ["L’IA dans", "votre PME."],
     items: [
       {
-        question: "Combien coûte une automatisation avec l’IA ?",
+        question: "Combien coûte une automatisation avec l’IA ?",
         answer: `Un premier usage branché sur un outil que vous utilisez déjà démarre à ${prixPlancher(integrationIA)} HT. Le prix monte avec le nombre d’usages, les règles de votre métier à appliquer et le nombre d’outils à relier. L’abonnement au modèle d’IA est à votre nom, payé directement à son éditeur.`,
       },
       {
-        question: "Faut-il changer nos logiciels ?",
+        question: "Faut-il changer nos logiciels ?",
         answer:
           "Non. L’automatisation se branche sur votre messagerie, votre logiciel de gestion ou vos tableurs. Quand il manque un outil entier, je le chiffre à part avec La Solution métier.",
       },
       {
-        question: "L’IA peut-elle se tromper ?",
+        question: "L’IA peut-elle se tromper ?",
         answer:
           "Oui, et c’est prévu. Elle propose, votre équipe valide, tant que son taux d’erreur sur vos cas réels n’est pas connu. Les calculs exacts, comme un total de facture, restent faits par le code.",
       },
       {
-        question: "Où vont nos données ?",
+        question: "Où vont nos données ?",
         answer:
           "Elles restent dans vos outils. Seul le texte utile à la tâche part vers le modèle, après masquage de ce qui identifie une personne, sur un compte ouvert à votre nom.",
       },
