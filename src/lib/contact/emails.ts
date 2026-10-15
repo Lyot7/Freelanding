@@ -65,6 +65,17 @@ function libelleIntention(intention: SoumissionValide["intention"]): string {
 }
 
 /** E-mail reçu par Eliott. */
+/** Réponses au questionnaire, dans l'ordre du formulaire, sans les absentes. */
+function reponsesQuestionnaire(
+  soumission: SoumissionValide,
+): readonly (readonly [string, string])[] {
+  const lignes: [string, string][] = [];
+  if (soumission.budget) lignes.push(["Budget HT", soumission.budget]);
+  if (soumission.objectif) lignes.push(["Objectif", soumission.objectif]);
+  if (soumission.echeance) lignes.push(["Échéance", soumission.echeance]);
+  return lignes;
+}
+
 export function composerNotification(
   soumission: SoumissionValide,
 ): MessageCompose {
@@ -84,6 +95,9 @@ export function composerNotification(
   if (soumission.typeProjet) {
     morceaux.push(bloc("Type de projet", echapperHtml(soumission.typeProjet)));
   }
+  for (const [etiquette, valeur] of reponsesQuestionnaire(soumission)) {
+    morceaux.push(bloc(etiquette, echapperHtml(valeur)));
+  }
   if (soumission.message) {
     morceaux.push(bloc("Message", echapperHtmlMultiligne(soumission.message)));
   }
@@ -95,6 +109,9 @@ export function composerNotification(
   lignesTexte.push(`E-mail : ${soumission.email}`);
   if (soumission.typeProjet) {
     lignesTexte.push(`Type de projet : ${soumission.typeProjet}`);
+  }
+  for (const [etiquette, valeur] of reponsesQuestionnaire(soumission)) {
+    lignesTexte.push(`${etiquette} : ${valeur}`);
   }
   if (soumission.message) {
     lignesTexte.push("", "Message :", soumission.message);

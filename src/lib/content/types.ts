@@ -909,6 +909,12 @@ export interface ContactFormContent {
   name: ContactFieldContent;
   email: ContactFieldContent;
   projectType: ContactFieldContent & { options: readonly string[] };
+  /** Mêmes questions que la prise de rendez-vous ; les listes en viennent. */
+  questionnaire: {
+    budget: ContactFieldContent;
+    objectif: ContactFieldContent;
+    echeance: ContactFieldContent;
+  };
   message: ContactFieldContent;
   submitLabel: string;
   disclaimer: { text: string; links: readonly Link[] };
