@@ -256,3 +256,45 @@ describe("validerSoumission — normalisation", () => {
     ]);
   });
 });
+
+describe("validerSoumission — questionnaire de /contact", () => {
+  it("accepte les réponses de la liste du type choisi et les rend en libellés", () => {
+    const resultat = valider(
+      soumissionProjet({ budget: "inconnu", objectif: "google", echeance: "vite" }),
+    );
+    expect(resultat.ok).toBe(true);
+    expect(resultat.soumission.budget).toBe("Je ne sais pas encore");
+    expect(resultat.soumission.objectif).toBe("Être trouvé sur Google");
+    expect(resultat.soumission.echeance).toBe("Dès que possible");
+  });
+
+  it("refuse un objectif qui n'appartient pas au type de projet", () => {
+    const resultat = valider(soumissionProjet({ objectif: "tableur" }));
+    expect(resultat.ok).toBe(false);
+    expect(resultat.motif).toEqual({
+      type: "champ_invalide",
+      champ: "objectif",
+      raison: "hors_liste",
+    });
+  });
+
+  it("refuse une tranche de budget inventée", () => {
+    const resultat = valider(soumissionProjet({ budget: "1-2" }));
+    expect(resultat.ok).toBe(false);
+    expect(resultat.motif.champ).toBe("budget");
+  });
+
+  it("prend les listes de la découverte quand le type n'est pas tranché", () => {
+    const resultat = valider(
+      soumissionProjet({ typeProjet: TYPES[2], objectif: "tache" }),
+    );
+    expect(resultat.ok).toBe(true);
+    expect(resultat.soumission.objectif).toBe("Supprimer une tâche faite à la main");
+  });
+
+  it("tolère un questionnaire absent", () => {
+    const resultat = valider(soumissionProjet());
+    expect(resultat.ok).toBe(true);
+    expect(resultat.soumission.budget).toBeUndefined();
+  });
+});

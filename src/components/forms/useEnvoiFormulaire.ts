@@ -152,6 +152,9 @@ export function useEnvoiFormulaire(
       corps.nom = lire("nom");
       corps.typeProjet = lire("typeProjet");
       if (intention === "projet") {
+        corps.budget = lire("budget");
+        corps.objectif = lire("objectif");
+        corps.echeance = lire("echeance");
         corps.message = lire("message");
       }
 

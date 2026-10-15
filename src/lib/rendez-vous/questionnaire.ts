@@ -249,3 +249,31 @@ export function composerNotes(reponses: ReponsesQuestionnaire): string {
   const texte = lignes.join("\n").replace(/\u00a0|\u202f/gu, " ");
   return reponses.message ? `${texte}\n\n${reponses.message}` : texte;
 }
+
+/**
+ * Type de projet du formulaire de contact → questionnaire du rendez-vous.
+ *
+ * Le formulaire de `/contact` pose les mêmes questions que la prise de
+ * rendez-vous (budget, objectif, échéance), avec les mêmes listes : Eliott lit
+ * des demandes écrites comme ses réservations. « Je ne sais pas encore », et
+ * toute valeur absente d'ici, retombent sur le rendez-vous « decouverte », qui
+ * couvre toutes les prestations.
+ */
+const RDV_PAR_TYPE_PROJET: Readonly<Record<string, IdRendezVous>> = {
+  "Un site": "site",
+  "Une solution métier": "logiciel",
+};
+
+export function rendezVousDuTypeProjet(typeProjet: string): IdRendezVous {
+  return Object.hasOwn(RDV_PAR_TYPE_PROJET, typeProjet)
+    ? RDV_PAR_TYPE_PROJET[typeProjet]
+    : "decouverte";
+}
+
+/** Libellé d'une réponse, ou `undefined` si l'identifiant n'est pas dans la liste. */
+export function libelleOption(
+  options: readonly OptionQuestion[],
+  id: string,
+): string | undefined {
+  return options.find((option) => option.id === id)?.libelle;
+}
