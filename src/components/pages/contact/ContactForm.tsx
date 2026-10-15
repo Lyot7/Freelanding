@@ -23,6 +23,7 @@
  */
 
 import Link from "next/link";
+import { useState } from "react";
 import type { ReactNode } from "react";
 import { Reveal } from "@/components/motion/Reveal";
 import { Icon, SwapText } from "@/components/ui";
@@ -32,6 +33,13 @@ import {
   ReplisSansScript,
 } from "@/components/forms/ProtectionFormulaire";
 import { useEnvoiFormulaire } from "@/components/forms/useEnvoiFormulaire";
+import {
+  OPTIONS_ECHEANCE,
+  optionsObjectif,
+  rendezVousDuTypeProjet,
+  tranchesBudget,
+} from "@/lib/rendez-vous/questionnaire";
+import type { OptionQuestion } from "@/content/rendez-vous";
 import type {
   ContactFormContent,
   Link as ContentLink,
@@ -128,6 +136,67 @@ function FormField({
   );
 }
 
+/**
+ * Question à choix du questionnaire (budget, objectif, échéance), au dessin
+ * du sélecteur « Que cherchez-vous ? ». Les valeurs envoyées sont les
+ * identifiants de `questionnaire.ts`, vérifiés en liste fermée par le serveur.
+ */
+function QuestionField({
+  name,
+  label,
+  placeholder,
+  options,
+  requis,
+  delay,
+  enErreur,
+}: {
+  name: string;
+  label: string;
+  placeholder: string;
+  options: readonly OptionQuestion[];
+  requis: boolean;
+  delay: number;
+  enErreur: boolean;
+}) {
+  const id = `contact-${name}`;
+  return (
+    <FieldReveal delay={delay}>
+      <label htmlFor={id} className="flex w-full flex-col items-end gap-[10px]">
+        <span className="text-right text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-background/60">
+          {label}
+          {requis ? " *" : ""}
+        </span>
+        <span className="relative block w-full">
+          <select
+            id={id}
+            name={name}
+            required={requis}
+            defaultValue=""
+            aria-invalid={enErreur || undefined}
+            className={`h-[50px] w-full appearance-none border bg-transparent px-[16px] pr-[48px] text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-background transition-colors tablet:border-l-0 tablet:text-[14px] ${
+              enErreur ? "border-accent" : "border-black/10"
+            }`}
+          >
+            <option value="" disabled={requis}>
+              {placeholder}
+            </option>
+            {options.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.libelle}
+              </option>
+            ))}
+          </select>
+          <Icon
+            name="chevron-down"
+            size={16}
+            className="pointer-events-none absolute right-[16px] top-1/2 -translate-y-1/2 text-background"
+          />
+        </span>
+      </label>
+    </FieldReveal>
+  );
+}
+
 function linkedDisclaimer(
   text: string,
   links: readonly ContentLink[],
@@ -176,6 +245,11 @@ export function ContactForm({
 }) {
   const firstOption = form.projectType.options[0];
   const envoi = useEnvoiFormulaire("projet", emailContact);
+  // Le type choisi règle les listes du questionnaire, comme le sujet du
+  // rendez-vous : tranches et objectifs d'un site ne sont pas ceux d'un logiciel.
+  const [typeProjet, setTypeProjet] = useState(firstOption);
+  const idRendezVous = rendezVousDuTypeProjet(typeProjet);
+  const { questionnaire } = form;
   const enCours = envoi.etat === "envoi";
 
   return (
@@ -193,6 +267,7 @@ export function ContactForm({
       method="post"
       action="/api/contact"
       onSubmit={envoi.gererSoumission}
+      onReset={() => setTypeProjet(firstOption)}
       /* Première interaction = chargement du script Turnstile. Tant que
          personne ne touche le formulaire, aucune requête ne part vers
          Cloudflare. */
@@ -222,7 +297,8 @@ export function ContactForm({
             <select
               id="projectType"
               name="typeProjet"
-              defaultValue={firstOption}
+              value={typeProjet}
+              onChange={(evenement) => setTypeProjet(evenement.target.value)}
               aria-invalid={envoi.champEnErreur === "typeProjet" || undefined}
               // `outline-none` retiré : voir `src/app/focus.css`.
               className="h-[50px] w-full appearance-none border border-black/10 bg-transparent px-[16px] pr-[48px] text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-background transition-colors tablet:border-l-0 tablet:text-[14px]"
@@ -241,6 +317,38 @@ export function ContactForm({
           </span>
         </label>
       </FieldReveal>
+
+      {/* `key` sur le type : changer de type remet les réponses à zéro,
+          puisque les listes changent. */}
+      <div key={idRendezVous} className="contents">
+        <QuestionField
+          name="budget"
+          label={questionnaire.budget.label}
+          placeholder={questionnaire.budget.placeholder}
+          options={tranchesBudget(idRendezVous)}
+          requis
+          delay={0.15}
+          enErreur={envoi.champEnErreur === "budget"}
+        />
+        <QuestionField
+          name="objectif"
+          label={questionnaire.objectif.label}
+          placeholder={questionnaire.objectif.placeholder}
+          options={optionsObjectif(idRendezVous)}
+          requis
+          delay={0.2}
+          enErreur={envoi.champEnErreur === "objectif"}
+        />
+        <QuestionField
+          name="echeance"
+          label={questionnaire.echeance.label}
+          placeholder={questionnaire.echeance.placeholder}
+          options={OPTIONS_ECHEANCE}
+          requis={false}
+          delay={0.25}
+          enErreur={envoi.champEnErreur === "echeance"}
+        />
+      </div>
 
       <FormField
         id="name"

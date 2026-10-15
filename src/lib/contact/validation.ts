@@ -17,6 +17,15 @@
  * ligne. Tout ce qui compte se décide ici.
  */
 
+import {
+  OPTIONS_ECHEANCE,
+  libelleOption,
+  optionsObjectif,
+  rendezVousDuTypeProjet,
+  tranchesBudget,
+} from "@/lib/rendez-vous/questionnaire";
+import type { OptionQuestion } from "@/content/rendez-vous";
+
 /** Intentions distinctes portées par les deux formulaires du site. */
 export const INTENTIONS = ["projet", "footer"] as const;
 
@@ -28,8 +37,14 @@ export interface SoumissionValide {
   readonly nom: string;
   readonly email: string;
   readonly typeProjet: string;
-  /** Présent pour `projet` seulement, et facultatif même là. */
   readonly message?: string;
+  /**
+   * Réponses au questionnaire de `/contact`, en LIBELLÉS (prêts pour l'e-mail).
+   * Absentes du pied de page, et d'un onglet ouvert avant leur arrivée.
+   */
+  readonly budget?: string;
+  readonly objectif?: string;
+  readonly echeance?: string;
 }
 
 /**
@@ -205,11 +220,35 @@ export function validerSoumission(
     };
   }
 
+  // Questionnaire : chaque réponse donnée doit venir de la liste du type de
+  // projet choisi. Le navigateur exige budget et objectif ; le serveur les
+  // tolère absents, sinon un onglet ouvert avant leur arrivée ne pourrait plus
+  // écrire.
+  const idRendezVous = rendezVousDuTypeProjet(typeProjet);
+  const reponses: { budget?: string; objectif?: string; echeance?: string } = {};
+  const questions: readonly [keyof typeof reponses, readonly OptionQuestion[]][] = [
+    ["budget", tranchesBudget(idRendezVous)],
+    ["objectif", optionsObjectif(idRendezVous)],
+    ["echeance", OPTIONS_ECHEANCE],
+  ];
+  for (const [champ, options] of questions) {
+    const id = normaliserLigne(lireChaine(champs, champ) ?? "");
+    if (id.length === 0) continue;
+    const libelle = libelleOption(options, id);
+    if (libelle === undefined) {
+      return {
+        ok: false,
+        motif: { type: "champ_invalide", champ, raison: "hors_liste" },
+      };
+    }
+    reponses[champ] = libelle;
+  }
+
   // Le message est facultatif pour les deux intentions : le pied de page le
   // propose aussi depuis le 2026-10-15, en champ court.
   const messageBrut = normaliserTexte(lireChaine(champs, "message") ?? "");
   if (messageBrut.length === 0) {
-    return { ok: true, soumission: { intention, nom, email, typeProjet } };
+    return { ok: true, soumission: { intention, nom, email, typeProjet, ...reponses } };
   }
   if (
     messageBrut.length < LIMITES.message.min ||
@@ -223,6 +262,6 @@ export function validerSoumission(
 
   return {
     ok: true,
-    soumission: { intention, nom, email, typeProjet, message: messageBrut },
+    soumission: { intention, nom, email, typeProjet, ...reponses, message: messageBrut },
   };
 }

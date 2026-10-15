@@ -1,6 +1,7 @@
 import type { ContactContent } from "@/lib/content/types";
 // FAQ = source unique dans faq.ts (identique à home / work, template partagé).
 import { faqItems } from "@/content/faq";
+import { rendezVousContent } from "@/content/rendez-vous";
 import { siteConfig } from "@/content/site";
 
 /**
@@ -51,6 +52,20 @@ export const contactContent: ContactContent = {
       label: "Que cherchez-vous ?",
       placeholder: "Choisissez un type de projet",
       options: siteConfig.footerForm?.selectOptions ?? [],
+    },
+    questionnaire: {
+      budget: {
+        label: rendezVousContent.questionnaire.budget.legende,
+        placeholder: "Choisissez une tranche",
+      },
+      objectif: {
+        label: rendezVousContent.questionnaire.objectif.legende,
+        placeholder: "Choisissez ce qui compte le plus",
+      },
+      echeance: {
+        label: rendezVousContent.questionnaire.echeance.legende,
+        placeholder: "Choisissez une échéance",
+      },
     },
     message: {
       label: "Autre chose ?",

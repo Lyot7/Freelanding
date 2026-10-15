@@ -80,6 +80,12 @@ function messageRejet(motif: MotifRejet): { message: string; champ?: string } {
           message: "Choisissez un type de projet dans la liste.",
           champ: "typeProjet",
         };
+      case "budget":
+        return { message: "Choisissez une tranche de budget dans la liste.", champ: "budget" };
+      case "objectif":
+        return { message: "Choisissez ce que vous voulez obtenir.", champ: "objectif" };
+      case "echeance":
+        return { message: "Choisissez une échéance dans la liste.", champ: "echeance" };
       case "message":
         return {
           message: "Votre message est trop court ou trop long.",

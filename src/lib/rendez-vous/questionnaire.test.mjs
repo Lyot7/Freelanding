@@ -1,12 +1,14 @@
 import { describe, expect, it } from "bun:test";
 import { aPartirDe, euros, prestation } from "../../content/offre.ts";
 import { rendezVousContent } from "../../content/rendez-vous.ts";
+import { siteConfig } from "../../content/site.ts";
 import {
   BUDGET_INCONNU,
   bornesBudget,
   composerNotes,
   optionsObjectif,
   prestationsDuRendezVous,
+  rendezVousDuTypeProjet,
   retourBudget,
   tranchesBudget,
 } from "./questionnaire.ts";
@@ -180,5 +182,14 @@ describe("composerNotes — ce qu'Eliott lit dans son agenda", () => {
       objectif: "relier",
     });
     expect(texte).not.toMatch(/[\u00a0\u202f]/u);
+  });
+});
+
+describe("rendezVousDuTypeProjet", () => {
+  it("relie chaque type du formulaire de contact à un rendez-vous", () => {
+    const [site, solution, inconnu] = siteConfig.footerForm.selectOptions;
+    expect(rendezVousDuTypeProjet(site)).toBe("site");
+    expect(rendezVousDuTypeProjet(solution)).toBe("logiciel");
+    expect(rendezVousDuTypeProjet(inconnu)).toBe("decouverte");
   });
 });
