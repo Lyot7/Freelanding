@@ -36,7 +36,7 @@ Depuis le 2026-10-15, la routine du blog rédige, Eliott valide dans le cockpit
 1. `bun scripts/publier-articles.ts` : chaque article validé et pas encore
    présent part dans `src/content/articles/<slug>.mdx`, ses métadonnées dans
    `src/content/articles-cockpit.json` (lues par `src/content/blog-cockpit.ts`,
-   visuels empruntés à un article publié).
+   visuel propre calculé par `scripts/visuel-articles-decision.mjs`).
 2. `bun run test`, puis PR, merge et déploiement Coolify.
 3. `bun scripts/publier-articles.ts --confirmer` : chaque article qui répond
    en ligne est marqué « Publié » dans le cockpit, avec son adresse.
