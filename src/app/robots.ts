@@ -15,8 +15,8 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      // Redirections des liens d'e-mails de prospection (`src/app/r/[id]`).
-      disallow: "/r/",
+      // Lien et logo suivis des e-mails de prospection (`src/app/r/[id]`, `src/app/o/[id]`).
+      disallow: ["/r/", "/o/"],
     },
     sitemap: absoluteUrl("/sitemap.xml"),
   };

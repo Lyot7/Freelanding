@@ -2,10 +2,13 @@ import { describe, expect, it } from "bun:test";
 import {
   creerThrottleClic,
   DESTINATION_CLIC,
+  DESTINATION_OUVERTURE,
   estRobotProbable,
   idClicValide,
   nettoyerNavigateur,
+  ouvertureRobotProbable,
   traiterClic,
+  traiterOuverture,
   URL_COCKPIT_CLICS,
 } from "./signature.ts";
 
@@ -384,5 +387,64 @@ describe("traiterClic : appel au cockpit", () => {
     const tout = [...journal.info, ...journal.erreur].join("\n");
     expect(tout).not.toContain("jeton-de-test");
     expect(tout).not.toContain("Signe-Distinctif");
+  });
+});
+
+describe("traiterOuverture : logo de la signature", () => {
+  function requeteLogo(methode, ua = UA_SAFARI) {
+    const headers = ua === null ? {} : { "user-agent": ua };
+    return new Request("http://localhost/o/x", { method: methode, headers });
+  }
+
+  it("redirige toujours vers le logo fixe, sans cache", async () => {
+    const { deps, planifies } = banc();
+    const reponse = traiterOuverture(requeteLogo("GET"), "dupont-plomberie", deps);
+    expect(reponse.status).toBe(302);
+    expect(reponse.headers.get("location")).toBe("https://eliottbouquerel.fr/apple-icon.png");
+    expect(DESTINATION_OUVERTURE).toBe("https://eliottbouquerel.fr/apple-icon.png");
+    expect(reponse.headers.get("cache-control")).toBe("no-store");
+    expect(planifies).toHaveLength(1);
+  });
+
+  it("corps du clic plus nature ouverture, sur la même URL du cockpit", async () => {
+    const { deps, planifies, appels } = banc();
+    traiterOuverture(requeteLogo("GET"), "dupont-plomberie", deps);
+    const journal = await executer(planifies);
+    expect(appels[0].url).toBe(URL_COCKPIT);
+    expect(appels[0].init.body).toBe(
+      JSON.stringify({
+        id: "dupont-plomberie",
+        cliqueLe: new Date(T0).toISOString(),
+        navigateur: UA_SAFARI,
+        robotProbable: false,
+        nature: "ouverture",
+      }),
+    );
+    expect(journal.info).toEqual(["[ouverture] dupont-plomberie 201"]);
+  });
+
+  it("le relais d'Apple Mail (« Mozilla/5.0 » seul) est un robot probable", async () => {
+    expect(ouvertureRobotProbable("Mozilla/5.0")).toBe(true);
+    expect(ouvertureRobotProbable(UA_SAFARI)).toBe(false);
+    const gmail = "Mozilla/5.0 (Windows NT 5.1; rv:11.0) Gecko Firefox/11.0 (via ggpht.com GoogleImageProxy)";
+    expect(ouvertureRobotProbable(gmail)).toBe(false);
+    const { deps, planifies, appels } = banc();
+    traiterOuverture(requeteLogo("GET", "Mozilla/5.0"), "abc", deps);
+    await executer(planifies);
+    expect(JSON.parse(appels[0].init.body).robotProbable).toBe(true);
+  });
+
+  it("HEAD et identifiant invalide : image servie, aucun appel", () => {
+    const { deps, planifies } = banc();
+    expect(traiterOuverture(requeteLogo("HEAD"), "abc", deps).status).toBe(302);
+    expect(traiterOuverture(requeteLogo("GET"), "AB CD", deps).status).toBe(302);
+    expect(planifies).toHaveLength(0);
+  });
+
+  it("le corps d'un clic ne porte pas de nature", async () => {
+    const { deps, planifies, appels } = banc();
+    traiterClic(requete("GET"), "abc", deps);
+    await executer(planifies);
+    expect(JSON.parse(appels[0].init.body)).not.toHaveProperty("nature");
   });
 });
