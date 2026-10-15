@@ -158,6 +158,24 @@ function wordpress(l, h, graine) {
   return cadre(l, h, corps);
 }
 
+/** Les quatre motifs, réutilisés par les articles validés dans le cockpit (`publier-articles.ts`). */
+export const DESSINS = { odoo, excel, refonte, wordpress };
+
+/** Écrit héros, vignette et image de partage d'un article, depuis `racine` (le dépôt). */
+export async function fabriquerVisuels(slug, dessin, graine, racine = ".") {
+  const sorties = [
+    [`${racine}/public/images/heros/blog-${slug}.jpg`, dessin(2400, 1350, graine)],
+    [`${racine}/public/images/blog/${slug}.jpg`, dessin(1200, 1114, graine)],
+    [`${racine}/public/images/og-blog-${slug}.jpg`, dessin(1200, 630, graine)],
+  ];
+  for (const [chemin, contenu] of sorties) {
+    await sharp(Buffer.from(contenu))
+      .jpeg({ quality: 82, progressive: true, mozjpeg: true })
+      .toFile(chemin);
+  }
+  return sorties.map(([chemin]) => chemin);
+}
+
 const ARTICLES = [
   ["logiciel-sur-mesure-ou-odoo", odoo, 11],
   ["remplacer-excel-par-un-logiciel", excel, 23],
@@ -165,16 +183,8 @@ const ARTICLES = [
   ["site-sur-mesure-ou-wordpress", wordpress, 41],
 ];
 
-for (const [slug, dessin, graine] of ARTICLES) {
-  const sorties = [
-    [`public/images/heros/blog-${slug}.jpg`, dessin(2400, 1350, graine)],
-    [`public/images/blog/${slug}.jpg`, dessin(1200, 1114, graine)],
-    [`public/images/og-blog-${slug}.jpg`, dessin(1200, 630, graine)],
-  ];
-  for (const [chemin, contenu] of sorties) {
-    await sharp(Buffer.from(contenu))
-      .jpeg({ quality: 82, progressive: true, mozjpeg: true })
-      .toFile(chemin);
-    console.log(chemin);
+if (import.meta.main) {
+  for (const [slug, dessin, graine] of ARTICLES) {
+    for (const chemin of await fabriquerVisuels(slug, dessin, graine)) console.log(chemin);
   }
 }
