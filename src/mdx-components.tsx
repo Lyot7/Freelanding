@@ -9,6 +9,7 @@ import {
   Steps,
   Video,
 } from "@/components/blog/blocks";
+import { CodeEnLigne, Gras, Italique, Lien } from "@/components/blog/en-ligne";
 import { idDeTitre } from "@/lib/blog/sommaire";
 
 /**
@@ -143,24 +144,9 @@ const components: MDXComponents = {
       {children}
     </p>
   ),
-  strong: ({ children }) => (
-    // L'emphase passe par la COULEUR, pas par la graisse : le corps est déjà en
-    // 500, et monter à 600 sur quelques mots donne un gris plus dense plutôt
-    // qu'un accent lisible. Le texte plein sur fond de texte à 60 % ressort net.
-    <strong className="font-medium text-background">{children}</strong>
-  ),
-  em: ({ children }) => <em className="italic">{children}</em>,
-  a: ({ href, children }) => (
-    <a
-      href={href}
-      className="text-background underline decoration-background/30 underline-offset-[3px] transition-colors duration-200 ease-[cubic-bezier(0.44,0,0.56,1)] hover:text-accent-ink hover:decoration-accent-ink motion-reduce:transition-none"
-      {...(href?.startsWith("http")
-        ? { target: "_blank", rel: "noopener noreferrer" }
-        : {})}
-    >
-      {children}
-    </a>
-  ),
+  strong: Gras,
+  em: Italique,
+  a: Lien,
   ul: ({ children }) => (
     // Sans marqueur, indentation portée par le `li` : c'est la forme relevée sur
     // la source, où `list-style-type` vaut `none` et le retrait vit sur l'item.
@@ -171,11 +157,7 @@ const components: MDXComponents = {
   ),
   li: ({ children }) => <li className="mt-[12px] first:mt-0">{children}</li>,
   blockquote: ({ children }) => <Quote>{children}</Quote>,
-  code: ({ children }) => (
-    <code className="rounded-[3px] bg-background/[0.06] px-[5px] py-[2px] font-mono text-[13px] text-background">
-      {children}
-    </code>
-  ),
+  code: CodeEnLigne,
   pre: ({ children }) => (
     // `overflow-x-auto` sur le bloc lui-même : une ligne de code longue doit
     // défiler DANS son cadre, jamais faire défiler la page entière.

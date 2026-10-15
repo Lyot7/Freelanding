@@ -1,6 +1,11 @@
 import { describe, expect, it } from "bun:test";
+import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 
-import { Callout, Video } from "./blocks";
+import { Callout, Steps, Video } from "./blocks";
 
 /**
  * Ces deux blocs sont composés directement (sans rendu DOM) : ce sont de
@@ -26,4 +31,61 @@ describe("Callout", () => {
     const element = Callout({ title: "Attention", children: "corps" });
     expect(element.type).toBe("div");
   });
+});
+
+describe("Steps", () => {
+  const rendu = (items) => renderToStaticMarkup(createElement(Steps, { items }));
+
+  it("rend un lien markdown externe en vrai lien, ouvert dans un nouvel onglet", () => {
+    const html = rendu(["Voir [la Search Central](https://developers.google.com/search) ici."]);
+    expect(html).toContain('href="https://developers.google.com/search"');
+    expect(html).toContain('target="_blank"');
+    expect(html).toContain(">la Search Central</a> ici.");
+    expect(html).not.toContain("](");
+  });
+
+  it("garde un lien interne dans l'onglet courant", () => {
+    const html = rendu(["Lire [la méthode](/blog/methode)."]);
+    expect(html).toContain('<a href="/blog/methode"');
+    expect(html).not.toContain("_blank");
+  });
+
+  it("rend le gras et l'italique", () => {
+    const html = rendu(["Un **chiffre** et un *mot*."]);
+    expect(html).toMatch(/<strong[^>]*>chiffre<\/strong>/);
+    expect(html).toMatch(/<em[^>]*>mot<\/em>/);
+  });
+
+  it("laisse un texte sans markdown intact", () => {
+    expect(rendu(["Une étape, 3 000 €."])).toContain(">Une étape, 3 000 €.</span>");
+  });
+
+  it("rend le code en ligne et le retour à la ligne forcé", () => {
+    const html = rendu(["Lancer `bun test`  \npuis relire."]);
+    expect(html).toMatch(/<code[^>]*>bun test<\/code>/);
+    expect(html).toContain("<br/>");
+  });
+
+  it("garde en texte une syntaxe que le rendu ne porte pas", () => {
+    expect(rendu(["Voir ![schéma](/s.png) ici."])).toContain(">Voir ![schéma](/s.png) ici.</span>");
+  });
+
+  it("rend tel quel ce qui ne forme pas une phrase", () => {
+    expect(rendu(["- pas une liste"])).toContain(">- pas une liste</span>");
+    expect(rendu(["Un.\n\nDeux."])).toContain(">Un.\n\nDeux.</span>");
+    expect(rendu([""])).toContain("></span>");
+  });
+
+  // Tous les usages réels : aucune étape d'article publiée ne doit montrer sa
+  // syntaxe markdown à l'écran.
+  const DOSSIER = fileURLToPath(new URL("../../content/articles", import.meta.url));
+  for (const fichier of readdirSync(DOSSIER).filter((f) => f.endsWith(".mdx"))) {
+    const source = readFileSync(join(DOSSIER, fichier), "utf8");
+    for (const [, tableau] of source.matchAll(/<Steps items=\{(\[[\s\S]*?\])\}\s*\/>/g)) {
+      it(`${fichier} : aucune syntaxe markdown visible dans les étapes`, () => {
+        const html = rendu(JSON.parse(tableau));
+        expect(html).not.toMatch(/\]\(|\*\*/);
+      });
+    }
+  }
 });
