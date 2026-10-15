@@ -4,7 +4,7 @@ des seuils précis pour ses signaux Web essentiels : l’affichage du plus gran
 interaction rester sous **200 millisecondes**, et le décalage cumulé de mise en
 page sous **0,1**. Ce sont les valeurs
 [publiées par Google sur web.dev](https://web.dev/articles/vitals), et elles se
-mesurent sur ta boutique en dix minutes.
+mesurent sur votre boutique en dix minutes.
 
 Cet article explique ce que ces trois nombres veulent dire, comment les relever
 sans outil payant, et ce qui les dégrade réellement sur une boutique.
@@ -29,13 +29,13 @@ qu’on rate parce qu’une bannière s’est insérée au-dessus au dernier mom
 
 <Stat
   value="2,5 s"
-  label="seuil publié par Google pour le LCP, au-delà duquel l’expérience n’est plus considérée comme bonne. Il s’apprécie au 75e centile des chargements, séparément sur mobile et sur ordinateur : ce n’est pas ta page la plus rapide qui compte, c’est celle que subissent tes visiteurs les moins bien lotis."
+  label="seuil publié par Google pour le LCP, au-delà duquel l’expérience n’est plus considérée comme bonne. Il s’apprécie au 75e centile des chargements, séparément sur mobile et sur ordinateur : ce n’est pas votre page la plus rapide qui compte, c’est celle que subissent vos visiteurs les moins bien lotis."
 />
 
 ## Ce que la lenteur coûte, sans invoquer d’étude douteuse
 
-Je ne vais pas te servir un pourcentage de conversion perdue par seconde. Ces
-chiffres circulent, ils viennent d’échantillons très différents du tien, et je
+Je ne vais pas vous servir un pourcentage de conversion perdue par seconde. Ces
+chiffres circulent, ils viennent d’échantillons très différents du vôtre, et je
 n’ai personnellement mesuré aucun résultat client sur ce point : je démarre mon
 activité. J’ai relevé les trois seuils cités plus haut directement dans la
 documentation de Google, un par un, plutôt que de les recopier d’un article de
@@ -44,8 +44,8 @@ blog : c’est la seule partie de ce texte que je peux garantir au chiffre prè
 Ce que je peux affirmer sans risque tient en trois mécanismes.
 
 <Steps items={[
-  "Un visiteur qui attend part. C’est une évidence, elle se vérifie dans tes propres statistiques : compare le taux de rebond de tes pages les plus lentes et de tes pages les plus rapides, à trafic comparable.",
-  "Une publicité payée sur une page lente est payée deux fois. Tu paies le clic, et tu perds une partie du trafic avant l’affichage. C’est le seul poste où la lenteur se chiffre directement en euros.",
+  "Un visiteur qui attend part. C’est une évidence, elle se vérifie dans vos propres statistiques : comparez le taux de rebond de vos pages les plus lentes et de vos pages les plus rapides, à trafic comparable.",
+  "Une publicité payée sur une page lente est payée deux fois. Vous payez le clic, et vous perdez une partie du trafic avant l’affichage. C’est le seul poste où la lenteur se chiffre directement en euros.",
   "La vitesse est un signal de classement documenté par Google, via l’expérience de page, [ce que la Search Central confirme noir sur blanc](https://developers.google.com/search/docs/appearance/core-web-vitals). Elle ne fait pas classer une mauvaise page devant une bonne, mais elle départage à qualité égale."
 ]} />
 
@@ -63,24 +63,24 @@ la page pendant son chargement. Ils se relèvent sur des visiteurs réels, au
 
 Trois relevés, dans cet ordre.
 
-**[PageSpeed Insights](https://developers.google.com/speed/docs/insights/v5/about)**, l’outil public de Google. Entre l’adresse d’une fiche
-produit, pas ta page d’accueil : c’est là qu’atterrissent tes visiteurs. Regarde
+**[PageSpeed Insights](https://developers.google.com/speed/docs/insights/v5/about)**, l’outil public de Google. Entrez l’adresse d’une fiche
+produit, pas votre page d’accueil : c’est là qu’atterrissent vos visiteurs. Regardez
 la section des données de terrain, celles qui viennent d’utilisateurs réels,
 avant la section de laboratoire.
 
-**La Search Console**, onglet des signaux Web essentiels. Elle regroupe tes
-pages par gabarit et te dit lesquels échouent. C’est le seul endroit qui donne
+**La Search Console**, onglet des signaux Web essentiels. Elle regroupe vos
+pages par gabarit et vous dit lesquels échouent. C’est le seul endroit qui donne
 une vue d’ensemble plutôt qu’une page à la fois.
 
-**Ton propre téléphone, en données mobiles, hors du wifi de ton bureau.** C’est
-le test le plus désagréable et le plus instructif. Ouvre ta boutique comme un
-inconnu, en partant d’une recherche, et va jusqu’au paiement.
+**Votre propre téléphone, en données mobiles, hors du wifi de votre bureau.** C’est
+le test le plus désagréable et le plus instructif. Ouvrez votre boutique comme un
+inconnu, en partant d’une recherche, et allez jusqu’au paiement.
 
 <Callout title="Le piège du score sur cent">
 Le score coloré de PageSpeed est une synthèse de laboratoire, calculée sur un
 appareil simulé. Il est utile pour comparer deux versions d’une même page, pas
-pour juger ta boutique. Les seuils qui comptent sont les trois mesures de
-terrain, celles qui viennent de tes vrais visiteurs.
+pour juger votre boutique. Les seuils qui comptent sont les trois mesures de
+terrain, celles qui viennent de vos vrais visiteurs.
 </Callout>
 
 ## Ce qui ralentit réellement une boutique
@@ -102,7 +102,7 @@ outil de statistiques, deux pixels publicitaires, un chat, un système d’avis,
 gestionnaire de consentement, une bannière de promotion, un widget de fidélité.
 Chacun a été ajouté pour une bonne raison, aucun n’a jamais été retiré.
 
-Fais l’inventaire. Pour chaque script, pose deux questions : qu’est-ce qu’il
+Faites l’inventaire. Pour chaque script, posez deux questions : qu’est-ce qu’il
 apporte, et qui regarde ce qu’il produit. Les scripts dont personne ne lit les
 données sortent.
 
@@ -124,7 +124,7 @@ page qui met huit secondes à s’afficher est souvent abandonnée avant.
 ### Les polices
 
 Une police chargée depuis un service externe ajoute une connexion réseau avant
-le premier texte affiché. Les héberger sur ton propre domaine et déclarer un
+le premier texte affiché. Les héberger sur votre propre domaine et déclarer un
 repli visible pendant le chargement supprime le problème.
 
 ## L’ordre dans lequel je prends les choses
@@ -148,15 +148,15 @@ envoyant moins de choses.
 
 ## Ce qu’il ne faut pas faire
 
-Ne poursuis pas le score de cent sur cent. Au-delà d’un certain point, les gains
+Ne poursuivez pas le score de cent sur cent. Au-delà d’un certain point, les gains
 sont invisibles pour un visiteur et coûtent très cher en complexité.
 
-Ne retire pas un outil qui rapporte pour gagner deux dixièmes de seconde. Un
+Ne retirez pas un outil qui rapporte pour gagner deux dixièmes de seconde. Un
 système d’avis qui augmente vraiment la conversion vaut son poids ; c’est le
 widget de fidélité que personne n’a ouvert depuis dix-huit mois qui doit partir.
 
-Ne mesure pas une seule fois. La performance se dégrade toute seule, au rythme
-des ajouts. Un relevé trimestriel de tes quatre gabarits principaux suffit à
+Ne mesurez pas une seule fois. La performance se dégrade toute seule, au rythme
+des ajouts. Un relevé trimestriel de vos quatre gabarits principaux suffit à
 tenir la ligne.
 
 ## Ce que je retiens
@@ -166,7 +166,7 @@ diagnostic est gratuit. Les trois seuils de Google sont publics, les outils de
 mesure aussi, et les deux tiers des corrections consistent à retirer plutôt qu’à
 ajouter.
 
-Si tu veux que je mesure tes gabarits, que je te rende ce qui pèse et
+Si vous voulez que je mesure vos gabarits, que je vous rende ce qui pèse et
 dans quel ordre le traiter, c’est le point de départ de mes
-[prestations de site et de refonte](/services/site-vitrine). [Réserve un
-appel](/contact?sujet=site#rendez-vous) avec l’adresse de ta boutique.
+[prestations de site et de refonte](/services/site-vitrine). [Réservez un
+appel](/contact?sujet=site#rendez-vous) avec l’adresse de votre boutique.

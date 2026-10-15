@@ -78,8 +78,8 @@ export function personSchema(site: SiteConfig) {
     jobTitle: site.contact.person?.role,
     url: absoluteUrl("/a-propos"),
     email: site.contact.email ? `mailto:${site.contact.email}` : undefined,
-    image: site.credits?.createdByAvatar
-      ? absoluteUrl(site.credits.createdByAvatar.src)
+    image: site.contact.person?.avatar
+      ? absoluteUrl(site.contact.person.avatar.src)
       : undefined,
     sameAs: site.socials?.filter((s) => s.external).map((s) => s.href),
     worksFor: { "@id": BUSINESS_ID },

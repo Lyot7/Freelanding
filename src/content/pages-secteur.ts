@@ -161,7 +161,7 @@ const pageBtp: PageSecteur = {
     description: `Logiciel de gestion de chantier sur mesure pour votre PME du BTP : devis, situations, pointage, sous-traitants. Prix : ${aPartirDe(LOGICIEL, " HT")}, au devis.`,
   },
   h1: "Logiciel de gestion de chantier BTP",
-  resume: `Un logiciel de gestion de chantier sur mesure réunit tes devis, l’avancement, les situations de travaux et les heures de tes équipes dans un seul outil. Il s’adresse aux PME du BTP que le tableur ou un logiciel standard ne suit plus. Compte ${aPartirDe(LOGICIEL, " HT")}, selon le périmètre.`,
+  resume: `Un logiciel de gestion de chantier sur mesure réunit vos devis, l’avancement, les situations de travaux et les heures de vos équipes dans un seul outil. Il s’adresse aux PME du BTP que le tableur ou un logiciel standard ne suit plus. Comptez ${aPartirDe(LOGICIEL, " HT")}, selon le périmètre.`,
   marcheFilAriane: "BTP",
   libelleLien: "logiciel de gestion de chantier BTP",
   noteLlms:
@@ -200,16 +200,16 @@ const pageBtp: PageSecteur = {
     },
     {
       id: "modules",
-      titre: "Ce que fait ton logiciel de chantier",
+      titre: "Du métré à la situation : ce que fait votre logiciel de chantier",
       paragraphes: [
-        "Le logiciel reprend tes lots, ta bibliothèque d’ouvrages et tes règles de facturation. Tu retiens les modules qui règlent ton problème, et leur nombre fait l’essentiel du prix.",
+        "Le logiciel reprend vos lots, votre bibliothèque d’ouvrages et vos règles de facturation. Vous retenez les modules qui règlent votre problème, et leur nombre fait l’essentiel du prix.",
         "Une donnée saisie une fois sert partout : le métré alimente le devis, le devis signé devient le budget, le pointage nourrit le coût réel, l’avancement produit la situation du mois.",
       ],
       points: [
         {
           titre: "Devis par ouvrage",
           corps:
-            "Tes ouvrages avec leur déboursé sec, tes coefficients de vente, les variantes, et les avenants rattachés au devis d’origine.",
+            "Vos ouvrages avec leur déboursé sec, vos coefficients de vente, les variantes, et les avenants rattachés au devis d’origine.",
         },
         {
           titre: "Suivi de chantier",
@@ -242,8 +242,8 @@ const pageBtp: PageSecteur = {
       id: "calcul",
       titre: "La ressaisie, chiffrée sur une année",
       paragraphes: [
-        `Prends une PME avec ${BTP_CONDUCTEURS} conducteurs de travaux. Par personne, ${BTP_HEURES_SEMAINE} heures par semaine partent à recopier des pointages, à tenir un tableur d’avancement et à refaire les situations. Sur ${BTP_SEMAINES} semaines travaillées, le total atteint ${BTP_HEURES_AN} heures par an.`,
-        `À ${euros(BTP_COUT_HORAIRE)} l’heure, salaire chargé et frais compris, ces heures coûtent ${euros(BTP_COUT_AN)} par an. Un logiciel de chantier sur mesure démarre à ${prixPlancher(LOGICIEL)} HT, payé une fois. Ces 4 chiffres sont des hypothèses : remplace-les par les tiens avant d’en tirer une conclusion.`,
+        `Prenez une PME avec ${BTP_CONDUCTEURS} conducteurs de travaux. Par personne, ${BTP_HEURES_SEMAINE} heures par semaine partent à recopier des pointages, à tenir un tableur d’avancement et à refaire les situations. Sur ${BTP_SEMAINES} semaines travaillées, le total atteint ${BTP_HEURES_AN} heures par an.`,
+        `À ${euros(BTP_COUT_HORAIRE)} l’heure, salaire chargé et frais compris, ces heures coûtent ${euros(BTP_COUT_AN)} par an. Un logiciel de chantier sur mesure démarre à ${prixPlancher(LOGICIEL)} HT, payé une fois. Ces 4 chiffres sont des hypothèses : remplacez-les par les vôtres avant d’en tirer une conclusion.`,
       ],
       points: [
         {
@@ -272,8 +272,8 @@ const pageBtp: PageSecteur = {
       id: "marche",
       titre: "Sur mesure ou logiciel BTP du marché ?",
       paragraphes: [
-        "Des éditeurs vendent des logiciels BTP complets, avec devis, situations et facturation, sur abonnement mensuel. Si ton activité tient dans leurs écrans, prends-en un : il coûtera moins cher et se mettra en place plus vite qu’un développement.",
-        "Le sur mesure se justifie quand ton métier sort de leur cadre, ou quand ton logiciel actuel fait l’essentiel et que le reste te coûte des heures chaque semaine. Dans ce cas, garde-le et fais développer la pièce qui manque.",
+        "Des éditeurs vendent des logiciels BTP complets, avec devis, situations et facturation, sur abonnement mensuel. Si votre activité tient dans leurs écrans, prenez-en un : il coûtera moins cher et se mettra en place plus vite qu’un développement.",
+        "Le sur mesure se justifie quand votre métier sort de leur cadre, ou quand votre logiciel actuel fait l’essentiel et que le reste vous coûte des heures chaque semaine. Dans ce cas, gardez-le et faites développer la pièce qui manque.",
       ],
       liens: {
         titre: "Pour trancher",
@@ -282,7 +282,7 @@ const pageBtp: PageSecteur = {
             libelle: "Outil sur mesure ou abonnements SaaS",
             href: CHEMIN_ARTICLE_SAAS,
             description:
-              "Comment comparer un abonnement par utilisateur et un outil qui t’appartient.",
+              "Comment comparer un abonnement par utilisateur et un outil qui vous appartient.",
           },
         ],
       },
@@ -295,16 +295,16 @@ const pageBtp: PageSecteur = {
         {
           titre: "Le sur mesure se justifie",
           corps:
-            "Plusieurs sociétés à consolider, un process propre à ton métier comme la préfabrication en atelier ou un parc de matériel interne, ou des outils existants à faire parler entre eux.",
+            "Plusieurs sociétés à consolider, un process propre à votre métier comme la préfabrication en atelier ou un parc de matériel interne, ou des outils existants à faire parler entre eux.",
         },
         {
           titre: "Entre les deux",
-          corps: `À partir de ${prixPlancher(LOGICIEL)} HT, j’ajoute à ton logiciel actuel la fonction qui lui manque : un pointage mobile, un export vers la paie, un tableau de marge par chantier.`,
+          corps: `À partir de ${prixPlancher(LOGICIEL)} HT, j’ajoute à votre logiciel actuel la fonction qui lui manque : un pointage mobile, un export vers la paie, un tableau de marge par chantier.`,
         },
         {
           titre: "À qui appartient l’outil",
           corps:
-            "Avec un abonnement, tu loues l’outil et tes données vivent chez l’éditeur. Le sur mesure t’appartient à la livraison, code et base compris, sans licence par utilisateur.",
+            "Avec un abonnement, vous louez l’outil. Le sur mesure vous appartient à la livraison, code et base compris, sans licence par utilisateur.",
         },
       ],
     },
@@ -332,7 +332,7 @@ const pageBtp: PageSecteur = {
           {
             libelle: "Réserver un appel",
             href: "#rendez-vous",
-            description: "Choisis un créneau en visio pour parler de tes chantiers.",
+            description: "Choisissez un créneau en visio pour parler de vos chantiers.",
           },
         ],
       },
@@ -340,22 +340,22 @@ const pageBtp: PageSecteur = {
         {
           titre: "1. Un appel en visio",
           corps:
-            "Gratuit. Quand tu le réserves, 3 questions sur ton budget, ton objectif et ton échéance me permettent de te dire dès l’appel ce que ton budget permet.",
+            "Gratuit : vous décrivez vos chantiers et ce qui vous coûte des heures chaque semaine.",
         },
         {
           titre: "2. Le devis, relu ensemble",
           corps:
-            "Je te le présente lors d’un second rendez-vous : les modules retenus, le prix ferme et la date de mise en ligne, écrits avant que tu signes.",
+            "Les modules, le prix ferme et la date de mise en ligne, présentés lors d’un second rendez-vous.",
         },
         {
-          titre: "3. Le logiciel avance sous tes yeux",
+          titre: "3. Le logiciel avance sous vos yeux",
           corps:
-            "Je ne mène qu’un projet à la fois. Chaque module arrive sur une adresse en ligne, et tes conducteurs de travaux l’essaient sur un vrai chantier avant la livraison.",
+            "Chaque module arrive sur une adresse en ligne, et vos conducteurs de travaux l’essaient sur un vrai chantier.",
         },
         {
-          titre: "4. Livré à ton nom",
+          titre: "4. Livré à votre nom",
           corps:
-            "Le code dans ton dépôt, l’hébergement à ton nom, et une documentation qui permet à un autre développeur de reprendre.",
+            "Le code dans votre dépôt, l’hébergement à votre nom, et une documentation qui permet à un autre développeur de reprendre.",
         },
       ],
     },
@@ -368,7 +368,7 @@ const pageBtp: PageSecteur = {
   titreOffre: "Prix d’un logiciel de chantier : ce qui le fait varier",
   faq: {
     eyebrow: "FAQ",
-    titleLines: ["Ton logiciel", "de chantier."],
+    titleLines: ["Votre logiciel", "de chantier."],
     items: [
       {
         question: "Combien coûte un logiciel de gestion de chantier sur mesure ?",
@@ -378,22 +378,28 @@ const pageBtp: PageSecteur = {
         question:
           "Le logiciel gère-t-il la facturation à l’avancement et la retenue de garantie ?",
         answer:
-          "Oui, si tu retiens ce module. Chaque situation reprend l’avancement par poste, déduit les situations déjà facturées et applique la retenue de garantie prévue au marché, ou note la caution qui la remplace. Le logiciel garde la trace de chaque retenue jusqu’à sa libération.",
+          "Oui, si vous retenez ce module. Chaque situation reprend l’avancement par poste, déduit les situations déjà facturées et applique la retenue de garantie prévue au marché, ou note la caution qui la remplace. Le logiciel garde la trace de chaque retenue jusqu’à sa libération.",
       },
       {
         question: "Mes chefs d’équipe pourront-ils pointer depuis le chantier ?",
         answer:
-          "Oui. Le pointage s’ouvre dans le navigateur du téléphone, sans application à installer : le chantier, les compagnons présents, les heures. Si tes chantiers captent mal, dis-le au premier appel, et la saisie hors connexion entre dans le périmètre du devis.",
+          "Oui. Le pointage s’ouvre dans le navigateur du téléphone, sans application à installer : le chantier, les compagnons présents, les heures. Si vos chantiers captent mal, dites-le au premier appel, et la saisie hors connexion entre dans le périmètre du devis.",
       },
       {
         question: "Peut-on reprendre mes devis et mes chantiers en cours ?",
         answer:
-          "Oui. Tes tableurs et les exports de ton logiciel actuel sont nettoyés et chargés avant la mise en ligne, chantiers ouverts compris. Cette reprise est chiffrée au devis.",
+          "Oui. Vos tableurs et les exports de votre logiciel actuel sont nettoyés et chargés avant la mise en ligne, chantiers ouverts compris. Cette reprise est chiffrée au devis.",
+      },
+      // Vise « logiciel devis facture BTP » (carte SEO du 2026-10-15).
+      {
+        question: "Logiciel de devis et facture BTP : éditeur ou sur mesure ?",
+        answer:
+          "Pour des devis et des factures classiques, un logiciel d’éditeur suffit. Le sur mesure se justifie quand le devis par ouvrage doit nourrir le budget, l’avancement et la situation sans ressaisie, ou quand votre facturation sort de ses règles.",
       },
       {
-        question: "As-tu déjà travaillé pour une entreprise du BTP ?",
+        question: "Avez-vous déjà travaillé pour une entreprise du BTP ?",
         answer:
-          "Pas encore. Mon projet chiffré le plus proche vient de la distribution : le parcours de création de compte de l’eShop de Würth France. Ce que j’en transpose, c’est la façon de travailler : comprendre comment tes équipes saisissent avant de coder, puis te montrer chaque module en cours de route.",
+          "Pas encore. Mon projet chiffré le plus proche vient de la distribution : le parcours de création de compte de l’eShop de Würth France. Ce que j’en transpose, c’est la façon de travailler : comprendre comment vos équipes saisissent avant de coder, puis vous montrer chaque module en cours de route.",
       },
     ],
   },
@@ -425,7 +431,7 @@ const pageTransport: PageSecteur = {
     description: `TMS sur mesure pour votre entreprise de transport routier : ordres, tournées, CMR, preuves de livraison, facturation. Prix : ${aPartirDe(LOGICIEL, " HT")}, au devis.`,
   },
   h1: "Logiciel de gestion de transport",
-  resume: `Un logiciel de gestion de transport sur mesure, ou TMS, reçoit tes ordres de transport, organise les tournées, suit chaque livraison jusqu’à la preuve signée et prépare la facture. Il vise les PME du transport routier que les mails et les tableurs ne suivent plus. Son prix démarre à ${prixPlancher(LOGICIEL)} HT, et suit le nombre de modules.`,
+  resume: `Un logiciel de gestion de transport sur mesure, ou TMS, reçoit vos ordres de transport, organise les tournées, suit chaque livraison jusqu’à la preuve signée et prépare la facture. Il vise les PME du transport routier que les mails et les tableurs ne suivent plus. Son prix démarre à ${prixPlancher(LOGICIEL)} HT, et suit le nombre de modules.`,
   marcheFilAriane: "Transport",
   libelleLien: "logiciel de gestion de transport",
   noteLlms:
@@ -448,7 +454,7 @@ const pageTransport: PageSecteur = {
         {
           titre: "Tournées et affrètement",
           corps:
-            "L’exploitant arbitre entre tes camions et un confrère affrété de mémoire, sans voir la marge de chaque option.",
+            "L’exploitant arbitre entre vos camions et un confrère affrété de mémoire, sans voir la marge de chaque option.",
         },
         {
           titre: "Lettres de voiture et CMR",
@@ -474,16 +480,16 @@ const pageTransport: PageSecteur = {
     },
     {
       id: "modules",
-      titre: "Ce que fait ton TMS sur mesure",
+      titre: "De l’ordre au POD : ce que fait votre TMS sur mesure",
       paragraphes: [
-        "Un TMS sur mesure suit ton exploitation telle qu’elle tourne : tes chargeurs, tes grilles tarifaires, ton affrètement. Le nombre de modules retenus fait l’essentiel du prix.",
+        "Un TMS sur mesure suit votre exploitation telle qu’elle tourne : vos chargeurs, vos grilles tarifaires, votre affrètement. Le nombre de modules retenus fait l’essentiel du prix.",
         "L’ordre importé ou saisi une seule fois devient la mission du conducteur, puis la ligne de facture, sans nouvelle frappe entre les deux.",
       ],
       points: [
         {
           titre: "Prise d’ordres",
           corps:
-            "L’import des fichiers de tes chargeurs, ou la saisie par tes clients sur un espace à leur nom, avec contrôle des adresses et des créneaux.",
+            "L’import des fichiers de vos chargeurs, ou la saisie par vos clients sur un espace à leur nom, avec contrôle des adresses et des créneaux.",
         },
         {
           titre: "Planning et tournées",
@@ -511,14 +517,14 @@ const pageTransport: PageSecteur = {
       id: "calcul",
       titre: "Le prix d’une ressaisie de 4 minutes",
       paragraphes: [
-        `Prends une exploitation qui reçoit ${TR_ORDRES_JOUR} ordres de transport par jour. Recopier un ordre du mail vers le planning, puis vers la lettre de voiture et la facture, prend ${TR_MINUTES_ORDRE} minutes au total. La ressaisie occupe ${TR_HEURES_JOUR} heures par jour, soit ${TR_HEURES_AN} heures sur ${TR_JOURS} jours ouvrés.`,
-        `À ${euros(TR_COUT_HORAIRE)} l’heure chargée, elle coûte ${euros(TR_COUT_AN)} par an, sans compter les lignes oubliées à la facturation. Un TMS sur mesure démarre à ${prixPlancher(LOGICIEL)} HT, payé une fois. Remplace ces hypothèses par tes chiffres : si le résultat tombe loin sous le prix de ton devis, garde tes outils actuels.`,
+        `Prenez une exploitation qui reçoit ${TR_ORDRES_JOUR} ordres de transport par jour. Recopier un ordre du mail vers le planning, puis vers la lettre de voiture et la facture, prend ${TR_MINUTES_ORDRE} minutes au total. La ressaisie occupe ${TR_HEURES_JOUR} heures par jour, soit ${TR_HEURES_AN} heures sur ${TR_JOURS} jours ouvrés.`,
+        `À ${euros(TR_COUT_HORAIRE)} l’heure chargée, elle coûte ${euros(TR_COUT_AN)} par an, sans compter les lignes oubliées à la facturation. Un TMS sur mesure démarre à ${prixPlancher(LOGICIEL)} HT, payé une fois. Remplacez ces hypothèses par vos chiffres : si le résultat tombe loin sous le prix de votre devis, gardez vos outils actuels.`,
       ],
       points: [
         {
           titre: `Hypothèse 1 : ${TR_ORDRES_JOUR} ordres par jour`,
           corps:
-            "Pour trouver le tien, compte les ordres d’une semaine ordinaire et divise par 5.",
+            "Pour trouver le vôtre, comptez les ordres d’une semaine ordinaire et divisez par 5.",
         },
         {
           titre: `Hypothèse 2 : ${TR_MINUTES_ORDRE} minutes par ordre`,
@@ -541,7 +547,7 @@ const pageTransport: PageSecteur = {
       titre: "TMS du marché ou TMS sur mesure ?",
       paragraphes: [
         "Les éditeurs de TMS couvrent bien le cas général, sur abonnement : ordres, planning, documents de transport, facturation. Pour une flotte en lot complet ou en messagerie classique, avec des chargeurs qui envoient des ordres propres, un TMS du marché fait le travail et démarre plus vite qu’un développement.",
-        "Le sur mesure prend le relais quand ton exploitation a ses propres règles, ou quand ton TMS tient l’essentiel et qu’une partie de ta journée se passe encore dans des tableurs à côté.",
+        "Le sur mesure prend le relais quand votre exploitation a ses propres règles, ou quand votre TMS tient l’essentiel et qu’une partie de votre journée se passe encore dans des tableurs à côté.",
       ],
       liens: {
         titre: "Pour comparer",
@@ -558,27 +564,27 @@ const pageTransport: PageSecteur = {
         {
           titre: "Un TMS du marché suffit",
           corps:
-            "Des règles de tarification courantes, peu d’échanges de fichiers avec tes chargeurs, et une équipe prête à suivre les écrans de l’éditeur.",
+            "Des règles de tarification courantes, peu d’échanges de fichiers avec vos chargeurs, et une équipe prête à suivre les écrans de l’éditeur.",
         },
         {
           titre: "Le sur mesure se justifie",
           corps:
-            "Des chargeurs qui imposent leur format, une activité mixte entre transport et entreposage, ou une tarification que ton TMS ne sait pas calculer.",
+            "Des chargeurs qui imposent leur format, une activité mixte entre transport et entreposage, ou une tarification que votre TMS ne sait pas calculer.",
         },
         {
-          titre: "Garder ton TMS",
-          corps: `À partir de ${prixPlancher(LOGICIEL)} HT, je branche la pièce manquante sur ton TMS actuel : l’import des ordres d’un gros chargeur, ou le calcul de l’indexation gazole.`,
+          titre: "Garder votre TMS",
+          corps: `À partir de ${prixPlancher(LOGICIEL)} HT, je branche la pièce manquante sur votre TMS actuel : l’import des ordres d’un gros chargeur, ou le calcul de l’indexation gazole.`,
         },
         {
-          titre: "Ton outil, tes données",
+          titre: "Votre outil, vos données",
           corps:
-            "Une fois livré, le logiciel t’appartient : code, base et hébergement. Aucune licence par camion ni par utilisateur ne s’ajoute quand la flotte grandit.",
+            "Une fois livré, le logiciel vous appartient : code, base et hébergement. Aucune licence par camion ni par utilisateur ne s’ajoute quand la flotte grandit.",
         },
       ],
     },
     {
       id: "methode",
-      titre: "La méthode, appliquée à ton exploitation",
+      titre: "La méthode, appliquée à votre exploitation",
       paragraphes: [
         "Je commence par relever où l’information se perd : quel ordre a été retapé, quelle ligne a sauté de la facture, quel POD a manqué. C’est la méthode suivie chez Würth France, dans un autre secteur, la distribution, sur un parcours de création de compte : −92 % d’erreurs, mesuré en interne.",
       ],
@@ -600,7 +606,7 @@ const pageTransport: PageSecteur = {
           {
             libelle: "Réserver un appel",
             href: "#rendez-vous",
-            description: "Un créneau en visio pour parler de ton exploitation.",
+            description: "Un créneau en visio pour parler de votre exploitation.",
           },
         ],
       },
@@ -608,22 +614,22 @@ const pageTransport: PageSecteur = {
         {
           titre: "1. Un premier appel en visio",
           corps:
-            "Sans frais. En réservant, tu réponds à 3 questions, budget, objectif et échéance, et je te dis pendant l’appel ce que ton budget couvre.",
+            "Sans frais. En réservant, vous répondez à 3 questions, budget, objectif et échéance, et je vous dis pendant l’appel ce que votre budget couvre.",
         },
         {
           titre: "2. Un devis présenté à 2",
           corps:
-            "Il ne part jamais seul par e-mail : je te le présente lors d’un second rendez-vous, avec les modules, le prix ferme et la date de mise en ligne.",
+            "Il ne part jamais seul par e-mail : je vous le présente lors d’un second rendez-vous, avec les modules, le prix ferme et la date de mise en ligne.",
         },
         {
           titre: "3. Des modules testés sur de vrais ordres",
           corps:
-            "Un seul projet à la fois. Chaque module arrive sur une adresse en ligne, et ton équipe d’exploitation l’essaie sur ses ordres du jour avant la livraison.",
+            "Un seul projet à la fois. Chaque module arrive sur une adresse en ligne, et votre équipe d’exploitation l’essaie sur ses ordres du jour avant la livraison.",
         },
         {
-          titre: "4. Un logiciel à ton nom",
+          titre: "4. Un logiciel à votre nom",
           corps:
-            "Code dans ton dépôt, hébergement à ton nom, documentation remise : tu changes de prestataire quand tu le décides.",
+            "Code dans votre dépôt, hébergement à votre nom, documentation remise : vous changez de prestataire quand vous le décidez.",
         },
       ],
     },
@@ -636,11 +642,11 @@ const pageTransport: PageSecteur = {
   titreOffre: "Prix d’un TMS sur mesure : ce qui le fait varier",
   faq: {
     eyebrow: "FAQ",
-    titleLines: ["Ton TMS", "sur mesure."],
+    titleLines: ["Votre TMS", "sur mesure."],
     items: [
       {
         question: "Combien coûte un TMS sur mesure ?",
-        answer: `Le prix démarre à ${prixPlancher(LOGICIEL)} HT et monte avec les modules retenus, de l’import des ordres d’un chargeur jusqu’à la prise d’ordres, le planning et la facturation réunis. Un TMS qui dialogue dans les 2 sens avec tes autres systèmes coûte davantage. Le devis fixe le montant.`,
+        answer: `Le prix démarre à ${prixPlancher(LOGICIEL)} HT et monte avec les modules retenus, de l’import des ordres d’un chargeur jusqu’à la prise d’ordres, le planning et la facturation réunis. Un TMS qui dialogue dans les 2 sens avec vos autres systèmes coûte davantage. Le devis fixe le montant.`,
       },
       {
         question: "Le logiciel peut-il importer les ordres de mes clients ?",
@@ -654,12 +660,12 @@ const pageTransport: PageSecteur = {
       {
         question: "Le TMS calcule-t-il l’indexation gazole ?",
         answer:
-          "Oui. Tu saisis pour chaque contrat l’indice de référence et la part du gazole dans le prix, et le logiciel recalcule la surcharge à chaque nouvelle valeur de l’indice, puis l’ajoute aux factures concernées.",
+          "Oui. Vous saisissez pour chaque contrat l’indice de référence et la part du gazole dans le prix, et le logiciel recalcule la surcharge à chaque nouvelle valeur de l’indice, puis l’ajoute aux factures concernées.",
       },
       {
-        question: "As-tu déjà développé un TMS ?",
+        question: "Avez-vous déjà développé un TMS ?",
         answer:
-          "Non, pas pour une entreprise de transport. Le projet que je peux te montrer chiffres à l’appui vient de la distribution : le parcours de création de compte de l’eShop de Würth France. J’en apporte la manière de faire : relever où l’information se perd, construire module par module, tester sur de vrais ordres.",
+          "Non, pas pour une entreprise de transport. Le projet que je peux vous montrer chiffres à l’appui vient de la distribution : le parcours de création de compte de l’eShop de Würth France. J’en apporte la manière de faire : relever où l’information se perd, construire module par module, tester sur de vrais ordres.",
       },
     ],
   },
@@ -689,7 +695,7 @@ const pageLocation: PageSecteur = {
     description: `Logiciel de location de matériel sur mesure : votre parc, vos contrats, disponibilités, états des lieux et facturation. Prix : ${aPartirDe(LOGICIEL, " HT")}, au devis.`,
   },
   h1: "Logiciel de gestion de location de matériel",
-  resume: `Un logiciel de gestion de location de matériel sur mesure suit ton parc machine par machine, te dit ce qui est disponible demain, et édite le contrat, l’état des lieux et la facture à la journée. Il vise les loueurs et les entreprises de BTP ou de TP qui gèrent leur parc sur un tableur ou un planning mural. Compte ${aPartirDe(LOGICIEL, " HT")}, selon les modules retenus.`,
+  resume: `Un logiciel de gestion de location de matériel sur mesure suit votre parc machine par machine, vous dit ce qui est disponible demain, et édite le contrat, l’état des lieux et la facture à la journée. Il vise les loueurs et les entreprises de BTP ou de TP qui gèrent leur parc sur un tableur ou un planning mural. Comptez ${aPartirDe(LOGICIEL, " HT")}, selon les modules retenus.`,
   marcheFilAriane: "Location de matériel",
   libelleLien: "logiciel de gestion de location de matériel",
   noteLlms:
@@ -701,7 +707,7 @@ const pageLocation: PageSecteur = {
       titre: "Quand le planning mural ne suit plus le parc",
       paragraphes: [
         "Chez un loueur, une même machine change de mains plusieurs fois par mois. Le commercial la réserve au téléphone, le dépôt la prépare, le chauffeur la livre sur le chantier, le client prolonge d’une semaine par SMS, puis elle revient avec des heures au compteur, des rayures et un réservoir à moitié vide. Chaque étape laisse sa trace sur un support différent : planning mural, carnet de bons, tableur, photos dans un téléphone.",
-        "Le jour où 2 commerciaux promettent la même minipelle pour le lundi, ou qu’une prolongation n’arrive jamais sur la facture, tu paies le prix de ces supports qui ne se parlent pas.",
+        "Le jour où 2 commerciaux promettent la même minipelle pour le lundi, ou qu’une prolongation n’arrive jamais sur la facture, vous payez le prix de ces supports qui ne se parlent pas.",
       ],
       points: [
         {
@@ -728,9 +734,9 @@ const pageLocation: PageSecteur = {
     },
     {
       id: "modules",
-      titre: "Ce que fait ton logiciel de location",
+      titre: "De la réservation au retour : ce que fait votre logiciel de location",
       paragraphes: [
-        "Le logiciel part de ton parc tel qu’il est : tes familles de matériel, tes numéros de série, tes tarifs à la journée, à la semaine et au mois, tes conditions par client. Tu choisis les modules, et leur nombre fait l’essentiel du prix.",
+        "Le logiciel part de votre parc tel qu’il est : vos familles de matériel, vos numéros de série, vos tarifs à la journée, à la semaine et au mois, vos conditions par client. Vous choisissez les modules, et leur nombre fait l’essentiel du prix.",
         "Chaque mouvement alimente le suivant : la réservation bloque la machine sur le planning, le départ ouvre le contrat, le retour clôt la période facturée et relève le compteur qui déclenche l’entretien.",
       ],
       points: [
@@ -752,7 +758,7 @@ const pageLocation: PageSecteur = {
         {
           titre: "Facturation à la durée",
           corps:
-            "Le tarif dégressif appliqué à la durée réelle, avec tes règles pour les jours non ouvrés, et le carburant, le nettoyage et le transport ajoutés.",
+            "Le tarif dégressif appliqué à la durée réelle, avec vos règles pour les jours non ouvrés, et le carburant, le nettoyage et le transport ajoutés.",
         },
         {
           titre: "Maintenance préventive",
@@ -765,14 +771,14 @@ const pageLocation: PageSecteur = {
       id: "calcul",
       titre: "Les mouvements du dépôt, chiffrés sur une année",
       paragraphes: [
-        `Prends un dépôt qui enregistre ${LOC_MOUVEMENTS_JOUR} mouvements par jour, départs et retours confondus. Pour chacun, ${LOC_MINUTES} minutes partent à recopier le bon de sortie, à reporter le compteur et à corriger la durée pour la facture. Sur ${LOC_JOURS} jours d’ouverture, le total atteint ${LOC_HEURES_AN} heures par an.`,
-        `À ${euros(LOC_COUT_HORAIRE)} l’heure, salaire chargé et frais compris, ces heures coûtent ${euros(LOC_COUT_AN)} par an. Un logiciel de location sur mesure démarre à ${prixPlancher(LOGICIEL)} HT, payé une fois. Ces 4 chiffres sont des hypothèses : remplace-les par ceux de ton dépôt.`,
+        `Prenez un dépôt qui enregistre ${LOC_MOUVEMENTS_JOUR} mouvements par jour, départs et retours confondus. Pour chacun, ${LOC_MINUTES} minutes partent à recopier le bon de sortie, à reporter le compteur et à corriger la durée pour la facture. Sur ${LOC_JOURS} jours d’ouverture, le total atteint ${LOC_HEURES_AN} heures par an.`,
+        `À ${euros(LOC_COUT_HORAIRE)} l’heure, salaire chargé et frais compris, ces heures coûtent ${euros(LOC_COUT_AN)} par an. Un logiciel de location sur mesure démarre à ${prixPlancher(LOGICIEL)} HT, payé une fois. Ces 4 chiffres sont des hypothèses : remplacez-les par ceux de votre dépôt.`,
       ],
       points: [
         {
           titre: `Hypothèse 1 : ${LOC_MOUVEMENTS_JOUR} mouvements par jour`,
           corps:
-            "Les machines qui sortent du dépôt et celles qui y reviennent, livrées par ton chauffeur ou enlevées par le client.",
+            "Les machines qui sortent du dépôt et celles qui y reviennent, livrées par votre chauffeur ou enlevées par le client.",
         },
         {
           titre: `Hypothèse 2 : ${LOC_MINUTES} minutes par mouvement`,
@@ -794,8 +800,8 @@ const pageLocation: PageSecteur = {
       id: "marche",
       titre: "Sur mesure ou logiciel de location du marché ?",
       paragraphes: [
-        "Des éditeurs vendent des logiciels de location complets, souvent pensés pour un type de parc : l’outillage, les engins de TP, l’événementiel. Si ton activité ressemble à celle qu’ils ont modélisée, commence par eux : la mise en place est rapide et l’abonnement reste lisible.",
-        "Le sur mesure prend le relais quand tes règles sortent de leurs paramètres : un parc partagé entre la location et tes propres chantiers, des tarifs négociés par client, ou des compteurs déjà relevés par un boîtier télématique qu’il faut faire entrer dans le planning.",
+        "Des éditeurs vendent des logiciels de location complets, souvent pensés pour un type de parc : l’outillage, les engins de TP, l’événementiel. Si votre activité ressemble à celle qu’ils ont modélisée, commencez par eux : la mise en place est rapide et l’abonnement reste lisible.",
+        "Le sur mesure prend le relais quand vos règles sortent de leurs paramètres : un parc partagé entre la location et vos propres chantiers, des tarifs négociés par client, ou des compteurs déjà relevés par un boîtier télématique qu’il faut faire entrer dans le planning.",
       ],
       liens: {
         titre: "Pour trancher",
@@ -804,7 +810,7 @@ const pageLocation: PageSecteur = {
             libelle: "Outil sur mesure ou abonnements SaaS",
             href: CHEMIN_ARTICLE_SAAS,
             description:
-              "Comparer un abonnement par utilisateur et un outil qui t’appartient.",
+              "Comparer un abonnement par utilisateur et un outil qui vous appartient.",
           },
         ],
       },
@@ -817,11 +823,11 @@ const pageLocation: PageSecteur = {
         {
           titre: "Le sur mesure se justifie",
           corps:
-            "Plusieurs dépôts, du matériel loué avec opérateur, de la sous-location chez des confrères, ou un parc qui sert aussi tes chantiers.",
+            "Plusieurs dépôts, du matériel loué avec opérateur, de la sous-location chez des confrères, ou un parc qui sert aussi vos chantiers.",
         },
         {
           titre: "Entre les deux",
-          corps: `À partir de ${prixPlancher(LOGICIEL)} HT, j’ajoute à ton outil actuel la pièce qui lui manque : l’état des lieux photo sur téléphone, ou le relevé de compteurs qui déclenche l’entretien.`,
+          corps: `À partir de ${prixPlancher(LOGICIEL)} HT, j’ajoute à votre outil actuel la pièce qui lui manque : l’état des lieux photo sur téléphone, ou le relevé de compteurs qui déclenche l’entretien.`,
         },
       ],
     },
@@ -849,7 +855,7 @@ const pageLocation: PageSecteur = {
           {
             libelle: "Réserver un appel",
             href: "#rendez-vous",
-            description: "Choisis un créneau en visio pour parler de ton parc.",
+            description: "Choisissez un créneau en visio pour parler de votre parc.",
           },
         ],
       },
@@ -857,7 +863,7 @@ const pageLocation: PageSecteur = {
         {
           titre: "1. Un appel en visio",
           corps:
-            "Gratuit. Tu me décris ton parc, ton dépôt et ta façon de facturer, et je te dis dès l’appel ce que ton projet demande.",
+            "Gratuit. Vous me décrivez votre parc, votre dépôt et votre façon de facturer, et je vous dis dès l’appel ce que votre projet demande.",
         },
         {
           titre: "2. Un devis à prix ferme",
@@ -865,14 +871,14 @@ const pageLocation: PageSecteur = {
             "Les modules, le prix et la date de mise en service, présentés lors d’un second rendez-vous et écrits avant toute signature.",
         },
         {
-          titre: "3. Testé sur tes vraies machines",
+          titre: "3. Testé sur vos vraies machines",
           corps:
-            "Chaque module arrive sur une adresse en ligne. Ton équipe de dépôt l’essaie sur de vrais départs avant la mise en service.",
+            "Chaque module arrive sur une adresse en ligne. Votre équipe de dépôt l’essaie sur de vrais départs avant la mise en service.",
         },
         {
-          titre: "4. À ton nom",
+          titre: "4. À votre nom",
           corps:
-            "Le code dans ton dépôt Git, l’hébergement à ton nom, et une documentation qu’un autre développeur sait reprendre.",
+            "Le code dans votre dépôt Git, l’hébergement à votre nom, et une documentation qu’un autre développeur sait reprendre.",
         },
       ],
     },
@@ -885,7 +891,7 @@ const pageLocation: PageSecteur = {
   titreOffre: "Prix d’un logiciel de location : ce qui le fait varier",
   faq: {
     eyebrow: "FAQ",
-    titleLines: ["Ton logiciel", "de location."],
+    titleLines: ["Votre logiciel", "de location."],
     items: [
       {
         question: "Combien coûte un logiciel de gestion de location de matériel ?",
@@ -894,12 +900,12 @@ const pageLocation: PageSecteur = {
       {
         question: "Le logiciel gère-t-il les tarifs dégressifs et les prolongations ?",
         answer:
-          "Oui. Tu poses tes grilles à la journée, à la semaine et au mois, et tes remises par client. Une prolongation s’ajoute au contrat en cours, et la facture reprend la durée réelle sans ressaisie.",
+          "Oui. Vous posez vos grilles à la journée, à la semaine et au mois, et vos remises par client. Une prolongation s’ajoute au contrat en cours, et la facture reprend la durée réelle sans ressaisie.",
       },
       {
         question: "Peut-on signer le contrat et faire l’état des lieux sur une tablette ?",
         answer:
-          "Oui, dans le navigateur de la tablette ou du téléphone, sans application à installer. Photos, compteur, carburant et signature du client s’enregistrent sur le contrat. Si ton dépôt ou tes chantiers captent mal, la saisie hors connexion entre au devis.",
+          "Oui, dans le navigateur de la tablette ou du téléphone, sans application à installer. Photos, compteur, carburant et signature du client s’enregistrent sur le contrat. Si votre dépôt ou vos chantiers captent mal, la saisie hors connexion entre au devis.",
       },
       {
         question: "Le logiciel peut-il suivre l’entretien de mes engins ?",
@@ -907,9 +913,9 @@ const pageLocation: PageSecteur = {
           "Oui, avec le module de maintenance. Chaque machine porte ses entretiens, déclenchés par le compteur d’heures ou par une date, et ses vérifications périodiques avec leurs rapports. Une machine à l’atelier sort du planning de location jusqu’à sa remise en service.",
       },
       {
-        question: "As-tu déjà travaillé pour un loueur de matériel ?",
+        question: "Avez-vous déjà travaillé pour un loueur de matériel ?",
         answer:
-          "Non, pas encore. Le projet que je peux te montrer chiffres à l’appui vient de la distribution : le parcours de création de compte de l’eShop de Würth France. J’en reprends la méthode : observer le terrain avant de coder, livrer module par module, faire tester par ceux qui s’en servent.",
+          "Non, pas encore. Le projet que je peux vous montrer chiffres à l’appui vient de la distribution : le parcours de création de compte de l’eShop de Würth France. J’en reprends la méthode : observer le terrain avant de coder, livrer module par module, faire tester par ceux qui s’en servent.",
       },
     ],
   },
@@ -940,7 +946,7 @@ const pageNegoce: PageSecteur = {
     description: `Logiciel de négoce sur mesure pour votre distribution : stock, tarifs clients, remises, comptoir, reliquats, achats. Prix : ${aPartirDe(LOGICIEL, " HT")}, au devis.`,
   },
   h1: "Logiciel de gestion de négoce",
-  resume: `Un logiciel de gestion de négoce sur mesure réunit ton stock, tes tarifs clients, tes commandes et tes achats fournisseurs dans un seul outil, comptoir compris. Il s’adresse aux négociants et aux distributeurs techniques dont l’ERP ne suit plus les conditions commerciales, ou qui travaillent encore sur tableur. Son prix démarre à ${prixPlancher(LOGICIEL)} HT.`,
+  resume: `Un logiciel de gestion de négoce sur mesure réunit votre stock, vos tarifs clients, vos commandes et vos achats fournisseurs dans un seul outil, comptoir compris. Il s’adresse aux négociants et aux distributeurs techniques dont l’ERP ne suit plus les conditions commerciales, ou qui travaillent encore sur tableur. Son prix démarre à ${prixPlancher(LOGICIEL)} HT.`,
   marcheFilAriane: "Négoce et distribution",
   libelleLien: "logiciel de gestion de négoce",
   noteLlms:
@@ -979,9 +985,9 @@ const pageNegoce: PageSecteur = {
     },
     {
       id: "modules",
-      titre: "Ce que fait ton logiciel de négoce",
+      titre: "Du tarif fournisseur à la facture : ce que fait votre logiciel de négoce",
       paragraphes: [
-        "Le logiciel reprend ton catalogue, tes familles de produits, tes dépôts et tes conditions par client, tels que tu les pratiques. Tu retiens les modules qui te coûtent le plus aujourd’hui, et leur nombre pèse le plus dans le prix.",
+        "Le logiciel reprend votre catalogue, vos familles de produits, vos dépôts et vos conditions par client, tels que vous les pratiquez. Vous retenez les modules qui vous coûtent le plus aujourd’hui, et leur nombre pèse le plus dans le prix.",
         "Une condition saisie une fois s’applique partout : le prix calculé au devis est celui de la commande, du bon de livraison et de la facture, et chaque vente décompte le stock du bon dépôt.",
       ],
       points: [
@@ -1013,7 +1019,7 @@ const pageNegoce: PageSecteur = {
         {
           titre: "Espace client professionnel",
           corps:
-            "Tes clients consultent leurs prix, leurs commandes et leurs factures en ligne, et commandent sans appeler le comptoir.",
+            "Vos clients consultent leurs prix, leurs commandes et leurs factures en ligne, et commandent sans appeler le comptoir.",
         },
       ],
     },
@@ -1021,8 +1027,8 @@ const pageNegoce: PageSecteur = {
       id: "calcul",
       titre: "La recherche de prix, chiffrée sur une année",
       paragraphes: [
-        `Prends une équipe de vente qui saisit ${NEG_LIGNES_JOUR} lignes de devis et de commande par jour. Pour chaque ligne, ${NEG_MINUTES_LIGNE} minutes partent à retrouver la remise du client dans un tableur, à vérifier le stock d’un autre dépôt ou à recalculer un prix net. Sur ${NEG_JOURS} jours ouvrés, le total atteint ${NEG_HEURES_AN} heures par an.`,
-        `À ${euros(NEG_COUT_HORAIRE)} l’heure, salaire chargé et frais compris, ces heures coûtent ${euros(NEG_COUT_AN)} par an. Un logiciel de négoce sur mesure démarre à ${prixPlancher(LOGICIEL)} HT, payé une fois. Ces 4 chiffres sont des hypothèses : mets les tiens à leur place avant de conclure.`,
+        `Prenez une équipe de vente qui saisit ${NEG_LIGNES_JOUR} lignes de devis et de commande par jour. Pour chaque ligne, ${NEG_MINUTES_LIGNE} minutes partent à retrouver la remise du client dans un tableur, à vérifier le stock d’un autre dépôt ou à recalculer un prix net. Sur ${NEG_JOURS} jours ouvrés, le total atteint ${NEG_HEURES_AN} heures par an.`,
+        `À ${euros(NEG_COUT_HORAIRE)} l’heure, salaire chargé et frais compris, ces heures coûtent ${euros(NEG_COUT_AN)} par an. Un logiciel de négoce sur mesure démarre à ${prixPlancher(LOGICIEL)} HT, payé une fois. Ces 4 chiffres sont des hypothèses : mettez les vôtres à leur place avant de conclure.`,
       ],
       points: [
         {
@@ -1050,8 +1056,8 @@ const pageNegoce: PageSecteur = {
       id: "marche",
       titre: "Sur mesure ou ERP négoce du marché ?",
       paragraphes: [
-        "Les ERP pour le négoce couvrent la gestion commerciale, le stock, les achats et la comptabilité, avec des années de cas particuliers derrière eux. Si tu démarres ou si tes conditions restent classiques, un ERP du marché te coûtera moins cher qu’un développement.",
-        "Le sur mesure trouve souvent sa place autour de l’ERP : le portail de commande que tes clients attendent, le calcul de prix que l’ERP ne sait pas faire, la liaison avec la plateforme d’un fournisseur. Ton ERP garde la comptabilité, et le module développé échange avec lui.",
+        "Les ERP pour le négoce couvrent la gestion commerciale, le stock, les achats et la comptabilité, avec des années de cas particuliers derrière eux. Si vous démarrez ou si vos conditions restent classiques, un ERP du marché vous coûtera moins cher qu’un développement.",
+        "Le sur mesure trouve souvent sa place autour de l’ERP : le portail de commande que vos clients attendent, le calcul de prix que l’ERP ne sait pas faire, la liaison avec la plateforme d’un fournisseur. Votre ERP garde la comptabilité, et le module développé échange avec lui.",
       ],
       liens: {
         titre: "Pour trancher",
@@ -1060,7 +1066,7 @@ const pageNegoce: PageSecteur = {
             libelle: "Outil sur mesure ou abonnements SaaS",
             href: CHEMIN_ARTICLE_SAAS,
             description:
-              "Mettre en face un abonnement par utilisateur et un outil à toi.",
+              "Mettre en face un abonnement par utilisateur et un outil à vous.",
           },
           {
             libelle: "Synchroniser catalogue, stock et commandes",
@@ -1083,7 +1089,7 @@ const pageNegoce: PageSecteur = {
         },
         {
           titre: "Entre les deux",
-          corps: `À partir de ${prixPlancher(LOGICIEL)} HT, je relie ton ERP à ce qui lui manque : l’import automatique d’un tarif fournisseur, ou un écran de comptoir plus rapide.`,
+          corps: `À partir de ${prixPlancher(LOGICIEL)} HT, je relie votre ERP à ce qui lui manque : l’import automatique d’un tarif fournisseur, ou un écran de comptoir plus rapide.`,
         },
       ],
     },
@@ -1092,7 +1098,7 @@ const pageNegoce: PageSecteur = {
       titre: "Le projet, du premier appel au premier bon de livraison",
       paragraphes: [
         "Würth France distribue des fournitures aux professionnels. En 2024, j’y ai refait le parcours de création de compte de l’eShop : relevé des erreurs réellement commises, contraintes affichées avant la saisie, SIRET vérifié auprès des données de l’INSEE. Résultat : −92 % d’erreurs à la création de compte, mesuré en interne.",
-        "Ton logiciel de négoce se construit de la même façon : je cherche où l’erreur naît avant de dessiner un écran.",
+        "Votre logiciel de négoce se construit de la même façon : je cherche où l’erreur naît avant de dessiner un écran.",
       ],
       liens: {
         titre: "Pour aller plus loin",
@@ -1112,7 +1118,7 @@ const pageNegoce: PageSecteur = {
           {
             libelle: "Réserver un appel",
             href: "#rendez-vous",
-            description: "Choisis un créneau en visio pour parler de ton comptoir.",
+            description: "Choisissez un créneau en visio pour parler de votre comptoir.",
           },
         ],
       },
@@ -1120,22 +1126,22 @@ const pageNegoce: PageSecteur = {
         {
           titre: "1. Un appel en visio",
           corps:
-            "Gratuit. Tu me montres ton écran de commande et tes grilles de remises, et je te dis dès l’appel ce que ton budget permet.",
+            "Gratuit. Vous me montrez votre écran de commande et vos grilles de remises, et je vous dis dès l’appel ce que votre budget permet.",
         },
         {
           titre: "2. Le devis, prix ferme compris",
           corps:
-            "Présenté lors d’un second rendez-vous : les modules, les raccordements à ton ERP ou à ta comptabilité, le prix et la date de mise en ligne.",
+            "Présenté lors d’un second rendez-vous : les modules, les raccordements à votre ERP ou à votre comptabilité, le prix et la date de mise en ligne.",
         },
         {
           titre: "3. Testé sur de vraies commandes",
           corps:
-            "Chaque module arrive sur une adresse en ligne. Ton comptoir le compare à l’outil actuel sur des commandes réelles avant la bascule.",
+            "Chaque module arrive sur une adresse en ligne. Votre comptoir le compare à l’outil actuel sur des commandes réelles avant la bascule.",
         },
         {
           titre: "4. Livré avec ses règles écrites",
           corps:
-            "Le code et la base t’appartiennent dès la livraison, et la documentation décrit chaque règle de prix pour qu’un autre développeur puisse reprendre.",
+            "Le code et la base vous appartiennent dès la livraison, et la documentation décrit chaque règle de prix pour qu’un autre développeur puisse reprendre.",
         },
       ],
     },
@@ -1148,21 +1154,21 @@ const pageNegoce: PageSecteur = {
   titreOffre: "Prix d’un logiciel de négoce : ce qui le fait varier",
   faq: {
     eyebrow: "FAQ",
-    titleLines: ["Ton logiciel", "de distribution."],
+    titleLines: ["Votre logiciel", "de distribution."],
     items: [
       {
         question: "Combien coûte un logiciel de gestion de négoce sur mesure ?",
-        answer: `Le prix démarre à ${prixPlancher(LOGICIEL)} HT, pour une pièce comme l’import des tarifs fournisseurs, et monte avec les modules réunis, par exemple tarifs clients, commandes et stock. Il monte encore quand le logiciel doit rester d’accord avec ton ERP, ta comptabilité et ton site dans les 2 sens. Le devis fixe le montant.`,
+        answer: `Le prix démarre à ${prixPlancher(LOGICIEL)} HT, pour une pièce comme l’import des tarifs fournisseurs, et monte avec les modules réunis, par exemple tarifs clients, commandes et stock. Il monte encore quand le logiciel doit rester d’accord avec votre ERP, votre comptabilité et votre site dans les 2 sens. Le devis fixe le montant.`,
       },
       {
         question: "Faut-il remplacer mon ERP ?",
         answer:
-          "Pas forcément. Si ton ERP tient correctement la comptabilité et le stock, je développe la partie qui manque et je la raccorde à lui.",
+          "Pas forcément. Si votre ERP tient correctement la comptabilité et le stock, je développe la partie qui manque et je la raccorde à lui.",
       },
       {
         question: "Le logiciel gère-t-il les remises en cascade et les prix nets ?",
         answer:
-          "Oui. Tu fixes l’ordre d’application : tarif de base, remise de la famille, remise du client, puis le prix net négocié qui prend le dessus. Chaque ligne affiche le détail du calcul, et le commercial voit sa marge avant de valider.",
+          "Oui. Vous fixez l’ordre d’application : tarif de base, remise de la famille, remise du client, puis le prix net négocié qui prend le dessus. Chaque ligne affiche le détail du calcul, et le commercial voit sa marge avant de valider.",
       },
       {
         question: "Mes clients pourront-ils commander en ligne à leur prix ?",
@@ -1170,7 +1176,7 @@ const pageNegoce: PageSecteur = {
           "Oui, avec le module d’espace client : chaque compte professionnel voit ses prix, le stock disponible et ses commandes en cours, reliquats compris. La commande arrive dans le logiciel sans ressaisie.",
       },
       {
-        question: "As-tu déjà travaillé dans la distribution ?",
+        question: "Avez-vous déjà travaillé dans la distribution ?",
         answer:
           "Oui. En 2024, chez Würth France, distributeur de fournitures pour les professionnels, j’ai refait le parcours de création de compte de l’eShop : −92 % d’erreurs, mesuré en interne. Je n’ai pas encore développé de logiciel de gestion complet pour un négociant.",
       },

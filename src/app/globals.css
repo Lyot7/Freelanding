@@ -782,3 +782,140 @@ html[data-consent-choisi] [data-consent-attente] {
   background: var(--color-background);
   cursor: ew-resize;
 }
+
+/* ---------------------------------------------------------------------------
+   Héros de l'accueil (2026-10-15) : une entrée orchestrée, en CSS pour tourner
+   hors du fil principal pendant l'hydratation. Délais portés par `--d`.
+   Courbe ease-out-expo : départ franc, arrivée douce, aucun rebond.
+   --------------------------------------------------------------------------- */
+@keyframes hero-monte {
+  from { transform: translateY(108%); }
+  to { transform: none; }
+}
+@keyframes hero-fond {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes hero-trait {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+@keyframes hero-respire {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.hero-fond {
+  animation: hero-fond 760ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: var(--d, 0ms);
+}
+
+/* Chaque ligne du titre monte depuis son propre masque. Les retraits haut et
+   bas laissent la place aux accents et aux jambages sans montrer la course. */
+.hero-ligne {
+  display: block;
+  overflow: hidden;
+  padding-block: 0.06em 0.1em;
+  margin-block: -0.06em -0.1em;
+}
+.hero-ligne > span {
+  display: inline-block;
+  animation: hero-monte 980ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: var(--d, 0ms);
+}
+.hero-ligne-amorce {
+  color: var(--foreground-60);
+  transition: color 240ms ease;
+}
+
+/* Filet haut de chaque porte, tracé de gauche à droite ; le dernier ferme la
+   liste par le bas. Le trait volt du survol glisse dessus. */
+.hero-porte::before,
+.hero-porte:last-child::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.14);
+  transform-origin: left;
+  animation: hero-trait 1200ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: var(--d, 0ms);
+}
+.hero-porte::before { top: 0; }
+.hero-porte:last-child::after { bottom: 0; }
+
+.hero-porte-titre {
+  transition: opacity 260ms ease, transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hero-porte-fleche {
+  transition:
+    background-color 220ms ease,
+    border-color 220ms ease,
+    color 220ms ease,
+    transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hero-porte:focus-visible .hero-porte-fleche {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hero-porte:hover .hero-ligne-amorce { color: var(--foreground); }
+  .hero-porte:hover .hero-porte-titre { transform: translateX(10px); }
+  .hero-porte:hover .hero-porte-fleche {
+    background-color: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+    transform: translateX(4px);
+  }
+  /* La porte visée s'allume, l'autre s'efface. */
+  .hero-portes:has(.hero-porte:hover) .hero-porte:not(:hover) .hero-porte-titre {
+    opacity: 0.32;
+  }
+  .hero-cta { transition: transform 160ms ease-out, background-color 200ms ease; }
+  .hero-cta:hover { background-color: color-mix(in oklab, var(--accent) 88%, white); }
+}
+.hero-cta:active { transform: scale(0.97); }
+
+/* Le carré volt du positionnement respire doucement : le seul mouvement
+   continu du héros, avec le mécanisme du fond. */
+.hero-pastille {
+  animation: hero-respire 2.8s ease-in-out 1.4s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-fond,
+  .hero-ligne > span,
+  .hero-porte::before,
+  .hero-porte:last-child::after {
+    animation: hero-fond-doux 400ms ease both;
+    animation-delay: 0ms;
+    transform: none;
+  }
+  .hero-pastille { animation: none; }
+  .hero-porte-titre,
+  .hero-porte-fleche { transition: none; }
+}
+@keyframes hero-fond-doux {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Bascule message / rendez-vous du pied de page. */
+.footer-onglet-pastille {
+  transition: transform 280ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.footer-onglet {
+  transition: color 200ms ease;
+}
+.footer-onglet:active {
+  transform: scale(0.97);
+}
+.footer-panneau:not([hidden]) {
+  animation: hero-fond 360ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .footer-onglet-pastille { transition: none; }
+  .footer-panneau:not([hidden]) { animation: hero-fond-doux 200ms ease both; }
+}

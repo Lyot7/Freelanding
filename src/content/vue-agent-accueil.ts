@@ -1,5 +1,5 @@
 /**
- * Raccourci « Demande à ton assistant IA » de la barre basse du héros de
+ * Raccourci « Demandez à votre assistant IA » de la barre basse du héros de
  * l'accueil, et les chemins des versions texte du profil.
  *
  * FICHIER À PART, et pour une raison de poids : `DemanderAssistant` est un
@@ -19,10 +19,10 @@ export const CHEMIN_PROMPT_TEXTE = "/agent/prompt.txt";
  */
 export const accueilVueAgent = {
   invite: ">",
-  libelle: "Demande à ton assistant IA si je suis le bon choix",
-  court: "Demande à ton assistant IA",
-  fait: "Copié, colle-le dans ton assistant IA",
+  libelle: "Demandez à votre assistant IA si je suis le bon choix",
+  court: "Demandez à votre assistant IA",
+  fait: "Copié, collez-le dans votre assistant IA",
   /** Entre 810 et 1199 px : la forme longue débordait sur « Prendre rendez-vous ». */
   faitCourt: "Prompt copié",
-  titre: "Copie un prompt qui contient tout mon profil",
+  titre: "Copiez un prompt qui contient tout mon profil",
 } as const;

@@ -3,6 +3,7 @@ import { homeContent } from "./home.ts";
 import { siteConfig } from "./site.ts";
 import { howWeDoItStats } from "./stats.ts";
 import { uiLabels } from "./ui.ts";
+import { euros, prestation, prixPlancher, repereAgenceSite } from "./offre.ts";
 
 /**
  * L'ACCUEIL, ce que la relecture d'écran ne garde pas.
@@ -20,17 +21,30 @@ describe("accueil", () => {
     expect(homeContent.logoBand?.logos.length).toBeGreaterThan(0);
   });
 
-  test("la preuve du héros est le chiffre Würth de la section chiffres", () => {
+  test("la première preuve du héros est le chiffre Würth de la section chiffres", () => {
     const stat = howWeDoItStats.find((s) => s.label.includes("Würth"));
-    const preuve = homeContent.hero.proof;
+    const preuve = homeContent.hero.proofs?.[0];
     expect(stat).toBeDefined();
     expect(preuve?.label).toBe(stat?.label);
     expect(preuve?.value).toBe(`${stat?.prefix}${stat?.value}\u202F${stat?.suffix}`);
     expect(preuve?.href).toBe("/realisations/wurth-creation-de-compte");
   });
 
-  test("la preuve ne présente aucune entreprise comme cliente", () => {
-    expect(homeContent.hero.proof?.label.toLowerCase()).not.toContain("client");
+  test("la comparaison avec les agences est calculée et sourcée", () => {
+    const preuve = homeContent.hero.proofs?.[1];
+    const part = Math.round((prestation("vitrine").plancher / repereAgenceSite.mediane) * 100);
+    expect(preuve?.value).toBe(`${part}\u202F%`);
+    expect(preuve?.label).toContain(euros(repereAgenceSite.mediane));
+    expect(preuve?.source?.href).toBe(repereAgenceSite.source.href);
+    // « Jusqu'à deux fois moins cher » n'est vrai que tant que le site
+    // d'entrée vaut au plus la moitié de la médiane d'agence.
+    expect(part).toBeLessThanOrEqual(50);
+  });
+
+  test("aucune preuve ne présente une entreprise comme cliente", () => {
+    for (const preuve of homeContent.hero.proofs ?? []) {
+      expect(preuve.label.toLowerCase()).not.toContain("client");
+    }
   });
 
   test("la bande des logos ne porte aucun intitulé qui en ferait des clients", () => {
@@ -49,19 +63,24 @@ describe("accueil", () => {
     expect(ordre.indexOf("services")).toBe(ordre.indexOf("about") + 1);
   });
 
-  test("le titre du héros est la phrase de l'accueil, dite une seule fois", () => {
+  test("le titre du héros est fait des deux portes, chacune vers sa prestation", () => {
+    const portes = homeContent.hero.doors ?? [];
+    expect(portes.map((porte) => porte.href)).toEqual([
+      "/services/site-vitrine",
+      "/services/logiciel-metier",
+    ]);
     expect(homeContent.hero.title).toBe(
-      "Des sites qui amènent des clients, des outils qui te rendent des heures.",
+      "Un site qui vous ramène des clients. Un outil qui vous rend des heures.",
     );
     expect(homeContent.hero.titleLines?.join(" ")).toBe(homeContent.hero.title);
+    expect(portes[0]?.price).toContain(prixPlancher(prestation("vitrine")));
+    expect(portes[1]?.price).toContain(prixPlancher(prestation("logiciel")));
     expect(homeContent.about.title).not.toBe(homeContent.hero.title);
     expect(homeContent.about.titleLines?.join(" ")).toBe(homeContent.about.title);
   });
 
-  test("le héros dit pour qui, sans prix ferme global", () => {
+  test("le héros dit ce qui explique le prix, sans montant", () => {
     const phrase = homeContent.hero.subtitleParagraphs?.[0]?.text ?? "";
-    expect(phrase).toContain("TPE");
-    expect(phrase).toContain("PME");
     expect(phrase.toLowerCase()).not.toContain("prix ferme");
     expect(phrase).not.toMatch(/\d\s?000/u);
   });

@@ -19,12 +19,19 @@
  *
  * MÊME TYPE QUE LA PAGE DE CAEN DU SITE VITRINE (`PageLocale`), avec des
  * sections en plus, rendues dans le gabarit des pages secteur.
+ *
+ * LE REPÈRE D'AGENCE vient d'`offre.ts`, source et date citées ; le lien vers
+ * la source est sur la page de prix du logiciel.
+ *
+ * VOUVOIEMENT depuis le 2026-10-15, décision d'Eliott.
  */
 import {
   aPartirDe,
+  euros,
   plancherSuivi,
   prestation,
   prixPlancher,
+  repereAgenceLogiciel,
   tauxSuivi,
 } from "./offre";
 import {
@@ -69,19 +76,19 @@ export const pageLogicielCaen: PageLocale = {
       {
         libelle: "Création de site internet à Caen",
         href: CHEMIN_PAGE_CAEN,
-        description: "Quand il te faut d’abord un site pour présenter ton entreprise.",
+        description: "Quand il vous faut d’abord un site pour présenter votre entreprise.",
       },
       {
         libelle: "Réserver un appel",
         href: "#rendez-vous",
-        description: "Choisis un créneau en visio pour parler de ton projet.",
+        description: "Choisissez un créneau en visio pour parler de votre projet.",
       },
     ],
     points: [
       {
         titre: "Basé à Caen",
         corps:
-          "Je travaille depuis Caen. Ton interlocuteur est en Normandie, aux mêmes horaires que toi, et c’est lui qui écrit le code.",
+          "Je travaille depuis Caen. Votre interlocuteur est en Normandie, aux mêmes horaires que vous, et c’est lui qui écrit le code.",
       },
       {
         titre: "Calvados, Manche, Orne",
@@ -91,14 +98,16 @@ export const pageLogicielCaen: PageLocale = {
       {
         titre: "Tous les rendez-vous en visio",
         corps:
-          "Le premier appel, le devis relu ensemble, la démonstration de chaque module : tout se fait en visio, sur un créneau que tu choisis, partage d’écran compris.",
+          "Le premier appel, le devis relu ensemble, la démonstration de chaque module : tout se fait en visio, sur un créneau que vous choisissez, partage d’écran compris.",
       },
     ],
   },
   sections: [
     {
       id: "besoins",
-      titre: "Ce qu’un logiciel sur mesure règle dans une PME",
+      // Vise « application sur mesure Caen », requête relevée dans la Search
+      // Console (carte SEO du 2026-10-15).
+      titre: "Application sur mesure à Caen : ce qu’elle règle dans une PME",
       paragraphes: [
         "Un logiciel métier sur mesure part d’une tâche précise : un devis qui se refait à la main, un planning tenu sur un tableau blanc, un stock auquel personne ne se fie. Il prend la forme d’une application web, qui s’ouvre dans un navigateur, sur ordinateur comme sur téléphone, sans rien installer sur les postes.",
         "Pour 4 métiers, le détail des modules et un calcul chiffré ont leur propre page.",
@@ -115,7 +124,7 @@ export const pageLogicielCaen: PageLocale = {
         {
           titre: "Devis et facturation",
           corps:
-            "Tes règles de prix, tes remises et tes acomptes appliqués sans calcul à la main, du devis jusqu’à la facture.",
+            "Vos règles de prix, vos remises et vos acomptes appliqués sans calcul à la main, du devis jusqu’à la facture.",
         },
         {
           titre: "Planning et interventions",
@@ -130,7 +139,7 @@ export const pageLogicielCaen: PageLocale = {
         {
           titre: "Espace client",
           corps:
-            "Tes clients suivent leurs commandes, leurs documents et leurs factures sans appeler ton secrétariat.",
+            "Vos clients suivent leurs commandes, leurs documents et leurs factures sans appeler votre secrétariat.",
         },
       ],
     },
@@ -138,14 +147,14 @@ export const pageLogicielCaen: PageLocale = {
       id: "questions",
       titre: "4 questions à poser avant de signer",
       paragraphes: [
-        "À Caen comme ailleurs, un logiciel sur mesure se commande à un éditeur, à un studio de développement ou à un indépendant. Avant de comparer les devis, pose les mêmes questions à chacun, et compare les réponses autant que les montants.",
-        "En face de chaque question, voici ma réponse, pour te donner un point de comparaison.",
+        "À Caen comme ailleurs, un logiciel sur mesure se commande à un éditeur, à un studio de développement ou à un indépendant. Avant de comparer les devis, posez les mêmes questions à chacun, et comparez les réponses autant que les montants.",
+        "En face de chaque question, voici ma réponse, pour vous donner un point de comparaison.",
       ],
       points: [
         {
           titre: "À qui appartient le code ?",
           corps:
-            "Chez moi, à toi dès la livraison : le code dans ton dépôt, la base et l’hébergement à ton nom. Un logiciel dont tu loues seulement l’usage te lie à son auteur.",
+            "Chez moi, à vous dès la livraison : le code dans votre dépôt, la base et l’hébergement à votre nom. Un logiciel dont vous louez seulement l’usage vous lie à son auteur.",
         },
         {
           titre: "Le prix est-il ferme ?",
@@ -155,7 +164,7 @@ export const pageLogicielCaen: PageLocale = {
         {
           titre: "Qui écrit le code ?",
           corps:
-            "Moi, du premier appel à la livraison. Je ne mène qu’un projet à la fois, et personne ne reformule ta demande entre nous.",
+            "Moi, du premier appel à la livraison. Je ne mène qu’un projet à la fois, et personne ne reformule votre demande entre nous.",
         },
         {
           titre: "Un autre développeur pourra-t-il reprendre ?",
@@ -166,26 +175,28 @@ export const pageLogicielCaen: PageLocale = {
     },
     {
       id: "budget",
-      titre: "Ce que ton budget permet",
+      // Vise « développement ERP Caen » et « création ERP Caen », requêtes
+      // relevées dans la Search Console (carte SEO du 2026-10-15).
+      titre: "Développement d’ERP à Caen : un module à la fois",
       paragraphes: [
-        "Le prix se compte surtout en modules, un module étant un pan de ton activité : les devis, le planning, la facturation. S’y ajoutent les outils à relier et la reprise de ton historique.",
-        "Le nombre de personnes qui s’en servent ne change rien : à 3 comme à 40, tu paies le même prix, et aucune licence ne s’ajoute chaque mois.",
+        "Un ERP sur mesure réunit les pans de votre activité sur une seule base : les devis, le stock, le planning, la facturation. Il se construit module par module, et son prix se compte surtout en modules. S’y ajoutent les outils à relier et la reprise de votre historique.",
+        "Le nombre de personnes qui s’en servent ne change rien : à 3 comme à 40, vous payez le même prix, et aucune licence ne s’ajoute chaque mois.",
       ],
       points: [
         {
           titre: "1 module",
           corps:
-            "Par exemple, le bon d’intervention rempli sur téléphone, qui arrive tout seul dans ta facturation.",
+            "Par exemple, le bon d’intervention rempli sur téléphone, qui arrive tout seul dans votre facturation.",
         },
         {
           titre: "Plusieurs modules",
           corps:
-            "Par exemple, devis, planning et facturation réunis, avec un compte par personne et la reprise de ton historique.",
+            "Par exemple, devis, planning et facturation réunis, avec un compte par personne et la reprise de votre historique.",
         },
         {
           titre: "Plusieurs systèmes",
           corps:
-            "Par exemple, ton logiciel, ton ERP et ton site marchand qui échangent dans les 2 sens et restent d’accord.",
+            "Par exemple, votre logiciel, votre ERP et votre site marchand qui échangent dans les 2 sens et restent d’accord.",
         },
       ],
     },
@@ -193,8 +204,8 @@ export const pageLogicielCaen: PageLocale = {
       id: "methode",
       titre: "Un projet mené en visio, depuis Caen",
       paragraphes: [
-        "Pendant le développement, chaque module arrive sur une adresse en ligne que ton équipe ouvre depuis son poste. Tu vois le logiciel avancer module par module, et tes remarques entrent dans la version suivante au lieu d’attendre la livraison.",
-        "Le projet chiffré que je peux te montrer vient de la distribution : chez Würth France, le parcours de création de compte de l’eShop, refait à partir des erreurs relevées, a conduit à −92 % d’erreurs, mesuré en interne.",
+        "Pendant le développement, chaque module arrive sur une adresse en ligne que votre équipe ouvre depuis son poste. Vous voyez le logiciel avancer module par module, et vos remarques entrent dans la version suivante au lieu d’attendre la livraison.",
+        "Le projet chiffré que je peux vous montrer vient de la distribution : chez Würth France, le parcours de création de compte de l’eShop, refait à partir des erreurs relevées, a conduit à −92 % d’erreurs, mesuré en interne.",
       ],
       liens: {
         titre: "À voir",
@@ -210,7 +221,7 @@ export const pageLogicielCaen: PageLocale = {
         {
           titre: "1. Un appel de 30 minutes",
           corps:
-            "En visio, gratuit. Tu poses ton besoin, et je te dis ce que ton budget permet.",
+            "En visio, gratuit. Vous posez votre besoin, et je vous dis ce que votre budget permet.",
         },
         {
           titre: "2. Le devis relu ensemble",
@@ -220,12 +231,12 @@ export const pageLogicielCaen: PageLocale = {
         {
           titre: "3. Le développement, module par module",
           corps:
-            "Ton équipe teste chaque module sur ses vraies données avant la mise en service.",
+            "Votre équipe teste chaque module sur ses vraies données avant la mise en service.",
         },
         {
-          titre: "4. La livraison à ton nom",
+          titre: "4. La livraison à votre nom",
           corps:
-            "Code, base, hébergement et documentation : tout est à toi, et tu choisis librement qui fera évoluer le logiciel.",
+            "Code, base, hébergement et documentation : tout est à vous, et vous choisissez librement qui fera évoluer le logiciel.",
         },
       ],
     },
@@ -233,35 +244,35 @@ export const pageLogicielCaen: PageLocale = {
   titreOffre: "Prix d’un logiciel sur mesure à Caen : ce qui le fait varier",
   faq: {
     eyebrow: "FAQ",
-    titleLines: ["Ton logiciel", "sur Caen."],
+    titleLines: ["Votre logiciel", "sur Caen."],
     items: [
       {
         question: "Combien coûte un logiciel sur mesure à Caen ?",
-        answer: `Le prix démarre à ${prixPlancher(LOGICIEL)} HT, puis il suit le nombre de modules, les outils à relier et la reprise de ton historique. Je le fixe au devis. Être à Caen ne change pas le prix : il se calcule de la même façon pour toute la France.`,
+        answer: `Le prix démarre à ${prixPlancher(LOGICIEL)} HT, puis il suit le nombre de modules, les outils à relier et la reprise de votre historique. Je le fixe au devis. En agence, un premier outil démarre entre ${euros(repereAgenceLogiciel.premierOutilMin)} et ${euros(repereAgenceLogiciel.premierOutilMax)} selon ${repereAgenceLogiciel.source.nom} (${repereAgenceLogiciel.source.releve}). Je conçois et je code moi-même : votre budget va au logiciel plutôt qu’à un chef de projet. Être à Caen ne change pas le prix : il se calcule de la même façon pour toute la France.`,
       },
       {
         question: "Faut-il se rencontrer pour lancer un logiciel sur mesure ?",
         answer:
-          "Non. Les échanges se font en visio, avec partage d’écran : tu me montres tes tableurs et tes outils actuels, je te montre le logiciel en construction. La visio permet aussi d’associer une équipe répartie sur plusieurs sites, à Caen, à Saint-Lô ou à Alençon.",
+          "Non. Les échanges se font en visio, avec partage d’écran : vous me montrez vos tableurs et vos outils actuels, je vous montre le logiciel en construction. La visio permet aussi d’associer une équipe répartie sur plusieurs sites, à Caen, à Saint-Lô ou à Alençon.",
       },
       {
-        question: "As-tu déjà développé un logiciel pour une entreprise de Caen ?",
+        question: "Avez-vous déjà développé un logiciel pour une entreprise de Caen ?",
         answer:
-          "Pas encore. Mon projet chiffré le plus proche est le parcours de création de compte de l’eShop de Würth France, dans la distribution. Ce que je t’apporte à Caen, c’est ma méthode et ma disponibilité : un seul projet à la fois, et un interlocuteur dans ta région.",
+          "Pas encore. Mon projet chiffré le plus proche est le parcours de création de compte de l’eShop de Würth France, dans la distribution. Ce que je vous apporte à Caen, c’est ma méthode et ma disponibilité : un seul projet à la fois, et un interlocuteur dans votre région.",
       },
       {
-        question: "Tu travailles aussi dans la Manche et dans l’Orne ?",
+        question: "Vous travaillez aussi dans la Manche et dans l’Orne ?",
         answer:
           "Oui. Ma zone d’intervention couvre le Calvados, la Manche et l’Orne, et je travaille à distance avec des entreprises de toute la France. Partout, les prix et la méthode restent les mêmes.",
       },
       {
         question: "Application web ou logiciel à installer : que choisir ?",
         answer:
-          "Pour un logiciel de gestion, je développe des applications web : elles s’ouvrent dans un navigateur, sur ordinateur, tablette ou téléphone, et une mise à jour touche tout le monde à la fois. Rien à installer poste par poste, et tes équipes sur le terrain y accèdent comme celles du bureau.",
+          "Pour un logiciel de gestion, je développe des applications web : elles s’ouvrent dans un navigateur, sur ordinateur, tablette ou téléphone, et une mise à jour touche tout le monde à la fois. Rien à installer poste par poste, et vos équipes sur le terrain y accèdent comme celles du bureau.",
       },
       {
-        question: "Que devient mon logiciel si tu n’es plus disponible ?",
-        answer: `Il continue de tourner : il est hébergé à ton nom, et son code est dans ton dépôt avec sa documentation, prêt pour un autre développeur. Si tu veux que je reste sur le projet, le suivi mensuel revient à ${tauxSuivi()} du prix du projet par an, avec un minimum de ${plancherSuivi()} par mois.`,
+        question: "Que devient mon logiciel si vous n’êtes plus disponible ?",
+        answer: `Il continue de tourner : il est hébergé à votre nom, et son code est dans votre dépôt avec sa documentation, prêt pour un autre développeur. Si vous voulez que je reste sur le projet, le suivi mensuel revient à ${tauxSuivi()} du prix du projet par an, avec un minimum de ${plancherSuivi()} par mois.`,
       },
     ],
   },
@@ -272,7 +283,7 @@ export const pageLogicielCaen: PageLocale = {
  * `lienLocalParPrestation`, comme la page de Caen l'est depuis le site vitrine.
  */
 export const lienVersPageLogicielCaen = {
-  avant: "Ton entreprise est à Caen ou en Normandie :",
+  avant: "Votre entreprise est à Caen ou en Normandie :",
   libelle: "logiciel sur mesure à Caen",
   href: CHEMIN_PAGE_LOGICIEL_CAEN,
 } as const;

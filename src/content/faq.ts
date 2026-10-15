@@ -1,4 +1,11 @@
-import { plancherSuivi, prestation, prixPlancher, tauxSuivi } from "@/content/offre";
+import {
+  euros,
+  plancherSuivi,
+  prestation,
+  prixPlancher,
+  repereAgenceSite,
+  tauxSuivi,
+} from "@/content/offre";
 import type { FaqItem } from "@/lib/content/types";
 
 /**
@@ -52,11 +59,8 @@ import type { FaqItem } from "@/lib/content/types";
  * `offre.ts` documente, quand les prix vivaient à la fois dans `services.ts`
  * et dans `pricing.ts` et ont divergé sans que rien ne le signale.
  *
- * LE TUTOIEMENT, DEPUIS LE 2026-09-02. Les RÉPONSES tutoient le lecteur ; les
- * QUESTIONS, elles, sont écrites dans sa voix à lui et tutoient donc Eliott
- * (« Tu le reprends ? », « Pourquoi toi plutôt qu'une agence ? »). Le
- * tutoiement est réciproque ou il n'est pas : une question qui vouvoierait au
- * milieu de réponses qui tutoient se lirait comme deux personnes différentes.
+ * VOUVOIEMENT depuis le 2026-10-15, décision d'Eliott : les réponses vouvoient
+ * le lecteur, les questions, écrites dans sa voix, vouvoient Eliott.
  *
  * Les réponses concernées sont donc des gabarits : elles appellent les mêmes
  * fonctions que les pages de service. Un montant réintroduit à la main ici
@@ -78,23 +82,27 @@ export const faqItems: FaqItem[] = [
   {
     question: "Combien coûte un projet, et comment c’est facturé ?",
     /* Les planchers sont lus dans `offre.ts`. Les 40 / 30 / 30 de
-       l'échéancier restent des pourcentages, pas des montants. */
-    answer: `Un site démarre à ${prixPlancher(prestation("vitrine"))} HT, une solution métier à ${prixPlancher(prestation("logiciel"))} HT. Au-delà, le prix dépend de ton projet : le nombre de pages ou de modules, les outils à relier, la reprise de tes données. Chaque page de prestation dit ce qui est compris et ce qui fait monter le prix. Je fixe le montant au devis, avant de commencer, et il ne bouge plus. Tu verses 40 % à la signature, 30 % à mi-parcours et 30 % à la livraison.`,
+       l'échéancier restent des pourcentages, pas des montants.
+
+       LE REPÈRE D'AGENCE (2026-10-15) vient lui aussi d'`offre.ts`, avec sa
+       source et sa date. Une réponse de FAQ n'a pas de champ de lien : le
+       lien vers la source est posé sur `/services/site-vitrine/prix`. */
+    answer: `Un site démarre à ${prixPlancher(prestation("vitrine"))} HT, une solution métier à ${prixPlancher(prestation("logiciel"))} HT. Pour un site de PME, ${repereAgenceSite.source.nom} relève une médiane de ${euros(repereAgenceSite.mediane)} en agence (${repereAgenceSite.source.releve}) : je demande environ deux fois moins, parce que je conçois et je code moi-même, sans chef de projet ni structure à payer. Au-delà du plancher, le prix dépend de votre projet : le nombre de pages ou de modules, les outils à relier, la reprise de vos données. Je fixe le montant au devis, avant de commencer, et il ne bouge plus. Vous versez 40 % à la signature, 30 % à mi-parcours et 30 % à la livraison.`,
   },
   {
     question: "Combien de temps ça prend ?",
     answer:
-      "La date de mise en ligne est écrite dans le devis, avant que tu signes. Elle dépend de ton projet et de la rapidité de tes retours : tes photos, ta relecture des textes, tes réponses à mes questions. Je ne mène qu’un projet à la fois : une fois le devis signé, je travaille sur le tien, et tu le vois avancer sur une adresse en ligne.",
+      "La date de mise en ligne est écrite dans le devis, avant que vous signiez. Elle dépend de votre projet et de la rapidité de vos retours : vos photos, votre relecture des textes, vos réponses à mes questions. Je ne mène qu’un projet à la fois : une fois le devis signé, je travaille sur le vôtre, et vous le voyez avancer sur une adresse en ligne.",
   },
   {
-    question: "Est-ce que je reste propriétaire de ce que tu construis ?",
+    question: "Est-ce que je reste propriétaire de ce que vous construisez ?",
     answer:
-      "Oui, entièrement. Les droits sur le code te sont cédés au paiement intégral, c’est écrit dans mes conditions générales de vente. Le code vit sur ton dépôt et ton serveur, tes données et ton fichier client restent chez toi, et aucun abonnement n’est nécessaire pour continuer à te servir de ce que je t’ai livré. Tu n’es captif de personne, moi compris : un autre développeur peut reprendre le travail, il est documenté pour ça.",
+      "Oui, entièrement. Les droits sur le code vous sont cédés au paiement intégral, c’est écrit dans mes conditions générales de vente. Le code vit sur votre dépôt et votre serveur, vos données et votre fichier client restent chez vous, et aucun abonnement n’est nécessaire pour continuer à vous servir de ce que je vous ai livré. Vous n’êtes captif de personne, moi compris : un autre développeur peut reprendre le travail, il est documenté pour ça.",
   },
   {
-    question: "J’ai déjà un site ou un logiciel. Tu le reprends ?",
+    question: "J’ai déjà un site ou un logiciel. Vous le reprenez ?",
     answer:
-      "Par défaut, je construis du neuf. Reprendre du code écrit par quelqu’un d’autre est risqué, et je ne m’y engage pas à l’aveugle. La reprise reste possible si ton logiciel repose sur une base JavaScript récente et qu’il est correctement construit : je commence alors par un audit de son code, qui répond à cette question-là et à aucune autre. Sur du PHP ou du Laravel, je n’y touche pas, et je te le dis avant que ça te coûte quoi que ce soit. Dans les autres cas, je te propose un outil neuf qui vit à côté de l’ancien, sans y toucher.",
+      "Par défaut, je construis du neuf. Reprendre du code écrit par quelqu’un d’autre est risqué, et je ne m’y engage pas à l’aveugle. La reprise reste possible si votre logiciel repose sur une base JavaScript récente et qu’il est correctement construit : je commence alors par un audit de son code, qui répond à cette question-là et à aucune autre. Sur du PHP ou du Laravel, je n’y touche pas, et je vous le dis avant que ça vous coûte quoi que ce soit. Dans les autres cas, je vous propose un outil neuf qui vit à côté de l’ancien, sans y toucher.",
   },
   {
     question: "Que se passe-t-il après la mise en ligne ?",
@@ -110,6 +118,6 @@ export const faqItems: FaqItem[] = [
        date, et le droit de dire non. L'hébergement est au nom du client : la
        machine plus grosse passe par SA facture, le suivi bouge parce qu'il y
        a plus à surveiller. */
-    answer: `Je ne disparais pas. Je propose un suivi mensuel qui revient à ${tauxSuivi()} du prix du projet par an, avec un minimum de ${plancherSuivi()} par mois. Il couvre ce qui existe : mises à jour, sauvegardes vérifiées, corrections. Une demande nouvelle fait l’objet d’un devis, parce qu’elle n’était pas au cadrage. Ce montant ne bouge que dans un cas : ton site reçoit beaucoup plus de monde, ou ton hébergeur augmente ses prix. Il faut alors une machine plus puissante, payée sur ta facture d’hébergement, qui est à ton nom, et un suivi plus large. Je te préviens avant, avec le nouveau montant et la date, et rien ne change tant que tu n’as pas dit oui. Tu n’as pas besoin de ce suivi pour continuer à te servir de ce que je t’ai livré.`,
+    answer: `Je ne disparais pas. Je propose un suivi mensuel qui revient à ${tauxSuivi()} du prix du projet par an, avec un minimum de ${plancherSuivi()} par mois. Il couvre ce qui existe : mises à jour, sauvegardes vérifiées, corrections. Une demande nouvelle fait l’objet d’un devis, parce qu’elle n’était pas au cadrage. Ce montant ne bouge que dans un cas : votre site reçoit beaucoup plus de monde, ou votre hébergeur augmente ses prix. Il faut alors une machine plus puissante, payée sur votre facture d’hébergement, qui est à votre nom, et un suivi plus large. Je vous préviens avant, avec le nouveau montant et la date, et rien ne change tant que vous n’avez pas dit oui. Vous n’avez pas besoin de ce suivi pour continuer à vous servir de ce que je vous ai livré.`,
   },
 ];

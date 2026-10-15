@@ -5,14 +5,12 @@ import { content } from "@/lib/content";
 import {
   businessSchema,
   faqSchema,
-  filArianeSchema,
   graph,
   serviceSchema,
 } from "@/lib/json-ld";
 import { pageMetadata } from "@/lib/page-metadata";
 import { prestation } from "@/content/offre";
 import { pageLogicielCaen } from "@/content/page-logiciel-caen";
-import { marchesFilAriane } from "@/content/service-pages";
 
 /**
  * `/logiciel-sur-mesure-caen` : la solution métier, déclinée pour Caen et
@@ -40,7 +38,7 @@ export default async function LogicielSurMesureCaen() {
 
   return (
     <>
-      {/* L'ACTIVITÉ, LE SERVICE LOCAL, LE FIL D'ARIANE ET LA FAQ AFFICHÉE,
+      {/* L'ACTIVITÉ, LE SERVICE LOCAL ET LA FAQ AFFICHÉE,
           comme sur la page de Caen du site vitrine : l'activité reprend le
           même `@id` que l'accueil, le service déclare Caen et les 3
           départements de la zone d'intervention. */}
@@ -52,7 +50,6 @@ export default async function LogicielSurMesureCaen() {
             chemin: pageLogicielCaen.chemin,
             zones: pageLogicielCaen.zones,
           }),
-          filArianeSchema(marchesFilAriane(LOGICIEL, pageLogicielCaen)),
           faqSchema(pageLogicielCaen.faq.items),
         )}
       />

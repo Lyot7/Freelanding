@@ -38,7 +38,7 @@ const limiteur = creerLimiteur(LIMITE_RESERVATION);
 const EMAIL_CONTACT = siteConfig.contact.email || EMAIL_CONTACT_PAR_DEFAUT;
 
 /** Repli affiché au prospect chaque fois que la réservation ne peut pas aboutir. */
-const REPLI_DIRECT = `Écris-moi directement à ${EMAIL_CONTACT}.`;
+const REPLI_DIRECT = `Écrivez-moi directement à ${EMAIL_CONTACT}.`;
 
 /**
  * Message client d'un rejet de validation.
@@ -54,37 +54,37 @@ function messageRejet(motif: MotifRejetReservation): {
   if (motif.type === "champ_invalide") {
     switch (motif.champ) {
       case "nom":
-        return { message: "Indique ton nom.", champ: "nom" };
+        return { message: "Indiquez votre nom.", champ: "nom" };
       case "email":
         return {
           message: "Cette adresse e-mail ne semble pas valide.",
           champ: "email",
         };
       case "message":
-        return { message: "Ton message est trop long.", champ: "message" };
+        return { message: "Votre message est trop long.", champ: "message" };
       case "creneau":
         return {
           message:
-            "Ce créneau n’est plus proposé. Choisis-en un autre dans la liste.",
+            "Ce créneau n’est plus proposé. Choisissez-en un autre dans la liste.",
           champ: "creneau",
         };
       case "duree":
         return {
-          message: "Cette durée n’est plus proposée. Choisis-en une autre.",
+          message: "Cette durée n’est plus proposée. Choisissez-en une autre.",
           champ: "duree",
         };
       case "type":
         return { message: "Ce type de rendez-vous n’est pas proposé.", champ: "type" };
       case "budget":
-        return { message: "Choisis une tranche de budget.", champ: "budget" };
+        return { message: "Choisissez une tranche de budget.", champ: "budget" };
       case "objectif":
-        return { message: "Choisis ce que tu veux obtenir en priorité.", champ: "objectif" };
+        return { message: "Choisissez ce que vous voulez obtenir en priorité.", champ: "objectif" };
       case "echeance":
         return { message: "Cette échéance n’est pas proposée.", champ: "echeance" };
     }
   }
   return {
-    message: "Cette demande n’a pas pu être vérifiée. Recharge la page et réessaie.",
+    message: "Cette demande n’a pas pu être vérifiée. Rechargez la page et réessayez.",
   };
 }
 
@@ -108,7 +108,7 @@ export async function POST(requete: Request): Promise<Response> {
     return json(
       {
         message:
-          "Trop de réservations depuis cette connexion. Réessaie dans quelques minutes, ou écris-moi directement.",
+          "Trop de réservations depuis cette connexion. Réessayez dans quelques minutes, ou écrivez-moi directement.",
       },
       429,
       { "retry-after": String(limite.reessayerDansS) },
@@ -172,7 +172,7 @@ export async function POST(requete: Request): Promise<Response> {
     return json(
       {
         message:
-          "La vérification anti-robot n’a pas abouti. Recharge la page et réessaie.",
+          "La vérification anti-robot n’a pas abouti. Rechargez la page et réessayez.",
       },
       403,
     );
@@ -234,7 +234,7 @@ export async function POST(requete: Request): Promise<Response> {
       return json(
         {
           message:
-            "Ce créneau vient d’être pris. Choisis-en un autre dans la liste.",
+            "Ce créneau vient d’être pris. Choisissez-en un autre dans la liste.",
           champ: "creneau",
         },
         409,

@@ -1,6 +1,6 @@
 /**
  * Textes du profil complet (`/llms-full.txt`) et du prompt copié par le
- * bouton « Demande à ton assistant IA » du héros (`/agent/prompt.txt`).
+ * bouton « Demandez à votre assistant IA » du héros (`/agent/prompt.txt`).
  *
  * CE FICHIER NE PORTE QUE LA CHARPENTE. Le profil lui-même (offres, prix,
  * réalisations, questions fréquentes, rendez-vous) est assemblé par
@@ -56,7 +56,7 @@ export const vueAgentContent = {
     pourQui: [
       "Les TPE et les PME, en Normandie et partout en France à distance.",
       "Celles qui veulent un site qui leur amène des clients, un outil qui leur rend des heures chaque semaine, ou un logiciel métier dont plusieurs personnes se servent tous les jours.",
-      "Tu me parles directement : je fais le cadrage, le design, le développement et la mise en ligne.",
+      "Vous me parlez directement : je fais le cadrage, le design, le développement et la mise en ligne.",
     ],
 
     offres: {
@@ -95,18 +95,18 @@ export const vueAgentContent = {
        * les prix dans `offre.ts`, et le profil les cite plus bas.
        */
       etapes: [
-        "Premier rendez-vous en visio, gratuit, pour comprendre ta situation et ce que tu veux obtenir. Quand tu le réserves, 3 questions sur ton projet, dont ton budget, me permettent de te dire tout de suite ce qu’il permet.",
-        "Le devis ne part jamais seul par e-mail\u00A0: je te le présente lors d’un second rendez-vous, et on le relit ensemble.",
+        "Premier rendez-vous en visio, gratuit, pour comprendre votre situation et ce que vous voulez obtenir. Quand vous le réservez, 3 questions sur votre projet, dont votre budget, me permettent de vous dire tout de suite ce qu’il permet.",
+        "Le devis ne part jamais seul par e-mail\u00A0: je vous le présente lors d’un second rendez-vous, et on le relit ensemble.",
       ],
     },
 
     limites: {
       prixPlancher: (prix: string) =>
-        `Tu cherches un site à quelques centaines d’euros\u00A0: mes prix commencent à ${prix}\u00A0HT.`,
+        `Vous cherchez un site à quelques centaines d’euros\u00A0: mes prix commencent à ${prix}\u00A0HT.`,
       items: [
-        "Ton site ou ton logiciel repose sur PHP ou Laravel et tu veux le faire reprendre : je n’y touche pas.",
-        "Tu veux une équipe de plusieurs personnes, avec chef de projet et studio de création : je travaille seul, par choix.",
-        "Tu es une agence ou une ESN et tu cherches un développeur en régie ou en marque blanche\u00A0: je ne travaille pas ainsi.",
+        "Votre site ou votre logiciel repose sur PHP ou Laravel et vous voulez le faire reprendre : je n’y touche pas.",
+        "Vous voulez une équipe de plusieurs personnes, avec chef de projet et studio de création : je travaille seul, par choix.",
+        "Vous êtes une agence ou une ESN et vous cherchez un développeur en régie ou en marque blanche\u00A0: je ne travaille pas ainsi.",
       ],
     },
 
@@ -117,12 +117,12 @@ export const vueAgentContent = {
       rendezVousLien: "Lien",
       rappel: "Demander à être rappelé",
       rappelTexte:
-        "Écris-moi par le formulaire de contact en laissant ton numéro et le moment où tu es joignable : je te rappelle.",
+        "Écrivez-moi par le formulaire de contact en laissant votre numéro et le moment où vous êtes joignable : je vous rappelle.",
       appel: (tel: string, horaires: string) =>
-        `Tu peux aussi appeler directement au ${tel}${horaires ? ` (${horaires})` : ""}.`,
+        `Vous pouvez aussi appeler directement au ${tel}${horaires ? ` (${horaires})` : ""}.`,
       formulaire: "Écrire par le formulaire de contact",
       formulaireTexte:
-        "Dis-moi ce que tu cherches, même en deux lignes.",
+        "Dites-moi ce que vous cherchez, même en deux lignes.",
       email: "Écrire un e-mail",
       ailleurs: "Ailleurs",
       /** Réseaux cités : les professionnels seulement, Strava reste au pied de page. */
@@ -132,11 +132,12 @@ export const vueAgentContent = {
 
   /**
    * Consignes données à l'assistant du visiteur, placées AVANT le profil dans
-   * le prompt copié. Tutoiement de l'assistant, comme le reste du site.
+   * le prompt copié. L'assistant reste tutoyé ; dans le profil, « vous » est le
+   * visiteur (VOUVOIEMENT depuis le 2026-10-15, décision d'Eliott).
    */
   prompt: {
     consignes: [
-      "Tu vas jouer le rôle de conseiller pour la personne qui t’envoie ce message. Elle dirige ou représente une entreprise et se demande si Eliott Bouquerel, développeur freelance, est la bonne personne pour son projet. Le profil complet d’Eliott est plus bas, écrit par lui. Dans ce profil, « tu » désigne la personne qui te parle, pas toi.",
+      "Tu vas jouer le rôle de conseiller pour la personne qui t’envoie ce message. Elle dirige ou représente une entreprise et se demande si Eliott Bouquerel, développeur freelance, est la bonne personne pour son projet. Le profil complet d’Eliott est plus bas, écrit par lui. Dans ce profil, « vous » désigne la personne qui te parle, pas toi.",
       "Voici comment procéder :",
     ],
     etapes: [

@@ -181,6 +181,27 @@ export function FooterContactForm({
         </div>
       </label>
 
+      {/* MESSAGE COURT, FACULTATIF (2026-10-15) : le pied de page ne
+          permettait que de laisser un nom et une adresse. Trois lignes, pas
+          plus : un projet détaillé se raconte sur `/contact` ou en appel. */}
+      {footerForm.messageLabel ? (
+        <label className="relative flex w-full flex-col items-end gap-[10px]">
+          <span className="h-auto w-auto whitespace-pre text-right text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground-60">
+            {footerForm.messageLabel}
+          </span>
+          <textarea
+            name="message"
+            rows={3}
+            maxLength={4000}
+            placeholder={footerForm.messagePlaceholder ?? ""}
+            aria-invalid={envoi.champEnErreur === "message" || undefined}
+            className={`block min-h-[96px] w-full resize-y border-y border-r bg-transparent px-[16px] py-[14px] text-[16px] font-medium leading-[1.35] tracking-[-0.01em] text-foreground transition-colors placeholder:text-[rgba(255,255,255,0.3)] focus:border-b-accent tablet:text-[14px] ${
+              envoi.champEnErreur === "message" ? "border-accent" : "border-[rgba(255,255,255,0.1)]"
+            }`}
+          />
+        </label>
+      ) : null}
+
       {/* framer-vx7pd3 : bouton + disclaimer */}
       <div className="relative flex w-full flex-col items-start gap-[16px] overflow-visible tablet:flex-row tablet:items-center tablet:gap-[20px] tablet:pt-[26px]">
         <SubmitButton

@@ -95,6 +95,16 @@ describe("gabarits d'e-mail", () => {
     expect(texte).toContain(promesse);
   });
 
+  it("l'accusé sans rien à rappeler n'affiche pas de bloc de rappel", () => {
+    const { html } = composerAccuseReception(
+      { intention: "footer", nom: "Jean", email: "jean@example.com", typeProjet: "" },
+      "contact@eliottbouquerel.fr",
+    );
+    expect(html).not.toContain("Ce que vous cherchez");
+    expect(html).not.toContain("Votre message");
+    expect(html).toContain("sous 24 heures ouvrées");
+  });
+
   it("la version texte existe et n'est jamais vide", () => {
     const notification = composerNotification(soumissionHostile);
     expect(notification.texte.length).toBeGreaterThan(0);

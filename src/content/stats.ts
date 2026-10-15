@@ -18,7 +18,7 @@ import type { Stat } from "@/lib/content/types";
  * NumberCounter) : ces valeurs sont des choix à arbitrer, pas un relevé.
  */
 
-/** Section « Ton projet n'attend personne » (numbers.ts) : grille principale. */
+/** Section « Votre projet n'attend personne » (numbers.ts) : grille principale. */
 export const howWeDoItStats: Stat[] = [
   /*
    * LES TROIS CHIFFRES CHOISIS PAR ELIOTT LE 2026-09-24, dans cet ordre : un
@@ -44,10 +44,10 @@ export const howWeDoItStats: Stat[] = [
    */
   {
     value: "24h",
-    label: "Pour répondre à ton message, en heures ouvrées",
+    label: "Pour répondre à votre message, en heures ouvrées",
     suffix: "h",
     format: "integer",
-    highlights: ["Pour répondre à ton message"],
+    highlights: ["Pour répondre à votre message"],
   },
   /*
    * LE SEUL RÉSULTAT MESURÉ QU'ELIOTT POSSÈDE : le parcours de création de
@@ -70,7 +70,7 @@ export const howWeDoItStats: Stat[] = [
 ];
 
 /**
- * Section « Personne ne te tient en otage » (number.ts) : UNE carte depuis le
+ * Section « Personne ne vous tient en otage » (number.ts) : UNE carte depuis le
  * 2026-09-24. « /10+ design pensé pour dix ans » est sorti (un cap de
  * conception, pas un fait que le client peut vérifier) ; reste la propriété,
  * vérifiable dès la mise en ligne. Préfixe et suffixe sont rendus tels quels
@@ -79,7 +79,7 @@ export const howWeDoItStats: Stat[] = [
 export const reputationStats: Stat[] = [
   {
     value: "100",
-    label: "Du code, de l’hébergement et des données à ton nom",
+    label: "Du code, de l’hébergement et des données à votre nom",
     prefix: "/",
     suffix: "%",
     format: "integer",

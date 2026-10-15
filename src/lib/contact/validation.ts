@@ -205,11 +205,8 @@ export function validerSoumission(
     };
   }
 
-  if (intention === "footer") {
-    return { ok: true, soumission: { intention, nom, email, typeProjet } };
-  }
-
-  // Intention « projet » : le message est le seul champ multiligne du site.
+  // Le message est facultatif pour les deux intentions : le pied de page le
+  // propose aussi depuis le 2026-10-15, en champ court.
   const messageBrut = normaliserTexte(lireChaine(champs, "message") ?? "");
   if (messageBrut.length === 0) {
     return { ok: true, soumission: { intention, nom, email, typeProjet } };

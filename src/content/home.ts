@@ -1,34 +1,50 @@
-import type { HomeContent } from "@/lib/content/types";
+import type { HeroProof, HomeContent } from "@/lib/content/types";
 import { slugsMisEnAvant } from "@/content/blog";
 import { faqItems } from "@/content/faq";
 import { services } from "@/content/services";
-import { prestation, prixPlancher } from "@/content/offre";
+import { euros, prestation, prixPlancher, repereAgenceSite } from "@/content/offre";
 import { lienRendezVous } from "@/content/rendez-vous";
 import { howWeDoItStats, reputationStats } from "@/content/stats";
 
 const ENTREE_VITRINE = prixPlancher(prestation("vitrine"));
 const ENTREE_LOGICIEL = prixPlancher(prestation("logiciel"));
-const ACCROCHE_HERO = `Je conçois et je code ton site vitrine, à partir de ${ENTREE_VITRINE} HT, ou ta solution métier, à partir de ${ENTREE_LOGICIEL} HT. Le prix est fixé au devis, avant de commencer.`;
 
 /*
- * LE TITRE DU HÉROS, ET LE SEUL H1 DE L'ACCUEIL, depuis le 2026-09-24 (phase E).
- * Eliott : « ton titre, ce serait bien que ce soit ce qu'on a ensuite ». La
- * phrase était le h1 de la section About, un écran plus bas ; elle monte dans
- * le cadre du héros et About passe à un h2 qui lui est propre.
+ * LE POSITIONNEMENT D'ELIOTT, décision du 2026-10-15 : « je fais le travail
+ * d'une agence pour deux fois moins cher ». « Jusqu'à » le garde vrai sur les
+ * deux offres : le site d'entrée vaut la moitié de la médiane d'un site de PME
+ * en agence (preuve chiffrée plus bas), le logiciel s'en rapproche sans
+ * l'atteindre sur un premier outil. Chiffres et source : `offre.ts`.
  */
-const TITRE_ACCUEIL =
-  "Des sites qui amènent des clients, des outils qui te rendent des heures.";
+const POSITIONNEMENT = "La qualité d’une agence, jusqu’à deux fois moins cher.";
 
 /*
- * LA LIGNE « POUR QUI », SANS PRIX, depuis la même date. « Prix ferme dès
- * 3 000 € HT » est parti : il affirmait un prix ferme pour toute l'offre alors
- * que le haut de l'offre se chiffre sur mesure. Les planchers restent dans
- * l'accordéon et sur les pages de prestation.
+ * LES DEUX PORTES, qui forment ensemble le seul h1 de l'accueil. Mots
+ * d'Eliott du 2026-10-15 : « un site qui vous ramène des clients, un outil
+ * qui vous rend des heures ». Chaque porte mène à sa prestation et porte son
+ * prix d'entrée.
  */
-const POUR_QUI_HERO = "Sites vitrines et solutions métier pour les TPE et les PME.";
+const PORTES = [
+  {
+    lines: ["Un site qui vous", "ramène des clients."],
+    href: `/services/${prestation("vitrine").slug}`,
+    price: `dès ${ENTREE_VITRINE} HT`,
+  },
+  {
+    lines: ["Un outil qui vous", "rend des heures."],
+    href: `/services/${prestation("logiciel").slug}`,
+    price: `dès ${ENTREE_LOGICIEL} HT`,
+  },
+] as const;
+
+const TITRE_ACCUEIL = PORTES.map((porte) => porte.lines.join(" ")).join(" ");
+
+/** Ce qui explique le prix, en une phrase, sous les deux portes. */
+const POURQUOI_CE_PRIX =
+  "Je conçois et je code moi-même, sans chef de projet ni structure à payer : votre budget va au produit.";
 
 /** La ligne de preuve du héros, tirée du chiffre Würth de `stats.ts`. */
-function preuveWurth(): HomeContent["hero"]["proof"] {
+function preuveWurth(): HeroProof | undefined {
   const stat = howWeDoItStats.find((s) => s.label.includes("Würth"));
   if (!stat) return undefined;
   return {
@@ -39,121 +55,66 @@ function preuveWurth(): HomeContent["hero"]["proof"] {
   };
 }
 
+/*
+ * « 50 % DU PRIX D'UNE AGENCE », formulé pour rester vrai : le prix d'entrée
+ * du site rapporté à la médiane d'un site de PME relevée sur des budgets
+ * d'agences, source liée. Le pourcentage est calculé, jamais tapé : si le
+ * plancher ou la médiane bougent, la phrase suit.
+ */
+function preuveAgence(): HeroProof {
+  const part = Math.round((prestation("vitrine").plancher / repereAgenceSite.mediane) * 100);
+  return {
+    value: `${part}\u202F%`,
+    label: `du prix d’un site de PME en agence, médiane ${euros(repereAgenceSite.mediane)}`,
+    source: {
+      label: `${repereAgenceSite.source.nom}, ${repereAgenceSite.source.releve}`,
+      href: repereAgenceSite.source.href,
+    },
+  };
+}
+
 /**
- * Contenu de la page d'accueil — recomposé fidèlement à partir des sections de
- * l'archive Framer (src/content/framer-html/*.ts). Chaque section pointe vers sa
- * source unique (faq / stats / pricing / services / testimonials) : aucune
- * duplication de texte.
+ * Contenu de la page d'accueil. Chaque section pointe vers sa source unique
+ * (faq / stats / services / offre) : aucune duplication de texte.
  *
- * TRADUCTION FR : la copy passe à la première personne du singulier (Eliott
- * travaille seul) et toutes les preuves sociales fabriquées du template
- * (ancienneté 2019, 24+ projets, 12+ secteurs, 60+ projets livrés, 89 % de
- * recommandation, 4.9/5 Google & Clutch, lien Trustpilot) sont retirées.
- *
- * TUTOIEMENT depuis le 2026-09-02, décision d'Eliott. Il travaille seul, et
- * c'est là son écart avec les agences : le vouvoiement faisait parler un
- * cabinet, le tutoiement fait parler une personne. Il tient sur TOUT le texte
- * visible du site ; les documents contractuels (`legal.ts`) restent au
- * vouvoiement, parce qu'un contrat ne se tutoie pas.
- *
- * CE QUE LA BASCULE N'A PAS FAIT : elle n'a introduit aucune promesse, aucun
- * chiffre et aucun délai neufs. Chaque phrase touchée dit exactement ce qu'elle
- * disait la veille, à la personne près, et reste adossée à
- * `vault/wiki/business/copy-matiere-brute.md`.
+ * VOUVOIEMENT depuis le 2026-10-15, décision d'Eliott : il parle en « je », le
+ * visiteur est « vous » sur tout le texte visible du site.
  */
 export const homeContent: HomeContent = {
   hero: {
-    /*
-     * L'EYEBROW PORTE LA ZONE, plus le millésime, décision d'Eliott du
-     * 2026-09-02. « (Depuis 2026, version 1.0.4) » occupait la ligne la plus
-     * haute de la page pour dire deux choses coûteuses : que l'activité est
-     * neuve, et que le site est un produit versionné, donc un gabarit.
-     *
-     * La zone est le seul élément du hero qui n'apparaît nulle part ailleurs :
-     * le métier est déjà dit par le H1, par « Développeur freelance » sous la
-     * photo et par les trois disciplines en pied de cadre. Un prospect normand
-     * cherche du local, et rien ne le lui disait.
-     */
-    eyebrow: "Sur mesure, depuis la Normandie, partout en France",
-    // LE H1 DE L'ACCUEIL, rendu dans le cadre du héros sous le mot-symbole.
-    // Voir `TITRE_ACCUEIL` plus haut.
+    // Au-dessus des deux portes : ce qui distingue Eliott d'une agence.
+    eyebrow: POSITIONNEMENT,
+    // LE H1 DE L'ACCUEIL : les deux portes mises bout à bout. Le héros rend
+    // chaque porte comme un lien vers sa prestation.
     title: TITRE_ACCUEIL,
-    // Coupure à la virgule dès 1360 px, où les deux moitiés tiennent chacune
-    // sur une ligne (voir `HeroSection`).
-    titleLines: [
-      "Des sites qui amènent des clients,",
-      "des outils qui te rendent des heures.",
-    ],
-    // `subtitle` est la copy de repli, non affichée ici : le hero rend le
-    // paragraphe de `subtitleParagraphs`. Les deux disent désormais la même
-    // chose, il n'y a plus de raison qu'elles divergent.
-    subtitle: ACCROCHE_HERO,
+    titleLines: PORTES.map((porte) => porte.lines.join(" ")),
+    doors: PORTES,
+    subtitle: POURQUOI_CE_PRIX,
+    subtitleParagraphs: [{ text: POURQUOI_CE_PRIX }],
     /*
-     * SOUS LE TITRE, LA CIBLE ET LES DEUX PRESTATIONS, en corps de lecture et
-     * sans prix (voir `POUR_QUI_HERO`). Le détail de l'offre est dans
-     * l'accordéon, un clic plus bas.
+     * DEUX PREUVES DANS LE PREMIER ÉCRAN : le seul résultat mesuré du site,
+     * lu dans `stats.ts` pour ne jamais diverger de la section chiffres, puis
+     * la comparaison de prix, sourcée. Aucune ne présente une entreprise comme
+     * cliente.
      */
-    subtitleParagraphs: [{ text: POUR_QUI_HERO }],
-    offerLink: { label: "↓ Voir les prestations", href: "#services" },
-    /*
-     * LA PREUVE DANS LE PREMIER ÉCRAN depuis le 2026-09-24 (phase D). La bande
-     * des logos commençait sous la ligne de flottaison : à 1440 × 900, le
-     * visiteur ne voyait ni les logos ni un seul résultat avant de défiler.
-     * La ligne reprend le seul résultat mesuré du site, lu dans `stats.ts`
-     * pour ne jamais diverger de la section chiffres, et mène à l'étude de
-     * cas qui le détaille. Elle dit « chez Würth France » : rien n'y présente
-     * une entreprise comme cliente.
-     */
-    proof: preuveWurth(),
-    // Fond du hero. Remplace le plan de pilote du template, dont la licence
-    // n'était pas traçable, par un asset généré et possédé (Veo/Nano Banana,
-    // 2026-08-10) : macro d'un mouvement d'horlogerie, qui dit « l'outil qui
-    // tourne derrière » sans l'illustrer.
-    //
-    // La boucle est produite par `scripts/hero-loop.mjs`, qui la CALIBRE sur le
-    // profil lumineux relevé du fond d'origine (moyenne 17/255, aucun pixel
-    // au-dessus de 200) et échoue si la cible n'est pas atteinte. Ce n'est pas
-    // une coquetterie : ce fond porte le wordmark blanc, et un aplat clair
-    // mouvant sous le texte le trouerait par intermittence.
-    // Mesuré ici : moyenne 13,7 · max 114 · p99 93 · 0,000 % au-dessus de 200.
+    proofs: [preuveWurth(), preuveAgence()].filter(
+      (preuve): preuve is HeroProof => preuve !== undefined,
+    ),
+    // Fond du hero : macro d'un mouvement d'horlogerie, asset généré et
+    // possédé (2026-08-10), calibré sombre par `scripts/hero-loop.mjs`
+    // (moyenne 13,7/255) pour porter du texte blanc.
     media: {
       kind: "video",
       src: "/videos/hero-loop.mp4",
-      // Première image de la boucle, 14 Ko. Sans affiche, l'élément LCP du
-      // mobile était la vidéo elle-même, peinte à 8,8 s sur réseau bridé.
+      // Première image de la boucle, 14 Ko : sans affiche, l'élément LCP du
+      // mobile était la vidéo elle-même.
       poster: "/videos/hero-loop-poster.webp",
     },
-    // Mot posé à droite du logotype dans la source. Le hero reconstruit affiche
-    // « Eliott » en dur : ce champ n'est plus lu par le rendu.
-    wordmarkCaption: "freelance",
-    // Mots volontairement COURTS (contrainte de largeur du hero) : mesurés à
-    // 18 px, séparateurs et gouttières compris, 449 px dans une rangée de 678.
-    //
-    // CES TROIS MOTS-LÀ depuis le 2026-08-29. La bande répétait « sites /
-    // outils / logiciels », c’est-à-dire les trois mots du H1 posé cent pixels
-    // plus haut : un bégaiement. Elle dit désormais ce que je FAIS, le H1 disant
-    // ce qu’il en SORT.
-    serviceWords: ["design", "développement", "référencement"],
-    serviceWordsSeparator: "/",
-    // Carte « fondateur » du template : la persona Anna Schneider (CEO) n'existe
-    // pas, le champ porte la seule identité réelle du site.
-    //
-    // PHOTO RÉELLE depuis le 2026-08-10 (fournie par Eliott). Le portrait du
-    // template, la photo d'une inconnue rendue sous le nom d'Eliott, est
-    // définitivement écarté.
-    //
-    // Le fond d'origine du fichier était un vert citron `#cdff00`, plus saturé
-    // que l'accent du site. Il a été remplacé par `--accent` (#c8f24a) au
-    // chromakey, sinon la vignette posait un vert étranger à la palette juste à
-    // côté des aplats accent. Recadrage serré sur le visage : la vignette fait
-    // 40 px de côté, un plan buste s'y lirait comme un aplat vert.
-    //
-    // `alt` VIDE et non « Eliott Bouquerel » : le nom est déjà rendu en texte à
-    // deux centimètres de là. Le répéter ferait dire deux fois la même chose à
-    // un lecteur d'écran, la vignette est donc décorative au sens WCAG.
+    // PHOTO RÉELLE d'Eliott (fournie le 2026-08-10). `alt` vide : le nom est
+    // rendu en texte juste à côté, la vignette est décorative au sens WCAG.
     person: {
       name: "Eliott Bouquerel",
-      role: "Développeur freelance",
+      role: "Développeur à Caen",
       avatar: {
         src: "/images/eliott-bouquerel-avatar.jpg",
         alt: "",
@@ -174,10 +135,12 @@ export const homeContent: HomeContent = {
      * LIGNES DE 12 SIGNES AU PLUS, le titre est rendu à 92 px dans une demi-
      * colonne de 683 px, aligné à droite dès 810.
      */
-    marquee: "Ton client te compare avant d’appeler.",
-    marqueeLines: ["Ton client", "te compare", "avant", "d’appeler."],
+    marquee: "On vous compare avant d’appeler.",
+    // Dix signes au plus par ligne : « vous compare » débordait sa colonne
+    // de 12 à 17 px entre 810 et 1200 (relevé du 2026-10-15).
+    marqueeLines: ["On vous", "compare", "avant", "d’appeler."],
     statement:
-      "Il ouvre ton site puis celui du concurrent, et il appelle celui qui rassure. Regarde ce que j’ai livré.",
+      "Votre client ouvre votre site puis celui du concurrent, et il appelle celui qui rassure. Regardez ce que j’ai livré.",
     // Rendue en noir 60 %, ce fragment passe en noir plein.
     statementEmphasis: ["il appelle celui qui rassure."],
     vintage: "2026©",
@@ -231,13 +194,13 @@ export const homeContent: HomeContent = {
      * DÉCOUPAGE : trois lignes aux unités de sens. Toutes reçoivent le corps
      * dicté par la plus large (cf. `TitleFitText`).
      */
-    title: "Je pars de ce que ton site doit rapporter.",
-    titleLines: ["Je pars de ce", "que ton site", "doit rapporter."],
+    title: "Je pars de ce que votre site doit rapporter.",
+    titleLines: ["Je pars de ce", "que votre site", "doit rapporter."],
     // FIDÉLITÉ : la section About du source n'a QU'UN paragraphe (cf.
     // framer-html/about.ts, RichText « People decide… »). Les paragraphes
     // précédemment ajoutés provenaient de showreel/numbers → retirés.
     body: [
-      "Un site peut impressionner et ne rien rapporter du tout. C’est même devenu courant : une belle carrosserie posée sur un moteur lent, sortie en quelques heures, qui n’a jamais eu à répondre à la question de savoir à quoi elle sert. Je prends le problème dans l’autre sens. Ce que tu vois est dessiné pour ton métier ; ce que tu ne vois pas, l’architecture, la vitesse, ce que les moteurs de recherche lisent, est décidé avant la première ligne de code.",
+      "Un site peut impressionner et ne rien rapporter du tout. C’est même devenu courant : une belle carrosserie posée sur un moteur lent, sortie en quelques heures, qui n’a jamais eu à répondre à la question de savoir à quoi elle sert. Je prends le problème dans l’autre sens. Ce que vous voyez est dessiné pour votre métier ; ce que vous ne voyez pas, l’architecture, la vitesse, ce que les moteurs de recherche lisent, est décidé avant la première ligne de code.",
     ],
     // Emphase blanche (source Framer) : ces expressions passent en blanc plein
     // au milieu du paragraphe rendu en blanc 70 %.
@@ -299,10 +262,12 @@ export const homeContent: HomeContent = {
      * ne cherche pas le volume… ») est sortie : elle redisait « 1 projet à la
      * fois » avec d'autres mots.
      */
-    title: "Ton projet n’attend personne.",
-    titleLines: ["Ton projet", "n’attend", "personne."],
+    title: "Votre projet n’attend personne.",
+    // « Votre projet » déborde la colonne à 92 px (1 338 px pour 1 313) :
+    // le possessif prend sa ligne.
+    titleLines: ["Votre", "projet", "n’attend", "personne."],
     intro:
-      "Je ne mène qu’un chantier à la fois, alors ton message a sa réponse sous 24 h ouvrées.",
+      "Je ne mène qu’un chantier à la fois, alors votre message a sa réponse sous 24 h ouvrées.",
     stats: howWeDoItStats,
   },
 
@@ -311,10 +276,10 @@ export const homeContent: HomeContent = {
     eyebrow: "Pourquoi moi ?",
     // TITRE ET SOUS-TITRE CHOISIS PAR ELIOTT le 2026-09-24 (remplacent « Ce
     // qui est vérifiable. »). La carte porte le chiffre qui le prouve.
-    title: "Personne ne te tient en otage.",
-    titleLines: ["Personne", "ne te tient", "en otage."],
+    title: "Personne ne vous tient en otage.",
+    titleLines: ["Personne", "ne vous tient", "en otage."],
     intro:
-      "Tu as tous les accès dès la mise en ligne, et tu changes de prestataire quand tu veux.",
+      "Vous avez tous les accès dès la mise en ligne, et vous changez de prestataire quand vous voulez.",
     stats: reputationStats,
     // LE RENDEZ-VOUS EST LE CHEMIN PRINCIPAL du site. « Voir les réalisations »
     // est parti : la section des réalisations est juste au-dessus.
@@ -331,7 +296,7 @@ export const homeContent: HomeContent = {
     // l’autre sans que personne le remarque.
     // Mesuré : 3 lignes dans les 560 px du bloc, contre 4 auparavant.
     intro:
-      "Je pars de ta façon de travailler, et je construis ce qui lui correspond. Pas de fonctions en trop, rien à contourner.",
+      "Je pars de votre façon de travailler, et je construis ce qui lui correspond. Pas de fonctions en trop, rien à contourner.",
     items: services,
   },
 
@@ -484,10 +449,12 @@ export const homeContent: HomeContent = {
   ],
 
   seo: {
-    // Mot-clé en tête, marque en fin (audit on-page du 2026-09-28).
-    title: "Développeur web freelance à Caen · Eliott Bouquerel",
+    // Mot-clé en tête, marque en fin. « Développeur web freelance » portait
+    // une intention emploi (carte SEO du 2026-10-15) : le titre nomme les
+    // deux offres.
+    title: "Site internet et logiciel sur mesure à Caen · Eliott Bouquerel",
     description:
-      "Des sites qui amènent des clients et des logiciels métier sur mesure. Développeur freelance basé à Caen, disponible partout en France en visio.",
+      "Sites internet et logiciels métier sur mesure à Caen. La qualité d’une agence, jusqu’à deux fois moins cher. En visio partout en France.",
     ogImage: {
       src: "/images/og.jpg",
       alt: "Eliott Bouquerel",

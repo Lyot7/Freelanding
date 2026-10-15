@@ -12,9 +12,8 @@ import type { NotFoundContent } from "@/lib/content/types";
  * branchera qu'une fois le composant mis à jour.
  */
 export const notFoundContent: NotFoundContent = {
-  // TUTOIEMENT, comme tout le texte visible du site : ce message était resté
-  // au vouvoiement.
-  messageLines: ["Le lien que tu as suivi", "ne mène nulle part."],
+  // VOUVOIEMENT depuis le 2026-10-15, décision d'Eliott.
+  messageLines: ["Le lien que vous avez suivi", "ne mène nulle part."],
   titleLines: ["Page", "introuvable"],
   errorLabel: "Erreur 404",
   backLink: { label: "Retour à l’accueil", href: "/" },

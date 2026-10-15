@@ -46,7 +46,7 @@ const MESSAGE = {
   de: "Eliott Bouquerel <contact@exemple.test>",
   destinataire: "prospect@exemple.test",
   repondreA: "prospect@exemple.test",
-  sujet: "Ton message est bien arrivé",
+  sujet: "Votre message est bien arrivé",
   html: "<p>Bonjour Élodie,</p>",
   texte: "Bonjour Élodie,",
 };
@@ -89,11 +89,11 @@ describe("encoderEntete", () => {
   });
 
   it("encode les accents en mot encodé UTF-8", () => {
-    const encode = encoderEntete("Ton message est bien arrivé");
+    const encode = encoderEntete("Votre message est bien arrivé");
     expect(encode.startsWith("=?UTF-8?B?")).toBe(true);
     const charge = encode.slice("=?UTF-8?B?".length, -"?=".length);
     expect(Buffer.from(charge, "base64").toString("utf8")).toBe(
-      "Ton message est bien arrivé",
+      "Votre message est bien arrivé",
     );
   });
 

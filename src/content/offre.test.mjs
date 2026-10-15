@@ -10,6 +10,7 @@ import {
   prestations,
   prixPlancher,
   plancherSuivi,
+  repereAgenceSite,
   suiviMensuel,
   tauxSuivi,
 } from "./offre.ts";
@@ -108,7 +109,7 @@ describe("un plancher par offre, écrit une seule fois", () => {
     expect(vitrine.inclus.some((l) => /textes écrits par moi/iu.test(l))).toBe(true);
     const tout = [vitrine.resume, vitrine.horsOffre, ...vitrine.inclus, ...vitrine.faitMonter];
     for (const texte of tout) {
-      expect(/textes mis en page|textes que tu fournis/iu.test(texte), texte).toBe(false);
+      expect(/textes mis en page|textes que (?:tu fournis|vous fournissez)/iu.test(texte), texte).toBe(false);
     }
   });
 
@@ -134,6 +135,68 @@ describe("un plancher par offre, écrit une seule fois", () => {
  * une chaîne (une FAQ, un article, un libellé) promettrait au visiteur un
  * forfait qui n'existe plus.
  */
+/**
+ * PLUS AUCUN TAUX JOURNALIER SUR LE SITE, même pour le critiquer (décision
+ * d'Eliott du 2026-10-15). Le site parle de prix « à partir de » et de devis :
+ * un TJM, même cité en repoussoir, ramène le lecteur à un prix au temps passé.
+ * Le test lit les sources de `src/content`, commentaires retirés.
+ */
+describe("aucun taux journalier dans src/content", () => {
+  const racine = fileURLToPath(new URL("./", import.meta.url));
+  const fichiers = readdirSync(racine, { recursive: true })
+    .map(String)
+    .filter((f) => /\.(ts|tsx|mdx|md)$/u.test(f));
+
+  test("les fichiers de contenu sont bien lus", () => {
+    expect(fichiers.length).toBeGreaterThan(20);
+  });
+
+  test("ni « TJM », ni « taux journalier », ni « tarif journalier », hors commentaires", () => {
+    const motif = /\bTJM\b|taux journaliers?|tarifs? journaliers?/iu;
+    const fautifs = [];
+    for (const f of fichiers) {
+      const source = readFileSync(join(racine, f), "utf8")
+        .replace(/\/\*[\s\S]*?\*\//g, " ")
+        .replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+      const trouve = source.match(motif);
+      if (trouve) fautifs.push(`${f} : ${trouve[0]}`);
+    }
+    expect(fautifs).toEqual([]);
+  });
+});
+
+/**
+ * LE VISITEUR EST VOUVOYÉ (décision d'Eliott du 2026-10-15) dans l'offre et la
+ * FAQ, qui se rendent sur toutes les pages de prestation.
+ */
+describe("l'offre et la FAQ vouvoient", () => {
+  test("aucun tutoiement dans l'offre ni dans la FAQ", () => {
+    const tutoiement = /(?<![\p{L}’'])(?:tu|toi|ton|ta|tes|te)(?!\p{L})|(?<!\p{L})t’/iu;
+    const textes = [
+      ...[...prestations, integrationIA].flatMap((p) => [
+        p.resume ?? "",
+        p.horsOffre,
+        ...p.inclus,
+        ...p.faitMonter,
+      ]),
+      ...faqItems.flatMap((f) => [f.question, f.answer]),
+    ];
+    for (const texte of textes) {
+      expect(tutoiement.test(texte), `tutoiement : ${texte}`).toBe(false);
+    }
+  });
+
+  test("la réponse prix de la FAQ cite le repère d'agence, sa source et sa date", () => {
+    const reponse = faqItems.find((f) => /Combien coûte un projet/u.test(f.question))?.answer;
+    expect(reponse).toContain(euros(repereAgenceSite.mediane));
+    expect(reponse).toContain(repereAgenceSite.source.nom);
+    expect(reponse).toContain(repereAgenceSite.source.releve);
+    // « Deux fois moins » n'est écrit que parce que le rapport est exact.
+    expect(reponse).toMatch(/deux fois moins/u);
+    expect(repereAgenceSite.mediane / prestation("vitrine").plancher).toBeCloseTo(2, 1);
+  });
+});
+
 describe("aucun nom de palier ne reste dans src/", () => {
   const racine = fileURLToPath(new URL("../", import.meta.url));
   const fichiers = readdirSync(racine, { recursive: true })
@@ -346,11 +409,11 @@ describe("le site annonce le même prix que le module", () => {
     expect(clause, "la clause ne prévient pas avant la hausse").toMatch(
       /préviens avant|avant/i,
     );
-    // LE SITE TUTOIE DEPUIS LE 2026-09-02 : le motif accepte les deux personnes.
-    // Ce qui est vérifié n'est pas la formulation mais le fait que le client
-    // garde le droit de dire non, quelle que soit la personne grammaticale.
+    // VOUVOIEMENT depuis le 2026-10-15, décision d'Eliott. Ce qui est vérifié
+    // n'est pas la formulation mais le fait que le client garde le droit de
+    // dire non.
     expect(clause, "la clause ne laisse pas le client refuser").toMatch(
-      /tant que (?:vous n’avez|tu n’as) pas dit oui|(?:vous pouvez|tu peux) refuser/i,
+      /tant que vous n’avez pas dit oui|vous pouvez refuser/i,
     );
   });
 

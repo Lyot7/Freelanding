@@ -54,6 +54,17 @@ describe("JSON-LD d'un article", () => {
   });
 });
 
+describe("JSON-LD de la personne, portrait", () => {
+  test("pose le portrait quand il existe, et rien sinon", () => {
+    expect(personSchema(siteConfig).image).toContain(siteConfig.contact.person.avatar?.src ?? "absent");
+    const sansPortrait = {
+      ...siteConfig,
+      contact: { ...siteConfig.contact, person: { ...siteConfig.contact.person, avatar: undefined } },
+    };
+    expect(personSchema(sansPortrait).image).toBeUndefined();
+  });
+});
+
 describe("JSON-LD de la page à propos", () => {
   test("désigne la personne du site, profils externes compris", () => {
     const person = personSchema(siteConfig);

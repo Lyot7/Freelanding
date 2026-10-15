@@ -123,7 +123,7 @@ export const servicePageLabels = {
 
   /** En vis-à-vis du titre de l'offre : comment on paie, et que le prix tient. */
   reassurance:
-    "Le prix est fixé au devis et ne bouge plus. Tu paies 40 % à la signature, 30 % à la première version fonctionnelle et 30 % à la livraison. Le code et l’hébergement sont à ton nom.",
+    "Le prix est fixé au devis et ne bouge plus. Vous payez 40 % à la signature, 30 % à la première version fonctionnelle et 30 % à la livraison. Le code et l’hébergement sont à votre nom.",
 
   /** Bouton de l'offre, vers l'ancre `#rendez-vous` de la page. */
   cta: RESERVER_UN_APPEL,
@@ -140,24 +140,24 @@ export const servicePageLabels = {
   surMesureBloc: {
     titre: "Hors offre, sur devis",
     cta: RESERVER_UN_APPEL,
-    titreQuestions: "Pas sûr de ce qu’il te faut ?",
+    titreQuestions: "Pas sûr de ce qu’il vous faut ?",
     introQuestions:
-      "3 questions, posées quand tu réserves ton appel. Je te dis tout de suite ce que ton budget permet, et ce qu’il ne permet pas.",
+      "3 questions, posées quand vous réservez votre appel. Je vous dis tout de suite ce que votre budget permet, et ce qu’il ne permet pas.",
     questions: [
       {
-        titre: "Ton budget",
+        titre: "Votre budget",
         corps:
-          "Le repère le plus utile des trois. À budget connu, je te dis ce qu’il permet de construire, et ce qui attendra.",
+          "Le repère le plus utile des trois. À budget connu, je vous dis ce qu’il permet de construire, et ce qui attendra.",
       },
       {
-        titre: "Ton objectif",
+        titre: "Votre objectif",
         corps:
-          "Le résultat que tu attends décide de ce qu’on construit. Dis-le avec tes mots, je le traduis en périmètre.",
+          "Le résultat que vous attendez décide de ce qu’on construit. Dites-le avec vos mots, je le traduis en périmètre.",
       },
       {
-        titre: "Ton échéance",
+        titre: "Votre échéance",
         corps:
-          "Si une date compte pour toi, dis-la dès le premier appel. Je te dis tout de suite si elle tient.",
+          "Si une date compte pour vous, dites-la dès le premier appel. Je vous dis tout de suite si elle tient.",
       },
     ],
   },

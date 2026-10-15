@@ -126,7 +126,7 @@ describe("le sitemap et les pages secteur disent la même chose", () => {
 
 describe("les pages secteur ne promettent que ce qui est vrai", () => {
   test("aucune promesse de rendez-vous sur place ni de déplacement", () => {
-    const interdit = /sur place|en personne|présentiel|déplac|autour d.un café|chez toi, devant/iu;
+    const interdit = /sur place|en personne|présentiel|déplac|autour d.un café|chez (?:toi|vous), devant/iu;
     for (const page of pagesSecteur) {
       for (const texte of textes(page)) {
         expect(interdit.test(texte), `promesse de présentiel : ${texte}`).toBe(false);

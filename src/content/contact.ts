@@ -17,10 +17,10 @@ export const contactContent: ContactContent = {
   hero: {
     title: "Contact.",
     subtitle:
-      "Voyons si je suis la bonne personne pour ton projet. Une conversation sur ce dont tu as besoin, et sur ce que je peux faire.",
+      "Voyons si je suis la bonne personne pour votre projet. Une conversation sur ce dont vous avez besoin, et sur ce que je peux faire.",
     subtitleParagraphs: [
       {
-        text: "Voyons si je suis la bonne personne pour ton projet. Une conversation sur ce dont tu as besoin, et sur ce que je peux faire.",
+        text: "Voyons si je suis la bonne personne pour votre projet. Une conversation sur ce dont vous avez besoin, et sur ce que je peux faire.",
         emphasis: ["conversation", "ce que je peux faire."],
       },
     ],
@@ -35,32 +35,32 @@ export const contactContent: ContactContent = {
     alt: "",
   },
   intro: [
-    "Chaque projet commence par une conversation. Dis-moi ce que tu cherches à régler, et je te dirai honnêtement si je suis la bonne personne pour le faire.",
-    "Je te réponds sous 24 heures ouvrées, franchement, même si c’est pour te dire « ce projet n’est pas pour moi ».",
+    "Chaque projet commence par une conversation. Dites-moi ce que vous cherchez à régler, et je vous dirai honnêtement si je suis la bonne personne pour le faire.",
+    "Je vous réponds sous 24 heures ouvrées, franchement, même si c’est pour vous dire « ce projet n’est pas pour moi ».",
     // « JE VOUS DONNE UNE DATE DE DÉMARRAGE ESTIMÉE » A ÉTÉ RETIRÉ le
     // 2026-08-31 : c'est un engagement de planning qu'aucun mot d'Eliott ne
     // porte, sur la page même où le visiteur écrit. À sa place, ce que le
     // corpus dit du process : tout ce qui se décide se décide AVANT la
     // signature, et la signature déclenche le développement.
-    "Avant toute signature, on cale ensemble le périmètre et la direction visuelle : ce que tu veux obtenir, ce qui te plaît, les références que tu as déjà trouvées. Le jour où tu signes, je commence à développer.",
+    "Avant toute signature, on cale ensemble le périmètre et la direction visuelle : ce que vous voulez obtenir, ce qui vous plaît, les références que vous avez déjà trouvées. Le jour où vous signez, je commence à développer.",
   ],
   form: {
     name: { label: "Nom", placeholder: "Jean Dupont" },
-    email: { label: "Ton adresse e-mail", placeholder: "exemple@email.com" },
+    email: { label: "Votre adresse e-mail", placeholder: "exemple@email.com" },
     projectType: {
-      label: "Tu cherches quoi ?",
-      placeholder: "Choisis un type de projet",
+      label: "Que cherchez-vous ?",
+      placeholder: "Choisissez un type de projet",
       options: siteConfig.footerForm?.selectOptions ?? [],
     },
     message: {
       label: "Autre chose ?",
-      placeholder: "Ton message ici…",
+      placeholder: "Votre message ici…",
     },
     submitLabel: siteConfig.footerForm?.submitLabel ?? "Envoyer le message",
     disclaimer: {
       text:
         siteConfig.footerForm?.disclaimer ??
-        "En envoyant ce formulaire, tu acceptes mes conditions et ma politique de confidentialité.",
+        "En envoyant ce formulaire, vous acceptez mes conditions et ma politique de confidentialité.",
       links: siteConfig.footerForm?.disclaimerLinks ?? siteConfig.legalLinks,
     },
   },
@@ -110,6 +110,6 @@ export const contactContent: ContactContent = {
     // 2026-08-29, qui n'avait vidé que `brand.mark`.
     title: "Contact · Eliott Bouquerel",
     description:
-      "Dis-moi ce que tu cherches à régler. Je te réponds sous 24 heures ouvrées, même si c’est pour te dire que ce n’est pas pour moi. Normandie, et France à distance.",
+      "Dites-moi ce que vous cherchez à régler. Je vous réponds sous 24 heures ouvrées, même si c’est pour vous dire que ce n’est pas pour moi. Normandie, et France à distance.",
   },
 };

@@ -118,7 +118,7 @@ export interface ContenuRendezVous {
       readonly options: readonly OptionQuestion[];
     };
   };
-  /** « Ce que tu peux espérer à ce budget », affiché dès qu'une tranche est choisie. */
+  /** « Ce que vous pouvez espérer à ce budget », affiché dès qu'une tranche est choisie. */
   readonly retour: {
     readonly titre: string;
     readonly aucun: (prixEntree: string) => string;
@@ -153,7 +153,7 @@ export const rendezVousContent: ContenuRendezVous = {
   eyebrow: "Prendre rendez-vous",
   titre: "Réserver un créneau",
   chapeau:
-    "Choisis un sujet, une durée et une heure, puis réponds à trois questions sur ton projet : tu sais avant l’appel ce que ton budget permet. Le lien de visioconférence part par e-mail dans la foulée.",
+    "Choisissez un sujet, une durée et une heure, puis répondez à trois questions sur votre projet : vous savez avant l’appel ce que votre budget permet. Le lien de visioconférence part par e-mail dans la foulée.",
   noteFuseau: "Heures affichées à l’heure de Paris.",
   garanties: [
     "Gratuit et sans engagement",
@@ -205,32 +205,32 @@ export const rendezVousContent: ContenuRendezVous = {
   types: [
     {
       id: "site",
-      nom: "Parle-moi de ton projet de site",
+      nom: "Parlez-moi de votre projet de site",
       duree: "15, 30 ou 45 minutes",
       description:
-        "On regarde ce que tu as aujourd’hui, ce que tu veux que le site rapporte, et à quoi ressemblerait la bonne version. Tu repars avec un ordre de grandeur de budget et de délai, et on cale la suite.",
+        "On regarde ce que vous avez aujourd’hui, ce que vous voulez que le site rapporte, et à quoi ressemblerait la bonne version. Vous repartez avec un ordre de grandeur de budget et de délai, et on cale la suite.",
     },
     {
       id: "logiciel",
-      nom: "Explique-moi ce qui coince dans ton métier",
+      nom: "Expliquez-moi ce qui coince dans votre métier",
       duree: "30, 45 ou 60 minutes",
       description:
-        "Une tâche que tu refais à la main, un tableur qui déborde, des outils qui ne se parlent pas, ou un logiciel entier à construire. On regarde où passe le temps et ce qui existe déjà. Tu repars avec un ordre de grandeur et une prochaine étape.",
+        "Une tâche que vous refaites à la main, un tableur qui déborde, des outils qui ne se parlent pas, ou un logiciel entier à construire. On regarde où passe le temps et ce qui existe déjà. Vous repartez avec un ordre de grandeur et une prochaine étape.",
     },
     {
       id: "decouverte",
-      nom: "Décris-moi ton projet",
+      nom: "Décrivez-moi votre projet",
       duree: "15, 30 ou 45 minutes",
       description:
-        "Tu vois le problème, pas encore la solution. On en parle sans que tu aies à choisir une case avant. Si ce n’est pas pour moi, je te le dis pendant l’appel, ça t’évite de perdre du temps.",
+        "Vous voyez le problème, pas encore la solution. On en parle sans que vous ayez à choisir une case avant. Si ce n’est pas pour moi, je vous le dis pendant l’appel, ça vous évite de perdre du temps.",
     },
   ],
 
   etapes: {
     sujet: "Le sujet",
     creneau: "Le créneau",
-    projet: "Ton projet",
-    coordonnees: "Tes coordonnées",
+    projet: "Votre projet",
+    coordonnees: "Vos coordonnées",
   },
 
   actions: {
@@ -244,8 +244,8 @@ export const rendezVousContent: ContenuRendezVous = {
   creneaux: {
     chargement: "Recherche des créneaux libres…",
     erreur:
-      "Les créneaux n’ont pas pu être chargés. Réessaie, ou écris-moi par le formulaire de contact.",
-    vide: "Aucun créneau libre ce mois-ci. Essaie le suivant.",
+      "Les créneaux n’ont pas pu être chargés. Réessayez, ou écrivez-moi par le formulaire de contact.",
+    vide: "Aucun créneau libre ce mois-ci. Essayez le suivant.",
     indisponible:
       "La prise de rendez-vous en ligne est momentanément indisponible. Le formulaire de contact reste le chemin le plus direct.",
     libelleGrille: "Heures libres",
@@ -256,20 +256,20 @@ export const rendezVousContent: ContenuRendezVous = {
     duree: (minutes) => `${minutes} min`,
   },
 
-  recapitulatif: "Ton rendez-vous",
+  recapitulatif: "Votre rendez-vous",
 
   formulaire: {
-    nomLabel: "Ton nom",
+    nomLabel: "Votre nom",
     nomPlaceholder: "Prénom et nom",
-    emailLabel: "Ton e-mail",
-    emailPlaceholder: "toi@exemple.fr",
-    messageLabel: "Ta situation en deux lignes (facultatif)",
+    emailLabel: "Votre e-mail",
+    emailPlaceholder: "vous@exemple.fr",
+    messageLabel: "Votre situation en deux lignes (facultatif)",
     messagePlaceholder:
-      "Ce que tu as aujourd’hui, ce qui coince, ce que tu as déjà essayé.",
+      "Ce que vous avez aujourd’hui, ce qui coince, ce que vous avez déjà essayé.",
     envoyer: "Confirmer le rendez-vous",
     envoiEnCours: "Confirmation en cours…",
     mention:
-      "Ton nom, ton adresse et tes réponses sont transmis à Cal.com, qui héberge mon agenda, dans le seul but de créer ce rendez-vous. Détail dans la",
+      "Votre nom, votre adresse et vos réponses sont transmis à Cal.com, qui héberge mon agenda, dans le seul but de créer ce rendez-vous. Détail dans la",
     mentionLien: "politique de confidentialité",
     mentionHref: "/legal/politique-de-confidentialite",
   },
@@ -288,16 +288,16 @@ export const rendezVousContent: ContenuRendezVous = {
    */
   questionnaire: {
     budget: {
-      legende: "Ton budget, hors taxes",
-      erreur: "Choisis une tranche. « Je ne sais pas encore » est une réponse valable.",
+      legende: "Votre budget, hors taxes",
+      erreur: "Choisissez une tranche. « Je ne sais pas encore » est une réponse valable.",
       moinsDe: (prix) => `Moins de ${prix}`,
       entre: (bas, haut) => `De ${bas} à ${haut}`,
       plusDe: (prix) => `Plus de ${prix}`,
       inconnu: "Je ne sais pas encore",
     },
     objectif: {
-      legende: "Ce que tu veux obtenir en priorité",
-      erreur: "Choisis ce qui compte le plus pour toi.",
+      legende: "Ce que vous voulez obtenir en priorité",
+      erreur: "Choisissez ce qui compte le plus pour vous.",
       options: {
         site: [
           { id: "google", libelle: "Être trouvé sur Google" },
@@ -323,7 +323,7 @@ export const rendezVousContent: ContenuRendezVous = {
       },
     },
     echeance: {
-      legende: "Ton échéance (facultatif)",
+      legende: "Votre échéance (facultatif)",
       options: [
         { id: "vite", libelle: "Dès que possible" },
         { id: "trimestre", libelle: "Dans les trois mois" },
@@ -333,16 +333,16 @@ export const rendezVousContent: ContenuRendezVous = {
   },
 
   retour: {
-    titre: "Ce que tu peux espérer à ce budget",
+    titre: "Ce que vous pouvez espérer à ce budget",
     aucun: (prixEntree) =>
-      `Mes projets commencent à ${prixEntree} HT, et ce budget n’y suffit pas. Réserve quand même : on regarde ensemble ce qui est faisable, et par quoi commencer.`,
-    inconnu: "On le cale ensemble pendant l’appel. Pour te situer :",
+      `Mes projets commencent à ${prixEntree} HT, et ce budget n’y suffit pas. Réservez quand même : on regarde ensemble ce qui est faisable, et par quoi commencer.`,
+    inconnu: "On le cale ensemble pendant l’appel. Pour vous situer :",
     repere: (prestation, prix) => `${prestation}, ${prix}.`,
     prixPlancher: (prix) => `À partir de ${prix} HT`,
     aPortee:
-      "Ton budget couvre le prix de départ. Ce qu’il permet d’ajouter, je te le dis pendant l’appel, et le devis le fixe.",
+      "Votre budget couvre le prix de départ. Ce qu’il permet d’ajouter, je vous le dis pendant l’appel, et le devis le fixe.",
     large:
-      "Ton budget laisse de la place à un projet complet. On fixe le périmètre ensemble, au devis.",
+      "Votre budget laisse de la place à un projet complet. On fixe le périmètre ensemble, au devis.",
   },
 
   notes: {
@@ -357,7 +357,7 @@ export const rendezVousContent: ContenuRendezVous = {
   succes: {
     titre: "C’est réservé.",
     texte:
-      "Un e-mail de confirmation vient de partir vers ta boîte, avec le lien de visioconférence et de quoi annuler ou déplacer en un clic. Tu n’as rien d’autre à faire d’ici là.",
+      "Un e-mail de confirmation vient de partir vers votre boîte, avec le lien de visioconférence et de quoi annuler ou déplacer en un clic. Vous n’avez rien d’autre à faire d’ici là.",
     autre: "Prendre un autre rendez-vous",
   },
 };

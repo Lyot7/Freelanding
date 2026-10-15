@@ -77,7 +77,7 @@ describe("bornesBudget et tranchesBudget", () => {
   });
 });
 
-describe("retourBudget — ce que tu peux espérer", () => {
+describe("retourBudget — ce que vous pouvez espérer", () => {
   const { retour: R } = rendezVousContent;
 
   it("dit franchement que rien ne tient sous le plancher", () => {

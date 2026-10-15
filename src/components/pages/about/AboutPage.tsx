@@ -106,7 +106,17 @@ function AboutHero({ about }: { about: AboutContent }) {
         >
           {/* Échelle de héros MESURÉE sur la source : 63 / 78 / 98 px et chasse
               -0,05em (pas 52 / 68 / 92 en -0,06em). */}
+          {/* LE H1 PORTE LA REQUÊTE « développeur freelance Caen » (carte SEO du
+              2026-10-15) sans toucher à l'échelle du héros : le surtitre, écrit
+              dans la donnée, ouvre le titre à la taille du chapô, puis vient
+              « À propos. » à 98 px. Le nom et le métier à 98 px en capitales
+              déborderaient la demi-colonne mobile. */}
           <h1 className="col-start-1 m-0 text-[63px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] text-foreground tablet:col-start-2 tablet:text-[78px] desktop:text-[98px]">
+            {about.hero.eyebrow ? (
+              <span className="mb-[16px] block text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground-60">
+                {about.hero.eyebrow}
+              </span>
+            ) : null}
             {about.hero.title}
           </h1>
         </Reveal>
@@ -515,7 +525,7 @@ function AboutParcours({
           <LineReveal
             as="h2"
             lines={[...parcours.titleLines]}
-            className="m-0 flex w-full flex-col p-0 text-left text-[52px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] tablet:text-right tablet:text-[68px] desktop:text-[92px]"
+            className="m-0 flex w-full flex-col p-0 text-left text-[52px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] tablet:text-right tablet:text-[64px] desktop:text-[92px]"
             lineClassName="w-full overflow-hidden leading-[0.82]"
           />
         </div>
