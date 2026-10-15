@@ -107,20 +107,10 @@ export const siteConfig: SiteConfig = {
     address: "Calvados, Manche, Orne, et France à distance",
     addressLabel: "Zone d’intervention",
     hours: ["Lun. au ven. : 9h - 18h"],
-    // Sous la zone d'intervention qu'elles déclinent : les deux pages de Caen
-    // et les deux pages de prix, qui recevaient trop peu de liens internes
-    // (carte SEO du 2026-10-15).
-    localLinks: [
-      { label: "Création de site internet à Caen", href: "/creation-site-internet-caen" },
-      { label: "Logiciel sur mesure à Caen", href: "/logiciel-sur-mesure-caen" },
-      { label: "Prix d’un site internet", href: "/services/site-vitrine/prix" },
-      { label: "Prix d’un logiciel sur mesure", href: "/services/logiciel-metier/prix" },
-      { label: "ERP sur mesure", href: "/services/logiciel-metier/erp-sur-mesure" },
-      { label: "Logiciel GMAO et SAV", href: "/services/logiciel-metier/maintenance-sav" },
-      { label: "Automatisation et IA pour PME", href: "/services/automatisation" },
-      { label: "Automatisation et IA à Caen", href: "/automatisation-ia-caen" },
-      { label: "Site internet pour artisans", href: "/services/site-vitrine/artisans" },
-    ],
+    // PAS DE LIENS SEO DANS LE PIED DE PAGE (décision d'Eliott du 2026-10-15) :
+    // lister les pages Caen, prix et thématiques sous la zone d'intervention se
+    // lisait comme du remplissage pour Google. Elles restent reliées depuis leur
+    // pilier (`lienLocalParPrestation`) et entre elles.
     responseTime:
       "Je réponds à chaque message sous 24 heures ouvrées.",
     responseTimeLabel: "Délai de réponse",
