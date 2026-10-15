@@ -37,6 +37,12 @@ describe("origineEtrangere", () => {
     expect(origineEtrangere(r)).toBe(false);
   });
 
+  test("accepte le domaine nu quand le site est déclaré en www", () => {
+    process.env.NEXT_PUBLIC_SITE_URL = "https://www.exemple.fr";
+    const r = requete("http://interne:3000/api/contact", { origin: "https://exemple.fr" });
+    expect(origineEtrangere(r)).toBe(false);
+  });
+
   test("refuse un autre site", () => {
     process.env.NEXT_PUBLIC_SITE_URL = "https://eliottbouquerel.fr";
     const r = requete("http://interne:3000/api/contact", {
