@@ -13,7 +13,7 @@ lignes vertes », qui colle au design du site, et un aperçu au cockpit.
   style, script ou image étrangère ; `scripts/visuel-article.mjs` le rend en
   héros, vignette (recadrée au centre) et partage.
 - Zones relevées sur le site à 1440 × 900 : le titre occupe la moitié droite
-  entre 46 et 66 % de la hauteur, l'extrait la bande 32-50 % sous 70 %, un voile
+  entre 54 et 75 % de la hauteur, l'extrait la bande 32-50 % sous 70 %, un voile
   assombrit la droite et le bas. La carte de l'index ne garde que la bande
   centrale 22-78 % en largeur. Le sujet du visuel vit donc à gauche et au
   centre, entre 15 et 60 % de la hauteur, et peut déborder à gauche et en haut.
