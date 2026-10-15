@@ -1,4 +1,5 @@
 import type { BlogContent, BlogPost } from "@/lib/content/types";
+import { articlesDuCockpit } from "./blog-cockpit";
 
 /**
  * REGISTRE DES ARTICLES — métadonnées seulement, jamais le corps.
@@ -707,6 +708,9 @@ export const blogPosts: BlogPost[] = [
     },
   },
 ];
+
+// Les articles validés dans le cockpit passent en tête du registre (`blog-cockpit.ts`).
+blogPosts.unshift(...articlesDuCockpit(blogPosts));
 
 /**
  * LES QUATRE ARTICLES MIS EN AVANT, dérivés du registre au lieu d'être recopiés.

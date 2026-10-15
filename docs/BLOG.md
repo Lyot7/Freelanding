@@ -28,6 +28,19 @@ compiler le moindre MDX, ce dont se servent l'index, le sitemap et les tests.
 Le `slug` de l'entrée et le nom du fichier doivent coïncider : c'est ce que
 vérifie le premier test, et c'est par le slug que la page charge le corps.
 
+## Publier un article validé dans le cockpit
+
+Depuis le 2026-10-15, la routine du blog rédige, Eliott valide dans le cockpit
+(hub Blog, `admin.eliottbouquerel.fr/revue/blog`), et le site publie :
+
+1. `bun scripts/publier-articles.ts` : chaque article validé et pas encore
+   présent part dans `src/content/articles/<slug>.mdx`, ses métadonnées dans
+   `src/content/articles-cockpit.json` (lues par `src/content/blog-cockpit.ts`,
+   visuels empruntés à un article publié).
+2. `bun run test`, puis PR, merge et déploiement Coolify.
+3. `bun scripts/publier-articles.ts --confirmer` : chaque article qui répond
+   en ligne est marqué « Publié » dans le cockpit, avec son adresse.
+
 ## Ce qu'un article peut contenir
 
 Du markdown (titres, paragraphes, listes, gras, liens, code), plus **six blocs**
