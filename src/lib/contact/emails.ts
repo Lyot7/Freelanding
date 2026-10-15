@@ -37,7 +37,7 @@ import {
  * c'est exactement la phrase qu'il ressortirait.
  */
 export const PROMESSE_DELAI =
-  "Je te réponds sous 24 heures ouvrées.";
+  "Je vous réponds sous 24 heures ouvrées.";
 
 export interface MessageCompose {
   readonly sujet: string;
@@ -112,31 +112,31 @@ export function composerAccuseReception(
 
   const rappel: string[] = [];
   if (soumission.typeProjet) {
-    rappel.push(bloc("Ce que tu cherches", echapperHtml(soumission.typeProjet)));
+    rappel.push(bloc("Ce que vous cherchez", echapperHtml(soumission.typeProjet)));
   }
   if (soumission.message) {
-    rappel.push(bloc("Ton message", echapperHtmlMultiligne(soumission.message)));
+    rappel.push(bloc("Votre message", echapperHtmlMultiligne(soumission.message)));
   }
 
-  const html = `<div style="${STYLE_CORPS}max-width:560px;"><p style="margin:0 0 16px;">${salutation}</p><p style="margin:0 0 16px;">J’ai bien reçu ta demande. ${echapperHtml(PROMESSE_DELAI)}</p><p style="margin:0 0 24px;">Je lis ton message moi-même : la réponse sera honnête, même si c’est pour te dire que ce projet n’est pas pour moi.</p>${rappel.length > 0 ? `<hr style="border:none;border-top:1px solid #e5e5e5;margin:0 0 24px;" />${rappel.join("")}` : ""}<p style="margin:0 0 4px;">Eliott Bouquerel</p><p style="margin:0;"><a href="mailto:${echapperHtml(contactEmail)}" style="color:#0b0b0b;">${echapperHtml(contactEmail)}</a></p></div>`;
+  const html = `<div style="${STYLE_CORPS}max-width:560px;"><p style="margin:0 0 16px;">${salutation}</p><p style="margin:0 0 16px;">J’ai bien reçu votre demande. ${echapperHtml(PROMESSE_DELAI)}</p><p style="margin:0 0 24px;">Je lis votre message moi-même : la réponse sera honnête, même si c’est pour vous dire que ce projet n’est pas pour moi.</p>${rappel.length > 0 ? `<hr style="border:none;border-top:1px solid #e5e5e5;margin:0 0 24px;" />${rappel.join("")}` : ""}<p style="margin:0 0 4px;">Eliott Bouquerel</p><p style="margin:0;"><a href="mailto:${echapperHtml(contactEmail)}" style="color:#0b0b0b;">${echapperHtml(contactEmail)}</a></p></div>`;
 
   const texte = [
     `Bonjour ${soumission.nom},`,
     "",
-    `J’ai bien reçu ta demande. ${PROMESSE_DELAI}`,
+    `J’ai bien reçu votre demande. ${PROMESSE_DELAI}`,
     "",
-    "Je lis ton message moi-même : la réponse sera honnête, même si c’est pour te dire que ce projet n’est pas pour moi.",
+    "Je lis votre message moi-même : la réponse sera honnête, même si c’est pour vous dire que ce projet n’est pas pour moi.",
   ];
   if (soumission.typeProjet) {
-    texte.push("", `Ce que tu cherches : ${soumission.typeProjet}`);
+    texte.push("", `Ce que vous cherchez : ${soumission.typeProjet}`);
   }
   if (soumission.message) {
-    texte.push("", "Ton message :", soumission.message);
+    texte.push("", "Votre message :", soumission.message);
   }
   texte.push("", "Eliott Bouquerel", contactEmail);
 
   return {
-    sujet: "Ton message est bien arrivé",
+    sujet: "Votre message est bien arrivé",
     html,
     texte: texte.join("\n"),
   };

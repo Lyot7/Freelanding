@@ -124,7 +124,12 @@ export function Ticker({
   const trackStyle: CSSProperties = animated
     ? ({
         "--ticker-shift": `${period}px`,
-        animation: `ticker-scroll ${period / SPEED_PX_PER_S}s linear infinite`,
+        // Propriétés longues seulement : mêler `animation` et
+        // `animationPlayState` faisait avertir React à chaque rendu.
+        animationName: "ticker-scroll",
+        animationDuration: `${period / SPEED_PX_PER_S}s`,
+        animationTimingFunction: "linear",
+        animationIterationCount: "infinite",
         animationPlayState: inView ? "running" : "paused",
         willChange: "transform",
       } as CSSProperties)

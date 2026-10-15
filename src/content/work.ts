@@ -204,7 +204,15 @@ export const workItems: WorkItem[] = [
       video: { kind: "video", src: "/work/kpsull/mockup.mp4" },
     },
     excerpt:
-      "Place de marché reliant des créateurs de mode indépendants à leurs acheteurs.",
+      "Place de marché reliant des créateurs de mode indépendants à leurs acheteurs : catalogue à facettes, panier et deux types de comptes, menés seul de la conception à la mise en ligne.",
+    /* Titre et description de recherche (carte SEO du 2026-10-15) : le titre
+       de 6 caractères et l'aperçu de 405 servis jusque-là ne disaient rien dans
+       un résultat. Aucun chiffre : projet d'école, rien de mesuré. */
+    seo: {
+      title: "Kpsull : marketplace de créateurs sur mesure",
+      description:
+        "Place de marché de créateurs de mode indépendants : recherche à facettes, panier, comptes acheteur et créateur. Design et développement Next.js.",
+    },
     overview:
       "Kpsull est une place de marché qui met en relation des créateurs de mode indépendants et des acheteurs, chaque pièce étant fabriquée puis expédiée par son créateur. Le projet est né en formation et je l’ai mené comme une création d’entreprise : personne ne me l’a commandé, j’en ai fait la conception, le design et le développement, et j’ai visé un e-commerce multi-vendeurs complet plutôt qu’une vitrine.",
     problem: [
@@ -354,7 +362,16 @@ export const workItems: WorkItem[] = [
       alt: "La première étape du formulaire de création de compte affichée sur un écran, dans une pièce sombre",
     },
     excerpt:
-      "Refonte du parcours de création de compte de l’eShop français de Würth.",
+      "Refonte du parcours de création de compte de l’eShop français de Würth, réservé aux professionnels : −92 % d’erreurs à la création de compte, mesuré en interne.",
+    /* Carte SEO du 2026-10-15 : la meilleure preuve du site était servie sous
+       « Création de compte, Würth » (25 caractères) et restait non indexée. Le
+       chiffre est celui de la fiche du vault (`wurth-refonte-inscription.md`),
+       ni arrondi ni augmenté. */
+    seo: {
+      title: "Würth : création de compte B2B, −92 % d’erreurs support",
+      description:
+        "Refonte du parcours de création de compte de l’eShop Würth France : SIRET vérifié en direct, adresse tirée du registre, −92 % d’erreurs mesuré en interne.",
+    },
     overview:
       "Würth France distribue des fournitures professionnelles aux artisans et aux industriels. Sur l’eShop, j’ai repris le parcours de création de compte : celui par lequel passe tout nouveau client avant de pouvoir commander.",
     problem: [
@@ -369,7 +386,10 @@ export const workItems: WorkItem[] = [
       "Le point de départ a été le relevé des erreurs réellement commises, pas une opinion sur le formulaire. Les contraintes ont ensuite été rendues visibles avant la saisie plutôt qu’après, la validation déplacée au fil de la frappe, et chaque message réécrit pour dire quoi corriger au lieu de constater un refus. Le tout est construit en surcouche : la plateforme de l’eShop est allemande et son code source n’est pas ouvert à la filiale française, donc le parcours est réécrit par-dessus le formulaire existant, dont les champs superflus sont pilotés et masqués depuis l’extérieur. Les données, elles, viennent de registres publics : un proxy vers l’INSEE pour le SIRET, la Base Adresse Nationale pour la rue, geo.api.gouv.fr pour le code postal.",
     ],
     body: [
-      "Le résultat est mesuré en interne sur les erreurs de création de compte, avant et après la refonte.",
+      /* Faits repris de la fiche du vault `wurth-refonte-inscription.md`
+         (carte SEO du 2026-10-15 : enrichir le cas sans rien inventer). */
+      "La boutique est réservée aux professionnels : un compte ne s’ouvre qu’avec un numéro SIREN valide. Le parcours tient en quatre écrans courts, le compte, l’entreprise, l’utilisateur puis la validation, et un fil d’Ariane numéroté dit à chaque étape combien il en reste. Le bouton « Continuer » reste inactif tant que l’étape n’est pas valide : l’erreur se voit pendant la saisie, jamais après l’envoi.",
+      "Le résultat est mesuré en interne, avant et après la refonte : −92 % d’erreurs et de sollicitations du support sur la création de compte.",
       "C’est le projet le moins spectaculaire des trois et le plus représentatif de ce que je fais : un formulaire n’intéresse personne jusqu’au jour où on compte ce qu’il coûte.",
     ],
     results: [
@@ -601,7 +621,14 @@ export const workItems: WorkItem[] = [
       video: { kind: "video", src: "/work/nslysium/mockup.mp4" },
     },
     excerpt:
-      "Page produit pour un assistant vocal qui centralise sport, nutrition et sommeil.",
+      "Page produit pour un assistant vocal qui centralise sport, nutrition et sommeil : l’objet rendu en 3D temps réel, et une journée racontée au fil du défilement.",
+    // Carte SEO du 2026-10-15 : titre de 8 caractères, aperçu de 465. Workshop
+    // d'école, aucun chiffre à publier.
+    seo: {
+      title: "NSLysium : page produit 3D pour un assistant vocal",
+      description:
+        "Page produit d’un assistant vocal sport, nutrition et sommeil : rendu 3D temps réel et récit au défilement. Workshop d’école, design et développement.",
+    },
     overview:
       "NSLysium présente Aether, un assistant vocal qui réunit sport, nutrition et sommeil dans une seule interface, avec un modèle qui tourne localement sur l’appareil. La page vient d’un workshop d’école : le produit n’existe pas, le commanditaire était une équipe d’étudiants d’une autre formation, et rien de tout cela ne sera mis en vente. La page, elle, est réelle et se juge sur pièce, comme l’exercice inverse de Kpsull : peu de fonctions, tout dans la conviction.",
     problem: [

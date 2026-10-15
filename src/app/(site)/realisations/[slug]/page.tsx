@@ -29,7 +29,7 @@ export async function generateMetadata({
   // Le résumé sert de description : il est écrit pour être lu seul, c'est
   // exactement ce qu'attend un extrait de résultat de recherche.
   return pageMetadata(
-    { title: work.title, description: work.overview },
+    work.seo ?? { title: work.title, description: work.overview },
     `/realisations/${work.slug}`,
     { ogType: "article", ogImage: work.cover },
   );

@@ -1,5 +1,3 @@
-import { SITE_URL } from "@/lib/site-url";
-import { preferredSourceUrl } from "@/lib/preferred-source";
 import { ImageProgressive } from "@/components/ui/ImageProgressive";
 /* Le pied de page est sur les NEUF routes : ses liens préchargeaient toutes les
    routes du site dès qu'on descendait jusqu'à lui. Voir `HoverPrefetchLink`. */
@@ -9,7 +7,6 @@ import { content } from "@/lib/content";
 import { Reveal } from "@/components/motion/Reveal";
 import { Grain } from "@/components/effects/Grain";
 import { ParallaxCover } from "@/components/effects/ParallaxCover";
-import { SwapText } from "@/components/ui";
 import { BrandB } from "@/components/brand/BrandB";
 import { SocialGlyph } from "@/components/layout/SocialGlyph";
 import type { Link } from "@/lib/content/types";
@@ -17,6 +14,10 @@ import { uiLabels } from "@/content/ui";
 import { Logo } from "./Logo";
 // Le formulaire est un composant CLIENT ; le pied de page reste serveur.
 import { FooterContactForm } from "./FooterContactForm";
+import { FooterContact } from "./FooterContact";
+import { ReservationRendezVous } from "@/components/rendez-vous/ReservationRendezVous";
+import { rendezVousContent } from "@/content/rendez-vous";
+import { resoudreConfiguration } from "@/lib/rendez-vous/config";
 
 /**
  * Footer — reconstruction fidèle (100 %) du footer Framer de la page d'accueil d'origine
@@ -68,7 +69,6 @@ const LABELS = { contact: "Contact", navigation: "Navigation" } as const;
  * le second est porté par la donnée (`credits.createdBy.href`, qui pointe vers
  * la page « à propos »).
  */
-const BUILT_WITH_HREF = "https://nextjs.org";
 
 /* Les onze champs pièges du template Framer ont disparu : aucun n'était lu,
    faute de route serveur. Un seul piège subsiste, dans `ChampsProtection`, et
@@ -93,80 +93,6 @@ function CardBrandMark() {
 }
 
 /** Flèche « Built in Framer » (`#svg-1500971939_213`, 9×14, fill BLANC). */
-/**
- * Bouton « source préférée » de Google.
- *
- * CE QUE ÇA FAIT, exactement : un visiteur connecté qui clique déclare à Google
- * qu'il veut voir ce site plus souvent. SES résultats mettent alors le site en
- * avant, avec un badge, y compris dans AI Mode et les AI Overviews. Ça ne
- * change rien pour les autres internautes : ce n'est pas un signal de
- * classement, c'est un abonnement.
- *
- * L'adresse est construite depuis le domaine du site plutôt que saisie à la
- * main. Google n'accepte que des domaines et sous-domaines, jamais un
- * sous-répertoire, et le paramètre attend le domaine NU (ni protocole, ni www).
- *
- * Rien n'est rendu tant que le site tourne en local : `SITE_URL` retombe alors
- * sur localhost, et un bouton pointant vers `?q=localhost` n'aurait aucun sens.
- */
-function PreferredSourceLink({ label }: { label: string }) {
-  const href = preferredSourceUrl(SITE_URL);
-  if (!href) {
-    return null;
-  }
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="relative flex min-h-[24px] w-min flex-row items-center gap-[8px] whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60 no-underline transition-colors duration-200 hover:text-foreground"
-    >
-      <svg viewBox="0 0 24 24" aria-hidden className="block h-[12px] w-[12px] flex-none">
-        <path
-          d="M12 3.5 14.2 9h5.8l-4.7 3.4 1.8 5.6-5.1-3.5-5.1 3.5 1.8-5.6L4 9h5.8L12 3.5Z"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.6"
-          strokeLinejoin="round"
-        />
-      </svg>
-      {label}
-    </a>
-  );
-}
-
-/**
- * Marque de la technologie employée, à gauche de « construit avec Next.js ».
- *
- * C'était le logo FRAMER : trois parallélogrammes, la marque de l'outil qui a
- * produit le template. Il annonçait donc une technologie que ce site n'utilise
- * pas, juste à côté d'un texte qui en nomme une autre. Remplacé par la marque
- * de Next.js, citée nominativement pour dire avec quoi le site est construit.
- */
-function BuiltWithMark() {
-  return (
-    <span aria-hidden className="relative block h-[14px] w-[14px] flex-none">
-      <svg viewBox="0 0 24 24" className="block h-full w-full">
-        <circle cx="12" cy="12" r="11" fill="none" stroke="white" strokeWidth="1.6" />
-        <path d="M8.4 16.4V7.6h1.5l6.1 8.2" fill="none" stroke="white" strokeWidth="1.6" strokeLinecap="square" />
-        <path d="M15.1 7.6v6.1" fill="none" stroke="white" strokeWidth="1.6" strokeLinecap="square" />
-      </svg>
-    </span>
-  );
-}
-
-/**
- * Pastille montrée au survol à la place du portrait, dans les crédits.
- *
- * C'était l'ÉCLAIR DE FRAMER, la marque de l'outil du template, affichée sous
- * la mention « par Eliott Bouquerel ». Remplacée par son propre B, qui est
- * aussi la lettre d'attaque du logotype d'en-tête. Le tracé n'est plus recopié
- * ici : il vient de `BrandB`, sa source unique.
- */
-function CreatedByLogo() {
-  return <BrandB className="block h-[13px] w-[13px] text-accent-ink" />;
-}
-
 /*
  * Le grain du footer était une COPIE LOCALE du calque, sans `grain-drift` : les
  * deux calques du footer étaient donc les seuls du site à ne pas dériver du
@@ -331,12 +257,17 @@ export async function Footer() {
     socials,
     legalLinks,
     copyrightLong,
-    credits,
     footerCta,
     footerColumnLabels,
   } = await content.getSiteConfig();
 
   const person = contact.person;
+  // Mêmes types de rendez-vous que la section de `/contact` : ceux dont
+  // l'événement Cal.com est configuré. Aucun = pas d'onglet rendez-vous.
+  const { typesDisponibles } = resoudreConfiguration();
+  const typesRendezVous = rendezVousContent.types.filter((type) =>
+    typesDisponibles.includes(type.id),
+  );
   /*
    * TOUS LES RÉSEAUX, ET PLUS LES DEUX PREMIERS. La source Framer en exposait
    * deux (X et Instagram) et la coupe avait été recopiée telle quelle. Elle est
@@ -489,10 +420,23 @@ export async function Footer() {
 
             {/* framer-24skgi : formulaire, branché sur `POST /api/contact`. */}
             {footerForm ? (
-              <FooterContactForm
-                footerForm={footerForm}
-                emailContact={contact.email}
-                inlineLinkCls={inlineLinkCls}
+              <FooterContact
+                modes={footerForm.modes}
+                message={
+                  <FooterContactForm
+                    footerForm={footerForm}
+                    emailContact={contact.email}
+                    inlineLinkCls={inlineLinkCls}
+                  />
+                }
+                rendezVous={
+                  typesRendezVous.length > 0 ? (
+                    <ReservationRendezVous
+                      types={typesRendezVous}
+                      emailContact={contact.email}
+                    />
+                  ) : undefined
+                }
               />
             ) : null}
           </div>
@@ -606,13 +550,19 @@ export async function Footer() {
                       {contact.address}
                     </p>
                   ) : null}
-                  {contact.localLink ? (
-                    <HoverPrefetchLink
-                      href={contact.localLink.href}
-                      className="relative h-auto w-auto text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground-60 underline decoration-white/30 underline-offset-4 transition-colors hover:text-foreground motion-reduce:transition-none"
-                    >
-                      {contact.localLink.label}
-                    </HoverPrefetchLink>
+                  {contact.localLinks?.length ? (
+                    <ul className="m-0 flex list-none flex-col gap-[6px] p-0">
+                      {contact.localLinks.map((lien) => (
+                        <li key={lien.href}>
+                          <HoverPrefetchLink
+                            href={lien.href}
+                            className="relative h-auto w-auto text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground-60 underline decoration-white/30 underline-offset-4 transition-colors hover:text-foreground motion-reduce:transition-none"
+                          >
+                            {lien.label}
+                          </HoverPrefetchLink>
+                        </li>
+                      ))}
+                    </ul>
                   ) : null}
                   {/* framer-vgtjiq : horaires (gap 1) */}
                   {contact.hours && contact.hours.length > 0 ? (
@@ -640,114 +590,15 @@ export async function Footer() {
               </div>
             </div>
 
-            {/* framer-tl8ugv : copyright + crédits */}
-            <div className="relative flex w-full flex-col items-start gap-[22px] overflow-clip tablet:flex-row tablet:items-end tablet:gap-0 desktop:items-center">
-              {/* framer-1ja693d : copyright (preset 11kvajf 11px, blanc 60 %, w 37 %) */}
-              <div className="relative flex w-full flex-row items-center overflow-clip tablet:w-[37%]">
-                {/* `uppercase` : le live rend « © 2026 LA MARQUE D'ORIGINE. ALL RIGHTS
-                    RESERVED. » en capitales (`text-transform: uppercase`). Sans
-                    lui la casse de la donnée passait telle quelle. */}
-                <p className="h-auto w-full max-w-[90%] whitespace-pre-wrap break-words text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60">
-                  {copyrightLong}
-                </p>
-              </div>
-
-              {/* framer-jzr464 : « Built in Framer » + « Created by … » */}
-              <div className="relative flex w-full flex-col items-start gap-[8px] overflow-clip tablet:items-end tablet:gap-[6px] desktop:w-px desktop:flex-1 desktop:flex-row desktop:items-center desktop:justify-between">
-                {/* framer-egZYB : Built in Framer (flèche + texte) */}
-                {credits?.preferredSourceLabel ? (
-                  <PreferredSourceLink label={credits.preferredSourceLabel} />
-                ) : null}
-
-                <a
-                  href={BUILT_WITH_HREF}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  /* `min-h-[24px]` : cible tactile minimale WCAG 2.5.8, les
-                     deux liens de crédit mesuraient 14 px de haut. */
-                  className="group relative flex min-h-[24px] w-min flex-row items-center gap-[8px] overflow-hidden no-underline"
-                >
-                  <BuiltWithMark />
-                  <span className="relative h-auto w-auto whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground">
-                    {/* Motif `.framer-xh8ae` : 18 px vers le BAS et AUCUN
-                        fondu. Relevé rAF sur `/live-proxy` : les deux copies
-                        restent à `opacity: 1` sur toute la course, seul le cadre
-                        décide de ce qui se voit. */}
-                    <SwapText travel={18}>
-                      {credits?.builtWithLabel}
-                      {credits?.builtWith}
-                    </SwapText>
-                  </span>
-                </a>
-
-                {/* framer-1yN27 : Created by (texte + avatar/badge + nom) */}
-                {/* PERMUTATION portrait → pastille au survol (framer-1yN27).
-                    MESURÉ dans le CSS du miroir : au repos `framer-bp41xy`
-                    (portrait 24×24) est en flux et `framer-1d0gb8f` (pastille
-                    24×24) est en `position:absolute; top:28px; left:0`, donc
-                    clippée par le `overflow:hidden` du lien ; au survol les deux
-                    échangent (`.framer-v-5hsx70.hover .framer-bp41xy{position:
-                    absolute; top:-28px; left:0}` et `.hover .framer-1d0gb8f{
-                    position:relative; top:unset; left:unset}`). Capture live à
-                    l'appui : portrait seul au repos, pastille verte à l'éclair
-                    seule au survol.
-                    Notre version affichait EN PERMANENCE une demi-pastille de
-                    12×13 par-dessus le portrait, sans aucun survol — et sa
-                    hauteur de 25 px poussait la rangée de crédits à 25 px contre
-                    24 sur la source, second pixel de l'écart de la barre légale. */}
-                <a
-                  href={credits?.createdBy?.href ?? "/a-propos"}
-                  {...(credits?.createdBy?.external
-                    ? { target: "_blank", rel: "noopener noreferrer" }
-                    : {})}
-                  className="group relative flex w-min flex-row items-center gap-[8px] overflow-hidden no-underline"
-                >
-                  <span className="relative h-auto w-auto whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60">
-                    {credits?.createdByLabel}
-                  </span>
-                  {/* PERMUTATION ANIMÉE portrait → pastille, au survol du lien.
-                        La version précédente basculait `position` de `absolute`
-                        à `relative` : c'est ce que faisait la source Framer, et
-                        ça ne s'anime PAS, une position ne s'interpole pas. Le
-                        portrait disparaissait donc d'un coup.
-                        Ici les deux calques restent superposés en `inset-0` et
-                        c'est la TRANSLATION qui bouge : le portrait sort par le
-                        haut pendant que la pastille entre par le bas, sur la
-                        même course. Le cadre rond masque ce qui dépasse.
-                        Durée et courbe reprises des autres permutations du site
-                        (`SwapCopies`), pour que le pied de page bouge comme le
-                        reste. */}
-                  <span className="relative block h-[24px] w-[24px] flex-none overflow-hidden rounded-full">
-                    {credits?.createdByAvatar ? (
-                      <span className="absolute inset-0 transition-transform duration-[320ms] ease-[cubic-bezier(0.68,0,0,1)] group-hover:-translate-y-full motion-reduce:transition-none">
-                          {/* 24 px à l'écran (voir la note de l'avatar plus haut). */}
-                          <ImageProgressive
-                            src={credits.createdByAvatar.src}
-                            alt={credits.createdByAvatar.alt}
-                            width={24}
-                            height={24}
-                            className="block h-full w-full object-cover object-center"
-                          />
-                        </span>
-                    ) : null}
-                    <span
-                      className={
-                          "absolute inset-0 flex items-center justify-center rounded-full bg-accent " +
-                          "transition-transform duration-[320ms] ease-[cubic-bezier(0.68,0,0,1)] motion-reduce:transition-none " +
-                          (credits?.createdByAvatar
-                            ? "translate-y-full group-hover:translate-y-0"
-                            : "translate-y-0")
-                        }
-                      >
-                      <CreatedByLogo />
-                    </span>
-                  </span>
-                  <span className="relative h-auto w-auto whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground">
-                    {credits?.createdBy?.label}
-                  </span>
-                </a>
-              </div>
-            </div>
+            {/* COPYRIGHT SEUL depuis le 2026-10-15. La ligne portait aussi
+                « Suivre dans Google » (un abonnement pensé pour les sites
+                d'actualité, sans usage pour un prospect), « Construit avec
+                Next.js » et « Par Eliott Bouquerel » : trois crédits qui se
+                coupaient selon la largeur et redisaient le nom déjà écrit
+                ici. */}
+            <p className="m-0 whitespace-nowrap text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60">
+              {copyrightLong}
+            </p>
           </div>
         </div>
       </div>

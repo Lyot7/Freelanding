@@ -78,8 +78,10 @@ export async function NotFoundView() {
                     anglaise, « Not found », tenait partout.
                     Colonne = 100vw - 40 sous 810, et le texte mesure 6,16 x le
                     corps ; le corps tenable vaut donc colonne / 6,3. `min()`
-                    conserve les 68 px partout où ils tiennent. */}
-                <h1 className="text-[min(68px,calc(15.87vw-6.35px))] font-semibold uppercase leading-[0.82] tracking-[-0.06em] tablet:text-[92px] desktop:text-[120px]">
+                    conserve les 68 px partout où ils tiennent. Même règle dès
+                    810, colonne = 50vw - 48 puis 50vw - 60 : à 120 px fixes,
+                    le mot sortait de l'écran à 1440 (relevé le 2026-10-15). */}
+                <h1 className="text-[min(68px,calc(15.87vw-6.35px))] font-semibold uppercase leading-[0.82] tracking-[-0.06em] tablet:text-[min(92px,calc((50vw-48px)/6.3))] desktop:text-[min(120px,calc((50vw-60px)/6.3))]">
                   {titleLine1}
                   <br />
                   {titleLine2}

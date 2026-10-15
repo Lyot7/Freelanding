@@ -7,6 +7,7 @@ import {
   plancherSuivi,
   prestation,
   prixPlancher,
+  repereAgenceLogiciel,
   suiviMensuelHT,
   tauxSuivi,
 } from "./offre.ts";
@@ -88,6 +89,11 @@ describe("la page de prix est cherchable", () => {
     const chemins = contentRoutes.map((r) => r.pathname);
     const hrefs = page.sections.flatMap((s) => s.liens?.items.map((l) => l.href) ?? []);
     for (const href of hrefs) {
+      // Seul lien externe permis : la source du repère d'agence.
+      if (/^https?:/u.test(href)) {
+        expect(href).toBe(repereAgenceLogiciel.source.href);
+        continue;
+      }
       if (href.startsWith("#")) {
         expect(href).toBe("#rendez-vous");
         continue;
@@ -184,7 +190,7 @@ describe("la comparaison avec un abonnement tombe juste", () => {
 
 describe("la page de prix ne promet que ce qui est vrai", () => {
   test("aucune promesse de rendez-vous sur place ni de déplacement", () => {
-    const interdit = /sur place|en personne|présentiel|déplac|autour d.un café|chez toi, devant/iu;
+    const interdit = /sur place|en personne|présentiel|déplac|autour d.un café|chez (?:toi|vous), devant/iu;
     for (const texte of textes()) {
       expect(interdit.test(texte), `promesse de présentiel : ${texte}`).toBe(false);
     }
@@ -194,6 +200,24 @@ describe("la page de prix ne promet que ce qui est vrai", () => {
     for (const texte of textes()) {
       expect(/[–—]/u.test(texte), `tiret long : ${texte}`).toBe(false);
     }
+  });
+
+  test("le visiteur est vouvoyé partout (décision d'Eliott du 2026-10-15)", () => {
+    const tutoiement = /(?<![\p{L}’'])(?:tu|toi|ton|ta|tes|te)(?!\p{L})|(?<!\p{L})t’/iu;
+    for (const texte of textes()) {
+      expect(tutoiement.test(texte), `tutoiement : ${texte}`).toBe(false);
+    }
+  });
+
+  test("la comparaison avec les agences est sourcée, liée, et garde le plancher à côté", () => {
+    const section = page.sections.find((s) => s.id === "variation");
+    const paragraphe = section.paragraphes.find((p) => p.includes(repereAgenceLogiciel.source.nom));
+    expect(paragraphe).toBeDefined();
+    expect(paragraphe).toContain(euros(repereAgenceLogiciel.mediane));
+    expect(paragraphe).toContain(euros(repereAgenceLogiciel.premierOutilMin));
+    expect(paragraphe).toContain(prixPlancher(LOGICIEL));
+    expect(paragraphe).toContain(repereAgenceLogiciel.source.releve);
+    expect(section.liens.items.map((l) => l.href)).toContain(repereAgenceLogiciel.source.href);
   });
 });
 

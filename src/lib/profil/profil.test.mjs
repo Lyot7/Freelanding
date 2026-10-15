@@ -215,7 +215,7 @@ describe("profil : contenu facultatif absent", () => {
     const texte = profilEnMarkdown(profil);
 
     expect(profil.titre).toBe(`${siteReel.brand.given} ${siteReel.brand.name}`);
-    expect(texte).toContain(`Tu peux aussi appeler directement au ${siteReel.contact.phone}.`);
+    expect(texte).toContain(`Vous pouvez aussi appeler directement au ${siteReel.contact.phone}.`);
     expect(texte).not.toContain("- Horaires");
     expect(texte).toContain("- 2020\u00A0: Développeur, Studio\n");
   });

@@ -1,6 +1,6 @@
 /**
  * Questionnaire de la prise de rendez-vous : tranches de budget, retour « ce
- * que tu peux espérer à ce budget », et mise en forme des notes Cal.com.
+ * que vous pouvez espérer à ce budget », et mise en forme des notes Cal.com.
  *
  * POURQUOI CE MODULE. Eliott veut recevoir des demandes déjà en partie
  * chiffrées, et le visiteur doit savoir avant l'appel ce que son budget permet.

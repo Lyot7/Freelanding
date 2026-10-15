@@ -65,7 +65,7 @@ const FONT = "[font-family:var(--font-sans)]";
 // affiché vient de la donnée via la prop `intro` ; cette constante ne sert que
 // si elle manque.
 const INTRO =
-  "Chaque projet commence par comprendre comment tes clients prennent leur décision, et ce qui les empêche de la prendre maintenant.";
+  "Chaque projet commence par comprendre comment vos clients prennent leur décision, et ce qui les empêche de la prendre maintenant.";
 
 /*
  * LA TABLE DE REPLI EST SUPPRIMÉE. Elle associait un numéro de prestation à une

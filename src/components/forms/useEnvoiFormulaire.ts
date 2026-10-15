@@ -42,13 +42,13 @@ export const NOM_CHAMP_PIEGE = "referenceInterne";
    réponse à chaque message sous 24 heures ouvrées. */
 const MESSAGES_SUCCES: Record<IntentionFormulaire, string> = {
   projet:
-    "Message envoyé. Un accusé de réception vient de partir vers ta boîte : je te réponds sous 24 heures ouvrées.",
+    "Message envoyé. Un accusé de réception vient de partir vers votre boîte : je vous réponds sous 24 heures ouvrées.",
   footer:
-    "Message envoyé. Un accusé de réception vient de partir vers ta boîte : je te réponds sous 24 heures ouvrées.",
+    "Message envoyé. Un accusé de réception vient de partir vers votre boîte : je vous réponds sous 24 heures ouvrées.",
 };
 
 const MESSAGE_RESEAU =
-  "La connexion a échoué. Vérifie ton réseau et réessaie.";
+  "La connexion a échoué. Vérifiez votre réseau et réessayez.";
 
 function estMessage(charge: unknown): charge is { message: string; champ?: string } {
   return (
@@ -134,7 +134,7 @@ export function useEnvoiFormulaire(
         // dit la vérité au lieu d'afficher une roue qui tourne.
         setEtat("erreur");
         setMessage(
-          `Le formulaire est momentanément indisponible (protection anti-robot non configurée). Écris-moi directement à ${emailContact}.`,
+          `Le formulaire est momentanément indisponible (protection anti-robot non configurée). Écrivez-moi directement à ${emailContact}.`,
         );
         emettre("formulaire:echec", { intention, statut: 0, motif: "captcha_absent" });
         return;
@@ -176,7 +176,7 @@ export function useEnvoiFormulaire(
         setMessage(
           estMessage(charge)
             ? charge.message
-            : `Ton message n’a pas pu être envoyé. Écris-moi directement à ${emailContact}.`,
+            : `Votre message n’a pas pu être envoyé. Écrivez-moi directement à ${emailContact}.`,
         );
         setChampEnErreur(estMessage(charge) ? charge.champ : undefined);
         // Le jeton est à usage unique : sans réinitialisation, la deuxième

@@ -107,9 +107,15 @@ export const siteConfig: SiteConfig = {
     address: "Calvados, Manche, Orne, et France à distance",
     addressLabel: "Zone d’intervention",
     hours: ["Lun. au ven. : 9h - 18h"],
-    // Seul lien du pied de page vers la page locale (2026-09-28), posé sous la
-    // zone d'intervention qu'il décline.
-    localLink: { label: "Création de site internet à Caen", href: "/creation-site-internet-caen" },
+    // Sous la zone d'intervention qu'elles déclinent : les deux pages de Caen
+    // et les deux pages de prix, qui recevaient trop peu de liens internes
+    // (carte SEO du 2026-10-15).
+    localLinks: [
+      { label: "Création de site internet à Caen", href: "/creation-site-internet-caen" },
+      { label: "Logiciel sur mesure à Caen", href: "/logiciel-sur-mesure-caen" },
+      { label: "Prix d’un site internet", href: "/services/site-vitrine/prix" },
+      { label: "Prix d’un logiciel sur mesure", href: "/services/logiciel-metier/prix" },
+    ],
     responseTime:
       "Je réponds à chaque message sous 24 heures ouvrées.",
     responseTimeLabel: "Délai de réponse",
@@ -119,7 +125,14 @@ export const siteConfig: SiteConfig = {
     person: {
       name: "Eliott Bouquerel",
       role: "Développeur freelance",
-      note: "C’est moi qui lis ton message, et moi qui te réponds.",
+      note: "C’est moi qui lis votre message, et moi qui vous réponds.",
+      // Portrait réel, lu par les données structurées (`Person.image`).
+      avatar: {
+        src: "/images/eliott-bouquerel-avatar.jpg",
+        alt: "",
+        width: 400,
+        height: 400,
+      },
     },
   },
   /*
@@ -198,7 +211,7 @@ export const siteConfig: SiteConfig = {
     },
   ],
   copyright: "2026©",
-  copyrightLong: "© 2026 Bouquerel. Tous droits réservés.",
+  copyrightLong: "© 2026 Eliott Bouquerel",
   // LA JAUGE DE CRÉNEAUX EST RETIRÉE depuis le 2026-09-01, et le bandeau reste.
   //
   // CE QU'ELLE DISAIT. `slotsLeft: 2, totalSlots: 4` rendait deux barres
@@ -237,17 +250,26 @@ export const siteConfig: SiteConfig = {
   // Titres des deux colonnes du pied de page (habillage, pas de l'éditorial).
   footerColumnLabels: { contact: "Contact", navigation: "Navigation" },
   footerCta: {
-    heading: "Démarrons ton projet.",
+    heading: "Démarrons votre projet.",
+    // Le sous-texte annonce la bascule du dessous : deux lignes à écrire, ou
+    // un appel en visio préparé par trois questions.
     subtext:
-      "Que tu aies un cahier des charges complet ou seulement une idée, je t’aide à lui donner forme. Pas de dossier de présentation, pas d’appel commercial, juste une prochaine étape claire.",
-    subtextEmphasis: ["juste une prochaine étape claire."],
+      "Un cahier des charges complet ou une simple idée : écrivez-moi deux lignes, ou réservez un appel en visio.",
+    subtextEmphasis: ["réservez un appel en visio."],
   },
   footerForm: {
+    modes: {
+      label: "Comment me contacter",
+      message: "Écrire un message",
+      rendezVous: "Réserver un appel",
+    },
     nameLabel: "Nom",
     namePlaceholder: "Alex Dupont",
-    emailLabel: "Ton adresse e-mail",
+    emailLabel: "Votre adresse e-mail",
     emailPlaceholder: "exemple@email.com",
-    selectLabel: "Tu cherches quoi ?",
+    selectLabel: "Que cherchez-vous ?",
+    messageLabel: "Votre message, si vous voulez",
+    messagePlaceholder: "Deux lignes sur votre projet suffisent.",
     selectOptions: [
       "Un site",
       "Une solution métier",
@@ -255,9 +277,9 @@ export const siteConfig: SiteConfig = {
     ],
     submitLabel: "Envoyer",
     disclaimer:
-      "En envoyant ce formulaire, tu acceptes mes conditions générales et ma politique de confidentialité.",
+      "En envoyant ce formulaire, vous acceptez mes conditions générales et ma politique de confidentialité.",
     // Le texte est rendu en trois morceaux autour de ses deux liens.
-    disclaimerPrefix: "En envoyant ce formulaire, tu acceptes mes ",
+    disclaimerPrefix: "En envoyant ce formulaire, vous acceptez mes ",
     disclaimerJoiner: "et ma ",
     disclaimerSuffix: ".",
     disclaimerLinks: [
@@ -273,34 +295,6 @@ export const siteConfig: SiteConfig = {
   },
   // La source distingue la casse du bouton flottant de celle de la nav.
   floatingCta: { label: "Réserver un appel", href: lienRendezVous("decouverte") },
-  credits: {
-    // Le template créditait Framer et l'auteur du thème. Ce site est une
-    // reconstruction Next.js écrite par Eliott : le crédit lui revient.
-    builtWith: "Next.js",
-    builtWithLabel: "Construit avec ",
-    createdBy: {
-      label: "Eliott Bouquerel",
-      href: "/a-propos",
-    },
-    createdByLabel: "Par",
-    // Portrait réel d'Eliott depuis le 2026-08-10, fond harmonisé sur `--accent`
-    // (voir la note de `homeContent.hero.person`). Il remplace celui du
-    // template, qui était la photo d'un inconnu rendue sous le nom d'Eliott.
-    // `alt` vide : le nom est rendu en texte juste à côté.
-    createdByAvatar: {
-      src: "/images/eliott-bouquerel-avatar.jpg",
-      alt: "",
-      width: 400,
-      height: 400,
-    },
-    // Bouton « source préférée » de Google. Ce qu'il fait RÉELLEMENT : les
-    // visiteurs qui cliquent déclarent à Google qu'ils veulent voir ce site plus
-    // souvent, et leurs propres résultats le mettent alors en avant, badge
-    // compris, jusque dans AI Mode et les AI Overviews. Ce n'est PAS un levier
-    // de classement pour les autres, et la fonctionnalité vise d'abord les
-    // sites d'actualité. Utile ici comme bouton d'abonnement, pas comme SEO.
-    preferredSourceLabel: "Suivre dans Google",
-  },
   meta: {
     // « ® » RETIRÉ DES TITRES le 2026-09-01. Le symbole avait été vidé de
     // `brand.mark` le 2026-08-29 pour la raison écrite en tête de ce fichier :
@@ -310,7 +304,7 @@ export const siteConfig: SiteConfig = {
     // exposées de tout le site : elles sortent dans l'onglet du navigateur et
     // dans chaque résultat Google, là où la fausse allégation se lit le plus.
     // Le retrait n'était donc pas fait, il était seulement invisible à l'écran.
-    defaultTitle: "Eliott Bouquerel · Développeur web freelance en Normandie",
+    defaultTitle: "Eliott Bouquerel · Site internet et logiciel sur mesure à Caen",
     // GABARIT DOCUMENTAIRE, plus branché sur `Metadata` depuis le
     // 2026-08-28 : toutes les pages posent leur titre en `absolute`
     // (`pageMetadata`), et le laisser déclaré dans le layout faisait écrire la
@@ -318,7 +312,7 @@ export const siteConfig: SiteConfig = {
     // séparateur, celle que suivent les titres écrits à la main.
     titleTemplate: "%s · Eliott Bouquerel",
     description:
-      "Sites rapides, référencement local et outils métier sur mesure pour TPE et PME : prise de rendez-vous, suivi client, devis. Développeur freelance en Normandie, et partout en France à distance.",
+      "Des sites qui amènent des clients et des logiciels métier sur mesure pour TPE et PME. La qualité d’une agence, jusqu’à deux fois moins cher. Basé à Caen, en visio partout en France.",
     ogImage: {
       src: "/images/og.jpg",
       alt: "Eliott Bouquerel",

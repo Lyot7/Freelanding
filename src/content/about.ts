@@ -26,7 +26,7 @@ const aboutStats = [
      formule sans contenu. Les deux sont remplacés par des engagements écrits
      ailleurs et vérifiables : l'échéancier des CGV et la cession des droits. */
   { value: "40 %", label: "À la signature, 30 % à mi-parcours, 30 % à la livraison" },
-  { value: "100 %", label: "Du code livré t’appartient" },
+  { value: "100 %", label: "Du code livré vous appartient" },
 ] as const;
 
 /**
@@ -36,15 +36,14 @@ const aboutStats = [
  * était « la marque d'origine » (incohérence d'origine). Sans objet ici : le récit ne porte
  * plus de nom de studio.
  *
- * TUTOIEMENT depuis le 2026-09-02 (décision d'Eliott, cf. l'en-tête de
- * `home.ts`). C'est la page qui répond à « qui je suis » : c'est aussi celle où
- * le vouvoiement sonnait le plus comme un cabinet. Aucune phrase n'a changé de
- * contenu, seulement de personne. Attention aux accords en cas de reprise :
- * « vous ne verrez jamais » est devenu « tu ne verras jamais », « vous
- * n'achetez pas » est devenu « tu n'achètes pas ».
+ * VOUVOIEMENT depuis le 2026-10-15, décision d'Eliott.
  */
 export const aboutContent: AboutContent = {
   hero: {
+    /* Rendu DANS le H1, avant « À propos. » : c'est lui qui porte la requête
+       « développeur freelance Caen » (carte SEO du 2026-10-15, 89 impressions
+       en position 5 pour un clic). */
+    eyebrow: "Eliott Bouquerel, développeur freelance à Caen",
     title: "À propos.",
     subtitle:
       "Je construis seul les sites et les outils des entreprises qui veulent des résultats.",
@@ -75,7 +74,7 @@ export const aboutContent: AboutContent = {
     src: "/images/eliott-nature-vertical.jpg",
     alt: "Eliott Bouquerel, au bord d’un étang",
   },
-  bodyHighlights: ["Seul par choix", "toi et le travail"],
+  bodyHighlights: ["Seul par choix", "vous et le travail"],
   teamTitleLines: ["Qui", "je suis."],
   body: [
     /* PARAGRAPHE D'OUVERTURE, RÉÉCRIT le 2026-08-31.
@@ -89,7 +88,7 @@ export const aboutContent: AboutContent = {
      *
      * CE QUI OUVRE MAINTENANT est ce qu'il vend réellement, dans ses mots : pas
      * un site, ce que le site rapporte. */
-    "Je ne vends pas un site. Je vends ce qu’il te rapporte : des clients qui te trouvent, une image qui te place au-dessus, un prétexte pour décrocher un rendez-vous. Un site qui impressionne et qui n’amène rien, ça existe, et c’est même devenu courant.",
+    "Je ne vends pas un site. Je vends ce qu’il vous rapporte : des clients qui vous trouvent, une image qui vous place au-dessus, un prétexte pour décrocher un rendez-vous. Un site qui impressionne et qui n’amène rien, ça existe, et c’est même devenu courant.",
     /*
      * PARAGRAPHES 2 A 5, REECRITS le 2026-08-31.
      *
@@ -119,7 +118,7 @@ export const aboutContent: AboutContent = {
      * 2026-09-23 : aucun argument IA face aux clients, decision d'Eliott.
      */
     "Ce que je construis est pensé pour le référencement naturel et pour la conversion, avec ce que je sais faire en expérience utilisateur, en interface, en ergonomie, en accessibilité et en marketing. Sur un projet à quelques centaines d’euros, ces étapes-là sautent : personne n’a le temps d’y penser et de rester rentable. C’est pour ça que je facture au-dessus, et c’est pour ça que ce que je livre n’a pas grand-chose à voir.",
-    "Une agence, ce sont des salariés, des plannings, des ressources humaines et plusieurs corps de métier : des frais qui courent que ton projet avance ou non, et une chaîne de personnes entre toi et le travail. Je vais droit au but. Je suis développeur, et je suis à l’aise avec les métiers qui gravitent autour, ce qui me permet de tenir un projet d’un bout à l’autre au lieu de le faire passer de main en main.",
+    "Une agence, ce sont des salariés, des plannings, des ressources humaines et plusieurs corps de métier : des frais qui courent que votre projet avance ou non, et une chaîne de personnes entre vous et le travail. Je vais droit au but. Je suis développeur, et je suis à l’aise avec les métiers qui gravitent autour, ce qui me permet de tenir un projet d’un bout à l’autre au lieu de le faire passer de main en main.",
     /*
      * LES SIX CHOSES QU'ELIOTT FAIT SANS QU'ON LES LUI DEMANDE, tenues en un
      * seul paragraphe. Elles ne se vendent pas une par une : leur point commun
@@ -127,7 +126,7 @@ export const aboutContent: AboutContent = {
      * le jour ou ca casse, ou deux ans plus tard quand il faut faire evoluer.
      * D'ou la derniere phrase, qui est l'argument et non le resume.
      */
-    "Il y a une part du travail que tu ne verras jamais, et c’est la plus importante. L’architecture décidée avant le premier écran. Les outils choisis sur ce qu’ils coûteront à faire vivre, pas sur mes préférences. Les tests passés par des outils extérieurs aux miens, sur la vitesse, le référencement, l’accessibilité. La gestion des erreurs, pour qu’une panne dise pourquoi elle arrive au lieu de te laisser deviner. Le code documenté, pour que quelqu’un d’autre puisse reprendre après moi. Tu n’achètes pas ces points-là : tu achètes de ne jamais avoir à les découvrir.",
+    "Il y a une part du travail que vous ne verrez jamais, et c’est la plus importante. L’architecture décidée avant le premier écran. Les outils choisis sur ce qu’ils coûteront à faire vivre, pas sur mes préférences. Les tests passés par des outils extérieurs aux miens, sur la vitesse, le référencement, l’accessibilité. La gestion des erreurs, pour qu’une panne dise pourquoi elle arrive au lieu de vous laisser deviner. Le code documenté, pour que quelqu’un d’autre puisse reprendre après moi. Vous n’achetez pas ces points-là : vous achetez de ne jamais avoir à les découvrir.",
     // Le template écrivait « four people » en minuscule après un point (artefact
     // de la source Framer). Sans objet en français : Eliott travaille seul, la
     // phrase est repartie proprement.
@@ -136,7 +135,7 @@ export const aboutContent: AboutContent = {
     // comme chapô de la section « Qui je suis. » : c'est lui, et lui seul, que
     // bodyHighlights met en avant. Les deux fragments déclarés doivent donc
     // rester dans cette phrase-là.
-    "Seul par choix. Un seul interlocuteur, aucune couche intermédiaire, personne entre toi et le travail. Et une barre que je me fixe sur chaque projet : n’avoir aucun regret sur ce que j’ai livré."
+    "Seul par choix. Un seul interlocuteur, aucune couche intermédiaire, personne entre vous et le travail. Et une barre que je me fixe sur chaque projet : n’avoir aucun regret sur ce que j’ai livré."
   ],
   // Les quatre membres d'équipe du template (Anna Schneider, Jennifer Peterson,
   // Erik Voss, Liam Torres) sont des personas fictifs : ils n'existent pas et
@@ -212,7 +211,7 @@ export const aboutContent: AboutContent = {
     eyebrow: "Services",
     // IDENTIQUE à `homeContent.services.intro` (même section, deux pages).
     intro:
-      "Je pars de ta façon de travailler, et je construis ce qui lui correspond. Pas de fonctions en trop, rien à contourner.",
+      "Je pars de votre façon de travailler, et je construis ce qui lui correspond. Pas de fonctions en trop, rien à contourner.",
     items: services,
   },
   // `testimonial` ABSENT depuis le 2026-09-01. Il portait « Sophie Andersen »,
@@ -237,7 +236,7 @@ export const aboutContent: AboutContent = {
     // gabarit ne s'applique donc pas et la marque doit être écrite ici. C'est
     // exactement pourquoi le « ® » y avait survécu au retrait du 2026-08-29 :
     // `brand.mark` ne passe pas par là.
-    title: "Eliott Bouquerel, développeur full stack freelance à Caen",
+    title: "Eliott Bouquerel, développeur freelance à Caen",
     description:
       "Développeur full stack freelance à Caen, et partout en France à distance. Je construis des sites qui amènent des clients et des outils métier qui rendent des heures.",
   },

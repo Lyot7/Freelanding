@@ -289,6 +289,9 @@ export function SectionDeuxMoities({
                   <li key={lien.href} className="flex flex-col gap-[2px]">
                     <Link
                       href={lien.href}
+                      {...(/^https?:/u.test(lien.href)
+                        ? { target: "_blank", rel: "noopener noreferrer" }
+                        : {})}
                       className={`w-fit text-[15px] font-semibold leading-[1.3] tracking-[-0.01em] underline underline-offset-[3px] transition-[text-decoration-color,text-underline-offset] duration-200 hover:underline-offset-[4px] ${t.lien}`}
                     >
                       {lien.libelle}
@@ -435,12 +438,19 @@ export function ServicePage({
               les textes de la grille. Les voiles de `HeroPhoto` suffisent à
               l'AA ; l'ombre n'est pas comptée dans la mesure. */}
           <div className={`relative z-[2] mx-auto grid w-full max-w-[1440px] gap-[20px] tablet:grid-cols-2 tablet:items-end tablet:gap-x-0 tablet:gap-y-[30px]${heroImage ? " [text-shadow:0_0_18px_rgba(0,0,0,.45)]" : ""}`}>
-            <div className="tablet:col-start-1 tablet:row-start-1">
-              <FilAriane
-                marches={marchesFilAriane(prestation, local)}
-                surPhoto={heroImage !== undefined}
-              />
-            </div>
+            {/* PAS DE FIL D'ARIANE SUR UNE PAGE LOCALE (2026-10-15). Eliott le
+                jugeait hors de propos sur la page de Caen : elle s'adresse à
+                quelqu'un qui arrive de Google sur « site internet Caen », et
+                « Accueil / Prestations / Site vitrine / Caen » posé sur la
+                photo décrivait une arborescence que son adresse n'a pas. */}
+            {local ? null : (
+              <div className="tablet:col-start-1 tablet:row-start-1">
+                <FilAriane
+                  marches={marchesFilAriane(prestation, local)}
+                  surPhoto={heroImage !== undefined}
+                />
+              </div>
+            )}
             <Reveal
               trigger="appear"
               appearId="service-hero-titre"

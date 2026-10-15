@@ -5,14 +5,12 @@ import { content } from "@/lib/content";
 import {
   businessSchema,
   faqSchema,
-  filArianeSchema,
   graph,
   serviceSchema,
 } from "@/lib/json-ld";
 import { pageMetadata } from "@/lib/page-metadata";
 import { prestation } from "@/content/offre";
 import { pageCaen } from "@/content/page-caen";
-import { marchesFilAriane } from "@/content/service-pages";
 
 /**
  * `/creation-site-internet-caen` : le site vitrine, décliné pour Caen et le
@@ -37,7 +35,7 @@ export default async function CreationSiteInternetCaen() {
 
   return (
     <>
-      {/* L'ACTIVITÉ, LE SERVICE LOCAL, LE FIL D'ARIANE ET LA FAQ AFFICHÉE.
+      {/* L'ACTIVITÉ, LE SERVICE LOCAL ET LA FAQ AFFICHÉE.
           L'activité (`ProfessionalService`, un `LocalBusiness`) est redéclarée
           sous le même `@id` que sur l'accueil : un moteur fusionne les deux
           nœuds au lieu de croire à une seconde entreprise. Le service, lui,
@@ -50,7 +48,6 @@ export default async function CreationSiteInternetCaen() {
             chemin: pageCaen.chemin,
             zones: pageCaen.zones,
           }),
-          filArianeSchema(marchesFilAriane(VITRINE, pageCaen)),
           faqSchema(pageCaen.faq.items),
         )}
       />

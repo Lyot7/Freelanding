@@ -112,7 +112,10 @@ export function WorkDetailHero({ work }: { work: WorkItem }) {
                 63. La chasse passe de -0,055em à -0,05em : ces deux fichiers de
                 `/work` étaient les seuls du site à porter -0,055em, les six
                 autres H1 sont en -0,05em et la source aussi. */}
-            <h1 className="m-0 text-[63px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] tablet:text-[78px] desktop:text-[98px]">
+            {/* INTERLIGNAGE 0,9 et non 0,82 (2026-10-15) : le tréma de
+                « WÜRTH » montait entre les lettres de la ligne du dessus et se
+                lisait comme un point (« DE.COMPTE »). */}
+            <h1 className="m-0 text-[63px] font-semibold uppercase leading-[0.9] tracking-[-0.05em] tablet:text-[78px] desktop:text-[98px]">
               {work.title}
             </h1>
           </Reveal>

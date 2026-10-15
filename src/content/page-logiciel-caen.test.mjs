@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { prestation, prixPlancher } from "./offre.ts";
+import { euros, prestation, prixPlancher, repereAgenceLogiciel } from "./offre.ts";
 import { CHEMIN_PAGE_LOGICIEL_CAEN, pageCaen } from "./page-caen.ts";
 import { lienVersPageLogicielCaen, pageLogicielCaen } from "./page-logiciel-caen.ts";
 import { pagesSecteur } from "./pages-secteur.ts";
@@ -114,7 +114,7 @@ describe("la page du logiciel à Caen est cherchable", () => {
 
 describe("la page du logiciel à Caen ne promet que ce qui est vrai", () => {
   test("aucune promesse de rendez-vous sur place ni de déplacement", () => {
-    const interdit = /sur place|en personne|présentiel|déplac|autour d.un café|chez toi, devant/iu;
+    const interdit = /sur place|en personne|présentiel|déplac|autour d.un café|chez (?:toi|vous), devant/iu;
     for (const texte of textes()) {
       expect(interdit.test(texte), `promesse de présentiel : ${texte}`).toBe(false);
     }
@@ -134,6 +134,21 @@ describe("la page du logiciel à Caen ne promet que ce qui est vrai", () => {
     for (const texte of textes()) {
       expect(/[–—]/u.test(texte), `tiret long : ${texte}`).toBe(false);
     }
+  });
+
+  test("le visiteur est vouvoyé partout (décision d'Eliott du 2026-10-15)", () => {
+    const tutoiement = /(?<![\p{L}’'])(?:tu|toi|ton|ta|tes|te)(?!\p{L})|(?<!\p{L})t’/iu;
+    for (const texte of [...textes(), lienVersPageLogicielCaen.avant]) {
+      expect(tutoiement.test(texte), `tutoiement : ${texte}`).toBe(false);
+    }
+  });
+
+  test("le repère d'agence garde le plancher à côté, avec sa source et sa date", () => {
+    const reponse = page.faq.items.find((i) => /Combien coûte/u.test(i.question))?.answer;
+    expect(reponse).toContain(prixPlancher(LOGICIEL));
+    expect(reponse).toContain(euros(repereAgenceLogiciel.premierOutilMin));
+    expect(reponse).toContain(repereAgenceLogiciel.source.nom);
+    expect(reponse).toContain(repereAgenceLogiciel.source.releve);
   });
 
   test("la réponse directe et la FAQ donnent le plancher lu dans offre.ts, sans forfait", () => {

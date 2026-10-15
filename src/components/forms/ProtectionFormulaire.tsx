@@ -115,7 +115,7 @@ export function ReplisSansScript({ emailContact }: { emailContact: string }) {
     <noscript>
       <p className="text-[12px] font-medium leading-[1.3] tracking-[-0.01em]">
         Ce formulaire a besoin de JavaScript pour vérifier qu’il n’est pas
-        rempli par un robot. Écris-moi directement à{" "}
+        rempli par un robot. Écrivez-moi directement à{" "}
         <a href={`mailto:${emailContact}`}>{emailContact}</a>.
       </p>
     </noscript>

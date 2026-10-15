@@ -24,10 +24,19 @@
  *     caennais à citer.
  *
  * LES PRIX NE S'ÉCRIVENT PAS ICI, ils se calculent (`aPartirDe`, `prixPlancher`),
- * comme partout ailleurs sur le site.
+ * comme partout ailleurs sur le site. Le repère d'agence aussi (`offre.ts`) :
+ * sa source et sa date sont citées, le lien est sur la page de prix.
+ *
+ * VOUVOIEMENT depuis le 2026-10-15, décision d'Eliott.
  */
 import type { FaqItem, ImageHero } from "@/lib/content/types";
-import { aPartirDe, prestation, prixPlancher } from "./offre";
+import {
+  aPartirDe,
+  euros,
+  prestation,
+  prixPlancher,
+  repereAgenceSite,
+} from "./offre";
 import type { SectionSecteur } from "./pages-secteur";
 
 const VITRINE = prestation("vitrine");
@@ -116,7 +125,7 @@ export const pageCaen: PageLocale = {
   },
   h1: "Création de site internet à Caen",
   resume:
-    "Un site sur mesure pour les TPE et PME de Caen et du Calvados. Il dit ce que tu fais, il sort quand on cherche ton métier près de chez toi, et il est à toi une fois livré.",
+    "Un site sur mesure pour les TPE et PME de Caen et du Calvados. Il dit ce que vous faites, il sort quand on cherche votre métier près de chez vous, et il est à vous une fois livré.",
   /*
    * L'ÉGLISE SAINT-PIERRE VUE DU CHÂTEAU, et non une photo de bureau : c'est la
    * vue que tout Caennais reconnaît, et elle dit la ville avant le titre.
@@ -163,9 +172,12 @@ export const pageCaen: PageLocale = {
     departements: ["Calvados"],
   },
   contexte: {
-    titre: "Site vitrine et refonte pour les entreprises de Caen",
-    intro:
-      "Artisans, commerçants, professions libérales, PME de services ou d’industrie : tes clients te cherchent sur Google avec ton métier et le nom de leur ville. Le site se construit autour de ces recherches, de Caen à Hérouville-Saint-Clair, Bayeux, Lisieux, Falaise, Vire ou Honfleur.",
+    /* H2 VISANT « agence web Caen » (carte SEO du 2026-10-15). « Deux fois
+       moins » n'est exact que pour le site : médiane d'agence contre plancher,
+       recalculée par `offre.test.mjs`. La source et sa date sont dans
+       l'introduction, juste dessous. */
+    titre: "Agence web à Caen : la qualité d’une agence, pour environ deux fois moins cher",
+    intro: `Artisans, commerçants, PME de services ou d’industrie : vos clients vous cherchent sur Google avec votre métier et le nom de leur ville. Je conçois, j’écris et je code votre site comme une agence, ${aPartirDe(VITRINE, " HT")}, quand ${repereAgenceSite.source.nom} relève une médiane de ${euros(repereAgenceSite.mediane)} en agence pour un site de PME (${repereAgenceSite.source.releve}). Le site part de ces recherches, de Caen à Bayeux, Lisieux ou Honfleur.`,
     titreLiens: "Pour aller plus loin",
     liens: [
       {
@@ -183,7 +195,7 @@ export const pageCaen: PageLocale = {
         libelle: "Une solution métier sur mesure",
         href: "/services/logiciel-metier",
         description:
-          "Quand il te faut une réservation, un espace client ou une tâche automatisée.",
+          "Quand il vous faut une réservation, un espace client ou une tâche automatisée.",
       },
       {
         libelle: "Un logiciel sur mesure à Caen",
@@ -201,38 +213,38 @@ export const pageCaen: PageLocale = {
       {
         libelle: "Réserver un appel",
         href: "#rendez-vous",
-        description: "Choisis un créneau pour parler de ton site.",
+        description: "Choisissez un créneau pour parler de votre site.",
       },
     ],
     points: [
       {
         titre: "Les recherches locales d’abord",
-        corps: `Tes clients tapent « plombier Caen » ou « fleuriste Bayeux », rarement le nom de ton entreprise. Je cherche ces mots avant d’écrire, et je crée une page par métier ou par ville quand ton marché est local.`,
+        corps: `Vos clients tapent « plombier Caen » ou « fleuriste Bayeux », rarement le nom de votre entreprise. Je cherche ces mots avant d’écrire, et je crée une page par métier ou par ville quand votre marché est local.`,
       },
       {
         titre: "Les mêmes coordonnées partout",
         corps:
-          "Google recoupe ton site, ta fiche d’établissement et les annuaires pour décider qu’il s’agit bien de toi. Le site déclare ton nom, ton téléphone et ta zone d’intervention dans des données structurées, écrits comme sur ta fiche.",
+          "Google recoupe votre site, votre fiche d’établissement et les annuaires. Le site déclare votre nom, votre téléphone et votre zone d’intervention dans des données structurées, écrits comme sur votre fiche.",
       },
       {
-        titre: "Tes photos, pas une banque d’images",
+        titre: "Vos photos, pas une banque d’images",
         corps:
-          "Ta devanture, ton atelier, ton équipe : un client du coin reconnaît un lieu qu’il a déjà vu. Je recadre et je compresse tes photos pour que la page reste rapide sur mobile.",
+          "Votre devanture, votre atelier, votre équipe : un client du coin reconnaît un lieu qu’il a déjà vu. Je recadre et je compresse vos photos pour que la page reste rapide sur mobile.",
       },
       {
         titre: "Un interlocuteur en Normandie, en visio",
         corps:
-          "Je suis développeur freelance en Normandie, et le Calvados fait partie de ma zone d’intervention. On se parle en visio : 30 minutes pour poser ton besoin, puis un devis. Tu suis ensuite ton site en construction sur une adresse en ligne.",
+          "Je suis développeur freelance en Normandie. On se parle en visio : 30 minutes pour poser votre besoin, puis un devis, et vous suivez votre site en construction sur une adresse en ligne.",
       },
     ],
   },
   sections: [
     {
       id: "refonte",
-      titre: "Refonte de site internet à Caen : que devient ton référencement ?",
+      titre: "Refonte de site internet à Caen : que devient votre référencement ?",
       paragraphes: [
-        `Ton site actuel a peut-être 10 ans, un thème qui s’affiche mal sur téléphone, ou un prestataire qui ne répond plus. Le refaire coûte le prix d’un site neuf, ${aPartirDe(VITRINE, " HT")}. Le vrai risque est de perdre les pages que Google montre déjà quand on cherche ton métier dans le Calvados.`,
-        "Avant d’écrire une ligne, je relève les adresses de ton site actuel et celles qui reçoivent des visites. Chaque ancienne adresse pointe ensuite vers la nouvelle page qui traite le même sujet, et les textes qui se classent bien sont repris puis complétés.",
+        `Votre site actuel a peut-être 10 ans, un thème qui s’affiche mal sur téléphone, ou un prestataire qui ne répond plus. Le refaire coûte le prix d’un site neuf, ${aPartirDe(VITRINE, " HT")}. Le vrai risque est de perdre les pages que Google montre déjà quand on cherche votre métier dans le Calvados.`,
+        "Avant d’écrire une ligne, je relève les adresses de votre site actuel et celles qui reçoivent des visites. Chaque ancienne adresse pointe ensuite vers la nouvelle page qui traite le même sujet, et les textes qui se classent bien sont repris puis complétés.",
       ],
       liens: {
         titre: "Pour aller plus loin",
@@ -270,10 +282,11 @@ export const pageCaen: PageLocale = {
     },
     {
       id: "artisans-commerces",
-      titre: "Quel site pour un artisan ou un commerce du Calvados ?",
+      // Vise « site vitrine Caen » (carte SEO du 2026-10-15).
+      titre: "Site vitrine à Caen : quel site pour un artisan ou un commerce ?",
       paragraphes: [
-        "Un artisan est appelé depuis un téléphone, souvent par quelqu’un qui a un problème à régler dans la semaine. Son site doit répondre en 1 écran : ce que tu fais, où tu interviens, comment te joindre. Un commerce doit donner ses horaires, son adresse et l’envie de passer la porte.",
-        "Pour ces métiers, une page longue suffit souvent au départ. Plusieurs pages deviennent utiles quand tu proposes plusieurs prestations ou que tu interviens dans plusieurs villes : chaque recherche trouve alors la page qui lui répond.",
+        "Un artisan est appelé depuis un téléphone, souvent par quelqu’un qui a un problème à régler dans la semaine. Son site doit répondre en 1 écran : ce qu’il fait, où il intervient, comment le joindre. Un commerce doit donner ses horaires, son adresse et l’envie de passer la porte.",
+        "Pour ces métiers, une page longue suffit souvent au départ. Plusieurs pages deviennent utiles quand vous proposez plusieurs prestations ou que vous intervenez dans plusieurs villes : chaque recherche trouve alors la page qui lui répond.",
       ],
       liens: {
         titre: "Pour comparer",
@@ -288,24 +301,24 @@ export const pageCaen: PageLocale = {
       },
       points: [
         {
-          titre: "Ton numéro à portée de pouce",
+          titre: "Votre numéro à portée de pouce",
           corps:
             "Sur téléphone, le numéro se touche pour appeler, en haut de chaque page.",
         },
         {
-          titre: "Ta zone écrite en clair",
+          titre: "Votre zone écrite en clair",
           corps:
-            "Les communes où tu interviens figurent sur le site. Le client sait tout de suite si tu couvres son secteur.",
+            "Les communes où vous intervenez figurent sur le site. Le client sait tout de suite si vous couvrez son secteur.",
         },
         {
-          titre: "Ton travail en images",
+          titre: "Votre travail en images",
           corps:
-            "Un chantier avant et après, une vitrine refaite, l’assiette du jour : tes photos montrent ce qu’une description ne dit pas.",
+            "Un chantier avant et après, une vitrine refaite, l’assiette du jour : vos photos montrent ce qu’une description ne dit pas.",
         },
         {
           titre: "Une demande qui arrive complète",
           corps:
-            "Un formulaire court demande la commune et la nature du besoin, puis arrive dans ta boîte mail. Tu rappelles avec une réponse.",
+            "Un formulaire court demande la commune et la nature du besoin, puis arrive dans votre boîte mail. Vous rappelez avec une réponse.",
         },
       ],
     },
@@ -313,24 +326,24 @@ export const pageCaen: PageLocale = {
       id: "referencement-local",
       titre: "Référencement local : que faire en plus du site ?",
       paragraphes: [
-        "Quand quelqu’un cherche « électricien Caen », Google affiche souvent, au-dessus des sites, une carte avec quelques établissements. Cette carte vient des fiches d’établissement Google, appelées Google Business Profile. Ta fiche et ton site travaillent ensemble : la fiche renvoie vers le site, et le site confirme ce que dit la fiche.",
-        "La fiche se crée gratuitement et reste à ton nom. Sa remise d’aplomb n’est pas comprise : je la reprends en plus, sur devis.",
+        "Quand quelqu’un cherche « électricien Caen », Google affiche souvent, au-dessus des sites, une carte avec quelques établissements. Cette carte vient des fiches d’établissement Google, appelées Google Business Profile. Votre fiche et votre site travaillent ensemble : la fiche renvoie vers le site, et le site confirme ce que dit la fiche.",
+        "La fiche se crée gratuitement et reste à votre nom. Sa remise d’aplomb n’est pas comprise : je la reprends en plus, sur devis.",
       ],
       points: [
         {
           titre: "Une fiche complète",
           corps:
-            "La bonne catégorie principale, ta zone d’intervention, tes horaires, des photos récentes et le lien vers ton site.",
+            "La bonne catégorie principale, votre zone d’intervention, vos horaires, des photos récentes et le lien vers votre site.",
         },
         {
-          titre: "Les annuaires de ton métier",
+          titre: "Les annuaires de votre métier",
           corps:
-            "Pages Jaunes et les annuaires de ta profession reprennent tes coordonnées. Un numéro faux, recopié d’annuaire en annuaire, brouille le signal que Google recoupe.",
+            "Pages Jaunes et les annuaires de votre profession reprennent vos coordonnées. Un numéro faux, recopié d’annuaire en annuaire, brouille le signal que Google recoupe.",
         },
         {
-          titre: "Des avis, et tes réponses",
+          titre: "Des avis, et vos réponses",
           corps:
-            "Demande un avis à la fin d’un travail réussi, avec le lien direct vers ta fiche. Réponds aux avis, critiques comprises : les prochains clients lisent tes réponses.",
+            "Demandez un avis à la fin d’un travail réussi, avec le lien direct vers votre fiche. Répondez aux avis, critiques comprises : les prochains clients lisent vos réponses.",
         },
       ],
     },
@@ -338,7 +351,7 @@ export const pageCaen: PageLocale = {
   titreOffre: "Prix d’un site internet à Caen : ce qui le fait varier",
   faq: {
     eyebrow: "FAQ",
-    titleLines: ["Ton site", "sur Caen."],
+    titleLines: ["Votre site", "sur Caen."],
     items: [
       {
         question: "Combien coûte un site internet à Caen ?",
@@ -346,42 +359,41 @@ export const pageCaen: PageLocale = {
       },
       {
         question: "Combien coûte la refonte d’un site à Caen ?",
-        answer: `Une refonte coûte le prix d’un site neuf, ${aPartirDe(VITRINE, " HT")}. Le relevé des anciennes adresses et leurs redirections font partie du travail : ton référencement acquis suit le nouveau site.`,
+        answer: `Une refonte coûte le prix d’un site neuf, ${aPartirDe(VITRINE, " HT")}. Le relevé des anciennes adresses et leurs redirections font partie du travail : votre référencement acquis suit le nouveau site.`,
       },
       {
         question: "Mon site est sur Wix ou WordPress : peut-on le refaire ?",
         answer:
-          "Oui. Je reconstruis le site sur mesure, je reprends tes textes et tes photos, et les anciennes adresses redirigent vers les nouvelles. Ton nom de domaine reste le tien : seul l’endroit où il pointe change.",
+          "Oui. Je reconstruis le site sur mesure, je reprends vos textes et vos photos, et les anciennes adresses redirigent vers les nouvelles. Votre nom de domaine reste le vôtre : seul l’endroit où il pointe change.",
       },
       {
         question: "Faut-il se rencontrer pour lancer le projet ?",
         answer:
-          "Non. Le premier échange se fait en visio, comme la suite : tu réserves un créneau sur cette page et le lien part par e-mail. Pendant le développement, tu suis ton site sur une adresse en ligne, depuis ton bureau ou ton téléphone.",
+          "Non. Le premier échange se fait en visio, comme la suite : vous réservez un créneau sur cette page et le lien part par e-mail. Pendant le développement, vous suivez votre site sur une adresse en ligne, depuis votre bureau ou votre téléphone.",
       },
       {
         question: "Mon site sortira-t-il dans les recherches à Caen ?",
         answer:
-          "Chaque site part avec les bases du référencement posées et son indexation vérifiée, et ses textes visent les mots que tapent tes clients. Le balisage complet, qui déclare ta zone d’intervention à Google, s’ajoute au devis. Personne ne peut te garantir une position : le référencement local prend plusieurs mois, et ta fiche d’établissement Google pèse lourd dans les résultats.",
+          "Chaque site part avec les bases du référencement posées et son indexation vérifiée, et ses textes visent les mots que tapent vos clients. Le balisage complet, qui déclare votre zone d’intervention à Google, s’ajoute au devis. Personne ne peut vous garantir une position : le référencement local prend plusieurs mois, et votre fiche d’établissement Google pèse lourd dans les résultats.",
       },
       {
         question: "Une fiche Google suffit-elle, sans site internet ?",
         answer:
-          "Elle te rend visible sur la carte, avec ton numéro et tes horaires. Le client qui hésite entre 2 artisans clique ensuite vers leur site pour voir leurs réalisations et leurs prestations. Sans site, il ne trouve que la fiche pour te juger.",
+          "Elle vous rend visible sur la carte, avec votre numéro et vos horaires. Le client qui hésite entre 2 artisans clique ensuite vers leur site pour voir leurs réalisations et leurs prestations. Sans site, il ne trouve que la fiche pour vous juger.",
       },
       {
         question: "Comment obtenir des avis Google pour mon entreprise ?",
         answer:
-          "Demande-les au moment où le travail est fini et le client satisfait, avec le lien court que Google fournit dans ta fiche. Envoyé par SMS ou glissé dans la facture, il évite à ton client de chercher ta fiche.",
+          "Demandez-les au moment où le travail est fini et le client satisfait, avec le lien court que Google fournit dans votre fiche. Envoyé par SMS ou glissé dans la facture, il évite à votre client de chercher votre fiche.",
       },
       {
-        question: "Tu travailles seulement avec des entreprises de Caen ?",
+        question: "Vous travaillez seulement avec des entreprises de Caen ?",
         answer:
-          "Non. Ma zone d’intervention couvre le Calvados, la Manche et l’Orne, et je travaille à distance avec des entreprises de toute la France. Pour toi, la méthode et les prix restent les mêmes, et les rendez-vous se font en visio.",
+          "Non. Ma zone d’intervention couvre le Calvados, la Manche et l’Orne, et je travaille à distance avec des entreprises de toute la France. Pour vous, la méthode et les prix restent les mêmes, et les rendez-vous se font en visio.",
       },
       {
         question: "Pourquoi un freelance plutôt qu’une agence web de Caen ?",
-        answer:
-          "Tu parles à la personne qui écrit le code, du premier appel à la mise en ligne. Aucun intermédiaire ne reformule ta demande. À la livraison, l’hébergement est à ton nom et le code dans ton dépôt.",
+        answer: `Vous parlez à la personne qui conçoit et code votre site, sans chef de projet entre nous. Sans structure à payer, je demande environ deux fois moins que la médiane d’un site de PME en agence, ${euros(repereAgenceSite.mediane)} selon ${repereAgenceSite.source.nom} (${repereAgenceSite.source.releve}). Le code et l’hébergement sont à votre nom.`,
       },
     ],
   },
@@ -391,10 +403,10 @@ export const pageCaen: PageLocale = {
  * LIEN VERS CETTE PAGE, posé sous les trois périmètres de
  * `/services/site-vitrine`, sur sa propre ligne après celle du prix. C'est
  * l'endroit où le lecteur vient de lire « une page par métier ou par ville si
- * ton marché est local » : la page Caen en est l'exemple.
+ * votre marché est local » : la page Caen en est l'exemple.
  */
 export const lienVersPageCaen = {
-  avant: "Ton entreprise est à Caen ou dans le Calvados :",
+  avant: "Votre entreprise est à Caen ou dans le Calvados :",
   libelle: "création de site internet à Caen",
   href: CHEMIN_PAGE_CAEN,
 } as const;

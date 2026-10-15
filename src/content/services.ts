@@ -44,9 +44,9 @@ const IMAGES: Record<PrestationId, ImageAsset> = {
  */
 const RENVOI: Record<PrestationId, string> = {
   vitrine:
-    "De la page qui fait appeler au site qui te dit ce qu’il rapporte. Ce qui est compris et ce qui fait varier le prix sont sur la page dédiée.",
+    "De la page qui fait appeler au site qui vous dit ce qu’il rapporte. Ce qui est compris et ce qui fait varier le prix sont sur la page dédiée.",
   logiciel:
-    "De l’outil qui fait disparaître une tâche à la plateforme où tes systèmes restent d’accord entre eux. Ce qui est compris et ce qui fait varier le prix sont sur la page dédiée.",
+    "De l’outil qui fait disparaître une tâche à la plateforme où vos systèmes restent d’accord entre eux. Ce qui est compris et ce qui fait varier le prix sont sur la page dédiée.",
 };
 
 export const services: ServiceItem[] = prestations.map(

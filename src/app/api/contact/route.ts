@@ -65,7 +65,7 @@ const TYPES_PROJET = siteConfig.footerForm?.selectOptions ?? [];
 const EMAIL_CONTACT = siteConfig.contact.email || EMAIL_CONTACT_PAR_DEFAUT;
 
 /** Repli affiché au prospect chaque fois que l’envoi ne peut pas aboutir. */
-const REPLI_DIRECT = `Écris-moi directement à ${EMAIL_CONTACT}.`;
+const REPLI_DIRECT = `Écrivez-moi directement à ${EMAIL_CONTACT}.`;
 
 /** Message client d’un rejet de validation. Aucun détail d’implémentation. */
 function messageRejet(motif: MotifRejet): { message: string; champ?: string } {
@@ -74,15 +74,15 @@ function messageRejet(motif: MotifRejet): { message: string; champ?: string } {
       case "email":
         return { message: "Cette adresse e-mail ne semble pas valide.", champ: "email" };
       case "nom":
-        return { message: "Merci d’indiquer ton nom.", champ: "nom" };
+        return { message: "Merci d’indiquer votre nom.", champ: "nom" };
       case "typeProjet":
         return {
-          message: "Choisis un type de projet dans la liste.",
+          message: "Choisissez un type de projet dans la liste.",
           champ: "typeProjet",
         };
       case "message":
         return {
-          message: "Ton message est trop court ou trop long.",
+          message: "Votre message est trop court ou trop long.",
           champ: "message",
         };
     }
@@ -90,7 +90,7 @@ function messageRejet(motif: MotifRejet): { message: string; champ?: string } {
   // Piège, temps de remplissage, horodatage, corps illisible, intention
   // inconnue : le client reçoit LE MÊME message. Distinguer les cas
   // apprendrait à un robot lequel de nos contrôles l’a arrêté.
-  return { message: "Cette demande n’a pas pu être vérifiée. Recharge la page et réessaie." };
+  return { message: "Cette demande n’a pas pu être vérifiée. Rechargez la page et réessayez." };
 }
 
 export async function POST(requete: Request): Promise<Response> {
@@ -113,7 +113,7 @@ export async function POST(requete: Request): Promise<Response> {
     return json(
       {
         message:
-          "Trop de demandes envoyées depuis cette connexion. Réessaie dans quelques minutes, ou écris-moi directement.",
+          "Trop de demandes envoyées depuis cette connexion. Réessayez dans quelques minutes, ou écrivez-moi directement.",
       },
       429,
       { "retry-after": String(limite.reessayerDansS) },
@@ -166,7 +166,7 @@ export async function POST(requete: Request): Promise<Response> {
     return json(
       {
         message:
-          "La vérification anti-robot n’a pas abouti. Recharge la page et réessaie.",
+          "La vérification anti-robot n’a pas abouti. Rechargez la page et réessayez.",
       },
       403,
     );
@@ -203,7 +203,7 @@ export async function POST(requete: Request): Promise<Response> {
     });
     return json(
       {
-        message: `Ton message n’a pas pu être transmis. ${REPLI_DIRECT}`,
+        message: `Votre message n’a pas pu être transmis. ${REPLI_DIRECT}`,
       },
       notification.raison === "indisponible" ? 504 : 502,
     );

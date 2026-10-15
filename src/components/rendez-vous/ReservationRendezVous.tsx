@@ -16,7 +16,7 @@
  * plutôt une sorte de stepper ». Quatre temps, un seul affiché :
  *   01 le sujet — trois cartes ; un clic passe à la suite ;
  *   02 le créneau — durée, calendrier du mois, heures du jour retenu ;
- *   03 le projet — budget, objectif, échéance, et le retour « ce que tu peux
+ *   03 le projet — budget, objectif, échéance, et le retour « ce que vous pouvez
  *      espérer à ce budget » calculé sur place depuis la grille de l'offre ;
  *   04 les coordonnées — nom, adresse, et un message facultatif.
  * La barre de progression rend chaque étape franchie cliquable, et le
@@ -49,7 +49,7 @@
  */
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import type { FormEvent, ReactNode, RefObject } from "react";
 import {
   ChampsProtection,
@@ -303,6 +303,7 @@ function ChoixType({
  */
 function ChoixUnique({
   nom,
+  prefixe,
   legende,
   options,
   choisi,
@@ -311,6 +312,8 @@ function ChoixUnique({
   refPremier,
 }: {
   nom: string;
+  /** Propre à chaque instance : deux réservations peuvent cohabiter sur une page. */
+  prefixe: string;
   legende: string;
   options: readonly OptionQuestion[];
   choisi: string;
@@ -320,7 +323,7 @@ function ChoixUnique({
   /** Reçoit la première pastille, pour y poser le focus. */
   refPremier?: RefObject<HTMLInputElement | null>;
 }) {
-  const idErreur = `rdv-${nom}-erreur`;
+  const idErreur = `${prefixe}-${nom}-erreur`;
   return (
     <fieldset
       className="m-0 min-w-0 border-0 p-0"
@@ -340,7 +343,7 @@ function ChoixUnique({
               <input
                 ref={index === 0 ? refPremier : undefined}
                 type="radio"
-                name={nom}
+                name={`${prefixe}-${nom}`}
                 value={option.id}
                 checked={actif}
                 onChange={() => onChoisir(option.id)}
@@ -366,7 +369,7 @@ function ChoixUnique({
 }
 
 /**
- * « Ce que tu peux espérer à ce budget ».
+ * « Ce que vous pouvez espérer à ce budget ».
  *
  * LA RÉGION LIVE EXISTE AVANT SON CONTENU : un lecteur d'écran n'annonce pas
  * une région qui apparaît déjà remplie. Vide, elle ne prend aucune place.
@@ -606,6 +609,9 @@ export function ReservationRendezVous({
    */
   typeInitial?: IdRendezVous;
 }) {
+  // Préfixe des identifiants et des groupes de boutons radio : la page de
+  // contact et le pied de page peuvent monter deux réservations à la fois.
+  const instance = `rdv${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
   const [etape, setEtape] = useState(typeInitial ? ETAPE_CRENEAU : ETAPE_SUJET);
   const [type, setType] = useState<IdRendezVous | undefined>(typeInitial);
   const [creneau, setCreneau] = useState<Creneau | undefined>(undefined);
@@ -1133,6 +1139,7 @@ export function ReservationRendezVous({
           <div className="flex flex-col gap-[24px]">
             {durees && durees.options.length > 1 ? (
               <ChoixUnique
+                prefixe={instance}
                 nom="duree"
                 legende={contenu.creneaux.libelleDuree}
                 options={durees.options.map((minutes) => ({
@@ -1224,6 +1231,7 @@ export function ReservationRendezVous({
               <div className="flex flex-col gap-[24px]">
                 <div>
                   <ChoixUnique
+                    prefixe={instance}
                     nom="budget"
                     legende={contenu.questionnaire.budget.legende}
                     options={tranches}
@@ -1235,6 +1243,7 @@ export function ReservationRendezVous({
                   <RetourEspere retour={retour} />
                 </div>
                 <ChoixUnique
+                  prefixe={instance}
                   nom="objectif"
                   legende={contenu.questionnaire.objectif.legende}
                   options={objectifs}
@@ -1244,6 +1253,7 @@ export function ReservationRendezVous({
                   refPremier={refObjectif}
                 />
                 <ChoixUnique
+                  prefixe={instance}
                   nom="echeance"
                   legende={contenu.questionnaire.echeance.legende}
                   options={OPTIONS_ECHEANCE}
@@ -1265,10 +1275,10 @@ export function ReservationRendezVous({
           ) : (
             <Etape titre={contenu.etapes.coordonnees} refTitre={refTitre}>
               <div className="flex flex-col gap-[14px]">
-                <label htmlFor="rdv-nom" className="flex w-full flex-col gap-[10px]">
+                <label htmlFor={`${instance}-nom`} className="flex w-full flex-col gap-[10px]">
                   <span className={CLASSE_LIBELLE}>{contenu.formulaire.nomLabel}</span>
                   <input
-                    id="rdv-nom"
+                    id={`${instance}-nom`}
                     name="nom"
                     type="text"
                     required
@@ -1281,10 +1291,10 @@ export function ReservationRendezVous({
                   />
                 </label>
 
-                <label htmlFor="rdv-email" className="flex w-full flex-col gap-[10px]">
+                <label htmlFor={`${instance}-email`} className="flex w-full flex-col gap-[10px]">
                   <span className={CLASSE_LIBELLE}>{contenu.formulaire.emailLabel}</span>
                   <input
-                    id="rdv-email"
+                    id={`${instance}-email`}
                     name="email"
                     type="email"
                     required
@@ -1297,10 +1307,10 @@ export function ReservationRendezVous({
                   />
                 </label>
 
-                <label htmlFor="rdv-message" className="flex w-full flex-col gap-[10px]">
+                <label htmlFor={`${instance}-message`} className="flex w-full flex-col gap-[10px]">
                   <span className={CLASSE_LIBELLE}>{contenu.formulaire.messageLabel}</span>
                   <textarea
-                    id="rdv-message"
+                    id={`${instance}-message`}
                     name="message"
                     maxLength={1500}
                     value={message}

@@ -254,7 +254,8 @@ export interface SiteConfig {
     /** Horaires d'ouverture (bloc footer). */
     hours?: string[]; // ["Mon–Fri: 09:00 – 18:00", "Sat: 10:00 – 16:00"]
     /** Page locale liée sous la zone d'intervention, dans le pied de page. */
-    localLink?: Link;
+    /** Liens du pied de page vers les pages locales et de prix. */
+    localLinks?: Link[];
     /** Interlocuteur mis en avant dans le footer (avec note perso). */
     person: Person & { note?: string };
   };
@@ -277,10 +278,20 @@ export interface SiteConfig {
   };
   /** Formulaire de contact du footer (labels, options, disclaimer). */
   footerForm?: {
+    /** Bascule entre le message et le rendez-vous, au-dessus du formulaire. */
+    modes?: {
+      /** Nom accessible de la bascule. */
+      label: string;
+      message: string;
+      rendezVous: string;
+    };
     nameLabel: string;
     namePlaceholder?: string;
     emailLabel: string;
     emailPlaceholder?: string;
+    /** Message court, facultatif. */
+    messageLabel?: string;
+    messagePlaceholder?: string;
     selectLabel: string;
     selectOptions: string[];
     submitLabel: string;
@@ -292,22 +303,6 @@ export interface SiteConfig {
     disclaimerLinks?: Link[];
   };
   floatingCta?: Link; // bouton flottant / sticky
-  credits?: {
-    builtWith?: string;
-    /** Libellé précédant l'outil (« Built in »). */
-    builtWithLabel?: string;
-    createdBy?: Link;
-    /** Libellé précédant l'auteur (« Created by »). */
-    createdByLabel?: string;
-    /** Portrait affiché à côté de l'auteur. */
-    createdByAvatar?: ImageAsset;
-    /**
-     * Libellé du bouton « source préférée » de Google. Le lien lui-même n'est
-     * pas dans la donnée : il se déduit du domaine du site, et une adresse
-     * saisie à la main serait une occasion de plus de se tromper.
-     */
-    preferredSourceLabel?: string;
-  };
   meta: {
     defaultTitle: string;
     titleTemplate: string; // "%s — le studio d'origine"
@@ -418,6 +413,13 @@ export interface WorkItem extends SluggedContent {
    * précisément ce qu'on retire du site.
    */
   results?: readonly Metric[];
+  /**
+   * Titre et description de recherche de la page projet. Absent, la page
+   * retombe sur `title` et `overview`. Le titre de la fiche (« Kpsull ») sert
+   * aussi la carte et le bandeau défilant : il reste court, et c'est ce champ
+   * qui porte les mots cherchés (carte SEO du 2026-10-15).
+   */
+  seo?: PageSeo;
   /** Témoignage client. Optionnel pour la même raison : on n'en fabrique pas. */
   testimonial?: Testimonial;
   testimonialFollowUp?: string;
@@ -582,7 +584,10 @@ export interface HeroContent {
    * Ligne de preuve du bas du héros, à côté des logos : un résultat mesuré,
    * son libellé et, quand elle existe, la page qui le détaille.
    */
-  proof?: HeroProof;
+  /** Les deux portes du héros, qui composent ensemble le h1. */
+  doors?: readonly HeroDoor[];
+  /** Preuves du premier écran, dans l'ordre d'affichage. */
+  proofs?: readonly HeroProof[];
 }
 
 /** Résultat affiché dans le bas du héros (« −92 % d'erreurs… »). */
@@ -591,6 +596,17 @@ export interface HeroProof {
   value: string;
   label: string;
   href?: string;
+  /** Source publique du chiffre, quand il compare à un tiers. */
+  source?: { label: string; href: string };
+}
+
+/** Une porte de l'accueil : une offre, une ligne du titre, un prix plancher. */
+export interface HeroDoor {
+  /** Lignes du titre, rendues chacune sur sa ligne dès la tablette. */
+  lines: readonly string[];
+  href: string;
+  /** Prix d'entrée, déjà formaté (« dès 3 000 € HT »). */
+  price: string;
 }
 
 /** Bloc « Showreel » — marquee défilant + phrase manifeste + millésime. */
@@ -980,6 +996,11 @@ export interface NotFoundContent {
  * ne varient pas d'une page à l'autre, d'où un modèle unique et partagé.
  */
 export interface UiLabels {
+  /** Héros de l'accueil. */
+  hero: {
+    /** Précède la source d'un chiffre comparé (« Source : »). */
+    source: string;
+  };
   /** En-tête, menu, pied de page et mentions d'accessibilité globales. */
   chrome: {
     skipToContent: string; // « Skip to content »

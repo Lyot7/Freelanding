@@ -1,7 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync, statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { CHEMIN_PAGE_CAEN, pageCaen } from "./page-caen.ts";
+import { euros, repereAgenceSite } from "./offre.ts";
+import { CHEMIN_PAGE_CAEN, lienVersPageCaen, pageCaen } from "./page-caen.ts";
 import { pagePrixSite } from "./page-prix-site.ts";
 import { contentRoutes } from "./routes.ts";
 import { siteConfig } from "./site.ts";
@@ -125,7 +126,7 @@ describe("la page de Caen répond aux recherches locales", () => {
 
 describe("la page de Caen ne promet que ce qui est vrai", () => {
   test("aucune promesse de rendez-vous sur place ni de déplacement", () => {
-    const interdit = /sur place|en personne|présentiel|déplac|autour d.un café|chez toi, devant/iu;
+    const interdit = /sur place|en personne|présentiel|déplac|autour d.un café|chez (?:toi|vous), devant/iu;
     for (const texte of textes()) {
       expect(interdit.test(texte), `promesse de présentiel : ${texte}`).toBe(false);
     }
@@ -135,6 +136,20 @@ describe("la page de Caen ne promet que ce qui est vrai", () => {
     for (const texte of textes()) {
       expect(/[\u2013\u2014]/u.test(texte), `tiret long : ${texte}`).toBe(false);
     }
+  });
+
+  test("le visiteur est vouvoyé partout (décision d'Eliott du 2026-10-15)", () => {
+    const tutoiement = /(?<![\p{L}’'])(?:tu|toi|ton|ta|tes|te)(?!\p{L})|(?<!\p{L})t’/iu;
+    for (const texte of [...textes(), lienVersPageCaen.avant]) {
+      expect(tutoiement.test(texte), `tutoiement : ${texte}`).toBe(false);
+    }
+  });
+
+  test("la comparaison avec les agences cite son chiffre, sa source et sa date", () => {
+    const reponse = pageCaen.faq.items.find((i) => /agence/u.test(i.question))?.answer;
+    expect(reponse).toContain(euros(repereAgenceSite.mediane));
+    expect(reponse).toContain(repereAgenceSite.source.nom);
+    expect(reponse).toContain(repereAgenceSite.source.releve);
   });
 
   test("aucun montant en euros n'est écrit à la main dans page-caen.ts", () => {

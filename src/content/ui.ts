@@ -33,6 +33,9 @@ import type { UiLabels } from "@/lib/content/types";
  *   de typographie laissé en suspens ici.
  */
 export const uiLabels: UiLabels = {
+  hero: {
+    source: "Source :",
+  },
   chrome: {
     skipToContent: "Aller au contenu",
     mainNavLabel: "Navigation principale",
@@ -169,7 +172,7 @@ export const uiLabels: UiLabels = {
     nextProjectLabel: "Projet suivant",
     /* Bloc de fin de fiche, avant « Projet suivant » : la fiche se terminait
        sans aucune action, le lecteur convaincu n'avait qu'à remonter. */
-    rendezVousEyebrow: "Ton projet",
+    rendezVousEyebrow: "Votre projet",
     rendezVousTitleLines: ["Un besoin", "proche ?"],
     rendezVousLabel: "Réserver un appel",
     /* Comparateur avant / après des pages projet. Le libellé du curseur n'est

@@ -43,7 +43,7 @@ export function ConsentPreferencesLink() {
       <button
         type="button"
         data-consent-open=""
-        className="text-foreground-60 underline decoration-[rgba(255,255,255,0.13)] underline-offset-[3px] transition-[color,text-underline-offset] duration-200 hover:text-foreground hover:underline-offset-[4px]"
+        className="uppercase text-foreground-60 underline decoration-[rgba(255,255,255,0.13)] underline-offset-[3px] transition-[color,text-underline-offset] duration-200 hover:text-foreground hover:underline-offset-[4px]"
       >
         {consentCopy.footerShortLink}
       </button>

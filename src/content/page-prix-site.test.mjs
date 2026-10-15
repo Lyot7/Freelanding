@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { prestation, prixPlancher } from "./offre.ts";
+import { euros, prestation, prixPlancher, repereAgenceSite } from "./offre.ts";
 import { pageCaen } from "./page-caen.ts";
 import { CHEMIN_PRIX_SITE, pagePrixSite } from "./page-prix-site.ts";
 import { pagesSecteur } from "./pages-secteur.ts";
@@ -68,6 +68,11 @@ describe("la page de prix est cherchable", () => {
   test("ses liens internes visent des pages servies ou le rendez-vous", () => {
     const chemins = contentRoutes.map((r) => r.pathname);
     for (const lien of page.sections.flatMap((s) => s.liens?.items ?? [])) {
+      // Seul lien externe permis : la source du repère d'agence.
+      if (/^https?:/u.test(lien.href)) {
+        expect(lien.href).toBe(repereAgenceSite.source.href);
+        continue;
+      }
       if (lien.href.startsWith("#")) {
         expect(lien.href).toBe("#rendez-vous");
         continue;
@@ -106,8 +111,27 @@ describe("la page de prix ne dit que ce qui est vrai", () => {
 
   test("les textes sont écrits par Eliott et compris dans le prix", () => {
     const tout = textesDe(page).join(" ");
-    expect(tout).not.toMatch(/textes que tu fournis|mets en page les textes/iu);
-    expect(tout).toMatch(/tu n’as rien à rédiger/u);
+    expect(tout).not.toMatch(/textes que (?:tu fournis|vous fournissez)|mets en page les textes/iu);
+    expect(tout).toMatch(/vous n’avez rien à rédiger/u);
+  });
+
+  test("le visiteur est vouvoyé partout (décision d'Eliott du 2026-10-15)", () => {
+    const tutoiement = /(?<![\p{L}’'])(?:tu|toi|ton|ta|tes|te)(?!\p{L})|(?<!\p{L})t’/iu;
+    for (const texte of [...textesDe(page), page.seo.description, ...page.faq.titleLines]) {
+      expect(tutoiement.test(texte), `tutoiement : ${texte}`).toBe(false);
+    }
+  });
+
+  test("la comparaison avec les agences est sourcée et liée", () => {
+    const section = page.sections.find((s) => s.id === "comparaison");
+    const corps = [...section.paragraphes, ...section.points.map((p) => p.corps)].join(" ");
+    expect(corps).toContain(euros(repereAgenceSite.mediane));
+    expect(corps).toContain(repereAgenceSite.source.nom);
+    expect(corps).toContain(repereAgenceSite.source.releve);
+    expect(section.liens.items.map((l) => l.href)).toContain(repereAgenceSite.source.href);
+    // « Deux fois moins » n'est écrit que parce que le rapport est exact.
+    expect(corps).toMatch(/deux fois moins/u);
+    expect(repereAgenceSite.mediane / VITRINE.plancher).toBeCloseTo(2, 1);
   });
 
   test("aucun montant en euros n'est écrit à la main dans page-prix-site.ts", () => {

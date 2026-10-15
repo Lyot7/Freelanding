@@ -88,8 +88,8 @@ export function euros(montant: number): string {
  * couvre aussi l'outil interne, dès 6 000 € HT ; intégration IA dans un outil
  * existant dès 2 500 € HT. Rien d'autre n'est chiffré sur le site.
  *
- * LE SITE TUTOIE, et Eliott dit « je » : il est seul, c'est son argument face
- * aux agences. Le « nous » n'existe nulle part.
+ * VOUVOIEMENT depuis le 2026-10-15, décision d'Eliott. Eliott dit « je » : il
+ * est seul, c'est son argument face aux agences. Le « nous » n'existe nulle part.
  */
 export const prestations: readonly Prestation[] = [
   {
@@ -98,29 +98,29 @@ export const prestations: readonly Prestation[] = [
     slug: "site-vitrine",
     plancher: 3000,
     resume:
-      "Une adresse qui dit ce que tu fais, pour qui, et comment te joindre. Écrite et développée sur mesure. Une fois livrée, elle est à toi, sans abonnement pour continuer à l’utiliser.",
+      "Une adresse qui dit ce que vous faites, pour qui, et comment vous joindre, pensée pour vous amener des clients. Écrite et développée sur mesure. Une fois livrée, elle est à vous, sans abonnement pour continuer à l’utiliser.",
     inclus: [
-      "Un site développé sur mesure, direction visuelle tirée de ton univers",
-      "Tes textes écrits par moi, pour être lus et trouvés",
-      "Les mots que tapent tes clients, cherchés avant d’écrire",
-      "Tes photos recadrées et compressées",
-      "Un formulaire qui arrive dans ta boîte mail",
+      "Un site développé sur mesure, direction visuelle tirée de votre univers",
+      "Vos textes écrits par moi, pour être lus et trouvés",
+      "Les mots que tapent vos clients, cherchés avant d’écrire",
+      "Vos photos recadrées et compressées",
+      "Un formulaire qui arrive dans votre boîte mail",
       "Vitesse mesurée avant la mise en ligne, mobile et ordinateur",
       "Les bases du référencement posées, indexation vérifiée",
       "Mentions légales, politique de confidentialité et bandeau cookies",
-      "Hébergement à ton nom, code dans ton dépôt",
+      "Hébergement à votre nom, code dans votre dépôt",
     ],
     faitMonter: [
       "Le nombre de pages, d’une page longue à un site complet",
-      "Une page par métier ou par ville si ton marché est local",
+      "Une page par métier ou par ville si votre marché est local",
       "Balisage, données structurées, Search Console branchée",
-      "Un parcours dessiné pour une action décidée avec toi",
+      "Un parcours dessiné pour une action décidée avec vous",
       "La mesure installée : d’où viennent les visites, ce qui déclenche un contact",
-      "Tes formulaires branchés sur ton agenda ou ton CRM",
+      "Vos formulaires branchés sur votre agenda ou votre CRM",
       "Une passe de correction après la mise en ligne, sur ce que les chiffres montrent",
     ],
     horsOffre:
-      "Boutique en ligne, espace client, réservation avec paiement : ces fonctions sortent du site, et je les chiffre avec La Solution métier. Un tableau de bord de suivi du trafic et la remise d’aplomb de ta fiche établissement Google se font en plus, sur devis.",
+      "Boutique en ligne, espace client, réservation avec paiement : ces fonctions sortent du site, et je les chiffre avec La Solution métier. Un tableau de bord de suivi du trafic et la remise d’aplomb de votre fiche établissement Google se font en plus, sur devis.",
   },
 
   {
@@ -129,19 +129,19 @@ export const prestations: readonly Prestation[] = [
     slug: "logiciel-metier",
     plancher: 6000,
     resume:
-      "La réponse à un problème précis de ton métier : une tâche que tu refais à la main, un tableur qui déborde, des outils qui ne se parlent pas. Des écrans, une base de données et une mise en production, à la taille de ce que tu dois résoudre.",
+      "La réponse à un problème précis de votre métier : une tâche que vous refaites à la main, un tableur qui déborde, des outils qui ne se parlent pas. Des écrans, une base de données et une mise en production, à la taille de ce que vous devez résoudre.",
     inclus: [
-      "Les écrans nécessaires, la base de données et la mise en production sur ton hébergement",
-      "Le raccordement à l’outil qui porte déjà tes données",
+      "Les écrans nécessaires, la base de données et la mise en production sur votre hébergement",
+      "Le raccordement à l’outil qui porte déjà vos données",
       "Un export de tout ce que le logiciel contient, à tout moment",
-      "Code source dans ton dépôt, et sa documentation",
+      "Code source dans votre dépôt, et sa documentation",
     ],
     faitMonter: [
       "Le nombre de modules, comme les devis, le planning et la facturation",
       "Le nombre d’outils à relier, et les échanges dans les deux sens",
       "Un compte par personne, et des droits différenciés par rôle",
-      "La reprise de ton historique",
-      "Les cas particuliers de ton métier, traités un par un",
+      "La reprise de votre historique",
+      "Les cas particuliers de votre métier, traités un par un",
       "La règle écrite : qui gagne quand deux sources se contredisent",
       "Supervision, alertes et journal des échanges",
       "Sauvegardes vérifiées, reprise après incident testée en conditions réelles",
@@ -152,7 +152,7 @@ export const prestations: readonly Prestation[] = [
      * précédée d'un audit du code, lui-même prestation à part entière.
      */
     horsOffre:
-      "Un existant non documenté ou plusieurs sociétés à servir : je chiffre le cadrage à part, je te le remets écrit, et il t’appartient. La prise en main de tes équipes se fait en plus, sur devis. Reprendre un logiciel déjà en place se tranche par un audit de son code, et la réponse est non sur PHP et sur Laravel.",
+      "Un existant non documenté ou plusieurs sociétés à servir : je chiffre le cadrage à part, je vous le remets écrit, et il vous appartient. La prise en main de vos équipes se fait en plus, sur devis. Reprendre un logiciel déjà en place se tranche par un audit de son code, et la réponse est non sur PHP et sur Laravel.",
   },
 ];
 
@@ -175,16 +175,16 @@ export const integrationIA: Offre = {
   plancher: 2500,
   inclus: [
     "1 usage : résumer, classer ou rédiger",
-    "Branché sur 1 outil que tu utilises déjà",
-    "Code source dans ton dépôt, et sa documentation",
+    "Branché sur 1 outil que vous utilisez déjà",
+    "Code source dans votre dépôt, et sa documentation",
   ],
   faitMonter: [
     "Le nombre d’usages confiés à l’IA",
-    "Les règles et le vocabulaire de ton métier appliqués",
+    "Les règles et le vocabulaire de votre métier appliqués",
     "Plusieurs outils reliés entre eux",
   ],
   horsOffre:
-    "L’abonnement au modèle d’IA est ouvert à ton nom, et tu le paies directement à son éditeur.",
+    "L’abonnement au modèle d’IA est ouvert à votre nom, et vous le payez directement à son éditeur.",
 };
 
 /**
@@ -251,3 +251,64 @@ export const prixPlancher = (offre: Offre): string => euros(offre.plancher);
  */
 export const aPartirDe = (offre: Offre, taxe = ""): string =>
   `à partir de ${prixPlancher(offre)}${taxe}`;
+
+/*
+ * LES REPÈRES D'AGENCE, relevés le 2026-10-15 sur La Fabrique du Net.
+ *
+ * POSITIONNEMENT DU 2026-10-15, décision d'Eliott : la qualité et le travail
+ * d'une agence, pour environ deux fois moins cher. Une comparaison publique
+ * reste vérifiable : chaque chiffre affiché vient de cette source, s'affiche
+ * avec son nom et sa date, et vit ici, à côté des planchers qu'il compare.
+ * Aucun autre chiffre de marché ne s'écrit sur le site.
+ *
+ *  - Site (`agences-site-internet/tarifs`) : « Site vitrine PME soigné
+ *    (design, UX/UI) : 5 000 – 8 000 € » ; médiane d'un site pour une PME :
+ *    6 000 €, sur 357 projets d'agences.
+ *  - Logiciel (`agences-developpement-logiciel/tarifs`) : un premier outil
+ *    démarre autour de 8 000 à 10 000 € ; médiane d'un projet logiciel en
+ *    agence : 30 000 €.
+ *
+ * « DEUX FOIS MOINS » NE S'ÉCRIT QUE POUR LE SITE, où il est exact : médiane
+ * de 6 000 € contre un plancher de 3 000 €, et `offre.test.mjs` recalcule le
+ * rapport. Pour le logiciel, le chiffre de l'agence s'écrit toujours à côté du
+ * plancher, jamais un rapport seul.
+ */
+
+/** La source des repères, telle qu'elle se cite et se lie. */
+export interface SourceRepere {
+  readonly nom: string;
+  readonly href: string;
+  /** Mois du relevé, tel qu'il s'écrit dans une phrase. */
+  readonly releve: string;
+}
+
+const LA_FABRIQUE_DU_NET = "La Fabrique du Net";
+const RELEVE_REPERES = "octobre 2026";
+
+export const repereAgenceSite = {
+  source: {
+    nom: LA_FABRIQUE_DU_NET,
+    href: "https://www.lafabriquedunet.fr/agences/pages/agences-site-internet/tarifs",
+    releve: RELEVE_REPERES,
+  } satisfies SourceRepere,
+  /** Médiane d'un site pour une PME, en euros. */
+  mediane: 6000,
+  /** Nombre de projets d'agences sur lesquels la médiane est calculée. */
+  projets: 357,
+  /** Site vitrine de PME soigné (design, UX/UI), bornes en euros. */
+  soigneMin: 5000,
+  soigneMax: 8000,
+} as const;
+
+export const repereAgenceLogiciel = {
+  source: {
+    nom: LA_FABRIQUE_DU_NET,
+    href: "https://www.lafabriquedunet.fr/agences/pages/agences-developpement-logiciel/tarifs",
+    releve: RELEVE_REPERES,
+  } satisfies SourceRepere,
+  /** Médiane d'un projet logiciel en agence, en euros. */
+  mediane: 30000,
+  /** Prix d'entrée d'un premier outil en agence, bornes en euros. */
+  premierOutilMin: 8000,
+  premierOutilMax: 10000,
+} as const;

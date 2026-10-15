@@ -129,7 +129,7 @@ export const blogPosts: BlogPost[] = [
       },
     },
     excerpt:
-      "25 736 fiches Google Maps et 6 631 sites relevés dans 35 villes normandes : qui a un site, avec quel outil, et ce que ça change pour ton commerce.",
+      "25 736 fiches Google Maps et 6 631 sites relevés dans 35 villes normandes : qui a un site, avec quel outil, et ce que ça change pour votre commerce.",
     readingTime: "9 min de lecture",
     tags: ["étude", "Normandie", "site internet", "Google Maps"],
     seo: {
@@ -198,13 +198,15 @@ export const blogPosts: BlogPost[] = [
       },
     },
     excerpt:
-      "Odoo gagne sur un périmètre standard et une petite équipe. Le sur mesure prend l’avantage quand ton métier sort du cadre, ou quand la licence suit ta croissance.",
+      "Odoo gagne sur un périmètre standard et une petite équipe. Le sur mesure prend l’avantage quand votre métier sort du cadre, ou quand la licence suit votre croissance.",
     readingTime: "7 min de lecture",
     tags: ["Odoo", "ERP", "logiciel sur mesure"],
     seo: {
-      title: "Odoo ou logiciel sur mesure : quand choisir l’un ou l’autre",
+      // Carte SEO du 2026-10-15 : position 32 sur « odoo prix ». Les prix
+      // d'Odoo du corps sont relevés sur odoo.com le 2026-10-15.
+      title: "Odoo ou logiciel sur mesure : prix réel et comment choisir",
       description:
-        "Odoo ou logiciel sur mesure : licences par utilisateur, intégrateur, personnalisation, coût sur 3 ans, et les cas où Odoo reste le bon choix pour votre PME.",
+        "Le prix d’Odoo relevé en octobre 2026, licences et intégrateur, le coût sur 3 ans face au sur mesure, et les cas où Odoo reste le bon choix pour votre PME.",
       ogImage: {
         src: "/images/og-blog-logiciel-sur-mesure-ou-odoo.jpg",
         alt: "Une grille de modules carrés identiques sur fond noir, et un groupe de forme libre qui ressort en vert",
@@ -254,7 +256,9 @@ export const blogPosts: BlogPost[] = [
     readingTime: "6 min de lecture",
     tags: ["Excel", "migration", "logiciel sur mesure"],
     seo: {
-      title: "Remplacer Excel par un logiciel de gestion : méthode et coût",
+      // Position 15 sur « remplacer excel logiciel sur mesure » (carte SEO du
+      // 2026-10-15) : le titre porte la formulation exacte.
+      title: "Remplacer Excel par un logiciel sur mesure : méthode et coût",
       description:
         "Les signes qu’Excel ne suffit plus, la migration de vos données en 5 étapes, le coût d’un tableur partagé et le prix d’un logiciel sur mesure pour votre PME.",
       ogImage: {
@@ -306,9 +310,11 @@ export const blogPosts: BlogPost[] = [
     readingTime: "6 min de lecture",
     tags: ["refonte", "référencement", "redirections"],
     seo: {
-      title: "Refonte site internet : prix et méthode pour garder son SEO",
+      // Vise aussi « plan de migration refonte » (position 72, carte SEO du
+      // 2026-10-15).
+      title: "Refonte site internet : prix et plan de migration SEO",
       description:
-        "Quand refondre votre site, comment garder votre référencement avec un plan de redirections 301, et ce que coûte la refonte d’un site internet pour une PME.",
+        "Quand refondre votre site, le plan de migration qui garde votre référencement, redirections 301 et Search Console, et ce que coûte la refonte pour une PME.",
       ogImage: {
         src: "/images/og-blog-refonte-site-internet-pme.jpg",
         alt: "Deux colonnes d’adresses sur fond noir, reliées une à une par des courbes vertes",
@@ -354,7 +360,7 @@ export const blogPosts: BlogPost[] = [
       },
     },
     excerpt:
-      "WordPress achète l’autonomie sur tes textes, le sur mesure achète un site rapide qui ne ressemble qu’à toi. Sur 3 ans, l’écart se joue sur la maintenance.",
+      "WordPress achète l’autonomie sur vos textes, le sur mesure achète un site rapide qui ne ressemble qu’à vous. Sur 3 ans, l’écart se joue sur la maintenance.",
     readingTime: "6 min de lecture",
     tags: ["WordPress", "Next.js", "site sur mesure"],
     seo: {
@@ -466,14 +472,17 @@ export const blogPosts: BlogPost[] = [
       },
     },
     excerpt:
-      "Trois seuils publiés par Google décident si ta boutique est considérée comme rapide. Ils se relèvent gratuitement, et les deux tiers des corrections consistent à retirer.",
+      "Trois seuils publiés par Google décident si votre boutique est considérée comme rapide. Ils se relèvent gratuitement, et les deux tiers des corrections consistent à retirer.",
     readingTime: "7 min de lecture",
     tags: ["performance", "signaux Web essentiels", "e-commerce"],
     seo: {
       // Position 4,4 sur « site e-commerce lent » et aucun clic (Search
       // Console, 2026-09-28) : le titre promet désormais ce que l'article
       // livre, le moyen de chiffrer la perte, plutôt qu'un intitulé technique.
-      title: "Site e-commerce lent : chiffrer ce qu’il vous coûte",
+      // Carte SEO du 2026-10-15 : position 4,1, 50 impressions, 0 clic. Le
+      // seul chiffre que l'article garantit est le seuil de Google : c'est lui
+      // qui va dans le titre, aucun taux de perte inventé.
+      title: "Site e-commerce lent : au-delà de 2,5 s, ce que vous perdez",
       description:
         "Au-delà de 2,5 s d’affichage, Google juge votre boutique lente. Mesurez vos 3 seuils gratuitement, chiffrez ce que la lenteur vous coûte, puis corrigez.",
       ogImage: {
@@ -525,7 +534,7 @@ export const blogPosts: BlogPost[] = [
       },
     },
     excerpt:
-      "Ce qui coûte, c’est l’écart entre ta façon de vendre et ce que la plateforme prévoit. Voici comment mettre un chiffre en face de cet écart.",
+      "Ce qui coûte, c’est l’écart entre votre façon de vendre et ce que la plateforme prévoit. Voici comment mettre un chiffre en face de cet écart.",
     readingTime: "7 min de lecture",
     tags: ["Shopify", "sur mesure", "e-commerce"],
     seo: {
@@ -581,13 +590,14 @@ export const blogPosts: BlogPost[] = [
       },
     },
     excerpt:
-      "Un abonnement achète un droit d’usage, un outil sur mesure achète un actif. Avant de comparer les prix, regarde ce qui, chez toi, ne rentre dans aucune case.",
+      "Un abonnement achète un droit d’usage, un outil sur mesure achète un actif. Avant de comparer les prix, regardez ce qui, chez vous, ne rentre dans aucune case.",
     readingTime: "7 min de lecture",
     tags: ["outil métier", "SaaS", "coûts"],
     seo: {
-      title: "Outil sur mesure ou abonnements SaaS : les critères de décision",
+      // Positions 14 à 18 sur « saas abonnement » (carte SEO du 2026-10-15).
+      title: "Abonnement SaaS ou outil sur mesure : le coût sur 3 ans",
       description:
-        "Le calcul de coût que personne ne fait, les cas où l’abonnement reste le bon choix, les trois signaux qui font basculer, et la voie mixte qui rend le plus vite.",
+        "Abonnement SaaS ou outil sur mesure : le coût sur 3 ans, hypothèses affichées, les cas où l’abonnement reste le bon choix, et quand faire du sur mesure.",
       ogImage: {
         src: "/images/og-blog-outil-sur-mesure-ou-abonnements-saas.jpg",
         alt: "Rabot à main en métal posé sur une planche de pin, au milieu des copeaux",
@@ -599,7 +609,7 @@ export const blogPosts: BlogPost[] = [
 
   {
     slug: "synchroniser-catalogue-stock-et-commandes",
-    title: "Pourquoi tes outils ne sont jamais d’accord sur le stock",
+    title: "Pourquoi vos outils ne sont jamais d’accord sur le stock",
     date: "2026-08-28",
     dateSource: "editorial",
     listedInIndex: true,
@@ -637,7 +647,7 @@ export const blogPosts: BlogPost[] = [
       },
     },
     excerpt:
-      "Aucun de tes outils n’a été désigné comme la source de vérité. C’est une décision de gestion, et aucun connecteur ne la prendra à ta place.",
+      "Aucun de vos outils n’a été désigné comme la source de vérité. C’est une décision de gestion, et aucun connecteur ne la prendra à votre place.",
     readingTime: "7 min de lecture",
     tags: ["synchronisation", "catalogue", "outil métier"],
     seo: {
@@ -654,7 +664,7 @@ export const blogPosts: BlogPost[] = [
   },
   {
     slug: "a-qui-appartient-votre-fichier-client",
-    title: "À qui appartient ton fichier client ?",
+    title: "À qui appartient votre fichier client ?",
     date: "2026-08-27",
     dateSource: "editorial",
     listedInIndex: true,
@@ -692,13 +702,13 @@ export const blogPosts: BlogPost[] = [
       },
     },
     excerpt:
-      "La question ne se pose jamais au moment de signer un abonnement logiciel. Elle se pose le jour où tu veux partir, et ce jour-là il est trop tard pour la poser.",
+      "La question ne se pose jamais au moment de signer un abonnement logiciel. Elle se pose le jour où vous voulez partir, et ce jour-là il est trop tard pour la poser.",
     readingTime: "5 min de lecture",
     tags: ["logiciel", "données", "RGPD"],
     seo: {
-      title: "Logiciel métier : à qui appartiennent tes données ?",
+      title: "Logiciel métier : à qui appartiennent vos données ?",
       description:
-        "Export, commission sur ton activité, nom affiché à ton client : les quatre questions à poser avant de confier ton activité à un logiciel du marché, et ce que le RGPD couvre vraiment.",
+        "Export, commission sur votre activité, nom affiché à votre client : les quatre questions à poser avant de confier votre activité à un logiciel du marché, et ce que le RGPD couvre vraiment.",
       ogImage: {
         src: "/images/og-blog-fichier-client.jpg",
         alt: "Un tiroir de fichier ouvert, plein de fiches cartonnées",
@@ -748,11 +758,13 @@ export const blogContent = {
     // Le titre est rendu sur deux lignes séparées par un saut forcé.
     titleLines: ["Derniers", "articles."],
     subtitle:
-      "Ce que j’apprends en construisant des boutiques en ligne et les outils qui vont avec.",
+      "Pour les dirigeants de PME : ce que coûtent un site ou un logiciel sur mesure, et comment choisir.",
+    // Carte SEO du 2026-10-15 : l'index dit à qui il s'adresse. L'ancien
+    // sous-titre parlait de boutiques en ligne, hors des deux offres.
     subtitleParagraphs: [
       {
-        text: "Ce que j’apprends en construisant des boutiques en ligne et les outils qui vont avec.",
-        emphasis: ["Ce que j’apprends", "des boutiques en ligne"],
+        text: "Pour les dirigeants de PME : ce que coûtent un site ou un logiciel sur mesure, et comment choisir.",
+        emphasis: ["dirigeants de PME", "comment choisir."],
       },
     ],
   },
@@ -777,6 +789,6 @@ export const blogContent = {
   seo: {
     title: "Blog · Eliott Bouquerel",
     description:
-      "Des notes sur les boutiques en ligne : conversion, vitesse, référencement, et les outils sur mesure qui remplacent une pile d’abonnements.",
+      "Articles pour les dirigeants de PME : prix d’un site ou d’un logiciel sur mesure, Excel, Odoo, SaaS, refonte et référencement, calculs à hypothèses affichées.",
   },
 } satisfies BlogContent;

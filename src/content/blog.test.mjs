@@ -56,6 +56,21 @@ describe("registre du blog", () => {
       expect(publiées.has(catégorie)).toBe(true);
     }
   });
+
+  // VOUVOIEMENT depuis le 2026-10-15, décision d'Eliott. `\b` ne connaît pas
+  // les lettres accentuées (« boîte » y contient « te »), d'où les bornes \p{L}.
+  test("titres, extraits et corps vouvoient le lecteur", () => {
+    const tutoiement = /(?<!\p{L})((tu|ton|ta|tes|toi|te)(?!\p{L})|t’)/iu;
+    for (const post of blogPosts) {
+      for (const texte of [post.title, post.excerpt, post.seo?.title, post.seo?.description]) {
+        expect([post.slug, texte?.match(tutoiement)?.[0]]).toEqual([post.slug, undefined]);
+      }
+    }
+    for (const fichier of fichiers) {
+      const corps = readFileSync(join(DOSSIER, fichier), "utf8");
+      expect([fichier, corps.match(tutoiement)?.[0]]).toEqual([fichier, undefined]);
+    }
+  });
 });
 
 describe("métadonnées d'article", () => {

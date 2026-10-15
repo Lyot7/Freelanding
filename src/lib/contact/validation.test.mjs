@@ -65,6 +65,19 @@ describe("validerSoumission — cas nominal", () => {
     expect(resultat.soumission.message).toBeUndefined();
   });
 
+  it("garde le message du pied de page quand il est écrit", () => {
+    const resultat = valider({
+      intention: "footer",
+      nom: "Alex Martin",
+      email: "alex@example.fr",
+      typeProjet: TYPES[1],
+      message: "Je voudrais refaire le site de mon garage.",
+      debutMs: DEBUT_HUMAIN,
+    });
+    expect(resultat.ok).toBe(true);
+    expect(resultat.soumission.message).toBe("Je voudrais refaire le site de mon garage.");
+  });
+
   it("refuse une intention inconnue", () => {
     const resultat = valider({
       intention: "newsletter",

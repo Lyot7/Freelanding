@@ -18,17 +18,22 @@
  *     `offre.ts`. Le test le vérifie sur la source ;
  *   - aucun coût d'hébergement ni de nom de domaine chiffré : le site ne les
  *     facture pas, ils sont au nom du client et à son tarif ;
- *   - aucun chiffre de marché attribué à une source : les repères agence,
- *     WordPress et créateurs en ligne sont des ordres de grandeur d'Eliott,
- *     présentés comme tels ;
+ *   - aucun chiffre de marché sans sa source : les repères WordPress et
+ *     créateurs en ligne sont des ordres de grandeur d'Eliott, présentés comme
+ *     tels ; le repère agence vient de La Fabrique du Net (`offre.ts`), cité
+ *     avec son lien et sa date ;
  *   - aucune durée chiffrée (règle de `offre.ts`) et aucun présentiel.
+ *
+ * VOUVOIEMENT depuis le 2026-10-15, décision d'Eliott.
  */
 import type { FaqItem } from "@/lib/content/types";
 import {
   aPartirDe,
+  euros,
   plancherSuivi,
   prestation,
   prixPlancher,
+  repereAgenceSite,
   tauxSuivi,
 } from "./offre";
 import { CHEMIN_PAGE_CAEN } from "./page-caen";
@@ -39,6 +44,7 @@ export const CHEMIN_PRIX_SITE = `/services/${VITRINE.slug}/prix`;
 const CHEMIN_PILIER_LOGICIEL = `/services/${prestation("logiciel").slug}`;
 const CHEMIN_ARTICLE_REFONTE = "/blog/refonte-site-internet-pme";
 const CHEMIN_ARTICLE_WORDPRESS = "/blog/site-sur-mesure-ou-wordpress";
+const AGENCE = repereAgenceSite;
 
 export interface PagePrixSite {
   readonly chemin: string;
@@ -73,7 +79,9 @@ export const pagePrixSite: PagePrixSite = {
     description: `Combien coûte un site internet professionnel ? Comptez ${aPartirDe(VITRINE, " HT")} : ce qui fait varier le prix du devis, et ce qui se paie après la mise en ligne.`,
   },
   h1: "Prix d’un site internet sur mesure",
-  resume: `Un site internet professionnel sur mesure démarre à ${prixPlancher(VITRINE)} HT, textes compris. Le prix final dépend du nombre de pages, du travail de référencement et de la mesure de ce que le site rapporte, et il est fixé au devis. Une fois livré, le site est à toi, sans abonnement.`,
+  /* RÉPONSE CHIFFRÉE EN TÊTE (carte SEO du 2026-10-15) : le plancher, puis la
+     médiane d'agence sourcée, qui vise aussi « agence web prix ». */
+  resume: `Un site internet professionnel sur mesure démarre à ${prixPlancher(VITRINE)} HT chez moi, textes compris. En agence, ${AGENCE.source.nom} relève une médiane de ${euros(AGENCE.mediane)} pour un site de PME (${AGENCE.source.releve}). Le prix final dépend du nombre de pages, du référencement et de la mesure, et il est fixé au devis. Une fois livré, le site est à vous, sans abonnement.`,
   marcheFilAriane: "Prix",
   libelleLien: "prix d’un site internet sur mesure",
   noteLlms:
@@ -83,19 +91,19 @@ export const pagePrixSite: PagePrixSite = {
       id: "reponse",
       titre: "Combien coûte un site internet professionnel ?",
       paragraphes: [
-        `Chez moi, un site internet sur mesure démarre à ${prixPlancher(VITRINE)} HT. Au-dessus, le montant dépend de ce que le site doit faire pour toi : exister en ligne, être trouvé par tes clients, ou rapporter des contacts que tu peux compter. Je le fixe au devis, et il ne bouge plus.`,
+        `Chez moi, un site internet sur mesure démarre à ${prixPlancher(VITRINE)} HT. Au-dessus, le montant dépend de ce que le site doit faire pour vous : exister en ligne, être trouvé par vos clients, ou rapporter des contacts que vous pouvez compter. Je le fixe au devis, et il ne bouge plus.`,
         "Tout site comprend la conception, les textes, le développement, la mise en ligne et une mesure de la vitesse sur mobile et sur ordinateur avant la livraison. Ce qui fait monter le prix, c’est la profondeur du travail : le nombre de pages, le référencement et la mesure.",
       ],
       points: [
         {
           titre: "Exister en ligne",
           corps:
-            "1 page longue qui présente ton activité et donne envie d’appeler. Le bon point de départ pour une première présence en ligne ou une offre unique.",
+            "1 page longue qui présente votre activité et donne envie d’appeler. Le bon point de départ pour une première présence en ligne ou une offre unique.",
         },
         {
-          titre: "Être trouvé par tes clients",
+          titre: "Être trouvé par vos clients",
           corps:
-            "Plusieurs pages, et les recherches de tes clients étudiées avant d’écrire. Le choix courant quand tes prospects comparent avant de te contacter.",
+            "Plusieurs pages, et les recherches de vos clients étudiées avant d’écrire. Le choix courant quand vos prospects comparent avant de vous contacter.",
         },
         {
           titre: "Rapporter des contacts",
@@ -118,7 +126,7 @@ export const pagePrixSite: PagePrixSite = {
             libelle: "Une solution métier sur mesure",
             href: CHEMIN_PILIER_LOGICIEL,
             description:
-              "Quand ton projet demande une boutique, un espace client ou une réservation avec paiement.",
+              "Quand votre projet demande une boutique, un espace client ou une réservation avec paiement.",
           },
           {
             libelle: "Refonte de site internet : prix et méthode",
@@ -132,17 +140,17 @@ export const pagePrixSite: PagePrixSite = {
         {
           titre: "Le nombre de pages",
           corps:
-            "Une page longue au départ, plusieurs pages ensuite, avec une page par métier ou par ville quand ton marché est local.",
+            "Une page longue au départ, plusieurs pages ensuite, avec une page par métier ou par ville quand votre marché est local.",
         },
         {
           titre: "Les textes",
           corps:
-            "Je les écris pour qu’ils soient lus et trouvés, et c’est compris dans le prix : tu n’as rien à rédiger. Leur volume suit le nombre de pages.",
+            "Je les écris pour qu’ils soient lus et trouvés, et c’est compris dans le prix : vous n’avez rien à rédiger. Leur volume suit le nombre de pages.",
         },
         {
-          titre: "Les mots que tapent tes clients",
+          titre: "Les mots que tapent vos clients",
           corps:
-            "Je cherche les requêtes de ton marché avant d’écrire. Le balisage complet, les données structurées et la Search Console branchée font monter le prix.",
+            "Je cherche les requêtes de votre marché avant d’écrire. Le balisage complet, les données structurées et la Search Console branchée font monter le prix.",
         },
         {
           titre: "La mesure",
@@ -160,19 +168,19 @@ export const pagePrixSite: PagePrixSite = {
       id: "recurrent",
       titre: "Combien coûte un site internet après sa mise en ligne ?",
       paragraphes: [
-        "Un site sur mesure ne demande aucun abonnement pour continuer à fonctionner. Restent des dépenses que tu vois sur des factures à ton nom, au tarif de tes prestataires.",
-        "Le suivi est facultatif : sans lui, ton site reste en ligne et t’appartient. Il sert à le garder à jour et à corriger ce qui doit l’être.",
+        "Un site sur mesure ne demande aucun abonnement pour continuer à fonctionner. Restent des dépenses que vous voyez sur des factures à votre nom, au tarif de vos prestataires.",
+        "Le suivi est facultatif : sans lui, votre site reste en ligne et vous appartient. Il sert à le garder à jour et à corriger ce qui doit l’être.",
       ],
       points: [
         {
           titre: "L’hébergement",
           corps:
-            "Le site est hébergé à ton nom, chez un hébergeur que tu paies directement. Si ton trafic grossit au point de demander une machine plus puissante, c’est cette facture qui change.",
+            "Le site est hébergé à votre nom, chez un hébergeur que vous payez directement. Si votre trafic grossit au point de demander une machine plus puissante, c’est cette facture qui change.",
         },
         {
           titre: "Le nom de domaine",
           corps:
-            "Ton adresse est réservée à ton nom et se renouvelle chaque année auprès de ton bureau d’enregistrement. Tu la gardes si tu changes de prestataire.",
+            "Votre adresse est réservée à votre nom et se renouvelle chaque année auprès de votre bureau d’enregistrement. Vous la gardez si vous changez de prestataire.",
         },
         {
           titre: "Le suivi mensuel",
@@ -181,16 +189,16 @@ export const pagePrixSite: PagePrixSite = {
         {
           titre: "Les évolutions",
           corps:
-            "Une page ou une fonction nouvelle n’était pas au cadrage : elle fait l’objet d’un devis à part, au moment où tu en as besoin.",
+            "Une page ou une fonction nouvelle n’était pas au cadrage : elle fait l’objet d’un devis à part, au moment où vous en avez besoin.",
         },
       ],
     },
     {
       id: "comparaison",
-      titre: "Agence, freelance ou Wix : quel budget prévoir ?",
+      titre: "Agence web, freelance ou Wix : quel prix pour un site ?",
       paragraphes: [
-        "Les prix d’un site internet s’étalent sur une large plage, selon ce qui est livré et la structure de celui qui le livre. Les ordres de grandeur ci-contre servent de repères pour lire les devis que tu reçois.",
-        `Je me situe sur le sur mesure, sans la structure d’une agence : ${aPartirDe(VITRINE, " HT")}, avec la personne qui écrit le code comme seul interlocuteur.`,
+        "Les prix d’un site internet s’étalent sur une large plage, selon ce qui est livré et la structure de celui qui le livre. Les ordres de grandeur ci-contre servent de repères pour lire les devis que vous recevez.",
+        `Je fais le travail d’une agence, de la conception à la mise en ligne, ${aPartirDe(VITRINE, " HT")} : environ deux fois moins que la médiane de ${euros(AGENCE.mediane)} relevée pour un site de PME, sur ${AGENCE.projets} projets d’agences. Je conçois et je code moi-même, sans chef de projet ni structure à payer, et votre budget va au site.`,
       ],
       liens: {
         titre: "Pour comparer",
@@ -201,13 +209,18 @@ export const pagePrixSite: PagePrixSite = {
             description:
               "Maintenance, sécurité, vitesse et coût sur 3 ans, et les cas où WordPress suffit.",
           },
+          {
+            libelle: AGENCE.source.nom,
+            href: AGENCE.source.href,
+            description: `Les tarifs des agences de création de site, relevés en ${AGENCE.source.releve}.`,
+          },
         ],
       },
       points: [
         {
           titre: "Créateur de site en ligne",
           corps:
-            "Wix, Squarespace et leurs équivalents : un abonnement de quelques dizaines d’euros par mois et ton temps pour construire le site. Bien pour démarrer seul, mais le site reste sur leur plateforme.",
+            "Wix, Squarespace et leurs équivalents : un abonnement de quelques dizaines d’euros par mois et votre temps pour construire le site. Bien pour démarrer seul, mais le site reste sur leur plateforme.",
         },
         {
           titre: "Thème WordPress installé par un prestataire",
@@ -217,12 +230,11 @@ export const pagePrixSite: PagePrixSite = {
         {
           titre: "Freelance",
           corps:
-            "Des tarifs très variables selon l’expérience et le périmètre. Tu parles directement à la personne qui construit ton site.",
+            "Des tarifs très variables selon l’expérience et le périmètre. Vous parlez directement à la personne qui construit votre site.",
         },
         {
           titre: "Agence web",
-          corps:
-            "Chef de projet, designer, développeur : le prix couvre cette équipe et sa structure. Pour un site sur mesure, compte plusieurs milliers à plusieurs dizaines de milliers d’euros.",
+          corps: `Le prix couvre une équipe et sa structure. Pour un site vitrine de PME soigné, ${AGENCE.source.nom} relève entre ${euros(AGENCE.soigneMin)} et ${euros(AGENCE.soigneMax)} (${AGENCE.source.releve}).`,
         },
       ],
     },
@@ -230,8 +242,8 @@ export const pagePrixSite: PagePrixSite = {
       id: "devis",
       titre: "Comment obtenir un devis de site internet ?",
       paragraphes: [
-        "Le devis part d’un appel en visio. En réservant ton créneau, tu réponds à 3 questions sur ton budget, ton objectif et ton échéance : je sais avant l’appel quel projet se dessine.",
-        "Le devis écrit reprend ce que contient ton site, son prix et la date de mise en ligne. Rien n’est dû tant que tu ne l’as pas signé.",
+        "Le devis part d’un appel en visio. En réservant votre créneau, vous répondez à 3 questions sur votre budget, votre objectif et votre échéance : je sais avant l’appel quel projet se dessine.",
+        "Le devis écrit reprend ce que contient votre site, son prix et la date de mise en ligne. Rien n’est dû tant que vous ne l’avez pas signé.",
       ],
       liens: {
         titre: "Pour aller plus loin",
@@ -250,7 +262,7 @@ export const pagePrixSite: PagePrixSite = {
           {
             libelle: "Réserver un appel",
             href: "#rendez-vous",
-            description: "Choisis un créneau en visio pour parler de ton site.",
+            description: "Choisissez un créneau en visio pour parler de votre site.",
           },
         ],
       },
@@ -258,22 +270,22 @@ export const pagePrixSite: PagePrixSite = {
         {
           titre: "1. L’appel",
           corps:
-            "15, 30 ou 45 minutes en visio, au choix, pour comprendre ton activité, tes clients et ce que ton site actuel ne fait pas.",
+            "15, 30 ou 45 minutes en visio, au choix, pour comprendre votre activité, vos clients et ce que votre site actuel ne fait pas.",
         },
         {
           titre: "2. Le devis écrit",
           corps:
-            "Ce que contient ton site, son prix ferme et la date de mise en ligne, avant toute signature.",
+            "Ce que contient votre site, son prix ferme et la date de mise en ligne, avant toute signature.",
         },
         {
           titre: "3. La construction",
           corps:
-            "Tu suis ton site sur une adresse en ligne pendant qu’il se construit, et tu donnes tes retours au fil de l’eau.",
+            "Vous suivez votre site sur une adresse en ligne pendant qu’il se construit, et vous donnez vos retours au fil de l’eau.",
         },
         {
           titre: "4. La livraison",
           corps:
-            "Le site en ligne, le code dans ton dépôt et l’hébergement à ton nom.",
+            "Le site en ligne, le code dans votre dépôt et l’hébergement à votre nom.",
         },
       ],
     },
@@ -281,22 +293,27 @@ export const pagePrixSite: PagePrixSite = {
   titreOffre: "Ce qui est compris, ce qui fait varier le prix",
   faq: {
     eyebrow: "FAQ",
-    titleLines: ["Le prix", "de ton site."],
+    titleLines: ["Le prix", "de votre site."],
     items: [
       {
         question: "Le devis de site internet est-il gratuit ?",
         answer:
-          "Oui. L’appel en visio et le devis écrit ne te coûtent rien et ne t’engagent à rien. Le premier paiement intervient à la signature du devis.",
+          "Oui. L’appel en visio et le devis écrit ne vous coûtent rien et ne vous engagent à rien. Le premier paiement intervient à la signature du devis.",
       },
       {
         question: "Pourquoi un site sur mesure coûte-t-il plus cher qu’un site Wix ?",
         answer:
-          "Avec un créateur de site en ligne, tu paies un abonnement et tu construis le site toi-même dans un modèle. Un site sur mesure est conçu, écrit et développé pour ton entreprise, mesuré avant sa mise en ligne, et il t’appartient : tu ne paies plus rien à une plateforme pour qu’il reste en ligne.",
+          "Avec un créateur de site en ligne, vous payez un abonnement et vous construisez le site vous-même dans un modèle. Un site sur mesure est conçu, écrit et développé pour votre entreprise, mesuré avant sa mise en ligne, et il vous appartient : vous ne payez plus rien à une plateforme pour qu’il reste en ligne.",
       },
       {
         question: "Le prix comprend-il l’hébergement ?",
         answer:
-          "Non. L’hébergement est à ton nom, et tu le paies directement à ton hébergeur. Je le configure et je mets le site en ligne dessus. Si tu changes de prestataire un jour, ton site ne bouge pas.",
+          "Non. L’hébergement est à votre nom, et vous le payez directement à votre hébergeur. Je le configure et je mets le site en ligne dessus. Si vous changez de prestataire un jour, votre site ne bouge pas.",
+      },
+      {
+        question: "Que contient un devis de site internet ?",
+        answer:
+          "Le mien tient en 4 parties : les pages et ce que chacune doit obtenir, ce qui est compris (textes, référencement, mesure), le prix ferme hors taxes avec son échéancier, et la date de mise en ligne. Un devis lisible détaille ce qui est livré page par page. Une ligne unique « création de site » ne vous permet pas de comparer.",
       },
       {
         question: "Puis-je payer mon site en plusieurs fois ?",
@@ -310,7 +327,7 @@ export const pagePrixSite: PagePrixSite = {
       {
         question: "Le référencement est-il compris dans le prix ?",
         answer:
-          "Les bases du référencement sont posées sur chaque site, et l’indexation est vérifiée. Les textes visent les mots que tapent tes clients. Le balisage complet et les données structurées s’ajoutent au devis. Personne ne peut te garantir une position : le classement prend plusieurs mois et dépend aussi de tes concurrents.",
+          "Les bases du référencement sont posées sur chaque site, et l’indexation est vérifiée. Les textes visent les mots que tapent vos clients. Le balisage complet et les données structurées s’ajoutent au devis. Personne ne peut vous garantir une position : le classement prend plusieurs mois et dépend aussi de vos concurrents.",
       },
     ],
   },

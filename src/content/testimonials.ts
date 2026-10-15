@@ -83,9 +83,9 @@ export const jenniferTestimonial: Testimonial = {
  *
  * CE QUI LA REMPLACE EST DÉJÀ ÉCRIT AILLEURS, mot pour mot, ce qui est la
  * meilleure preuve qu'elle est tenable. « L'abonnement est la décision
- * raisonnable, et je te le dirai » apparaît dans DEUX articles du blog, et le
+ * raisonnable, et je vous le dirai » apparaît dans DEUX articles du blog, et le
  * descriptif du rendez-vous de découverte porte la même promesse : « si ce
- * n'est pas pour moi, je te le dis pendant l'appel ». Une phrase qu'on répète
+ * n'est pas pour moi, je vous le dis pendant l'appel ». Une phrase qu'on répète
  * sans y penser dans trois textes séparés n'est pas une posture, c'est une
  * pratique.
  *
@@ -100,7 +100,7 @@ export const jenniferTestimonial: Testimonial = {
  */
 export const methodePromise: Testimonial = {
   quote:
-    "« Si un abonnement à quarante euros règle ton problème, je te le dirai. Ce que je vends commence là où il ne suffit plus. »",
+    "« Si un abonnement à quarante euros règle votre problème, je vous le dirai. Ce que je vends commence là où il ne suffit plus. »",
   author: {
     name: "Eliott Bouquerel",
     // RÔLE REMIS. La source affiche trois lignes sous le portrait : le nom, la
