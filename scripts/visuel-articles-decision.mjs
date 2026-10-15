@@ -158,9 +158,6 @@ function wordpress(l, h, graine) {
   return cadre(l, h, corps);
 }
 
-/** Les quatre motifs, réutilisés par les articles validés dans le cockpit (`publier-articles.ts`). */
-export const DESSINS = { odoo, excel, refonte, wordpress };
-
 /** Écrit héros, vignette et image de partage d'un article, depuis `racine` (le dépôt). */
 export async function fabriquerVisuels(slug, dessin, graine, racine = ".") {
   const sorties = [

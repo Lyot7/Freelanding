@@ -15,11 +15,11 @@ import entrees from "./articles-cockpit.json";
  * résultat (corps présent, description bornée, liens vers une prestation et la
  * prise de rendez-vous, aucun tiret cadratin).
  *
- * CHAQUE ARTICLE A SON VISUEL, calculé à la publication par un des quatre
- * motifs de `scripts/visuel-articles-decision.mjs`, avec une graine tirée du
- * slug : une photo de héros ne sert qu'une fois (`heros-pages.test.mjs`).
- * Les fichiers suivent le slug : `heros/blog-<slug>.jpg`, `blog/<slug>.jpg`,
- * `og-blog-<slug>.jpg`.
+ * CHAQUE ARTICLE A SON VISUEL, conçu pour son sujet : le rédacteur l'écrit en
+ * SVG dans la palette du site, Eliott le voit dans l'aperçu du cockpit, et
+ * `scripts/visuel-article.mjs` le rend en JPG à la publication. Une photo de
+ * héros ne sert qu'une fois (`heros-pages.test.mjs`). Les fichiers suivent le
+ * slug : `heros/blog-<slug>.jpg`, `blog/<slug>.jpg`, `og-blog-<slug>.jpg`.
  */
 export interface ArticleCockpit {
   slug: string;
@@ -31,21 +31,11 @@ export interface ArticleCockpit {
   description: string;
   readingTime: string;
   tags?: string[];
-  /** Le motif du visuel calculé, choisi d'après l'offre que l'article sert. */
-  motif: Motif;
+  /** Ce que montre le visuel, pour le texte de remplacement (20 à 200 caractères). */
+  alt: string;
   /** La validation du cockpit, marquée publiée une fois l'article en ligne. */
   validationId: string;
 }
-
-export type Motif = "odoo" | "excel" | "refonte" | "wordpress";
-
-/** Ce que montre chaque motif, pour le texte de remplacement. */
-export const ALT_MOTIF: Record<Motif, string> = {
-  odoo: "Une grille de modules carrés identiques sur fond noir, et un groupe de forme libre qui ressort en vert",
-  excel: "Une grille de tableur sur fond noir, une colonne de cellules surlignée en vert",
-  refonte: "Deux colonnes d’adresses sur fond noir, reliées une à une par des courbes vertes",
-  wordpress: "Sur fond noir, un bloc unique cerné de vert face à une pile de petits blocs gris",
-};
 
 export function articlesDuCockpit(
   base: readonly BlogPost[],
@@ -54,8 +44,8 @@ export function articlesDuCockpit(
   const auteur = base[0]?.author;
   if (!auteur) throw new Error("Registre du blog vide : aucun auteur à reprendre");
   return liste.map((a) => {
-    const alt = ALT_MOTIF[a.motif];
-    if (!alt) throw new Error(`Article ${a.slug} : motif ${a.motif} inconnu`);
+    const alt = a.alt?.trim();
+    if (!alt) throw new Error(`Article ${a.slug} : visuel sans texte de remplacement`);
     const og = { src: `/images/og-blog-${a.slug}.jpg`, alt, width: 1200, height: 630 };
     return {
       slug: a.slug,
