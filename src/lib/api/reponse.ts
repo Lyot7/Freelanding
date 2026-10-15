@@ -79,9 +79,47 @@ export function json(
 export function origineEtrangere(requete: Request): boolean {
   const origine = requete.headers.get("origin");
   if (!origine) return false;
+  let hoteOrigine: string;
   try {
-    return new URL(origine).host !== new URL(requete.url).host;
+    hoteOrigine = new URL(origine).host;
   } catch {
     return true;
   }
+  return !hotesDuSite(requete).has(hoteOrigine);
+}
+
+/**
+ * LES NOMS SOUS LESQUELS LE SITE EST SERVI, et pas seulement `requete.url`.
+ *
+ * Derrière le proxy de Coolify, `requete.url` porte l'hôte INTERNE du
+ * conteneur, jamais `eliottbouquerel.fr` : comparer l'origine à lui seul
+ * refusait en 403 tous les envois réels du formulaire et des rendez-vous
+ * (relevé en production le 2026-10-15, 41 jours sans un seul envoi abouti).
+ * On accepte donc l'hôte public déclaré (`NEXT_PUBLIC_SITE_URL`, avec et sans
+ * `www.`), l'hôte transmis par le proxy et l'hôte de la requête.
+ */
+function hotesDuSite(requete: Request): Set<string> {
+  const hotes = new Set<string>();
+  const ajouter = (valeur: string | null | undefined) => {
+    const hote = valeur?.split(",")[0]?.trim().toLowerCase();
+    if (hote) hotes.add(hote);
+  };
+  try {
+    ajouter(new URL(requete.url).host);
+  } catch {
+    // URL de requête illisible : seuls les autres noms comptent.
+  }
+  ajouter(requete.headers.get("x-forwarded-host"));
+  ajouter(requete.headers.get("host"));
+  const public_ = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (public_) {
+    try {
+      const hote = new URL(public_).host.toLowerCase();
+      hotes.add(hote);
+      hotes.add(hote.startsWith("www.") ? hote.slice(4) : `www.${hote}`);
+    } catch {
+      // Variable mal formée : le site se rabat sur les en-têtes.
+    }
+  }
+  return hotes;
 }
