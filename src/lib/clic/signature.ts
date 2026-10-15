@@ -3,12 +3,17 @@
  *
  * Chaque e-mail porte un lien unique `/r/<id>`. La route redirige toujours
  * vers `/contact` et, pour un vrai clic, l'enregistre dans le cockpit
- * d'Eliott : il sait QUI a cliqué sans pixel d'ouverture et sans cookie.
+ * d'Eliott : il sait QUI a cliqué, sans cookie.
+ *
+ * Le logo de la signature porte le même identifiant, `/o/<id>` : son
+ * affichage est relayé au cockpit comme une ouverture (décision d'Eliott du
+ * 2026-10-15), puis redirigé vers l'image fixe.
  *
  * CONTRATS PARTAGÉS avec deux autres dépôts. Le pipeline d'envoi génère les
  * identifiants au format `ID_CLIC`. Le cockpit (`admin.eliottbouquerel.fr`)
  * reçoit `POST /api/clics` avec un jeton Bearer et le corps
- * `{ id, cliqueLe, navigateur, robotProbable }`. Il répond 201 (créé), 200
+ * `{ id, cliqueLe, navigateur, robotProbable }`, plus `nature: "ouverture"`
+ * pour un affichage du logo. Il répond 201 (créé), 200
  * (déjà enregistré), 404 (identifiant qui ne correspond à aucun envoi,
  * attendu) ; 400, 401 et 503 signalent un défaut de notre côté ou du sien.
  * L'URL, les en-têtes et les quatre champs ne bougent pas sans lui.
@@ -37,6 +42,9 @@ export const DESTINATION_CLIC =
  * que vers le cockpit, quel que soit l'environnement.
  */
 export const URL_COCKPIT_CLICS = "https://admin.eliottbouquerel.fr/api/clics";
+
+/** Le logo de la signature, servi par Next depuis `src/app/apple-icon.png`. */
+export const DESTINATION_OUVERTURE = "https://eliottbouquerel.fr/apple-icon.png";
 
 /** Au-delà, le cockpit est jugé injoignable. La redirection, elle, est déjà partie. */
 const DELAI_COCKPIT_MS = 5_000;
@@ -75,10 +83,23 @@ export function nettoyerNavigateur(userAgent: string | null): string {
     .slice(0, LONGUEUR_NAVIGATEUR);
 }
 
+/**
+ * Apple Mail (protection de la confidentialité) télécharge toutes les images
+ * à la réception, par un relais dont le navigateur se résume à « Mozilla/5.0 » :
+ * ce chargement ne dit pas que le destinataire a lu.
+ */
+export function ouvertureRobotProbable(userAgent: string | null): boolean {
+  return estRobotProbable(userAgent) || userAgent?.trim() === "Mozilla/5.0";
+}
+
+type Nature = "clic" | "ouverture";
+
 interface ClicARapporter {
+  readonly nature: Nature;
   readonly id: string;
   readonly maintenantMs: number;
   readonly userAgent: string | null;
+  readonly robot: boolean;
 }
 
 export interface ThrottleClic {
@@ -146,11 +167,11 @@ export interface DependancesClic {
   readonly maintenantMs: () => number;
 }
 
-function redirection(): Response {
+function redirection(destination: string = DESTINATION_CLIC): Response {
   return new Response(null, {
     status: 302,
     headers: {
-      location: DESTINATION_CLIC,
+      location: destination,
       "cache-control": "no-store",
       "x-robots-tag": "noindex, nofollow",
       "referrer-policy": "no-referrer",
@@ -162,8 +183,8 @@ function redirection(): Response {
  * Une ligne par clic, `[clic] <id> <issue>`. Ni jeton, ni navigateur, ni
  * corps de réponse : l'identifiant suffit à recouper avec le cockpit.
  */
-function journaliser(id: string, issue: string | number, normale: boolean): void {
-  const ligne = `[clic] ${id} ${issue}`;
+function journaliser(nature: Nature, id: string, issue: string | number, normale: boolean): void {
+  const ligne = `[${nature}] ${id} ${issue}`;
   if (normale) console.info(ligne);
   else console.error(ligne);
 }
@@ -181,7 +202,7 @@ function estTimeout(erreur: unknown): boolean {
 async function enregistrer(clic: ClicARapporter, deps: DependancesClic): Promise<void> {
   const jeton = deps.jeton()?.trim();
   if (!jeton) {
-    journaliser(clic.id, "non_configure", false);
+    journaliser(clic.nature, clic.id, "non_configure", false);
     return;
   }
   try {
@@ -195,15 +216,32 @@ async function enregistrer(clic: ClicARapporter, deps: DependancesClic): Promise
         id: clic.id,
         cliqueLe: new Date(clic.maintenantMs).toISOString(),
         navigateur: nettoyerNavigateur(clic.userAgent),
-        robotProbable: estRobotProbable(clic.userAgent),
+        robotProbable: clic.robot,
+        ...(clic.nature === "ouverture" ? { nature: "ouverture" } : {}),
       }),
       signal: AbortSignal.timeout(DELAI_COCKPIT_MS),
     });
-    journaliser(clic.id, reponse.status, STATUTS_NORMAUX.has(reponse.status));
+    journaliser(clic.nature, clic.id, reponse.status, STATUTS_NORMAUX.has(reponse.status));
     // Corps inutile : le libérer rend la connexion au pool.
     await reponse.body?.cancel().catch(() => undefined);
   } catch (erreur) {
-    journaliser(clic.id, estTimeout(erreur) ? "timeout" : "reseau", false);
+    journaliser(clic.nature, clic.id, estTimeout(erreur) ? "timeout" : "reseau", false);
+  }
+}
+
+function planifierEnregistrement(
+  requete: Request,
+  nature: Nature,
+  id: string,
+  deps: DependancesClic,
+): void {
+  if (requete.method !== "GET" || !idClicValide(id)) return;
+  const maintenantMs = deps.maintenantMs();
+  const userAgent = requete.headers.get("user-agent");
+  const robot = nature === "ouverture" ? ouvertureRobotProbable(userAgent) : estRobotProbable(userAgent);
+  if (deps.throttle.autoriser(id, maintenantMs, robot)) {
+    const clic: ClicARapporter = { nature, id, maintenantMs, userAgent, robot };
+    deps.planifier(() => enregistrer(clic, deps));
   }
 }
 
@@ -217,14 +255,20 @@ export function traiterClic(
   id: string,
   deps: DependancesClic,
 ): Response {
-  if (requete.method === "GET" && idClicValide(id)) {
-    const maintenantMs = deps.maintenantMs();
-    const userAgent = requete.headers.get("user-agent");
-    const robot = estRobotProbable(userAgent);
-    if (deps.throttle.autoriser(id, maintenantMs, robot)) {
-      const clic: ClicARapporter = { id, maintenantMs, userAgent };
-      deps.planifier(() => enregistrer(clic, deps));
-    }
-  }
+  planifierEnregistrement(requete, "clic", id, deps);
   return redirection();
+}
+
+/**
+ * Affichage du logo de la signature : toujours redirigé vers l'image fixe,
+ * relayé au cockpit comme une ouverture. Mêmes règles que le clic, avec son
+ * propre plafond (`deps.throttle` distinct dans la route).
+ */
+export function traiterOuverture(
+  requete: Request,
+  id: string,
+  deps: DependancesClic,
+): Response {
+  planifierEnregistrement(requete, "ouverture", id, deps);
+  return redirection(DESTINATION_OUVERTURE);
 }
