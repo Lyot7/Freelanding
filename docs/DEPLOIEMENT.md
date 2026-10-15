@@ -69,13 +69,34 @@ rend les oublis difficiles à repérer. D'où ce tableau.
 
 ## Le déploiement automatique
 
-Coolify redéploie à chaque poussée sur `main` **si le webhook GitHub est
-posé**. Dans Coolify, onglet **Webhooks** de l'application, copier l'URL de
-déploiement, puis dans GitHub, `Settings` → `Webhooks` → `Add webhook`, coller
-l'URL, choisir `application/json` et l'événement `push` seul.
+Chaque poussée sur `main` redéploie le site, par un **webhook manuel** : le
+dépôt est lu par la source « Public GitHub » de Coolify, sans GitHub App, donc
+Coolify ne pose rien tout seul.
 
-Le raccourci : si le dépôt est connecté par une **GitHub App** plutôt que par
-une URL publique, Coolify pose le webhook tout seul et il n'y a rien à faire.
+| Réglage du webhook GitHub | Valeur |
+| --- | --- |
+| Payload URL | `https://coolify.eliottbouquerel.fr/webhooks/source/github/events/manual` |
+| Content type | `application/json` |
+| Secret | le « GitHub Webhook Secret » de l'onglet **Webhooks** de l'application Coolify |
+| Événements | `push` seul |
+
+**L'adresse passe par le domaine de Coolify, jamais par l'IP et le port.**
+Jusqu'au 2026-10-15, le webhook visait `http://82.112.254.43:8000/…` : le port
+8000 n'est plus ouvert depuis que Coolify est servi derrière son domaine, chaque
+poussée échouait en `502 failed to connect to host`, et aucune ne déclenchait de
+déploiement. Rien ne le signalait côté site : il faut regarder les livraisons.
+
+Pour vérifier :
+
+```bash
+gh api repos/Lyot7/Freelanding/hooks --jq '.[] | [.config.url, .last_response.code] | @tsv'
+gh api repos/Lyot7/Freelanding/hooks/590325270/deliveries --jq '.[:3][] | [.delivered_at, .event, .status_code] | @tsv'
+```
+
+Une livraison `push` en `200` doit être suivie d'un déploiement visible dans
+Coolify. Le secret se repose sans l'afficher, en lisant la valeur de Coolify
+par l'API et en la passant à `gh api -X PATCH … --input -` par l'entrée
+standard.
 
 ## Vérifier après le premier déploiement
 

@@ -1,5 +1,6 @@
 import { ImageProgressive } from "@/components/ui/ImageProgressive";
 import type { ReactNode } from "react";
+import { MarkdownEnLigne } from "@/components/blog/en-ligne";
 import { aPartirDe, prestation, suiviMensuel, type PrestationId } from "@/content/offre";
 
 /**
@@ -167,6 +168,9 @@ export function Stat({ value, label }: { value: string; label: string }) {
  * Les numéros sont posés par le composant, pas par une liste ordonnée du
  * markdown : ils reprennent la numérotation du site (deux chiffres, capitales,
  * couleur d'accent), la même que les prestations et la FAQ.
+ *
+ * Chaque étape est une chaîne JavaScript, que MDX ne lit pas comme du markdown :
+ * `MarkdownEnLigne` y rend les liens, le gras et l'italique.
  */
 export function Steps({ items }: { items: readonly string[] }) {
   return (
@@ -176,7 +180,9 @@ export function Steps({ items }: { items: readonly string[] }) {
           <span className="mt-[2px] shrink-0 text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-accent-ink">
             {String(index + 1).padStart(2, "0")}
           </span>
-          <span className={CORPS}>{item}</span>
+          <span className={CORPS}>
+            <MarkdownEnLigne texte={item} />
+          </span>
         </li>
       ))}
     </ol>
