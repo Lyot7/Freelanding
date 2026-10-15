@@ -443,7 +443,7 @@ export function ServicePage({
                 quelqu'un qui arrive de Google sur « site internet Caen », et
                 « Accueil / Prestations / Site vitrine / Caen » posé sur la
                 photo décrivait une arborescence que son adresse n'a pas. */}
-            {local ? null : (
+            {local && "zones" in local ? null : (
               <div className="tablet:col-start-1 tablet:row-start-1">
                 <FilAriane
                   marches={marchesFilAriane(prestation, local)}
@@ -466,7 +466,9 @@ export function ServicePage({
                   maintenant ce que le client cherche ; le nom de catalogue,
                   lui, reste affiché sur la dernière marche du fil d'Ariane, à
                   quelques centimètres au-dessus. */}
-              <h1 className="max-w-[510px] text-[63px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] tablet:text-[78px] desktop:text-[98px]">
+              {/* Corps plafonné par la colonne dès 810 : « TRANSPORT » (5,55 em) sortait
+                  de 53 px à 78 px de corps (relevé du 2026-10-15). */}
+              <h1 className="max-w-[510px] text-[63px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] tablet:text-[min(78px,calc((50vw-24px)/5.7))] desktop:text-[98px]">
                 {local?.h1 ?? servicePageSeo[prestation.id].h1}
               </h1>
             </Reveal>

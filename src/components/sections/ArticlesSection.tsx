@@ -118,7 +118,7 @@ function Heading({
       <LineReveal
         as="h2"
         lines={[...lines]}
-        className={`relative m-0 flex w-full flex-col justify-center p-0 text-left text-[clamp(40px,13.6vw,52px)] font-semibold uppercase leading-[0.82] tracking-[-0.05em] text-background desktop:text-[92px] ${HEADING_TABLET[tabletPx]}`}
+        className={`relative m-0 flex w-full flex-col justify-center p-0 text-left text-[clamp(40px,13.6vw,52px)] font-semibold uppercase leading-[0.82] tracking-[-0.05em] text-background desktop:text-[min(92px,calc((50vw-60px)/6.6))] ${HEADING_TABLET[tabletPx]}`}
         lineClassName={lineClass}
       />
     </div>

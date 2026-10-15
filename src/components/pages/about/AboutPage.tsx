@@ -525,7 +525,7 @@ function AboutParcours({
           <LineReveal
             as="h2"
             lines={[...parcours.titleLines]}
-            className="m-0 flex w-full flex-col p-0 text-left text-[52px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] tablet:text-right tablet:text-[68px] desktop:text-[92px]"
+            className="m-0 flex w-full flex-col p-0 text-left text-[52px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] tablet:text-right tablet:text-[64px] desktop:text-[92px]"
             lineClassName="w-full overflow-hidden leading-[0.82]"
           />
         </div>

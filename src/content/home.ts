@@ -135,10 +135,12 @@ export const homeContent: HomeContent = {
      * LIGNES DE 12 SIGNES AU PLUS, le titre est rendu à 92 px dans une demi-
      * colonne de 683 px, aligné à droite dès 810.
      */
-    marquee: "Votre client vous compare avant d’appeler.",
-    marqueeLines: ["Votre client", "vous compare", "avant", "d’appeler."],
+    marquee: "On vous compare avant d’appeler.",
+    // Dix signes au plus par ligne : « vous compare » débordait sa colonne
+    // de 12 à 17 px entre 810 et 1200 (relevé du 2026-10-15).
+    marqueeLines: ["On vous", "compare", "avant", "d’appeler."],
     statement:
-      "Il ouvre votre site puis celui du concurrent, et il appelle celui qui rassure. Regardez ce que j’ai livré.",
+      "Votre client ouvre votre site puis celui du concurrent, et il appelle celui qui rassure. Regardez ce que j’ai livré.",
     // Rendue en noir 60 %, ce fragment passe en noir plein.
     statementEmphasis: ["il appelle celui qui rassure."],
     vintage: "2026©",
