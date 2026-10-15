@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { ALT_MOTIF, articlesDuCockpit } from "./blog-cockpit.ts";
+import { articlesDuCockpit } from "./blog-cockpit.ts";
 import { blogPosts } from "./blog.ts";
 
 /**
@@ -15,7 +15,7 @@ const entree = {
   description:
     "Ce que coûte un site vitrine à Caen en 2026, poste par poste, et ce qui fait varier le devis.",
   readingTime: "7 min de lecture",
-  motif: "refonte",
+  alt: "Une spirale de traits blancs sur fond noir, le tour de l’année en cours surligné en vert",
   validationId: "00000000-0000-4000-8000-000000000001",
 };
 
@@ -26,7 +26,8 @@ describe("articles du cockpit", () => {
     expect(article.heroImage.src).toBe("/images/heros/blog-prix-site-vitrine-caen.jpg");
     expect(article.seo.ogImage.src).toBe("/images/og-blog-prix-site-vitrine-caen.jpg");
     expect(article.heroImage.og).toEqual(article.seo.ogImage);
-    expect(article.cover.alt).toBe(ALT_MOTIF.refonte);
+    expect(article.cover.alt).toBe(entree.alt);
+    expect(article.heroImage.alt).toBe(entree.alt);
     const autres = blogPosts.flatMap((p) => [p.cover.src, p.heroImage?.src]);
     expect(autres).not.toContain(article.heroImage.src);
     expect(autres).not.toContain(article.cover.src);
@@ -36,8 +37,8 @@ describe("articles du cockpit", () => {
     expect(article.author.name).toBe("Eliott Bouquerel");
   });
 
-  test("un motif inconnu casse le build au lieu de laisser un cadre vide", () => {
-    expect(() => articlesDuCockpit(blogPosts, [{ ...entree, motif: "inconnu" }])).toThrow("motif inconnu inconnu");
+  test("un visuel sans texte de remplacement casse le build au lieu de laisser une image muette", () => {
+    expect(() => articlesDuCockpit(blogPosts, [{ ...entree, alt: " " }])).toThrow("visuel sans texte de remplacement");
   });
 
   test("sans article publié pour en reprendre l'auteur, le registre le dit", () => {

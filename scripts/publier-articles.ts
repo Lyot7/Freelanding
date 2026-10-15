@@ -20,8 +20,8 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import type { ArticleCockpit, Motif } from "../src/content/blog-cockpit";
-import { DESSINS, fabriquerVisuels } from "./visuel-articles-decision.mjs";
+import type { ArticleCockpit } from "../src/content/blog-cockpit";
+import { rendreVisuel } from "./visuel-article.mjs";
 
 const RACINE = join(import.meta.dirname, "..");
 const REGISTRE = join(RACINE, "src/content/articles-cockpit.json");
@@ -47,6 +47,8 @@ type Validation = {
       motCle: { requete: string };
       motsCles?: { requete: string }[];
       pageServie: { url: string };
+      /** Le SVG conçu pour l'article par le rédacteur, contrôlé par le cockpit. */
+      visuel?: { svg: string; alt: string };
     };
   } | null;
 };
@@ -80,20 +82,9 @@ function dureeLecture(corps: string): string {
   return `${Math.max(1, Math.ceil(mots / 200))} min de lecture`;
 }
 
-/** Le motif du visuel et la rubrique suivent l'offre que l'article sert. */
-function visuelPour(pageServie: string): { motif: Motif; categorie: string } {
-  if (pageServie.includes("logiciel")) return { motif: "odoo", categorie: "Outils métier" };
-  if (pageServie.includes("site-vitrine") || pageServie.includes("creation-site")) {
-    return { motif: "wordpress", categorie: "Méthode" };
-  }
-  return { motif: "refonte", categorie: "Méthode" };
-}
-
-/** Graine tirée du slug (FNV-1a) : le même article redonne la même image. */
-function graine(slug: string): number {
-  let h = 0x811c9dc5;
-  for (const c of slug) h = Math.imul(h ^ c.charCodeAt(0), 0x01000193) >>> 0;
-  return h;
+/** La rubrique suit l'offre que l'article sert, quand le rédacteur n'en a pas donné. */
+function rubriquePour(pageServie: string): string {
+  return pageServie.includes("logiciel") ? "Outils métier" : "Méthode";
 }
 
 async function validesDuCockpit(): Promise<Validation[]> {
@@ -128,24 +119,27 @@ async function ecrire(): Promise<void> {
       ignores.push(`${v.id} : ni titre ni slug`);
       continue;
     }
+    if (!article.visuel) {
+      ignores.push(`${article.slug} : pas encore de visuel, le rédacteur le pose au cockpit`);
+      continue;
+    }
     const chemin = join(ARTICLES, `${article.slug}.mdx`);
     if (connus.has(article.slug) || existsSync(chemin)) {
       ignores.push(`${article.slug} : déjà présent sur le site`);
       continue;
     }
     const corps = (v.contenuCorrige ?? v.contenu).trim();
-    const { motif, categorie } = visuelPour(article.pageServie.url);
+    await rendreVisuel(article.slug, article.visuel.svg, RACINE);
     writeFileSync(chemin, `${corps}\n`);
-    await fabriquerVisuels(article.slug, DESSINS[motif], graine(article.slug), RACINE);
     registre.unshift({
       slug: article.slug,
       title: v.titre,
       date: aujourdhui(),
-      category: article.categorie ?? categorie,
+      category: article.categorie ?? rubriquePour(article.pageServie.url),
       description: article.description,
       readingTime: dureeLecture(corps),
       tags: [article.motCle.requete, ...(article.motsCles ?? []).map((m) => m.requete)].slice(0, 5),
-      motif,
+      alt: article.visuel.alt,
       validationId: v.id,
     });
     connus.add(article.slug);
