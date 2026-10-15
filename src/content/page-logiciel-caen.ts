@@ -79,6 +79,11 @@ export const pageLogicielCaen: PageLocale = {
         description: "Quand il vous faut d’abord un site pour présenter votre entreprise.",
       },
       {
+        libelle: "Automatisation et IA à Caen",
+        href: "/automatisation-ia-caen",
+        description: "Quand une tâche répétitive se règle sans logiciel entier.",
+      },
+      {
         libelle: "Réserver un appel",
         href: "#rendez-vous",
         description: "Choisissez un créneau en visio pour parler de votre projet.",
@@ -182,6 +187,21 @@ export const pageLogicielCaen: PageLocale = {
         "Un ERP sur mesure réunit les pans de votre activité sur une seule base : les devis, le stock, le planning, la facturation. Il se construit module par module, et son prix se compte surtout en modules. S’y ajoutent les outils à relier et la reprise de votre historique.",
         "Le nombre de personnes qui s’en servent ne change rien : à 3 comme à 40, vous payez le même prix, et aucune licence ne s’ajoute chaque mois.",
       ],
+      liens: {
+        titre: "Pour aller plus loin",
+        items: [
+          {
+            libelle: "ERP sur mesure",
+            href: "/services/logiciel-metier/erp-sur-mesure",
+            description: "Devis, commandes, stock et factures reliés dans un seul outil.",
+          },
+          {
+            libelle: "Logiciel GMAO et SAV",
+            href: "/services/logiciel-metier/maintenance-sav",
+            description: "Le bon d’intervention signé sur téléphone, envoyé en facturation le soir même.",
+          },
+        ],
+      },
       points: [
         {
           titre: "1 module",
