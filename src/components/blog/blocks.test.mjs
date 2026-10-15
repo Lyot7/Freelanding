@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
@@ -59,9 +60,25 @@ describe("Steps", () => {
     expect(rendu(["Une étape, 3 000 €."])).toContain(">Une étape, 3 000 €.</span>");
   });
 
+  it("rend le code en ligne et le retour à la ligne forcé", () => {
+    const html = rendu(["Lancer `bun test`  \npuis relire."]);
+    expect(html).toMatch(/<code[^>]*>bun test<\/code>/);
+    expect(html).toContain("<br/>");
+  });
+
+  it("garde en texte une syntaxe que le rendu ne porte pas", () => {
+    expect(rendu(["Voir ![schéma](/s.png) ici."])).toContain(">Voir ![schéma](/s.png) ici.</span>");
+  });
+
+  it("rend tel quel ce qui ne forme pas une phrase", () => {
+    expect(rendu(["- pas une liste"])).toContain(">- pas une liste</span>");
+    expect(rendu(["Un.\n\nDeux."])).toContain(">Un.\n\nDeux.</span>");
+    expect(rendu([""])).toContain("></span>");
+  });
+
   // Tous les usages réels : aucune étape d'article publiée ne doit montrer sa
   // syntaxe markdown à l'écran.
-  const DOSSIER = join(import.meta.dir, "../../content/articles");
+  const DOSSIER = fileURLToPath(new URL("../../content/articles", import.meta.url));
   for (const fichier of readdirSync(DOSSIER).filter((f) => f.endsWith(".mdx"))) {
     const source = readFileSync(join(DOSSIER, fichier), "utf8");
     for (const [, tableau] of source.matchAll(/<Steps items=\{(\[[\s\S]*?\])\}\s*\/>/g)) {

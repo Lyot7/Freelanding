@@ -68,13 +68,13 @@ function rendre(noeuds: readonly Noeud[], source: string): ReactNode[] {
         return <CodeEnLigne key={index}>{noeud.value}</CodeEnLigne>;
       case "break":
         return <br key={index} />;
-      default:
+      default: {
         // Une syntaxe que ce rendu ne porte pas (image, HTML brut) garde son
-        // texte source : rien ne disparaît de la page.
-        return source.slice(
-          noeud.position?.start.offset ?? 0,
-          noeud.position?.end.offset ?? 0,
-        );
+        // texte source : rien ne disparaît de la page. `fromMarkdown` pose
+        // toujours une position sur les nœuds qu'il produit.
+        const { start, end } = noeud.position as NonNullable<Noeud["position"]>;
+        return source.slice(start.offset, end.offset);
+      }
     }
   });
 }
