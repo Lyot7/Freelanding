@@ -368,7 +368,6 @@ describe("date de réécriture", () => {
       expect([post.slug, lastmod(post.slug)]).toEqual([post.slug, post.updated ?? post.date]);
     }
     expect(blogPosts.some((p) => p.updated)).toBe(true);
-    expect(blogPosts.some((p) => !p.updated)).toBe(true);
   });
 
   test("l'index du blog vaut la plus récente des dates", () => {

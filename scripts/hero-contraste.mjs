@@ -51,7 +51,6 @@ const PAGES = [
   "/legal/politique-de-confidentialite",
   "/legal/conditions-generales-de-vente",
   "/page-introuvable",
-  "/blog/a-qui-appartient-votre-fichier-client",
   "/blog/landing-page-ou-page-produit",
   "/blog/site-e-commerce-lent-ce-que-ca-coute",
   "/blog/shopify-ou-site-sur-mesure",

@@ -42,7 +42,6 @@ const ROUTES = [
   "/blog",
   "/blog/dessiner-avant-de-coder",
   "/blog/ce-que-google-montre-de-vous",
-  "/blog/a-qui-appartient-votre-fichier-client",
   "/blog/formulaire-inscription-erreurs-saisie",
   "/services/site-vitrine",
   "/services/logiciel-metier",
