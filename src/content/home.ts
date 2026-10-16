@@ -1,4 +1,4 @@
-import type { HeroProof, HomeContent } from "@/lib/content/types";
+import type { HeroComparaison, HomeContent } from "@/lib/content/types";
 import { slugsMisEnAvant } from "@/content/blog";
 import { faqItems } from "@/content/faq";
 import { services } from "@/content/services";
@@ -43,32 +43,27 @@ const TITRE_ACCUEIL = PORTES.map((porte) => porte.lines.join(" ")).join(" ");
 const POURQUOI_CE_PRIX =
   "Je conçois et je code moi-même, sans chef de projet ni structure à payer : votre budget va au produit.";
 
-/** La ligne de preuve du héros, tirée du chiffre Würth de `stats.ts`. */
-function preuveWurth(): HeroProof | undefined {
-  const stat = howWeDoItStats.find((s) => s.label.includes("Würth"));
-  if (!stat) return undefined;
-  return {
-    // Espace fine insécable avant le signe pour cent.
-    value: `${stat.prefix ?? ""}${stat.value}\u202F${stat.suffix ?? ""}`,
-    label: stat.label,
-    href: "/realisations/wurth-creation-de-compte",
-  };
-}
-
 /*
- * « 50 % DU PRIX D'UNE AGENCE », formulé pour rester vrai : le prix d'entrée
- * du site rapporté à la médiane d'un site de PME relevée sur des budgets
- * d'agences, source liée. Le pourcentage est calculé, jamais tapé : si le
- * plancher ou la médiane bougent, la phrase suit.
+ * LE PRIX D'UNE AGENCE ET LE MIEN, POUR LE MÊME SITE, décision d'Eliott du
+ * 2026-10-16. Le « 50 % du prix d'un site de PME en agence » rapportait mon
+ * plancher à la MÉDIANE des agences : un visiteur y lisait « son prix le plus
+ * bas contre leur prix moyen, forcément moitié moins, mais pour quelle
+ * qualité ? ». La comparaison se fait donc à livrable égal : la fourchette
+ * qu'une agence facture un site vitrine soigné, design et ergonomie compris,
+ * contre ce que coûte le mien, qui comprend la même chose (`offre.ts`).
+ * Chiffres et source : `repereAgenceSite`.
  */
-function preuveAgence(): HeroProof {
-  const part = Math.round((prestation("vitrine").plancher / repereAgenceSite.mediane) * 100);
+function comparaisonAgence(): HeroComparaison {
+  const agence = repereAgenceSite;
   return {
-    value: `${part}\u202F%`,
-    label: `du prix d’un site de PME en agence, médiane ${euros(repereAgenceSite.mediane)}`,
+    sujet: "Un site vitrine soigné, design et ergonomie compris",
+    lignes: [
+      { qui: "En agence", prix: `${euros(agence.soigneMin).replace(/\s€$/u, "")} à ${euros(agence.soigneMax)}` },
+      { qui: "Avec moi", prix: `dès ${ENTREE_VITRINE}`, fort: true },
+    ],
     source: {
-      label: `${repereAgenceSite.source.nom}, ${repereAgenceSite.source.releve}`,
-      href: repereAgenceSite.source.href,
+      label: `${agence.source.nom}, ${agence.source.releve}`,
+      href: agence.source.href,
     },
   };
 }
@@ -92,14 +87,11 @@ export const homeContent: HomeContent = {
     subtitle: POURQUOI_CE_PRIX,
     subtitleParagraphs: [{ text: POURQUOI_CE_PRIX }],
     /*
-     * DEUX PREUVES DANS LE PREMIER ÉCRAN : le seul résultat mesuré du site,
-     * lu dans `stats.ts` pour ne jamais diverger de la section chiffres, puis
-     * la comparaison de prix, sourcée. Aucune ne présente une entreprise comme
-     * cliente.
+     * UNE SEULE PREUVE DANS LE PREMIER ÉCRAN depuis le 2026-10-16 : le prix
+     * d'une agence et le mien, pour le même site. Le −92 % de Würth est sorti
+     * du héros, décision d'Eliott ; il reste dans la section chiffres.
      */
-    proofs: [preuveWurth(), preuveAgence()].filter(
-      (preuve): preuve is HeroProof => preuve !== undefined,
-    ),
+    comparison: comparaisonAgence(),
     // Fond du hero : macro d'un mouvement d'horlogerie, asset généré et
     // possédé (2026-08-10), calibré sombre par `scripts/hero-loop.mjs`
     // (moyenne 13,7/255) pour porter du texte blanc.
@@ -120,6 +112,53 @@ export const homeContent: HomeContent = {
         alt: "",
         width: 400,
         height: 400,
+      },
+    },
+  },
+
+  /*
+   * LA SECTION NOIRE MONTRE LE LOGICIEL depuis le 2026-10-16, idée d'Eliott :
+   * « On vous compare avant d'appeler » parle au client du site vitrine, il
+   * en fallait une pour celui de l'outil. Elle remplace la prise de parole
+   * sur la méthode, dont elle garde la citation, qui parle de logiciel.
+   *
+   * LA DÉMONSTRATION EST UN EXEMPLE, et le dit : une tâche que la plupart des
+   * PME refont à la main, découpée en étapes, sans durée inventée. Ce qui
+   * change entre les deux onglets se compte : qui fait chaque étape.
+   */
+  logiciel: {
+    eyebrow: prestation("logiciel").nom,
+    // Lignes de douze signes au plus : le titre est rendu à 92 px dans une
+    // demi-colonne, comme celui du showreel.
+    titleLines: ["Vos heures", "valent mieux", "qu’un", "tableur."],
+    statement:
+      "Une commande arrive par mail, vous la recopiez dans un tableur, vous vérifiez le stock, puis vous retapez le devis. Je construis l’outil qui enchaîne ces étapes à votre place : il vous reste à relire et à envoyer.",
+    statementEmphasis: ["il vous reste à relire et à envoyer."],
+    cta: {
+      label: "Voir La Solution métier",
+      href: `/services/${prestation("logiciel").slug}`,
+    },
+    demo: {
+      titre: "Exemple : une commande reçue par mail",
+      onglets: { main: "À la main", outil: "Avec l’outil" },
+      acteurs: { vous: "Vous", outil: "Automatique" },
+      main: [
+        { libelle: "Lire la commande dans le mail", auto: false },
+        { libelle: "Recopier chaque ligne dans le tableur", auto: false },
+        { libelle: "Vérifier le stock article par article", auto: false },
+        { libelle: "Retaper le devis dans un document", auto: false },
+        { libelle: "Envoyer le devis et noter de relancer", auto: false },
+      ],
+      outil: [
+        { libelle: "La commande est lue dès son arrivée", auto: true },
+        { libelle: "Les lignes entrent dans votre base", auto: true },
+        { libelle: "Le stock est vérifié, les manques signalés", auto: true },
+        { libelle: "Le devis est prêt, à vos prix", auto: true },
+        { libelle: "Vous relisez et vous envoyez", auto: false },
+      ],
+      bilan: {
+        main: "Cinq étapes pour vous, à chaque commande.",
+        outil: "Une étape pour vous : relire et envoyer.",
       },
     },
   },
@@ -180,69 +219,48 @@ export const homeContent: HomeContent = {
 
   about: {
     /*
-     * H2 DEPUIS LE 2026-09-24 (phase E). Sa phrase précédente, « Des sites qui
-     * amènent des clients, des outils qui te rendent des heures », est devenue
-     * le titre du héros et le seul h1 de l'accueil. La répéter un écran plus
-     * bas l'aurait affaiblie.
+     * UNE VRAIE SECTION « À PROPOS » depuis le 2026-10-16, demande d'Eliott :
+     * le héros dit ce que je fais, la deuxième section dit qui le fait. Eliott
+     * est seul : c'est son argument face aux agences, et le visiteur doit
+     * savoir à qui il parle avant de lire les offres.
      *
-     * LA SECTION RESTE, avec un titre à elle, parce qu'elle porte le seul
-     * texte de l'accueil qui dit COMMENT Eliott travaille : il part de ce que
-     * le site doit rapporter, et décide de ce qui ne se voit pas avant le
-     * code. Le titre donne le point de départ, le corps le développe dessous
-     * sans reprendre ses mots.
+     * L'ancien titre, « Je pars de ce que votre site doit rapporter », parlait
+     * de méthode ; l'idée reste, en fin de récit.
      *
-     * DÉCOUPAGE : trois lignes aux unités de sens. Toutes reçoivent le corps
+     * DÉCOUPAGE : deux lignes aux unités de sens. Toutes reçoivent le corps
      * dicté par la plus large (cf. `TitleFitText`).
      */
-    title: "Je pars de ce que votre site doit rapporter.",
-    titleLines: ["Je pars de ce", "que votre site", "doit rapporter."],
-    // FIDÉLITÉ : la section About du source n'a QU'UN paragraphe (cf.
-    // framer-html/about.ts, RichText « People decide… »). Les paragraphes
-    // précédemment ajoutés provenaient de showreel/numbers → retirés.
+    title: "Moi, c’est Eliott.",
+    titleLines: ["Moi,", "c’est Eliott."],
+    /*
+     * LE PARCOURS EST CELUI DE `/a-propos` (`about.ts`), relevé sur LinkedIn,
+     * le CV et Malt : Médiapilote et Würth France en stage, MeilleursBiens et
+     * MECA SERVICES en alternance. Aucun n'est présenté comme client.
+     */
     body: [
-      "Un site peut impressionner et ne rien rapporter du tout. C’est même devenu courant : une belle carrosserie posée sur un moteur lent, sortie en quelques heures, qui n’a jamais eu à répondre à la question de savoir à quoi elle sert. Je prends le problème dans l’autre sens. Ce que vous voyez est dessiné pour votre métier ; ce que vous ne voyez pas, l’architecture, la vitesse, ce que les moteurs de recherche lisent, est décidé avant la première ligne de code.",
+      "Je suis développeur full-stack, installé à Caen, et je travaille seul. Du premier appel à la mise en ligne, vous parlez à celui qui conçoit et qui code votre projet.",
+      "Avant de me lancer, j’ai développé chez Médiapilote, Würth France, MeilleursBiens, puis MECA SERVICES, où je tenais aussi la boutique en ligne. J’y ai appris à partir de ce qu’un site ou un outil doit rapporter, et à décider avant la première ligne de code de ce qui ne se voit pas : la vitesse, l’architecture, ce que lisent les moteurs de recherche.",
     ],
-    // Emphase blanche (source Framer) : ces expressions passent en blanc plein
-    // au milieu du paragraphe rendu en blanc 70 %.
+    // Emphase (source Framer) : ces expressions passent en noir plein au
+    // milieu du paragraphe rendu à 70 %.
     highlights: [
-      "une belle carrosserie posée sur un moteur lent",
-      "décidé avant la première ligne de code",
+      "je travaille seul",
+      "vous parlez à celui qui conçoit et qui code votre projet",
+      "partir de ce qu’un site ou un outil doit rapporter",
     ],
     /*
-     * GRILLE D'INFOS, MILLÉSIME ET COMPTEUR VIDÉS le 2026-09-24 (panel design,
-     * phase C), comme sur `/a-propos` qui monte la même section sans eux :
-     *   - « Lancé en 2026 » se lisait « débutant », sans rien apprendre au
-     *     client ;
-     *   - « Développeur freelance » redisait la carte fondateur du héros,
-     *     un écran plus haut ;
-     *   - « 2026© » est déjà le millésime du showreel ;
-     *   - « 1 / Projet à la fois » est dit par la section chiffres, « Ton
-     *     projet n'attend personne ».
-     * Les champs restent dans le type : la section sait encore les rendre.
+     * GRILLE D'INFOS ET COMPTEUR RENDUS le 2026-10-16 : Eliott trouvait la
+     * section vide de repères. Ils disent ce qu'aucune autre section ne dit,
+     * le métier, le lieu et le parcours ; « 1 projet à la fois » reste à la
+     * section chiffres.
      */
-    cta: { label: "À propos", href: "/a-propos" },
-    // PHOTO PLEINE CADRE depuis le 2026-08-27. Ce cadre portait le portrait
-    // DÉTOURÉ sur aplat accent, alors que la source y met une photographie qui
-    // remplit le cadre bord à bord. Sur un aplat, deux défauts se cumulaient :
-    // le sujet flottait (141 px d'aplat vide au-dessus de la tête sur 885, soit
-    // 16 % du fichier) et le calque de grain de la section dessinait un
-    // rectangle sale sur la couleur unie. Une photographie règle les deux d'un
-    // coup, et rend au grain sa raison d'être.
-    // Recadrée au rapport 0,637584 du cadre, servie en niveaux de gris par le
-    // composant. Le détourage vert reste employé sur la vignette ronde et sur
-    // la citation de la section tarifs.
-    //
-    // CADRAGE RESSERRÉ le 2026-08-27. Le plan précédent descendait au mollet et
-    // laissait 12 % de ciel au-dessus de la tête : dans un cadre de 341 px de
-    // large au point d'arrêt bureau, le visage tombait à une trentaine de
-    // pixels et le sujet devenait indistinct. Nouveau plan taille, coupé au
-    // haut du jean : tête à 8 % du bord haut, visage lisible à la taille réelle
-    // d'affichage. Recadré depuis l'original `IMG_0738.HEIC` (4284 × 5712 après
-    // orientation), fenêtre 1430 × 2243 à +1439/+1577, rééchantillonné en
-    // 1035 × 1623 — mêmes dimensions de fichier qu'avant, aucune mise en page
-    // ne bouge.
-    // Portrait sans nom écrit à côté : c'est une image de contenu, elle porte
-    // un texte alternatif (audit du 2026-09-28).
+    launchedLabel: "Développeur full-stack",
+    projectsLabel: "Caen, et en visio",
+    counter: {
+      value: "4",
+      caption: "entreprises où j’ai développé avant de me lancer",
+    },
+    cta: { label: "Mon parcours", href: "/a-propos" },
     image: {
       src: "/images/eliott-nature-bloc.jpg",
       alt: "Portrait d’Eliott Bouquerel, développeur web freelance, au bord d’un lac",
@@ -432,17 +450,24 @@ export const homeContent: HomeContent = {
    * seule, deux fois plus longue. La méthode les sépare, et « Pourquoi moi »
    * finit sur le rendez-vous juste avant la FAQ.
    *
+   * L'ACCORDÉON DES PRESTATIONS A QUITTÉ L'ACCUEIL le 2026-10-16 : ses deux
+   * offres, leurs prix et leurs liens sont déjà les deux portes du héros, et
+   * son chapô (« Je pars de votre façon de travailler… ») redisait le sous-
+   * titre. Chaque offre a désormais sa section : le site vitrine avec « On
+   * vous compare avant d'appeler » et les réalisations, le logiciel avec la
+   * section noire qui le montre au travail. `home.services` reste dans la
+   * donnée : la section sait toujours le rendre.
+   *
    * LES TARIFS NE SONT PLUS SUR L'ACCUEIL depuis le 2026-09-07 : chaque page de
    * prestation porte son offre et sa prise de rendez-vous.
    */
   sectionOrder: [
     "hero",
     "about",
-    "services",
     "showreel",
     "works",
     "numbers",
-    "methode",
+    "logiciel",
     "whyUs",
     "faq",
     "articles",

@@ -85,9 +85,11 @@ export const faqItems: FaqItem[] = [
        l'échéancier restent des pourcentages, pas des montants.
 
        LE REPÈRE D'AGENCE (2026-10-15) vient lui aussi d'`offre.ts`, avec sa
-       source et sa date. Une réponse de FAQ n'a pas de champ de lien : le
+       source et sa date. Depuis le 2026-10-16, il compare à livrable égal
+       (un site vitrine soigné) et non plus mon plancher à la médiane des
+       agences, décision d'Eliott. Une réponse de FAQ n'a pas de champ de lien : le
        lien vers la source est posé sur `/services/site-vitrine/prix`. */
-    answer: `Un site démarre à ${prixPlancher(prestation("vitrine"))} HT, une solution métier à ${prixPlancher(prestation("logiciel"))} HT. Pour un site de PME, ${repereAgenceSite.source.nom} relève une médiane de ${euros(repereAgenceSite.mediane)} en agence (${repereAgenceSite.source.releve}) : je demande environ deux fois moins, parce que je conçois et je code moi-même, sans chef de projet ni structure à payer. Au-delà du plancher, le prix dépend de votre projet : le nombre de pages ou de modules, les outils à relier, la reprise de vos données. Je fixe le montant au devis, avant de commencer, et il ne bouge plus. Vous versez 40 % à la signature, 30 % à mi-parcours et 30 % à la livraison.`,
+    answer: `Un site démarre à ${prixPlancher(prestation("vitrine"))} HT, une solution métier à ${prixPlancher(prestation("logiciel"))} HT. Un site vitrine soigné, design et ergonomie compris, se facture ${euros(repereAgenceSite.soigneMin)} à ${euros(repereAgenceSite.soigneMax)} en agence selon ${repereAgenceSite.source.nom} (${repereAgenceSite.source.releve}). Le mien comprend la même chose et coûte moins cher, parce que je conçois et je code moi-même, sans chef de projet ni structure à payer. Au-delà du plancher, le prix dépend de votre projet : le nombre de pages ou de modules, les outils à relier, la reprise de vos données. Je fixe le montant au devis, avant de commencer, et il ne bouge plus. Vous versez 40 % à la signature, 30 % à mi-parcours et 30 % à la livraison.`,
   },
   {
     question: "Combien de temps ça prend ?",

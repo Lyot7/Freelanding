@@ -65,7 +65,7 @@ function ContactHero({
     : [];
 
   return (
-    <section className="relative flex h-[90svh] min-h-[600px] w-full items-end justify-center overflow-hidden bg-background px-[20px] pb-[40px] tablet:px-[24px] tablet:pb-[30px] desktop:px-[30px]">
+    <section className="relative flex h-[calc(90svh/var(--zoom-ecran,1))] min-h-[600px] w-full items-end justify-center overflow-hidden bg-background px-[20px] pb-[40px] tablet:px-[24px] tablet:pb-[30px] desktop:px-[30px]">
       <GradientWaveBackdrop seed={82} />
       {/* RELEVÉ sur `/contact` : hôte 1440 × 810, z-1, opacité 0,05. Nous
           étions à 0,07 PLUS le calque global de 0,05, soit un grain doublé. */}

@@ -8,6 +8,7 @@ import {
   type CSSProperties,
 } from "react";
 import { useReducedMotion } from "motion/react";
+import { lireZoomEcran } from "@/lib/zoom-ecran";
 
 // useLayoutEffect côté client (avant paint), useEffect côté serveur (no-op SSR).
 const useIsoLayoutEffect =
@@ -79,9 +80,12 @@ export function Ticker({
     const item = itemRef.current;
     if (!band || !item) return;
 
+    // En pixels de mise en page : le décalage est réécrit en `px` dans un
+    // `translateX` que le zoom des grands écrans agrandit (`lireZoomEcran`).
     const measure = () => {
-      setBandWidth(band.getBoundingClientRect().width);
-      setItemWidth(item.getBoundingClientRect().width);
+      const zoom = lireZoomEcran();
+      setBandWidth(band.getBoundingClientRect().width / zoom);
+      setItemWidth(item.getBoundingClientRect().width / zoom);
     };
     measure();
 

@@ -47,7 +47,7 @@ function AboutHero({ about }: { about: AboutContent }) {
     ? [...subtitleParagraph.emphasis]
     : [];
   return (
-    <section className="relative flex h-[90svh] min-h-[600px] w-full items-end justify-center overflow-hidden bg-background px-[20px] pb-[60px] tablet:px-[24px] tablet:pb-[90px] desktop:px-[30px]">
+    <section className="relative flex h-[calc(90svh/var(--zoom-ecran,1))] min-h-[600px] w-full items-end justify-center overflow-hidden bg-background px-[20px] pb-[60px] tablet:px-[24px] tablet:pb-[90px] desktop:px-[30px]">
       {/* framer-55nez « BG » : le fond du hero DÉRIVE au scroll sur la source,
           il était posé fixe. Relevé sur `/live-proxy/about` à 1440, par sauts de
           scroll : translateY = 75,15 px à 501 · 150,30 à 1002 · 225,45 à 1503 ·

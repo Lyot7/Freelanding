@@ -2,7 +2,8 @@
 
 import { motion, useScroll, useTransform } from "motion/react";
 import { useReducedMotionAfterMount } from "@/components/motion/reducedMotion";
-import type { ReactNode } from "react";
+import { lireZoomEcran } from "@/lib/zoom-ecran";
+import { useEffect, useRef, type ReactNode } from "react";
 
 /**
  * ScrollParallax — dérive verticale proportionnelle au scroll DOCUMENT, sans
@@ -45,7 +46,20 @@ import type { ReactNode } from "react";
 export function useScrollParallaxY(factor: number) {
   const reduced = useReducedMotionAfterMount();
   const { scrollY } = useScroll();
-  const y = useTransform(scrollY, (v) => v * factor);
+  /* `scrollY` compte en pixels affichés, la translation en pixels de mise en
+     page, que le `zoom` des grands écrans agrandit (voir `--zoom-ecran` dans
+     `globals.css`) : sans cette division, la couche filerait deux fois plus
+     vite en 4K. Relu à chaque redimensionnement, jamais pendant le défilement. */
+  const zoom = useRef(1);
+  useEffect(() => {
+    const lire = () => {
+      zoom.current = lireZoomEcran();
+    };
+    lire();
+    window.addEventListener("resize", lire);
+    return () => window.removeEventListener("resize", lire);
+  }, []);
+  const y = useTransform(scrollY, (v) => (v * factor) / zoom.current);
   return reduced ? undefined : y;
 }
 

@@ -81,7 +81,7 @@ export async function NotFoundView() {
                     conserve les 68 px partout où ils tiennent. Même règle dès
                     810, colonne = 50vw - 48 puis 50vw - 60 : à 120 px fixes,
                     le mot sortait de l'écran à 1440 (relevé le 2026-10-15). */}
-                <h1 className="text-[min(68px,calc(15.87vw-6.35px))] font-semibold uppercase leading-[0.82] tracking-[-0.06em] tablet:text-[min(92px,calc((50vw-48px)/6.3))] desktop:text-[min(120px,calc((50vw-60px)/6.3))]">
+                <h1 className="text-[min(68px,calc(calc(15.87vw/var(--zoom-ecran,1))-6.35px))] font-semibold uppercase leading-[0.82] tracking-[-0.06em] tablet:text-[min(92px,calc((calc(50vw/var(--zoom-ecran,1))-48px)/6.3))] desktop:text-[min(120px,calc((calc(50vw/var(--zoom-ecran,1))-60px)/6.3))]">
                   {titleLine1}
                   <br />
                   {titleLine2}

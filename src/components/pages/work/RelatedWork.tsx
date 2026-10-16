@@ -22,7 +22,7 @@ export function RelatedWork({ work }: { work: WorkItem }) {
     <section aria-labelledby="next-project-title" className="relative">
       <WorkCardPin
         work={work}
-        rowClassName="h-[800px] desktop:h-screen"
+        rowClassName="h-[800px] desktop:h-[calc(100vh/var(--zoom-ecran,1))]"
         overlay={
           <h2
             id="next-project-title"
@@ -38,7 +38,7 @@ export function RelatedWork({ work }: { work: WorkItem }) {
                1920. `max()` exprime la règle en une déclaration, sans figer de
                palier : max(20, (100vw - 1440) / 2) vaut 20 jusqu'à 1480 puis
                suit le conteneur. */
-            className="absolute left-[max(20px,calc((100vw-1440px)/2))] top-[20px] z-[3] text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-white tablet:top-[30px]"
+            className="absolute left-[max(20px,calc((calc(100vw/var(--zoom-ecran,1))-1440px)/2))] top-[20px] z-[3] text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-white tablet:top-[30px]"
           >
             {uiLabels.work.nextProjectLabel}
           </h2>

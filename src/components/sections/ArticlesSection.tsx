@@ -82,8 +82,8 @@ function SeeMoreButton({ cta }: { cta?: { label: string; href: string } }) {
  * le masque de ligne. Le corps suit la largeur jusqu'au repère de la source.
  */
 const HEADING_TABLET = {
-  68: "tablet:text-[clamp(52px,7.2vw,68px)]",
-  64: "tablet:text-[clamp(52px,7.2vw,64px)]",
+  68: "tablet:text-[clamp(52px,calc(7.2vw/var(--zoom-ecran,1)),68px)]",
+  64: "tablet:text-[clamp(52px,calc(7.2vw/var(--zoom-ecran,1)),64px)]",
 } as const;
 
 export type ArticlesHeadingTabletPx = keyof typeof HEADING_TABLET;
@@ -118,7 +118,7 @@ function Heading({
       <LineReveal
         as="h2"
         lines={[...lines]}
-        className={`relative m-0 flex w-full flex-col justify-center p-0 text-left text-[clamp(40px,13.6vw,52px)] font-semibold uppercase leading-[0.82] tracking-[-0.05em] text-background desktop:text-[min(92px,calc((50vw-60px)/6.6))] ${HEADING_TABLET[tabletPx]}`}
+        className={`relative m-0 flex w-full flex-col justify-center p-0 text-left text-[clamp(40px,calc(13.6vw/var(--zoom-ecran,1)),52px)] font-semibold uppercase leading-[0.82] tracking-[-0.05em] text-background desktop:text-[min(92px,calc((calc(50vw/var(--zoom-ecran,1))-60px)/6.6))] ${HEADING_TABLET[tabletPx]}`}
         lineClassName={lineClass}
       />
     </div>

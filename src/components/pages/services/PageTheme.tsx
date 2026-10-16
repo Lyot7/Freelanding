@@ -292,16 +292,11 @@ export function PageTheme({
       <SvgSprite />
       <Header site={site} />
       <main id="main-content" tabIndex={-1}>
-        <section className="relative flex min-h-[70svh] items-end overflow-hidden bg-background px-[20px] pb-[60px] pt-[140px] text-foreground tablet:px-[24px] tablet:pb-[90px] desktop:px-[30px]">
+        <section className="relative flex min-h-[calc(70svh/var(--zoom-ecran,1))] items-end overflow-hidden bg-background px-[20px] pb-[60px] pt-[140px] text-foreground tablet:px-[24px] tablet:pb-[90px] desktop:px-[30px]">
           <GradientWaveBackdrop seed={graine(page.chemin)} />
           <Grain opacity={0.05} className="z-[1]" />
           <span className="absolute inset-y-0 left-1/2 z-[1] w-px bg-white/10" />
           <div className="relative z-[2] mx-auto grid w-full max-w-[1440px] gap-[20px] tablet:grid-cols-2 tablet:items-end tablet:gap-x-0 tablet:gap-y-[30px]">
-            {page.filAriane ? (
-              <div className="tablet:col-start-1 tablet:row-start-1">
-                <FilAriane marches={page.filAriane} />
-              </div>
-            ) : null}
             <Reveal
               trigger="appear"
               appearId="theme-hero-titre"
@@ -357,6 +352,7 @@ export function PageTheme({
           eyebrow={page.faq.eyebrow}
           titleLines={page.faq.titleLines}
         />
+        {page.filAriane ? <FilAriane marches={page.filAriane} /> : null}
       </main>
       <Footer sujetRendezVous={RDV_PAR_PRESTATION[page.prestation]} />
       <FloatingNav site={site} />

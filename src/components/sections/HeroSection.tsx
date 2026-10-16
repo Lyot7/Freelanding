@@ -12,7 +12,7 @@ import { preload } from "react-dom";
 import { estProfilLeger } from "@/lib/profil-appareil";
 import { useDepixelisation } from "@/components/motion/useDepixelisation";
 import { recadrageCover } from "@/lib/images/recadrage";
-import type { HeroContent, HeroDoor, HeroProof, SiteConfig } from "@/lib/content/types";
+import type { HeroComparaison, HeroContent, HeroDoor, HeroProof, SiteConfig } from "@/lib/content/types";
 import { ScrollParallax } from "@/components/motion/ScrollParallax";
 import { Grain } from "@/components/effects/Grain";
 import { ImageProgressive } from "@/components/ui/ImageProgressive";
@@ -79,7 +79,7 @@ function Porte({ porte, index }: { porte: HeroDoor; index: number }) {
       >
         {String(index + 1).padStart(2, "0")}
       </span>
-      <span className="hero-porte-titre col-start-1 row-start-1 min-w-0 tablet:col-start-2 text-[clamp(31px,8.6vw,46px)] font-semibold leading-[0.95] tracking-[-0.045em] tablet:text-[clamp(46px,5.6vw,80px)] tablet:leading-[0.92]">
+      <span className="hero-porte-titre col-start-1 row-start-1 min-w-0 tablet:col-start-2 text-[clamp(31px,calc(8.6vw/var(--zoom-ecran,1)),46px)] font-semibold leading-[0.95] tracking-[-0.045em] tablet:text-[clamp(46px,calc(5.6vw/var(--zoom-ecran,1)),80px)] tablet:leading-[0.92]">
         {porte.lines.map((ligne, i) => (
           <span key={ligne} className="hero-ligne">
             <span
@@ -153,6 +153,52 @@ function Preuve({ preuve, ordre }: { preuve: HeroProof; ordre: number }) {
       {valeur}
       {libelle}
     </p>
+  );
+}
+
+/**
+ * LE PRIX D'UNE AGENCE ET LE MIEN, POUR LE MÊME SITE (2026-10-16). Le sujet
+ * nomme ce qui est comparé avant les montants : le visiteur lit « même
+ * livrable » avant de lire « moins cher ». Mon prix porte la seule couleur.
+ */
+function Comparaison({ comparaison }: { comparaison: HeroComparaison }) {
+  return (
+    <div
+      data-part="comparaison"
+      className="hero-fond flex flex-col gap-[12px] tablet:flex-row tablet:items-center tablet:gap-[32px]"
+      style={delai(760)}
+    >
+      <p className="m-0 max-w-[24ch] text-[12px] font-medium uppercase leading-[1.25] tracking-[-0.01em] text-foreground [text-wrap:balance]">
+        {comparaison.sujet}
+      </p>
+      <dl className="m-0 flex items-end gap-[24px] tablet:gap-[32px]">
+        {comparaison.lignes.map((ligne) => (
+          <div key={ligne.qui} className="flex flex-col gap-[6px]">
+            <dt className="text-[12px] font-medium uppercase leading-none tracking-[-0.01em] text-foreground-60">
+              {ligne.qui}
+            </dt>
+            <dd
+              className={`m-0 whitespace-nowrap text-[22px] font-medium leading-none tracking-[-0.03em] tablet:text-[28px] ${
+                ligne.fort ? "text-accent" : "text-foreground-60"
+              }`}
+            >
+              {ligne.prix}
+            </dd>
+          </div>
+        ))}
+      </dl>
+      <p className="m-0 text-[12px] font-medium leading-[1.25] tracking-[-0.01em] text-foreground-60">
+        {uiLabels.hero.source}{" "}
+        <a
+          href={comparaison.source.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-foreground-60 underline decoration-white/30 underline-offset-[3px] transition-colors duration-200 hover:text-foreground"
+        >
+          {comparaison.source.label}
+        </a>
+      </p>
+    </div>
   );
 }
 
@@ -414,7 +460,7 @@ export function HeroSection({
   return (
     <section
       data-section="hero"
-      className="relative isolate flex min-h-[100dvh] w-full flex-col overflow-hidden bg-background pt-[88px] pb-[20px] [font-family:var(--font-sans)] tablet:min-h-[max(100dvh,720px)] tablet:pt-[112px] tablet:pb-[30px]"
+      className="relative isolate flex min-h-[calc(100dvh/var(--zoom-ecran,1))] w-full flex-col overflow-hidden bg-background pt-[88px] pb-[20px] [font-family:var(--font-sans)] tablet:min-h-[max(calc(100dvh/var(--zoom-ecran,1)),720px)] tablet:pt-[112px] tablet:pb-[30px]"
     >
       {hasVideo ? (
         <ScrollParallax
@@ -450,8 +496,10 @@ export function HeroSection({
             </p>
           ) : null}
 
-          {/* LE SEUL h1 DE L'ACCUEIL : les deux portes. */}
-          <h1 data-part="hero-titre" className="hero-portes m-0 mt-[18px] tablet:mt-[34px]">
+          {/* LE SEUL h1 DE L'ACCUEIL : les deux portes. `id="services"` : la
+              marche « Prestations » des fils d'Ariane (`/#services`) y mène
+              depuis que l'accordéon a quitté l'accueil (2026-10-16). */}
+          <h1 id="services" data-part="hero-titre" className="hero-portes m-0 mt-[18px] tablet:mt-[34px]">
             {portes.map((porte, index) => (
               <Porte key={porte.href} porte={porte} index={index} />
             ))}
@@ -499,9 +547,10 @@ export function HeroSection({
           </div>
         </div>
 
-        {preuves.length > 0 || logos ? (
+        {preuves.length > 0 || hero.comparison || logos ? (
           <div className="relative mt-[36px] flex flex-col gap-[18px] border-t border-white/10 pt-[18px] tablet:mt-[48px] desktop:flex-row desktop:items-center desktop:justify-between desktop:gap-[40px]">
             <div className="flex flex-col gap-[16px] tablet:flex-row tablet:gap-[40px]">
+              {hero.comparison ? <Comparaison comparaison={hero.comparison} /> : null}
               {preuves.map((preuve, ordre) => (
                 <Preuve key={preuve.label} preuve={preuve} ordre={ordre} />
               ))}

@@ -24,7 +24,7 @@ export function BlogIndexPage({
       <Header site={site} />
       {/* Cible du lien d'évitement (voir SkipLink.tsx et focus.css). */}
       <main id="main-content" tabIndex={-1}>
-        <section className="relative flex h-[90svh] items-end overflow-hidden bg-background px-[20px] pb-[20px] pt-[140px] text-foreground tablet:px-[24px] tablet:pb-[30px] desktop:px-[30px]">
+        <section className="relative flex h-[calc(90svh/var(--zoom-ecran,1))] items-end overflow-hidden bg-background px-[20px] pb-[20px] pt-[140px] text-foreground tablet:px-[24px] tablet:pb-[30px] desktop:px-[30px]">
           <HeroPhoto image={herosPages.blog} hauteur={{ mobile: "90vh", tablette: "90vh" }} />
           {/* RELEVÉ sur `/blog` : hôte 1440 × 810, z-1, opacité 0,05. Nous
               étions à 0,08, plus le calque global inventé de 0,05. */}
@@ -51,7 +51,7 @@ export function BlogIndexPage({
                   titre anglais : le saut de ligne forcé reste celui de la
                   source, seul le texte vient désormais du contenu. */}
               {/* Corps plafonné : « DERNIERS » débordait de 8 px à 320. */}
-              <h1 className="text-[clamp(44px,17.2vw,63px)] font-semibold uppercase leading-[0.82] tracking-[-0.05em] tablet:text-[78px] desktop:text-[98px]">
+              <h1 className="text-[clamp(44px,calc(17.2vw/var(--zoom-ecran,1)),63px)] font-semibold uppercase leading-[0.82] tracking-[-0.05em] tablet:text-[78px] desktop:text-[98px]">
                 {(blog.hero.titleLines ?? [blog.hero.title]).map((line, index) => (
                   <Fragment key={line}>
                     {index > 0 ? <br /> : null}

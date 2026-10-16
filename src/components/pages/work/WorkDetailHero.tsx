@@ -24,7 +24,7 @@ export function WorkDetailHero({ work }: { work: WorkItem }) {
   const fond = work.heroBackground ?? work.cover;
 
   return (
-    <section className="relative flex h-[90svh] w-full items-end overflow-hidden bg-background px-[20px] pb-[60px] pt-[110px] text-white tablet:px-[24px] tablet:pb-[90px] desktop:px-[30px] desktop:pt-[60px]">
+    <section className="relative flex h-[calc(90svh/var(--zoom-ecran,1))] w-full items-end overflow-hidden bg-background px-[20px] pb-[60px] pt-[110px] text-white tablet:px-[24px] tablet:pb-[90px] desktop:px-[30px] desktop:pt-[60px]">
       {/* framer-1gqz6xi « Media » : le visuel du hero DÉRIVE au scroll sur la
           source, il était posé fixe. Relevé sur `/live-proxy/work/box-mode` à
           1440, par sauts de scroll : translateY = 105,30 px à 702 · 210,60 à

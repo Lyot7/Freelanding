@@ -52,7 +52,7 @@ export function WorkCardPin({
    * mesurée sur la home : 800px, et 100vh à partir de 1200 (seuil `desktop`,
    * PAS `tablet` : relevé à 800px de hublot aussi bien à 390 qu'à 810).
    */
-  rowClassName = "h-[800px] desktop:h-[100vh]",
+  rowClassName = "h-[800px] desktop:h-[calc(100vh/var(--zoom-ecran,1))]",
   /** Contenu superposé à la carte, dans le repère du sticky (titre de section…). */
   overlay,
   /** Châssis d'ordinateur portable autour de la vignette. Home uniquement. */
@@ -82,9 +82,9 @@ export function WorkCardPin({
             fond recouvrirait la totalité du contenu de la carte. Sur le live les
             deux frères sont à `z-index: 1` et c'est l'ordre du DOM qui tranche,
             plaçant les détails devant. */}
-        <div className="relative z-[1] h-[300vh] w-full flex-none overflow-clip">
+        <div className="relative z-[1] h-[calc(300vh/var(--zoom-ecran,1))] w-full flex-none overflow-clip">
           {/* framer-1l83zgi : « Container Sticky » — épinglé au viewport */}
-          <div className="sticky top-0 flex h-[100vh] w-full flex-row items-center justify-start">
+          <div className="sticky top-0 flex h-[calc(100vh/var(--zoom-ecran,1))] w-full flex-row items-center justify-start">
             {overlay}
             <WorkCard work={work} index={index} />
           </div>

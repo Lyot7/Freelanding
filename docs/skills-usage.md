@@ -60,3 +60,25 @@ décrivait encore la reconstruction du gabarit Framer d'origine.
   entre eux et lisibles, rien à corriger au rendu.
 - Les logos d'employeurs sans intitulé dans le héros : décision d'Eliott du
   2026-09-02.
+
+# Reprise de l'accueil et grands écrans — 2026-10-16
+
+Demande d'Eliott : comparaison de prix à livrable égal, −92 % Würth hors du
+héros, vraie section « à propos », plus d'accordéon qui redit le héros, une
+section noire qui montre le logiciel, fil d'Ariane qui ne double plus le menu,
+rendu correct jusqu'en 4K. Travail visuel fait par l'agent principal, sur la
+direction fixée le 2026-10-15 (Geist, volt sur noir, grille à filet central) :
+les règles de la passe précédente ont été reprises, aucun skill rechargé.
+
+Captures avant et après, 390 × 844, 1024 × 768, 1440 × 900, 1920, 2240 et
+3840 de large, pleine page pour les grands écrans.
+
+| Règle reprise | Constat sur le rendu | Ce qui a changé |
+| --- | --- | --- |
+| impeccable · critique (une preuve, lisible en premier) | « 50 % du prix d'un site de PME en agence, médiane 6 000 € » se lisait plancher contre moyenne | Sujet nommé d'abord (« un site vitrine soigné, design et ergonomie compris »), puis « en agence 5 000 à 8 000 € » à 60 %, « avec moi dès 3 000 € » seul en volt |
+| impeccable · layout | Moitié gauche de l'à-propos vide sur 200 px, colonne droite vide à côté du portrait | Grille d'infos (métier, lieu) en tête, compteur « 4 entreprises » au pied du portrait |
+| impeccable · layout | L'accordéon répétait les deux portes du héros et leur chapô | Accordéon retiré de l'accueil ; une section par offre (vitrine : « On vous compare… » + réalisations ; logiciel : section noire) |
+| taste · point focal relié au produit | La section noire portait une citation sans rien montrer | Fenêtre d'outil : la même commande traitée à la main (5 étapes pour vous) puis par l'outil (1 étape), bascule seule une fois visible |
+| emil · une forme qui glisse | Onglets de la démo | Pastille déplacée en `transform` 280 ms `cubic-bezier(0.23, 1, 0.32, 1)`, étapes en fondu décalé 70 ms, rien en mouvement réduit |
+| impeccable · polish | Fil d'Ariane en capitales et barres obliques sous le menu en capitales et barres obliques | En pied de page, casse normale, chevrons, sur le fond clair de la FAQ |
+| impeccable · responsive | En 4K, héros à 22 px dans 3840, cartes projet de 2000 px de haut, logo et menu à 1 200 px du texte | `zoom` par paliers de 160 à 320 px au-delà de 2048 (rendu 1920 net en 4K), unités d'écran compensées, en-tête calé sur la colonne de 1440 |

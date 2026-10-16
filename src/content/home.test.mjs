@@ -1,7 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { homeContent } from "./home.ts";
 import { siteConfig } from "./site.ts";
-import { howWeDoItStats } from "./stats.ts";
 import { uiLabels } from "./ui.ts";
 import { euros, prestation, prixPlancher, repereAgenceSite } from "./offre.ts";
 
@@ -21,30 +20,22 @@ describe("accueil", () => {
     expect(homeContent.logoBand?.logos.length).toBeGreaterThan(0);
   });
 
-  test("la première preuve du héros est le chiffre Würth de la section chiffres", () => {
-    const stat = howWeDoItStats.find((s) => s.label.includes("Würth"));
-    const preuve = homeContent.hero.proofs?.[0];
-    expect(stat).toBeDefined();
-    expect(preuve?.label).toBe(stat?.label);
-    expect(preuve?.value).toBe(`${stat?.prefix}${stat?.value}\u202F${stat?.suffix}`);
-    expect(preuve?.href).toBe("/realisations/wurth-creation-de-compte");
+  test("le chiffre Würth n'est plus dans le héros", () => {
+    expect(homeContent.hero.proofs ?? []).toHaveLength(0);
+    expect(JSON.stringify(homeContent.hero)).not.toContain("Würth");
   });
 
-  test("la comparaison avec les agences est calculée et sourcée", () => {
-    const preuve = homeContent.hero.proofs?.[1];
-    const part = Math.round((prestation("vitrine").plancher / repereAgenceSite.mediane) * 100);
-    expect(preuve?.value).toBe(`${part}\u202F%`);
-    expect(preuve?.label).toContain(euros(repereAgenceSite.mediane));
-    expect(preuve?.source?.href).toBe(repereAgenceSite.source.href);
-    // « Jusqu'à deux fois moins cher » n'est vrai que tant que le site
-    // d'entrée vaut au plus la moitié de la médiane d'agence.
-    expect(part).toBeLessThanOrEqual(50);
-  });
-
-  test("aucune preuve ne présente une entreprise comme cliente", () => {
-    for (const preuve of homeContent.hero.proofs ?? []) {
-      expect(preuve.label.toLowerCase()).not.toContain("client");
-    }
+  test("le héros compare les prix à livrable égal, sourcé", () => {
+    const comparaison = homeContent.hero.comparison;
+    const [agence, moi] = comparaison?.lignes ?? [];
+    expect(comparaison?.sujet).toMatch(/site vitrine soigné/u);
+    // Les deux bornes de l'agence sont écrites, jamais une médiane seule.
+    expect(agence?.prix).toContain(euros(repereAgenceSite.soigneMax));
+    expect(agence?.prix).toContain(euros(repereAgenceSite.soigneMin).replace(/\s€$/u, ""));
+    expect(moi?.prix).toContain(prixPlancher(prestation("vitrine")));
+    expect(moi?.fort).toBe(true);
+    expect(comparaison?.source.href).toBe(repereAgenceSite.source.href);
+    expect(prestation("vitrine").plancher).toBeLessThan(repereAgenceSite.soigneMin);
   });
 
   test("la bande des logos ne porte aucun intitulé qui en ferait des clients", () => {
@@ -59,8 +50,18 @@ describe("accueil", () => {
     expect(Math.abs(chiffres - pourquoi)).toBeGreaterThan(1);
   });
 
-  test("les prestations suivent la section About", () => {
-    expect(ordre.indexOf("services")).toBe(ordre.indexOf("about") + 1);
+  test("les offres ne sont pas redites sous le héros, chacune a sa section", () => {
+    expect(ordre).not.toContain("services");
+    expect(ordre.indexOf("showreel")).toBe(ordre.indexOf("about") + 1);
+    expect(ordre).toContain("logiciel");
+    expect(homeContent.logiciel?.cta.href).toBe("/services/logiciel-metier");
+  });
+
+  test("la démonstration du logiciel compte les étapes qui vous restent", () => {
+    const demo = homeContent.logiciel?.demo;
+    expect(demo?.main.every((etape) => !etape.auto)).toBe(true);
+    expect(demo?.outil.filter((etape) => !etape.auto)).toHaveLength(1);
+    expect(demo?.main).toHaveLength(demo?.outil.length ?? -1);
   });
 
   test("le titre du héros est fait des deux portes, chacune vers sa prestation", () => {
@@ -86,8 +87,9 @@ describe("accueil", () => {
   });
 
   test("« 1 projet à la fois » n'est dit qu'une fois, par la section chiffres", () => {
-    expect(homeContent.about.counter).toBeUndefined();
-    expect(homeContent.about.launchedLabel).toBeUndefined();
+    const about = homeContent.about;
+    const textes = [about.launchedLabel, about.projectsLabel, about.counter?.caption, ...about.body];
+    for (const texte of textes) expect(texte ?? "").not.toMatch(/projet à la fois/u);
   });
 });
 
@@ -107,5 +109,15 @@ describe("un seul libellé pour le rendez-vous", () => {
       siteConfig.floatingCta?.label ?? "",
     ];
     for (const l of libelles) expect(l.toLowerCase()).not.toContain("démarrer");
+  });
+});
+
+describe("la marche « Prestations » des fils d'Ariane", () => {
+  test("mène à une section qui existe sur l'accueil", async () => {
+    const { readFileSync } = await import("node:fs");
+    const heros = readFileSync(new URL("../components/sections/HeroSection.tsx", import.meta.url), "utf8");
+    // `/#services` : l'accordéon a quitté l'accueil, l'ancre vit sur les portes.
+    expect(heros).toContain('id="services"');
+    expect(homeContent.sectionOrder).toContain("hero");
   });
 });

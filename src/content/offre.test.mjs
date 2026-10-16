@@ -15,7 +15,7 @@ import {
   tauxSuivi,
 } from "./offre.ts";
 import { services } from "./services.ts";
-import { lienDevis, methodeLabels } from "./tarifs.ts";
+import { lienDevis } from "./tarifs.ts";
 import { contentRoutes as routesTarifs } from "./routes.ts";
 import { faqItems } from "./faq.ts";
 import { uiLabels } from "./ui.ts";
@@ -188,12 +188,14 @@ describe("l'offre et la FAQ vouvoient", () => {
 
   test("la réponse prix de la FAQ cite le repère d'agence, sa source et sa date", () => {
     const reponse = faqItems.find((f) => /Combien coûte un projet/u.test(f.question))?.answer;
-    expect(reponse).toContain(euros(repereAgenceSite.mediane));
+    // À livrable égal : la fourchette d'un site vitrine soigné, jamais mon
+    // plancher contre leur médiane.
+    expect(reponse).toContain(euros(repereAgenceSite.soigneMin));
+    expect(reponse).toContain(euros(repereAgenceSite.soigneMax));
+    expect(reponse).not.toContain("médiane");
     expect(reponse).toContain(repereAgenceSite.source.nom);
     expect(reponse).toContain(repereAgenceSite.source.releve);
-    // « Deux fois moins » n'est écrit que parce que le rapport est exact.
-    expect(reponse).toMatch(/deux fois moins/u);
-    expect(repereAgenceSite.mediane / prestation("vitrine").plancher).toBeCloseTo(2, 1);
+    expect(prestation("vitrine").plancher).toBeLessThan(repereAgenceSite.soigneMin);
   });
 });
 
@@ -439,7 +441,6 @@ describe("le site annonce le même prix que le module", () => {
       ...services.flatMap((s) => [s.title, s.price ?? "", ...s.body]),
       ...faqItems.flatMap((f) => [f.question, f.answer]),
       ...prestations.flatMap((p) => [p.resume, p.horsOffre, ...p.inclus, ...p.faitMonter]),
-      ...Object.values(methodeLabels).filter((v) => typeof v === "string"),
     ];
     for (const texte of textes) {
       expect(

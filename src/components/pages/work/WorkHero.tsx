@@ -34,7 +34,7 @@ import type { HeroContent, HeroSubtitleParagraph } from "@/lib/content";
  * d'autant. On cale sur le bas de l'encre : 170+7 et 140+7.
  */
 const SECTION_CLS =
-  "relative flex h-[90svh] w-full items-end overflow-hidden bg-background " +
+  "relative flex h-[calc(90svh/var(--zoom-ecran,1))] w-full items-end overflow-hidden bg-background " +
   "px-[20px] pb-[185px] pt-0 text-foreground " +
   "tablet:px-[24px] tablet:pb-[177px] tablet:pt-[60px] " +
   "desktop:px-[30px] desktop:pb-[147px]";
@@ -93,7 +93,7 @@ export function WorkHero({ hero }: { hero: HeroContent }) {
             >
               {/* Corps plafonné et non fixe : « PROJETS » demandait 319 px pour
                   280 disponibles à 320, et 395 pour 381 à 810. */}
-              <h1 className="m-0 text-[clamp(44px,17.2vw,63px)] font-semibold uppercase leading-[0.82] tracking-[-0.05em] tablet:text-[clamp(60px,9.2vw,78px)] desktop:text-[98px]">
+              <h1 className="m-0 text-[clamp(44px,calc(17.2vw/var(--zoom-ecran,1)),63px)] font-semibold uppercase leading-[0.82] tracking-[-0.05em] tablet:text-[clamp(60px,calc(9.2vw/var(--zoom-ecran,1)),78px)] desktop:text-[98px]">
                 {hero.title}
               </h1>
             </Reveal>

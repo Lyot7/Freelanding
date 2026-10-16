@@ -136,7 +136,7 @@ function Headline({
       {/* 68 px PLAFONNÉS À 7,8 vw entre 810 et 1199 : à 810, « TE COMPARE »
           mesure 399 px à 68 px pour une demi-colonne de 381, et la ligne se
           repliait. À 7,8 vw elle en fait 371 ; dès 872 px le corps revient à 68. */}
-      <h2 className="relative m-0 flex w-full flex-col justify-center p-0 text-left text-[52px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] text-background tablet:text-right tablet:text-[min(68px,7.8vw)] desktop:text-[92px]">
+      <h2 className="relative m-0 flex w-full flex-col justify-center p-0 text-left text-[52px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] text-background tablet:text-right tablet:text-[min(68px,calc(7.8vw/var(--zoom-ecran,1)))] desktop:text-[92px]">
         {lines.map((word, i) => (
           // span externe = masque du slide-up (overflow-hidden), l'alignement
           // du texte est hérité du h2.
