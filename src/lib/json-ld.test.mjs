@@ -52,19 +52,23 @@ describe("JSON-LD d'un article", () => {
     expect(article.publisher.logo["@type"]).toBe("ImageObject");
     expect(article.publisher.logo.url).toMatch(/^https?:\/\/.+\/apple-icon\.png$/);
   });
+  const base = {
+    slug: "exemple",
+    title: "Exemple",
+    date: "2026-09-01",
+    excerpt: "Résumé",
+    cover: { src: "/images/exemple.jpg" },
+  };
 
-  test("dateModified suit la date de révision, et la date de publication sans elle", () => {
-    const base = {
-      slug: "exemple",
-      title: "Exemple",
-      date: "2026-09-01",
-      excerpt: "Résumé",
-      cover: { src: "/images/exemple.jpg" },
-    };
-    expect(articleSchema(base, siteConfig)[0].dateModified).toBe("2026-09-01");
-    const [revise] = articleSchema({ ...base, dateModified: "2026-10-16" }, siteConfig);
-    expect(revise.datePublished).toBe("2026-09-01");
-    expect(revise.dateModified).toBe("2026-10-16");
+  test("dateModified vaut la date de réécriture quand elle existe", () => {
+    const [article] = articleSchema({ ...base, updated: "2026-10-16" }, siteConfig);
+    expect(article.datePublished).toBe("2026-09-01");
+    expect(article.dateModified).toBe("2026-10-16");
+  });
+
+  test("dateModified retombe sur la date de publication sans réécriture", () => {
+    const [article] = articleSchema(base, siteConfig);
+    expect(article.dateModified).toBe("2026-09-01");
   });
 });
 

@@ -2,9 +2,9 @@ import { describe, expect, test } from "bun:test";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { blogPosts, blogContent } from "./blog.ts";
+import { contentRoutes } from "./routes.ts";
 import { IDS_RENDEZ_VOUS } from "./rendez-vous.ts";
 import { prestation, prixPlancher } from "./offre.ts";
-import { contentRoutes } from "./routes.ts";
 
 /**
  * AUDIT DES ARTICLES.
@@ -355,29 +355,35 @@ describe("articles de décision et de prix", () => {
   });
 });
 
-describe("date de révision d'un article", () => {
-  const route = (chemin) => contentRoutes.find((r) => r.pathname === chemin);
+/*
+ * DATE DE RÉÉCRITURE (2026-10-16). `updated` alimente `<lastmod>` du sitemap ;
+ * sans elle, la date de publication. Elle ne précède jamais la publication.
+ */
+describe("date de réécriture", () => {
+  const lastmod = (slug) =>
+    contentRoutes.find((r) => r.pathname === `/blog/${slug}`)?.lastModified;
 
-  test("le sitemap date un article révisé à sa révision, les autres à leur publication", () => {
+  test("le sitemap publie la date de réécriture, sinon la date de publication", () => {
     for (const post of blogPosts) {
-      expect([post.slug, route(`/blog/${post.slug}`)?.lastModified]).toEqual([
-        post.slug,
-        post.dateModified ?? post.date,
-      ]);
+      expect([post.slug, lastmod(post.slug)]).toEqual([post.slug, post.updated ?? post.date]);
     }
-    expect(blogPosts.some((p) => p.dateModified)).toBe(true);
-    expect(blogPosts.some((p) => !p.dateModified)).toBe(true);
+    expect(blogPosts.some((p) => p.updated)).toBe(true);
+    expect(blogPosts.some((p) => !p.updated)).toBe(true);
   });
 
-  test("une révision ne précède jamais la publication", () => {
-    for (const post of blogPosts.filter((p) => p.dateModified)) {
-      expect(/^\d{4}-\d{2}-\d{2}$/.test(post.dateModified)).toBe(true);
-      expect(post.dateModified >= post.date).toBe(true);
+  test("l'index du blog vaut la plus récente des dates", () => {
+    const plusRecente = blogPosts.map((p) => p.updated ?? p.date).sort().at(-1);
+    expect(contentRoutes.find((r) => r.pathname === "/blog")?.lastModified).toBe(plusRecente);
+  });
+
+  test("une réécriture est datée après la publication, au format ISO", () => {
+    for (const post of blogPosts.filter((p) => p.updated)) {
+      expect(post.updated).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      expect(post.updated >= post.date).toBe(true);
     }
   });
 
-  test("l'index du blog prend la date la plus récente, révisions comprises", () => {
-    const plusRecente = blogPosts.map((p) => p.dateModified ?? p.date).sort().at(-1);
-    expect(route("/blog")?.lastModified).toBe(plusRecente);
+  test("l'article fusionné n'est plus au registre", () => {
+    expect(blogPosts.some((p) => p.slug === "a-qui-appartient-votre-fichier-client")).toBe(false);
   });
 });

@@ -166,6 +166,7 @@ export const blogPosts: BlogPost[] = [
     slug: "logiciel-sur-mesure-ou-odoo",
     title: "Odoo ou logiciel sur mesure : comment choisir",
     date: "2026-10-02",
+    updated: "2026-10-16",
     dateSource: "editorial",
     listedInIndex: true,
     category: "Outils métier",
@@ -198,15 +199,17 @@ export const blogPosts: BlogPost[] = [
       },
     },
     excerpt:
-      "Odoo gagne sur un périmètre standard et une petite équipe. Le sur mesure prend l’avantage quand votre métier sort du cadre, ou quand la licence suit votre croissance.",
-    readingTime: "7 min de lecture",
+      "Les licences Odoo sur 3 ans pour 5, 10 et 20 utilisateurs, ce que l’intégrateur ajoute, et les cas où Odoo reste meilleur qu’un logiciel sur mesure.",
+    readingTime: "8 min de lecture",
     tags: ["Odoo", "ERP", "logiciel sur mesure"],
     seo: {
-      // Carte SEO du 2026-10-15 : position 32 sur « odoo prix ». Les prix
-      // d'Odoo du corps sont relevés sur odoo.com le 2026-10-15.
-      title: "Odoo ou logiciel sur mesure : prix réel et comment choisir",
+      // Réécriture du 2026-10-16 (vault `blog-etat-articles.md`, n° 1) : le
+      // titre ne porte plus « prix » à côté de « logiciel sur mesure », pour
+      // rendre « logiciel sur mesure prix » à la page prix. Prix d'Odoo du
+      // corps relevés sur odoo.com le 2026-10-15.
+      title: "Odoo ou logiciel sur mesure : tarifs Odoo sur 3 ans",
       description:
-        "Le prix d’Odoo relevé en octobre 2026, licences et intégrateur, le coût sur 3 ans face au sur mesure, et les cas où Odoo reste le bon choix pour votre PME.",
+        "Odoo se paie par utilisateur et par mois, plus l’intégrateur. Comparez le total sur 3 ans avec un logiciel sur mesure, et voyez quand Odoo reste meilleur.",
       ogImage: {
         src: "/images/og-blog-logiciel-sur-mesure-ou-odoo.jpg",
         alt: "Une grille de modules carrés identiques sur fond noir, et un groupe de forme libre qui ressort en vert",
@@ -218,8 +221,9 @@ export const blogPosts: BlogPost[] = [
 
   {
     slug: "remplacer-excel-par-un-logiciel",
-    title: "Remplacer Excel par un logiciel : signes, étapes et coût",
+    title: "Remplacer Excel par un logiciel : quand et à quel prix",
     date: "2026-10-02",
+    updated: "2026-10-16",
     dateSource: "editorial",
     listedInIndex: true,
     category: "Outils métier",
@@ -252,15 +256,15 @@ export const blogPosts: BlogPost[] = [
       },
     },
     excerpt:
-      "Un tableur partagé coûte des heures que personne ne facture. Les signes qu’Excel ne suffit plus, la migration des données en 5 étapes, et le calcul pour décider.",
-    readingTime: "6 min de lecture",
+      "Un tableur partagé coûte des heures que personne ne facture. Les 6 signes qu’Excel ne suffit plus, l’option qui le remplace, la migration en 4 étapes et le prix.",
+    readingTime: "8 min de lecture",
     tags: ["Excel", "migration", "logiciel sur mesure"],
     seo: {
-      // Position 15 sur « remplacer excel logiciel sur mesure » (carte SEO du
-      // 2026-10-15) : le titre porte la formulation exacte.
-      title: "Remplacer Excel par un logiciel sur mesure : méthode et coût",
+      // Position 14,8 sur « remplacer excel logiciel sur mesure » : le titre
+      // garde la formulation exacte (réécriture du 2026-10-16, vault n° 2).
+      title: "Remplacer Excel par un logiciel sur mesure : signes et prix",
       description:
-        "Les signes qu’Excel ne suffit plus, la migration de vos données en 5 étapes, le coût d’un tableur partagé et le prix d’un logiciel sur mesure pour votre PME.",
+        "Votre fichier Excel fait office de logiciel de gestion ? Les 6 signes, ce qu’il vous coûte en heures, la migration en 4 étapes et le prix du sur mesure.",
       ogImage: {
         src: "/images/og-blog-remplacer-excel-par-un-logiciel.jpg",
         alt: "Une grille de tableur sur fond noir, une colonne de cellules surlignée en vert",
@@ -274,7 +278,7 @@ export const blogPosts: BlogPost[] = [
     slug: "refonte-site-internet-pme",
     title: "Refonte de site internet : prix moyen et méthode",
     date: "2026-10-02",
-    dateModified: "2026-10-16",
+    updated: "2026-10-16",
     dateSource: "editorial",
     listedInIndex: true,
     category: "Méthode",
@@ -330,7 +334,7 @@ export const blogPosts: BlogPost[] = [
     slug: "site-sur-mesure-ou-wordpress",
     title: "WordPress ou site sur mesure : comment choisir",
     date: "2026-10-02",
-    dateModified: "2026-10-16",
+    updated: "2026-10-16",
     dateSource: "editorial",
     listedInIndex: true,
     category: "Méthode",
@@ -558,8 +562,9 @@ export const blogPosts: BlogPost[] = [
 
   {
     slug: "outil-sur-mesure-ou-abonnements-saas",
-    title: "Outil sur mesure ou abonnements SaaS : comment décider",
+    title: "Logiciel sur mesure ou SaaS : comment décider",
     date: "2026-08-28",
+    updated: "2026-10-16",
     dateSource: "editorial",
     listedInIndex: true,
     category: "Outils métier",
@@ -596,14 +601,16 @@ export const blogPosts: BlogPost[] = [
       },
     },
     excerpt:
-      "Un abonnement achète un droit d’usage, un outil sur mesure achète un actif. Avant de comparer les prix, regardez ce qui, chez vous, ne rentre dans aucune case.",
-    readingTime: "7 min de lecture",
-    tags: ["outil métier", "SaaS", "coûts"],
+      "Un abonnement achète un droit d’usage, un logiciel sur mesure achète un actif. Le coût sur 3 ans chiffré, le seuil en utilisateurs et à qui restent vos données.",
+    readingTime: "9 min de lecture",
+    tags: ["outil métier", "SaaS", "coûts", "données"],
     seo: {
-      // Positions 14 à 18 sur « saas abonnement » (carte SEO du 2026-10-15).
-      title: "Abonnement SaaS ou outil sur mesure : le coût sur 3 ans",
+      // Réécriture du 2026-10-16 (vault n° 3) : vise « logiciel sur mesure ou
+      // saas » et absorbe l'article « À qui appartient votre fichier client »,
+      // redirigé ici en 301 (voir `next.config.ts`).
+      title: "Logiciel sur mesure ou SaaS : le vrai coût sur 3 ans",
       description:
-        "Abonnement SaaS ou outil sur mesure : le coût sur 3 ans, hypothèses affichées, les cas où l’abonnement reste le bon choix, et quand faire du sur mesure.",
+        "Abonnement SaaS ou logiciel sur mesure : le coût sur 3 ans chiffré, à qui appartiennent vos données, et les cas où l’abonnement reste le meilleur choix.",
       ogImage: {
         src: "/images/og-blog-outil-sur-mesure-ou-abonnements-saas.jpg",
         alt: "Rabot à main en métal posé sur une planche de pin, au milieu des copeaux",
@@ -617,7 +624,7 @@ export const blogPosts: BlogPost[] = [
     slug: "synchroniser-catalogue-stock-et-commandes",
     title: "Connecter son ERP et son site e-commerce sans écart de stock",
     date: "2026-08-28",
-    dateModified: "2026-10-16",
+    updated: "2026-10-16",
     dateSource: "editorial",
     listedInIndex: true,
     category: "Outils métier",
@@ -666,61 +673,6 @@ export const blogPosts: BlogPost[] = [
       ogImage: {
         src: "/images/og-blog-synchroniser-catalogue-stock-et-commandes.jpg",
         alt: "Travée de rayonnage métallique chargée de cartons dans un entrepôt",
-        width: 1200,
-        height: 630,
-      },
-    },
-  },
-  {
-    slug: "a-qui-appartient-votre-fichier-client",
-    title: "À qui appartient votre fichier client ?",
-    date: "2026-08-27",
-    dateSource: "editorial",
-    listedInIndex: true,
-    category: "Outils métier",
-    author: eliott,
-    cover: {
-      src: "/images/blog/fichier-client.jpg",
-      alt: "Un tiroir de fichier ouvert, plein de fiches cartonnées",
-      width: 1200,
-      height: 1114,
-    },
-    heroImage: {
-      src: "/images/heros/blog-fichier-client.jpg",
-      alt: "Un tiroir de fichier ouvert, plein de fiches cartonnées",
-      width: 2400,
-      height: 1350,
-      cadrage: { x: 30, y: 40 },
-      credit: {
-        prefixe: "Photo :",
-        auteur: {
-          libelle: "Alicia Fagerving",
-          href: "https://commons.wikimedia.org/wiki/File:GU_Library_Card_catalog_3.jpg",
-        },
-        licence: {
-          libelle: "CC BY-SA 3.0",
-          href: "https://creativecommons.org/licenses/by-sa/3.0/deed.fr",
-        },
-        modification: "retouchée",
-      },
-      og: {
-        src: "/images/og-blog-fichier-client.jpg",
-        alt: "Un tiroir de fichier ouvert, plein de fiches cartonnées",
-        width: 1200,
-        height: 630,
-      },
-    },
-    excerpt:
-      "La question ne se pose jamais au moment de signer un abonnement logiciel. Elle se pose le jour où vous voulez partir, et ce jour-là il est trop tard pour la poser.",
-    readingTime: "5 min de lecture",
-    tags: ["logiciel", "données", "RGPD"],
-    seo: {
-      title: "Logiciel métier : à qui appartiennent vos données ?",
-      description:
-        "Export, commission sur votre activité, nom affiché à votre client : les quatre questions à poser avant de confier votre activité à un logiciel du marché, et ce que le RGPD couvre vraiment.",
-      ogImage: {
-        src: "/images/og-blog-fichier-client.jpg",
-        alt: "Un tiroir de fichier ouvert, plein de fiches cartonnées",
         width: 1200,
         height: 630,
       },

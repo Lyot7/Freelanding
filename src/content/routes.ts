@@ -20,7 +20,7 @@ import { pagesTheme } from "./pages-theme";
  * dont on soit certain.
  */
 const derniereDateArticle: string | undefined = blogPosts
-  .map((post) => post.dateModified ?? post.date)
+  .map((post) => post.updated ?? post.date)
   .sort()
   .at(-1);
 
@@ -141,7 +141,7 @@ export const contentRoutes: readonly ContentRoute[] = [
       pathname: `/blog/${post.slug}`,
       kind: "post",
       contentSlug: post.slug,
-      lastModified: post.dateModified ?? post.date,
+      lastModified: post.updated ?? post.date,
     }),
   ),
 ];

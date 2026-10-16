@@ -49,7 +49,7 @@ export async function generateMetadata({
       type: "article",
       url: canonical,
       publishedTime: post.date,
-      modifiedTime: post.dateModified ?? post.date,
+      modifiedTime: post.updated ?? post.date,
       images: [
         {
           url: post.seo?.ogImage?.src ?? post.cover.src,
