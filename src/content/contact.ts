@@ -67,6 +67,11 @@ export const contactContent: ContactContent = {
         placeholder: "Choisissez une échéance",
       },
     },
+    etapes: {
+      titres: ["Votre projet", "Votre budget", "Vos coordonnées"],
+      continuer: "Continuer",
+      retour: "Retour",
+    },
     message: {
       label: "Autre chose ?",
       placeholder: "Votre message ici…",

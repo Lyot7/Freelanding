@@ -915,6 +915,12 @@ export interface ContactFormContent {
     objectif: ContactFieldContent;
     echeance: ContactFieldContent;
   };
+  /** Le formulaire se remplit en trois étapes, une seule affichée. */
+  etapes: {
+    titres: readonly [string, string, string];
+    continuer: string;
+    retour: string;
+  };
   message: ContactFieldContent;
   submitLabel: string;
   disclaimer: { text: string; links: readonly Link[] };
