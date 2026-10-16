@@ -135,7 +135,7 @@ export const blogPosts: BlogPost[] = [
     seo: {
       title: "Sites internet des entreprises normandes : l’étude 2026",
       description:
-        "29,65 % des fiches Google Maps d’entreprises normandes n’ont aucun site renseigné. Consultez l’étude sur 25 736 fiches et 6 631 sites, et sa méthode complète.",
+        "29,65 % des fiches Google Maps d’entreprises normandes n’ont aucun site. L’étude 2026 sur 25 736 fiches et 6 631 sites, par secteur et département.",
       ogImage: {
         src: "/images/og-blog-etat-des-sites-des-entreprises-normandes-2026.jpg",
         alt: "Un champ de points sur fond noir, un par fiche Google Maps : près de trois sur dix sont en vert, la part des fiches sans site renseigné",
@@ -426,7 +426,7 @@ export const blogPosts: BlogPost[] = [
     seo: {
       title: "Landing page ou page produit : quand l’une bat l’autre",
       description:
-        "Ce qu’une landing page fait de plus, les quatre situations où elle rapporte, la structure section par section, et les erreurs qui gaspillent un budget publicitaire.",
+        "Landing page ou page produit : laquelle choisir selon d’où vient votre visiteur, la structure qui convertit et les erreurs qui gâchent un budget pub.",
       ogImage: {
         src: "/images/og-blog-landing-page-ou-page-produit.jpg",
         alt: "Une bottine en cuir noir posée seule sur une caisse en bois dans une boutique",
@@ -488,7 +488,7 @@ export const blogPosts: BlogPost[] = [
       // qui va dans le titre, aucun taux de perte inventé.
       title: "Site e-commerce lent : au-delà de 2,5 s, ce que vous perdez",
       description:
-        "Au-delà de 2,5 s d’affichage, Google juge votre boutique lente. Mesurez vos 3 seuils gratuitement, chiffrez ce que la lenteur vous coûte, puis corrigez.",
+        "Au-delà de 2,5 s, Google juge votre site lent et vos visiteurs partent. Mesurez vos 3 seuils gratuitement en 10 minutes, puis corrigez dans le bon ordre.",
       ogImage: {
         src: "/images/og-blog-site-e-commerce-lent-ce-que-ca-coute.jpg",
         alt: "Chronomètre mécanique à cadran blanc posé sur une table claire, couronne et anneau en haut à droite",
@@ -544,7 +544,7 @@ export const blogPosts: BlogPost[] = [
     seo: {
       title: "Shopify ou site sur mesure : les cinq critères qui décident",
       description:
-        "Ce que chaque option achète vraiment, le calcul de coût sur trois ans commissions comprises, les trois signaux qui font basculer, et la solution mixte qui convient souvent mieux.",
+        "Shopify ou site sur mesure : ce que chaque option achète, le coût sur 3 ans commissions comprises, et les signaux qui font basculer vers le sur mesure.",
       ogImage: {
         src: "/images/og-blog-shopify-ou-site-sur-mesure.jpg",
         alt: "Buste de couture habillé d’un tissu à fines rayures, un mètre ruban autour du cou, dans un atelier",
