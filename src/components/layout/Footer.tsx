@@ -14,7 +14,10 @@ import { uiLabels } from "@/content/ui";
 import { Logo } from "./Logo";
 // Le formulaire est un composant CLIENT ; le pied de page reste serveur.
 import { FooterContactForm } from "./FooterContactForm";
+import { Suspense } from "react";
 import { FooterContact } from "./FooterContact";
+import { FooterContactAvecSujet } from "./FooterContactAvecSujet";
+import { ReservationAvecSujet } from "@/components/rendez-vous/ReservationAvecSujet";
 import { ReservationRendezVous } from "@/components/rendez-vous/ReservationRendezVous";
 import { rendezVousContent } from "@/content/rendez-vous";
 import { resoudreConfiguration } from "@/lib/rendez-vous/config";
@@ -292,6 +295,14 @@ export async function Footer() {
   // les 150ms par défaut de Tailwind, une bascule sensiblement plus sèche.
   const inlineLinkCls =
     "text-foreground no-underline transition-colors duration-200 hover:text-accent";
+
+  const formulaireMessage = footerForm ? (
+    <FooterContactForm
+      footerForm={footerForm}
+      emailContact={contact.email}
+      inlineLinkCls={inlineLinkCls}
+    />
+  ) : null;
   // Nav du footer (preset 1r5vzwr 20/18px + lien gdp728 blanc) — LA NAV.
   const navLinkCls =
     "relative h-auto w-auto whitespace-pre text-[18px] font-medium leading-[1.2] tracking-[-0.01em] " +
@@ -419,25 +430,40 @@ export async function Footer() {
             </div>
 
             {/* framer-24skgi : formulaire, branché sur `POST /api/contact`. */}
+            {/* SEUL FORMULAIRE DU SITE depuis le 2026-10-16 (message ou
+                rendez-vous). Les replis des frontières `Suspense` rendent le
+                même bloc sans lecture de `?sujet` : le HTML servi porte
+                toujours les deux formulaires. */}
             {footerForm ? (
-              <FooterContact
-                modes={footerForm.modes}
-                message={
-                  <FooterContactForm
-                    footerForm={footerForm}
-                    emailContact={contact.email}
-                    inlineLinkCls={inlineLinkCls}
+              <Suspense
+                fallback={
+                  <FooterContact
+                    modes={footerForm.modes}
+                    message={formulaireMessage}
+                    rendezVous={
+                      typesRendezVous.length > 0 ? (
+                        <ReservationRendezVous
+                          types={typesRendezVous}
+                          emailContact={contact.email}
+                        />
+                      ) : undefined
+                    }
                   />
                 }
-                rendezVous={
-                  typesRendezVous.length > 0 ? (
-                    <ReservationRendezVous
-                      types={typesRendezVous}
-                      emailContact={contact.email}
-                    />
-                  ) : undefined
-                }
-              />
+              >
+                <FooterContactAvecSujet
+                  modes={footerForm.modes}
+                  message={formulaireMessage}
+                  rendezVous={
+                    typesRendezVous.length > 0 ? (
+                      <ReservationAvecSujet
+                        types={typesRendezVous}
+                        emailContact={contact.email}
+                      />
+                    ) : undefined
+                  }
+                />
+              </Suspense>
             ) : null}
           </div>
         </div>

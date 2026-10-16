@@ -8,11 +8,8 @@ import { ParallaxBackdrop } from "@/components/motion/ParallaxBackdrop";
 import { AvailabilityMeter, Highlighted } from "@/components/ui";
 import { FaqSection } from "@/components/sections/FaqSection";
 // Le formulaire est un composant CLIENT (soumission, état d'envoi, anti-robot).
-// Cette page reste un composant serveur : voir l'en-tête de `ContactForm.tsx`.
-import { ContactForm } from "@/components/pages/contact/ContactForm";
 // Prise de rendez-vous Cal.com. Composant SERVEUR : il lit l'environnement et
 // ne rend RIEN tant qu'aucun type d'événement n'est configuré.
-import { SectionRendezVous } from "@/components/rendez-vous/SectionRendezVous";
 import { content } from "@/lib/content";
 import type { Availability, ContactContent } from "@/lib/content/types";
 
@@ -389,10 +386,6 @@ function ContactBody({ contact }: { contact: ContactContent }) {
           ))}
         </div>
 
-        <ContactForm
-          form={contact.form}
-          emailContact={contact.contactCard.email}
-        />
         <ContactDetails contact={contact} />
       </div>
     </section>
@@ -411,13 +404,6 @@ export async function ContactPage() {
       {/* Cible du lien d'évitement (voir SkipLink.tsx et focus.css). */}
       <main id="main-content" tabIndex={-1}>
         <ContactHero contact={contact} timeZone={site.contact.timezone} />
-        {/* JUSTE SOUS LE HÉROS depuis le 2026-10-01. Placée après le
-            formulaire, la réservation arrivait trois écrans plus bas, derrière
-            son concurrent direct ; Eliott : « les créneaux arrivent assez loin
-            dans la page contact ». Réserver est l'action la plus engageante de
-            la page, elle passe donc en premier, et le formulaire suit pour qui
-            préfère écrire. */}
-        <SectionRendezVous emailContact={contact.contactCard.email} />
         <ContactBody contact={contact} />
         {/* Bloc FAQ standard, comme la home, `/work`, `/blog` et les pages
             légales. Une variante locale divergeait : questions en 18px casse
@@ -426,6 +412,12 @@ export async function ContactPage() {
             contre 735 px sur le live, soit ~315 px de vide en bas. */}
         <FaqSection faq={[...contact.faq]} />
       </main>
+      {/* UN SEUL FORMULAIRE SUR LE SITE depuis le 2026-10-16 : celui du pied
+          de page (message ou rendez-vous). La page ne porte plus ni le
+          formulaire de contact ni la réservation ; l'ancre `#rendez-vous`,
+          visée par `lienRendezVous` et par les articles du blog, mène donc au
+          pied de page, où `?sujet=` ouvre l'onglet rendez-vous. */}
+      <div id="rendez-vous" aria-hidden />
       <Footer />
       <FloatingNav site={site} />
     </>
