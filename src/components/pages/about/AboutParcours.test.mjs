@@ -1,0 +1,43 @@
+import { describe, expect, it } from "bun:test";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+
+import { aboutContent } from "@/content/about";
+import { AboutParcours } from "./AboutPage";
+
+/**
+ * LA FORMATION DÉTAILLÉE (2026-10-16) : chaque diplôme dit son niveau, ce
+ * qu'il a apporté et ses domaines ; une expérience sans ces champs garde sa
+ * ligne courte, sans paragraphe ni étiquette vides.
+ */
+describe("parcours de la page À propos", () => {
+  const parcours = aboutContent.parcours;
+  if (!parcours) throw new Error("parcours absent de about.ts");
+  const html = renderToStaticMarkup(createElement(AboutParcours, { parcours }));
+  const formation = parcours.groupes.find((g) => g.titre === "Formation");
+  const experience = parcours.groupes.find((g) => g.titre === "Expérience");
+
+  it("annonce Bac+5 puis Bac+3, du plus récent au plus ancien", () => {
+    const niveaux = formation?.etapes.map((etape) => etape.nature);
+    expect(niveaux).toEqual(["Bac+5", "Bac+3"]);
+    expect(html.indexOf("MyDigitalSchool")).toBeLessThan(html.indexOf("IUT de Saint-Lô"));
+  });
+
+  it("rend l'apport et chaque domaine des formations", () => {
+    for (const etape of formation?.etapes ?? []) {
+      expect(etape.apport).toBeTruthy();
+      expect(html).toContain(etape.apport ?? "");
+      expect(etape.domaines?.length).toBeGreaterThan(0);
+      for (const domaine of etape.domaines ?? []) expect(html).toContain(`>${domaine}</li>`);
+    }
+    expect(html).toContain(">DevOps</li>");
+    expect(html).toContain(">Expérience utilisateur</li>");
+  });
+
+  it("ne pose ni paragraphe ni liste vides sur une expérience", () => {
+    const sansDetail = experience?.etapes.filter((e) => !e.apport && !e.domaines) ?? [];
+    expect(sansDetail.length).toBe(experience?.etapes.length);
+    const listes = html.match(/<ul\b/g) ?? [];
+    expect(listes).toHaveLength(formation?.etapes.length ?? -1);
+  });
+});

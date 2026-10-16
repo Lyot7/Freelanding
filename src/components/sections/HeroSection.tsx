@@ -157,37 +157,32 @@ function Preuve({ preuve, ordre }: { preuve: HeroProof; ordre: number }) {
 }
 
 /**
- * LE PRIX D'UNE AGENCE ET LE MIEN, POUR LE MÊME SITE (2026-10-16). Le sujet
- * nomme ce qui est comparé avant les montants : le visiteur lit « même
- * livrable » avant de lire « moins cher ». Mon prix porte la seule couleur.
+ * LE PRIX D'UNE AGENCE ET LE MIEN, POUR LE MÊME SITE (2026-10-16). Une seule
+ * ligne discrète depuis la même journée (Eliott : « allège l'affichage, garde
+ * la source ») : le sujet nomme ce qui est comparé, puis les deux prix, puis
+ * la source. Mon prix porte la seule couleur.
  */
 function Comparaison({ comparaison }: { comparaison: HeroComparaison }) {
   return (
-    <div
+    <p
       data-part="comparaison"
-      className="hero-fond flex flex-col gap-[12px] tablet:flex-row tablet:items-center tablet:gap-[32px]"
+      className="hero-fond m-0 flex flex-wrap items-baseline gap-x-[16px] gap-y-[6px] text-[12px] font-medium uppercase leading-[1.3] tracking-[-0.01em] text-foreground-60"
       style={delai(760)}
     >
-      <p className="m-0 max-w-[24ch] text-[12px] font-medium uppercase leading-[1.25] tracking-[-0.01em] text-foreground [text-wrap:balance]">
-        {comparaison.sujet}
-      </p>
-      <dl className="m-0 flex items-end gap-[24px] tablet:gap-[32px]">
-        {comparaison.lignes.map((ligne) => (
-          <div key={ligne.qui} className="flex flex-col gap-[6px]">
-            <dt className="text-[12px] font-medium uppercase leading-none tracking-[-0.01em] text-foreground-60">
-              {ligne.qui}
-            </dt>
-            <dd
-              className={`m-0 whitespace-nowrap text-[22px] font-medium leading-none tracking-[-0.03em] tablet:text-[28px] ${
-                ligne.fort ? "text-accent" : "text-foreground-60"
-              }`}
-            >
-              {ligne.prix}
-            </dd>
-          </div>
-        ))}
-      </dl>
-      <p className="m-0 text-[12px] font-medium leading-[1.25] tracking-[-0.01em] text-foreground-60">
+      <span>{comparaison.sujet}</span>
+      {comparaison.lignes.map((ligne) => (
+        <span key={ligne.qui} className="flex items-baseline gap-[6px] whitespace-nowrap">
+          {ligne.qui}
+          <span
+            className={`text-[15px] normal-case tracking-[-0.02em] ${
+              ligne.fort ? "text-accent" : "text-foreground"
+            }`}
+          >
+            {ligne.prix}
+          </span>
+        </span>
+      ))}
+      <span className="normal-case">
         {uiLabels.hero.source}{" "}
         <a
           href={comparaison.source.href}
@@ -197,8 +192,8 @@ function Comparaison({ comparaison }: { comparaison: HeroComparaison }) {
         >
           {comparaison.source.label}
         </a>
-      </p>
-    </div>
+      </span>
+    </p>
   );
 }
 

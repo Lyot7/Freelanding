@@ -196,12 +196,45 @@ export const aboutContent: AboutContent = {
       },
       {
         titre: "Formation",
+        /* DÉTAILLÉE LE 2026-10-16 à la demande d'Eliott : un profil complet,
+           polyvalent et très spécialisé en développement. Le niveau (Bac+5,
+           Bac+3) tient la place de la nature. Périodes déduites des stages et
+           des alternances ci-dessus (Médiapilote en 2e année de BUT, Würth en
+           3e, MeilleursBiens et MECA SERVICES pendant le MBA). */
         etapes: [
           {
-            periode: "Juil. 2026",
+            periode: "2024 à 2026",
             structure: "MyDigitalSchool",
-            role: "MBA Développeur Full-Stack",
-            nature: "Diplôme",
+            lieu: "En alternance",
+            role: "MBA Développeur Full-Stack, diplômé en juillet 2026",
+            nature: "Bac+5",
+            apport:
+              "Le développement approfondi jusqu’à l’architecture et la mise en production, avec ce qu’il faut pour mener un projet et une entreprise.",
+            domaines: [
+              "Architecture logicielle",
+              "DevOps",
+              "Gestion de projet",
+              "Entrepreneuriat",
+              "Marketing",
+            ],
+          },
+          {
+            periode: "2021 à 2024",
+            structure: "IUT de Saint-Lô",
+            lieu: "Saint-Lô",
+            role: "BUT MMI, Métiers du multimédia et de l’internet, parcours développement web",
+            nature: "Bac+3",
+            apport:
+              "Le développement au centre, entouré de tout ce qui fait qu’un site se lit, se comprend et donne envie d’agir.",
+            domaines: [
+              "Développement web",
+              "Design et ergonomie",
+              "Expérience utilisateur",
+              "Communication",
+              "Storytelling",
+              "Infographie",
+              "Photo et vidéo",
+            ],
           },
         ],
       },

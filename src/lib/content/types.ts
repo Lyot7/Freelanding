@@ -924,6 +924,10 @@ export interface ParcoursEtape {
   nature: string;
   /** Étude de cas liée, quand elle existe. */
   href?: string;
+  /** Ce que l'étape a apporté, en une phrase (formations surtout). */
+  apport?: string;
+  /** Domaines travaillés, rendus en étiquettes sous l'apport. */
+  domaines?: readonly string[];
 }
 
 export interface ParcoursGroupe {
