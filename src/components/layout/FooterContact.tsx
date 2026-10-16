@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState, type ReactNode } from "react";
+import { useId, useState, useSyncExternalStore, type ReactNode } from "react";
 
 /**
  * Bascule du pied de page entre ÉCRIRE et RÉSERVER (2026-10-15).
@@ -12,6 +12,43 @@ import { useId, useState, type ReactNode } from "react";
  *
  * Sans rendez-vous configuré, il ne reste qu'une porte : pas d'onglets.
  */
+const ANCRE_RENDEZ_VOUS = "#rendez-vous";
+
+/**
+ * Nombre de demandes d'ouverture du rendez-vous : arrivée sur la page avec
+ * l'ancre, clic sur un lien vers elle, changement d'ancre. Un COMPTEUR et non
+ * l'ancre elle-même : les liens de Next posent l'ancre par `pushState`, sans
+ * `hashchange`, et un second clic sur le même lien ne la change pas.
+ */
+let demandesRendezVous =
+  typeof window !== "undefined" && window.location.hash === ANCRE_RENDEZ_VOUS ? 1 : 0;
+
+function abonnerDemandes(rappel: () => void): () => void {
+  const surClic = (evenement: MouseEvent) => {
+    const cible = evenement.target;
+    const lien = cible instanceof Element ? cible.closest("a[href]") : null;
+    if (lien?.getAttribute("href")?.endsWith(ANCRE_RENDEZ_VOUS)) {
+      demandesRendezVous += 1;
+      rappel();
+    }
+  };
+  const surAncre = () => {
+    if (window.location.hash !== ANCRE_RENDEZ_VOUS) return;
+    demandesRendezVous += 1;
+    rappel();
+  };
+  document.addEventListener("click", surClic, true);
+  window.addEventListener("hashchange", surAncre);
+  return () => {
+    document.removeEventListener("click", surClic, true);
+    window.removeEventListener("hashchange", surAncre);
+  };
+}
+
+function lireDemandes(): number {
+  return demandesRendezVous;
+}
+
 export function FooterContact({
   modes,
   message,
@@ -24,7 +61,17 @@ export function FooterContact({
   /** « rendezVous » quand l'adresse porte un sujet (`?sujet=`). */
   ongletInitial?: "message" | "rendezVous";
 }) {
-  const [onglet, setOnglet] = useState<"message" | "rendezVous">(ongletInitial);
+  // Un lien vers `#rendez-vous` (boutons « Réserver » des pages) ouvre
+  // l'onglet rendez-vous, même quand le visiteur avait choisi l'autre.
+  const demandes = useSyncExternalStore(abonnerDemandes, lireDemandes, () => 0);
+  const [choisi, setOnglet] = useState<"message" | "rendezVous" | null>(null);
+  const [demandesVues, setDemandesVues] = useState(demandes);
+  if (demandes !== demandesVues) {
+    setDemandesVues(demandes);
+    setOnglet(null);
+  }
+  const onglet =
+    choisi ?? (demandes > 0 || ongletInitial === "rendezVous" ? "rendezVous" : "message");
   const base = useId();
   if (!rendezVous || !modes) return <>{message}</>;
 

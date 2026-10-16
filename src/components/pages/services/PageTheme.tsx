@@ -12,7 +12,6 @@ import {
   TONS,
   type Ton,
 } from "@/components/pages/services/ServicePage";
-import { SectionRendezVous } from "@/components/rendez-vous/SectionRendezVous";
 import { prixPlancher } from "@/content/offre";
 import type {
   BlocChiffres,
@@ -353,18 +352,13 @@ export function PageTheme({
           </div>
         </section>
 
-        <SectionRendezVous
-          emailContact={site.contact.email}
-          typeImpose={RDV_PAR_PRESTATION[page.prestation]}
-        />
-
         <FaqSection
           faq={[...page.faq.items]}
           eyebrow={page.faq.eyebrow}
           titleLines={page.faq.titleLines}
         />
       </main>
-      <Footer />
+      <Footer sujetRendezVous={RDV_PAR_PRESTATION[page.prestation]} />
       <FloatingNav site={site} />
     </>
   );

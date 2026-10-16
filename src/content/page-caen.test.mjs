@@ -67,8 +67,8 @@ describe("la page de Caen est cherchable", () => {
 
   test("ses liens internes visent des pages servies", () => {
     const chemins = contentRoutes.map((r) => r.pathname);
-    // Seule ancre locale admise : la prise de rendez-vous, que le gabarit des
-    // pages de prestation rend sur cette page (`SectionRendezVous`).
+    // Seule ancre locale admise : la prise de rendez-vous, portée par le pied
+    // de page de chaque page (`Footer`).
     const ancresLocales = ["#rendez-vous"];
     const liens = [
       ...pageCaen.contexte.liens,

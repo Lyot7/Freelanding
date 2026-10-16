@@ -20,6 +20,7 @@ import { FooterContactAvecSujet } from "./FooterContactAvecSujet";
 import { ReservationAvecSujet } from "@/components/rendez-vous/ReservationAvecSujet";
 import { ReservationRendezVous } from "@/components/rendez-vous/ReservationRendezVous";
 import { rendezVousContent } from "@/content/rendez-vous";
+import type { IdRendezVous } from "@/content/rendez-vous";
 import { resoudreConfiguration } from "@/lib/rendez-vous/config";
 
 /**
@@ -251,7 +252,15 @@ function SocialIcon({ social }: { social: Link }) {
 
 /* --------------------------------- Footer ------------------------------------ */
 
-export async function Footer() {
+export async function Footer({
+  sujetRendezVous,
+}: {
+  /**
+   * Sujet de rendez-vous de la page (pages de prestation) : présélectionné
+   * dans l'onglet rendez-vous, sans lecture de `?sujet=`.
+   */
+  sujetRendezVous?: IdRendezVous;
+} = {}) {
   const {
     brand,
     footerNav = [],
@@ -313,6 +322,12 @@ export async function Footer() {
     "relative h-auto w-auto whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60";
 
   return (
+    <>
+    {/* ANCRE DES BOUTONS « RÉSERVER » depuis le 2026-10-16 : le pied de page
+        porte le seul formulaire du site (message ou rendez-vous). Les liens
+        `#rendez-vous` des pages et `lienRendezVous` y mènent, et
+        `FooterContact` ouvre alors l'onglet rendez-vous. */}
+    <div id="rendez-vous" aria-hidden />
     <Reveal
       as="footer"
       className={
@@ -434,7 +449,25 @@ export async function Footer() {
                 rendez-vous). Les replis des frontières `Suspense` rendent le
                 même bloc sans lecture de `?sujet` : le HTML servi porte
                 toujours les deux formulaires. */}
-            {footerForm ? (
+            {footerForm && sujetRendezVous ? (
+              <FooterContact
+                modes={footerForm.modes}
+                message={formulaireMessage}
+                rendezVous={
+                  typesRendezVous.length > 0 ? (
+                    <ReservationRendezVous
+                      types={typesRendezVous}
+                      emailContact={contact.email}
+                      typeInitial={
+                        typesRendezVous.some((type) => type.id === sujetRendezVous)
+                          ? sujetRendezVous
+                          : undefined
+                      }
+                    />
+                  ) : undefined
+                }
+              />
+            ) : footerForm ? (
               <Suspense
                 fallback={
                   <FooterContact
@@ -629,5 +662,6 @@ export async function Footer() {
         </div>
       </div>
     </Reveal>
+    </>
   );
 }
