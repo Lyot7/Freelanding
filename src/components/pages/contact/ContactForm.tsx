@@ -23,7 +23,7 @@
  */
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Reveal } from "@/components/motion/Reveal";
 import { Icon, SwapText } from "@/components/ui";
@@ -197,6 +197,83 @@ function QuestionField({
   );
 }
 
+/** Étape qui porte chaque champ, pour y revenir quand le serveur le refuse. */
+const ETAPE_DU_CHAMP: Readonly<Record<string, number>> = {
+  typeProjet: 0,
+  objectif: 0,
+  budget: 1,
+  echeance: 1,
+  nom: 2,
+  email: 2,
+  message: 2,
+};
+
+const DERNIERE_ETAPE = 2;
+
+/**
+ * Barre de progression, même dessin que la prise de rendez-vous : un segment,
+ * un numéro et un titre par étape. En sombre et non en accent : l'accent clair
+ * de la prise de rendez-vous disparaît sur le fond clair de cette page. Une étape franchie ramène à elle ; on
+ * n'atteint pas une étape à venir sans valider la courante.
+ */
+function Progression({
+  titres,
+  etape,
+  onAller,
+}: {
+  titres: readonly string[];
+  etape: number;
+  onAller: (index: number) => void;
+}) {
+  return (
+    <ol className="m-0 grid w-full list-none grid-cols-3 gap-[6px] p-0">
+      {titres.map((titre, index) => {
+        const faite = index < etape;
+        const courante = index === etape;
+        const corps = (
+          <>
+            <span
+              aria-hidden
+              className={`block h-[2px] w-full transition-colors motion-reduce:transition-none ${
+                faite || courante ? "bg-background" : "bg-black/10"
+              }`}
+            />
+            <span className="flex flex-col gap-[4px] pt-[10px] text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em]">
+              <span className={faite || courante ? "text-background" : "text-background/60"}>
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <span className={courante ? "text-background" : "text-background/60"}>
+                {titre}
+              </span>
+            </span>
+          </>
+        );
+        return (
+          <li key={titre} aria-current={courante ? "step" : undefined}>
+            {faite ? (
+              <button
+                type="button"
+                onClick={() => onAller(index)}
+                className="block w-full text-left transition-opacity hover:opacity-70 motion-reduce:transition-none"
+              >
+                {corps}
+              </button>
+            ) : (
+              <div>{corps}</div>
+            )}
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+const CLASSE_BOUTON_PLEIN =
+  "group flex h-[50px] w-full items-center justify-center bg-background px-[20px] text-[13px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground transition-opacity disabled:cursor-progress disabled:opacity-60 tablet:w-auto";
+
+const CLASSE_BOUTON_RETOUR =
+  "flex h-[50px] w-full items-center justify-center border border-black/10 px-[20px] text-[13px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background transition-colors hover:border-black/30 motion-reduce:transition-none tablet:w-auto";
+
 function linkedDisclaimer(
   text: string,
   links: readonly ContentLink[],
@@ -252,8 +329,63 @@ export function ContactForm({
   const { questionnaire } = form;
   const enCours = envoi.etat === "envoi";
 
+  /*
+   * TROIS ÉTAPES, UNE SEULE AFFICHÉE, depuis le 2026-10-16 : sept champs d'un
+   * bloc faisaient long (Eliott). Tous les champs restent dans le formulaire,
+   * les étapes cachées par `hidden` : la soumission lit toujours le même
+   * `FormData`, et le repli sans script garde ses champs.
+   */
+  const [etape, setEtape] = useState(0);
+  const refFormulaire = useRef<HTMLFormElement>(null);
+  const refPremierRendu = useRef(true);
+
+  // Le focus suit l'étape, sauf au premier affichage de la page.
+  useEffect(() => {
+    if (refPremierRendu.current) {
+      refPremierRendu.current = false;
+      return;
+    }
+    conteneurEtape(etape)
+      ?.querySelector<HTMLElement>("select, input, textarea")
+      ?.focus({ preventScroll: true });
+  }, [etape]);
+
+  // Un champ refusé par le serveur ramène à son étape (ajusté au rendu, sans
+  // effet : https://react.dev/learn/you-might-not-need-an-effect).
+  const [champVu, setChampVu] = useState(envoi.champEnErreur);
+  if (envoi.champEnErreur !== champVu) {
+    setChampVu(envoi.champEnErreur);
+    const cible = envoi.champEnErreur ? ETAPE_DU_CHAMP[envoi.champEnErreur] : undefined;
+    if (cible !== undefined) setEtape(cible);
+  }
+
+  function conteneurEtape(index: number): HTMLElement | null | undefined {
+    return refFormulaire.current?.querySelector<HTMLElement>(`[data-etape="${index}"]`);
+  }
+
+  /** Valide les champs de l'étape affichée, puis passe à la suivante. */
+  function continuer() {
+    const conteneur = conteneurEtape(etape);
+    const champs = conteneur
+      ? Array.from(
+          conteneur.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(
+            "select, input, textarea",
+          ),
+        )
+      : [];
+    const invalide = champs.find((champ) => !champ.checkValidity());
+    if (invalide) {
+      invalide.reportValidity();
+      return;
+    }
+    setEtape((courante) => Math.min(courante + 1, DERNIERE_ETAPE));
+  }
+
+  const { etapes } = form;
+
   return (
     <form
+      ref={refFormulaire}
       // Bas de formulaire MESURÉ sur la source : `padding-bottom: 30px` sous 810
       // (hauteur de formulaire 526 contre 518 chez nous), 80 au-dessus. Il était
       // à 16 en mobile.
@@ -267,70 +399,68 @@ export function ContactForm({
       method="post"
       action="/api/contact"
       onSubmit={envoi.gererSoumission}
-      onReset={() => setTypeProjet(firstOption)}
+      onReset={() => {
+        setTypeProjet(firstOption);
+        setEtape(0);
+      }}
       /* Première interaction = chargement du script Turnstile. Tant que
          personne ne touche le formulaire, aucune requête ne part vers
          Cloudflare. */
       onFocusCapture={envoi.protection.activer}
       noValidate={false}
     >
-      {/* Fondus échelonnés de 0,1 s, dans l'ordre de lecture du formulaire. */}
       <FieldReveal delay={0.1}>
-        <label
-          htmlFor="projectType"
-          className="flex w-full flex-col items-end gap-[10px]"
-        >
-          <span className="text-right text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-background/60">
-            {form.projectType.label}
-          </span>
-          <span className="relative block w-full">
-            {/* Deux écarts MESURÉS contre `.framer-90sxxy` :
-                - bord GAUCHE nul à partir de 810 (`--framer-input-border-left-width:
-                  0px`, remis à 1px seulement sous le seuil). Relevé des quatre
-                  champs, bords t/r/b/l : source 1/1/1/0 à 810 et 1440, 1/1/1/1 à
-                  390 ; nous 1/1/1/1 partout ;
-                - le SELECT ne change PAS de couleur au focus : contrairement au
-                  champ texte, son enveloppe ne déclare aucun
-                  `--framer-input-focused-border-color`, et le relevé le confirme
-                  (bord `rgba(0,0,0,0.1)` identique au repos et au focus). Le
-                  nôtre passait son bord bas à l'accent. */}
-            <select
-              id="projectType"
-              name="typeProjet"
-              value={typeProjet}
-              onChange={(evenement) => setTypeProjet(evenement.target.value)}
-              aria-invalid={envoi.champEnErreur === "typeProjet" || undefined}
-              // `outline-none` retiré : voir `src/app/focus.css`.
-              className="h-[50px] w-full appearance-none border border-black/10 bg-transparent px-[16px] pr-[48px] text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-background transition-colors tablet:border-l-0 tablet:text-[14px]"
-            >
-              {form.projectType.options.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-            <Icon
-              name="chevron-down"
-              size={16}
-              className="pointer-events-none absolute right-[16px] top-1/2 -translate-y-1/2 text-background"
-            />
-          </span>
-        </label>
+        <Progression titres={etapes.titres} etape={etape} onAller={setEtape} />
       </FieldReveal>
 
-      {/* `key` sur le type : changer de type remet les réponses à zéro,
-          puisque les listes changent. */}
-      <div key={idRendezVous} className="contents">
+      {/* 01 — le projet : ce qui est cherché, et pour obtenir quoi. */}
+      <div data-etape={0} hidden={etape !== 0} className="flex w-full flex-col gap-[14px] tablet:gap-[16px]">
+        <FieldReveal delay={0.15}>
+          <label
+            htmlFor="projectType"
+            className="flex w-full flex-col items-end gap-[10px]"
+          >
+            <span className="text-right text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-background/60">
+              {form.projectType.label}
+            </span>
+            <span className="relative block w-full">
+              {/* Deux écarts MESURÉS contre `.framer-90sxxy` :
+                  - bord GAUCHE nul à partir de 810 (`--framer-input-border-left-width:
+                    0px`, remis à 1px seulement sous le seuil). Relevé des quatre
+                    champs, bords t/r/b/l : source 1/1/1/0 à 810 et 1440, 1/1/1/1 à
+                    390 ; nous 1/1/1/1 partout ;
+                  - le SELECT ne change PAS de couleur au focus : contrairement au
+                    champ texte, son enveloppe ne déclare aucun
+                    `--framer-input-focused-border-color`, et le relevé le confirme
+                    (bord `rgba(0,0,0,0.1)` identique au repos et au focus). Le
+                    nôtre passait son bord bas à l'accent. */}
+              <select
+                id="projectType"
+                name="typeProjet"
+                value={typeProjet}
+                onChange={(evenement) => setTypeProjet(evenement.target.value)}
+                aria-invalid={envoi.champEnErreur === "typeProjet" || undefined}
+                // `outline-none` retiré : voir `src/app/focus.css`.
+                className="h-[50px] w-full appearance-none border border-black/10 bg-transparent px-[16px] pr-[48px] text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-background transition-colors tablet:border-l-0 tablet:text-[14px]"
+              >
+                {form.projectType.options.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+              <Icon
+                name="chevron-down"
+                size={16}
+                className="pointer-events-none absolute right-[16px] top-1/2 -translate-y-1/2 text-background"
+              />
+            </span>
+          </label>
+        </FieldReveal>
+        {/* `key` sur le type : changer de type remet la réponse à zéro,
+            puisque la liste change. */}
         <QuestionField
-          name="budget"
-          label={questionnaire.budget.label}
-          placeholder={questionnaire.budget.placeholder}
-          options={tranchesBudget(idRendezVous)}
-          requis
-          delay={0.15}
-          enErreur={envoi.champEnErreur === "budget"}
-        />
-        <QuestionField
+          key={`objectif-${idRendezVous}`}
           name="objectif"
           label={questionnaire.objectif.label}
           placeholder={questionnaire.objectif.placeholder}
@@ -339,85 +469,109 @@ export function ContactForm({
           delay={0.2}
           enErreur={envoi.champEnErreur === "objectif"}
         />
+      </div>
+
+      {/* 02 — le budget et l'échéance. */}
+      <div data-etape={1} hidden={etape !== 1} className="flex w-full flex-col gap-[14px] tablet:gap-[16px]">
+        <QuestionField
+          key={`budget-${idRendezVous}`}
+          name="budget"
+          label={questionnaire.budget.label}
+          placeholder={questionnaire.budget.placeholder}
+          options={tranchesBudget(idRendezVous)}
+          requis
+          delay={0}
+          enErreur={envoi.champEnErreur === "budget"}
+        />
         <QuestionField
           name="echeance"
           label={questionnaire.echeance.label}
           placeholder={questionnaire.echeance.placeholder}
           options={OPTIONS_ECHEANCE}
           requis={false}
-          delay={0.25}
+          delay={0}
           enErreur={envoi.champEnErreur === "echeance"}
         />
       </div>
 
-      <FormField
-        id="name"
-        name="nom"
-        label={form.name.label}
-        placeholder={form.name.placeholder}
-        delay={0.2}
-        enErreur={envoi.champEnErreur === "nom"}
-      />
-      <FormField
-        id="email"
-        name="email"
-        label={form.email.label}
-        placeholder={form.email.placeholder}
-        type="email"
-        delay={0.3}
-        enErreur={envoi.champEnErreur === "email"}
-      />
-
-      <FieldReveal delay={0.4}>
-        <label
-          htmlFor="message"
-          className="flex w-full flex-col items-end gap-[10px]"
-        >
-          <span className="text-right text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-background/60">
-            {form.message.label}
-          </span>
-          <textarea
-            id="message"
-            name="message"
-            maxLength={4000}
-            aria-invalid={envoi.champEnErreur === "message" || undefined}
-            placeholder={form.message.placeholder}
-            // Bord GAUCHE nul dès 810 (cf. le commentaire du `<select>`).
-            // `outline-none` retiré : voir `src/app/focus.css`.
-            className="min-h-[100px] w-full resize-y border border-black/10 bg-transparent p-[16px] text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-background transition-colors placeholder:text-black/30 focus:border-b-accent tablet:border-l-0 tablet:text-[14px]"
-          />
-        </label>
-      </FieldReveal>
-
-      {/* Rangée bouton + mention : `padding-top` MESURÉ sur la source à 0 sous
-          810 (rangée de 97px = 50 + 16 + 31) et 20 au-dessus (rangée de 70px =
-          20 + 50). Elle était à 6 des deux côtés du seuil. */}
-      <div className="flex flex-col items-start gap-[16px] tablet:flex-row tablet:items-center tablet:gap-[20px] tablet:pt-[20px]">
-        {/* Le bouton fond lui aussi (`-O DIV "Send messageSend message"` sur le
-            live) ; `w-full tablet:w-auto` recopie la largeur qu'il avait comme
-            enfant direct de cette rangée flex. */}
-        <FieldReveal delay={0.5} className="w-full tablet:w-auto">
-          <button
-            type="submit"
-            disabled={enCours}
-            // Aucun style de focus ici, comme partout ailleurs : l'indicateur
-            // est global (`src/app/focus.css`). Le relevé de la source sur ce
-            // bouton (anneau par défaut du navigateur, `outline: 1px auto
-            // rgb(0,95,204)`, offset 0) reste vrai, mais c'est précisément
-            // l'anneau que le propriétaire a demandé de remplacer partout.
-            className="group flex h-[50px] w-full items-center justify-center bg-background px-[20px] text-[13px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground transition-opacity disabled:cursor-progress disabled:opacity-60 tablet:w-auto"
+      {/* 03 — les coordonnées, puis l'envoi. */}
+      <div data-etape={2} hidden={etape !== 2} className="flex w-full flex-col gap-[14px] tablet:gap-[16px]">
+        <FormField
+          id="name"
+          name="nom"
+          label={form.name.label}
+          placeholder={form.name.placeholder}
+          delay={0}
+          enErreur={envoi.champEnErreur === "nom"}
+        />
+        <FormField
+          id="email"
+          name="email"
+          label={form.email.label}
+          placeholder={form.email.placeholder}
+          type="email"
+          delay={0}
+          enErreur={envoi.champEnErreur === "email"}
+        />
+        <FieldReveal delay={0}>
+          <label
+            htmlFor="message"
+            className="flex w-full flex-col items-end gap-[10px]"
           >
-            {/* Motif `.framer-yuvr8` : 12 px vers le BAS, fondu croisé, 430 ms.
-                Relevé sur `/live-proxy/contact` à 1440, copie en attente posée à
-                `top: -12px` et non sous la boîte. */}
-            <SwapText travel={12}>
-              {enCours ? "Envoi en cours…" : form.submitLabel}
-            </SwapText>
-          </button>
+            <span className="text-right text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-background/60">
+              {form.message.label}
+            </span>
+            <textarea
+              id="message"
+              name="message"
+              maxLength={4000}
+              aria-invalid={envoi.champEnErreur === "message" || undefined}
+              placeholder={form.message.placeholder}
+              // Bord GAUCHE nul dès 810 (cf. le commentaire du `<select>`).
+              // `outline-none` retiré : voir `src/app/focus.css`.
+              className="min-h-[100px] w-full resize-y border border-black/10 bg-transparent p-[16px] text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-background transition-colors placeholder:text-black/30 focus:border-b-accent tablet:border-l-0 tablet:text-[14px]"
+            />
+          </label>
         </FieldReveal>
-        <p className="max-w-[189px] text-[12px] font-medium leading-[1.3] tracking-[-0.01em] text-background/60">
-          {linkedDisclaimer(form.disclaimer.text, form.disclaimer.links)}
-        </p>
+      </div>
+
+      {/* Rangée des boutons : `padding-top` MESURÉ sur la source à 0 sous 810
+          et 20 au-dessus. La mention légale n'accompagne que l'envoi. */}
+      <div className="flex flex-col items-start gap-[16px] tablet:flex-row tablet:items-center tablet:gap-[20px] tablet:pt-[20px]">
+        <FieldReveal delay={0.3} className="flex w-full flex-col gap-[10px] tablet:w-auto tablet:flex-row">
+          {etape > 0 ? (
+            <button
+              type="button"
+              onClick={() => setEtape((courante) => Math.max(courante - 1, 0))}
+              className={CLASSE_BOUTON_RETOUR}
+            >
+              {etapes.retour}
+            </button>
+          ) : null}
+          {etape < DERNIERE_ETAPE ? (
+            <button type="button" onClick={continuer} className={CLASSE_BOUTON_PLEIN}>
+              <SwapText travel={12}>{etapes.continuer}</SwapText>
+            </button>
+          ) : (
+            <button
+              type="submit"
+              disabled={enCours}
+              // Aucun style de focus ici : l'indicateur est global
+              // (`src/app/focus.css`).
+              className={CLASSE_BOUTON_PLEIN}
+            >
+              {/* Motif `.framer-yuvr8` : 12 px vers le BAS, fondu croisé, 430 ms. */}
+              <SwapText travel={12}>
+                {enCours ? "Envoi en cours…" : form.submitLabel}
+              </SwapText>
+            </button>
+          )}
+        </FieldReveal>
+        {etape === DERNIERE_ETAPE ? (
+          <p className="max-w-[189px] text-[12px] font-medium leading-[1.3] tracking-[-0.01em] text-background/60">
+            {linkedDisclaimer(form.disclaimer.text, form.disclaimer.links)}
+          </p>
+        ) : null}
       </div>
 
       {/* État d'envoi : c'est le retour que le prospect n'avait pas du tout. */}
