@@ -4,6 +4,7 @@ import {
   PREAVIS_MINIMAL_MS,
   validerReservation,
 } from "./validation.ts";
+import { prestation } from "../../content/offre.ts";
 
 /**
  * UNE RÉSERVATION N'EST PAS UN E-MAIL DE PLUS. Elle pose un événement dans
@@ -206,7 +207,14 @@ describe("validerReservation — le questionnaire", () => {
   });
 
   it("lit les tranches du type réellement demandé", () => {
-    const resultat = valider({ type: "decouverte", budget: "12000-24000", objectif: "tache" });
+    // Tranche propre à « decouverte » : deux et quatre fois le plancher du
+    // logiciel, lu dans `offre.ts` pour suivre un plancher qui bouge.
+    const plancher = prestation("logiciel").plancher;
+    const resultat = valider({
+      type: "decouverte",
+      budget: `${plancher * 2}-${plancher * 4}`,
+      objectif: "tache",
+    });
     expect(resultat.ok).toBe(true);
   });
 });

@@ -186,7 +186,7 @@ export function businessSchema(site: SiteConfig, home: HomeContent) {
     image: LOGO,
     email: site.contact.email ? `mailto:${site.contact.email}` : undefined,
     telephone: telephoneE164(site.contact.phone),
-    // Prix de départ de 3 000 et 6 000 €, devis au-dessus : le haut de l'échelle locale.
+    // Prix de départ de 3 000 et 3 500 €, devis au-dessus : le haut de l'échelle locale.
     priceRange: "€€€",
     // VILLE SANS RUE : l'activité se déplace chez le client ou travaille à
     // distance, aucune adresse de local n'est publiée. Google accepte une
@@ -350,11 +350,14 @@ export function serviceSchema(
       name: prestation.nom,
       description: prestation.resume,
       priceCurrency: "EUR",
+      // UNE OFFRE MENSUELLE (le CTO à temps partagé) déclare son unité : un
+      // plancher sans elle se lirait comme le prix d'un projet entier.
       priceSpecification: {
-        "@type": "PriceSpecification",
+        "@type": prestation.periode ? "UnitPriceSpecification" : "PriceSpecification",
         priceCurrency: "EUR",
         minPrice: prestation.plancher,
         valueAddedTaxIncluded: false,
+        ...(prestation.periode === "mois" ? { unitCode: "MON" } : {}),
       },
     },
   });

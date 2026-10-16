@@ -388,6 +388,19 @@ export const RDV_PAR_PRESTATION: Readonly<Record<PrestationId, IdRendezVous>> = 
 };
 
 /**
+ * Les deux offres sans prestation propre, depuis le 2026-10-16 : l'intégration
+ * IA et le CTO et référent IA à temps partagé. Aucun type d'événement Cal.com
+ * de plus : l'intégration IA se discute comme un outil (« logiciel »), et le
+ * pilotage technique part d'un problème dont la solution n'est pas encore
+ * choisie (« decouverte »). Un nouveau sujet demanderait son type d'événement
+ * chez Cal.com avant d'exister ici (`docs/CAL-COM.md`).
+ */
+export const RDV_HORS_PRESTATION = {
+  integrationIA: "logiciel",
+  cto: "decouverte",
+} as const satisfies Readonly<Record<string, IdRendezVous>>;
+
+/**
  * Adresse de la prise de rendez-vous, sujet compris.
  *
  * COMPOSÉE, JAMAIS ÉCRITE À LA MAIN : trois appelants la construisent

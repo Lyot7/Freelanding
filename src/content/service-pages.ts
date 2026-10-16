@@ -232,7 +232,12 @@ export const lienLocalParPrestation: Partial<
     },
     {
       avant: "Par besoin :",
-      liens: [lienTheme("erp-sur-mesure"), lienTheme("maintenance-sav"), lienTheme("automatisation")],
+      liens: [
+        lienTheme("erp-sur-mesure"),
+        lienTheme("maintenance-sav"),
+        lienTheme("automatisation"),
+        lienTheme("cto-referent-ia"),
+      ],
     },
     {
       avant: avantLienPrix,

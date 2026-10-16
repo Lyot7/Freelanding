@@ -70,7 +70,8 @@ export const vueAgentContent = {
         "Tous les montants sont hors taxes.",
       ],
       /* Aucune durée à côté d'un prix (règle du vault, `offre-grille-prix.md`). */
-      plancher: (prix: string) => `À partir de ${prix}\u00A0HT, prix fixé au devis.`,
+      /* Le prix arrive taxe comprise, et « par mois » derrière une offre mensuelle. */
+      plancher: (prix: string) => `À partir de ${prix}, prix fixé au devis.`,
       aPartirDe: (titre: string, prix: string) => `${titre} (${prix})`,
       inclus: "Compris dès le plancher",
       faitMonter: "Ce qui fait monter le prix",

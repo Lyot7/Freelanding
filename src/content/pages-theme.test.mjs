@@ -2,7 +2,11 @@ import { describe, expect, test } from "bun:test";
 import { calculArtisans } from "./page-artisans.ts";
 import { calculAutomatisation } from "./page-automatisation.ts";
 import { calculGmao } from "./page-gmao.ts";
-import { prestation } from "./offre.ts";
+import { ctoReferentIA, CTO_QUATRE_JOURS, euros, prestation, repereAgenceLogiciel } from "./offre.ts";
+import { pageCto } from "./page-cto.ts";
+import { pageErp } from "./page-erp.ts";
+import { lienLocalParPrestation } from "./service-pages.ts";
+import { RDV_HORS_PRESTATION } from "./rendez-vous.ts";
 import { pagesSecteur } from "./pages-secteur.ts";
 import { pagesTheme } from "./pages-theme.ts";
 import { contentRoutes } from "./routes.ts";
@@ -139,5 +143,53 @@ describe("accès par identifiant", () => {
     const { pageTheme } = await import("./pages-theme.ts");
     expect(() => pageTheme("inconnue")).toThrow("Page thématique inconnue");
     expect(pageTheme("artisans").chemin).toBe("/services/site-vitrine/artisans");
+  });
+});
+
+describe("la page CTO et référent IA", () => {
+  const tout = textes(pageCto).join("\n");
+
+  test("vise les trois requêtes : CTO externalisé, à temps partagé, référent IA", () => {
+    expect(pageCto.seo.titre).toContain("CTO externalisé");
+    expect(pageCto.h1).toContain("CTO à temps partagé");
+    expect(pageCto.seo.description).toContain("CTO externalisé à temps partagé");
+    expect(tout).toMatch(/référent IA/u);
+  });
+
+  test("présente l'offre mensuelle, prix lu dans offre.ts", () => {
+    expect(pageCto.offre).toBe(ctoReferentIA);
+    expect(pageCto.resume).toContain(`${euros(ctoReferentIA.plancher)} HT par mois`);
+    expect(pageCto.seo.description).toContain(`${euros(ctoReferentIA.plancher)} HT par mois`);
+    const prix = pageCto.faq.items.find((i) => /Combien coûte/u.test(i.question));
+    expect(prix.answer).toContain(euros(ctoReferentIA.plancher));
+    expect(prix.answer).toContain(euros(CTO_QUATRE_JOURS));
+  });
+
+  test("aucun prix au jour, aucun palier", () => {
+    expect(tout).not.toMatch(/par jour|\/\s*jour|à la journée|\bpaliers?\b/iu);
+  });
+
+  test("quatre questions, un déroulé, une réassurance d'abonnement", () => {
+    expect(pageCto.faq.items).toHaveLength(4);
+    expect(pageCto.blocs.some((b) => b.type === "etapes")).toBe(true);
+    expect(pageCto.reassurance).toMatch(/un mois de préavis/u);
+    expect(pageCto.reassurance).not.toMatch(/40\s?%/u);
+  });
+
+  test("se réserve sur le sujet du CTO, et la page pilier du logiciel y mène", () => {
+    expect(pageCto.rendezVous).toBe(RDV_HORS_PRESTATION.cto);
+    const liens = (lienLocalParPrestation.logiciel ?? []).flatMap((l) => l.liens.map((x) => x.href));
+    expect(liens).toContain(pageCto.chemin);
+  });
+});
+
+describe("la comparaison aux agences se fait à livrable égal", () => {
+  test("ERP : le plancher face au premier outil d'agence, jamais face à leur médiane", () => {
+    const prix = pageErp.faq.items.find((i) => /Combien coûte/u.test(i.question)).answer;
+    const note = pageErp.blocs.find((b) => b.type === "tableau" && b.note?.includes(repereAgenceLogiciel.source.nom)).note;
+    for (const texte of [prix, note]) {
+      expect(texte).toContain(euros(repereAgenceLogiciel.premierOutilMin));
+      expect(texte).not.toMatch(/médiane/u);
+    }
   });
 });

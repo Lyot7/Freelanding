@@ -317,9 +317,10 @@ export const homeContent: HomeContent = {
     // IDENTIQUE à `aboutContent.services.intro` : les deux pages rendent le même
     // bloc, et un chapô qui dérive est une page qui ne dit pas la même chose que
     // l’autre sans que personne le remarque.
-    // Mesuré : 3 lignes dans les 560 px du bloc, contre 4 auparavant.
+    // Élargi le 2026-10-16 aux quatre offres de l'accordéon : du site à
+    // l'outil, de l'IA au pilotage technique (`services.ts`).
     intro:
-      "Je pars de votre façon de travailler, et je construis ce qui lui correspond. Pas de fonctions en trop, rien à contourner.",
+      "Du site qui vous amène des clients à l’outil qui vous rend des heures, de l’IA dans vos logiciels au pilotage technique de votre entreprise. Je pars de votre façon de travailler, et je construis ce qui lui correspond.",
     items: services,
   },
 

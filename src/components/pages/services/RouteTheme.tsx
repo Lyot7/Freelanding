@@ -9,7 +9,7 @@ import type { IdPageTheme } from "@/content/page-theme";
 import { pageTheme } from "@/content/pages-theme";
 
 /**
- * Ce que partagent les cinq routes thématiques : la balise `<head>` et la page
+ * Ce que partagent les routes thématiques : la balise `<head>` et la page
  * avec son JSON-LD. Chaque `page.tsx` ne fait que nommer sa page.
  */
 export function metadataTheme(id: IdPageTheme): Metadata {
@@ -32,6 +32,7 @@ export async function RouteTheme({ id }: { id: IdPageTheme }) {
     ...prestation(page.prestation),
     nom: page.offre.nom,
     plancher: page.offre.plancher,
+    periode: page.offre.periode,
     resume: page.resume,
   };
 

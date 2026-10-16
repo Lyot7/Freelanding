@@ -1,7 +1,6 @@
 import { ImageProgressive } from "@/components/ui/ImageProgressive";
 import Link from "next/link";
 import { ArticlesSection } from "@/components/sections/ArticlesSection";
-import { LogoBandSection } from "@/components/sections/LogoBandSection";
 import { ServicesSection } from "@/components/sections/ServicesSection";
 import { TestimonialsSection } from "@/components/sections/TestimonialsSection";
 import { FloatingNav, Footer, Header } from "@/components/layout";
@@ -20,7 +19,6 @@ import type {
   AboutContent,
   BlogPost,
   Stat,
-  TeamMember,
 } from "@/lib/content/types";
 
 /*
@@ -170,76 +168,12 @@ function StatCell({ stat, speedMs }: { stat: Stat; speedMs: number }) {
   );
 }
 
-function TeamCard({ member }: { member: TeamMember }) {
-  return (
-    // En MOBILE la source empile : photo 110×135 au-dessus, texte en dessous,
-    // écart 14 — la carte fait 114×202. Les 114 comptent : à 110 le texte n'a
-    // plus la place et « Jennifer Peterson » passe sur deux lignes, ce qui
-    // décale la seconde rangée de 17px. À partir de 810 elle passe côte à côte
-    // (colonne photo 110px, gouttière 22px, contenu calé en bas).
-    <article className="flex w-[114px] flex-col gap-[14px] tablet:grid tablet:w-auto tablet:grid-cols-[110px_1fr] tablet:items-end tablet:gap-[22px]">
-      {member.avatar ? (
-        // Portrait 110×135 sur la source, soit un rapport 0,8148 (pas 0,8333).
-        // Les 3px manquants par carte décalaient tout le bas de page de 6px.
-        <div className="relative aspect-[110/135] w-[110px] overflow-hidden bg-black/[0.03] tablet:w-full">
-          {/* Portrait sur-cadré de 6 % et DÉRIVANT au scroll, comme la source.
-              Pas de `grayscale` : le live laisse les photos d'équipe en couleur
-              (vérifié, aucun filtre sur les 4 portraits, mêmes fichiers). */}
-          <ParallaxCover
-            src={member.avatar.src}
-            alt={member.avatar.alt}
-            overshoot={0.06}
-            /* Portrait de 110 px de large à 1440 (114 en mobile) : sans ce
-               `sizes`, le gabarit par défaut du composant ferait servir une
-               variante trois fois trop large pour la vignette. */
-            sizes="(min-width: 810px) 8vw, 114px"
-            /* La source fait ENTRER chaque portrait : le conteneur passe de
-               `scale 1.1` / opacité 0 à `scale 1` / opacité 1. Chez nous la
-               photo était posée à plat, seule sa dérive de parallaxe bougeait.
-               Invisible à `motion-sweep`, qui apparie par contenu textuel : un
-               cadre d'image n'a pas de texte, donc pas de clé. */
-            reveal
-          >
-            {/* RELEVÉ sur `/about` : quatre portraits d'équipe, hôte 110 × 135
-                à 1440, z-3, opacité 0,05 (nous étions à 0,07). */}
-            <Grain opacity={0.05} className="z-[3]" />
-          </ParallaxCover>
-        </div>
-      ) : (
-        <div className="aspect-[.8333] w-full bg-black/[0.03]" aria-hidden />
-      )}
-      <div className="flex min-w-0 flex-col items-start gap-[5px]">
-        <h3 className="text-[14px] font-medium leading-[1.3] tracking-[-0.01em] text-background">
-          {member.name}
-        </h3>
-        <p className="text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-black/60">
-          {member.role}
-          {member.company ? (
-            <>
-              <br />
-              {/* 13px / 500 sur le live (nous étions à 11px hérités / 600). */}
-              <span className="text-[13px] font-medium text-background">
-                {member.company}
-              </span>
-            </>
-          ) : null}
-        </p>
-      </div>
-    </article>
-  );
-}
-
 function AboutStory({ about }: { about: AboutContent }) {
-  /* LE CHAPÔ DE « QUI JE SUIS » EST LE DERNIER PARAGRAPHE, pas le quatrième.
-     La destructuration positionnelle précédente (`[lead, process, positioning,
-     smallByDesign]`) laissait le CINQUIÈME paragraphe hors du rendu : il était
-     écrit dans `about.ts`, il ne s'affichait nulle part, et `bodyHighlights`,
-     qui déclare deux fragments de ce paragraphe-là, ne trouvait donc rien à
-     mettre en avant — une emphase éteinte sans que rien ne le signale.
-     La colonne du milieu prend tout l'entre-deux, le chapô prend la fin. */
+  /* LA PHRASE D'OUVERTURE EN GRAND, LES TROIS PARAGRAPHES ENSUITE, l'un
+     après l'autre dans une seule colonne (2026-10-16, demande d'Eliott). Ils
+     étaient répartis sur deux colonnes étroites, plus un chapô en capitales
+     sous un titre « Qui je suis » qui ne disait rien de lui. */
   const [lead, ...suite] = about.body;
-  const smallByDesign = suite.at(-1);
-  const milieu = suite.slice(0, -1);
 
   return (
     <section className="relative flex w-full justify-center bg-muted px-[20px] pb-[30px] pt-[20px] text-background tablet:px-[24px] tablet:pb-[90px] tablet:pt-[30px] desktop:px-[30px]">
@@ -288,34 +222,18 @@ function AboutStory({ about }: { about: AboutContent }) {
           </div>
         ) : null}
 
-        {/* `gap-y` À PARTIR DE 810, et `gap-x` toujours nul : la gouttière
-            horizontale de la source est bien à zéro (elle vit dans le `pr` de
-            la cellule), mais dès qu'il y a plus de deux paragraphes une
-            DEUXIÈME RANGÉE apparaît, et sans gouttière verticale les deux
-            paragraphes d'une même colonne se collent et se lisent comme un
-            seul. À deux paragraphes il n'y a qu'une rangée : `gap-y` est alors
-            sans effet, la mise en page d'origine est intacte. */}
-        <div className="grid w-full grid-cols-1 gap-[16px] pb-[20px] tablet:ml-auto tablet:w-1/2 tablet:grid-cols-2 tablet:gap-x-0 tablet:gap-y-[16px] tablet:pb-[30px]">
-          {/* La gouttière de 20px vit sur la CELLULE, pas sur le paragraphe :
-              en `border-box` un `pr-20` sur le <p> rognerait sa colonne de texte
-              (5 lignes au lieu de 4 à 1440, 4 au lieu de 5 à 810). */}
-          {milieu.filter(Boolean).map((paragraph) => (
-            <div key={paragraph} className="pr-[20px]">
-              {/* Plafond de 320 px À PARTIR DE 810, et pas avant. La source
-                  pose bien un `max-width: 320px` sur cette cellule — relevé
-                  `none` à 809, `320px` à 810, 1000, 1199, 1200, 1300, 1440, 1600
-                  et 1920. Le plafond inconditionnel qui existait ici avait été
-                  retiré à juste titre : il rabotait le texte à 320 px là où la
-                  source en fait 749 juste sous la bascule tablette. Mais la
-                  version correctement bornée n'avait jamais été remise, d'où
-                  325 px à 1440 et 340 au-delà de 1600 là où la source tient 320.
-                  `text-background/60` et non `text-black/60` : chez Tailwind v4
-                  le second rend du NOIR PUR à 60 %, la charte du site est
-                  `#0b0b0b`. */}
-              <p className="text-[15px] font-medium leading-[1.3] tracking-[-0.01em] text-background/60 tablet:max-w-[320px]">
-                {paragraph}
-              </p>
-            </div>
+        <div className="flex w-full flex-col gap-[16px] pb-[40px] tablet:ml-auto tablet:w-1/2 tablet:gap-[20px] tablet:pb-[70px]">
+          {suite.filter(Boolean).map((paragraph) => (
+            <p
+              key={paragraph}
+              className="m-0 max-w-[62ch] text-[16px] font-medium leading-[1.45] tracking-[-0.01em] text-background/70 tablet:text-[17px]"
+            >
+              <Highlighted
+                text={paragraph}
+                highlights={about.bodyHighlights ? [...about.bodyHighlights] : []}
+                highlightClassName="text-background"
+              />
+            </p>
           ))}
         </div>
 
@@ -403,93 +321,6 @@ function AboutStory({ about }: { about: AboutContent }) {
           </div>
         </div>
 
-        {/* Bloc équipe — structure MESURÉE sur le live : une colonne verticale de
-            gap 30, avec le grand titre « THE TEAM. » EN HAUT (moitié gauche,
-            aligné à droite), puis un empilement de gap 50 dans la moitié droite
-            contenant le chapô puis la grille. Le titre était purement absent, et
-            le chapô se trouvait à gauche au lieu de la droite : d'où un déficit de
-            275 px de hauteur de section. */}
-        {/* Écart titre « THE TEAM. » → colonne de droite MESURÉ sur la source :
-            20 sous 810 (bas du titre 1970, bloc suivant 1990 à 390, idem à 600
-            et 809), 30 à partir de 810. Il était à 30 partout. */}
-        <div className="flex w-full flex-col gap-[20px] tablet:gap-[30px]">
-          {/* Le titre est RÉVÉLÉ LIGNE PAR LIGNE sur le live (motion-sweep :
-              `TO SPAN "The"` et `TO SPAN "team."`, transform + opacité), il était
-              figé chez nous. Motif repris tel quel de ShowreelSection : une ligne
-              = un masque `overflow-hidden` + un `inline-block` qui remonte.
-              Le découpage vient de la donnée (`about.teamTitleLines`) et NON de
-              la largeur de la fenêtre : le couper est donc sûr. Il était écrit
-              en dur en anglais (« The » / « team. »).
-              La casse suit celle de la donnée : le rendu est identique
-              puisque le `h2` porte déjà `uppercase`. */}
-          {/* Le DÉCLENCHEUR vit sur le `h2`, pas sur chaque ligne.
-              Un observateur posé sur la ligne raisonne sur sa boîte TRANSFORMÉE
-              et CLIPPÉE par le masque : décalée de 40 px sous un masque de 75,
-              elle n'entre dans la zone d'observation que 40 px trop tard, et
-              chaque ligne repart pour son propre compte au lieu de suivre la
-              cascade. Mesuré par saut direct puis attente de 1,7 s à 1440x900 :
-              « team. » restait masqué tant que son haut était à 804 et se
-              révélait à 755, alors que la source la révèle dès 970 — 215 px de
-              retard. La source déclenche les DEUX lignes au même défilement
-              (3948 → 3957 pour « News and » / « updates. »), signature d'un
-              déclencheur unique porté par le conteneur. */}
-          <LineReveal
-            as="h2"
-            lines={about.teamTitleLines ? [...about.teamTitleLines] : []}
-            className="m-0 flex w-full flex-col p-0 text-left text-[52px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] text-background tablet:w-1/2 tablet:text-right tablet:text-[68px] desktop:text-[92px]"
-            lineClassName="w-full overflow-hidden leading-[0.82]"
-          />
-
-          <div className="flex w-full flex-col gap-[30px] tablet:ml-auto tablet:w-1/2 tablet:gap-[50px]">
-            {smallByDesign ? (
-              // 12 px UPPERCASE à 60 %, avec deux fragments en noir plein. La
-              // version précédente : 14 px, casse normale, sans emphase.
-              // Largeur : 280 px sous 810, 260 au-delà — mesuré, la source rend
-              // ce bloc en 280×43 à 390, 600 et 808, puis en 260×43 à 810 et
-              // 1440. Il était plafonné à 260 partout.
-              // Le chapô apparaît en FONDU sur le live (motion-sweep :
-              // `-O DIV "Small on purpose. four p"`, opacité seule, sans
-              // translation), il était immobile chez nous. Le fondu est porté par
-              // un `div` enveloppant et non par le `<p>` : c'est bien un DIV qui
-              // s'anime sur la source, et le paragraphe se révèle D'UN BLOC —
-              // son texte vient des données, ses retours à la ligne dépendent de
-              // la largeur, les découper les figerait hors de 1440.
-              <Reveal
-                as="div"
-                initialOpacity={0.001}
-                duration={0.8}
-                delay={0.15}
-              >
-                <p className="max-w-[280px] text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-black/60 tablet:max-w-[260px]">
-                  <Highlighted
-                    text={smallByDesign}
-                    highlights={
-                      about.bodyHighlights ? [...about.bodyHighlights] : []
-                    }
-                    highlightClassName="text-background"
-                  />
-                </p>
-              </Reveal>
-            ) : null}
-          </div>
-
-          {/* Largeur de la grille : PLEINE entre 810 et 1199, puis moitié droite
-              à partir de 1200. Mesuré aux deux bornes de chaque bande : noms à
-              x156/537 en 810 et x852/1197 en 1440. Enfermée en permanence dans
-              le demi-conteneur du chapô, elle comprimait les colonnes en
-              tablette (410 et 600 au lieu de 156 et 537) et cassait les noms sur
-              deux lignes ; en pleine largeur partout, elle ratait le desktop.
-              Gouttière de colonne nulle à toutes les largeurs (`gap: 20px 0`). */}
-          {/* `mt-[10px]` en mobile : la source empile le chapô ET la grille dans
-              un même bloc d'écart 30 (bas du chapô 2033, grille 2063 à 390),
-              alors que chez nous la grille est un troisième enfant de la colonne
-              dont l'écart vaut 20. Les 10 manquants sont rendus ici. */}
-          <div className="mt-[10px] grid grid-cols-2 gap-x-0 gap-y-[20px] tablet:mt-[20px] tablet:gap-y-[30px] desktop:ml-auto desktop:w-1/2">
-            {about.team.map((member) => (
-              <TeamCard key={member.name} member={member} />
-            ))}
-          </div>
-        </div>
       </div>
     </section>
   );
@@ -530,7 +361,7 @@ export function AboutParcours({
           />
         </div>
 
-        <div className="flex flex-col gap-[48px] tablet:pl-[30px] desktop:gap-[64px] desktop:pl-[40px]">
+        <div className="flex flex-col gap-[64px] tablet:pl-[30px] desktop:gap-[90px] desktop:pl-[40px]">
           {parcours.groupes.map((groupe) => (
             <Reveal
               key={groupe.titre}
@@ -539,8 +370,15 @@ export function AboutParcours({
               initialY={30}
               duration={0.8}
             >
-              <h3 className="m-0 pb-[14px] text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/60">
+              {/* EXPÉRIENCE ET FORMATION SE DISTINGUENT AU PREMIER COUP D'ŒIL
+                  depuis le 2026-10-16 (demande d'Eliott) : chaque groupe ouvre
+                  sur un vrai titre, son nombre d'étapes et un filet plein, là
+                  où un surtitre gris de 12 px les laissait se confondre. */}
+              <h3 className="m-0 flex items-baseline justify-between gap-[12px] border-b-2 border-background pb-[14px] text-[26px] font-semibold uppercase leading-none tracking-[-0.04em] text-background desktop:text-[32px]">
                 {groupe.titre}
+                <span className="text-[12px] font-medium tracking-[-0.01em] text-background/60 tabular-nums">
+                  {String(groupe.etapes.length).padStart(2, "0")}
+                </span>
               </h3>
               <ol className="m-0 flex list-none flex-col p-0">
                 {groupe.etapes.map((etape) => (
@@ -616,11 +454,10 @@ function selectArticles(
 }
 
 export async function AboutPage() {
-  const [site, about, posts, home] = await Promise.all([
+  const [site, about, posts] = await Promise.all([
     content.getSiteConfig(),
     content.getAbout(),
     content.getPosts(),
-    content.getHome(),
   ]);
   const articles = selectArticles(posts, about.articles.featuredSlugs);
 
@@ -650,7 +487,6 @@ export async function AboutPage() {
         ) : null}
         {/* Bande de logos fixe (140px) : elle sépare les témoignages du
             teaser blog sur la source, elle manquait ici. */}
-        {home.logoBand ? <LogoBandSection logoBand={home.logoBand} /> : null}
         {/* Retrait haut MESURÉ à 30 en mobile sur `/about` (contre 40 sur la
             home) : la section faisait 2119 sur la source à 390 et 2129 chez
             nous, écart identique à 600 et 809. */}

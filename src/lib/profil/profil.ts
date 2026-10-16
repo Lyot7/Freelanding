@@ -1,7 +1,17 @@
 import { content, type ContentRepository } from "@/lib/content";
 import type { ContentBlock, Stat } from "@/lib/content/types";
 import { absoluteUrl } from "@/lib/site-url";
-import { aPartirDe, euros, prestations, prixPlancher, type Prestation } from "@/content/offre";
+import {
+  aPartirDe,
+  ctoReferentIA,
+  euros,
+  integrationIA,
+  prestations,
+  prixAffiche,
+  type Offre,
+  type Prestation,
+} from "@/content/offre";
+import { CHEMIN_AUTOMATISATION, CHEMIN_CTO } from "@/content/page-theme";
 import { lienRendezVous, rendezVousContent } from "@/content/rendez-vous";
 import { CHEMIN_PROFIL_TEXTE, vueAgentContent } from "@/content/vue-agent";
 
@@ -71,14 +81,29 @@ function phrase(texte: string): string {
   return /[.!?…»]$/.test(texte.trim()) ? texte.trim() : `${texte.trim()}.`;
 }
 
-function blocsPrestation(prestation: Prestation): ContentBlock[] {
+/** Une offre et sa page, pour retrouver le détail d'une ligne de l'accordéon. */
+interface OffreAvecPage {
+  readonly offre: Offre;
+  readonly page: string;
+}
+
+/**
+ * Les offres sans prestation propre, présentes dans l'accordéon depuis le
+ * 2026-10-16 : leur page est une page thématique, pas `/services/<slug>`.
+ */
+const OFFRES_HORS_PRESTATION: readonly OffreAvecPage[] = [
+  { offre: integrationIA, page: CHEMIN_AUTOMATISATION },
+  { offre: ctoReferentIA, page: CHEMIN_CTO },
+];
+
+function blocsOffre(offre: Offre): ContentBlock[] {
   return [
-    p(T.offres.plancher(prixPlancher(prestation))),
+    p(T.offres.plancher(prixAffiche(offre, "\u00A0HT"))),
     p(`${T.offres.inclus}${DP}`),
-    liste(prestation.inclus),
+    liste(offre.inclus),
     p(`${T.offres.faitMonter}${DP}`),
-    liste(prestation.faitMonter),
-    p(`${T.offres.horsOffre}${DP} ${minuscule(prestation.horsOffre)}`),
+    liste(offre.faitMonter),
+    p(`${T.offres.horsOffre}${DP} ${minuscule(offre.horsOffre)}`),
   ];
 }
 
@@ -142,18 +167,18 @@ export async function construireProfil(
      tiré de `offre.ts` : plancher, ce qui est compris, ce qui fait monter le
      prix. */
   blocs.push(h2(T.sections.offres), p(home.services.intro ?? ""), ...T.offres.prix.map(p));
+  const offres: readonly OffreAvecPage[] = [
+    ...sources.prestations.map((offre) => ({ offre, page: `/services/${offre.slug}` })),
+    ...OFFRES_HORS_PRESTATION,
+  ];
   for (const service of home.services.items) {
-    const prestation = sources.prestations.find(
-      (candidate) => service.cta?.href === `/services/${candidate.slug}`,
-    );
-    const prix = prestation ? aPartirDe(prestation, "\u00A0HT") : service.price;
+    const trouvee = offres.find((candidate) => service.cta?.href === candidate.page);
+    const prix = trouvee ? aPartirDe(trouvee.offre, "\u00A0HT") : service.price;
     blocs.push(
       h3(prix ? T.offres.aPartirDe(service.title, prix) : service.title),
       ...service.body.map(p),
-      ...(prestation ? blocsPrestation(prestation) : []),
-      ...(prestation
-        ? [p(`${T.offres.detail}${DP} ${absoluteUrl(`/services/${prestation.slug}`)}`)]
-        : []),
+      ...(trouvee ? blocsOffre(trouvee.offre) : []),
+      ...(trouvee ? [p(`${T.offres.detail}${DP} ${absoluteUrl(trouvee.page)}`)] : []),
       ...(service.rdvHref
         ? [p(`${T.offres.rendezVous}${DP} ${absoluteUrl(service.rdvHref)}`)]
         : []),
