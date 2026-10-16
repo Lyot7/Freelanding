@@ -147,7 +147,11 @@ describe("la page de Caen ne promet que ce qui est vrai", () => {
 
   test("la comparaison avec les agences cite son chiffre, sa source et sa date", () => {
     const reponse = pageCaen.faq.items.find((i) => /agence/u.test(i.question))?.answer;
-    expect(reponse).toContain(euros(repereAgenceSite.mediane));
+    // À livrable égal (2026-10-16) : la fourchette d'un site soigné, jamais
+    // mon plancher contre la médiane des agences.
+    expect(reponse).toContain(euros(repereAgenceSite.soigneMin));
+    expect(reponse).toContain(euros(repereAgenceSite.soigneMax));
+    expect(reponse).not.toContain("médiane");
     expect(reponse).toContain(repereAgenceSite.source.nom);
     expect(reponse).toContain(repereAgenceSite.source.releve);
   });

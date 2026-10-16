@@ -172,12 +172,13 @@ export const pageCaen: PageLocale = {
     departements: ["Calvados"],
   },
   contexte: {
-    /* H2 VISANT « agence web Caen » (carte SEO du 2026-10-15). « Deux fois
-       moins » n'est exact que pour le site : médiane d'agence contre plancher,
-       recalculée par `offre.test.mjs`. La source et sa date sont dans
+    /* H2 VISANT « agence web Caen » (carte SEO du 2026-10-15). Depuis le
+       2026-10-16, la comparaison se fait À LIVRABLE ÉGAL, décision d'Eliott :
+       la fourchette d'un site vitrine soigné en agence contre mon plancher,
+       jamais mon plancher contre leur médiane. La source et sa date sont dans
        l'introduction, juste dessous. */
-    titre: "Agence web à Caen : la qualité d’une agence, pour environ deux fois moins cher",
-    intro: `Artisans, commerçants, PME de services ou d’industrie : vos clients vous cherchent sur Google avec votre métier et le nom de leur ville. Je conçois, j’écris et je code votre site comme une agence, ${aPartirDe(VITRINE, " HT")}, quand ${repereAgenceSite.source.nom} relève une médiane de ${euros(repereAgenceSite.mediane)} en agence pour un site de PME (${repereAgenceSite.source.releve}). Le site part de ces recherches, de Caen à Bayeux, Lisieux ou Honfleur.`,
+    titre: "Agence web à Caen : la qualité d’une agence, jusqu’à deux fois moins cher",
+    intro: `Artisans, commerçants, PME de services ou d’industrie : vos clients vous cherchent sur Google avec votre métier et le nom de leur ville. Je conçois, j’écris et je code votre site comme une agence, ${aPartirDe(VITRINE, " HT")}, quand un site vitrine soigné se facture ${euros(repereAgenceSite.soigneMin)} à ${euros(repereAgenceSite.soigneMax)} en agence selon ${repereAgenceSite.source.nom} (${repereAgenceSite.source.releve}). Le site part de ces recherches, de Caen à Bayeux, Lisieux ou Honfleur.`,
     titreLiens: "Pour aller plus loin",
     liens: [
       {
@@ -393,7 +394,7 @@ export const pageCaen: PageLocale = {
       },
       {
         question: "Pourquoi un freelance plutôt qu’une agence web de Caen ?",
-        answer: `Vous parlez à la personne qui conçoit et code votre site, sans chef de projet entre nous. Sans structure à payer, je demande environ deux fois moins que la médiane d’un site de PME en agence, ${euros(repereAgenceSite.mediane)} selon ${repereAgenceSite.source.nom} (${repereAgenceSite.source.releve}). Le code et l’hébergement sont à votre nom.`,
+        answer: `Vous parlez à la personne qui conçoit et code votre site. Sans structure à payer, un site vitrine soigné coûte ${aPartirDe(VITRINE, " HT")} chez moi, contre ${euros(repereAgenceSite.soigneMin)} à ${euros(repereAgenceSite.soigneMax)} en agence selon ${repereAgenceSite.source.nom} (${repereAgenceSite.source.releve}). Le code et l’hébergement sont à votre nom.`,
       },
     ],
   },
