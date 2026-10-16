@@ -4,6 +4,9 @@ import { renderToStaticMarkup } from "react-dom/server";
 
 import { aboutContent } from "@/content/about";
 import { AboutParcours } from "./AboutPage";
+// Fichier de types seuls : importé pour que la mesure de couverture le voie
+// (les champs `apport` et `domaines` y sont déclarés).
+import "@/lib/content/types";
 
 /**
  * LA FORMATION DÉTAILLÉE (2026-10-16) : chaque diplôme dit son niveau, ce
