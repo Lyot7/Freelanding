@@ -240,6 +240,10 @@ export const homeContent: HomeContent = {
     body: [
       "Je suis développeur full-stack, installé à Caen, et je travaille seul. Du premier appel à la mise en ligne, vous parlez à celui qui conçoit et qui code votre projet.",
       "Avant de me lancer, j’ai développé chez Médiapilote, Würth France, MeilleursBiens, puis MECA SERVICES, où je tenais aussi la boutique en ligne. J’y ai appris à partir de ce qu’un site ou un outil doit rapporter, et à décider avant la première ligne de code de ce qui ne se voit pas : la vitesse, l’architecture, ce que lisent les moteurs de recherche.",
+      /* LA VISION D'ELIOTT, ajoutée le 2026-10-16 à sa demande : du premium,
+         fini, rien au hasard, et le prix qui va avec. « Jusqu'à » garde la
+         phrase vraie, comme le positionnement du héros. */
+      "Je livre des sites et des outils finis. Chaque détail est décidé, testé et documenté avant de vous être remis : rien n’est laissé au hasard, et rien n’est bâclé pour tenir une date. C’est le niveau qu’une entreprise attend d’une agence, pour un prix jusqu’à deux fois moins élevé, parce qu’il ne paie que le travail.",
     ],
     // Emphase (source Framer) : ces expressions passent en noir plein au
     // milieu du paragraphe rendu à 70 %.
@@ -247,6 +251,7 @@ export const homeContent: HomeContent = {
       "je travaille seul",
       "vous parlez à celui qui conçoit et qui code votre projet",
       "partir de ce qu’un site ou un outil doit rapporter",
+      "rien n’est laissé au hasard",
     ],
     /*
      * GRILLE D'INFOS ET COMPTEUR RENDUS le 2026-10-16 : Eliott trouvait la

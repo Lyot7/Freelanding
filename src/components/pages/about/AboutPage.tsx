@@ -503,7 +503,7 @@ function AboutStory({ about }: { about: AboutContent }) {
  * droite. La colonne « nature » (alternance, stage, diplôme) dit le statut de
  * chaque ligne par la structure, sans phrase d'explication.
  */
-function AboutParcours({
+export function AboutParcours({
   parcours,
 }: {
   parcours: NonNullable<AboutContent["parcours"]>;
@@ -576,6 +576,23 @@ function AboutParcours({
                         <p className="m-0 text-[12px] font-medium uppercase leading-[1.3] tracking-[-0.01em] text-background/60">
                           {etape.lieu}
                         </p>
+                      ) : null}
+                      {etape.apport ? (
+                        <p className="m-0 mt-[6px] max-w-[60ch] text-[15px] font-medium leading-[1.45] tracking-[-0.01em] text-background/70">
+                          {etape.apport}
+                        </p>
+                      ) : null}
+                      {etape.domaines?.length ? (
+                        <ul className="m-0 mt-[6px] flex list-none flex-wrap gap-[6px] p-0">
+                          {etape.domaines.map((domaine) => (
+                            <li
+                              key={domaine}
+                              className="border border-black/15 px-[8px] py-[4px] text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-background"
+                            >
+                              {domaine}
+                            </li>
+                          ))}
+                        </ul>
                       ) : null}
                     </div>
                   </li>

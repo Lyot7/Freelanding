@@ -142,13 +142,18 @@ describe("HeroSection, comparaison de prix", async () => {
     const html = rendre(heroSansVideo);
     const bloc = html.slice(html.indexOf('data-part="comparaison"'));
     expect(bloc).toContain(comparaison.sujet);
-    expect(bloc.indexOf(comparaison.sujet)).toBeLessThan(bloc.indexOf("<dl"));
+    // Une seule ligne : le sujet d'abord, puis chaque acteur et son prix.
+    let curseur = bloc.indexOf(comparaison.sujet);
     for (const ligne of comparaison.lignes) {
       const motif = new RegExp(
-        `<dt[^>]*>${ligne.qui}</dt><dd class="[^"]*${ligne.fort ? "text-accent" : "text-foreground-60"}"[^>]*>${ligne.prix}</dd>`,
+        `${ligne.qui}<span class="[^"]*${ligne.fort ? "text-accent" : "text-foreground"}"[^>]*>${ligne.prix}</span>`,
       );
       expect(bloc).toMatch(motif);
+      const position = bloc.indexOf(ligne.prix);
+      expect(position).toBeGreaterThan(curseur);
+      curseur = position;
     }
+    expect(bloc).not.toContain("<dl");
     expect(comparaison.lignes.filter((ligne) => ligne.fort)).toHaveLength(1);
   });
 
