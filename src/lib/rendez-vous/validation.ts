@@ -125,20 +125,30 @@ function lireChoix(
   corps: Record<string, unknown>,
   champ: ChampQuestionnaire,
   options: readonly OptionQuestion[],
-  requis: boolean,
 ):
-  | { readonly ok: true; readonly valeur?: string }
+  | { readonly ok: true; readonly valeur: string }
   | { readonly ok: false; readonly motif: MotifRejetReservation } {
   const valeur = lireChaine(corps, champ).trim();
   if (valeur.length === 0) {
-    return requis
-      ? { ok: false, motif: { type: "champ_invalide", champ, raison: "requis" } }
-      : { ok: true };
+    return { ok: false, motif: { type: "champ_invalide", champ, raison: "requis" } };
   }
   if (!options.some((option) => option.id === valeur)) {
     return { ok: false, motif: { type: "champ_invalide", champ, raison: "hors_liste" } };
   }
   return { ok: true, valeur };
+}
+
+/** Même lecture, pour une question facultative : vide = pas de réponse. */
+function lireChoixFacultatif(
+  corps: Record<string, unknown>,
+  champ: ChampQuestionnaire,
+  options: readonly OptionQuestion[],
+):
+  | { readonly ok: true; readonly valeur?: string }
+  | { readonly ok: false; readonly motif: MotifRejetReservation } {
+  return lireChaine(corps, champ).trim().length === 0
+    ? { ok: true }
+    : lireChoix(corps, champ, options);
 }
 
 export function validerReservation(
@@ -249,27 +259,20 @@ export function validerReservation(
       { ...champs, budget: rattacherTranche(type, lireChaine(champs, "budget").trim()) },
       "budget",
       tranchesBudget(type),
-      true,
     );
     if (!budget.ok) return budget;
-    // `requis` garantit la valeur ; le test la rend lisible au typage sans `!`.
-    if (budget.valeur === undefined) return { ok: false, motif: { type: "corps_illisible" } };
     budgetRetenu = budget.valeur;
   }
-  const objectif = lireChoix(champs, "objectif", optionsObjectif(type), true);
+  const objectif = lireChoix(champs, "objectif", optionsObjectif(type));
   if (!objectif.ok) return objectif;
   let outilRetenu: string | undefined;
   if (questionsPosees.outil) {
-    const outil = lireChoix(champs, "outil", OPTIONS_OUTIL, true);
+    const outil = lireChoix(champs, "outil", OPTIONS_OUTIL);
     if (!outil.ok) return outil;
-    if (outil.valeur === undefined) return { ok: false, motif: { type: "corps_illisible" } };
     outilRetenu = outil.valeur;
   }
-  const echeance = lireChoix(champs, "echeance", OPTIONS_ECHEANCE, false);
+  const echeance = lireChoixFacultatif(champs, "echeance", OPTIONS_ECHEANCE);
   if (!echeance.ok) return echeance;
-  if (objectif.valeur === undefined) {
-    return { ok: false, motif: { type: "corps_illisible" } };
-  }
 
   return {
     ok: true,

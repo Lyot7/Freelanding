@@ -260,6 +260,7 @@ describe("ReservationRendezVous — les questions suivent le sujet", () => {
     const envois = simulerServeur([
       { status: 400, corps: { message: "Choisissez l’outil où se fait cette tâche.", champ: "outil" } },
       { status: 400, corps: { message: "Indiquez votre nom.", champ: "nom" } },
+      { status: 409, corps: { message: "Ce créneau vient d’être pris.", champ: "creneau" } },
       { status: 200, corps: { ok: true } },
     ]);
     montage = await monter("ia");
@@ -298,9 +299,15 @@ describe("ReservationRendezVous — les questions suivent le sujet", () => {
     await soumettre(conteneur);
     expect(conteneur.querySelector('input[name="nom"]')).not.toBeNull();
 
+    // Créneau pris entre-temps : retour au calendrier, les réponses gardées.
     await soumettre(conteneur);
-    expect(envois).toHaveLength(3);
-    expect(envois[2]).toMatchObject({
+    expect(conteneur.querySelector('input[name="nom"]')).toBeNull();
+    await allerAuProjet(conteneur);
+    await cliquer(bouton(conteneur, C.actions.continuer));
+
+    await soumettre(conteneur);
+    expect(envois).toHaveLength(4);
+    expect(envois[3]).toMatchObject({
       type: "ia",
       budget: TRANCHE_IA,
       objectif: "mails",

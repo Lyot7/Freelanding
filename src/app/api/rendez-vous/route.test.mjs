@@ -105,3 +105,27 @@ describe("POST /api/rendez-vous — sujet « ia »", () => {
     });
   });
 });
+
+describe("POST /api/rendez-vous — chaque refus nomme son champ", () => {
+  const tranche = `${integrationIA.plancher}-${integrationIA.plancher * 2}`;
+  const valide = { type: "ia", budget: tranche, objectif: "mails", outil: "crm" };
+  const loin = new Date(Date.now() + 400 * 24 * 3600 * 1000).toISOString();
+
+  it.each([
+    ["nom", { nom: "A" }],
+    ["email", { email: "a".repeat(300) }],
+    ["email", { email: "pas-une-adresse" }],
+    ["message", { message: "x".repeat(5_000) }],
+    ["creneau", { debut: loin }],
+    ["duree", { duree: 0.5 }],
+    ["type", { type: "site" }],
+    ["budget", { budget: "" }],
+    ["echeance", { echeance: "demain" }],
+  ])("%s", async (champ, surcharge) => {
+    const reponse = await reserver({ ...valide, ...surcharge });
+    expect(reponse.status).toBe(400);
+    const corps = await reponse.json();
+    expect(corps.champ).toBe(champ);
+    expect(corps.message.length).toBeGreaterThan(0);
+  });
+});
