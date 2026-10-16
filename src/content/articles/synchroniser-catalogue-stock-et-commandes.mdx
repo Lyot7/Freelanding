@@ -1,202 +1,107 @@
-Vos outils ne sont jamais d’accord sur le stock parce qu’aucun d’eux n’a été
-désigné comme la source de vérité. Chacun tient sa version, chacun a raison de
-son point de vue, et personne n’a écrit la règle qui tranche quand ils
-divergent. C’est une décision de gestion qui n’a pas été prise, et qu’aucun
-connecteur ne prendra à votre place.
+Pour connecter votre ERP et votre site e-commerce sans que le stock diverge, décidez d’abord quel outil a raison pour chaque donnée : le stock et les prix dans l’ERP, le texte des fiches produits sur le site, la commande là où elle est passée. Le connecteur vient ensuite, et il doit tenir quatre choses que la plupart des connecteurs du marché négligent : un journal des échanges, une alerte quand un envoi échoue, la reprise sans doublon et un écran des écarts. Quand vos règles métier ne rentrent dans aucun connecteur, un petit outil sur mesure entre l’ERP et la boutique coûte souvent moins qu’une pile d’abonnements et le temps passé à corriger à la main.
 
-Cet article explique pourquoi les synchronisations cassent, ce qu’il faut
-décider avant de connecter quoi que ce soit, et comment reconnaître le moment où
-un branchement sur mesure devient moins cher qu’une pile d’abonnements.
+Vous vendez à des professionnels et vos stocks ne tombent jamais juste ? [Décrivez-moi vos outils en visio](/contact?sujet=logiciel#rendez-vous), et je vous dis où placer la source de vérité et ce que coûterait le branchement.
 
-## Le problème, énoncé proprement
+## Pourquoi vos outils ne sont pas d’accord sur le stock
 
-Une boutique en ligne moderne fait dialoguer quatre à sept systèmes : la
-boutique, la gestion commerciale ou l’ERP, la logistique, la comptabilité, le
-service client, parfois une ou deux places de marché.
+Un négoce ou un distributeur fait dialoguer quatre à sept systèmes : la boutique en ligne, l’ERP ou la gestion commerciale, la logistique, la comptabilité, parfois une place de marché ou un portail client B2B. Chacun peut modifier la même donnée. Une vente en ligne baisse le stock, une réception l’augmente dans l’ERP, un retour le remet en rayon, un inventaire le corrige. Quatre sources, quatre horloges, et aucune ne connaît les autres.
 
-Chacun peut modifier la même donnée. Une vente sur une place de marché diminue
-le stock ; une réception de marchandise l’augmente dans la gestion ; un retour
-le remet en circulation ; un inventaire physique le corrige. Quatre sources,
-quatre horloges, et aucune ne connaît les autres.
+Le symptôme le plus visible est la survente : une commande encaissée pour un produit que vous n’avez plus, découverte au moment de préparer le colis. Le plus coûteux reste caché : le produit affiché en rupture alors qu’il est en rayon, et l’heure passée chaque jour par quelqu’un à rapprocher deux tableaux.
 
-Le résultat est toujours le même : une survente. Vous encaissez une commande pour
-un produit que vous n’avez pas, et vous découvrez l’écart au moment de préparer le
-colis. C’est le coût le plus visible ; ce n’est pas le plus élevé.
+## Quelle source de vérité choisir ?
 
-<Callout title="Ce que coûte vraiment une divergence">
-La survente coûte un remboursement et un client. L’invendu coûte du stock
-immobilisé sur un produit affiché en rupture alors qu’il est en rayon. Et le
-temps humain de rapprochement, une heure ici, deux heures là, coûte tous les
-mois sans jamais apparaître nulle part.
+La source de vérité est l’outil désigné à l’avance comme ayant raison pour une donnée précise quand les autres le contredisent. C’est une décision de gestion, prise donnée par donnée, et aucun prestataire ne peut la prendre à votre place. Voici la répartition qui tient dans la plupart des négoces.
+
+| Donnée | Source de vérité habituelle | Ce que reçoivent les autres outils |
+| --- | --- | --- |
+| Stock disponible | ERP ou logistique | La boutique lit, ne corrige jamais |
+| Prix et remises client | ERP, gestion commerciale | Le site affiche le prix du client connecté |
+| Texte et photos des fiches produits | Site ou outil de fiches produits | L’ERP garde la référence et le prix |
+| Commande | L’outil où elle est passée, puis l’ERP | Statut renvoyé au client |
+| Compte client professionnel | ERP, contrôlé à la création | Le site ouvre le compte après vérification |
+
+Écrivez cette table pour vos propres données. Elle tient sur une page et règle la moitié des conflits avant qu’ils arrivent. Restent deux décisions :
+
+- **la règle quand deux outils divergent** : l’un écrase l’autre, on bloque et on alerte quelqu’un, ou la valeur la plus récente gagne. Pour le stock, je recommande presque toujours la prudence : la valeur la plus basse gagne et une alerte part, parce que vendre moins coûte moins cher que survendre ;
+- **le délai acceptable**, donnée par donnée : une fiche produit supporte une heure de décalage, le stock d’un article qui part vite n’en supporte aucun.
+
+<Callout title="Où placer la source de vérité chez vous">
+Vous me décrivez vos outils et vos flux, je vous rends la table des sources de vérité de votre entreprise et la manière de la faire respecter, avec un ordre de prix. [Réservez un créneau en visio](/contact?sujet=logiciel#rendez-vous).
 </Callout>
 
-## Pourquoi les connecteurs du marché finissent par casser
+## Pourquoi les connecteurs du marché cassent
 
-Ils font bien ce qu’ils annoncent et mal ce qu’on leur demande vraiment.
-
-<Steps items={[
-  "Ils synchronisent dans un seul sens. La plupart des connecteurs poussent la gestion vers la boutique. Le retour, les corrections d’inventaire et les ventes hors ligne ne remontent pas.",
-  "Ils travaillent par lots, pas en continu. Une synchronisation toutes les heures signifie une heure pendant laquelle deux systèmes affirment deux choses différentes, et c’est largement suffisant pour vendre ce qui n’existe plus.",
-  "Ils ignorent les cas particuliers de votre métier. Les lots, les produits composés, les variantes qui partagent un stock physique, les précommandes : chaque métier a ses règles, et un connecteur générique n’en connaît aucune.",
-  "Ils échouent en silence. Un appel qui n’aboutit pas, un produit refusé pour un champ manquant, et rien ne vous prévient. Vous découvrez le décalage trois jours plus tard, par un client mécontent.",
-  "Ils ne gardent pas de trace. Quand deux systèmes ne disent pas la même chose, personne ne peut reconstituer qui a écrit quoi et quand."
-]} />
-
-Le quatrième point est celui qui fait le plus de dégâts. Un système qui tombe en
-panne bruyamment se répare le jour même. Un système qui échoue en silence
-produit une divergence qui grandit pendant des semaines.
-
-### Pourquoi le travail par lots n’est pas un choix de paresse
-
-Le deuxième point mérite une explication, parce qu’on l’attribue souvent à la
-négligence du connecteur alors qu’il vient d’une contrainte réelle. Les
-plateformes plafonnent le débit de leur interface de programmation, et le
-plafond dépend de la formule. Chez Shopify, l’API Admin GraphQL accorde
-**100 points par seconde** en formule standard, **200** en Advanced et
-**1 000** en Plus, une même requête ne pouvant jamais dépasser 1 000 points
-([documentation développeur Shopify](https://shopify.dev/docs/api/usage/limits)).
-
-Ce plafond décide de ce qui est réalisable. Sur un catalogue de dix mille
-références, interroger chaque produit à chaque cycle est hors budget : le
-connecteur regroupe, espace ses passages, et c’est là que naît la fenêtre
-pendant laquelle deux systèmes se contredisent. La sortie n’est pas de
-synchroniser plus souvent, c’est de ne synchroniser que ce qui a changé, en
-étant prévenu du changement au lieu d’aller le chercher. C’est exactement ce
-que sont les **webhooks** : un message que la plateforme envoie d’elle-même dès
-qu’une donnée bouge. Shopify les présente dans ses propres termes comme
-« une alternative performante à l’interrogation continue des données d’une
-boutique »
-([documentation développeur Shopify](https://shopify.dev/docs/apps/build/webhooks)),
-avec des événements dédiés à la création et à la mise à jour de produit. Un
-connecteur qui interroge en boucle là où un message suffirait ne se contente
-pas d’être lent : il consomme le budget d’appels dont vous auriez besoin
-ailleurs.
-
-J’ai relevé les plafonds publiés par Shopify et posé le calcul à partir d’eux, plutôt que de répéter
-l’explication habituelle selon laquelle « les connecteurs sont mal faits ». Une lecture de produit avec ses variantes et
-son stock coûte de l’ordre de dix à vingt points sur cette interface. À
-100 points par seconde, un catalogue de dix mille références demande entre
-mille et deux mille secondes pour être parcouru en entier, soit **entre vingt et
-trente-cinq minutes par passage complet**, sans compter les écritures. C’est la
-raison pour laquelle personne ne synchronise tout en continu, et c’est aussi la
-raison pour laquelle il faut arrêter d’essayer.
-
-La **source de vérité** est le système désigné à l’avance comme ayant raison
-pour une donnée précise, quand les autres le contredisent. Ce n’est pas un
-réglage technique, c’est une décision de gestion : elle nomme qui tranche, et
-elle se prend donnée par donnée.
-
-## Les trois décisions à prendre avant de connecter quoi que ce soit
-
-Aucune n’est technique, et aucune ne peut être déléguée à un prestataire.
-
-### Qui détient la vérité, donnée par donnée
-
-La question se pose donnée par donnée. Pour le stock, qui gagne ? Pour le prix ?
-Pour la fiche produit ? Pour l’adresse client ?
-
-Les réponses sont souvent différentes. Le stock appartient en général à la
-gestion ou à la logistique, le prix à la gestion commerciale, le texte de la
-fiche à la boutique, l’adresse de livraison à la commande. Écrivez cette table.
-Elle tient sur une page et elle résout la moitié des conflits futurs.
-
-### Ce qui se passe quand deux sources divergent
-
-Il n’y a que trois réponses possibles : l’une écrase l’autre, on bloque et on
-alerte un humain, ou on prend la plus récente. Chacune est défendable, aucune
-n’est bonne partout, et la pire des situations est de ne pas avoir tranché.
-
-Pour le stock, je recommande presque toujours la plus prudente : la valeur la
-plus basse gagne, et une alerte part. Vendre moins coûte moins cher que
-survendre.
-
-### Le délai acceptable
-
-Certaines données supportent un décalage d’une heure. Le stock d’un produit qui
-part vite n’en supporte aucun. Décidez la fréquence par donnée, pas par système :
-synchroniser tout en continu coûte cher pour rien, tout synchroniser la nuit
-coûte des ventes.
-
-<Quote>
-Une synchronisation, c’est une règle de gestion écrite, à laquelle on a ensuite
-donné une forme technique.
-</Quote>
-
-## Ce que doit contenir une synchronisation qui tient
-
-Six éléments. Ce sont les mêmes quel que soit le nombre de systèmes.
+Ils font bien ce qu’ils annoncent, et mal ce que votre métier leur demande.
 
 <Steps items={[
-  "Une source de vérité déclarée par donnée, et écrite quelque part que tout le monde peut lire.",
-  "Une règle d’arbitrage explicite pour les conflits, appliquée toujours de la même façon.",
-  "Un journal des échanges : ce qui est entré, ce qui est sorti, quand, et avec quel résultat. Sans journal, un écart est indiagnosticable.",
-  "Une alerte quand une opération échoue, envoyée à quelqu’un qui la lit. Une alerte qui part dans une boîte que personne n’ouvre n’existe pas.",
-  "La reprise sur erreur : une opération qui échoue doit pouvoir être rejouée, sans créer de doublon.",
-  "Un tableau de contrôle qui montre les écarts en cours, pas seulement les opérations réussies."
+  "Ils synchronisent dans un seul sens : l’ERP pousse vers la boutique, mais les retours, les corrections d’inventaire et les ventes au comptoir ne remontent pas.",
+  "Ils travaillent par lots : une synchronisation toutes les heures laisse une heure pendant laquelle deux outils affirment deux stocks différents.",
+  "Ils ignorent vos règles : lots, produits composés, variantes qui partagent un stock physique, réservations pour un client professionnel.",
+  "Ils échouent en silence : une fiche refusée pour un champ manquant, et personne n’est prévenu avant la réclamation du client.",
+  "Ils ne gardent pas de trace : quand deux outils se contredisent, personne ne peut dire qui a écrit quoi, ni quand."
 ]} />
 
-Le sixième point est celui qui change la vie au quotidien. Un écran qui affiche
-« douze références en écart entre la boutique et la gestion » transforme un
-problème invisible en une tâche de dix minutes.
+Le travail par lots vient d’une contrainte réelle. Les plateformes plafonnent le débit de leur interface de programmation. Chez Shopify, l’API Admin GraphQL accorde 100 points par seconde en formule standard, 200 en Advanced et 1 000 en Plus ([documentation développeur Shopify](https://shopify.dev/docs/api/usage/limits)). Une lecture de produit avec ses variantes et son stock coûte de l’ordre de dix à vingt points. Sur un catalogue de dix mille références, un passage complet prend donc entre vingt et trente-cinq minutes au plafond standard, écritures non comprises.
 
-## Quand un branchement sur mesure devient le bon choix
+La sortie consiste à ne transmettre que ce qui a changé, au moment où ça change. Les webhooks servent à ça : la plateforme envoie elle-même un message dès qu’un produit ou une commande bouge ([documentation Shopify sur les webhooks](https://shopify.dev/docs/apps/build/webhooks)). Un connecteur qui interroge en boucle là où un message suffirait consomme le budget d’appels dont vous auriez besoin ailleurs.
 
-Trois signaux, assez francs pour être reconnus sans expertise technique.
+## Les six éléments d’une synchronisation qui tient
 
-**Vous payez plusieurs connecteurs qui font chacun la moitié du travail.**
-Additionnez leurs abonnements sur un an, et comparez au coût d’un branchement qui
-fait exactement ce dont vous avez besoin. La comparaison surprend souvent.
+Quel que soit le nombre d’outils, une synchronisation fiable repose sur les mêmes six éléments.
 
-**Quelqu’un fait le rapprochement à la main.** Trente minutes par jour ouvré,
-c’est environ cent-vingt heures par an. Mettez votre coût horaire chargé en face
-avant de décider que l’abonnement est moins cher.
+<Steps items={[
+  "Une source de vérité déclarée par donnée, écrite là où toute l’équipe peut la lire.",
+  "Une règle d’arbitrage des conflits, appliquée toujours de la même façon.",
+  "Un journal des échanges : ce qui est entré, ce qui est sorti, quand, avec quel résultat.",
+  "Une alerte quand une opération échoue, envoyée à quelqu’un qui la lit.",
+  "La reprise sur erreur : une opération ratée se rejoue sans créer de doublon.",
+  "Un écran de contrôle qui montre les écarts en cours, pas seulement les opérations réussies."
+]} />
 
-**Vos règles métier ne rentrent nulle part.** Produits composés, stock partagé
-entre variantes, précommandes, réservation par client professionnel : si votre
-façon de gérer le stock est ce qui vous distingue, aucun connecteur générique ne
-l’épousera.
+Le sixième change le quotidien. Un écran qui affiche « douze références en écart entre la boutique et l’ERP » transforme un problème invisible en une tâche de dix minutes.
 
-J’ai développé l’arbitrage complet entre construire et s’abonner dans
-[outil sur mesure ou abonnements SaaS](/blog/outil-sur-mesure-ou-abonnements-saas).
+## Connecteur, ERP ou outil sur mesure : combien ?
 
-## Ce qu’un branchement coûte, honnêtement
+Trois chemins existent, et le bon dépend de vos règles métier plus que de votre taille.
 
-Il ne remplace pas vos outils, il les relie. Ce qui se construit, c’est la règle
-d’arbitrage, le journal, les alertes et l’écran de contrôle. Le reste continue
-de vivre là où il vit.
+| Option | Ce que vous payez | Quand elle suffit |
+| --- | --- | --- |
+| Connecteur du marché | Un abonnement mensuel par flux, plus le temps de correction à la main | Un ERP et une boutique standards, sans règle particulière |
+| Module e-commerce de l’ERP | La licence et le paramétrage de l’intégrateur | Votre ERP en propose un et vos règles y rentrent |
+| Outil sur mesure entre l’ERP et le site | Un projet <Prix offre="logiciel" />, puis un suivi | Vos règles métier ne rentrent nulle part, ou plusieurs connecteurs font chacun la moitié du travail |
 
-Ce type de travail se chiffre en jours, pas en mois, à une condition : que vos
-règles soient écrites avant qu’on commence. Ce qui fait déraper ce genre de
-projet, c’est une question de gestion à laquelle personne n’a répondu, et le
-temps passé à attendre la réponse.
+Faites le calcul avec vos chiffres. Trente minutes de rapprochement par jour ouvré représentent environ cent vingt heures par an : mettez votre coût horaire chargé en face, et ajoutez les abonnements des connecteurs sur 3 ans. Si votre ERP lui-même ne suit plus, la page [ERP sur mesure](/services/logiciel-metier/erp-sur-mesure) détaille quand le remplacer.
 
-Et il faut prévoir une part annuelle d’entretien. Les interfaces de
-programmation des plateformes changent, les formats évoluent, et une
-synchronisation qu’on n’entretient pas se dégrade toute seule.
+Pour le budget, une agence facture couramment 8 000 à 10 000 € un premier outil et 30 000 € de médiane un projet logiciel ([La Fabrique du Net](https://www.lafabriquedunet.fr/agences/pages/agences-developpement-logiciel/tarifs), octobre 2026). Je fais le même travail pour environ deux fois moins cher, sans chef de projet ni commercial à payer. Le détail est sur la page du [prix d’un logiciel sur mesure](/services/logiciel-metier/prix), et l’arbitrage complet entre construire et s’abonner dans [outil sur mesure ou abonnements SaaS](/blog/outil-sur-mesure-ou-abonnements-saas).
 
-## Par où commencer, cette semaine
+## Le cas d’un distributeur B2B
 
-Avant tout appel à un prestataire, faites trois choses.
+Würth France distribue des fournitures aux artisans et aux industriels, et son eShop est réservé aux professionnels. J’y ai repris le parcours de création de compte, la porte par laquelle passe tout nouveau client avant de commander. Le problème ressemblait à celui du stock : des erreurs de saisie découvertes trop tard, qui finissaient en abandons ou en appels au support.
 
-Dessinez sur une feuille les systèmes que vous avez et les flèches entre eux. Le
-dessin est souvent plus révélateur que la conversation : il montre les boucles
-et les allers-retours dont personne n’avait conscience.
+La réponse a suivi la même logique. Le registre public tient lieu de source de vérité : le numéro SIREN est vérifié auprès de l’INSEE pendant la saisie, et l’adresse se remplit à partir du registre au lieu de la mémoire du visiteur. La plateforme de l’eShop étant fermée à la filiale française, tout a été construit en surcouche, sans toucher au système central. Résultat mesuré en interne : [−92 % d’erreurs et de sollicitations du support](/realisations/wurth-creation-de-compte) sur la création de compte.
 
-Écrivez la table des sources de vérité, donnée par donnée. Une page suffit.
+C’est la même méthode que pour relier un ERP à une boutique : désigner qui a raison, contrôler à l’entrée plutôt que corriger après, et construire autour de l’outil existant quand on ne peut pas le modifier. La page [logiciel pour le négoce et la distribution](/services/logiciel-metier/negoce-distribution) montre ce que ce travail donne pour un distributeur.
 
-Comptez le temps humain réellement passé chaque semaine à corriger des écarts.
-C’est ce nombre qui décide de la suite, pas l’agacement.
+## Questions fréquentes
+
+### Comment connecter un ERP à un site e-commerce ?
+
+Écrivez d’abord la table des sources de vérité, puis choisissez le mode d’échange : un connecteur du marché si vos règles sont standards, les webhooks de la plateforme et un petit service intermédiaire si elles ne le sont pas. Dans les deux cas, exigez un journal, des alertes et un écran des écarts.
+
+### À quelle fréquence synchroniser le stock ?
+
+À chaque changement. Un message envoyé à chaque mouvement de stock vaut mieux qu’un passage toutes les heures. Les données lentes, comme le texte des fiches produits, supportent une synchronisation quotidienne.
+
+### Comment synchroniser les fiches produits entre plusieurs canaux ?
+
+Gardez une seule source pour le texte et les photos, et laissez l’ERP maître de la référence, du prix et du stock. Chaque canal reçoit la fiche, aucun ne la modifie.
+
+### Un outil sur mesure remplace-t-il mon ERP ?
+
+Non : il le relie. L’ERP reste maître du stock et des prix, l’outil applique la règle d’arbitrage, tient le journal et montre les écarts.
 
 ## Ce que je retiens
 
-Vos outils ne sont pas d’accord parce que personne n’a écrit qui a raison. La
-technique ne résout pas ce problème, elle applique la décision une fois qu’elle
-est prise, et elle la rend visible avec un journal, des alertes et un écran
-d’écarts.
+Vos outils divergent parce que personne n’a écrit qui a raison. La technique applique cette décision une fois prise, et la rend visible avec un journal, des alertes et un écran des écarts.
 
-Si vous voulez que je regarde vos flux et que je vous rende la table des
-sources de vérité et le chiffrage du branchement, c’est le travail d’une
-[solution métier](/services/logiciel-metier), du branchement entre deux outils
-jusqu’à plusieurs systèmes qui doivent rester d’accord en permanence.
-[Réservez un appel](/contact?sujet=logiciel#rendez-vous) et dites-moi quels
-outils vous avez.
+Une [solution métier](/services/logiciel-metier) relie votre ERP, votre boutique et vos outils pour qu’ils restent d’accord en permanence. [Réservez un appel en visio](/contact?sujet=logiciel#rendez-vous) et dites-moi quels outils vous avez : vous repartez avec la table des sources de vérité et un ordre de prix.
