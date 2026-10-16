@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState, type ReactNode } from "react";
+import { useId, useState, useSyncExternalStore, type ReactNode } from "react";
 
 /**
  * Bascule du pied de page entre ÉCRIRE et RÉSERVER (2026-10-15).
@@ -12,6 +12,52 @@ import { useId, useState, type ReactNode } from "react";
  *
  * Sans rendez-vous configuré, il ne reste qu'une porte : pas d'onglets.
  */
+const ANCRE_RENDEZ_VOUS = "#rendez-vous";
+
+/**
+ * Nombre de clics ou de changements d'ancre vers le rendez-vous. Un clic fait
+ * sur la page ouvre l'onglet sans attendre l'ancre, et remet à zéro le choix
+ * du visiteur : un second clic sur « Réserver » rouvre le rendez-vous même si
+ * l'ancre n'a pas changé. Les liens de Next posent l'ancre par `pushState`,
+ * sans `hashchange` : d'où l'écoute des clics.
+ */
+let demandesRendezVous = 0;
+
+function abonnerDemandes(rappel: () => void): () => void {
+  const surClic = (evenement: MouseEvent) => {
+    const cible = evenement.target;
+    const lien = cible instanceof Element ? cible.closest("a[href]") : null;
+    if (lien?.getAttribute("href")?.endsWith(ANCRE_RENDEZ_VOUS)) {
+      demandesRendezVous += 1;
+      // Après le `pushState` du lien, pour lire la nouvelle ancre.
+      window.setTimeout(rappel, 0);
+    }
+  };
+  const surAncre = () => {
+    if (window.location.hash !== ANCRE_RENDEZ_VOUS) return;
+    demandesRendezVous += 1;
+    rappel();
+  };
+  document.addEventListener("click", surClic, true);
+  window.addEventListener("hashchange", surAncre);
+  return () => {
+    document.removeEventListener("click", surClic, true);
+    window.removeEventListener("hashchange", surAncre);
+  };
+}
+
+function lireDemandes(): number {
+  return demandesRendezVous;
+}
+
+function lireDemandesServeurOuClient(): number {
+  return typeof window === "undefined" ? 0 : demandesRendezVous;
+}
+
+function lireAncre(): string {
+  return window.location.hash;
+}
+
 export function FooterContact({
   modes,
   message,
@@ -24,7 +70,24 @@ export function FooterContact({
   /** « rendezVous » quand l'adresse porte un sujet (`?sujet=`). */
   ongletInitial?: "message" | "rendezVous";
 }) {
-  const [onglet, setOnglet] = useState<"message" | "rendezVous">(ongletInitial);
+  // Un lien vers `#rendez-vous` (boutons « Réserver » des pages) ouvre
+  // l'onglet rendez-vous, même quand le visiteur avait choisi l'autre.
+  const demandes = useSyncExternalStore(abonnerDemandes, lireDemandes, () => 0);
+  const ancre = useSyncExternalStore(abonnerDemandes, lireAncre, () => "");
+  // Les clics faits sur une page précédente ne comptent pas : le compteur vit
+  // au niveau du module, ce pied de page se monte à chaque page.
+  const [demandesAuMontage] = useState(lireDemandesServeurOuClient);
+  const [choisi, setOnglet] = useState<"message" | "rendezVous" | null>(null);
+  const [demandesVues, setDemandesVues] = useState(demandes);
+  if (demandes !== demandesVues) {
+    setDemandesVues(demandes);
+    setOnglet(null);
+  }
+  const onglet =
+    choisi ??
+    (ancre === ANCRE_RENDEZ_VOUS || demandes > demandesAuMontage || ongletInitial === "rendezVous"
+      ? "rendezVous"
+      : "message");
   const base = useId();
   if (!rendezVous || !modes) return <>{message}</>;
 
@@ -34,7 +97,9 @@ export function FooterContact({
   ] as const;
 
   return (
-    <div className="flex w-full flex-col gap-[24px]">
+    // `data-section` : premier palier de l'entonnoir de rendez-vous
+    // (`PageAnalytics`), porté par la section des pages avant le 2026-10-16.
+    <div data-section="rendez-vous" className="flex w-full flex-col gap-[24px]">
       <div
         role="tablist"
         aria-label={modes.label}

@@ -26,7 +26,6 @@ import type { PagePrix } from "@/content/page-prix-logiciel";
 import type { PageSecteur, SectionSecteur } from "@/content/pages-secteur";
 import type { PagePrixSite } from "@/content/page-prix-site";
 import { RDV_PAR_PRESTATION } from "@/content/rendez-vous";
-import { SectionRendezVous } from "@/components/rendez-vous/SectionRendezVous";
 
 /**
  * PAGE D'UNE PRESTATION — le détail des prix, là où il peut être expliqué.
@@ -629,23 +628,6 @@ export function ServicePage({
           </div>
         </section>
 
-        {/* LA PRISE DE RENDEZ-VOUS EST ICI, ET PLUS SEULEMENT UN LIEN VERS ELLE.
-            La page portait trois boutons « En parler » menant tous à
-            `/contact?sujet=…` : trois occasions de partir, aucune de réserver.
-            Le visiteur qui vient de lire les prix et le périmètre d'une
-            prestation est exactement celui qui est prêt à poser une date, et
-            l'envoyer sur une autre page pour ça lui coûtait un chargement, un
-            défilement et un choix.
-
-            LE SUJET EST IMPOSÉ, pas suggéré : la prestation qu'on vient de lire
-            EST le type de rendez-vous. `RDV_PAR_PRESTATION` porte la
-            correspondance, qui n'est pas l'identité (« vitrine » devient
-            « site »). */}
-        <SectionRendezVous
-          emailContact={site.contact.email}
-          typeImpose={RDV_PAR_PRESTATION[prestation.id]}
-        />
-
         {local ? (
           <FaqSection
             faq={[...local.faq.items]}
@@ -656,7 +638,10 @@ export function ServicePage({
           <FaqSection faq={[...faqItems]} />
         )}
       </main>
-      <Footer />
+      {/* LE RENDEZ-VOUS VIT DANS LE PIED DE PAGE depuis le 2026-10-16, seul
+          formulaire du site. La prestation lue EST le sujet : il y est
+          présélectionné (`RDV_PAR_PRESTATION`, « vitrine » devient « site »). */}
+      <Footer sujetRendezVous={RDV_PAR_PRESTATION[prestation.id]} />
       <FloatingNav site={site} />
     </>
   );

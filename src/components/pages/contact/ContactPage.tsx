@@ -412,12 +412,6 @@ export async function ContactPage() {
             contre 735 px sur le live, soit ~315 px de vide en bas. */}
         <FaqSection faq={[...contact.faq]} />
       </main>
-      {/* UN SEUL FORMULAIRE SUR LE SITE depuis le 2026-10-16 : celui du pied
-          de page (message ou rendez-vous). La page ne porte plus ni le
-          formulaire de contact ni la réservation ; l'ancre `#rendez-vous`,
-          visée par `lienRendezVous` et par les articles du blog, mène donc au
-          pied de page, où `?sujet=` ouvre l'onglet rendez-vous. */}
-      <div id="rendez-vous" aria-hidden />
       <Footer />
       <FloatingNav site={site} />
     </>

@@ -370,5 +370,5 @@ Dans l'ordre, et sans créer une seule vraie réservation avant le point 5 :
 | `src/lib/rendez-vous/limites.ts` | Débits autorisés par adresse. |
 | `src/app/api/rendez-vous/creneaux/route.ts` | `GET` — créneaux d'une semaine. |
 | `src/app/api/rendez-vous/route.ts` | `POST` — création de la réservation. |
-| `src/components/rendez-vous/SectionRendezVous.tsx` | Composant serveur : décide si la section existe. |
+| `src/components/layout/Footer.tsx` | Porte le seul formulaire du site (message ou rendez-vous) depuis le 2026-10-16 ; ancre `#rendez-vous`. |
 | `src/components/rendez-vous/ReservationRendezVous.tsx` | Composant client : le stepper en quatre étapes (sujet, créneau, projet, coordonnées). |
