@@ -294,6 +294,18 @@ export interface SiteConfig {
     messagePlaceholder?: string;
     selectLabel: string;
     selectOptions: string[];
+    /** Mêmes questions que la prise de rendez-vous ; les listes en viennent. */
+    questionnaire: {
+      budget: ContactFieldContent;
+      objectif: ContactFieldContent;
+      echeance: ContactFieldContent;
+    };
+    /** Le formulaire se remplit en trois étapes, une seule affichée. */
+    etapes: {
+      titres: readonly [string, string, string];
+      continuer: string;
+      retour: string;
+    };
     submitLabel: string;
     disclaimer: string;
     /** Découpage du disclaimer autour de ses deux liens. */
@@ -905,27 +917,6 @@ export interface ContactFieldContent {
   placeholder: string;
 }
 
-export interface ContactFormContent {
-  name: ContactFieldContent;
-  email: ContactFieldContent;
-  projectType: ContactFieldContent & { options: readonly string[] };
-  /** Mêmes questions que la prise de rendez-vous ; les listes en viennent. */
-  questionnaire: {
-    budget: ContactFieldContent;
-    objectif: ContactFieldContent;
-    echeance: ContactFieldContent;
-  };
-  /** Le formulaire se remplit en trois étapes, une seule affichée. */
-  etapes: {
-    titres: readonly [string, string, string];
-    continuer: string;
-    retour: string;
-  };
-  message: ContactFieldContent;
-  submitLabel: string;
-  disclaimer: { text: string; links: readonly Link[] };
-}
-
 export interface ContactCardContent {
   person: Person & { note?: string };
   email: string;
@@ -945,7 +936,6 @@ export interface ContactContent {
   detailsEyebrow?: string;
   /** Photo du studio, à gauche des coordonnées. */
   cover?: ImageAsset;
-  form: ContactFormContent;
   contactCard: ContactCardContent;
   faq: FaqItem[];
   seo: PageSeo;
