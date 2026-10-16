@@ -125,13 +125,15 @@ describe("la page de prix ne dit que ce qui est vrai", () => {
   test("la comparaison avec les agences est sourcée et liée", () => {
     const section = page.sections.find((s) => s.id === "comparaison");
     const corps = [...section.paragraphes, ...section.points.map((p) => p.corps)].join(" ");
-    expect(corps).toContain(euros(repereAgenceSite.mediane));
+    // À livrable égal (2026-10-16) : la fourchette d'un site vitrine soigné
+    // face à mon plancher, plus jamais la médiane de tous les sites.
+    expect(corps).toContain(euros(repereAgenceSite.soigneMin));
+    expect(corps).toContain(euros(repereAgenceSite.soigneMax));
+    expect(corps).not.toMatch(/médiane|deux fois moins/u);
     expect(corps).toContain(repereAgenceSite.source.nom);
     expect(corps).toContain(repereAgenceSite.source.releve);
     expect(section.liens.items.map((l) => l.href)).toContain(repereAgenceSite.source.href);
-    // « Deux fois moins » n'est écrit que parce que le rapport est exact.
-    expect(corps).toMatch(/deux fois moins/u);
-    expect(repereAgenceSite.mediane / VITRINE.plancher).toBeCloseTo(2, 1);
+    expect(VITRINE.plancher).toBeLessThan(repereAgenceSite.soigneMin);
   });
 
   test("aucun montant en euros n'est écrit à la main dans page-prix-site.ts", () => {

@@ -79,9 +79,11 @@ export const pagePrixSite: PagePrixSite = {
     description: `Combien coûte un site internet professionnel ? Comptez ${aPartirDe(VITRINE, " HT")} : ce qui fait varier le prix du devis, et ce qui se paie après la mise en ligne.`,
   },
   h1: "Prix d’un site internet sur mesure",
-  /* RÉPONSE CHIFFRÉE EN TÊTE (carte SEO du 2026-10-15) : le plancher, puis la
-     médiane d'agence sourcée, qui vise aussi « agence web prix ». */
-  resume: `Un site internet professionnel sur mesure démarre à ${prixPlancher(VITRINE)} HT chez moi, textes compris. En agence, ${AGENCE.source.nom} relève une médiane de ${euros(AGENCE.mediane)} pour un site de PME (${AGENCE.source.releve}). Le prix final dépend du nombre de pages, du référencement et de la mesure, et il est fixé au devis. Une fois livré, le site est à vous, sans abonnement.`,
+  /* RÉPONSE CHIFFRÉE EN TÊTE (carte SEO du 2026-10-15) : le plancher, puis le
+     prix d'agence sourcé, qui vise aussi « agence web prix ». À LIVRABLE ÉGAL
+     depuis le 2026-10-16 (décision d'Eliott) : la fourchette d'un site vitrine
+     soigné, jamais la médiane de tous les sites face à mon plancher. */
+  resume: `Un site internet professionnel sur mesure démarre à ${prixPlancher(VITRINE)} HT chez moi, textes compris. En agence, un site vitrine soigné se facture entre ${euros(AGENCE.soigneMin)} et ${euros(AGENCE.soigneMax)} selon ${AGENCE.source.nom} (${AGENCE.source.releve}). Le prix final dépend du nombre de pages, du référencement et de la mesure, et il est fixé au devis. Une fois livré, le site est à vous, sans abonnement.`,
   marcheFilAriane: "Prix",
   libelleLien: "prix d’un site internet sur mesure",
   noteLlms:
@@ -198,7 +200,7 @@ export const pagePrixSite: PagePrixSite = {
       titre: "Agence web, freelance ou Wix : quel prix pour un site ?",
       paragraphes: [
         "Les prix d’un site internet s’étalent sur une large plage, selon ce qui est livré et la structure de celui qui le livre. Les ordres de grandeur ci-contre servent de repères pour lire les devis que vous recevez.",
-        `Je fais le travail d’une agence, de la conception à la mise en ligne, ${aPartirDe(VITRINE, " HT")} : environ deux fois moins que la médiane de ${euros(AGENCE.mediane)} relevée pour un site de PME, sur ${AGENCE.projets} projets d’agences. Je conçois et je code moi-même, sans chef de projet ni structure à payer, et votre budget va au site.`,
+        `Je fais le travail d’une agence, de la conception à la mise en ligne, ${aPartirDe(VITRINE, " HT")}, pour un site vitrine soigné que les agences facturent entre ${euros(AGENCE.soigneMin)} et ${euros(AGENCE.soigneMax)}. Je conçois et je code moi-même, sans chef de projet ni structure à payer, et votre budget va au site.`,
       ],
       liens: {
         titre: "Pour comparer",

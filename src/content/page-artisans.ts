@@ -11,8 +11,9 @@
  * `etat-des-sites-des-entreprises-normandes-2026`), et la page lue avec les
  * questions du client sur son téléphone.
  *
- * « DEUX FOIS MOINS » EST EXACT ICI, et seulement pour le site : la médiane
- * d'agence vient de `repereAgenceSite`, le plancher d'`offre.ts`.
+ * LE PRIX D'AGENCE SE COMPARE À LIVRABLE ÉGAL depuis le 2026-10-16 (décision
+ * d'Eliott) : la fourchette d'un site vitrine soigné (`repereAgenceSite`),
+ * jamais la médiane de tous les sites face au plancher d'`offre.ts`.
  */
 import { aPartirDe, euros, prestation, prixPlancher, repereAgenceSite } from "./offre";
 import { CHEMIN_ARTISANS, nombre, pourcent, type PageTheme } from "./page-theme";
@@ -128,7 +129,7 @@ export const pageArtisans: PageTheme = {
       titre: `${CHANTIERS_POUR_PAYER} chantiers paient le site`,
       paragraphes: [
         `Prenons un chantier moyen à ${euros(CHANTIER_MOYEN)} HT, avec ${Math.round(TAUX_MARGE * 100)} % de marge : ${euros(MARGE_CHANTIER)} par chantier. Au plancher de ${prixPlancher(VITRINE)} HT, ${CHANTIERS_POUR_PAYER} chantiers venus du site l’ont remboursé. Les suivants sont du chiffre d’affaires en plus, pendant des années.`,
-        `${AGENCE.source.nom} relève une médiane de ${euros(AGENCE.mediane)} pour un site de PME en agence, sur ${nombre(AGENCE.projets)} projets (${AGENCE.source.releve}). Sans structure ni chef de projet à payer, je demande environ deux fois moins pour le même soin.`,
+        `En agence, un site vitrine soigné se facture entre ${euros(AGENCE.soigneMin)} et ${euros(AGENCE.soigneMax)} selon ${AGENCE.source.nom} (${AGENCE.source.releve}). Sans structure ni chef de projet à payer, je livre le même soin pour moins cher.`,
       ],
       liens: {
         titre: "Pour aller plus loin",
