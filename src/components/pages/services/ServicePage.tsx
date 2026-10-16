@@ -64,43 +64,33 @@ import { RDV_PAR_PRESTATION } from "@/content/rendez-vous";
  * prestation (« La Solution métier ») lisible sur la page, maintenant que
  * le titre principal porte les mots que le client tape.
  *
- * SUR UNE PHOTO, LE FIL EST PLUS CLAIR ET PORTE SON VOILE. Le blanc à 50 % tient
- * 5:1 sur le fond uni du site, mais il tombait à 2,3:1 sur le ciel et le
- * contour de l'église du héros de Caen. À 810 px, il croise la flèche : même
- * avec le voile collé au texte (`VOILE_TEXTE`), le blanc à 80 % restait à
- * 4,35:1. À 90 %, il passe sans assombrir davantage la photo.
+ * EN PIED DE PAGE DEPUIS LE 2026-10-16, décision d'Eliott. Posé dans le héros,
+ * en capitales séparées par des barres obliques, il répétait le menu juste
+ * au-dessus et parlait d'arborescence à quelqu'un qui venait lire une offre.
+ * Il clôt maintenant la page, sous la FAQ, en casse normale : il situe la page
+ * pour qui veut remonter, et le balisage reste vrai puisqu'il est affiché.
  */
-export function FilAriane({
-  marches,
-  surPhoto = false,
-}: {
-  marches: readonly MarcheFilAriane[];
-  surPhoto?: boolean;
-}) {
+export function FilAriane({ marches }: { marches: readonly MarcheFilAriane[] }) {
   const { filAriane } = servicePageLabels;
 
   return (
     <nav
       aria-label={filAriane.intitule}
-      className={`text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] ${surPhoto ? `text-white/90 ${VOILE_TEXTE}` : "text-white/50"}`}
+      className="bg-muted px-[20px] pb-[28px] pt-[8px] tablet:px-[24px] desktop:px-[30px]"
     >
-      <ol className="flex flex-wrap items-center gap-x-[8px] gap-y-[4px]">
+      <ol className="mx-auto flex w-full max-w-[1440px] flex-wrap items-center gap-x-[10px] gap-y-[4px] text-[13px] font-medium leading-[1.3] tracking-[-0.01em] text-[rgba(11,11,11,0.55)]">
         {marches.map((marche, index) => (
-          <li key={marche.libelle} className="flex items-center gap-[8px]">
-            {index > 0 ? (
-              <span aria-hidden className={surPhoto ? "text-white/60" : "text-white/25"}>
-                {filAriane.separateur}
-              </span>
-            ) : null}
+          <li key={marche.libelle} className="flex items-center gap-[10px]">
+            {index > 0 ? <span aria-hidden>{filAriane.separateur}</span> : null}
             {marche.href ? (
               <Link
                 href={marche.href}
-                className="no-underline transition-colors duration-200 hover:text-foreground"
+                className="text-[rgba(11,11,11,0.55)] underline decoration-[rgba(11,11,11,0.2)] underline-offset-[3px] transition-colors duration-200 hover:text-accent-ink"
               >
                 {marche.libelle}
               </Link>
             ) : (
-              <span aria-current="page" className="text-foreground">
+              <span aria-current="page" className="text-accent-ink">
                 {marche.libelle}
               </span>
             )}
@@ -412,7 +402,7 @@ export function ServicePage({
             fil d'Ariane et ne laissait à la photo qu'une bande de 150 px sous
             la navigation. À 85svh, le sujet de la photo a la place de se lire
             au-dessus du texte. */}
-        <section className={`relative flex ${heroImage ? "min-h-[85svh] tablet:min-h-[70svh]" : "min-h-[70svh]"} items-end overflow-hidden bg-background px-[20px] pb-[60px] pt-[140px] text-foreground tablet:px-[24px] tablet:pb-[90px] desktop:px-[30px]`}>
+        <section className={`relative flex ${heroImage ? "min-h-[calc(85svh/var(--zoom-ecran,1))] tablet:min-h-[calc(70svh/var(--zoom-ecran,1))]" : "min-h-[calc(70svh/var(--zoom-ecran,1))]"} items-end overflow-hidden bg-background px-[20px] pb-[60px] pt-[140px] text-foreground tablet:px-[24px] tablet:pb-[90px] desktop:px-[30px]`}>
           {heroImage ? (
             <HeroPhoto image={heroImage} hauteur={{ mobile: "85vh", tablette: "70vh" }} />
           ) : (
@@ -442,14 +432,6 @@ export function ServicePage({
                 quelqu'un qui arrive de Google sur « site internet Caen », et
                 « Accueil / Prestations / Site vitrine / Caen » posé sur la
                 photo décrivait une arborescence que son adresse n'a pas. */}
-            {local && "zones" in local ? null : (
-              <div className="tablet:col-start-1 tablet:row-start-1">
-                <FilAriane
-                  marches={marchesFilAriane(prestation, local)}
-                  surPhoto={heroImage !== undefined}
-                />
-              </div>
-            )}
             <Reveal
               trigger="appear"
               appearId="service-hero-titre"
@@ -467,7 +449,7 @@ export function ServicePage({
                   quelques centimètres au-dessus. */}
               {/* Corps plafonné par la colonne dès 810 : « TRANSPORT » (5,55 em) sortait
                   de 53 px à 78 px de corps (relevé du 2026-10-15). */}
-              <h1 className="max-w-[510px] text-[63px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] tablet:text-[min(78px,calc((50vw-24px)/5.7))] desktop:text-[98px]">
+              <h1 className="max-w-[510px] text-[63px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] tablet:text-[min(78px,calc((calc(50vw/var(--zoom-ecran,1))-24px)/5.7))] desktop:text-[98px]">
                 {local?.h1 ?? servicePageSeo[prestation.id].h1}
               </h1>
             </Reveal>
@@ -636,6 +618,9 @@ export function ServicePage({
           />
         ) : (
           <FaqSection faq={[...faqItems]} />
+        )}
+        {local && "zones" in local ? null : (
+          <FilAriane marches={marchesFilAriane(prestation, local)} />
         )}
       </main>
       {/* LE RENDEZ-VOUS VIT DANS LE PIED DE PAGE depuis le 2026-10-16, seul

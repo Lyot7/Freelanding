@@ -156,7 +156,7 @@ export function WorkExplorer({
           })}
         </div>
       ) : (
-        <div className="flex min-h-[60vh] flex-col items-center justify-center gap-[20px] px-[20px] text-center">
+        <div className="flex min-h-[calc(60vh/var(--zoom-ecran,1))] flex-col items-center justify-center gap-[20px] px-[20px] text-center">
           <p className="text-[28px] font-semibold uppercase leading-[0.9] tracking-[-0.04em]">
             {uiLabels.filters.workEmptyLabel}
           </p>

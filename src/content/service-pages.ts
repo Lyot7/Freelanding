@@ -109,8 +109,10 @@ export const servicePageLabels = {
     intitule: "Fil d’Ariane",
     accueil: "Accueil",
     prestations: "Prestations",
-    /** Séparateur visible entre deux marches. */
-    separateur: "/",
+    /** Séparateur visible entre deux marches. Pas la barre oblique du menu :
+     *  le fil se lit comme un repère de page, pas comme une seconde navigation
+     *  (décision d'Eliott du 2026-10-16). */
+    separateur: "›",
   },
 
   /** Chapô du prix, en tête de page : le plancher, et où le prix se fixe. */

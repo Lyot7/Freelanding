@@ -179,7 +179,7 @@ export function BlogArticlePage({
             premier poste d'écart de hauteur de la page.
             Rembourrage relevé sur la même sonde : 0 en haut / 60 en bas sous
             810, 60 en haut / 90 en bas au-dessus. */}
-        <section className="relative flex h-[90vh] min-h-[600px] items-end overflow-hidden bg-background px-[20px] pb-[60px] pt-0 text-foreground tablet:px-[24px] tablet:pb-[90px] tablet:pt-[60px] desktop:px-[30px]">
+        <section className="relative flex h-[calc(90vh/var(--zoom-ecran,1))] min-h-[600px] items-end overflow-hidden bg-background px-[20px] pb-[60px] pt-0 text-foreground tablet:px-[24px] tablet:pb-[90px] tablet:pt-[60px] desktop:px-[30px]">
           {/* framer-14e0onr « BG » : le fond du hero DÉRIVE au scroll sur la
               source, il était posé fixe. Relevé sur
               `/live-proxy/blog/stop-hiding-your-prices` à 1440, par sauts de

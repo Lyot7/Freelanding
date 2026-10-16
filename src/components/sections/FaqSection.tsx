@@ -251,7 +251,7 @@ export function FaqSection({
                    `min()` garde EXACTEMENT la taille d'origine partout où elle
                    tient, et ne réduit que dans les bandes où le texte serait
                    tronqué : 320-369, 810-913 et 1200-1227. */
-                className="relative m-0 flex w-full flex-col justify-center p-0 text-right text-[min(52px,calc(15.38vw-6.15px))] font-semibold uppercase leading-[0.82] tracking-[-0.05em] tablet:text-[min(68px,calc(7.69vw-3.85px))] desktop:text-[min(92px,calc(7.69vw-4.6px))]"
+                className="relative m-0 flex w-full flex-col justify-center p-0 text-right text-[min(52px,calc(calc(15.38vw/var(--zoom-ecran,1))-6.15px))] font-semibold uppercase leading-[0.82] tracking-[-0.05em] tablet:text-[min(68px,calc(calc(7.69vw/var(--zoom-ecran,1))-3.85px))] desktop:text-[min(92px,calc(calc(7.69vw/var(--zoom-ecran,1))-4.6px))]"
                 style={{ color: INK }}
               >
                 <Reveal

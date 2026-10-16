@@ -129,7 +129,7 @@ export const pagePrixSite: PagePrixSite = {
               "Quand votre projet demande une boutique, un espace client ou une réservation avec paiement.",
           },
           {
-            libelle: "Refonte de site internet : prix et méthode",
+            libelle: "Refonte de site internet : prix moyen 2026 et méthode",
             href: CHEMIN_ARTICLE_REFONTE,
             description:
               "Refaire un site existant sans perdre le référencement acquis.",

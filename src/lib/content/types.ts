@@ -605,6 +605,18 @@ export interface HeroContent {
   doors?: readonly HeroDoor[];
   /** Preuves du premier écran, dans l'ordre d'affichage. */
   proofs?: readonly HeroProof[];
+  /** Le prix d'une agence et le mien, pour le même livrable. */
+  comparison?: HeroComparaison;
+}
+
+/**
+ * Une comparaison de prix À LIVRABLE ÉGAL : le sujet nomme ce qui est
+ * comparé, chaque ligne dit qui le facture et combien.
+ */
+export interface HeroComparaison {
+  sujet: string;
+  lignes: readonly { qui: string; prix: string; fort?: boolean }[];
+  source: { label: string; href: string };
 }
 
 /** Résultat affiché dans le bas du héros (« −92 % d'erreurs… »). */
@@ -833,8 +845,41 @@ export interface HomeAboutSection {
   image?: ImageAsset;
 }
 
+/** Une étape d'une tâche, faite par vous ou par l'outil. */
+export interface EtapeDemo {
+  libelle: string;
+  /** `true` : l'outil la fait seul. */
+  auto: boolean;
+}
+
+/**
+ * La section qui montre un logiciel métier au travail : une même tâche,
+ * faite à la main puis par l'outil.
+ */
+export interface LogicielDemoContent {
+  eyebrow: string;
+  titleLines: readonly string[];
+  statement: string;
+  /** Fragments du paragraphe rendus en blanc plein. */
+  statementEmphasis?: readonly string[];
+  cta: Link;
+  demo: {
+    /** Intitulé de la fenêtre (« Exemple : une commande reçue par mail »). */
+    titre: string;
+    onglets: { main: string; outil: string };
+    /** Libellés de la colonne de droite (« Vous », « Automatique »). */
+    acteurs: { vous: string; outil: string };
+    main: readonly EtapeDemo[];
+    outil: readonly EtapeDemo[];
+    /** Bilan sous la liste, par onglet. */
+    bilan: { main: string; outil: string };
+  };
+}
+
 export interface HomeContent {
   hero: HeroContent;
+  /** Démonstration du logiciel métier, en section noire. */
+  logiciel?: LogicielDemoContent;
   showreel: ShowreelContent;
   about: HomeAboutSection;
   /** Projets mis en avant sur la home, dans l'ordre éditorial. */

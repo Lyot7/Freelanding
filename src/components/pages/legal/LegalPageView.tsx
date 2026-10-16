@@ -32,7 +32,7 @@ export function LegalPageView({
             section de 810 à 390 (donc 60), et à 720 à 810, 1200 et 1440 (donc
             90). Nous étions à 64 et 30, ce qui posait tout le héros 60 px trop
             bas en tablette et au-delà. */}
-        <section className="relative flex h-[90svh] items-end overflow-hidden bg-background px-[20px] pb-[60px] pt-[140px] text-foreground tablet:px-[24px] tablet:pb-[90px] desktop:px-[30px]">
+        <section className="relative flex h-[calc(90svh/var(--zoom-ecran,1))] items-end overflow-hidden bg-background px-[20px] pb-[60px] pt-[140px] text-foreground tablet:px-[24px] tablet:pb-[90px] desktop:px-[30px]">
           {photo ? <HeroPhoto image={photo} hauteur={{ mobile: "90vh", tablette: "90vh" }} /> : null}
           {/* RELEVÉ sur `/legal/privacy-policy` : hôte 1440 × 810, z-1,
               opacité 0,05. La page n'a que trois calques : ce héros, le grain
@@ -73,7 +73,7 @@ export function LegalPageView({
                   largeur disponible, et la boîte occupe sa colonne entière.
                   Repère de la source conservé pour les titres courts, qui
                   gardent leur présence. */}
-              <h1 className="max-w-[680px] text-[clamp(38px,9vw,63px)] font-semibold uppercase leading-[0.82] tracking-[-0.05em] tablet:text-[clamp(44px,6.2vw,78px)] desktop:text-[clamp(52px,5.4vw,98px)]">
+              <h1 className="max-w-[680px] text-[clamp(38px,calc(9vw/var(--zoom-ecran,1)),63px)] font-semibold uppercase leading-[0.82] tracking-[-0.05em] tablet:text-[clamp(44px,calc(6.2vw/var(--zoom-ecran,1)),78px)] desktop:text-[clamp(52px,calc(5.4vw/var(--zoom-ecran,1)),98px)]">
                 {document.title}
               </h1>
             </Reveal>

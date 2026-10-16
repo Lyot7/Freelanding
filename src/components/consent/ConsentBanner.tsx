@@ -391,7 +391,7 @@ export function ConsentBanner() {
                 inatteignables — c'est-à-dire un refus impossible. La borne est
                 calculée sur `svh` et non `vh` : sur iOS, `vh` compte la barre
                 d'adresse rétractée et surestime la place disponible. */}
-            <div className="relative z-[1] flex max-h-[calc(100svh-120px)] flex-col gap-[16px] overflow-y-auto p-[20px]">
+            <div className="relative z-[1] flex max-h-[calc(calc(100svh/var(--zoom-ecran,1))-120px)] flex-col gap-[16px] overflow-y-auto p-[20px]">
               <div className="flex flex-col gap-[8px]">
                 <p className="whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-white/60">
                   {consentCopy.eyebrow}

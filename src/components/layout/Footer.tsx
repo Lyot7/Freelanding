@@ -434,7 +434,7 @@ export async function Footer({
                   62 px au seul palier fautif — 408 x 62/68 = 372, sous les 381
                   disponibles. `scripts/word-break-audit.mjs` vérifie qu'aucun
                   mot ne se recoupe ailleurs. */}
-              <h2 className="relative m-0 w-full max-w-full whitespace-pre-wrap p-0 text-left text-[clamp(40px,13.6vw,52px)] font-semibold uppercase leading-[0.82] tracking-[-0.05em] text-foreground tablet:max-w-[390px] desktop:max-w-none tablet:text-[62px] desktop:text-[92px]">
+              <h2 className="relative m-0 w-full max-w-full whitespace-pre-wrap p-0 text-left text-[clamp(40px,calc(13.6vw/var(--zoom-ecran,1)),52px)] font-semibold uppercase leading-[0.82] tracking-[-0.05em] text-foreground tablet:max-w-[390px] desktop:max-w-none tablet:text-[62px] desktop:text-[92px]">
                 {footerCta?.heading}
               </h2>
               {/* framer-dak6ek : sous-texte (preset wwtw0z 12px, blanc 60 % + emphase blanche) */}

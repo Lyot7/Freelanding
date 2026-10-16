@@ -167,8 +167,11 @@ export function Header({
     navBaseCls +
     " transition-colors duration-200 ease-[cubic-bezier(0.44,0,0.56,1)] hover:text-accent motion-reduce:transition-none";
 
+  // Au-delà de 1500 px, le logo et le menu se calent sur la colonne de 1440
+  // du contenu au lieu des bords de la fenêtre (2026-10-16) : sur grand
+  // écran, ils flottaient à 240 px du texte qu'ils encadrent.
   const shellCls =
-    "absolute inset-x-0 top-0 z-[9] flex flex-row items-center justify-between gap-[10px] px-[20px] pt-[20px] tablet:px-[30px] tablet:pt-[30px]";
+    "absolute inset-x-0 top-0 z-[9] flex flex-row items-center justify-between gap-[10px] px-[20px] pt-[20px] tablet:px-[30px] tablet:pt-[30px] desktop:px-[max(30px,calc((100%-1440px)/2+30px))]";
 
   const contenu: ReactNode = (
     <>

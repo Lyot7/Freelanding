@@ -251,7 +251,7 @@ export function WorkCard({ work, index }: { work: WorkItem; index?: number }) {
       data-part="work-card"
       className={
         FONT +
-        " relative flex h-[100vh] w-full flex-col items-center justify-center overflow-hidden"
+        " relative flex h-[calc(100vh/var(--zoom-ecran,1))] w-full flex-col items-center justify-center overflow-hidden"
       }
     >
       {/* framer-1i699rn : bandeau titre défilant (Ticker Framer, -110 px/s).

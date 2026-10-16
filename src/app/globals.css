@@ -105,6 +105,50 @@ html body {
   font-family: var(--font-sans);
 }
 
+/* ============================================================
+   Grands écrans — mise à l'échelle par paliers (2026-10-16)
+
+   Le site est dessiné en pixels pour 1440 et tient tel quel jusqu'à 1920.
+   Au-delà, les textes et les marges restaient à leur taille pendant que les
+   images pleine largeur grandissaient : en 4K, un héros de 22 px perdu dans
+   une page de 3840, et des cartes projet de 2000 px de haut.
+
+   `zoom` agrandit tout d'un même facteur, de sorte que la mise en page voie
+   toujours une fenêtre de 1920 à 2048 px de large : un écran 4K affiche le
+   rendu 1920, deux fois plus net. Les paliers sont rapprochés (tous les 160
+   à 320 px) pour que le saut entre deux tailles de fenêtre reste invisible.
+
+   PIÈGE : `zoom` multiplie aussi les unités d'écran (`vh`, `vw`, `svh`…).
+   Toute valeur en unité d'écran se divise donc par `--zoom-ecran` dans le
+   code (`h-[calc(100vh/var(--zoom-ecran,1))]`) : 100vh redevient la hauteur
+   de la fenêtre une fois agrandi. Les attributs `sizes` des images n'en ont
+   pas besoin, le navigateur les lit hors de la mise en page.
+   ============================================================ */
+:root {
+  --zoom-ecran: 1;
+}
+@media (min-width: 2048px) { :root { --zoom-ecran: 1.0667; } }
+@media (min-width: 2160px) { :root { --zoom-ecran: 1.125; } }
+@media (min-width: 2304px) { :root { --zoom-ecran: 1.2; } }
+@media (min-width: 2400px) { :root { --zoom-ecran: 1.25; } }
+@media (min-width: 2560px) { :root { --zoom-ecran: 1.3334; } }
+@media (min-width: 2720px) { :root { --zoom-ecran: 1.4167; } }
+@media (min-width: 2880px) { :root { --zoom-ecran: 1.5; } }
+@media (min-width: 3072px) { :root { --zoom-ecran: 1.6; } }
+@media (min-width: 3200px) { :root { --zoom-ecran: 1.6667; } }
+@media (min-width: 3440px) { :root { --zoom-ecran: 1.7917; } }
+@media (min-width: 3600px) { :root { --zoom-ecran: 1.875; } }
+@media (min-width: 3840px) { :root { --zoom-ecran: 2; } }
+@media (min-width: 4480px) { :root { --zoom-ecran: 2.3334; } }
+@media (min-width: 5120px) { :root { --zoom-ecran: 2.6667; } }
+/* Sur `body` et non sur `html` : posé sur la racine, `zoom` laisse
+   `scrollHeight` en pixels de mise en page pendant que `scrollY` compte en
+   pixels affichés, et le défilement doux (Lenis) s'arrêtait à mi-page. Sur
+   `body`, les deux comptent pareil (mesuré dans Chromium le 2026-10-16). */
+body {
+  zoom: var(--zoom-ecran);
+}
+
 /* Garde-fou horizontal. `clip` et NON `hidden` : `hidden` ferait de la racine
    un conteneur de défilement et casserait les éléments en `position: sticky`
    (il y en a trois sur les cartes projet).
@@ -918,4 +962,29 @@ html[data-consent-choisi] [data-consent-attente] {
 @media (prefers-reduced-motion: reduce) {
   .footer-onglet-pastille { transition: none; }
   .footer-panneau:not([hidden]) { animation: hero-fond-doux 200ms ease both; }
+}
+
+/* ---------------------------------------------------------------------------
+   Démonstration du logiciel (accueil, 2026-10-16). La pastille glisse d'un
+   onglet à l'autre ; les étapes entrent en fondu décalé à chaque bascule.
+   --------------------------------------------------------------------------- */
+@keyframes logiciel-etape {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+.logiciel-etape {
+  animation: logiciel-etape 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.logiciel-pastille {
+  transition: transform 280ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.logiciel-cta {
+  transition: transform 160ms ease-out;
+}
+.logiciel-cta:active {
+  transform: scale(0.97);
+}
+@media (prefers-reduced-motion: reduce) {
+  .logiciel-etape { animation: none; }
+  .logiciel-pastille { transition: none; }
 }

@@ -327,7 +327,7 @@ export function FloatingNav({ site }: { site: SiteConfig }) {
           // 277,4 — c'est exactement le résultat d'une mise à l'échelle centrée
           // (655,9 - 138,7 + 20). `origin-bottom` le posait à 550,6, soit 13 px
           // trop bas pendant toute l'ouverture.
-          className={`absolute bottom-[70px] left-1/2 w-[min(400px,calc(100vw-40px))] overflow-hidden bg-[rgba(23,23,23,0.89)] transition-[opacity,transform,backdrop-filter] duration-300 before:pointer-events-none before:absolute before:inset-0 before:z-[2] before:border before:border-[rgba(255,255,255,0.1)] before:content-[''] motion-reduce:transition-none ${
+          className={`absolute bottom-[70px] left-1/2 w-[min(400px,calc(calc(100vw/var(--zoom-ecran,1))-40px))] overflow-hidden bg-[rgba(23,23,23,0.89)] transition-[opacity,transform,backdrop-filter] duration-300 before:pointer-events-none before:absolute before:inset-0 before:z-[2] before:border before:border-[rgba(255,255,255,0.1)] before:content-[''] motion-reduce:transition-none ${
             open
               ? "pointer-events-auto opacity-100 [backdrop-filter:blur(9px)]"
               : "pointer-events-none opacity-0 [backdrop-filter:blur(0px)]"

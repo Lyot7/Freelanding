@@ -67,12 +67,12 @@ export const jenniferTestimonial: Testimonial = {
 /**
  * Citation d'ouverture de la section tarifs (home.ts, œil « Ma façon de voir »)
  * — SECTION VISIBLE. Phrase d'Eliott, pas un témoignage.
- * Les guillemets font partie de la CHAÎNE : `MethodeSection.tsx` rend
+ * Les guillemets font partie de la CHAÎNE : `LogicielSection.tsx` rend
  * `quote.quote` tel quel, sans rien ajouter autour. Les retirer ferait
  * disparaître les guillemets à l'écran.
  */
 /**
- * PRISE DE PAROLE SUR LA MÉTHODE, rendue par `MethodeSection` sur l'accueil.
+ * PRISE DE PAROLE SUR LA MÉTHODE, rendue par `LogicielSection` sur l’accueil.
  *
  * CE QU'ELLE REMPLACE. Ce nœud portait l'engagement de FACTURATION : « le prix
  * est fixé avant que je commence, et il ne bouge pas ». Vrai, tenable, et sans
