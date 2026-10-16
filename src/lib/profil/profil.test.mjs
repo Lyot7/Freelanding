@@ -258,3 +258,26 @@ describe("profilEnMarkdown et consignesDuPrompt", () => {
     expect(prompt.startsWith(consignes)).toBe(true);
   });
 });
+
+describe("profil : ligne de service sans offre chiffrée", () => {
+  it("garde le prix affiché par la ligne et ne pose ni bloc d’offre ni lien de détail", async () => {
+    const ligne = {
+      ...premierService,
+      title: "Une ligne sans page d’offre",
+      price: "sur devis",
+      cta: { label: "Voir", href: "/ailleurs" },
+      rdvHref: undefined,
+    };
+    const texte = profilEnMarkdown(
+      await construireProfil({
+        depot: depot({
+          home: { ...homeReel, services: { ...homeReel.services, items: [ligne] } },
+        }),
+        prestations,
+      }),
+    );
+    expect(texte).toContain("### Une ligne sans page d’offre (sur devis)");
+    expect(texte).not.toContain("Détail\u00A0:");
+    expect(texte).not.toContain("prix fixé au devis");
+  });
+});

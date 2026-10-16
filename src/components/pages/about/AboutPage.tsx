@@ -168,7 +168,7 @@ function StatCell({ stat, speedMs }: { stat: Stat; speedMs: number }) {
   );
 }
 
-function AboutStory({ about }: { about: AboutContent }) {
+export function AboutStory({ about }: { about: AboutContent }) {
   /* LA PHRASE D'OUVERTURE EN GRAND, LES TROIS PARAGRAPHES ENSUITE, l'un
      après l'autre dans une seule colonne (2026-10-16, demande d'Eliott). Ils
      étaient répartis sur deux colonnes étroites, plus un chapô en capitales
@@ -485,8 +485,6 @@ export async function AboutPage() {
         {siteFeatures.testimonials && about.testimonial ? (
           <TestimonialsSection testimonials={[about.testimonial]} />
         ) : null}
-        {/* Bande de logos fixe (140px) : elle sépare les témoignages du
-            teaser blog sur la source, elle manquait ici. */}
         {/* Retrait haut MESURÉ à 30 en mobile sur `/about` (contre 40 sur la
             home) : la section faisait 2119 sur la source à 390 et 2129 chez
             nous, écart identique à 600 et 809. */}
