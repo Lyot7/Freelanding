@@ -15,13 +15,13 @@ import { useId, useState, useSyncExternalStore, type ReactNode } from "react";
 const ANCRE_RENDEZ_VOUS = "#rendez-vous";
 
 /**
- * Nombre de demandes d'ouverture du rendez-vous : arrivée sur la page avec
- * l'ancre, clic sur un lien vers elle, changement d'ancre. Un COMPTEUR et non
- * l'ancre elle-même : les liens de Next posent l'ancre par `pushState`, sans
- * `hashchange`, et un second clic sur le même lien ne la change pas.
+ * Nombre de clics ou de changements d'ancre vers le rendez-vous. Un clic fait
+ * sur la page ouvre l'onglet sans attendre l'ancre, et remet à zéro le choix
+ * du visiteur : un second clic sur « Réserver » rouvre le rendez-vous même si
+ * l'ancre n'a pas changé. Les liens de Next posent l'ancre par `pushState`,
+ * sans `hashchange` : d'où l'écoute des clics.
  */
-let demandesRendezVous =
-  typeof window !== "undefined" && window.location.hash === ANCRE_RENDEZ_VOUS ? 1 : 0;
+let demandesRendezVous = 0;
 
 function abonnerDemandes(rappel: () => void): () => void {
   const surClic = (evenement: MouseEvent) => {
@@ -29,7 +29,8 @@ function abonnerDemandes(rappel: () => void): () => void {
     const lien = cible instanceof Element ? cible.closest("a[href]") : null;
     if (lien?.getAttribute("href")?.endsWith(ANCRE_RENDEZ_VOUS)) {
       demandesRendezVous += 1;
-      rappel();
+      // Après le `pushState` du lien, pour lire la nouvelle ancre.
+      window.setTimeout(rappel, 0);
     }
   };
   const surAncre = () => {
@@ -49,6 +50,14 @@ function lireDemandes(): number {
   return demandesRendezVous;
 }
 
+function lireDemandesServeurOuClient(): number {
+  return typeof window === "undefined" ? 0 : demandesRendezVous;
+}
+
+function lireAncre(): string {
+  return window.location.hash;
+}
+
 export function FooterContact({
   modes,
   message,
@@ -64,6 +73,10 @@ export function FooterContact({
   // Un lien vers `#rendez-vous` (boutons « Réserver » des pages) ouvre
   // l'onglet rendez-vous, même quand le visiteur avait choisi l'autre.
   const demandes = useSyncExternalStore(abonnerDemandes, lireDemandes, () => 0);
+  const ancre = useSyncExternalStore(abonnerDemandes, lireAncre, () => "");
+  // Les clics faits sur une page précédente ne comptent pas : le compteur vit
+  // au niveau du module, ce pied de page se monte à chaque page.
+  const [demandesAuMontage] = useState(lireDemandesServeurOuClient);
   const [choisi, setOnglet] = useState<"message" | "rendezVous" | null>(null);
   const [demandesVues, setDemandesVues] = useState(demandes);
   if (demandes !== demandesVues) {
@@ -71,7 +84,10 @@ export function FooterContact({
     setOnglet(null);
   }
   const onglet =
-    choisi ?? (demandes > 0 || ongletInitial === "rendezVous" ? "rendezVous" : "message");
+    choisi ??
+    (ancre === ANCRE_RENDEZ_VOUS || demandes > demandesAuMontage || ongletInitial === "rendezVous"
+      ? "rendezVous"
+      : "message");
   const base = useId();
   if (!rendezVous || !modes) return <>{message}</>;
 
@@ -81,7 +97,9 @@ export function FooterContact({
   ] as const;
 
   return (
-    <div className="flex w-full flex-col gap-[24px]">
+    // `data-section` : premier palier de l'entonnoir de rendez-vous
+    // (`PageAnalytics`), porté par la section des pages avant le 2026-10-16.
+    <div data-section="rendez-vous" className="flex w-full flex-col gap-[24px]">
       <div
         role="tablist"
         aria-label={modes.label}

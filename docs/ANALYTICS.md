@@ -194,6 +194,12 @@ désintérêt alors qu'elle vient d'une panne.
    `section_viewed` (filtrer `section = rendez-vous`) → `rdv_type_selected` →
    `rdv_slots_loaded` → `rdv_slot_selected` → `form_submitted` → `rdv_confirmed`
 
+   Depuis le 2026-10-16, `section = rendez-vous` est le double formulaire du
+   pied de page (seul formulaire du site, présent sur toutes les pages) : le
+   premier palier compte donc chaque pied de page vu, plus seulement les
+   visiteurs d'une section de réservation. Comparer avant et après cette date
+   n'a pas de sens sur ce palier.
+
    Une chute entre les étapes 2 et 3 se lit à côté de `rdv_slots_failed` AVANT
    d'être attribuée au désintérêt : une panne Cal.com dessine exactement la même
    courbe. Le 2026-09-06, les quatre types pointaient sur des identifiants
