@@ -1,9 +1,14 @@
 import { afterEach, describe, expect, it } from "bun:test";
 import { JSDOM } from "jsdom";
+import { AppRouterContext } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
+import { renderToStaticMarkup } from "react-dom/server";
 
-import { HeroVideo } from "./HeroSection";
+import { homeContent } from "@/content/home";
+import { uiLabels } from "@/content/ui";
+import { content } from "@/lib/content";
+import { HeroSection, HeroVideo } from "./HeroSection";
 
 /**
  * `HeroVideo` ne pose la vidéo qu'APRÈS le montage (`useEffect`, jamais au
@@ -103,5 +108,80 @@ describe("HeroVideo", () => {
     // globals : une continuation en retard référencerait sinon un `window`
     // déjà remplacé.
     await new Promise((resoudre) => setTimeout(resoudre, 20));
+  });
+});
+
+/**
+ * Le prix d'une agence et le mien pour le même site (2026-10-16), rendu côté
+ * serveur sous les portes, à côté des preuves. Le décor vidéo est retiré : il
+ * n'a pas d'effet sur ce bloc et ne se monte qu'au client.
+ */
+describe("HeroSection, comparaison de prix", async () => {
+  const site = await content.getSiteConfig();
+  const heroSansVideo = { ...homeContent.hero, media: undefined };
+  const comparaison = homeContent.hero.comparison;
+  // `DemanderAssistant`, monté dans le héros, lit le routeur de l'app.
+  const routeur = { push() {}, replace() {}, prefetch() {}, back() {}, forward() {}, refresh() {} };
+  const rendre = (hero, logos) =>
+    renderToStaticMarkup(
+      createElement(
+        AppRouterContext.Provider,
+        { value: routeur },
+        createElement(HeroSection, { hero, site, logos }),
+      ),
+    );
+  const BLOC_BAS = "border-t border-white/10 pt-[18px]";
+
+  it("porte l'ancre #services sur le seul h1, cible des fils d'Ariane", () => {
+    const html = rendre(heroSansVideo);
+    expect(html).toMatch(/<h1 id="services" data-part="hero-titre"/);
+    expect(html.match(/<h1\b/g)).toHaveLength(1);
+  });
+
+  it("nomme le sujet, puis chaque ligne avec son prix, le mien seul en accent", () => {
+    const html = rendre(heroSansVideo);
+    const bloc = html.slice(html.indexOf('data-part="comparaison"'));
+    expect(bloc).toContain(comparaison.sujet);
+    expect(bloc.indexOf(comparaison.sujet)).toBeLessThan(bloc.indexOf("<dl"));
+    for (const ligne of comparaison.lignes) {
+      const motif = new RegExp(
+        `<dt[^>]*>${ligne.qui}</dt><dd class="[^"]*${ligne.fort ? "text-accent" : "text-foreground-60"}"[^>]*>${ligne.prix}</dd>`,
+      );
+      expect(bloc).toMatch(motif);
+    }
+    expect(comparaison.lignes.filter((ligne) => ligne.fort)).toHaveLength(1);
+  });
+
+  it("cite sa source dans un nouvel onglet", () => {
+    const html = rendre(heroSansVideo);
+    const bloc = html.slice(html.indexOf('data-part="comparaison"'));
+    expect(bloc).toContain(uiLabels.hero.source);
+    const lien = bloc.match(/<a [^>]*>[^<]*<\/a>/)?.[0] ?? "";
+    expect(lien).toContain(`href="${comparaison.source.href}"`);
+    expect(lien).toContain('target="_blank"');
+    expect(lien).toContain('rel="noopener noreferrer"');
+    expect(lien).toContain(`>${comparaison.source.label}</a>`);
+  });
+
+  it("garde le bas du héros pour les preuves, la comparaison ou les logos seuls", () => {
+    const preuve = { value: "-92 %", label: "d'erreurs de saisie" };
+    const avecPreuves = rendre({ ...heroSansVideo, comparison: undefined, proofs: [preuve] });
+    expect(avecPreuves).toContain(BLOC_BAS);
+    expect(avecPreuves).toContain('data-part="preuve"');
+    expect(avecPreuves).not.toContain('data-part="comparaison"');
+
+    const comparaisonSeule = rendre({ ...heroSansVideo, proofs: [] });
+    expect(comparaisonSeule).toContain(BLOC_BAS);
+    expect(comparaisonSeule).toContain('data-part="comparaison"');
+
+    const logosSeuls = rendre(
+      { ...heroSansVideo, comparison: undefined, proofs: [] },
+      createElement("span", { "data-part": "logos" }),
+    );
+    expect(logosSeuls).toContain(BLOC_BAS);
+    expect(logosSeuls).toContain('data-part="logos"');
+
+    const rien = rendre({ ...heroSansVideo, comparison: undefined, proofs: [] });
+    expect(rien).not.toContain(BLOC_BAS);
   });
 });
