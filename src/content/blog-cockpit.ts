@@ -26,6 +26,8 @@ export interface ArticleCockpit {
   title: string;
   /** Date de publication ISO, jour de Paris. */
   date: string;
+  /** Date de dernière réécriture, jour de Paris : alimente `dateModified` et `<lastmod>`. */
+  updated?: string;
   category: string;
   /** 70 à 200 caractères : extrait de l'index et description de recherche. */
   description: string;
@@ -51,6 +53,7 @@ export function articlesDuCockpit(
       slug: a.slug,
       title: a.title,
       date: a.date,
+      ...(a.updated ? { updated: a.updated } : {}),
       dateSource: "editorial",
       listedInIndex: true,
       category: a.category,

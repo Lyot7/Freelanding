@@ -37,6 +37,13 @@ describe("articles du cockpit", () => {
     expect(article.author.name).toBe("Eliott Bouquerel");
   });
 
+  test("la date de réécriture passe au BlogPost, et son absence n'ajoute aucune clé", () => {
+    const [avec] = articlesDuCockpit(blogPosts, [{ ...entree, updated: "2026-10-21" }]);
+    expect(avec.updated).toBe("2026-10-21");
+    const [sans] = articlesDuCockpit(blogPosts, [entree]);
+    expect("updated" in sans).toBe(false);
+  });
+
   test("un visuel sans texte de remplacement casse le build au lieu de laisser une image muette", () => {
     expect(() => articlesDuCockpit(blogPosts, [{ ...entree, alt: " " }])).toThrow("visuel sans texte de remplacement");
   });
