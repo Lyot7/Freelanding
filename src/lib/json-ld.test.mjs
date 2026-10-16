@@ -7,6 +7,7 @@ import {
   profilePageSchema,
 } from "./json-ld.ts";
 import { homeContent } from "../content/home.ts";
+import { ctoReferentIA } from "../content/offre.ts";
 import { siteConfig } from "../content/site.ts";
 
 /**
@@ -26,6 +27,22 @@ describe("JSON-LD de l'entité", () => {
       addressCountry: "FR",
     });
     expect(business.address).not.toHaveProperty("streetAddress");
+  });
+
+  test("déclare le prix mensuel du CTO avec son unité, et les projets sans", () => {
+    const cto = business.hasOfferCatalog.itemListElement.find((offre) => offre.name === ctoReferentIA.nom);
+    expect(cto.priceSpecification).toEqual({
+      "@type": "UnitPriceSpecification",
+      priceCurrency: "EUR",
+      minPrice: ctoReferentIA.plancher,
+      unitCode: "MON",
+    });
+    const projets = business.hasOfferCatalog.itemListElement.filter((offre) => offre.name !== ctoReferentIA.nom);
+    expect(projets).toHaveLength(homeContent.services.items.length - 1);
+    for (const offre of projets) {
+      expect(offre.priceSpecification["@type"]).toBe("PriceSpecification");
+      expect(offre.priceSpecification).not.toHaveProperty("unitCode");
+    }
   });
 
   test("déclare son logo en ImageObject dimensionné, en URL absolue", () => {

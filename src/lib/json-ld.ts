@@ -5,7 +5,7 @@ import type {
   SiteConfig,
   WorkItem,
 } from "@/lib/content/types";
-import type { Prestation } from "@/content/offre";
+import { PERIODES, type Prestation } from "@/content/offre";
 import { absoluteUrl } from "@/lib/site-url";
 
 /**
@@ -133,13 +133,20 @@ function bornesPrix(prix: string | undefined) {
 
   if (!montants.length) return undefined;
 
+  // UNE OFFRE MENSUELLE (« à partir de 1 600 € par mois », le CTO à temps
+  // partagé) déclare son unité, comme dans `serviceSchema` : sans elle, Google
+  // lirait le plancher comme le prix d'un projet entier. Le suffixe vient de
+  // `PERIODES`, le même que `aPartirDe()` écrit dans la ligne de service.
+  const mensuel = prix.includes(PERIODES.mois);
+
   return compact({
-    "@type": "PriceSpecification",
+    "@type": mensuel ? "UnitPriceSpecification" : "PriceSpecification",
     priceCurrency: "EUR",
     minPrice: Math.min(...montants),
     // Absent quand la page n'annonce qu'un seul montant : déclarer un plafond
     // égal au plancher fermerait une offre que la page laisse ouverte.
     maxPrice: montants.length > 1 ? Math.max(...montants) : undefined,
+    unitCode: mensuel ? "MON" : undefined,
   });
 }
 
