@@ -1,7 +1,6 @@
 import type { ContactContent } from "@/lib/content/types";
 // FAQ = source unique dans faq.ts (identique à home / work, template partagé).
 import { faqItems } from "@/content/faq";
-import { rendezVousContent } from "@/content/rendez-vous";
 import { siteConfig } from "@/content/site";
 
 /**
@@ -45,45 +44,6 @@ export const contactContent: ContactContent = {
     // signature, et la signature déclenche le développement.
     "Avant toute signature, on cale ensemble le périmètre et la direction visuelle : ce que vous voulez obtenir, ce qui vous plaît, les références que vous avez déjà trouvées. Le jour où vous signez, je commence à développer.",
   ],
-  form: {
-    name: { label: "Nom", placeholder: "Jean Dupont" },
-    email: { label: "Votre adresse e-mail", placeholder: "exemple@email.com" },
-    projectType: {
-      label: "Que cherchez-vous ?",
-      placeholder: "Choisissez un type de projet",
-      options: siteConfig.footerForm?.selectOptions ?? [],
-    },
-    questionnaire: {
-      budget: {
-        label: rendezVousContent.questionnaire.budget.legende,
-        placeholder: "Choisissez une tranche",
-      },
-      objectif: {
-        label: rendezVousContent.questionnaire.objectif.legende,
-        placeholder: "Choisissez ce qui compte le plus",
-      },
-      echeance: {
-        label: rendezVousContent.questionnaire.echeance.legende,
-        placeholder: "Choisissez une échéance",
-      },
-    },
-    etapes: {
-      titres: ["Votre projet", "Votre budget", "Vos coordonnées"],
-      continuer: "Continuer",
-      retour: "Retour",
-    },
-    message: {
-      label: "Autre chose ?",
-      placeholder: "Votre message ici…",
-    },
-    submitLabel: siteConfig.footerForm?.submitLabel ?? "Envoyer le message",
-    disclaimer: {
-      text:
-        siteConfig.footerForm?.disclaimer ??
-        "En envoyant ce formulaire, vous acceptez mes conditions et ma politique de confidentialité.",
-      links: siteConfig.footerForm?.disclaimerLinks ?? siteConfig.legalLinks,
-    },
-  },
   contactCard: {
     // Le template mettait en avant une commerciale fictive (Anna Schneider,
     // « Head of Sales »). Eliott est seul : c'est lui l'interlocuteur.
