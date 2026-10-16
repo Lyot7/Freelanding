@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useCallback, useId, useRef, useState } from "react";
 import type { LogicielDemoContent } from "@/lib/content/types";
 
 type Onglet = "main" | "outil";
@@ -19,12 +19,11 @@ type Onglet = "main" | "outil";
 export function LogicielDemo({ demo }: { demo: LogicielDemoContent["demo"] }) {
   const [onglet, setOnglet] = useState<Onglet>("main");
   const touche = useRef(false);
-  const fenetre = useRef<HTMLDivElement>(null);
   const base = useId();
 
-  useEffect(() => {
-    const cible = fenetre.current;
-    if (!cible) return;
+  /* Ref de rappel avec nettoyage (React 19) : appelée une fois le nœud posé,
+     jamais avec `null` puisqu'elle rend sa fonction de nettoyage. */
+  const observer = useCallback((cible: HTMLDivElement) => {
     let minuteur: ReturnType<typeof setTimeout> | undefined;
     const observateur = new IntersectionObserver(
       ([entree]) => {
@@ -54,7 +53,7 @@ export function LogicielDemo({ demo }: { demo: LogicielDemoContent["demo"] }) {
 
   return (
     <div
-      ref={fenetre}
+      ref={observer}
       className="relative w-full border border-white/10 bg-surface-1 text-foreground"
     >
       <div className="flex flex-col gap-[14px] border-b border-white/10 px-[16px] py-[14px] tablet:px-[20px] min-[1360px]:flex-row min-[1360px]:items-center min-[1360px]:justify-between">
