@@ -22,14 +22,20 @@
 import type { PrestationId } from "@/content/offre";
 
 /**
- * Les trois entrées du sélecteur, et l'ordre dans lequel elles s'affichent.
+ * Les cinq entrées du sélecteur, et l'ordre dans lequel elles s'affichent.
+ *
+ * « ia » et « cto » arrivent le 2026-10-16 avec les deux offres du même jour,
+ * demande d'Eliott : « go créer autant de rdvs cal.com que nécessaire ».
+ * Chacune a son type d'événement Cal.com (`docs/CAL-COM.md`) et ses questions :
+ * la tâche et l'outil pour l'IA, le besoin et l'échéance pour le CTO, dont le
+ * forfait mensuel n'entre dans aucune tranche de budget de projet.
  *
  * « outil » a disparu le 2026-09-23 avec la prestation du même nom : l'outil
  * est entré dans La Solution métier, et le rendez-vous
  * « logiciel » couvre les deux tailles. Un ancien lien `?sujet=outil` est
  * redirigé vers « logiciel » par `resoudreSujet` (`src/lib/rendez-vous/config.ts`).
  */
-export const IDS_RENDEZ_VOUS = ["site", "logiciel", "decouverte"] as const;
+export const IDS_RENDEZ_VOUS = ["site", "logiciel", "ia", "cto", "decouverte"] as const;
 
 export type IdRendezVous = (typeof IDS_RENDEZ_VOUS)[number];
 
@@ -109,9 +115,18 @@ export interface ContenuRendezVous {
       readonly inconnu: string;
     };
     readonly objectif: {
+      /** Légende commune, reprise par le formulaire de contact. */
       readonly legende: string;
+      /** Légende propre à un sujet, quand la commune ne lui va pas. */
+      readonly legendeParType: Readonly<Partial<Record<IdRendezVous, string>>>;
       readonly erreur: string;
       readonly options: Readonly<Record<IdRendezVous, readonly OptionQuestion[]>>;
+    };
+    /** Posée au seul sujet « ia » : l'outil où vit la tâche à automatiser. */
+    readonly outil: {
+      readonly legende: string;
+      readonly erreur: string;
+      readonly options: readonly OptionQuestion[];
     };
     readonly echeance: {
       readonly legende: string;
@@ -138,6 +153,7 @@ export interface ContenuRendezVous {
     readonly budget: string;
     readonly forfait: string;
     readonly objectif: string;
+    readonly outil: string;
     readonly echeance: string;
     readonly aucunForfait: string;
     readonly aCaler: string;
@@ -218,6 +234,20 @@ export const rendezVousContent: ContenuRendezVous = {
         "Une tâche que vous refaites à la main, un tableur qui déborde, des outils qui ne se parlent pas, ou un logiciel entier à construire. On regarde où passe le temps et ce qui existe déjà. Vous repartez avec un ordre de grandeur et une prochaine étape.",
     },
     {
+      id: "ia",
+      nom: "Montrez-moi la tâche à confier à l’IA",
+      duree: "30, 45 ou 60 minutes",
+      description:
+        "Des mails à trier, des commandes à saisir, des relances à écrire : vous me montrez comment vous faites aujourd’hui et dans quel outil. On regarde ce que l’IA peut prendre en charge, et vous repartez avec un ordre de grandeur et une prochaine étape.",
+    },
+    {
+      id: "cto",
+      nom: "Faisons le point sur vos sujets techniques",
+      duree: "30, 45 ou 60 minutes",
+      description:
+        "Un logiciel à choisir, un devis à relire, une IA à mettre en place, et personne en interne pour trancher. On regarde où vous en êtes et ce qui doit avancer en premier. Vous repartez avec une proposition d’accompagnement mensuel.",
+    },
+    {
       id: "decouverte",
       nom: "Décrivez-moi votre projet",
       duree: "15, 30 ou 45 minutes",
@@ -279,6 +309,11 @@ export const rendezVousContent: ContenuRendezVous = {
    * c'est de l'OR, sinon ce qu'ils veulent et leur dire si c'est possible ou non
    * et ce qu'ils peuvent espérer à ce prix ». Trois questions, deux obligatoires.
    *
+   * LES QUESTIONS SUIVENT LE SUJET depuis le 2026-10-16
+   * (`questionsDuRendezVous` dans `src/lib/rendez-vous/questionnaire.ts`) :
+   * pas de budget pour « cto », dont le prix est un forfait mensuel ; une
+   * question d'outil en plus pour « ia », la tâche tenant lieu d'objectif.
+   *
    * AUCUN MONTANT ICI. Les tranches de budget sont calculées depuis les planchers de
    * `offre.ts` par `src/lib/rendez-vous/questionnaire.ts` : un prix qui change
    * là-bas déplace les tranches sans qu'on touche à ce fichier.
@@ -297,7 +332,11 @@ export const rendezVousContent: ContenuRendezVous = {
     },
     objectif: {
       legende: "Ce que vous voulez obtenir en priorité",
-      erreur: "Choisissez ce qui compte le plus pour vous.",
+      legendeParType: {
+        ia: "La tâche à confier à l’IA",
+        cto: "Votre besoin le plus pressant",
+      },
+      erreur: "Choisissez la réponse la plus proche de votre cas.",
       options: {
         site: [
           { id: "google", libelle: "Être trouvé sur Google" },
@@ -313,6 +352,20 @@ export const rendezVousContent: ContenuRendezVous = {
           { id: "clients", libelle: "Donner un accès à mes clients" },
           { id: "autre", libelle: "Autre chose" },
         ],
+        ia: [
+          { id: "mails", libelle: "Trier et classer les mails entrants" },
+          { id: "saisie", libelle: "Saisir des commandes ou des factures" },
+          { id: "redaction", libelle: "Rédiger des réponses ou des relances" },
+          { id: "documents", libelle: "Résumer ou extraire des documents" },
+          { id: "autre", libelle: "Autre chose" },
+        ],
+        cto: [
+          { id: "decisions", libelle: "Prendre les décisions techniques avec quelqu’un" },
+          { id: "devis", libelle: "Faire relire les devis de mes prestataires" },
+          { id: "ia", libelle: "Choisir et mettre en place des outils d’IA" },
+          { id: "equipe", libelle: "Recruter ou encadrer une équipe technique" },
+          { id: "autre", libelle: "Autre chose" },
+        ],
         decouverte: [
           { id: "google", libelle: "Être trouvé sur Google" },
           { id: "demandes", libelle: "Recevoir plus de demandes" },
@@ -321,6 +374,17 @@ export const rendezVousContent: ContenuRendezVous = {
           { id: "autre", libelle: "Autre chose" },
         ],
       },
+    },
+    outil: {
+      legende: "L’outil où se fait cette tâche",
+      erreur: "Choisissez l’outil le plus proche du vôtre.",
+      options: [
+        { id: "messagerie", libelle: "Une messagerie (Gmail, Outlook)" },
+        { id: "tableur", libelle: "Un tableur (Excel, Google Sheets)" },
+        { id: "metier", libelle: "Un logiciel métier ou un ERP" },
+        { id: "crm", libelle: "Un CRM" },
+        { id: "autre", libelle: "Autre ou plusieurs outils" },
+      ],
     },
     echeance: {
       legende: "Votre échéance (facultatif)",
@@ -349,6 +413,7 @@ export const rendezVousContent: ContenuRendezVous = {
     budget: "Budget HT",
     forfait: "À portée",
     objectif: "Objectif",
+    outil: "Outil",
     echeance: "Échéance",
     aucunForfait: "rien à ce budget",
     aCaler: "à caler pendant l’appel",
@@ -389,15 +454,14 @@ export const RDV_PAR_PRESTATION: Readonly<Record<PrestationId, IdRendezVous>> = 
 
 /**
  * Les deux offres sans prestation propre, depuis le 2026-10-16 : l'intégration
- * IA et le CTO et référent IA à temps partagé. Aucun type d'événement Cal.com
- * de plus : l'intégration IA se discute comme un outil (« logiciel »), et le
- * pilotage technique part d'un problème dont la solution n'est pas encore
- * choisie (« decouverte »). Un nouveau sujet demanderait son type d'événement
- * chez Cal.com avant d'exister ici (`docs/CAL-COM.md`).
+ * IA et le CTO et référent IA à temps partagé. Chacune a son sujet et son type
+ * d'événement Cal.com depuis le même jour (`docs/CAL-COM.md`) : elles
+ * tombaient avant sur « logiciel » et « decouverte », dont les tranches de
+ * budget de projet ne disent rien d'un forfait mensuel.
  */
 export const RDV_HORS_PRESTATION = {
-  integrationIA: "logiciel",
-  cto: "decouverte",
+  integrationIA: "ia",
+  cto: "cto",
 } as const satisfies Readonly<Record<string, IdRendezVous>>;
 
 /**

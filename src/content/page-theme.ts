@@ -116,7 +116,8 @@ export interface PageTheme {
   readonly offre: Offre;
   /**
    * Sujet du rendez-vous quand il n'est pas celui de la prestation de
-   * rattachement : le CTO à temps partagé se réserve en « decouverte ».
+   * rattachement : l'intégration IA se réserve en « ia », le CTO à temps
+   * partagé en « cto » (`RDV_HORS_PRESTATION`).
    */
   readonly rendezVous?: IdRendezVous;
   /**

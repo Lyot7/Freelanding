@@ -18,6 +18,7 @@
 import { aPartirDe, CTO_QUATRE_JOURS, ctoReferentIA, euros, prixAffiche } from "./offre";
 import { CHEMIN_AUTOMATISATION, CHEMIN_CTO, type PageTheme } from "./page-theme";
 import { CHEMIN_PRIX_LOGICIEL } from "./pages-secteur";
+import { RDV_HORS_PRESTATION } from "./rendez-vous";
 
 export const pageCto: PageTheme = {
   id: "cto-referent-ia",
@@ -29,7 +30,7 @@ export const pageCto: PageTheme = {
   h1: "CTO à temps partagé et référent IA",
   resume: `Votre PME n’a pas de directeur technique, et chaque choix de logiciel, de prestataire ou d’outil d’IA engage votre budget. Je tiens ce rôle à temps partagé, avec deux jours de travail chaque mois, ${aPartirDe(ctoReferentIA, " HT")}.`,
   prestation: "logiciel",
-  rendezVous: "decouverte",
+  rendezVous: RDV_HORS_PRESTATION.cto,
   offre: ctoReferentIA,
   reassurance:
     "Trois mois d’engagement pour poser les bases, puis vous arrêtez quand vous voulez, avec un mois de préavis.",

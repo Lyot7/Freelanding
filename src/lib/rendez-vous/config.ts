@@ -46,6 +46,8 @@ export type CibleEvenement =
 export const VARIABLES_EVENEMENT: Readonly<Record<IdRendezVous, string>> = {
   site: "CAL_COM_EVENT_SITE",
   logiciel: "CAL_COM_EVENT_LOGICIEL",
+  ia: "CAL_COM_EVENT_IA",
+  cto: "CAL_COM_EVENT_CTO",
   decouverte: "CAL_COM_EVENT_DECOUVERTE",
 };
 

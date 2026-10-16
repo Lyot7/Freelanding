@@ -6,8 +6,8 @@
  * remplissage) plutôt que d'en écrire des jumelles qui divergeraient. Ce qui
  * s'ajoute ici est propre au rendez-vous : un type pris dans une liste blanche,
  * et un instant de début qui doit être à la fois lisible, futur et à l'intérieur
- * de l'horizon de réservation, puis les trois réponses du questionnaire, chacune
- * dans la liste fermée propre au type choisi (`questionnaire.ts`).
+ * de l'horizon de réservation, puis les réponses du questionnaire que le type
+ * choisi pose, chacune dans sa liste fermée (`questionnaire.ts`).
  *
  * POURQUOI VÉRIFIER L'INSTANT ALORS QUE CAL.COM LE FERA AUSSI. Parce qu'une
  * requête refusée par Cal.com est un aller-retour payé à un tiers pour rien, et
@@ -27,7 +27,14 @@ import {
 import { estIdRendezVous } from "./config";
 import { HORIZON_JOURS } from "./creneaux";
 import { estDureePlausible } from "./durees";
-import { OPTIONS_ECHEANCE, optionsObjectif, rattacherTranche, tranchesBudget } from "./questionnaire";
+import {
+  OPTIONS_ECHEANCE,
+  OPTIONS_OUTIL,
+  optionsObjectif,
+  questionsDuRendezVous,
+  rattacherTranche,
+  tranchesBudget,
+} from "./questionnaire";
 import type { OptionQuestion } from "@/content/rendez-vous";
 import type { IdRendezVous } from "@/content/rendez-vous";
 
@@ -54,16 +61,21 @@ export interface ReservationValide {
   readonly email: string;
   /** Absent quand le prospect n'a rien écrit. */
   readonly message?: string;
-  /** Identifiant de tranche, pris dans `tranchesBudget(type)`. */
-  readonly budget: string;
+  /**
+   * Identifiant de tranche, pris dans `tranchesBudget(type)`. Absent pour un
+   * sujet sans budget (`questionsDuRendezVous`), même si le client en envoie un.
+   */
+  readonly budget?: string;
   /** Identifiant d'objectif, pris dans `optionsObjectif(type)`. */
   readonly objectif: string;
+  /** Identifiant d'outil, pris dans `OPTIONS_OUTIL`, pour le seul sujet « ia ». */
+  readonly outil?: string;
   /** Facultative : absente quand le prospect n'a rien coché. */
   readonly echeance?: string;
 }
 
 /** Champs du questionnaire, tels que le serveur les nomme dans un rejet. */
-type ChampQuestionnaire = "budget" | "objectif" | "echeance";
+type ChampQuestionnaire = "budget" | "objectif" | "outil" | "echeance";
 
 export type MotifRejetReservation =
   | { readonly type: "corps_illisible" }
@@ -226,19 +238,36 @@ export function validerReservation(
     };
   }
 
-  const budget = lireChoix(
-    { ...champs, budget: rattacherTranche(type, lireChaine(champs, "budget").trim()) },
-    "budget",
-    tranchesBudget(type),
-    true,
-  );
-  if (!budget.ok) return budget;
+  /*
+   * UNE QUESTION QUE LE SUJET NE POSE PAS N'EST PAS LUE : un budget envoyé
+   * pour « cto », ou un outil pour « site », n'atteint jamais les notes.
+   */
+  const questionsPosees = questionsDuRendezVous(type);
+  let budgetRetenu: string | undefined;
+  if (questionsPosees.budget) {
+    const budget = lireChoix(
+      { ...champs, budget: rattacherTranche(type, lireChaine(champs, "budget").trim()) },
+      "budget",
+      tranchesBudget(type),
+      true,
+    );
+    if (!budget.ok) return budget;
+    // `requis` garantit la valeur ; le test la rend lisible au typage sans `!`.
+    if (budget.valeur === undefined) return { ok: false, motif: { type: "corps_illisible" } };
+    budgetRetenu = budget.valeur;
+  }
   const objectif = lireChoix(champs, "objectif", optionsObjectif(type), true);
   if (!objectif.ok) return objectif;
+  let outilRetenu: string | undefined;
+  if (questionsPosees.outil) {
+    const outil = lireChoix(champs, "outil", OPTIONS_OUTIL, true);
+    if (!outil.ok) return outil;
+    if (outil.valeur === undefined) return { ok: false, motif: { type: "corps_illisible" } };
+    outilRetenu = outil.valeur;
+  }
   const echeance = lireChoix(champs, "echeance", OPTIONS_ECHEANCE, false);
   if (!echeance.ok) return echeance;
-  // `requis` garantit la valeur ; le test la rend lisible au typage sans `!`.
-  if (budget.valeur === undefined || objectif.valeur === undefined) {
+  if (objectif.valeur === undefined) {
     return { ok: false, motif: { type: "corps_illisible" } };
   }
 
@@ -253,8 +282,9 @@ export function validerReservation(
       nom,
       email,
       ...(message.length > 0 ? { message } : {}),
-      budget: budget.valeur,
+      ...(budgetRetenu !== undefined ? { budget: budgetRetenu } : {}),
       objectif: objectif.valeur,
+      ...(outilRetenu !== undefined ? { outil: outilRetenu } : {}),
       ...(echeance.valeur ? { echeance: echeance.valeur } : {}),
     },
   };

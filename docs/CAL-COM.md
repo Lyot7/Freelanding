@@ -97,13 +97,43 @@ d'un utilisateur (`GET /v2/event-types?username=…`) répond sans, et le site y
 retrouve chaque type par son slug ou son identifiant. Sans nom d'utilisateur, la
 réservation fonctionne toujours, sans sélecteur de durée.
 
-Correspondance en production au 2026-10-01 :
+Correspondance en production au 2026-10-16 :
 
-| Variable | Type Cal.com | Durées (défaut en gras) |
-| -------- | ------------ | ----------------------- |
-| `CAL_COM_EVENT_SITE` | `6913210`, « Parle-moi de ton projet de site » | 15, **30**, 45 |
-| `CAL_COM_EVENT_LOGICIEL` | `6913033`, « Explique-moi ton projet de logiciel » | 30, **45**, 60 |
-| `CAL_COM_EVENT_DECOUVERTE` | `4271696`, slug `30min` | 15, **30**, 45 |
+| Variable | Sujet du site | Type Cal.com | Durées (défaut en gras) |
+| -------- | ------------- | ------------ | ----------------------- |
+| `CAL_COM_EVENT_SITE` | `site` | `6913210`, « Parle-moi de ton projet de site » | 15, **30**, 45 |
+| `CAL_COM_EVENT_LOGICIEL` | `logiciel` | `6913033`, « Explique-moi ton projet de logiciel » | 30, **45**, 60 |
+| `CAL_COM_EVENT_IA` | `ia` | `7514252`, slug `integration-ia`, « Montrez-moi la tâche à automatiser » | **30**, 45, 60 |
+| `CAL_COM_EVENT_CTO` | `cto` | `7514277`, slug `cto-referent-ia`, « Parlons de votre pilotage technique » | 30, **45**, 60 |
+| `CAL_COM_EVENT_DECOUVERTE` | `decouverte` | `4271696`, slug `30min` | 15, **30**, 45 |
+
+### Les sujets « ia » et « cto » (depuis le 2026-10-16)
+
+Les deux offres du 2026-10-16, L'intégration IA (`/services/automatisation`,
+`/automatisation-ia-caen`) et le CTO et référent IA à temps partagé
+(`/services/cto-referent-ia`), tombaient sur « logiciel » et « decouverte ».
+Elles ont chacune leur type d'événement, créé par **duplication de
+`explique-moi-ton-projet-de-logiciel`** dans l'interface Cal.com (menu « … »
+puis « Dupliquer ») : même lieu (Google Meet), même préavis (2 h), mêmes
+intervalles (15 min), même disponibilité, mêmes champs de réservation. Aucune
+clef d'API n'était disponible ; la duplication copie aussi ce que
+`POST /v2/event-types` aurait demandé de recopier à la main.
+
+Leurs questions diffèrent (`questionsDuRendezVous` dans
+`src/lib/rendez-vous/questionnaire.ts`) :
+
+| Sujet | Budget | Objectif | Question de plus | Échéance |
+| ----- | ------ | -------- | ---------------- | -------- |
+| `ia` | tranches tirées du plancher de L'intégration IA | la tâche à confier à l'IA | l'outil où elle se fait (obligatoire) | facultative |
+| `cto` | **non posé** : le prix est un forfait mensuel | le besoin le plus pressant | aucune | facultative |
+
+Les notes Cal.com suivent : pas de ligne « Budget HT » ni « À portée » pour le
+CTO, une ligne « Outil » après l'objectif pour l'IA. Un budget envoyé quand
+même pour le CTO est ignoré par la validation serveur.
+
+Les titres de ces deux types vouvoient, comme les pages ; les trois types plus
+anciens tutoient encore chez Cal.com (le site affiche ses propres intitulés,
+vouvoyés, et n'utilise pas ceux de Cal.com).
 
 La fourchette affichée sur chaque carte de sujet (`duree` dans
 `src/content/rendez-vous.ts`) reste un texte : la mettre à jour si les options
@@ -223,6 +253,8 @@ le gestionnaire de secrets du service.
 | `CAL_COM_USERNAME` | Le `<username>` de ton URL publique `cal.com/<username>`. Aussi dans `Settings > My Account > Username`. | Seulement si les variables ci-dessous portent des **slugs**. |
 | `CAL_COM_EVENT_SITE` | Slug ou identifiant du type « Un site ». | Non, mais son absence retire l'entrée du sélecteur. |
 | `CAL_COM_EVENT_LOGICIEL` | Idem, « Une solution métier » (outil simple comme logiciel complet). | Non. |
+| `CAL_COM_EVENT_IA` | Idem, « L'intégration IA ». | Non. |
+| `CAL_COM_EVENT_CTO` | Idem, « CTO et référent IA à temps partagé ». | Non. |
 | `CAL_COM_EVENT_DECOUVERTE` | Idem, « Je ne sais pas encore ». | Non. |
 
 **Deux façons de désigner un type d'événement**, au choix, variable par
@@ -361,7 +393,7 @@ Dans l'ordre, et sans créer une seule vraie réservation avant le point 5 :
 
 | Fichier | Rôle |
 | ------- | ---- |
-| `src/content/rendez-vous.ts` | Les quatre entrées et tout le texte affiché. Seul endroit à toucher pour changer un libellé ou une durée affichée. |
+| `src/content/rendez-vous.ts` | Les cinq entrées et tout le texte affiché. Seul endroit à toucher pour changer un libellé ou une durée affichée. |
 | `src/lib/rendez-vous/config.ts` | Lecture de l'environnement, résolution slug/identifiant. |
 | `src/lib/rendez-vous/creneaux.ts` | Dates, fuseau, fenêtre d'un mois, grille du calendrier, lecture des créneaux. Module pur. |
 | `src/lib/rendez-vous/durees.ts` | Lecture et choix des durées proposées par Cal.com. Module pur. |

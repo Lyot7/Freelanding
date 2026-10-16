@@ -1,13 +1,22 @@
 import { describe, expect, it } from "bun:test";
-import { aPartirDe, euros, prestation } from "../../content/offre.ts";
+import {
+  aPartirDe,
+  ctoReferentIA,
+  euros,
+  integrationIA,
+  prestation,
+} from "../../content/offre.ts";
 import { rendezVousContent } from "../../content/rendez-vous.ts";
 import { siteConfig } from "../../content/site.ts";
 import {
   BUDGET_INCONNU,
   bornesBudget,
   composerNotes,
+  legendeObjectif,
+  OPTIONS_OUTIL,
+  offresDuRendezVous,
   optionsObjectif,
-  prestationsDuRendezVous,
+  questionsDuRendezVous,
   rattacherTranche,
   rendezVousDuTypeProjet,
   retourBudget,
@@ -27,14 +36,44 @@ const logiciel = prestation("logiciel");
 const bornes = (p) => [1, 2, 4].map((m) => p.plancher * m);
 const sansInsecable = (texte) => texte.replace(/[\u00a0\u202f]/gu, " ");
 
-describe("prestationsDuRendezVous", () => {
-  it("relie chaque sujet à sa prestation, et « decouverte » à toutes", () => {
-    expect(prestationsDuRendezVous("site").map((p) => p.id)).toEqual(["vitrine"]);
-    expect(prestationsDuRendezVous("logiciel").map((p) => p.id)).toEqual(["logiciel"]);
-    expect(prestationsDuRendezVous("decouverte").map((p) => p.id)).toEqual([
-      "vitrine",
-      "logiciel",
+describe("offresDuRendezVous", () => {
+  it("relie chaque sujet à son offre, et « decouverte » aux prestations", () => {
+    expect(offresDuRendezVous("site")).toEqual([vitrine]);
+    expect(offresDuRendezVous("logiciel")).toEqual([logiciel]);
+    expect(offresDuRendezVous("ia")).toEqual([integrationIA]);
+    expect(offresDuRendezVous("cto")).toEqual([ctoReferentIA]);
+    expect(offresDuRendezVous("decouverte")).toEqual([vitrine, logiciel]);
+  });
+});
+
+describe("questionsDuRendezVous — les questions suivent le sujet", () => {
+  it("ne pose pas de budget au CTO, et l'outil à l'IA seule", () => {
+    expect(questionsDuRendezVous("cto")).toEqual({ budget: false, outil: false });
+    expect(questionsDuRendezVous("ia")).toEqual({ budget: true, outil: true });
+    for (const id of ["site", "logiciel", "decouverte"]) {
+      expect(questionsDuRendezVous(id)).toEqual({ budget: true, outil: false });
+    }
+  });
+
+  it("donne à l'IA et au CTO leur légende, aux autres la légende commune", () => {
+    const { objectif } = rendezVousContent.questionnaire;
+    expect(legendeObjectif("ia")).toBe(objectif.legendeParType.ia);
+    expect(legendeObjectif("cto")).toBe(objectif.legendeParType.cto);
+    expect(legendeObjectif("site")).toBe(objectif.legende);
+  });
+
+  it("tire les tranches de l'IA de son propre plancher", () => {
+    const [a, b, c] = bornes(integrationIA);
+    expect(tranchesBudget("ia").map((t) => t.id)).toEqual([
+      `moins-${a}`,
+      `${a}-${b}`,
+      `${b}-${c}`,
+      `plus-${c}`,
+      BUDGET_INCONNU,
     ]);
+    const retour = retourBudget("ia", `${a}-${b}`);
+    expect(retour.type).toBe("aPortee");
+    expect(retour.lignes.map((l) => l.prestation)).toEqual([integrationIA.nom]);
   });
 });
 
@@ -97,7 +136,7 @@ describe("bornesBudget et tranchesBudget", () => {
   });
 
   it("donne des identifiants uniques à chaque sujet", () => {
-    for (const id of ["site", "logiciel", "decouverte"]) {
+    for (const id of ["site", "logiciel", "ia", "cto", "decouverte"]) {
       const ids = tranchesBudget(id).map((t) => t.id);
       expect(new Set(ids).size).toBe(ids.length);
       const objectifs = optionsObjectif(id).map((o) => o.id);
@@ -200,6 +239,33 @@ describe("composerNotes — ce qu'Eliott lit dans son agenda", () => {
       objectif: "autre",
     });
     expect(texte).toContain(sansInsecable(`${notes.forfait} : ${notes.aucunForfait}`));
+  });
+
+  it("écrit pour le CTO le besoin et l'échéance, sans ligne de budget", () => {
+    const texte = composerNotes({
+      type: "cto",
+      objectif: "devis",
+      echeance: "vite",
+    });
+    expect(texte.split("\n")).toEqual([
+      sansInsecable(`${notes.objectif} : ${optionsObjectif("cto")[1].libelle}`),
+      sansInsecable(`${notes.echeance} : ${rendezVousContent.questionnaire.echeance.options[0].libelle}`),
+    ]);
+  });
+
+  it("écrit pour l'IA la tâche puis l'outil, après le budget", () => {
+    const texte = composerNotes({
+      type: "ia",
+      budget: BUDGET_INCONNU,
+      objectif: "mails",
+      outil: "messagerie",
+    });
+    expect(texte.split("\n")).toEqual([
+      sansInsecable(`${notes.budget} : ${rendezVousContent.questionnaire.budget.inconnu}`),
+      sansInsecable(`${notes.forfait} : ${notes.aCaler}`),
+      sansInsecable(`${notes.objectif} : ${optionsObjectif("ia")[0].libelle}`),
+      sansInsecable(`${notes.outil} : ${OPTIONS_OUTIL[0].libelle}`),
+    ]);
   });
 
   it("ne laisse aucune espace insécable dans le texte brut", () => {

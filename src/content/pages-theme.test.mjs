@@ -183,6 +183,18 @@ describe("la page CTO et référent IA", () => {
   });
 });
 
+describe("chaque offre hors prestation se réserve sur son propre sujet", () => {
+  test("les pages de l'intégration IA mènent au sujet « ia », la page CTO au sujet « cto »", () => {
+    expect(RDV_HORS_PRESTATION).toEqual({ integrationIA: "ia", cto: "cto" });
+    const parOffre = pagesTheme.filter((p) => p.offre.nom === "L’intégration IA");
+    expect(parOffre.length).toBeGreaterThan(0);
+    for (const page of parOffre) {
+      expect([page.chemin, page.rendezVous]).toEqual([page.chemin, RDV_HORS_PRESTATION.integrationIA]);
+    }
+    expect(pageCto.rendezVous).toBe("cto");
+  });
+});
+
 describe("la comparaison aux agences se fait à livrable égal", () => {
   test("ERP : le plancher face au premier outil d'agence, jamais face à leur médiane", () => {
     const prix = pageErp.faq.items.find((i) => /Combien coûte/u.test(i.question)).answer;
