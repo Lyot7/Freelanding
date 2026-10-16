@@ -495,6 +495,13 @@ export interface BlogPost extends SluggedContent {
   title: string;
   /** Date de publication ISO. */
   date: string;
+  /**
+   * Date ISO de la dernière réécriture de fond, quand il y en a eu une. Elle
+   * nourrit `dateModified` du JSON-LD, `modifiedTime` d'Open Graph et le
+   * `lastmod` du sitemap ; absente, ces trois champs reprennent `date`. Une
+   * retouche de virgule ne la change pas.
+   */
+  dateModified?: string;
   /** Provenance de la date lorsque le provider ne publie pas de date éditoriale. */
   dateSource: "editorial" | "provider-release";
   /** Indique si l'article apparaît dans la grille `/blog`. */

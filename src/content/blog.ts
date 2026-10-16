@@ -272,8 +272,9 @@ export const blogPosts: BlogPost[] = [
 
   {
     slug: "refonte-site-internet-pme",
-    title: "Refonte de site internet : prix et méthode",
+    title: "Refonte de site internet : prix moyen et méthode",
     date: "2026-10-02",
+    dateModified: "2026-10-16",
     dateSource: "editorial",
     listedInIndex: true,
     category: "Méthode",
@@ -306,15 +307,16 @@ export const blogPosts: BlogPost[] = [
       },
     },
     excerpt:
-      "Une refonte se justifie quand le site ne rapporte plus. Son risque principal est de perdre le référencement acquis, et il se protège avant de dessiner la moindre page.",
+      "Une refonte coûte 6 500 € de médiane en agence pour une PME. Voici ce qui fait varier votre devis, quand refondre plutôt que réparer, et comment garder votre référencement.",
     readingTime: "6 min de lecture",
     tags: ["refonte", "référencement", "redirections"],
     seo: {
-      // Vise aussi « plan de migration refonte » (position 72, carte SEO du
-      // 2026-10-15).
-      title: "Refonte site internet : prix et plan de migration SEO",
+      // Réécrit le 2026-10-16 sur « refonte site internet prix » (fiche du
+      // vault `blog-etat-articles.md`, n° 7). « plan de migration refonte »
+      // reste en section ; « refonte site internet caen » va à la page Caen.
+      title: "Refonte de site internet : prix moyen 2026 et méthode",
       description:
-        "Quand refondre votre site, le plan de migration qui garde votre référencement, redirections 301 et Search Console, et ce que coûte la refonte pour une PME.",
+        "Prix moyen d’une refonte de site en 2026, agence contre indépendant, ce qui fait varier le devis, et le plan de redirections qui garde votre référencement.",
       ogImage: {
         src: "/images/og-blog-refonte-site-internet-pme.jpg",
         alt: "Deux colonnes d’adresses sur fond noir, reliées une à une par des courbes vertes",
@@ -326,8 +328,9 @@ export const blogPosts: BlogPost[] = [
 
   {
     slug: "site-sur-mesure-ou-wordpress",
-    title: "Site sur mesure ou WordPress : comment choisir",
+    title: "WordPress ou site sur mesure : comment choisir",
     date: "2026-10-02",
+    dateModified: "2026-10-16",
     dateSource: "editorial",
     listedInIndex: true,
     category: "Méthode",
@@ -360,13 +363,16 @@ export const blogPosts: BlogPost[] = [
       },
     },
     excerpt:
-      "WordPress achète l’autonomie sur vos textes, le sur mesure achète un site rapide qui ne ressemble qu’à vous. Sur 3 ans, l’écart se joue sur la maintenance.",
+      "WordPress achète l’autonomie sur vos textes, le sur mesure un site rapide qui ne ressemble qu’à vous. Sur 3 ans, l’entretien pèse autant que la création.",
     readingTime: "6 min de lecture",
     tags: ["WordPress", "Next.js", "site sur mesure"],
     seo: {
-      title: "Site sur mesure ou WordPress : coût, sécurité et vitesse",
+      // Réécrit le 2026-10-16 sur « wordpress ou site sur mesure » (fiche
+      // `blog-etat-articles.md`, n° 9). L'entretien WordPress est laissé à
+      // l'article Maintenance, qui le vise : une phrase et un lien ici.
+      title: "WordPress ou site sur mesure : le coût réel sur 3 ans",
       description:
-        "WordPress ou site sur mesure en Next.js : maintenance des extensions, sécurité, vitesse, coût sur 3 ans, et les cas où WordPress suffit pour votre entreprise.",
+        "WordPress ou site sur mesure : extensions, sécurité, vitesse et coût sur 3 ans entretien compris, avec les cas où WordPress reste le bon choix pour vous.",
       ogImage: {
         src: "/images/og-blog-site-sur-mesure-ou-wordpress.jpg",
         alt: "Sur fond noir, un bloc unique cerné de vert face à une pile de petits blocs gris",
@@ -609,8 +615,9 @@ export const blogPosts: BlogPost[] = [
 
   {
     slug: "synchroniser-catalogue-stock-et-commandes",
-    title: "Pourquoi vos outils ne sont jamais d’accord sur le stock",
+    title: "Connecter son ERP et son site e-commerce sans écart de stock",
     date: "2026-08-28",
+    dateModified: "2026-10-16",
     dateSource: "editorial",
     listedInIndex: true,
     category: "Outils métier",
@@ -647,13 +654,15 @@ export const blogPosts: BlogPost[] = [
       },
     },
     excerpt:
-      "Aucun de vos outils n’a été désigné comme la source de vérité. C’est une décision de gestion, et aucun connecteur ne la prendra à votre place.",
+      "Votre ERP et votre boutique ne disent pas le même stock tant que personne n’a décidé lequel a raison. La table à écrire, et ce qui fait tenir la synchronisation.",
     readingTime: "7 min de lecture",
     tags: ["synchronisation", "catalogue", "outil métier"],
     seo: {
-      title: "Synchroniser catalogue, stock et commandes entre ses outils",
+      // Réécrit le 2026-10-16 sur « connecter erp et site e-commerce » (fiche
+      // `blog-etat-articles.md`, n° 12) ; le slug garde l'ancienne requête.
+      title: "Connecter ERP et site e-commerce : stock et commandes",
       description:
-        "Pourquoi les connecteurs du marché finissent par casser, les trois décisions à prendre avant de brancher quoi que ce soit, et les six éléments d’une synchronisation qui tient.",
+        "Votre site, votre ERP et vos commandes ne disent pas le même stock ? La source de vérité à choisir, pourquoi les connecteurs cassent, et ce qui tient.",
       ogImage: {
         src: "/images/og-blog-synchroniser-catalogue-stock-et-commandes.jpg",
         alt: "Travée de rayonnage métallique chargée de cartons dans un entrepôt",
