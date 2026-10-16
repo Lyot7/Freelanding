@@ -687,6 +687,9 @@ export function ReservationRendezVous({
   const objectifChoisi = objectifs.some((o) => o.id === objectif) ? objectif : "";
   const outilChoisi =
     questionsPosees.outil && OPTIONS_OUTIL.some((o) => o.id === outil) ? outil : "";
+  const legendeQuestionObjectif = type
+    ? legendeObjectif(type)
+    : contenu.questionnaire.objectif.legende;
   const budgetManquant = questionsPosees.budget && !budgetChoisi;
   const outilManquant = questionsPosees.outil && !outilChoisi;
   const retour = useMemo(
@@ -1281,7 +1284,7 @@ export function ReservationRendezVous({
                 <ChoixUnique
                   prefixe={instance}
                   nom="objectif"
-                  legende={type ? legendeObjectif(type) : contenu.questionnaire.objectif.legende}
+                  legende={legendeQuestionObjectif}
                   options={objectifs}
                   choisi={objectifChoisi}
                   onChoisir={choisirObjectif}
