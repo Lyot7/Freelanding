@@ -160,7 +160,7 @@ export const pageErp: PageTheme = {
           "Chacun reprend sa partie",
         ],
       ],
-      note: `Pour situer le prix : ${AGENCE.source.nom} relève une médiane de ${euros(AGENCE.mediane)} pour un projet logiciel en agence (${AGENCE.source.releve}). Un premier module démarre chez moi à ${prixPlancher(LOGICIEL)} HT.`,
+      note: `Pour situer le prix : ${AGENCE.source.nom} relève qu’en agence, un premier outil démarre entre ${euros(AGENCE.premierOutilMin)} et ${euros(AGENCE.premierOutilMax)} (${AGENCE.source.releve}). Chez moi, un premier module démarre à ${prixPlancher(LOGICIEL)} HT.`,
       liens: {
         titre: "Pour trancher",
         items: [
@@ -231,7 +231,7 @@ export const pageErp: PageTheme = {
     items: [
       {
         question: "Combien coûte un ERP sur mesure ?",
-        answer: `Le premier module démarre à ${prixPlancher(LOGICIEL)} HT. Le total dépend du nombre de modules, des outils à relier et de la reprise de votre historique, et se fixe au devis. Pour comparer, ${AGENCE.source.nom} relève une médiane de ${euros(AGENCE.mediane)} pour un projet logiciel en agence (${AGENCE.source.releve}).`,
+        answer: `Le premier module démarre à ${prixPlancher(LOGICIEL)} HT. Le total dépend du nombre de modules, des outils à relier et de la reprise de votre historique, et se fixe au devis. Pour comparer, ${AGENCE.source.nom} relève qu’en agence, un premier outil démarre entre ${euros(AGENCE.premierOutilMin)} et ${euros(AGENCE.premierOutilMax)} (${AGENCE.source.releve}).`,
       },
       {
         question: "Faut-il remplacer tous nos logiciels ?",

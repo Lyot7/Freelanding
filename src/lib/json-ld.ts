@@ -5,7 +5,7 @@ import type {
   SiteConfig,
   WorkItem,
 } from "@/lib/content/types";
-import type { Prestation } from "@/content/offre";
+import { PERIODES, type Prestation } from "@/content/offre";
 import { absoluteUrl } from "@/lib/site-url";
 
 /**
@@ -133,13 +133,20 @@ function bornesPrix(prix: string | undefined) {
 
   if (!montants.length) return undefined;
 
+  // UNE OFFRE MENSUELLE (« à partir de 1 600 € par mois », le CTO à temps
+  // partagé) déclare son unité, comme dans `serviceSchema` : sans elle, Google
+  // lirait le plancher comme le prix d'un projet entier. Le suffixe vient de
+  // `PERIODES`, le même que `aPartirDe()` écrit dans la ligne de service.
+  const mensuel = prix.includes(PERIODES.mois);
+
   return compact({
-    "@type": "PriceSpecification",
+    "@type": mensuel ? "UnitPriceSpecification" : "PriceSpecification",
     priceCurrency: "EUR",
     minPrice: Math.min(...montants),
     // Absent quand la page n'annonce qu'un seul montant : déclarer un plafond
     // égal au plancher fermerait une offre que la page laisse ouverte.
     maxPrice: montants.length > 1 ? Math.max(...montants) : undefined,
+    unitCode: mensuel ? "MON" : undefined,
   });
 }
 
@@ -186,7 +193,7 @@ export function businessSchema(site: SiteConfig, home: HomeContent) {
     image: LOGO,
     email: site.contact.email ? `mailto:${site.contact.email}` : undefined,
     telephone: telephoneE164(site.contact.phone),
-    // Prix de départ de 3 000 et 6 000 €, devis au-dessus : le haut de l'échelle locale.
+    // Prix de départ de 3 000 et 3 500 €, devis au-dessus : le haut de l'échelle locale.
     priceRange: "€€€",
     // VILLE SANS RUE : l'activité se déplace chez le client ou travaille à
     // distance, aucune adresse de local n'est publiée. Google accepte une
@@ -350,11 +357,14 @@ export function serviceSchema(
       name: prestation.nom,
       description: prestation.resume,
       priceCurrency: "EUR",
+      // UNE OFFRE MENSUELLE (le CTO à temps partagé) déclare son unité : un
+      // plancher sans elle se lirait comme le prix d'un projet entier.
       priceSpecification: {
-        "@type": "PriceSpecification",
+        "@type": prestation.periode ? "UnitPriceSpecification" : "PriceSpecification",
         priceCurrency: "EUR",
         minPrice: prestation.plancher,
         valueAddedTaxIncluded: false,
+        ...(prestation.periode === "mois" ? { unitCode: "MON" } : {}),
       },
     },
   });

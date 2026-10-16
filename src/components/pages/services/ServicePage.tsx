@@ -13,7 +13,7 @@ import {
 } from "@/components/pages/services/HeroPhoto";
 import { herosPages } from "@/content/heros-pages";
 import type { SiteConfig } from "@/lib/content/types";
-import { prixPlancher, type Offre, type Prestation } from "@/content/offre";
+import { periode, prixPlancher, type Offre, type Prestation } from "@/content/offre";
 import {
   lienLocalParPrestation,
   marchesFilAriane,
@@ -140,6 +140,7 @@ export function OffreDetail({
             {prixPlancher(offre)}
             <span className="ml-[8px] align-baseline text-[13px] font-medium uppercase tracking-[-0.01em] text-white/50">
               {servicePageLabels.horsTaxes}
+              {periode(offre)}
             </span>
           </span>
         </p>

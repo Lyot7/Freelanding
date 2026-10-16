@@ -9,24 +9,19 @@ import { services } from "@/content/services";
 // cellules et une valeur numérique par cellule), mais elle porte désormais des
 // ENGAGEMENTS tenables au présent, pas un palmarès.
 // L'ordre suit les vitesses de compteur du composant (10 / 12 / 40 / 10 ms).
+/*
+ * CHIFFRES DE CONFIANCE, refaits le 2026-10-16 à la demande d'Eliott : « un
+ * projet à la fois » et l'échéancier de paiement ne donnaient aucune raison
+ * de lui faire confiance. Chaque chiffre dit maintenant ce que le client y
+ * gagne, et chacun se vérifie : le résultat Würth (`stats.ts`), la cession
+ * des droits et l'absence d'abonnement (CGV, `offre.ts`), le délai de réponse
+ * (`site.ts`).
+ */
 const aboutStats = [
-  // « 1 INTERLOCUTEUR » REMPLACÉ le 2026-09-24, comme sur l'accueil : le
-  // chiffre porte la règle de travail d'Eliott, pas son organigramme.
-  { value: "1", label: "Projet à la fois" },
-  /* « 2h » A ÉTÉ CORRIGÉ EN « 24h » le 2026-08-31, et c'était la dernière
-     survivance de la promesse retirée. Elle était annoncée à deux heures à trois
-     endroits ; il n'en restait plus qu'un, ici, et il contredisait `site.ts`,
-     `contact.ts` et la grille de la page d'accueil. L'engagement tenu est une
-     réponse à chaque message sous 24 heures ouvrées. */
-  { value: "24h", label: "Réponse à chaque message, en heures ouvrées" },
-  /* « 0 FRAIS CACHÉ » ET « 100 % CODE SUR MESURE » SONT PARTIS le 2026-08-31.
-     Le second était une contre-vérité : Eliott part de briques standards
-     (boilerplates, composants, références visuelles), et ce qui n'existe nulle
-     part ailleurs est l'ASSEMBLAGE, pas chaque ligne. Le premier était une
-     formule sans contenu. Les deux sont remplacés par des engagements écrits
-     ailleurs et vérifiables : l'échéancier des CGV et la cession des droits. */
-  { value: "40 %", label: "À la signature, 30 % à mi-parcours, 30 % à la livraison" },
-  { value: "100 %", label: "Du code livré vous appartient" },
+  { value: "92 %", label: "D’erreurs en moins sur un parcours d’inscription refait chez Würth France" },
+  { value: "100 %", label: "Du code, des accès et des données à votre nom" },
+  { value: "0 €", label: "D’abonnement imposé pour utiliser ce que je livre" },
+  { value: "24h", label: "Pour répondre à chaque message, en heures ouvrées" },
 ] as const;
 
 /**
@@ -74,68 +69,19 @@ export const aboutContent: AboutContent = {
     src: "/images/eliott-nature-vertical.jpg",
     alt: "Eliott Bouquerel, au bord d’un étang",
   },
-  bodyHighlights: ["Seul par choix", "vous et le travail"],
-  teamTitleLines: ["Qui", "je suis."],
+  bodyHighlights: ["Je travaille seul, par choix", "n’avoir aucun regret sur ce que j’ai livré"],
+  /*
+   * RÉCIT RÉORGANISÉ le 2026-10-16 (Eliott : « retravailler les paragraphes
+   * pour une meilleure compréhension », trois paragraphes qui se lisent l'un
+   * après l'autre). La phrase d'ouverture reste en grand ; suivent ce que je
+   * sais faire, pourquoi seul, puis la part invisible du travail. Le bloc
+   * « Qui je suis » et son chapô sont fondus dans ces trois paragraphes.
+   */
   body: [
-    /* PARAGRAPHE D'OUVERTURE, RÉÉCRIT le 2026-08-31.
-     *
-     * IL S'OUVRAIT SUR « une phrase que j'entends à chaque premier appel ». Ce
-     * n'était pas vrai : Eliott n'a pas encore assez d'appels pour dégager une
-     * phrase récurrente de prospect, il l'a dit lui-même le 2026-08-31, et c'est
-     * même la seule chose que le corpus déclare manquante. Une citation de
-     * client inventée sur la page qui répond à « qui je suis » est exactement le
-     * défaut que ce chantier corrige.
-     *
-     * CE QUI OUVRE MAINTENANT est ce qu'il vend réellement, dans ses mots : pas
-     * un site, ce que le site rapporte. */
     "Je ne vends pas un site. Je vends ce qu’il vous rapporte : des clients qui vous trouvent, une image qui vous place au-dessus, un prétexte pour décrocher un rendez-vous. Un site qui impressionne et qui n’amène rien, ça existe, et c’est même devenu courant.",
-    /*
-     * PARAGRAPHES 2 A 5, REECRITS le 2026-08-31.
-     *
-     * CE QUI EST PARTI, ET POURQUOI.
-     *
-     * 1. « Le prix et le perimetre sont arretes sur le devis avant le premier
-     *    jour » disait vrai, mais repondait a « qu'est-ce que vous me
-     *    garantissez » alors que cette page repond a « qui je suis ». Les
-     *    engagements chiffres vivent dans la FAQ et dans la grille de chiffres
-     *    posee juste au-dessus : ils n'ont pas a etre racontes deux fois.
-     *
-     * 2. « Ce que je construis, ce n'est pas la boutique : ce sont les outils
-     *    autour » enfermait Eliott dans l'outillage e-commerce alors qu'il vend
-     *    aussi des sites, et sa liste (ERP, transporteur, back-office, tableau
-     *    de bord de marge) enumerait des segments. La cible est large et
-     *    assumee : une liste exclut.
-     *
-     * 3. « Si vous cherchez une refonte graphique ou du referencement, il y a
-     *    mieux ailleurs » etait la contradiction la plus couteuse de la page.
-     *    Le referencement naturel, la conversion, l'UX et le marketing SONT
-     *    exactement ce qu'Eliott met en avant pour justifier son prix : ce
-     *    paragraphe renvoyait ailleurs les clients qu'il cherche.
-     *
-     * CE QUI LES REMPLACE suit l'ordre de ses arguments : ce qu'il sait faire et
-     * pourquoi ca coute plus cher, l'agence, puis
-     * la part invisible du travail. Le paragraphe sur l'IA est sorti le
-     * 2026-09-23 : aucun argument IA face aux clients, decision d'Eliott.
-     */
-    "Ce que je construis est pensé pour le référencement naturel et pour la conversion, avec ce que je sais faire en expérience utilisateur, en interface, en ergonomie, en accessibilité et en marketing. Sur un projet à quelques centaines d’euros, ces étapes-là sautent : personne n’a le temps d’y penser et de rester rentable. C’est pour ça que je facture au-dessus, et c’est pour ça que ce que je livre n’a pas grand-chose à voir.",
-    "Une agence, ce sont des salariés, des plannings, des ressources humaines et plusieurs corps de métier : des frais qui courent que votre projet avance ou non, et une chaîne de personnes entre vous et le travail. Je vais droit au but. Je suis développeur, et je suis à l’aise avec les métiers qui gravitent autour, ce qui me permet de tenir un projet d’un bout à l’autre au lieu de le faire passer de main en main.",
-    /*
-     * LES SIX CHOSES QU'ELIOTT FAIT SANS QU'ON LES LUI DEMANDE, tenues en un
-     * seul paragraphe. Elles ne se vendent pas une par une : leur point commun
-     * est qu'aucune ne se voit a la livraison, et qu'elles ne se decouvrent que
-     * le jour ou ca casse, ou deux ans plus tard quand il faut faire evoluer.
-     * D'ou la derniere phrase, qui est l'argument et non le resume.
-     */
-    "Il y a une part du travail que vous ne verrez jamais, et c’est la plus importante. L’architecture décidée avant le premier écran. Les outils choisis sur ce qu’ils coûteront à faire vivre, pas sur mes préférences. Les tests passés par des outils extérieurs aux miens, sur la vitesse, le référencement, l’accessibilité. La gestion des erreurs, pour qu’une panne dise pourquoi elle arrive au lieu de vous laisser deviner. Le code documenté, pour que quelqu’un d’autre puisse reprendre après moi. Vous n’achetez pas ces points-là : vous achetez de ne jamais avoir à les découvrir.",
-    // Le template écrivait « four people » en minuscule après un point (artefact
-    // de la source Framer). Sans objet en français : Eliott travaille seul, la
-    // phrase est repartie proprement.
-    //
-    // DERNIER PARAGRAPHE = CHAPÔ. AboutPage prend le dernier élément de body
-    // comme chapô de la section « Qui je suis. » : c'est lui, et lui seul, que
-    // bodyHighlights met en avant. Les deux fragments déclarés doivent donc
-    // rester dans cette phrase-là.
-    "Seul par choix. Un seul interlocuteur, aucune couche intermédiaire, personne entre vous et le travail. Et une barre que je me fixe sur chaque projet : n’avoir aucun regret sur ce que j’ai livré."
+    "Ce que je construis est pensé pour être trouvé et pour convaincre : référencement naturel, conversion, expérience utilisateur, ergonomie, accessibilité, marketing. Sur un projet à quelques centaines d’euros, ces étapes sautent faute de temps. C’est pour ça que je facture au-dessus, et que ce que je livre n’a pas grand-chose à voir.",
+    "Je travaille seul, par choix. Dans une agence, votre projet passe d’un commercial à un chef de projet puis à plusieurs métiers, avec des frais qui courent qu’il avance ou non. Avec moi, vous parlez à celui qui conçoit et qui code, du premier appel à la mise en ligne, et je tiens le projet d’un bout à l’autre.",
+    "Il y a une part du travail que vous ne verrez jamais, et c’est la plus importante : l’architecture décidée avant le premier écran, des outils choisis sur ce qu’ils coûteront à faire vivre, des tests de vitesse, de référencement et d’accessibilité passés par des outils extérieurs aux miens, des pannes qui disent pourquoi elles arrivent, du code documenté pour qu’un autre puisse reprendre. Vous achetez de ne jamais avoir à découvrir ces points-là. Ma barre sur chaque projet : n’avoir aucun regret sur ce que j’ai livré.",
   ],
   // Les quatre membres d'équipe du template (Anna Schneider, Jennifer Peterson,
   // Erik Voss, Liam Torres) sont des personas fictifs : ils n'existent pas et
@@ -244,7 +190,7 @@ export const aboutContent: AboutContent = {
     eyebrow: "Services",
     // IDENTIQUE à `homeContent.services.intro` (même section, deux pages).
     intro:
-      "Je pars de votre façon de travailler, et je construis ce qui lui correspond. Pas de fonctions en trop, rien à contourner.",
+      "Du site qui vous amène des clients à l’outil qui vous rend des heures, de l’IA dans vos logiciels au pilotage technique de votre entreprise. Je pars de votre façon de travailler, et je construis ce qui lui correspond.",
     items: services,
   },
   // `testimonial` ABSENT depuis le 2026-09-01. Il portait « Sophie Andersen »,

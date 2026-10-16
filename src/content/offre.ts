@@ -52,6 +52,11 @@ export interface Offre {
   readonly faitMonter: readonly string[];
   /** Ce qui sort de l'offre, chiffré à part. */
   readonly horsOffre: string;
+  /**
+   * Absente pour un projet, payé une fois. « mois » pour un accompagnement
+   * facturé chaque mois : le plancher s'affiche alors « par mois ».
+   */
+  readonly periode?: "mois";
 }
 
 /** Une prestation vendable : une offre, une page dédiée. */
@@ -84,9 +89,18 @@ export function euros(montant: number): string {
 
 /*
  * LES PLANCHERS, ARRÊTÉS PAR ELIOTT LE 2026-10-05 : les prix d'entrée des
- * anciennes grilles. Site vitrine dès 3 000 € HT ; La Solution métier, qui
- * couvre aussi l'outil interne, dès 6 000 € HT ; intégration IA dans un outil
- * existant dès 2 500 € HT. Rien d'autre n'est chiffré sur le site.
+ * anciennes grilles. Site vitrine dès 3 000 € HT ; intégration IA dans un outil
+ * existant dès 2 500 € HT.
+ *
+ * LA SOLUTION MÉTIER DESCEND DE 6 000 À 3 500 € HT LE 2026-10-16, demande
+ * d'Eliott : « il peut y avoir des solutions métier qui coûtent moins de
+ * 6 000 € si c'est des outils simples ». Le plancher est celui d'un outil à
+ * une fonction : un écran ou un flux, une base, une tâche automatisée. Relevé
+ * de marché du jour (941 Consulting, Cœur du Web, Optimize Insight, Kolonell,
+ * Digitiz, Fenxi) : un outil interne simple chez un indépendant démarre entre
+ * 3 000 et 5 000 €. La comparaison aux agences reste à livrable égal : leur
+ * premier outil (`repereAgenceLogiciel.premierOutilMin`) contre ce plancher,
+ * jamais ce plancher contre leur médiane.
  *
  * VOUVOIEMENT depuis le 2026-10-15, décision d'Eliott. Eliott dit « je » : il
  * est seul, c'est son argument face aux agences. Le « nous » n'existe nulle part.
@@ -127,9 +141,9 @@ export const prestations: readonly Prestation[] = [
     id: "logiciel",
     nom: "La Solution métier",
     slug: "logiciel-metier",
-    plancher: 6000,
+    plancher: 3500,
     resume:
-      "La réponse à un problème précis de votre métier : une tâche que vous refaites à la main, un tableur qui déborde, des outils qui ne se parlent pas. Des écrans, une base de données et une mise en production, à la taille de ce que vous devez résoudre.",
+      "La réponse à un problème précis de votre métier : une tâche que vous refaites à la main, un tableur qui déborde, des outils qui ne se parlent pas. Du petit outil qui règle une seule tâche à la plateforme qui relie tous vos systèmes, à la taille de ce que vous devez résoudre.",
     inclus: [
       "Les écrans nécessaires, la base de données et la mise en production sur votre hébergement",
       "Le raccordement à l’outil qui porte déjà vos données",
@@ -159,12 +173,12 @@ export const prestations: readonly Prestation[] = [
 /*
  * L'INTÉGRATION IA DANS UN OUTIL EXISTANT, dès 2 500 € HT (2026-10-05).
  *
- * HORS DE `prestations`, ET C'EST VOULU. Les automatisations IA restent au
- * second rang (`offre-grille-prix.md` du vault) : elles se vendent, elles ne
- * se mettent pas en avant. Dans `prestations`, l'offre gagnerait d'office une
- * page `/services/…`, une ligne d'accordéon et une entrée au sitemap. Elle ne
- * s'affiche plus sur le site depuis le retrait du simulateur de prix
- * (2026-10-05) : elle se chiffre au devis.
+ * HORS DE `prestations`, ET C'EST VOULU. Dans `prestations`, l'offre
+ * gagnerait d'office une page `/services/<slug>`, une prise de rendez-vous à
+ * son nom et des tranches de budget dans le questionnaire. Sa page est une
+ * page thématique (`/services/automatisation`), et depuis le 2026-10-16,
+ * demande d'Eliott (« intégration IA dans les services »), elle a sa ligne
+ * dans la liste des services de `/a-propos` (`services.ts`).
  *
  * Les lignes reprennent les périmètres validés : 1 usage dans 1 outil ; les
  * règles du métier ; plusieurs outils ; le modèle d'IA payé par le client, à
@@ -185,6 +199,53 @@ export const integrationIA: Offre = {
   ],
   horsOffre:
     "L’abonnement au modèle d’IA est ouvert à votre nom, et vous le payez directement à son éditeur.",
+};
+
+/*
+ * LE CTO ET RÉFÉRENT IA À TEMPS PARTAGÉ, dès 1 600 € HT par mois (2026-10-16).
+ *
+ * DEMANDE D'ELIOTT DU 2026-10-16 : « CTO externalisé/fractionnel, et pas que
+ * CTO mais aussi référent IA ». Prix calé sur le relevé de marché du jour
+ * (941 Consulting, Cœur du Web, Optimize Insight, Kolonell, Digitiz, Fenxi) :
+ * un CTO à temps partagé pour une PME se facture de l'ordre de 1 500 à
+ * 3 500 € par mois pour deux à quatre jours de travail mensuels.
+ *
+ * LE PRIX EST UN PRIX MENSUEL, jamais un prix au jour : le site ne parle
+ * d'aucun taux journalier (`offre.test.mjs`). Les jours décrivent le temps
+ * réservé chaque mois, pas l'unité de facturation.
+ *
+ * HORS DE `prestations`, comme l'intégration IA : sa page est une page
+ * thématique (`/services/cto-referent-ia`), et un abonnement mensuel n'entre
+ * pas dans les tranches de budget du questionnaire, calculées pour un projet.
+ */
+
+/**
+ * Quatre jours de travail chaque mois au lieu de deux, en euros HT par mois.
+ * Le mot « palier » reste hors des textes : il désigne sur ce site les
+ * forfaits supprimés le 2026-10-05, et `profil.test.mjs` le refuse.
+ */
+export const CTO_QUATRE_JOURS = 3200;
+
+export const ctoReferentIA: Offre = {
+  nom: "CTO et référent IA à temps partagé",
+  plancher: 1600,
+  periode: "mois",
+  inclus: [
+    "Deux jours de travail chaque mois, sur vos sujets techniques et d’IA",
+    "Un comité mensuel en visio avec la direction",
+    "La revue de votre architecture et des devis de vos prestataires",
+    "La feuille de route technique et IA, revue chaque trimestre",
+    "Le choix et la mise en place de vos outils d’IA",
+    "Un support écrit, avec une réponse sous 48\u00A0h",
+  ],
+  faitMonter: [
+    `Quatre jours de travail chaque mois au lieu de deux, à ${euros(CTO_QUATRE_JOURS)} HT par mois`,
+    "Le recrutement de votre équipe technique, compris dans les quatre jours",
+    "La gouvernance de vos données, comprise dans les quatre jours : qui accède à quoi, ce qui part vers un modèle d’IA",
+    "Des déplacements occasionnels, sur devis",
+  ],
+  horsOffre:
+    "Le développement d’un outil ou d’une intégration se chiffre à part, avec La Solution métier ou L’intégration IA. L’engagement court sur trois mois, puis vous arrêtez quand vous voulez, avec un mois de préavis.",
 };
 
 /**
@@ -245,12 +306,29 @@ export const prestation = (id: PrestationId): Prestation => {
 /** Le plancher d'une offre, formaté : « 3 000 € ». */
 export const prixPlancher = (offre: Offre): string => euros(offre.plancher);
 
+/** Ce qui suit le montant d'une offre mensuelle : « par mois ». */
+export const PERIODES: Readonly<Record<NonNullable<Offre["periode"]>, string>> = {
+  mois: "par mois",
+};
+
+/** « par mois » pour une offre mensuelle, rien pour un projet. */
+export const periode = (offre: Offre): string =>
+  offre.periode ? ` ${PERIODES[offre.periode]}` : "";
+
+/**
+ * Le plancher, la taxe si l'appelant la demande, puis la période d'une offre
+ * mensuelle : « 3 000 € HT », « 1 600 € HT par mois ».
+ */
+export const prixAffiche = (offre: Offre, taxe = ""): string =>
+  `${prixPlancher(offre)}${taxe}${periode(offre)}`;
+
 /**
  * « à partir de 3 000 € », avec la taxe derrière le montant si l'appelant la
- * demande. En minuscule : la phrase ou le composant décide de la capitale.
+ * demande, et « par mois » derrière une offre mensuelle. En minuscule : la
+ * phrase ou le composant décide de la capitale.
  */
 export const aPartirDe = (offre: Offre, taxe = ""): string =>
-  `à partir de ${prixPlancher(offre)}${taxe}`;
+  `à partir de ${prixAffiche(offre, taxe)}`;
 
 /*
  * LES REPÈRES D'AGENCE, relevés le 2026-10-15 sur La Fabrique du Net.

@@ -21,6 +21,7 @@ import {
   OPTIONS_ECHEANCE,
   libelleOption,
   optionsObjectif,
+  rattacherTranche,
   rendezVousDuTypeProjet,
   tranchesBudget,
 } from "@/lib/rendez-vous/questionnaire";
@@ -232,8 +233,12 @@ export function validerSoumission(
     ["echeance", OPTIONS_ECHEANCE],
   ];
   for (const [champ, options] of questions) {
-    const id = normaliserLigne(lireChaine(champs, champ) ?? "");
-    if (id.length === 0) continue;
+    const brut = normaliserLigne(lireChaine(champs, champ) ?? "");
+    if (brut.length === 0) continue;
+    // Une tranche publiée avant un changement de plancher, envoyée par un
+    // onglet resté ouvert, se rattache à la tranche actuelle, comme à la
+    // prise de rendez-vous : la refuser ferait perdre le message.
+    const id = champ === "budget" ? rattacherTranche(idRendezVous, brut) : brut;
     const libelle = libelleOption(options, id);
     if (libelle === undefined) {
       return {

@@ -12,7 +12,7 @@ import {
   TONS,
   type Ton,
 } from "@/components/pages/services/ServicePage";
-import { prixPlancher } from "@/content/offre";
+import { prixAffiche } from "@/content/offre";
 import type {
   BlocChiffres,
   BlocEtapes,
@@ -314,7 +314,7 @@ export function PageTheme({
             </p>
             <p className="text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-white/50 tablet:col-start-2 tablet:row-start-3 tablet:pl-[30px] desktop:pl-[40px]">
               {servicePageLabels.chapoPrix(
-                `${prixPlancher(page.offre)} ${servicePageLabels.horsTaxes}`,
+                prixAffiche(page.offre, ` ${servicePageLabels.horsTaxes}`),
               )}
             </p>
           </div>
@@ -340,7 +340,7 @@ export function PageTheme({
                 {page.titreOffre}
               </h2>
               <p className="max-w-[440px] text-[15px] font-medium leading-[1.45] tracking-[-0.01em] text-white/80 tablet:pl-[30px] desktop:pl-[40px]">
-                {servicePageLabels.reassurance}
+                {page.reassurance ?? servicePageLabels.reassurance}
               </p>
             </div>
             <OffreDetail offre={page.offre} href="#rendez-vous" />
@@ -354,7 +354,7 @@ export function PageTheme({
         />
         {page.filAriane ? <FilAriane marches={page.filAriane} /> : null}
       </main>
-      <Footer sujetRendezVous={RDV_PAR_PRESTATION[page.prestation]} />
+      <Footer sujetRendezVous={page.rendezVous ?? RDV_PAR_PRESTATION[page.prestation]} />
       <FloatingNav site={site} />
     </>
   );

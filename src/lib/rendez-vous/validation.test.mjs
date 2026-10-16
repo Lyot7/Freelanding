@@ -4,6 +4,7 @@ import {
   PREAVIS_MINIMAL_MS,
   validerReservation,
 } from "./validation.ts";
+import { prestation } from "../../content/offre.ts";
 
 /**
  * UNE RÉSERVATION N'EST PAS UN E-MAIL DE PLUS. Elle pose un événement dans
@@ -193,8 +194,10 @@ describe("validerReservation — le questionnaire", () => {
   });
 
   it("refuse une réponse hors de la liste du type choisi", () => {
-    // `12000-24000` est une tranche du rendez-vous « logiciel », pas du « site ».
-    expect(valider({ budget: "12000-24000" }).motif).toEqual({
+    // Le haut du rendez-vous « logiciel » (deux à quatre fois son plancher)
+    // n'est pas une tranche du « site ».
+    const plancher = prestation("logiciel").plancher;
+    expect(valider({ budget: `${plancher * 2}-${plancher * 4}` }).motif).toEqual({
       type: "champ_invalide",
       champ: "budget",
       raison: "hors_liste",
@@ -206,7 +209,14 @@ describe("validerReservation — le questionnaire", () => {
   });
 
   it("lit les tranches du type réellement demandé", () => {
-    const resultat = valider({ type: "decouverte", budget: "12000-24000", objectif: "tache" });
+    // Tranche propre à « decouverte » : deux et quatre fois le plancher du
+    // logiciel, lu dans `offre.ts` pour suivre un plancher qui bouge.
+    const plancher = prestation("logiciel").plancher;
+    const resultat = valider({
+      type: "decouverte",
+      budget: `${plancher * 2}-${plancher * 4}`,
+      objectif: "tache",
+    });
     expect(resultat.ok).toBe(true);
   });
 });
