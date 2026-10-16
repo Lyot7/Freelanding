@@ -16,12 +16,15 @@ export function FooterContact({
   modes,
   message,
   rendezVous,
+  ongletInitial = "message",
 }: {
   modes?: { label: string; message: string; rendezVous: string };
   message: ReactNode;
   rendezVous?: ReactNode;
+  /** « rendezVous » quand l'adresse porte un sujet (`?sujet=`). */
+  ongletInitial?: "message" | "rendezVous";
 }) {
-  const [onglet, setOnglet] = useState<"message" | "rendezVous">("message");
+  const [onglet, setOnglet] = useState<"message" | "rendezVous">(ongletInitial);
   const base = useId();
   if (!rendezVous || !modes) return <>{message}</>;
 

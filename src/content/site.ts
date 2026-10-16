@@ -1,5 +1,5 @@
 import type { SiteConfig } from "@/lib/content/types";
-import { lienRendezVous } from "@/content/rendez-vous";
+import { lienRendezVous, rendezVousContent } from "@/content/rendez-vous";
 
 /**
  * Configuration globale du site.
@@ -270,6 +270,25 @@ export const siteConfig: SiteConfig = {
       "Une solution métier",
       "Je ne sais pas encore",
     ],
+    questionnaire: {
+      budget: {
+        label: rendezVousContent.questionnaire.budget.legende,
+        placeholder: "Choisissez une tranche",
+      },
+      objectif: {
+        label: rendezVousContent.questionnaire.objectif.legende,
+        placeholder: "Choisissez ce qui compte le plus",
+      },
+      echeance: {
+        label: rendezVousContent.questionnaire.echeance.legende,
+        placeholder: "Choisissez une échéance",
+      },
+    },
+    etapes: {
+      titres: ["Votre projet", "Votre budget", "Vos coordonnées"],
+      continuer: "Continuer",
+      retour: "Retour",
+    },
     submitLabel: "Envoyer",
     disclaimer:
       "En envoyant ce formulaire, vous acceptez mes conditions générales et ma politique de confidentialité.",
