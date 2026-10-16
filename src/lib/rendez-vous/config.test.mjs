@@ -95,19 +95,36 @@ describe("resoudreConfiguration", () => {
     expect(config.typesDisponibles).toEqual(["site", "logiciel", "decouverte"]);
   });
 
-  it("couvre les trois types du contenu, sans variable orpheline", () => {
+  it("couvre les cinq types du contenu, sans variable orpheline", () => {
     expect(Object.keys(VARIABLES_EVENEMENT).sort()).toEqual([
+      "cto",
       "decouverte",
+      "ia",
       "logiciel",
       "site",
     ]);
+    expect(VARIABLES_EVENEMENT.ia).toBe("CAL_COM_EVENT_IA");
+    expect(VARIABLES_EVENEMENT.cto).toBe("CAL_COM_EVENT_CTO");
+  });
+
+  it("range l'IA et le CTO entre le logiciel et la découverte", () => {
+    const config = resoudreConfiguration({
+      CAL_COM_EVENT_DECOUVERTE: "4",
+      CAL_COM_EVENT_CTO: "7514277",
+      CAL_COM_EVENT_IA: "7514252",
+      CAL_COM_EVENT_SITE: "1",
+    });
+    expect(config.typesDisponibles).toEqual(["site", "ia", "cto", "decouverte"]);
+    expect(config.cibles.cto).toEqual({ par: "id", eventTypeId: 7514277 });
   });
 });
 
 describe("estIdRendezVous", () => {
-  it("accepte les trois identifiants et refuse tout le reste", () => {
+  it("accepte les cinq identifiants et refuse tout le reste", () => {
     expect(estIdRendezVous("site")).toBe(true);
     expect(estIdRendezVous("logiciel")).toBe(true);
+    expect(estIdRendezVous("ia")).toBe(true);
+    expect(estIdRendezVous("cto")).toBe(true);
     expect(estIdRendezVous("decouverte")).toBe(true);
     expect(estIdRendezVous("outil")).toBe(false);
     expect(estIdRendezVous("autre")).toBe(false);

@@ -18,6 +18,7 @@
  */
 import { aPartirDe, euros, integrationIA, prixPlancher } from "./offre";
 import { CHEMIN_AUTOMATISATION, nombre, type PageTheme } from "./page-theme";
+import { RDV_HORS_PRESTATION } from "./rendez-vous";
 
 /*
  * HYPOTHÈSES DU CALCUL : minutes par semaine pour une PME d'une dizaine de
@@ -91,6 +92,7 @@ export const pageAutomatisation: PageTheme = {
   h1: "Automatisation et IA pour PME",
   resume: `J’installe l’IA dans les outils que vous utilisez déjà, sur les tâches que votre équipe refait chaque semaine : trier les mails, saisir les commandes, relancer les factures. Vous reprenez des heures pour le travail qui demande quelqu’un. Comptez ${aPartirDe(integrationIA, " HT")} pour un premier usage.`,
   prestation: "logiciel",
+  rendezVous: RDV_HORS_PRESTATION.integrationIA,
   offre: integrationIA,
   filAriane: [
     { libelle: "Accueil", href: "/" },

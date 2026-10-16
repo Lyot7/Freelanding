@@ -254,7 +254,7 @@ export const legalDocuments: readonly LegalDocument[] = [
           "Numéro de téléphone, si vous le laissez",
           "Nom de votre entreprise, si vous le laissez",
           "Le contenu de votre message et des échanges qui suivent",
-          "Quand vous réservez un créneau, vos réponses au questionnaire : budget, objectif et échéance du projet, transmises à Cal.com avec le rendez-vous",
+          "Quand vous réservez un créneau, vos réponses au questionnaire : budget, objectif, outil utilisé et échéance selon le sujet choisi, transmises à Cal.com avec le rendez-vous",
         ],
       },
       { type: "heading", level: 3, text: "2.2 Ce que la visite produit" },

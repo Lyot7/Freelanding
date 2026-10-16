@@ -60,6 +60,8 @@ erreur dans les journaux.
 | `CAL_COM_USERNAME` | non | compte Cal.com | prise de rendez-vous masquée |
 | `CAL_COM_EVENT_SITE` | non | type d'événement « un site » | entrée masquée |
 | `CAL_COM_EVENT_LOGICIEL` | non | type « une solution métier » | entrée masquée |
+| `CAL_COM_EVENT_IA` | non | type « l'intégration IA » | entrée masquée |
+| `CAL_COM_EVENT_CTO` | non | type « CTO et référent IA » | entrée masquée |
 | `CAL_COM_EVENT_DECOUVERTE` | non | type « je ne sais pas encore » | entrée masquée |
 | `CLIC_TOKEN` | non | jeton du cockpit, enregistre les clics des liens `/r/<id>` des e-mails de prospection | clic non enregistré, journal `[clic] <id> non_configure`, redirection intacte |
 

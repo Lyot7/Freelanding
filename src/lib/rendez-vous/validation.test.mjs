@@ -4,7 +4,7 @@ import {
   PREAVIS_MINIMAL_MS,
   validerReservation,
 } from "./validation.ts";
-import { prestation } from "../../content/offre.ts";
+import { integrationIA, prestation } from "../../content/offre.ts";
 
 /**
  * UNE RÉSERVATION N'EST PAS UN E-MAIL DE PLUS. Elle pose un événement dans
@@ -15,7 +15,7 @@ import { prestation } from "../../content/offre.ts";
 
 const MAINTENANT = Date.UTC(2026, 8, 1, 13, 0, 0);
 const DEBUT_HUMAIN = MAINTENANT - 10_000;
-const TYPES = ["site", "decouverte"];
+const TYPES = ["site", "ia", "cto", "decouverte"];
 
 function valider(surcharge = {}) {
   return validerReservation(
@@ -218,6 +218,52 @@ describe("validerReservation — le questionnaire", () => {
       objectif: "tache",
     });
     expect(resultat.ok).toBe(true);
+  });
+});
+
+describe("validerReservation — les questions propres à l'IA et au CTO", () => {
+  it("accepte le CTO sans budget, et ignore un budget envoyé quand même", () => {
+    const sans = valider({ type: "cto", budget: "", objectif: "devis", echeance: "vite" });
+    expect(sans.ok).toBe(true);
+    expect(sans.reservation).not.toHaveProperty("budget");
+    expect(sans.reservation.objectif).toBe("devis");
+    expect(sans.reservation.echeance).toBe("vite");
+    const avec = valider({ type: "cto", budget: "3000-6000", objectif: "decisions" });
+    expect(avec.ok).toBe(true);
+    expect(avec.reservation).not.toHaveProperty("budget");
+  });
+
+  it("refuse au CTO un besoin hors de sa liste", () => {
+    expect(valider({ type: "cto", objectif: "google" }).motif).toEqual({
+      type: "champ_invalide",
+      champ: "objectif",
+      raison: "hors_liste",
+    });
+  });
+
+  it("exige de l'IA la tâche, l'outil et une tranche tirée de son plancher", () => {
+    const tranche = `${integrationIA.plancher}-${integrationIA.plancher * 2}`;
+    const ok = valider({ type: "ia", budget: tranche, objectif: "mails", outil: "messagerie" });
+    expect(ok.ok).toBe(true);
+    expect(ok.reservation.outil).toBe("messagerie");
+    expect(ok.reservation.budget).toBe(tranche);
+    expect(valider({ type: "ia", budget: tranche, objectif: "mails" }).motif).toEqual({
+      type: "champ_invalide",
+      champ: "outil",
+      raison: "requis",
+    });
+    expect(
+      valider({ type: "ia", budget: tranche, objectif: "mails", outil: "fax" }).motif.raison,
+    ).toBe("hors_liste");
+    expect(
+      valider({ type: "ia", budget: "", objectif: "mails", outil: "crm" }).motif.champ,
+    ).toBe("budget");
+  });
+
+  it("ne garde pas d'outil pour un sujet qui ne le pose pas", () => {
+    const resultat = valider({ outil: "crm" });
+    expect(resultat.ok).toBe(true);
+    expect(resultat.reservation).not.toHaveProperty("outil");
   });
 });
 

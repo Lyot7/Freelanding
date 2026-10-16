@@ -18,6 +18,7 @@
 import { aPartirDe, integrationIA, prixPlancher } from "./offre";
 import { CHEMIN_PAGE_CAEN, CHEMIN_PAGE_LOGICIEL_CAEN } from "./page-caen";
 import { CHEMIN_AUTOMATISATION, CHEMIN_IA_CAEN, type PageTheme } from "./page-theme";
+import { RDV_HORS_PRESTATION } from "./rendez-vous";
 
 export const pageIaCaen: PageTheme = {
   id: "automatisation-ia-caen",
@@ -29,6 +30,7 @@ export const pageIaCaen: PageTheme = {
   h1: "Automatisation et IA à Caen",
   resume: `Basé à Caen, j’installe l’IA dans les outils des PME du Calvados, de la Manche et de l’Orne. Je choisis la tâche avec vous, je code l’automatisation et je la branche moi-même sur vos logiciels. Rendez-vous en visio, ${aPartirDe(integrationIA, " HT")} pour un premier usage.`,
   prestation: "logiciel",
+  rendezVous: RDV_HORS_PRESTATION.integrationIA,
   offre: integrationIA,
   zones: {
     villes: ["Caen"],

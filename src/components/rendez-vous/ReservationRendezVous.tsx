@@ -14,10 +14,11 @@
  * les étapes et grandissait à chaque choix : arrivé aux coordonnées, le bloc
  * dépassait deux écrans. Eliott : « assez indigeste et qui s'agrandit, faire
  * plutôt une sorte de stepper ». Quatre temps, un seul affiché :
- *   01 le sujet — trois cartes ; un clic passe à la suite ;
+ *   01 le sujet — une carte par sujet ; un clic passe à la suite ;
  *   02 le créneau — durée, calendrier du mois, heures du jour retenu ;
  *   03 le projet — budget, objectif, échéance, et le retour « ce que vous pouvez
  *      espérer à ce budget » calculé sur place depuis la grille de l'offre ;
+ *      sans budget pour « cto », avec l'outil pour « ia » (2026-10-16) ;
  *   04 les coordonnées — nom, adresse, et un message facultatif.
  * La barre de progression rend chaque étape franchie cliquable, et le
  * récapitulatif garde sous les yeux ce qui a déjà été choisi.
@@ -86,8 +87,11 @@ import type {
   ReponseCreneaux,
 } from "@/lib/rendez-vous/creneaux";
 import {
+  legendeObjectif,
   OPTIONS_ECHEANCE,
+  OPTIONS_OUTIL,
   optionsObjectif,
+  questionsDuRendezVous,
   retourBudget,
   tranchesBudget,
 } from "@/lib/rendez-vous/questionnaire";
@@ -665,27 +669,44 @@ export function ReservationRendezVous({
    */
   const [budget, setBudget] = useState("");
   const [objectif, setObjectif] = useState("");
+  const [outil, setOutil] = useState("");
   const [echeance, setEcheance] = useState("");
   const [nom, setNom] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   /** Vrai après un « Continuer » refusé : les champs requis vides s'affichent en erreur. */
   const [envoiTente, setEnvoiTente] = useState(false);
-  const tranches = useMemo(() => (type ? tranchesBudget(type) : []), [type]);
+  /** Questions posées au sujet courant : sans budget pour « cto », avec l'outil pour « ia ». */
+  const questionsPosees = type ? questionsDuRendezVous(type) : { budget: false, outil: false };
+  const tranches = useMemo(
+    () => (type && questionsDuRendezVous(type).budget ? tranchesBudget(type) : []),
+    [type],
+  );
   const objectifs = useMemo(() => (type ? optionsObjectif(type) : []), [type]);
   const budgetChoisi = tranches.some((t) => t.id === budget) ? budget : "";
   const objectifChoisi = objectifs.some((o) => o.id === objectif) ? objectif : "";
+  const outilChoisi =
+    questionsPosees.outil && OPTIONS_OUTIL.some((o) => o.id === outil) ? outil : "";
+  const legendeQuestionObjectif = type
+    ? legendeObjectif(type)
+    : contenu.questionnaire.objectif.legende;
+  const budgetManquant = questionsPosees.budget && !budgetChoisi;
+  const outilManquant = questionsPosees.outil && !outilChoisi;
   const retour = useMemo(
     () => (type && budgetChoisi ? retourBudget(type, budgetChoisi) : undefined),
     [type, budgetChoisi],
   );
   const erreurBudget =
-    (envoiTente && !budgetChoisi) || champEnErreur === "budget"
+    (envoiTente && budgetManquant) || champEnErreur === "budget"
       ? contenu.questionnaire.budget.erreur
       : undefined;
   const erreurObjectif =
     (envoiTente && !objectifChoisi) || champEnErreur === "objectif"
       ? contenu.questionnaire.objectif.erreur
+      : undefined;
+  const erreurOutil =
+    (envoiTente && outilManquant) || champEnErreur === "outil"
+      ? contenu.questionnaire.outil.erreur
       : undefined;
 
   const choisirBudget = useCallback((id: string) => {
@@ -695,6 +716,10 @@ export function ReservationRendezVous({
   const choisirObjectif = useCallback((id: string) => {
     setObjectif(id);
     setChampEnErreur((champ) => (champ === "objectif" ? undefined : champ));
+  }, []);
+  const choisirOutil = useCallback((id: string) => {
+    setOutil(id);
+    setChampEnErreur((champ) => (champ === "outil" ? undefined : champ));
   }, []);
 
   /**
@@ -726,6 +751,7 @@ export function ReservationRendezVous({
   const refTitre = useRef<HTMLHeadingElement | null>(null);
   const refBudget = useRef<HTMLInputElement | null>(null);
   const refObjectif = useRef<HTMLInputElement | null>(null);
+  const refOutil = useRef<HTMLInputElement | null>(null);
   const etapeAffichee = useRef(etape);
   useEffect(() => {
     if (etapeAffichee.current === etape) return;
@@ -920,13 +946,15 @@ export function ReservationRendezVous({
   );
 
   const continuerVersCoordonnees = useCallback(() => {
-    if (!budgetChoisi || !objectifChoisi) {
+    if (budgetManquant || !objectifChoisi || outilManquant) {
       setEnvoiTente(true);
-      (budgetChoisi ? refObjectif : refBudget).current?.focus();
+      // Le focus va à la PREMIÈRE question restée sans réponse, dans l'ordre affiché.
+      const premiere = budgetManquant ? refBudget : !objectifChoisi ? refObjectif : refOutil;
+      premiere.current?.focus();
       return;
     }
     setEtape(ETAPE_COORDONNEES);
-  }, [budgetChoisi, objectifChoisi]);
+  }, [budgetManquant, objectifChoisi, outilManquant]);
 
   const recommencer = useCallback(() => {
     setType(undefined);
@@ -939,6 +967,7 @@ export function ReservationRendezVous({
     setChampEnErreur(undefined);
     setBudget("");
     setObjectif("");
+    setOutil("");
     setEcheance("");
     setMessage("");
     setEnvoiTente(false);
@@ -992,8 +1021,9 @@ export function ReservationRendezVous({
             nom,
             email,
             message,
-            budget: budgetChoisi,
+            ...(budgetChoisi ? { budget: budgetChoisi } : {}),
             objectif: objectifChoisi,
+            ...(outilChoisi ? { outil: outilChoisi } : {}),
             echeance,
             debutMs: refDebut.current,
             [NOM_CHAMP_PIEGE]: typeof piege === "string" ? piege : "",
@@ -1010,7 +1040,8 @@ export function ReservationRendezVous({
           // La tranche, jamais un montant.
           capture(ANALYTICS_EVENTS.rdvConfirmed, {
             rdv_type: type,
-            budget: budgetChoisi,
+            // Vide pour le CTO, qui n'a pas de tranche : la propriété est omise.
+            ...(budgetChoisi ? { budget: budgetChoisi } : {}),
             duration_min: dureeRetenue,
           });
           return;
@@ -1040,7 +1071,12 @@ export function ReservationRendezVous({
           setCreneau(undefined);
           setTentative((valeur) => valeur + 1);
           setEtape(ETAPE_CRENEAU);
-        } else if (champ === "budget" || champ === "objectif" || champ === "echeance") {
+        } else if (
+          champ === "budget" ||
+          champ === "objectif" ||
+          champ === "outil" ||
+          champ === "echeance"
+        ) {
           setEtape(ETAPE_PROJET);
         }
         // Le jeton est à usage unique : sans réinitialisation, la deuxième
@@ -1068,6 +1104,7 @@ export function ReservationRendezVous({
       emailContact,
       budgetChoisi,
       objectifChoisi,
+      outilChoisi,
       echeance,
     ],
   );
@@ -1229,29 +1266,43 @@ export function ReservationRendezVous({
           {etape === ETAPE_PROJET ? (
             <Etape titre={contenu.etapes.projet} refTitre={refTitre}>
               <div className="flex flex-col gap-[24px]">
-                <div>
-                  <ChoixUnique
-                    prefixe={instance}
-                    nom="budget"
-                    legende={contenu.questionnaire.budget.legende}
-                    options={tranches}
-                    choisi={budgetChoisi}
-                    onChoisir={choisirBudget}
-                    erreur={erreurBudget}
-                    refPremier={refBudget}
-                  />
-                  <RetourEspere retour={retour} />
-                </div>
+                {questionsPosees.budget ? (
+                  <div>
+                    <ChoixUnique
+                      prefixe={instance}
+                      nom="budget"
+                      legende={contenu.questionnaire.budget.legende}
+                      options={tranches}
+                      choisi={budgetChoisi}
+                      onChoisir={choisirBudget}
+                      erreur={erreurBudget}
+                      refPremier={refBudget}
+                    />
+                    <RetourEspere retour={retour} />
+                  </div>
+                ) : null}
                 <ChoixUnique
                   prefixe={instance}
                   nom="objectif"
-                  legende={contenu.questionnaire.objectif.legende}
+                  legende={legendeQuestionObjectif}
                   options={objectifs}
                   choisi={objectifChoisi}
                   onChoisir={choisirObjectif}
                   erreur={erreurObjectif}
                   refPremier={refObjectif}
                 />
+                {questionsPosees.outil ? (
+                  <ChoixUnique
+                    prefixe={instance}
+                    nom="outil"
+                    legende={contenu.questionnaire.outil.legende}
+                    options={OPTIONS_OUTIL}
+                    choisi={outilChoisi}
+                    onChoisir={choisirOutil}
+                    erreur={erreurOutil}
+                    refPremier={refOutil}
+                  />
+                ) : null}
                 <ChoixUnique
                   prefixe={instance}
                   nom="echeance"
