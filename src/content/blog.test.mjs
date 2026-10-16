@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { blogPosts, blogContent } from "./blog.ts";
 import { IDS_RENDEZ_VOUS } from "./rendez-vous.ts";
 import { prestation, prixPlancher } from "./offre.ts";
+import { contentRoutes } from "./routes.ts";
 
 /**
  * AUDIT DES ARTICLES.
@@ -351,5 +352,32 @@ describe("articles de décision et de prix", () => {
         vus.set(cle, slug);
       }
     }
+  });
+});
+
+describe("date de révision d'un article", () => {
+  const route = (chemin) => contentRoutes.find((r) => r.pathname === chemin);
+
+  test("le sitemap date un article révisé à sa révision, les autres à leur publication", () => {
+    for (const post of blogPosts) {
+      expect([post.slug, route(`/blog/${post.slug}`)?.lastModified]).toEqual([
+        post.slug,
+        post.dateModified ?? post.date,
+      ]);
+    }
+    expect(blogPosts.some((p) => p.dateModified)).toBe(true);
+    expect(blogPosts.some((p) => !p.dateModified)).toBe(true);
+  });
+
+  test("une révision ne précède jamais la publication", () => {
+    for (const post of blogPosts.filter((p) => p.dateModified)) {
+      expect(/^\d{4}-\d{2}-\d{2}$/.test(post.dateModified)).toBe(true);
+      expect(post.dateModified >= post.date).toBe(true);
+    }
+  });
+
+  test("l'index du blog prend la date la plus récente, révisions comprises", () => {
+    const plusRecente = blogPosts.map((p) => p.dateModified ?? p.date).sort().at(-1);
+    expect(route("/blog")?.lastModified).toBe(plusRecente);
   });
 });
