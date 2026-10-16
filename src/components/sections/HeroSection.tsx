@@ -496,8 +496,10 @@ export function HeroSection({
             </p>
           ) : null}
 
-          {/* LE SEUL h1 DE L'ACCUEIL : les deux portes. */}
-          <h1 data-part="hero-titre" className="hero-portes m-0 mt-[18px] tablet:mt-[34px]">
+          {/* LE SEUL h1 DE L'ACCUEIL : les deux portes. `id="services"` : la
+              marche « Prestations » des fils d'Ariane (`/#services`) y mène
+              depuis que l'accordéon a quitté l'accueil (2026-10-16). */}
+          <h1 id="services" data-part="hero-titre" className="hero-portes m-0 mt-[18px] tablet:mt-[34px]">
             {portes.map((porte, index) => (
               <Porte key={porte.href} porte={porte} index={index} />
             ))}

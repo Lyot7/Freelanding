@@ -2,6 +2,7 @@
 
 import { motion, useScroll, useTransform } from "motion/react";
 import { useReducedMotionAfterMount } from "@/components/motion/reducedMotion";
+import { lireZoomEcran } from "@/lib/zoom-ecran";
 import { useEffect, useRef, type ReactNode } from "react";
 
 /**
@@ -52,10 +53,7 @@ export function useScrollParallaxY(factor: number) {
   const zoom = useRef(1);
   useEffect(() => {
     const lire = () => {
-      const valeur = Number.parseFloat(
-        getComputedStyle(document.documentElement).getPropertyValue("--zoom-ecran"),
-      );
-      zoom.current = Number.isFinite(valeur) && valeur > 0 ? valeur : 1;
+      zoom.current = lireZoomEcran();
     };
     lire();
     window.addEventListener("resize", lire);

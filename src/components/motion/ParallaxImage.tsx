@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, type RefObject } from "react";
 import { ImageProgressive } from "@/components/ui/ImageProgressive";
-import { motion, useMotionValue, useScroll, useTransform } from "motion/react";
+import { motion, useMotionValue, useScroll } from "motion/react";
 import {
   pourcentage,
   useReducedMotionAfterMount,
@@ -219,17 +219,12 @@ export function ParallaxImage({
   const ref = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotionAfterMount();
   const { reveal: revealProps } = useReveal();
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
-  // -7 % → +7 % de la hauteur du cadre, exprimés en % du wrapper.
-  const travel = (overshoot / (1 + 2 * overshoot)) * 100;
-  const y = useTransform(
-    scrollYProgress,
-    [0, 1],
-    [pourcentage(-travel), pourcentage(travel)],
-  );
+  /* -7 % → +7 % de la hauteur du cadre, exprimés en % du wrapper. Calculé par
+     `useParallaxLayerY`, qui mesure en `getBoundingClientRect` : le
+     `useScroll({ target })` d'avant additionnait des `offsetTop`, en pixels
+     de mise en page, à un `scrollY` en pixels affichés, et la course
+     s'achevait trop tôt sous le `zoom` des grands écrans (2026-10-16). */
+  const y = useParallaxLayerY(ref, overshoot);
   /*
    * Repli sûr sans dimensions : image en flux, hauteur naturelle, pas de dérive.
    *
@@ -272,7 +267,7 @@ export function ParallaxImage({
       style={{
         top: pourcentage(-overshoot * 100),
         height: pourcentage((1 + 2 * overshoot) * 100),
-        ...(reduced ? null : { y }),
+        ...(reduced || !y ? null : { y }),
       }}
     >
       {/* Zoom au survol de la CARTE : `scale 1 → 1.1` sur ~400 ms (mesuré sur

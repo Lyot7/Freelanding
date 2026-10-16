@@ -111,3 +111,13 @@ describe("un seul libellé pour le rendez-vous", () => {
     for (const l of libelles) expect(l.toLowerCase()).not.toContain("démarrer");
   });
 });
+
+describe("la marche « Prestations » des fils d'Ariane", () => {
+  test("mène à une section qui existe sur l'accueil", async () => {
+    const { readFileSync } = await import("node:fs");
+    const heros = readFileSync(new URL("../components/sections/HeroSection.tsx", import.meta.url), "utf8");
+    // `/#services` : l'accordéon a quitté l'accueil, l'ancre vit sur les portes.
+    expect(heros).toContain('id="services"');
+    expect(homeContent.sectionOrder).toContain("hero");
+  });
+});

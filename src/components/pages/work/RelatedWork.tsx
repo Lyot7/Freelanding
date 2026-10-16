@@ -22,7 +22,7 @@ export function RelatedWork({ work }: { work: WorkItem }) {
     <section aria-labelledby="next-project-title" className="relative">
       <WorkCardPin
         work={work}
-        rowClassName="h-[800px] desktop:h-screen"
+        rowClassName="h-[800px] desktop:h-[calc(100vh/var(--zoom-ecran,1))]"
         overlay={
           <h2
             id="next-project-title"

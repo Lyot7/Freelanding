@@ -100,7 +100,8 @@ export const servicePageLabels = {
    * et c'est elle qui garde le nom de catalogue lisible sur la page, une fois
    * que le H1 est passé aux mots que le client tape.
    *
-   * « Prestations » pointe sur `/#services`, l'accordéon de l'accueil : c'est
+   * « Prestations » pointe sur `/#services`, les deux portes du héros de
+   * l'accueil depuis le 2026-10-16 (l'accordéon y était avant) : c'est
    * le seul index de l'offre, il n'existe pas de page `/services` nue. Déclarer
    * une marche vers une adresse qui répond 404 serait pire que ne rien déclarer.
    */
