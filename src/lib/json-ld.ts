@@ -378,16 +378,16 @@ export function serviceSchema(
  * décrite par `personSchema` sur l'accueil ; répéter ici son nom et sa photo
  * créerait une seconde entité homonyme au lieu de renforcer la première.
  *
- * `dateModified` VAUT `datePublished` FAUTE DE MIEUX, et c'est volontaire : le
- * modèle ne porte pas de date de révision. En inventer une, ou pire y mettre la
- * date du jour à chaque construction, annoncerait une fraîcheur que le contenu
- * n'a pas. Le jour où une date de révision existera, elle se branchera ici.
+ * `dateModified` VAUT `updated`, la date de la dernière réécriture écrite dans
+ * le registre, et `datePublished` à défaut. Jamais la date du jour à chaque
+ * construction : elle annoncerait une fraîcheur que le contenu n'a pas.
  */
 export function articleSchema(
   post: {
     slug: string;
     title: string;
     date: string;
+    updated?: string;
     excerpt: string;
     cover: { src: string };
     seo?: { title?: string; description?: string };
@@ -405,7 +405,7 @@ export function articleSchema(
       mainEntityOfPage: url,
       image: absoluteUrl(post.cover.src),
       datePublished: post.date,
-      dateModified: post.date,
+      dateModified: post.updated ?? post.date,
       inLanguage: "fr-FR",
       author: { "@id": PERSON_ID },
       // ÉDITEUR DÉCRIT SUR PLACE, pas seulement référencé : le nœud

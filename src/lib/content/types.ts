@@ -497,6 +497,11 @@ export interface BlogPost extends SluggedContent {
   date: string;
   /** Provenance de la date lorsque le provider ne publie pas de date éditoriale. */
   dateSource: "editorial" | "provider-release";
+  /**
+   * Date ISO de la dernière réécriture du corps. Absente, la page vaut sa date
+   * de publication. Elle alimente `dateModified` (JSON-LD) et `<lastmod>`.
+   */
+  updated?: string;
   /** Indique si l'article apparaît dans la grille `/blog`. */
   listedInIndex: boolean;
   category: string;
