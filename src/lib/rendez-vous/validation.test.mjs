@@ -194,8 +194,10 @@ describe("validerReservation — le questionnaire", () => {
   });
 
   it("refuse une réponse hors de la liste du type choisi", () => {
-    // `12000-24000` est une tranche du rendez-vous « logiciel », pas du « site ».
-    expect(valider({ budget: "12000-24000" }).motif).toEqual({
+    // Le haut du rendez-vous « logiciel » (deux à quatre fois son plancher)
+    // n'est pas une tranche du « site ».
+    const plancher = prestation("logiciel").plancher;
+    expect(valider({ budget: `${plancher * 2}-${plancher * 4}` }).motif).toEqual({
       type: "champ_invalide",
       champ: "budget",
       raison: "hors_liste",

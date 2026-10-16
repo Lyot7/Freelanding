@@ -5,6 +5,7 @@ import {
   LIMITES,
   validerSoumission,
 } from "./validation.ts";
+import { tranchesBudget } from "../rendez-vous/questionnaire.ts";
 
 /**
  * La validation est la seule barrière réelle : la validation HTML du navigateur
@@ -282,6 +283,19 @@ describe("validerSoumission — questionnaire de /contact", () => {
     const resultat = valider(soumissionProjet({ budget: "1-2" }));
     expect(resultat.ok).toBe(false);
     expect(resultat.motif.champ).toBe("budget");
+  });
+
+  it("rattache une tranche du logiciel à 6 000 € à la tranche actuelle", () => {
+    // Un onglet ouvert avant le 2026-10-16 propose encore les tranches du
+    // logiciel calculées sur 6 000 € : son message doit passer.
+    const resultat = valider(
+      soumissionProjet({ typeProjet: TYPES[1], budget: "6000-12000", objectif: "tableur" }),
+    );
+    expect(resultat.ok).toBe(true);
+    const attendue = tranchesBudget("logiciel").find(
+      (t) => t.bas !== undefined && t.bas <= 6000 && (t.haut === undefined || 6000 < t.haut),
+    );
+    expect(resultat.soumission.budget).toBe(attendue.libelle);
   });
 
   it("prend les listes de la découverte quand le type n'est pas tranché", () => {

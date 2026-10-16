@@ -57,13 +57,24 @@ export function prestationsDuRendezVous(id: IdRendezVous): readonly Prestation[]
 const MULTIPLES_PLANCHER = [1, 2, 4] as const;
 
 /**
+ * ÉCART MINIMAL ENTRE DEUX BORNES VOISINES, depuis le 2026-10-16. Le logiciel
+ * descendu à 3 500 € HT, le rendez-vous « decouverte » posait une tranche
+ * « De 3 000 € à 3 500 € » : trop étroite pour qu'un visiteur s'y range, et
+ * inutile à Eliott. Une borne que la suivante ne dépasse pas d'au moins moitié
+ * s'efface ; la tranche du dessous l'absorbe.
+ */
+const ECART_MIN_BORNES = 1.5;
+
+/**
  * Bornes des tranches, en ordre croissant.
  *
  * UNE PRESTATION : son plancher, puis ses multiples.
  *
  * PLUSIEURS (le rendez-vous « decouverte ») : le plancher de chacune, puis les
  * multiples de la plus chère. Ce qui dit quelle famille est à portée, sans
- * multiplier les tranches.
+ * multiplier les tranches. Un plancher trop proche du suivant s'efface
+ * (`ECART_MIN_BORNES`) : la plus chère et ses multiples restent toujours, leur
+ * rapport étant de deux.
  */
 export function bornesBudget(id: IdRendezVous): readonly number[] {
   const concernees = prestationsDuRendezVous(id);
@@ -72,7 +83,10 @@ export function bornesBudget(id: IdRendezVous): readonly number[] {
     ...concernees.map((p) => p.plancher),
     ...MULTIPLES_PLANCHER.map((m) => haute.plancher * m),
   ];
-  return [...new Set(montants)].sort((a, b) => a - b);
+  const triees = [...new Set(montants)].sort((a, b) => a - b);
+  return triees.filter(
+    (borne, i) => i === triees.length - 1 || triees[i + 1] >= borne * ECART_MIN_BORNES,
+  );
 }
 
 function plusChere(liste: readonly Prestation[]): Prestation {
@@ -124,6 +138,18 @@ const TRANCHES_RETIREES: Readonly<Record<string, number>> = {
   "6000-18000": 6000,
   "18000-36000": 18000,
   "plus-36000": 36000,
+  /*
+   * LES TRANCHES DU LOGICIEL À 6 000 € HT, publiées jusqu'au 2026-10-16 sur
+   * « logiciel » et « decouverte ». Celles que le site garde (« 3000-6000 »,
+   * « 6000-12000 » et « moins-3000 », toujours servies au « site ») ne sont
+   * rattachées que pour les sujets qui ne les proposent plus.
+   */
+  "moins-3000": 0,
+  "moins-6000": 0,
+  "3000-6000": 3000,
+  "6000-12000": 6000,
+  "12000-24000": 12000,
+  "plus-24000": 24000,
 };
 
 /**

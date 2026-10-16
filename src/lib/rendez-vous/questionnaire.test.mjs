@@ -8,6 +8,7 @@ import {
   composerNotes,
   optionsObjectif,
   prestationsDuRendezVous,
+  rattacherTranche,
   rendezVousDuTypeProjet,
   retourBudget,
   tranchesBudget,
@@ -44,8 +45,34 @@ describe("bornesBudget et tranchesBudget", () => {
   });
 
   it("couvre les deux prestations pour « decouverte » sans multiplier les tranches", () => {
-    // Plancher de chaque prestation, puis les multiples de la plus chère.
-    expect(bornesBudget("decouverte")).toEqual([vitrine.plancher, ...bornes(logiciel)]);
+    // Plancher de chaque prestation, puis les multiples de la plus chère ; le
+    // plancher du site, trop proche de celui du logiciel, s'efface.
+    expect(vitrine.plancher * 1.5).toBeGreaterThan(logiciel.plancher);
+    expect(bornesBudget("decouverte")).toEqual(bornes(logiciel));
+  });
+
+  it("ne pose jamais deux bornes voisines à moins de moitié d’écart", () => {
+    for (const id of ["site", "logiciel", "decouverte"]) {
+      const b = bornesBudget(id);
+      for (let i = 0; i < b.length - 1; i += 1) {
+        expect(b[i + 1] / b[i]).toBeGreaterThanOrEqual(1.5);
+      }
+    }
+  });
+
+  it("propose à « decouverte » des tranches lisibles, sans la tranche étroite site-logiciel", () => {
+    const { budget } = rendezVousContent.questionnaire;
+    const [a, b, c] = bornes(logiciel);
+    expect(tranchesBudget("decouverte").map((t) => t.libelle)).toEqual([
+      budget.moinsDe(euros(a)),
+      budget.entre(euros(a), euros(b)),
+      budget.entre(euros(b), euros(c)),
+      budget.plusDe(euros(c)),
+      budget.inconnu,
+    ]);
+    expect(tranchesBudget("decouverte").map((t) => t.id)).not.toContain(
+      `${vitrine.plancher}-${logiciel.plancher}`,
+    );
   });
 
   it("encadre les planchers : sous le premier, entre chaque, au-dessus du dernier, puis « je ne sais pas »", () => {
@@ -113,7 +140,7 @@ describe("retourBudget — ce que vous pouvez espérer", () => {
   });
 
   it("sur « decouverte », écarte la prestation hors de portée", () => {
-    const tranche = `${vitrine.plancher}-${logiciel.plancher}`;
+    const tranche = `moins-${logiciel.plancher}`;
     const retour = retourBudget("decouverte", tranche);
     expect(retour.lignes.map((l) => l.prestation)).toEqual([vitrine.nom]);
   });
@@ -191,5 +218,24 @@ describe("rendezVousDuTypeProjet", () => {
     expect(rendezVousDuTypeProjet(site)).toBe("site");
     expect(rendezVousDuTypeProjet(solution)).toBe("logiciel");
     expect(rendezVousDuTypeProjet(inconnu)).toBe("decouverte");
+  });
+});
+
+describe("rattacherTranche — tranches du logiciel à 6 000 €", () => {
+  it("ramène chaque ancienne tranche du logiciel à la tranche actuelle qui contient sa borne basse", () => {
+    const [a, b, c] = bornes(logiciel);
+    for (const id of ["logiciel", "decouverte"]) {
+      expect(rattacherTranche(id, "moins-6000")).toBe(`moins-${a}`);
+      expect(rattacherTranche(id, "moins-3000")).toBe(`moins-${a}`);
+      expect(rattacherTranche(id, "6000-12000")).toBe(`${a}-${b}`);
+      expect(rattacherTranche(id, "12000-24000")).toBe(`${b}-${c}`);
+      expect(rattacherTranche(id, "plus-24000")).toBe(`plus-${c}`);
+    }
+  });
+
+  it("laisse au site les tranches qu’il propose toujours", () => {
+    for (const valeur of ["moins-3000", "3000-6000", "6000-12000"]) {
+      expect(rattacherTranche("site", valeur)).toBe(valeur);
+    }
   });
 });
