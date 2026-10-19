@@ -439,8 +439,9 @@ export const legalDocuments: readonly LegalDocument[] = [
     title: "Conditions générales de vente",
     summary:
       "Comment on travaille ensemble : devis, paiement, délais, droits sur le livrable. Écrites pour être lues.",
-    // Barème réécrit en prix de départ le 2026-10-05.
-    lastUpdated: "2026-10-05",
+    // Barème réécrit en prix de départ le 2026-10-05 ; vie après livraison
+    // sans suivi (art. 9) le 2026-10-19, décision d'Eliott.
+    lastUpdated: "2026-10-19",
     body: [
       { type: "heading", level: 2, text: "1. Objet et champ d’application" },
       {
@@ -617,6 +618,10 @@ export const legalDocuments: readonly LegalDocument[] = [
       {
         type: "paragraph",
         text: "La prestation ne comprend ni l’hébergement, ni la supervision, ni les mises à jour dans la durée : c’est une formule distincte, avec son prix et sa durée propres.",
+      },
+      {
+        type: "paragraph",
+        text: "Sans formule de suivi, votre site ou votre outil continue de fonctionner et reste à vous. Chaque demande ultérieure (modification, mise à jour, panne d’un service tiers) se traite sur devis, au tarif en vigueur et selon mes disponibilités, sans délai d’intervention garanti. Un délai garanti n’existe que dans une formule de suivi, aux conditions de son devis.",
       },
       { type: "heading", level: 2, text: "10. Références" },
       {
