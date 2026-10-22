@@ -151,7 +151,7 @@ describe("corps des articles", () => {
    * Le contrôle est volontairement grossier : il exige la PRÉSENCE d'un lien
    * vers une page de prestation et d'un lien vers `/contact`, pas leur
    * formulation. Le texte du lien reste un choix d'écriture ; son existence
-   * n'en est plus un.
+   * n'en est plus un. La page de prix d'une prestation compte : on y achète aussi.
    *
    * DEPUIS LE 2026-09-24, LE LIEN VERS `/contact` MÈNE À LA PRISE DE
    * RENDEZ-VOUS, sujet compris : un `/contact` nu posait le lecteur devant un
@@ -160,7 +160,7 @@ describe("corps des articles", () => {
    */
   test("chaque article mène vers une prestation et vers le contact", () => {
     for (const [fichier, texte] of corps) {
-      expect([fichier, /\]\(\/services\/[a-z-]+\)/.test(texte)]).toEqual([
+      expect([fichier, /\]\(\/services\/[a-z-]+(?:\/prix)?\)/.test(texte)]).toEqual([
         fichier,
         true,
       ]);

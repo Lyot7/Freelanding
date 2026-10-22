@@ -60,6 +60,10 @@ async function ecrire(a: ArticleAPublier, date: string): Promise<void> {
   const { rendreVisuel } = await import("./visuel-article.mjs");
   await rendreVisuel(a.article.slug, a.article.visuel.svg, RACINE);
   writeFileSync(join(ARTICLES, `${a.article.slug}.mdx`), `${a.corps.trim()}\n`);
+  // Un texte retouché dans le cockpit perd ses insécables, et le test de typographie
+  // bloquait l'article à chaque essai. La réparation mécanique passe avant les contrôles ;
+  // ce qu'elle ne sait pas corriger reste au test. Sa sortie en 1 sur un résidu est attendue.
+  spawnSync("bun", ["scripts/typo-fr.mjs", "--fix"], { cwd: RACINE, encoding: "utf8" });
   const registre = lireRegistre();
   registre.unshift(entreeDuCockpit({ ...a, corps: a.corps.trim() }, date));
   writeFileSync(REGISTRE, `${JSON.stringify(registre, null, 2)}\n`);
