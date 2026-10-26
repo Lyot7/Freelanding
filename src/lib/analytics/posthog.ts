@@ -29,7 +29,6 @@ import {
   POSTHOG_KEY,
   POSTHOG_PROXY_PATH,
   POSTHOG_UI_HOST,
-  isAnalyticsConfigured,
 } from "./config";
 import { CONSENT_TTL_DAYS, type ConsentChoices } from "./consent";
 
@@ -185,7 +184,7 @@ export async function startAnalytics(
   /* Points d'injection des tests : le SDK réel ne tourne pas hors navigateur,
      et la clé est figée au chargement de `config.ts`. */
   charger: () => Promise<{ default: PostHog }> = () => import("posthog-js"),
-  cle: string = isAnalyticsConfigured() ? POSTHOG_KEY : "",
+  cle: string = POSTHOG_KEY,
 ): Promise<PostHog | null> {
   if (typeof window === "undefined") return null;
   if (cle === "") return null;

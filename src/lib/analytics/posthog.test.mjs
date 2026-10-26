@@ -1,6 +1,8 @@
 import { afterAll, afterEach, describe, expect, it } from "bun:test";
 
-import * as mesure from "./posthog";
+/* Copie propre du module : `bun test` partage les modules entre fichiers, et
+   le singleton du SDK a pu être démarré par un test de composant. */
+const mesure = await import("./posthog?regimes");
 
 /* La clé de `config.ts` est figée à son chargement, souvent vide en test :
    elle est passée explicitement. */
@@ -211,6 +213,16 @@ describe("startAnalytics, les deux régimes", () => {
     expect(mesure.getRegimeSnapshot()).toBe("sans-cookie");
   });
 
+  it("un accord répété ne republie pas le régime", async () => {
+    await mesure.startAnalytics(accord, charger, CLE);
+    const vus = [];
+    const desabonner = mesure.subscribeAnalytics(() => vus.push(1));
+    await mesure.startAnalytics(accord, charger, CLE);
+    desabonner();
+    expect(vus).toEqual([]);
+    expect(mesure.getRegimeSnapshot()).toBe("complet");
+  });
+
   it("le rendu serveur voit toujours le régime sans cookie", () => {
     expect(mesure.getRegimeServerSnapshot()).toBe("sans-cookie");
   });
@@ -245,5 +257,24 @@ describe("startAnalytics, visiteur qui revient déjà consentant", () => {
 
   afterAll(() => {
     delete globalThis.window;
+  });
+});
+
+describe("startAnalytics, chargement réel du SDK", () => {
+  afterAll(() => {
+    delete globalThis.window;
+  });
+
+  it("charge posthog-js à la demande, sans casser hors navigateur réel", async () => {
+    const neuf = await import("./posthog?reel");
+    navigateur();
+    /* Le vrai SDK s'initialise sur un faux navigateur : il démarre ou échoue,
+       et dans les deux cas le site ne lève rien. */
+    const resultat = await neuf.startAnalytics(
+      { analytics: false, replay: false },
+      undefined,
+      CLE,
+    );
+    expect(resultat === null || typeof resultat.capture === "function").toBe(true);
   });
 });
