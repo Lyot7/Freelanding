@@ -24,3 +24,12 @@ export function getWorkCardMedia(work: WorkItem): ResolvedWorkCardMedia {
 
   return { kind: "image", image: work.cover };
 }
+
+/**
+ * Libellé de la colonne de droite de la carte : l'étiquette (type de projet,
+ * cadre, résultat), sinon le client, sinon le libellé générique. Cette
+ * colonne ne rend jamais du vide.
+ */
+export function getWorkCardLabel(work: WorkItem, fallback: string): string {
+  return work.etiquette ?? work.client ?? fallback;
+}

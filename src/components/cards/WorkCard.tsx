@@ -11,6 +11,7 @@ import { urlImageFond } from "@/lib/image-fond";
 import { estProfilLeger } from "@/lib/profil-appareil";
 import type { WorkItem } from "@/lib/content/types";
 import {
+  getWorkCardLabel,
   getWorkCardMedia,
   type ResolvedWorkCardMedia,
 } from "./work-card-media";
@@ -346,7 +347,7 @@ export function WorkCard({ work, index }: { work: WorkItem; index?: number }) {
                 disait déjà — elle n'était simplement affichée nulle part.
                 Le repli garde le libellé générique pour une carte sans
                 `client` : cette colonne ne doit jamais rendre du vide. */}
-            <p className={TXT}>{work.etiquette ?? work.client ?? uiLabels.work.portfolioLabel}</p>
+            <p className={TXT}>{getWorkCardLabel(work, uiLabels.work.portfolioLabel)}</p>
           </div>
         </div>
       </div>
