@@ -133,7 +133,7 @@ export const servicePageLabels = {
 
   /** En vis-à-vis du titre de l'offre : comment on paie, et que le prix tient. */
   reassurance:
-    "Le prix est fixé au devis et ne bouge plus. Vous payez 40 % à la signature, 30 % à la première version fonctionnelle et 30 % à la livraison. Le code et l’hébergement sont à votre nom.",
+    "Le prix est fixé au devis et ne bouge plus. Vous le réglez selon un échéancier étalé jusqu’à la livraison, écrit au devis. Le code et l’hébergement sont à votre nom.",
 
   /** Bouton de l'offre, vers l'ancre `#rendez-vous` de la page. */
   cta: RESERVER_UN_APPEL,
