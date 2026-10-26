@@ -474,17 +474,13 @@ export function ConsentBanner() {
                 </button>
               </div>
 
-              {panelOpen || hasDecision ? (
+              {/* Panneau replié, « Personnaliser » vit dans la phrase : cette
+                  rangée n'existe que panneau déplié. */}
+              {panelOpen ? (
                 <div className="flex flex-row flex-wrap items-center justify-between gap-x-[16px]">
-                  {panelOpen ? (
-                    <button type="button" onClick={closePanel} className={linkButton}>
-                      {hasDecision ? consentCopy.close : consentCopy.back}
-                    </button>
-                  ) : (
-                    <button type="button" onClick={openPanel} className={linkButton}>
-                      {consentCopy.customise}
-                    </button>
-                  )}
+                  <button type="button" onClick={closePanel} className={linkButton}>
+                    {hasDecision ? consentCopy.close : consentCopy.back}
+                  </button>
 
                   {hasDecision ? (
                     <button type="button" onClick={revoke} className={linkButton}>
