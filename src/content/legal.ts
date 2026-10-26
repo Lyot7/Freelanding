@@ -109,7 +109,7 @@ const contactDetails = [
  * fausse sur une politique de confidentialité est un défaut de conformité à
  * elle seule (art. 12 RGPD, information « à jour »).
  */
-const lastUpdated = "2026-09-30";
+const lastUpdated = "2026-10-26";
 
 export const legalDocuments: readonly LegalDocument[] = [
   {
@@ -174,7 +174,7 @@ export const legalDocuments: readonly LegalDocument[] = [
         type: "list",
         style: "unordered",
         items: [
-          "PostHog, Inc., 2261 Market St. #4008, San Francisco, CA 94114, États-Unis : mesure d’audience et enregistrement de session, après consentement, sur son instance européenne.",
+          "PostHog, Inc., 2261 Market St. #4008, San Francisco, CA 94114, États-Unis : comptage des visites sans cookie, et, après consentement, mesure d’audience et enregistrement de session, sur son instance européenne.",
           "Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irlande : messagerie professionnelle, où arrivent et sont archivés les messages qui me sont adressés.",
           "Cal.com, Inc., 2261 Market Street #4382, San Francisco, CA 94114, États-Unis : prise de rendez-vous en ligne.",
           "Plus Five Five, Inc., qui exploite le service Resend, 2261 Market Street #5039, San Francisco, CA 94114, États-Unis : acheminement des e-mails déclenchés par le formulaire.",
@@ -284,6 +284,7 @@ export const legalDocuments: readonly LegalDocument[] = [
           "Tenir la comptabilité et répondre à l’administration fiscale. Base légale : obligation légale (art. 6.1.c RGPD). Données : identité, coordonnées de facturation, montants. Durée : 10 ans, article L. 123-22 du code de commerce.",
           "Bloquer les envois automatisés sur le formulaire. Base légale : intérêt légitime à protéger le service (art. 6.1.f RGPD). Données : signaux techniques du navigateur et adresse IP, traités par Cloudflare Turnstile. Durée : le temps de la vérification, aucune conservation de mon côté.",
           "Assurer le fonctionnement et la sécurité du serveur. Base légale : intérêt légitime à maintenir le service disponible et à détecter les abus (art. 6.1.f RGPD). Données : adresse IP, date et heure, page demandée, navigateur, code de réponse. Durée : 12 mois au maximum.",
+          "Compter les visites sans cookie ni identifiant durable, pour savoir quelles pages sont lues et d’où viennent les visiteurs. Base légale : intérêt légitime à mesurer la fréquentation du site (art. 6.1.f RGPD) ; ce comptage est dispensé de consentement parce qu’il se limite à cette finalité. Données : page vue, provenance, appareil, et une empreinte calculée chaque jour à partir de l’adresse IP et du navigateur, qui ne permet pas de vous suivre d’un jour à l’autre ni d’un site à l’autre. Durée : 13 mois au maximum. Vous pouvez vous y opposer en activant le signal « Ne pas suivre » ou Global Privacy Control de votre navigateur : le site n’envoie alors plus rien.",
           "Mesurer l’audience du site et comprendre ce qui vous a été utile. Base légale : votre consentement (art. 6.1.a RGPD), donné dans la bannière et retirable à tout moment. Données : pages vues, provenance, clics, progression, appareil, adresse IP. Cette adresse sert à situer la visite par pays, elle n’est jamais rapprochée de votre identité. Durée : 13 mois au maximum, conformément aux recommandations de la CNIL.",
           "Rejouer une navigation, sans identification nominative, pour repérer ce qui bloque. Base légale : votre consentement (art. 6.1.a RGPD), distinct du précédent. Données : parcours et interactions rattachés à un identifiant technique et non à votre nom, toute saisie étant masquée avant enregistrement. Durée : 1 mois.",
         ],
@@ -303,7 +304,7 @@ export const legalDocuments: readonly LegalDocument[] = [
         items: [
           "Hostinger International Ltd (Chypre) : hébergement du site, sur un serveur situé en France.",
           "Cal.com, Inc. (États-Unis) : prise de rendez-vous en ligne, quand vous réservez un créneau.",
-          "PostHog, Inc. (instance européenne) : mesure d’audience et enregistrement de session, uniquement après votre consentement. Les données restent hébergées dans l’Union européenne.",
+          "PostHog, Inc. (instance européenne) : comptage des visites sans cookie, et, uniquement après votre consentement, mesure d’audience et enregistrement de session. Les données restent hébergées dans l’Union européenne.",
           "Cloudflare, Inc. (États-Unis) : vérification anti-robot du formulaire (Turnstile).",
           "Plus Five Five, Inc., qui exploite Resend (États-Unis) : acheminement des e-mails déclenchés par le formulaire.",
           "Google Ireland Limited (Irlande) : messagerie professionnelle, où arrivent et sont archivés les messages que vous m’adressez.",
@@ -354,6 +355,7 @@ export const legalDocuments: readonly LegalDocument[] = [
         style: "unordered",
         items: [
           "Le cookie qui mémorise votre choix de consentement, six mois, pour ne pas vous reposer la question à chaque page. Sans lui, refuser ne servirait à rien.",
+          "PostHog, pour le comptage des visites sans cookie : aucun cookie ni stockage dans votre navigateur, seulement la page vue et la provenance. Le signal « Ne pas suivre » de votre navigateur le coupe.",
           "Cloudflare Turnstile, déposé au moment où vous commencez à remplir le formulaire, pour distinguer un humain d’un robot. La CNIL range cette finalité de sécurité parmi les traceurs exemptés de consentement : il ne sert ni à vous reconnaître d’un site à l’autre, ni à mesurer quoi que ce soit.",
         ],
       },
@@ -366,7 +368,7 @@ export const legalDocuments: readonly LegalDocument[] = [
         type: "list",
         style: "unordered",
         items: [
-          "PostHog, pour la mesure d’audience : rien n’est déposé ni envoyé tant que vous n’avez pas accepté.",
+          "PostHog, pour la mesure d’audience complète (clics, progression, identifiant de visite) : rien n’est déposé tant que vous n’avez pas accepté.",
           "PostHog, pour l’enregistrement de session : accepté séparément, et il dépend du précédent.",
         ],
       },

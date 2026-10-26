@@ -216,9 +216,15 @@ parcours-là, pas à faire des moyennes.
 
 ### Ce qui est garanti, et vérifié
 
-- **Aucun traceur avant le choix.** `posthog-js` est chargé par un `import()`
-  dynamique déclenché uniquement après acceptation. Vérifié dans l'onglet
-  réseau : zéro requête, zéro cookie, zéro entrée `localStorage` avant.
+- **Aucun traceur avant le choix, mais un comptage sans cookie** (depuis le
+  2026-10-26). Sans accord, ou tant que le visiteur n'a pas répondu, le SDK
+  tourne en `cookieless_mode: "on_reject"` : zéro cookie, zéro entrée
+  `localStorage`, et `filtreSansConsentement` ne laisse partir que
+  `$pageview` et `consent_updated`. Périmètre dispensé de
+  consentement par la CNIL (pages vues, provenance). Il exige le réglage
+  « Cookieless server hash mode » du projet PostHog, sinon ces visites sont
+  jetées à la réception. Raison : la mesure ne voyait que les visiteurs qui
+  acceptaient, et un prospect arrivé par une IA n'avait laissé aucune trace.
 - **Refuser est aussi simple qu'accepter.** Deux boutons de géométrie
   strictement identique (même chaîne de classes), tous deux en aplat plein
   fortement contrasté (blanc 20,6:1, volt 14,4:1), sur le PREMIER écran, avec
@@ -235,6 +241,8 @@ parcours-là, pas à faire des moyennes.
   Le focus n'est piégé que dans le panneau « Personnaliser », qui s'annonce
   alors `role="dialog" aria-modal`.
 - `respect_dnt: true` : le signal « Do Not Track » s'ajoute au consentement.
+  Sans consentement, « Do Not Track » ou Global Privacy Control coupent aussi
+  le comptage sans cookie : c'est le droit d'opposition annoncé dans la politique.
 
 ### Ce qui est stocké
 
@@ -335,8 +343,9 @@ Sur `localhost:3000`, onglet réseau filtré sur `ingest` :
 
 | Situation | Attendu |
 |---|---|
-| Aucun choix fait | 0 requête, 0 cookie `ph_`, 0 entrée `localStorage` `ph_` |
-| Après « Tout refuser » | idem, et le choix survit au rechargement |
+| Aucun choix fait | `POST /ingest/e` pour `$pageview` seulement, 0 cookie `ph_`, 0 entrée `localStorage` `ph_` |
+| Après « Tout refuser » | idem, plus `consent_updated`, et le choix survit au rechargement |
+| « Ne pas suivre » actif, sans accord | aucune requête `POST /ingest` |
 | Après « Tout accepter » | `GET /ingest/static/…`, `POST /ingest/flags`, `POST /ingest/e`, tous sur l'origine du site |
 | Après « Retirer mon consentement » | `eb-consent` effacé, cookies et entrées `ph_…` disparus |
 

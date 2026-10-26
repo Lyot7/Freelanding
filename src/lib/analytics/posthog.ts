@@ -2,19 +2,26 @@
  * PILOTAGE DU SDK PostHog — le seul endroit qui le charge, l'initialise et
  * l'arrête.
  *
- * PROPRIÉTÉ CENTRALE, ET C'EST ELLE QU'IL FAUT VÉRIFIER À CHAQUE RELECTURE :
- * `posthog-js` est chargé par un `import()` DYNAMIQUE, déclenché uniquement
- * depuis `startAnalytics()`, elle-même appelée uniquement après un consentement
- * explicite. Tant que le visiteur n'a pas accepté :
- *   - le module n'est pas exécuté, donc aucune minuterie, aucun écouteur,
- *     aucun cookie `ph_…`, aucune entrée `localStorage` de PostHog ;
- *   - aucune requête ne part vers `/ingest` ni vers PostHog.
- * Un simple `import posthog from "posthog-js"` en tête de fichier suffirait à
- * casser cette garantie, parce que le module s'initialise partiellement au
- * chargement. C'est la raison de la forme un peu lourde de ce fichier.
+ * DEUX RÉGIMES, ET C'EST EUX QU'IL FAUT VÉRIFIER À CHAQUE RELECTURE.
  *
- * Le second effet est un gain de poids : le SDK (~60 ko compressé) ne descend
- * jamais chez un visiteur qui refuse.
+ * 1. SANS CONSENTEMENT (visiteur qui refuse, ou qui n'a pas encore répondu) :
+ *    comptage sans cookie exempté de consentement. Le SDK tourne en
+ *    `cookieless_mode: "on_reject"` : aucun cookie `ph_…`, aucune entrée
+ *    `localStorage`, l'identité de visite est un hachage calculé par PostHog
+ *    sur ses serveurs et renouvelé chaque jour. `filtreSansConsentement` ne
+ *    laisse partir que les vues de page et la trace du choix : ni clics, ni
+ *    défilement, ni carte de chaleur, ni rejeu. Ce périmètre (pages vues,
+ *    provenance) est celui que la CNIL dispense de consentement.
+ *
+ * 2. AVEC CONSENTEMENT : mesure complète, cookies et rejeu selon les cases.
+ *
+ * Pourquoi ce comptage existe (2026-10-26) : un prospect arrivé par une IA
+ * n'avait laissé aucune trace, parce que la mesure ne voyait que les visiteurs
+ * qui acceptaient, soit quelques-uns par semaine. La provenance de chaque
+ * visite est ce qu'on cherche ; elle ne demande aucun identifiant durable.
+ *
+ * `posthog-js` reste chargé par un `import()` DYNAMIQUE : un import statique
+ * s'exécuterait au rendu serveur et avant que le choix soit lu.
  */
 import type { PostHog } from "posthog-js";
 
@@ -22,7 +29,6 @@ import {
   POSTHOG_KEY,
   POSTHOG_PROXY_PATH,
   POSTHOG_UI_HOST,
-  isAnalyticsConfigured,
 } from "./config";
 import { CONSENT_TTL_DAYS, type ConsentChoices } from "./consent";
 
@@ -30,8 +36,39 @@ type Properties = Record<string, unknown>;
 
 let client: PostHog | null = null;
 let loading: Promise<PostHog | null> | null = null;
-/** Vrai dès que `init()` a été appelé une fois sur le singleton du SDK. */
-let initialised = false;
+/** Vrai seulement quand le visiteur a accepté la mesure d'audience. */
+let consentGranted = false;
+
+/**
+ * Ce qui part SANS consentement, énuméré. Tout le reste est jeté avant l'envoi.
+ * `consent_updated` y figure pour connaître la part de refus, sans identifiant.
+ * `$pageleave` n'y est pas : il porte le temps de lecture et le défilement.
+ */
+const EVENEMENTS_SANS_CONSENTEMENT = new Set(["$pageview", "consent_updated"]);
+
+/**
+ * Droit d'opposition au comptage sans cookie : le signal « Ne pas suivre » ou
+ * Global Privacy Control du navigateur. Le SDK, lui, le traite comme un refus
+ * et compterait encore sans cookie ; c'est ici qu'il devient « rien du tout ».
+ */
+function oppositionSignalee(): boolean {
+  if (typeof window === "undefined") return false;
+  const nav = window.navigator as Navigator & { globalPrivacyControl?: unknown };
+  const win = window as Window & { doNotTrack?: unknown };
+  return (
+    nav.doNotTrack === "1" ||
+    win.doNotTrack === "1" ||
+    nav.globalPrivacyControl === true
+  );
+}
+
+export function filtreSansConsentement<T extends { event: string }>(
+  event: T | null,
+): T | null {
+  if (!event || consentGranted) return event;
+  if (oppositionSignalee()) return null;
+  return EVENEMENTS_SANS_CONSENTEMENT.has(event.event) ? event : null;
+}
 
 /*
  * ÉTAT « la mesure tourne », exposé comme un MAGASIN EXTERNE.
@@ -45,10 +82,37 @@ let initialised = false;
 let running = false;
 const listeners = new Set<() => void>();
 
+/*
+ * RÉGIME EN COURS, publié APRÈS la bascule du SDK. Les vues de page se
+ * remontent sur lui et non sur le choix lu dans le consentement : React lance
+ * l'effet de l'enfant avant celui du parent, une vue remontée sur le choix
+ * partirait donc avant `grantConsent`, encore filtrée.
+ */
+export type Regime = "sans-cookie" | "complet";
+let regime: Regime = "sans-cookie";
+
+function emit(): void {
+  for (const listener of listeners) listener();
+}
+
 function notify(next: boolean): void {
   if (running === next) return;
   running = next;
-  for (const listener of listeners) listener();
+  emit();
+}
+
+function setRegime(next: Regime): void {
+  if (regime === next) return;
+  regime = next;
+  emit();
+}
+
+export function getRegimeSnapshot(): Regime {
+  return regime;
+}
+
+export function getRegimeServerSnapshot(): Regime {
+  return "sans-cookie";
 }
 
 export function subscribeAnalytics(listener: () => void): () => void {
@@ -111,48 +175,40 @@ function sessionRecordingOptions() {
 }
 
 /**
- * Démarre la mesure. Idempotent : deux appels ne créent qu'une instance.
- * Retourne `null` si aucune clé n'est configurée — cas normal, pas une erreur.
+ * Démarre la mesure dans le régime qui correspond au choix, ou y bascule si
+ * elle tourne déjà. Idempotent. Retourne `null` si aucune clé n'est configurée
+ * — cas normal, pas une erreur.
  */
 export async function startAnalytics(
   choices: ConsentChoices,
+  /* Points d'injection des tests : le SDK réel ne tourne pas hors navigateur,
+     et la clé est figée au chargement de `config.ts`. */
+  charger: () => Promise<{ default: PostHog }> = () => import("posthog-js"),
+  cle: string = POSTHOG_KEY,
 ): Promise<PostHog | null> {
   if (typeof window === "undefined") return null;
-  if (!isAnalyticsConfigured()) return null;
-  if (!choices.analytics) return null;
+  if (cle === "") return null;
+
+  if (!choices.analytics) {
+    /* Refus ou révocation alors que la mesure complète tournait : on efface
+       ce qu'elle avait posé avant de repasser en comptage sans cookie. */
+    if (consentGranted) revokeConsent();
+    else purgePostHogStorage();
+  }
+  consentGranted = choices.analytics;
+
+  if (!consentGranted && oppositionSignalee()) return client;
 
   if (client) {
+    if (choices.analytics) grantConsent(client);
     setReplayEnabled(choices.replay);
     return client;
   }
   if (loading) return loading;
 
-  loading = import("posthog-js")
+  loading = charger()
     .then(({ default: posthog }) => {
-      /*
-       * REPRISE APRÈS UN REFUS, DANS LA MÊME PAGE.
-       *
-       * `posthog-js` est un SINGLETON : rappeler `init()` sur une instance déjà
-       * initialisée ne réapplique RIEN, le SDK se contente d'avertir. Or
-       * `stopAnalytics()` a coupé la persistance et posé l'exclusion. Sans ce
-       * chemin, le parcours « j'accepte, je révoque, je réaccepte » laissait un
-       * SDK vivant mais muet, sans le moindre message d'erreur.
-       */
-      if (initialised) {
-        posthog.set_config({
-          disable_persistence: false,
-          disable_cookie: false,
-          disable_session_recording: !choices.replay,
-        });
-        // `captureEventName: false` : un `$opt_in` automatique polluerait les
-        // entonnoirs avec un événement qui ne veut rien dire côté visiteur.
-        posthog.opt_in_capturing({ captureEventName: false });
-        client = posthog;
-        notify(true);
-        return posthog;
-      }
-
-      posthog.init(POSTHOG_KEY, {
+      posthog.init(cle, {
         /* Ingestion via le proxy same-origin (cf. `config.ts` et le rewrite de
            `next.config.ts`). L'hôte PostHog réel n'apparaît nulle part dans le
            navigateur. */
@@ -185,8 +241,9 @@ export async function startAnalytics(
         enable_heatmaps: true,
         capture_performance: { web_vitals: true },
 
-        /* Rejeu de session : monté ou non selon la SECONDE case. */
-        disable_session_recording: !choices.replay,
+        /* Rejeu de session : monté ou non selon la SECONDE case, et jamais
+           sans la première. */
+        disable_session_recording: !(consentGranted && choices.replay),
         session_recording: sessionRecordingOptions(),
 
         /* Aucun profil de personne tant que rien n'identifie le visiteur. Le
@@ -204,12 +261,20 @@ export async function startAnalytics(
            moins de code téléchargé, moins de surface. */
         disable_surveys: true,
         /* Signal « Do Not Track » du navigateur respecté : il ne remplace pas
-           le consentement, il s'y ajoute. */
+           le consentement, il s'y ajoute. Sans consentement, il coupe aussi
+           le comptage sans cookie (voir `oppositionSignalee`). */
         respect_dnt: true,
-        opt_out_capturing_by_default: false,
+        /* Sans réponse du visiteur, le SDK démarre « refusé », donc en
+           comptage sans cookie. Il ne passe aux cookies qu'au
+           consentement (`grantConsent`). Le réglage « cookieless server hash
+           mode » du projet PostHog doit être actif, sinon ces visites sont
+           jetées à la réception. */
+        opt_out_capturing_by_default: true,
+        cookieless_mode: "on_reject",
+        before_send: filtreSansConsentement,
       });
 
-      initialised = true;
+      if (consentGranted) grantConsent(posthog);
       client = posthog;
       notify(true);
       return posthog;
@@ -224,15 +289,27 @@ export async function startAnalytics(
   return loading;
 }
 
+/** Passe en mesure complète : cookies, identifiant de visite, rejeu permis. */
+function grantConsent(posthog: PostHog): void {
+  posthog.set_config({ disable_persistence: false, disable_cookie: false });
+  // `captureEventName: false` : un `$opt_in` automatique polluerait les
+  // entonnoirs avec un événement qui ne veut rien dire côté visiteur.
+  posthog.opt_in_capturing({ captureEventName: false });
+  setRegime("complet");
+}
+
 /**
- * Arrête et efface. Appelé sur un refus ou une révocation.
+ * Révocation : retour au comptage sans cookie, et effacement de ce que la mesure
+ * complète avait posé.
  *
- * `opt_out_capturing()` coupe l'émission, `reset(true)` jette l'identifiant
- * anonyme et les propriétés persistées. Les entrées `localStorage`/cookies de
- * PostHog qui subsisteraient sont retirées juste après, parce qu'une révocation
- * qui laisse le cookie en place n'est pas une révocation.
+ * `opt_out_capturing()` fait repasser le SDK sans cookie, `reset(true)` jette
+ * l'identifiant et les propriétés persistées. Les entrées `localStorage`/cookies
+ * de PostHog qui subsisteraient sont retirées juste après, parce qu'une
+ * révocation qui laisse le cookie en place n'est pas une révocation.
  */
-export function stopAnalytics(): void {
+function revokeConsent(): void {
+  consentGranted = false;
+  setRegime("sans-cookie");
   if (client) {
     try {
       client.stopSessionRecording();
@@ -249,9 +326,6 @@ export function stopAnalytics(): void {
       /* SDK à moitié initialisé : le nettoyage ci-dessous suffit. */
     }
   }
-  client = null;
-  loading = null;
-  notify(false);
   purgePostHogStorage();
 }
 
@@ -286,7 +360,7 @@ export function purgePostHogStorage(): void {
 export function setReplayEnabled(enabled: boolean): void {
   if (!client) return;
   try {
-    if (enabled) client.startSessionRecording();
+    if (enabled && consentGranted) client.startSessionRecording();
     else client.stopSessionRecording();
   } catch {
     /* rien à faire : le rejeu n'est pas critique */
@@ -329,7 +403,7 @@ export function identifyVisitor(
   email: string,
   properties?: Properties,
 ): void {
-  if (!client) return;
+  if (!client || !consentGranted) return;
   const normalised = email.trim().toLowerCase();
   if (normalised === "") return;
   try {

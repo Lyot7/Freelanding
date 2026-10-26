@@ -8,10 +8,10 @@ import {
   capture,
   getAnalyticsServerSnapshot,
   getAnalyticsSnapshot,
-  purgePostHogStorage,
+  getRegimeServerSnapshot,
+  getRegimeSnapshot,
   setReplayEnabled,
   startAnalytics,
-  stopAnalytics,
   subscribeAnalytics,
 } from "@/lib/analytics/posthog";
 import { GlobalAnalytics } from "./GlobalAnalytics";
@@ -45,20 +45,17 @@ export function AnalyticsRuntime() {
     getAnalyticsSnapshot,
     getAnalyticsServerSnapshot,
   );
+  const regime = useSyncExternalStore(
+    subscribeAnalytics,
+    getRegimeSnapshot,
+    getRegimeServerSnapshot,
+  );
   const lastReported = useRef<number | null>(null);
 
   useEffect(() => {
     if (!ready) return;
-
-    if (!analyticsAllowed) {
-      stopAnalytics();
-      /* Purge de secours : le choix a pu être pris sur une autre page ou dans
-         un autre onglet, alors que ce runtime-ci n'avait jamais rien démarré.
-         `stopAnalytics` ne nettoierait alors rien. */
-      purgePostHogStorage();
-      return;
-    }
-
+    /* Toujours démarrée : sans accord, en comptage sans cookie ;
+       `startAnalytics` bascule de régime et purge sur un refus. */
     void startAnalytics({ analytics: analyticsAllowed, replay: replayAllowed });
   }, [analyticsAllowed, ready, replayAllowed]);
 
@@ -69,12 +66,18 @@ export function AnalyticsRuntime() {
     setReplayEnabled(replayAllowed);
   }, [replayAllowed, started]);
 
-  /* Trace du choix, émise UNE FOIS par décision et seulement quand la mesure
-     est autorisée. Un refus ne produit aucun événement : mesurer les refus
-     supposerait de mesurer sans consentement. */
+  /* Trace du choix, émise UNE FOIS par décision. Un refus part aussi, en
+     comptage sans cookie : c'est ce qui donne la part d'acceptation. */
   useEffect(() => {
     if (!started || !record) return;
     if (lastReported.current === record.decidedAt) return;
+    /* Choix fait sur une page précédente : déjà compté là-bas. Sans cette
+       garde, chaque rechargement renverrait la décision et la part
+       d'acceptation compterait des pages, pas des visiteurs. */
+    if (record.decidedAt < performance.timeOrigin) {
+      lastReported.current = record.decidedAt;
+      return;
+    }
     lastReported.current = record.decidedAt;
     capture(ANALYTICS_EVENTS.consentUpdated, {
       analytics: analyticsAllowed,
@@ -85,7 +88,11 @@ export function AnalyticsRuntime() {
 
   return (
     <>
-      <PageAnalytics enabled={started} />
+      {/* Remontée au changement de régime : un visiteur qui accepte sur sa
+          page d'arrivée (là où s'affiche le bandeau) voit sa vue réémise sous
+          la mesure complète, sinon les entonnoirs perdraient leur entrée. La
+          clé suit le régime publié par le SDK, pas le choix : voir `Regime`. */}
+      <PageAnalytics key={regime} enabled={started} />
       <GlobalAnalytics enabled={started} />
     </>
   );
