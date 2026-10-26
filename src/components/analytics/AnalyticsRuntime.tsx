@@ -8,10 +8,8 @@ import {
   capture,
   getAnalyticsServerSnapshot,
   getAnalyticsSnapshot,
-  purgePostHogStorage,
   setReplayEnabled,
   startAnalytics,
-  stopAnalytics,
   subscribeAnalytics,
 } from "@/lib/analytics/posthog";
 import { GlobalAnalytics } from "./GlobalAnalytics";
@@ -49,16 +47,8 @@ export function AnalyticsRuntime() {
 
   useEffect(() => {
     if (!ready) return;
-
-    if (!analyticsAllowed) {
-      stopAnalytics();
-      /* Purge de secours : le choix a pu être pris sur une autre page ou dans
-         un autre onglet, alors que ce runtime-ci n'avait jamais rien démarré.
-         `stopAnalytics` ne nettoierait alors rien. */
-      purgePostHogStorage();
-      return;
-    }
-
+    /* Toujours démarrée : sans accord, en comptage sans cookie sans cookie ;
+       `startAnalytics` bascule de régime et purge sur un refus. */
     void startAnalytics({ analytics: analyticsAllowed, replay: replayAllowed });
   }, [analyticsAllowed, ready, replayAllowed]);
 
@@ -69,9 +59,8 @@ export function AnalyticsRuntime() {
     setReplayEnabled(replayAllowed);
   }, [replayAllowed, started]);
 
-  /* Trace du choix, émise UNE FOIS par décision et seulement quand la mesure
-     est autorisée. Un refus ne produit aucun événement : mesurer les refus
-     supposerait de mesurer sans consentement. */
+  /* Trace du choix, émise UNE FOIS par décision. Un refus part aussi, en
+     comptage sans cookie : c'est ce qui donne la part d'acceptation. */
   useEffect(() => {
     if (!started || !record) return;
     if (lastReported.current === record.decidedAt) return;

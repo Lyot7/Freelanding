@@ -383,7 +383,7 @@ export function ConsentBanner() {
             /* Même matière que le panneau du menu flottant : fond très sombre
                translucide, flou d'arrière-plan, filet 1px en pseudo-élément
                (jamais un `border`, qui décalerait la boîte), angles vifs. */
-            className="pointer-events-auto relative w-full max-w-[460px] overflow-hidden bg-[rgba(23,23,23,0.94)] [backdrop-filter:blur(9px)] before:pointer-events-none before:absolute before:inset-0 before:z-[2] before:border before:border-[rgba(255,255,255,0.12)] before:content-['']"
+            className="pointer-events-auto relative w-full max-w-[400px] overflow-hidden bg-[rgba(23,23,23,0.94)] [backdrop-filter:blur(9px)] before:pointer-events-none before:absolute before:inset-0 before:z-[2] before:border before:border-[rgba(255,255,255,0.12)] before:content-['']"
           >
             {/* HAUTEUR BORNÉE, avec défilement interne. Le panneau déplié
                 mesure près de 700 px : sur un téléphone court (360 × 640) il
@@ -391,20 +391,29 @@ export function ConsentBanner() {
                 inatteignables — c'est-à-dire un refus impossible. La borne est
                 calculée sur `svh` et non `vh` : sur iOS, `vh` compte la barre
                 d'adresse rétractée et surestime la place disponible. */}
-            <div className="relative z-[1] flex max-h-[calc(calc(100svh/var(--zoom-ecran,1))-120px)] flex-col gap-[16px] overflow-y-auto p-[20px]">
+            <div className="relative z-[1] flex max-h-[calc(calc(100svh/var(--zoom-ecran,1))-120px)] flex-col gap-[12px] overflow-y-auto p-[16px]">
+              {/* DISCRET AU PREMIER ÉCRAN : une phrase et les deux boutons. Le
+                  titre reste lu par les lecteurs d'écran ; il ne s'affiche
+                  qu'une fois le panneau déplié, où il sert de repère. */}
               <div className="flex flex-col gap-[8px]">
-                <p className="whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-white/60">
-                  {consentCopy.eyebrow}
-                </p>
+                {panelOpen ? (
+                  <p className="whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-white/60">
+                    {consentCopy.eyebrow}
+                  </p>
+                ) : null}
                 <h2
                   id={titleId}
-                  className="accent-room text-[18px] font-semibold uppercase leading-[1.05] tracking-[-0.03em] text-foreground"
+                  className={
+                    panelOpen
+                      ? "accent-room text-[18px] font-semibold uppercase leading-[1.05] tracking-[-0.03em] text-foreground"
+                      : "sr-only"
+                  }
                 >
                   {consentCopy.title}
                 </h2>
                 <p
                   id={descriptionId}
-                  className="text-[13px] font-medium leading-[1.4] tracking-[-0.01em] text-white/70"
+                  className="text-[12px] font-medium leading-[1.4] tracking-[-0.01em] text-white/70"
                 >
                   {consentCopy.body}{" "}
                   <Link
