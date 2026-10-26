@@ -346,7 +346,7 @@ export function WorkCard({ work, index }: { work: WorkItem; index?: number }) {
                 disait déjà — elle n'était simplement affichée nulle part.
                 Le repli garde le libellé générique pour une carte sans
                 `client` : cette colonne ne doit jamais rendre du vide. */}
-            <p className={TXT}>{work.client ?? uiLabels.work.portfolioLabel}</p>
+            <p className={TXT}>{work.etiquette ?? work.client ?? uiLabels.work.portfolioLabel}</p>
           </div>
         </div>
       </div>
