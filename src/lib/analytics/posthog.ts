@@ -83,10 +83,37 @@ export function filtreSansConsentement<T extends { event: string }>(
 let running = false;
 const listeners = new Set<() => void>();
 
+/*
+ * RÉGIME EN COURS, publié APRÈS la bascule du SDK. Les vues de page se
+ * remontent sur lui et non sur le choix lu dans le consentement : React lance
+ * l'effet de l'enfant avant celui du parent, une vue remontée sur le choix
+ * partirait donc avant `grantConsent`, encore filtrée.
+ */
+export type Regime = "sans-cookie" | "complet";
+let regime: Regime = "sans-cookie";
+
+function emit(): void {
+  for (const listener of listeners) listener();
+}
+
 function notify(next: boolean): void {
   if (running === next) return;
   running = next;
-  for (const listener of listeners) listener();
+  emit();
+}
+
+function setRegime(next: Regime): void {
+  if (regime === next) return;
+  regime = next;
+  emit();
+}
+
+export function getRegimeSnapshot(): Regime {
+  return regime;
+}
+
+export function getRegimeServerSnapshot(): Regime {
+  return "sans-cookie";
 }
 
 export function subscribeAnalytics(listener: () => void): () => void {
@@ -265,6 +292,7 @@ function grantConsent(posthog: PostHog): void {
   // `captureEventName: false` : un `$opt_in` automatique polluerait les
   // entonnoirs avec un événement qui ne veut rien dire côté visiteur.
   posthog.opt_in_capturing({ captureEventName: false });
+  setRegime("complet");
 }
 
 /**
@@ -278,6 +306,7 @@ function grantConsent(posthog: PostHog): void {
  */
 function revokeConsent(): void {
   consentGranted = false;
+  setRegime("sans-cookie");
   if (client) {
     try {
       client.stopSessionRecording();

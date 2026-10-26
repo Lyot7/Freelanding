@@ -220,7 +220,7 @@ parcours-là, pas à faire des moyennes.
   2026-10-26). Sans accord, ou tant que le visiteur n'a pas répondu, le SDK
   tourne en `cookieless_mode: "on_reject"` : zéro cookie, zéro entrée
   `localStorage`, et `filtreSansConsentement` ne laisse partir que
-  `$pageview`, `$pageleave` et `consent_updated`. Périmètre dispensé de
+  `$pageview` et `consent_updated`. Périmètre dispensé de
   consentement par la CNIL (pages vues, provenance). Il exige le réglage
   « Cookieless server hash mode » du projet PostHog, sinon ces visites sont
   jetées à la réception. Raison : la mesure ne voyait que les visiteurs qui

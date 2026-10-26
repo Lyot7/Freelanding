@@ -8,6 +8,8 @@ import {
   capture,
   getAnalyticsServerSnapshot,
   getAnalyticsSnapshot,
+  getRegimeServerSnapshot,
+  getRegimeSnapshot,
   setReplayEnabled,
   startAnalytics,
   subscribeAnalytics,
@@ -42,6 +44,11 @@ export function AnalyticsRuntime() {
     subscribeAnalytics,
     getAnalyticsSnapshot,
     getAnalyticsServerSnapshot,
+  );
+  const regime = useSyncExternalStore(
+    subscribeAnalytics,
+    getRegimeSnapshot,
+    getRegimeServerSnapshot,
   );
   const lastReported = useRef<number | null>(null);
 
@@ -83,11 +90,9 @@ export function AnalyticsRuntime() {
     <>
       {/* Remontée au changement de régime : un visiteur qui accepte sur sa
           page d'arrivée (là où s'affiche le bandeau) voit sa vue réémise sous
-          la mesure complète, sinon les entonnoirs perdraient leur entrée. */}
-      <PageAnalytics
-        key={analyticsAllowed ? "complet" : "sans-cookie"}
-        enabled={started}
-      />
+          la mesure complète, sinon les entonnoirs perdraient leur entrée. La
+          clé suit le régime publié par le SDK, pas le choix : voir `Regime`. */}
+      <PageAnalytics key={regime} enabled={started} />
       <GlobalAnalytics enabled={started} />
     </>
   );
