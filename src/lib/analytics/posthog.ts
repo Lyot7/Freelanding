@@ -182,9 +182,13 @@ function sessionRecordingOptions() {
  */
 export async function startAnalytics(
   choices: ConsentChoices,
+  /* Points d'injection des tests : le SDK réel ne tourne pas hors navigateur,
+     et la clé est figée au chargement de `config.ts`. */
+  charger: () => Promise<{ default: PostHog }> = () => import("posthog-js"),
+  cle: string = isAnalyticsConfigured() ? POSTHOG_KEY : "",
 ): Promise<PostHog | null> {
   if (typeof window === "undefined") return null;
-  if (!isAnalyticsConfigured()) return null;
+  if (cle === "") return null;
 
   if (!choices.analytics) {
     /* Refus ou révocation alors que la mesure complète tournait : on efface
@@ -203,9 +207,9 @@ export async function startAnalytics(
   }
   if (loading) return loading;
 
-  loading = import("posthog-js")
+  loading = charger()
     .then(({ default: posthog }) => {
-      posthog.init(POSTHOG_KEY, {
+      posthog.init(cle, {
         /* Ingestion via le proxy same-origin (cf. `config.ts` et le rewrite de
            `next.config.ts`). L'hôte PostHog réel n'apparaît nulle part dans le
            navigateur. */
@@ -262,7 +266,7 @@ export async function startAnalytics(
            le comptage sans cookie (voir `oppositionSignalee`). */
         respect_dnt: true,
         /* Sans réponse du visiteur, le SDK démarre « refusé », donc en
-           comptage sans cookie sans cookie. Il ne passe aux cookies qu'au
+           comptage sans cookie. Il ne passe aux cookies qu'au
            consentement (`grantConsent`). Le réglage « cookieless server hash
            mode » du projet PostHog doit être actif, sinon ces visites sont
            jetées à la réception. */

@@ -54,7 +54,7 @@ export function AnalyticsRuntime() {
 
   useEffect(() => {
     if (!ready) return;
-    /* Toujours démarrée : sans accord, en comptage sans cookie sans cookie ;
+    /* Toujours démarrée : sans accord, en comptage sans cookie ;
        `startAnalytics` bascule de régime et purge sur un refus. */
     void startAnalytics({ analytics: analyticsAllowed, replay: replayAllowed });
   }, [analyticsAllowed, ready, replayAllowed]);
