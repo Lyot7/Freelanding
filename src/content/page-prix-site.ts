@@ -320,7 +320,7 @@ export const pagePrixSite: PagePrixSite = {
       {
         question: "Puis-je payer mon site en plusieurs fois ?",
         answer:
-          "Oui, en 3 fois : 40 % à la signature du devis, 30 % à mi-parcours et 30 % à la livraison. Les montants et les dates sont écrits dans le devis.",
+          "Oui. Le devis fixe un échéancier étalé jusqu’à la livraison, avec ses montants et ses dates : vous ne payez jamais tout d’avance.",
       },
       {
         question: "Combien coûte la refonte d’un site existant ?",

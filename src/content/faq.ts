@@ -81,15 +81,17 @@ import type { FaqItem } from "@/lib/content/types";
 export const faqItems: FaqItem[] = [
   {
     question: "Combien coûte un projet, et comment c’est facturé ?",
-    /* Les planchers sont lus dans `offre.ts`. Les 40 / 30 / 30 de
-       l'échéancier restent des pourcentages, pas des montants.
+    /* Les planchers sont lus dans `offre.ts`. L'échéancier se dit sans
+       ses pourcentages depuis le 2026-10-26, décision d'Eliott : un
+       paiement en trois fois affiché devient la norme attendue, alors
+       qu'Eliott le propose lui-même au devis. Les CGV gardent le défaut.
 
        LE REPÈRE D'AGENCE (2026-10-15) vient lui aussi d'`offre.ts`, avec sa
        source et sa date. Depuis le 2026-10-16, il compare à livrable égal
        (un site vitrine soigné) et non plus mon plancher à la médiane des
        agences, décision d'Eliott. Une réponse de FAQ n'a pas de champ de lien : le
        lien vers la source est posé sur `/services/site-vitrine/prix`. */
-    answer: `Un site démarre à ${prixPlancher(prestation("vitrine"))} HT, une solution métier à ${prixPlancher(prestation("logiciel"))} HT. Un site vitrine soigné, design et ergonomie compris, se facture ${euros(repereAgenceSite.soigneMin)} à ${euros(repereAgenceSite.soigneMax)} en agence selon ${repereAgenceSite.source.nom} (${repereAgenceSite.source.releve}). Le mien comprend la même chose et coûte moins cher, parce que je conçois et je code moi-même, sans chef de projet ni structure à payer. Au-delà du plancher, le prix dépend de votre projet : le nombre de pages ou de modules, les outils à relier, la reprise de vos données. Je fixe le montant au devis, avant de commencer, et il ne bouge plus. Vous versez 40 % à la signature, 30 % à mi-parcours et 30 % à la livraison.`,
+    answer: `Un site démarre à ${prixPlancher(prestation("vitrine"))} HT, une solution métier à ${prixPlancher(prestation("logiciel"))} HT. Un site vitrine soigné, design et ergonomie compris, se facture ${euros(repereAgenceSite.soigneMin)} à ${euros(repereAgenceSite.soigneMax)} en agence selon ${repereAgenceSite.source.nom} (${repereAgenceSite.source.releve}). Le mien comprend la même chose et coûte moins cher, parce que je conçois et je code moi-même, sans chef de projet ni structure à payer. Au-delà du plancher, le prix dépend de votre projet : le nombre de pages ou de modules, les outils à relier, la reprise de vos données. Je fixe le montant au devis, avant de commencer, et il ne bouge plus. Vous le réglez selon un échéancier écrit au devis et étalé jusqu’à la livraison : vous ne payez jamais tout d’avance.`,
   },
   {
     question: "Combien de temps ça prend ?",
