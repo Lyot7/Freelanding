@@ -29,6 +29,8 @@
  * une règle. Voir `src/lib/analytics/posthog.ts`.
  */
 
+import { adresseAppelante } from "@/lib/contact/rate-limit";
+
 const INGESTION = (process.env.NEXT_PUBLIC_POSTHOG_HOST ?? "").trim()
   || "https://eu.i.posthog.com";
 
@@ -84,6 +86,14 @@ async function relayer(requete: Request, chemin: string[]): Promise<Response> {
     const valeur = requete.headers.get(nom);
     if (valeur) entetes.set(nom, valeur);
   }
+  /* L'ADRESSE DU VISITEUR, et elle seule. Sans elle, PostHog voit celle du
+     serveur : la géolocalisation devient celle du VPS, et le comptage sans
+     cookie, qui identifie la visite par un hachage de l'adresse et du
+     navigateur, confond tous les visiteurs d'un même navigateur. On relaie le
+     premier élément de `x-forwarded-for`, jamais la liste : les autres
+     `x-forwarded-*` faisaient échouer l'appel sortant (voir plus haut). */
+  const adresse = adresseAppelante(requete.headers);
+  if (adresse !== "sans-adresse") entetes.set("x-forwarded-for", adresse);
 
   try {
     const reponse = await fetch(destination, {

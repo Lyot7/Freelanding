@@ -18,8 +18,10 @@
 export const consentCopy = {
   eyebrow: "Confidentialité",
   title: "Mesure d’audience",
-  body: "Sans votre accord, je compte seulement les visites, sans cookie. Avec, je mesure aussi ce qui vous a été utile, via PostHog hébergé dans l’Union européenne. Détails dans la",
+  body: "Sans votre accord, je compte seulement les visites, sans cookie. Avec, je mesure aussi ce qui vous a servi.",
   policyLabel: "politique de confidentialité",
+  /** Lien court de la barre fermée, suivi de « Personnaliser ». */
+  policyShort: "Détails",
   policyHref: "/legal/politique-de-confidentialite",
 
   acceptAll: "Tout accepter",

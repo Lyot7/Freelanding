@@ -43,12 +43,9 @@ let consentGranted = false;
 /**
  * Ce qui part SANS consentement, énuméré. Tout le reste est jeté avant l'envoi.
  * `consent_updated` y figure pour connaître la part de refus, sans identifiant.
+ * `$pageleave` n'y est pas : il porte le temps de lecture et le défilement.
  */
-const EVENEMENTS_SANS_CONSENTEMENT = new Set([
-  "$pageview",
-  "$pageleave",
-  "consent_updated",
-]);
+const EVENEMENTS_SANS_CONSENTEMENT = new Set(["$pageview", "consent_updated"]);
 
 /**
  * Droit d'opposition au comptage sans cookie : le signal « Ne pas suivre » ou
@@ -56,6 +53,7 @@ const EVENEMENTS_SANS_CONSENTEMENT = new Set([
  * et compterait encore sans cookie ; c'est ici qu'il devient « rien du tout ».
  */
 function oppositionSignalee(): boolean {
+  if (typeof window === "undefined") return false;
   const nav = window.navigator as Navigator & { globalPrivacyControl?: unknown };
   const win = window as Window & { doNotTrack?: unknown };
   return (
@@ -65,7 +63,7 @@ function oppositionSignalee(): boolean {
   );
 }
 
-function filtreSansConsentement<T extends { event: string }>(
+export function filtreSansConsentement<T extends { event: string }>(
   event: T | null,
 ): T | null {
   if (!event || consentGranted) return event;

@@ -331,9 +331,13 @@ export function ConsentBanner() {
      Écrite une fois, elle ne peut pas diverger — c'est ce qui garantit que le
      refus ne se dégrade pas au fil des retouches. */
   const decisionButton =
-    "flex min-h-[44px] flex-1 items-center justify-center rounded-none px-[16px] " +
+    "flex min-h-[40px] flex-1 items-center justify-center rounded-none px-[16px] " +
     "text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] " +
     "transition-opacity duration-200 hover:opacity-85 motion-reduce:transition-none";
+
+  const inlineLink =
+    "text-foreground underline decoration-white/30 underline-offset-[3px] " +
+    "transition-colors duration-200 hover:text-accent motion-reduce:transition-none";
 
   const linkButton =
     "inline-flex min-h-[44px] items-center whitespace-pre text-[12px] font-medium uppercase " +
@@ -383,7 +387,7 @@ export function ConsentBanner() {
             /* Même matière que le panneau du menu flottant : fond très sombre
                translucide, flou d'arrière-plan, filet 1px en pseudo-élément
                (jamais un `border`, qui décalerait la boîte), angles vifs. */
-            className="pointer-events-auto relative w-full max-w-[400px] overflow-hidden bg-[rgba(23,23,23,0.94)] [backdrop-filter:blur(9px)] before:pointer-events-none before:absolute before:inset-0 before:z-[2] before:border before:border-[rgba(255,255,255,0.12)] before:content-['']"
+            className="pointer-events-auto relative w-full max-w-[460px] overflow-hidden desktop:max-w-[min(520px,calc(50vw-211px))] bg-[rgba(23,23,23,0.94)] [backdrop-filter:blur(9px)] before:pointer-events-none before:absolute before:inset-0 before:z-[2] before:border before:border-[rgba(255,255,255,0.12)] before:content-['']"
           >
             {/* HAUTEUR BORNÉE, avec défilement interne. Le panneau déplié
                 mesure près de 700 px : sur un téléphone court (360 × 640) il
@@ -391,8 +395,11 @@ export function ConsentBanner() {
                 inatteignables — c'est-à-dire un refus impossible. La borne est
                 calculée sur `svh` et non `vh` : sur iOS, `vh` compte la barre
                 d'adresse rétractée et surestime la place disponible. */}
-            <div className="relative z-[1] flex max-h-[calc(calc(100svh/var(--zoom-ecran,1))-120px)] flex-col gap-[12px] overflow-y-auto p-[16px]">
-              {/* DISCRET AU PREMIER ÉCRAN : une phrase et les deux boutons. Le
+            <div className="relative z-[1] flex max-h-[calc(calc(100svh/var(--zoom-ecran,1))-120px)] flex-col gap-[10px] overflow-y-auto p-[12px]">
+              {/* BARRE FINE AU PREMIER ÉCRAN : une phrase, ses deux liens, et
+                  les deux boutons. Mesuré le 2026-10-26 sur la prod : l'ancienne
+                  carte était le premier obstacle cité par 60 visiteurs simulés
+                  sur 85 et masquait l'offre du haut de page sur mobile. Le
                   titre reste lu par les lecteurs d'écran ; il ne s'affiche
                   qu'une fois le panneau déplié, où il sert de repère. */}
               <div className="flex flex-col gap-[8px]">
@@ -418,11 +425,19 @@ export function ConsentBanner() {
                   {consentCopy.body}{" "}
                   <Link
                     href={consentCopy.policyHref}
-                    className="text-foreground underline decoration-white/30 underline-offset-[3px] transition-colors duration-200 hover:text-accent motion-reduce:transition-none"
+                    className={inlineLink}
                   >
-                    {consentCopy.policyLabel}
+                    {panelOpen ? consentCopy.policyLabel : consentCopy.policyShort}
                   </Link>
-                  .
+                  {panelOpen ? "." : null}
+                  {panelOpen ? null : (
+                    <>
+                      {" "}
+                      <button type="button" onClick={openPanel} className={`${inlineLink} cursor-pointer`}>
+                        {consentCopy.customise}
+                      </button>
+                    </>
+                  )}
                 </p>
               </div>
 
@@ -459,23 +474,25 @@ export function ConsentBanner() {
                 </button>
               </div>
 
-              <div className="flex flex-row flex-wrap items-center justify-between gap-x-[16px]">
-                {panelOpen ? (
-                  <button type="button" onClick={closePanel} className={linkButton}>
-                    {hasDecision ? consentCopy.close : consentCopy.back}
-                  </button>
-                ) : (
-                  <button type="button" onClick={openPanel} className={linkButton}>
-                    {consentCopy.customise}
-                  </button>
-                )}
+              {panelOpen || hasDecision ? (
+                <div className="flex flex-row flex-wrap items-center justify-between gap-x-[16px]">
+                  {panelOpen ? (
+                    <button type="button" onClick={closePanel} className={linkButton}>
+                      {hasDecision ? consentCopy.close : consentCopy.back}
+                    </button>
+                  ) : (
+                    <button type="button" onClick={openPanel} className={linkButton}>
+                      {consentCopy.customise}
+                    </button>
+                  )}
 
-                {hasDecision ? (
-                  <button type="button" onClick={revoke} className={linkButton}>
-                    {consentCopy.revoke}
-                  </button>
-                ) : null}
-              </div>
+                  {hasDecision ? (
+                    <button type="button" onClick={revoke} className={linkButton}>
+                      {consentCopy.revoke}
+                    </button>
+                  ) : null}
+                </div>
+              ) : null}
             </div>
           </div>
         </motion.div>

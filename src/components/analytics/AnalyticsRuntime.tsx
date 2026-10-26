@@ -64,6 +64,13 @@ export function AnalyticsRuntime() {
   useEffect(() => {
     if (!started || !record) return;
     if (lastReported.current === record.decidedAt) return;
+    /* Choix fait sur une page précédente : déjà compté là-bas. Sans cette
+       garde, chaque rechargement renverrait la décision et la part
+       d'acceptation compterait des pages, pas des visiteurs. */
+    if (record.decidedAt < performance.timeOrigin) {
+      lastReported.current = record.decidedAt;
+      return;
+    }
     lastReported.current = record.decidedAt;
     capture(ANALYTICS_EVENTS.consentUpdated, {
       analytics: analyticsAllowed,
@@ -74,7 +81,13 @@ export function AnalyticsRuntime() {
 
   return (
     <>
-      <PageAnalytics enabled={started} />
+      {/* Remontée au changement de régime : un visiteur qui accepte sur sa
+          page d'arrivée (là où s'affiche le bandeau) voit sa vue réémise sous
+          la mesure complète, sinon les entonnoirs perdraient leur entrée. */}
+      <PageAnalytics
+        key={analyticsAllowed ? "complet" : "sans-cookie"}
+        enabled={started}
+      />
       <GlobalAnalytics enabled={started} />
     </>
   );
