@@ -341,6 +341,14 @@ export interface Metric {
 
 export interface WorkItem extends SluggedContent {
   title: string;
+  /**
+   * Étiquette de la carte d'accueil : le type de projet, son cadre et, quand
+   * il existe, son résultat. Décision d'Eliott du 2026-10-26, après le test
+   * « visiteurs » : le nom du client seul ne disait ni ce qui avait été
+   * construit ni que le site fait aussi du logiciel. Absente, la carte
+   * retombe sur `client`.
+   */
+  etiquette?: string;
   client?: string;
   /**
    * Libellé de la ligne `client` de la fiche.

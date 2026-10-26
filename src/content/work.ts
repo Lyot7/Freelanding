@@ -159,6 +159,7 @@ export const workItems: WorkItem[] = [
        ne se replie pas (`white-space: pre`) : à 390 il reste environ 300px
        après le libellé, soit une quarantaine de caractères. « Projet monté en
        propre » en fait 22. */
+    etiquette: "Marketplace sur mesure · projet en propre",
     client: "Projet monté en propre",
     year: "2026",
     role: "Conception, design et développement",
@@ -273,6 +274,7 @@ export const workItems: WorkItem[] = [
      * de contrat et faux de deux ans. C'est cette date qui devait être corrigée,
      * pas le silence sur le contrat.
      */
+    etiquette: "Parcours B2B · Würth France · −92 % d’erreurs",
     client: "Würth France",
     clientKind: "employer",
     year: "2024",
@@ -581,6 +583,7 @@ export const workItems: WorkItem[] = [
        commande ; « WORKSHOP D'ÉCOLE » dit d'où vient le projet, ce qui est la
        seule information dont le lecteur a besoin à cet endroit. Le détail est
        dans le chapô. */
+    etiquette: "Page produit 3D · workshop d’école",
     client: "Workshop d’école",
     year: "2026",
     role: "Design et développement",

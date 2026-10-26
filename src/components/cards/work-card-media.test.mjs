@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test";
 
 import { workItems } from "../../content/work";
-import { getWorkCardMedia } from "./work-card-media";
+import { getWorkCardLabel, getWorkCardMedia } from "./work-card-media";
 
 describe("getWorkCardMedia", () => {
   it("sert le plateau 3D et son affiche quand le projet en a un", () => {
@@ -45,5 +45,22 @@ describe("getWorkCardMedia", () => {
       src: "/work/kpsull/demo.mp4",
       poster: kpsull.cover,
     });
+  });
+});
+
+describe("getWorkCardLabel", () => {
+  it("affiche l'étiquette de chaque réalisation, qui tient sur une ligne à 390", () => {
+    // Le libellé est en `white-space: pre` : au-delà d'environ 45 caractères,
+    // il déborde de l'écran mobile au lieu de passer à la ligne.
+    for (const work of workItems) {
+      const label = getWorkCardLabel(work, "Portfolio");
+      expect(label).toBe(work.etiquette);
+      expect(label.length).toBeLessThanOrEqual(45);
+    }
+  });
+
+  it("retombe sur le client, puis sur le libellé générique", () => {
+    expect(getWorkCardLabel({ client: "Würth France" }, "Portfolio")).toBe("Würth France");
+    expect(getWorkCardLabel({}, "Portfolio")).toBe("Portfolio");
   });
 });
