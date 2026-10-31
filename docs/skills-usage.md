@@ -47,6 +47,21 @@ pour ne pas multiplier les contextes ; `visiteurs` fait ensuite un jugement ext�
 | Réponse à l'appui | `active:translate-y-[1px]` en 150 ms sur chaque ligne. |
 | Survol sur tactile | Variante `hover:` de Tailwind 4, déjà limitée aux pointeurs qui survolent. Aucune animation ajoutée au chargement : la liste se revoit à chaque visite. |
 
+## visiteurs (30 visiteurs simulés, `--rapide`, deux passages en ligne)
+
+| Chiffre | Premier passage | Après corrections |
+| --- | --- | --- |
+| Compris en 5 s | 97 % | 90 % |
+| Restent | 87 % | 90 % |
+| Trouvent le bouton | 50 % | 60 % |
+| Passeraient à l'action, cible | 17 % | 22 % |
+
+Corrigé : métiers nommés au premier écran, lien vers l'offre à côté du bouton,
+« il vous appartient » à la place de « sans agence » (lu comme un discours de
+concurrent), bandeau cookies raccourci. Écart sur 30 visiteurs : indicatif, pas une mesure.
+Faux signaux écartés : contraste du bouton volt (texte sombre sur volt, l'outil lit
+mal les deux couches), lien La Fabrique du Net (403 aux robots seulement).
+
 ---
 
 # Usage des skills design — refonte du 2026-10-15
