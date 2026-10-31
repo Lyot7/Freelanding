@@ -161,7 +161,7 @@ describe("la page par métier en aperçu", () => {
     const lu = apercu({ corps: copie, article: { kind: "metier", slug: "copie" } });
     const rendu = pageDApercu(lu, "2026-10-15");
     expect(rendu.motifs.join()).toContain(`trop proche de ${sansDate.slug}`);
-    expect(rendu.visuel.src).toStartWith("data:image/svg+xml;base64,");
+    expect(rendu.visuel.src).toMatch(/^data:image\/svg\+xml;base64,/);
   });
 
   it("par défaut elle se compare aux entrées du fichier, sans se compter elle-même", () => {
@@ -175,5 +175,11 @@ describe("la page par métier en aperçu", () => {
     const sansFaq = JSON.stringify({ ...sansDate, faq: null });
     expect(pageDApercu(apercu({ corps: sansFaq }), "2026-10-15").illisible).toContain("faq invalide");
     expect(pageDApercu(apercu({ article: { kind: "metier", slug: "autre" } }), "2026-10-15").illisible).toContain("différent");
+    const panne = {
+      get length() {
+        throw "texte brut";
+      },
+    };
+    expect(pageDApercu(apercu(), "2026-10-15", panne).illisible).toBe("texte brut");
   });
 });
