@@ -48,6 +48,7 @@ export async function HomePage() {
       <HeroSection
         hero={home.hero}
         site={site}
+        metiers={pagesHub}
         logos={
           home.logoBand ? (
             <LogoBandSection logoBand={home.logoBand} variant="heros" />

@@ -18,7 +18,7 @@
 export const consentCopy = {
   eyebrow: "Confidentialité",
   title: "Mesure d’audience",
-  body: "Sans votre accord, je compte seulement les visites, sans cookie. Avec, je mesure aussi ce qui vous a servi.",
+  body: "Sans votre accord, je compte les visites, sans cookie.",
   policyLabel: "politique de confidentialité",
   /** Lien court de la barre fermée, suivi de « Personnaliser ». */
   policyShort: "Détails",

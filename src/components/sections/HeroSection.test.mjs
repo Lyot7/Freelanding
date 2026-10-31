@@ -6,6 +6,7 @@ import { createRoot } from "react-dom/client";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { homeContent } from "@/content/home";
+import { siteConfig } from "@/content/site";
 import { uiLabels } from "@/content/ui";
 import { content } from "@/lib/content";
 import { HeroSection, HeroVideo } from "./HeroSection";
@@ -188,5 +189,21 @@ describe("HeroSection, comparaison de prix", async () => {
 
     const rien = rendre({ ...heroSansVideo, comparison: undefined, proofs: [] });
     expect(rien).not.toContain(BLOC_BAS);
+  });
+});
+
+describe("HeroSection, les métiers au premier écran", () => {
+  it("lie chaque métier et la page de l'offre", () => {
+    const metiers = [{ libelle: "Échafaudage", chemin: "/logiciel-metier/echafaudage" }];
+    const rendu = JSON.stringify(HeroSection({ hero: homeContent.hero, site: siteConfig, metiers }));
+    expect(rendu).toContain("/logiciel-metier/echafaudage");
+    expect(rendu).toContain(homeContent.hero.offerLink.label);
+  });
+
+  it("n'affiche ni métiers ni lien d'offre quand ils manquent", () => {
+    const hero = { ...homeContent.hero, offerLink: undefined };
+    const rendu = JSON.stringify(HeroSection({ hero, site: siteConfig }));
+    expect(rendu).not.toContain("/logiciel-metier/");
+    expect(rendu).not.toContain(homeContent.hero.avantMetiers);
   });
 });
