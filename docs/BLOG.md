@@ -41,10 +41,12 @@ vendredi, chaque heure de 8 h à 18 h (heure de Paris en été), sur un runner
 hébergé par GitHub, gratuit pour un dépôt public. Il lance
 `bun scripts/publier-articles.ts --auto` (`scripts/publication.ts`), qui :
 
-1. marque « Publié » au cockpit tout article récent du registre qui répond en
-   ligne sans l'avoir encore été ;
+1. marque « Publié » au cockpit tout article récent du registre, et toute page
+   récente de `src/content/metiers.json`, qui répond en ligne sans l'avoir encore
+   été ;
 2. s'arrête le week-end, et dès qu'un article est déjà parti aujourd'hui :
-   **un article par jour ouvré**, le plus anciennement validé d'abord ;
+   **un article par jour ouvré**, le plus anciennement validé d'abord. La page
+   par métier a son propre quota (voir « Les pages par métier ») ;
 3. écrit l'article dans le site : `src/content/articles/<slug>.mdx`, son entrée
    dans `src/content/articles-cockpit.json`, et son visuel (le SVG que le
    rédacteur a conçu et qu'Eliott a vu dans l'aperçu) rendu en trois JPG par
@@ -55,7 +57,8 @@ hébergé par GitHub, gratuit pour un dépôt public. Il lance
 5. pousse un commit sur `main`. Coolify déploie seul à chaque poussée ;
 6. attend que `https://eliottbouquerel.fr/blog/<slug>` réponde 200 (20 minutes
    au plus, un relevé toutes les 10 secondes), puis marque l'article « Publié »
-   au cockpit avec son adresse, et le signale à IndexNow.
+   au cockpit avec son adresse, et le signale à IndexNow. Une exécution qui
+   publie aussi une page attend les deux adresses dans ces mêmes 20 minutes.
 
 Il faut au dépôt un seul secret, `COCKPIT_BLOG_TOKEN` : le jeton `blog` du
 cockpit, limité à deux routes (`GET /api/agents/articles`,
@@ -74,9 +77,9 @@ sa page répond. Chaque exécution reste lisible dans l'onglet Actions du dépô
 ### À la main, pour rejouer une étape
 
 - `bun scripts/publier-articles.ts --max 1` écrit l'article validé le plus
-  ancien, sans contrôle ni poussée.
+  ancien, sans contrôle ni poussée. Les pages par métier n'y passent pas.
 - `bun scripts/publier-articles.ts --confirmer` marque publiés ceux du registre
-  qui répondent en ligne.
+  et de `metiers.json` qui répondent en ligne.
 - Onglet Actions, « Publier l'article validé », « Run workflow » : la chaîne
   complète, sans attendre l'heure suivante.
 - Régler un SVG hors circuit : `bun scripts/visuel-article.mjs <fichier.svg> <dossier>`.
@@ -204,5 +207,36 @@ Le maillage se calcule : `themes` donne les voisins et les articles. Une page ne
 cite jamais une autre page à la main. Aucun montant dans le fichier : le prix vient
 d'`offre.ts` au rendu.
 
-Le branchement au circuit de publication (cockpit, `routine-blog`) n'est pas fait :
-il attend la décision d'Eliott (`~/vault/wiki/business/metiers-file-editoriale.md`).
+### Le circuit de publication
+
+Depuis le 2026-10-31, **un article ET une page par jour ouvré, chacun son quota**.
+Une page se valide au cockpit comme un article : une validation `ARTICLE_BLOG`
+avec `contexte.article.kind = "metier"`, `slug` et `visuel`. Sans `kind`, c'est un
+article, et rien ne change pour lui. Le corps est le JSON d'une entrée de
+`metiers.json`, sans `date` : une donnée, **jamais compilée**.
+
+`bun scripts/publier-articles.ts --auto` (`scripts/publication.ts`) reprend pour la
+page la chaîne de l'article, dans la même exécution, après lui :
+
+1. le quota lit `date` dans `metiers.json` : une page datée d'aujourd'hui arrête
+   les pages, jamais les articles, et l'inverse ;
+2. la page validée la plus ancienne est relue (`pageDuCorps`, `lirePage`) puis
+   soumise à `motifsDeRefus`. Corps illisible ou entrée refusée : échec, motif sur
+   la carte, rien d'écrit ;
+3. l'entrée rejoint la fin de `metiers.json`, datée du jour, avec `validationId`
+   (ce qui permet de confirmer la page plus tard) ; `rendreVisuelMetier` rend le SVG
+   en trois JPG ;
+4. mêmes contrôles qu'un article, même poussée, commit
+   `📝 Publier la page métier <slug>` ;
+5. même attente, sur `https://eliottbouquerel.fr/logiciel-metier/<slug>`, puis
+   « Publié » au cockpit et IndexNow.
+
+**Un échec de l'un n'empêche pas l'autre.** Chacun écrit, contrôle et pousse de son
+côté, avec son commit ; l'annulation d'une page ramène au commit d'avant la page et
+ne défait pas l'article déjà parti. L'issue de l'exécution dit l'article à plat et
+la page sous `page`, et le travail sort en erreur si l'un des deux a échoué.
+
+L'aperçu `/apercu/blog/<id>` rend `PageTheme` quand `kind` vaut `metier` : même
+gabarit et même maillage que la page publiée, le SVG à la place du JPG, et les
+`motifsDeRefus` au-dessus de la page. Un corps invalide donne un message dans le
+cadre. Le corps y est relu comme une donnée, comme à la publication.

@@ -5,6 +5,8 @@ import { MetiersSection } from "@/components/sections/MetiersSection";
 import { homeContent } from "@/content/home";
 import { pagesHub, pagesMetier, versPageTheme, visuelMetier } from "@/content/metiers";
 import { siteConfig } from "@/content/site";
+import { MESSAGES_METIER } from "@/lib/blog/apercu";
+import { ApercuMetier } from "./ApercuMetier";
 import { ListeMetiers } from "./ListeMetiers";
 import { MaillageMetier } from "./MaillageMetier";
 
@@ -78,5 +80,34 @@ describe("PageTheme, avec un visuel et un maillage", () => {
     );
     expect(rendu).toContain(visuel.src);
     expect(rendu).toContain("maillage");
+  });
+});
+
+describe("ApercuMetier", () => {
+  const apercu = { page, visuel: { src: "data:image/svg+xml;base64,", alt: "Un visuel" }, motifs: [] };
+  const pageRendue = (rendu) => rendu.props.children.find((c) => c?.type === PageTheme);
+
+  it("rend la page telle qu'elle sera publiée, avec le visuel de l'aperçu et son maillage", () => {
+    const rendu = ApercuMetier({ apercu, site: siteConfig });
+    expect(pageRendue(rendu).props.page).toEqual(versPageTheme(page));
+    expect(pageRendue(rendu).props.visuel).toBe(apercu.visuel);
+    expect(pageRendue(rendu).props.maillage.type).toBe(MaillageMetier);
+    expect(texte(rendu.props.children[0])).toBe("");
+  });
+
+  it("met les motifs de refus en tête", () => {
+    const rendu = ApercuMetier({ apercu: { ...apercu, motifs: ["moins de 4 blocs", "« x » absent du texte"] }, site: siteConfig });
+    const bandeau = rendu.props.children[0];
+    expect(bandeau.props.role).toBe("alert");
+    expect(texte(bandeau)).toContain(MESSAGES_METIER.refus);
+    expect(texte(bandeau)).toContain("moins de 4 blocs");
+    expect(texte(bandeau)).toContain("« x » absent du texte");
+  });
+
+  it("un corps illisible donne son message, sans page", () => {
+    const rendu = ApercuMetier({ apercu: { illisible: "faq invalide" }, site: siteConfig });
+    expect(texte(rendu)).toContain(MESSAGES_METIER.illisible);
+    expect(texte(rendu)).toContain("faq invalide");
+    expect(rendu.type).toBe("main");
   });
 });

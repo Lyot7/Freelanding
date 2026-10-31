@@ -86,6 +86,8 @@ export function articlesDuCockpit(
  * prévisualisé ait exactement les métadonnées qu'il aura une fois publié.
  */
 export interface ArticleDuCockpit {
+  /** Absent sur un article ; `metier` désigne une page par métier (`PageMetierDuCockpit`). */
+  kind?: undefined;
   slug: string;
   description: string;
   categorie?: string;
@@ -93,6 +95,17 @@ export interface ArticleDuCockpit {
   motsCles?: { requete: string }[];
   pageServie: { url: string };
   /** Le SVG conçu pour l'article par le rédacteur, contrôlé par le cockpit. */
+  visuel?: { svg: string; alt: string };
+}
+
+/**
+ * Ce que le cockpit dit d'une page par métier : même validation qu'un article,
+ * mais le corps est le JSON d'une entrée de `metiers.json`, sans sa date. Le titre,
+ * la description et le reste vivent dans ce JSON, relu par `pageDuCorps`.
+ */
+export interface PageMetierDuCockpit {
+  kind: "metier";
+  slug: string;
   visuel?: { svg: string; alt: string };
 }
 

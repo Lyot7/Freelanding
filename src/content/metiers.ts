@@ -50,6 +50,8 @@ export interface PageMetier {
   readonly slug: string;
   /** Date de publication, `<lastmod>` du sitemap. */
   readonly date: string;
+  /** La validation du cockpit, marquée publiée une fois la page en ligne. Absente d'une page écrite à la main. */
+  readonly validationId?: string;
   /** Nom du métier, dans les listes et le fil d'Ariane. */
   readonly libelle: string;
   readonly h1: string;
@@ -82,20 +84,34 @@ const estListe = (v: unknown, test: (x: unknown) => boolean): v is readonly unkn
 
 const estTheme = (v: unknown): v is Theme => THEMES.some((t) => t === v);
 
+const absentOuTexte = (v: unknown): boolean => v === undefined || estTexte(v);
+
+/** Un champ optionnel mal formé casserait le rendu : il se refuse comme un champ obligatoire. */
+const estLiens = (v: unknown): boolean =>
+  estObjet(v) &&
+  estTexte(v.titre) &&
+  estListe(
+    v.items,
+    (l) => estObjet(l) && estTexte(l.href) && estTexte(l.libelle) && estTexte(l.description),
+  );
+
 const estBloc = (v: unknown): v is BlocTheme => {
   if (!estObjet(v) || !estTexte(v.id) || !estTexte(v.titre)) return false;
   if (!estListe(v.paragraphes, estTexte)) return false;
+  if (v.liens !== undefined && !estLiens(v.liens)) return false;
   const titreCorps = (x: unknown): boolean => estObjet(x) && estTexte(x.titre) && estTexte(x.corps);
   switch (v.type) {
     case "section":
       return estListe(v.points, titreCorps);
     case "etapes":
-      return estListe(v.etapes, titreCorps);
+      return estListe(v.etapes, (e) => titreCorps(e) && absentOuTexte((e as { passe?: unknown }).passe));
     case "tableau":
       return (
         estTexte(v.legende) &&
         estListe(v.colonnes, estTexte) &&
-        estListe(v.lignes, (l) => estListe(l, estTexte))
+        estListe(v.lignes, (l) => estListe(l, estTexte)) &&
+        (v.total === undefined || estListe(v.total, estTexte)) &&
+        absentOuTexte(v.note)
       );
     default:
       return false;
@@ -109,10 +125,11 @@ const estQuestion = (v: unknown): boolean =>
 export function lirePage(v: unknown, index: number): PageMetier {
   const champ = (nom: string) => new Error(`metiers.json, entrée ${index} : ${nom} invalide`);
   if (!estObjet(v)) throw champ("entrée");
-  const { slug, date, libelle, h1, seo, resume, accroche, noteLlms } = v;
+  const { slug, date, validationId, libelle, h1, seo, resume, accroche, noteLlms } = v;
   const { themes, lexique, image, titreOffre, blocs, faq } = v;
   if (!estTexte(slug) || !/^[a-z0-9]+(-[a-z0-9]+)*$/u.test(slug)) throw champ("slug");
   if (!estTexte(date) || !/^\d{4}-\d{2}-\d{2}$/u.test(date)) throw champ("date");
+  if (validationId !== undefined && !estTexte(validationId)) throw champ("validationId");
   if (!estTexte(libelle) || !estTexte(h1)) throw champ("h1");
   if (!estTexte(resume) || !estTexte(accroche) || !estTexte(noteLlms)) throw champ("resume");
   if (!estObjet(seo) || !estTexte(seo.titre) || !estTexte(seo.description)) throw champ("seo");
@@ -124,6 +141,30 @@ export function lirePage(v: unknown, index: number): PageMetier {
   if (!estObjet(faq) || !estTexte(faq.eyebrow)) throw champ("faq");
   if (!estListe(faq.titleLines, estTexte) || !estListe(faq.items, estQuestion)) throw champ("faq");
   return v as unknown as PageMetier;
+}
+
+/**
+ * Le corps d'une validation du cockpit : le JSON d'une entrée, sans sa date.
+ * Une donnée, jamais du code : il est relu ici, à la publication comme à l'aperçu,
+ * et seuls les champs d'une entrée en sont gardés. Lève une erreur lisible s'il ne
+ * se relit pas, ou s'il ne porte pas le slug de la validation.
+ */
+export function pageDuCorps(corps: string, slug: string, date: string, rang: number): PageMetier {
+  let valeur: unknown;
+  try {
+    valeur = JSON.parse(corps);
+  } catch {
+    throw new Error("Le corps de la page n’est pas un JSON lisible");
+  }
+  if (!estObjet(valeur)) return lirePage(valeur, rang);
+  const { libelle, h1, seo, resume, accroche, noteLlms } = valeur;
+  const { themes, lexique, image, titreOffre, blocs, faq } = valeur;
+  const page = lirePage(
+    { slug: valeur.slug, date, libelle, h1, seo, resume, accroche, noteLlms, themes, lexique, image, titreOffre, blocs, faq },
+    rang,
+  );
+  if (page.slug !== slug) throw new Error(`Slug du corps (${page.slug}) différent de la validation (${slug})`);
+  return page;
 }
 
 /** Toutes les entrées du fichier, publiées ou non. */

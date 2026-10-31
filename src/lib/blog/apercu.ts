@@ -1,5 +1,18 @@
 import type { BlogPost } from "@/lib/content/types";
-import { articlesDuCockpit, entreeDuCockpit, type ArticleDuCockpit } from "@/content/blog-cockpit";
+import {
+  articlesDuCockpit,
+  entreeDuCockpit,
+  type ArticleDuCockpit,
+  type PageMetierDuCockpit,
+} from "@/content/blog-cockpit";
+import {
+  CHEMIN_HUB_METIERS,
+  entreesMetier,
+  motifsDeRefus,
+  pageDuCorps,
+  type PageMetier,
+  type PageMetierPubliee,
+} from "@/content/metiers";
 
 /**
  * L'APERÇU D'UN ARTICLE AVANT SA PUBLICATION, montré dans le cockpit.
@@ -16,6 +29,12 @@ export const COCKPIT = "https://admin.eliottbouquerel.fr";
 
 /** Ce que le cadre affiche quand l'article ne vient pas : la carte du cockpit en signe une nouvelle à son affichage. */
 export const MESSAGE_INDISPONIBLE = "Aperçu expiré ou indisponible. Recharge la carte dans le cockpit.";
+
+/** Ce que le cadre dit d'une page par métier qui ne partira pas telle quelle. */
+export const MESSAGES_METIER = {
+  illisible: "Cette page ne peut pas s’afficher, et elle ne partira pas :",
+  refus: "Cette page ne partira pas en l’état :",
+} as const;
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const EXPIRATION = /^\d{10,12}$/;
@@ -34,21 +53,33 @@ export function demandeApercu(id: string, exp: unknown, sig: unknown): DemandeAp
   return { id, exp, sig };
 }
 
-export interface ArticleApercu {
+interface Apercu<C> {
   id: string;
   titre: string;
   corps: string;
-  article: ArticleDuCockpit;
+  article: C;
 }
+
+export type ArticleApercu = Apercu<ArticleDuCockpit>;
+export type PageApercu = Apercu<PageMetierDuCockpit>;
+
+export const estPageApercu = (a: ArticleApercu | PageApercu): a is PageApercu => a.article.kind === "metier";
 
 const estObjet = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null;
 const estTexte = (v: unknown): v is string => typeof v === "string" && v.trim().length > 0;
 const estRequete = (v: unknown): v is { requete: string } => estObjet(v) && estTexte(v.requete);
 
+const lireVisuel = (v: unknown): { svg: string; alt: string } | undefined =>
+  estObjet(v) && estTexte(v.svg) && estTexte(v.alt) ? { svg: v.svg, alt: v.alt } : undefined;
+
+function lirePageMetier(a: unknown): PageMetierDuCockpit | null {
+  if (!estObjet(a) || a.kind !== "metier" || !estTexte(a.slug)) return null;
+  return { kind: "metier", slug: a.slug, visuel: lireVisuel(a.visuel) };
+}
+
 function lireArticle(a: unknown): ArticleDuCockpit | null {
   if (!estObjet(a) || !estTexte(a.slug) || !estTexte(a.description)) return null;
   if (!estRequete(a.motCle) || !estObjet(a.pageServie) || !estTexte(a.pageServie.url)) return null;
-  const visuel = estObjet(a.visuel) && estTexte(a.visuel.svg) && estTexte(a.visuel.alt) ? a.visuel : null;
   return {
     slug: a.slug,
     description: a.description,
@@ -56,22 +87,25 @@ function lireArticle(a: unknown): ArticleDuCockpit | null {
     motCle: { requete: a.motCle.requete },
     motsCles: Array.isArray(a.motsCles) ? a.motsCles.filter(estRequete) : undefined,
     pageServie: { url: a.pageServie.url },
-    visuel: visuel ? { svg: String(visuel.svg), alt: String(visuel.alt) } : undefined,
+    visuel: lireVisuel(a.visuel),
   };
 }
 
 /** La réponse du cockpit, lue champ par champ ; null si elle n'a pas la forme attendue. */
-export function lireReponse(id: string, corps: unknown): ArticleApercu | null {
+export function lireReponse(id: string, corps: unknown): ArticleApercu | PageApercu | null {
   if (!estObjet(corps) || !estTexte(corps.titre) || typeof corps.corps !== "string") return null;
+  const commun = { id, titre: corps.titre, corps: corps.corps };
+  const page = lirePageMetier(corps.article);
+  if (page) return { ...commun, article: page };
   const article = lireArticle(corps.article);
-  return article ? { id, titre: corps.titre, corps: corps.corps, article } : null;
+  return article ? { ...commun, article } : null;
 }
 
 /** L'article à prévisualiser, ou null : signature refusée, expirée, cockpit muet. */
 export async function chargerApercu(
   demande: DemandeApercu,
   lire: typeof fetch = fetch,
-): Promise<ArticleApercu | null> {
+): Promise<ArticleApercu | PageApercu | null> {
   const url = new URL(`/api/apercu/article/${demande.id}`, COCKPIT);
   url.searchParams.set("exp", demande.exp);
   url.searchParams.set("sig", demande.sig);
@@ -106,4 +140,30 @@ export function articleDApercu(a: ArticleApercu, base: readonly BlogPost[], date
     heroImage: post.heroImage && { ...post.heroImage, src: image, og },
     seo: { title: post.title, description: post.excerpt, ogImage: og },
   };
+}
+
+/** Ce que le cadre montre d'une page par métier : la page et ses motifs de refus, ou pourquoi elle ne se lit pas. */
+export type ApercuMetier =
+  | { illisible: string }
+  | {
+      page: PageMetierPubliee;
+      visuel: { src: string; alt: string };
+      motifs: readonly string[];
+    };
+
+/**
+ * Relit le corps comme une donnée (`pageDuCorps`), jamais comme du code, et lui
+ * applique le refus de la publication : Eliott voit ce qui bloquera avant de valider.
+ */
+export function pageDApercu(a: PageApercu, date: string, toutes: readonly PageMetier[] = entreesMetier): ApercuMetier {
+  try {
+    const page = pageDuCorps(a.corps, a.article.slug, date, toutes.length);
+    return {
+      page: { ...page, chemin: `${CHEMIN_HUB_METIERS}/${page.slug}` },
+      visuel: { src: uriSvg(a.article.visuel?.svg ?? SANS_VISUEL), alt: page.image.alt },
+      motifs: motifsDeRefus(page, toutes),
+    };
+  } catch (e) {
+    return { illisible: e instanceof Error ? e.message : String(e) };
+  }
 }

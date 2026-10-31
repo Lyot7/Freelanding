@@ -1,9 +1,9 @@
 /**
- * Publie sur le blog les articles qu'Eliott a validés dans le cockpit.
+ * Publie sur le site les articles et les pages par métier qu'Eliott a validés dans le cockpit.
  *
- *   bun scripts/publier-articles.ts --auto       la chaîne complète, un article au plus (scripts/publication.ts)
- *   bun scripts/publier-articles.ts --max 1      écrit seulement le plus anciennement validé, sans rien pousser
- *   bun scripts/publier-articles.ts --confirmer  marque publiés ceux du registre qui répondent en ligne
+ *   bun scripts/publier-articles.ts --auto       la chaîne complète, un article et une page au plus (scripts/publication.ts)
+ *   bun scripts/publier-articles.ts --max 1      écrit seulement l'article le plus anciennement validé, sans rien pousser
+ *   bun scripts/publier-articles.ts --confirmer  marque publiés ceux du registre et de metiers.json qui répondent en ligne
  *
  * `--auto` est ce que lance le travail planifié `.github/workflows/publier-article.yml`
  * chaque heure ouvrée ; les deux autres modes servent à la main, pour rejouer
@@ -16,21 +16,25 @@ import { execFileSync, spawnSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { entreeDuCockpit, type ArticleCockpit } from "../src/content/blog-cockpit";
+import type { PageMetier } from "../src/content/metiers";
 import {
   type ArticleAPublier,
   type Outils,
+  type PageAPublier,
   choisir,
   clientCockpit,
+  enEchec,
+  inscrits,
   jourDeParis,
   publierAuto,
   repondEnLigne,
   signalerIndexNow,
-  urlArticle,
 } from "./publication";
 
 const RACINE = join(import.meta.dirname, "..");
 const REGISTRE = join(RACINE, "src/content/articles-cockpit.json");
 const ARTICLES = join(RACINE, "src/content/articles");
+const METIERS = join(RACINE, "src/content/metiers.json");
 const COCKPIT = process.env.COCKPIT_URL ?? "https://admin.eliottbouquerel.fr";
 
 function jeton(): string {
@@ -51,6 +55,12 @@ function lireRegistre(): ArticleCockpit[] {
   return brut as ArticleCockpit[];
 }
 
+function lirePages(): PageMetier[] {
+  const brut: unknown = JSON.parse(readFileSync(METIERS, "utf8"));
+  if (!Array.isArray(brut)) throw new Error("metiers.json doit être un tableau");
+  return brut as PageMetier[];
+}
+
 const existe = (slug: string) => existsSync(join(ARTICLES, `${slug}.mdx`));
 
 /** Le corps, l'entrée du registre et les trois JPG du visuel. */
@@ -69,28 +79,35 @@ async function ecrire(a: ArticleAPublier, date: string): Promise<void> {
   writeFileSync(REGISTRE, `${JSON.stringify(registre, null, 2)}\n`);
 }
 
+/** L'entrée au bout de `metiers.json`, et les trois JPG du visuel. */
+async function ecrirePage(a: PageAPublier, entree: PageMetier): Promise<void> {
+  if (!a.article.visuel) throw new Error(`${a.article.slug} : pas de visuel`);
+  const { rendreVisuelMetier } = await import("./visuel-article.mjs");
+  await rendreVisuelMetier(a.article.slug, a.article.visuel.svg, RACINE);
+  writeFileSync(METIERS, `${JSON.stringify([...lirePages(), entree], null, 2)}\n`);
+}
+
 function executer(commande: string, args: readonly string[]) {
   const r = spawnSync(commande, args, { cwd: RACINE, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
   return { ok: r.status === 0, sortie: `${r.stdout ?? ""}${r.stderr ?? ""}${r.error?.message ?? ""}` };
 }
 
-/** Le dossier tel qu'au lancement : commit local, rebase en cours et fichiers écrits compris. */
-function annulerVers(tete: string) {
-  return () => {
-    executer("git", ["rebase", "--abort"]);
-    executer("git", ["reset", "--hard", tete]);
-    executer("git", ["clean", "-fd", "src/content", "public/images"]);
-  };
+/** Le dossier remis au commit `tete` : commit local, rebase en cours et fichiers écrits compris. */
+function annuler(tete: string) {
+  executer("git", ["rebase", "--abort"]);
+  executer("git", ["reset", "--hard", tete]);
+  executer("git", ["clean", "-fd", "src/content", "public/images"]);
 }
 
 function outils(): Outils {
-  const tete = executer("git", ["rev-parse", "HEAD"]).sortie.trim();
   return {
     cockpit: clientCockpit(COCKPIT, jeton()),
     registre: lireRegistre,
+    pages: lirePages,
     existe,
     ecrire,
-    annuler: annulerVers(tete),
+    ecrirePage,
+    annuler,
     executer,
     enLigne: (url) => repondEnLigne(url),
     indexNow: (url) => signalerIndexNow(url),
@@ -109,7 +126,7 @@ function maximum(): number {
   return n;
 }
 
-/** À la main : écrit les articles validés, sans contrôle ni poussée. */
+/** À la main : écrit les articles validés, sans contrôle ni poussée. Les pages passent par `--auto`. */
 async function ecrireSeulement(o: Outils): Promise<void> {
   const ecrits: string[] = [];
   const ignores: string[] = [];
@@ -128,11 +145,10 @@ async function ecrireSeulement(o: Outils): Promise<void> {
 async function confirmer(o: Outils): Promise<void> {
   const publies: string[] = [];
   const attente: string[] = [];
-  for (const a of o.registre()) {
-    const url = urlArticle(a.slug);
-    if (!(await o.enLigne(url))) attente.push(`${a.slug} : pas encore en ligne`);
-    else if (await o.cockpit.publie(a.validationId, url)) publies.push(url);
-    else attente.push(`${a.slug} : refusé par le cockpit`);
+  for (const { slug, id, url } of inscrits(o)) {
+    if (!(await o.enLigne(url))) attente.push(`${slug} : pas encore en ligne`);
+    else if (await o.cockpit.publie(id, url)) publies.push(url);
+    else attente.push(`${slug} : refusé par le cockpit`);
   }
   console.log(JSON.stringify({ publies, attente }, null, 2));
   if (attente.length > 0) process.exitCode = 1;
@@ -142,7 +158,7 @@ const o = outils();
 if (process.argv.includes("--auto")) {
   const issue = await publierAuto(o);
   console.log(JSON.stringify(issue, null, 2));
-  if (issue.etat === "echec") process.exitCode = 1;
+  if (enEchec(issue)) process.exitCode = 1;
 } else if (process.argv.includes("--confirmer")) {
   await confirmer(o);
 } else {

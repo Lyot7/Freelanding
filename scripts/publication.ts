@@ -1,52 +1,64 @@
 /**
- * LA PUBLICATION AUTOMATIQUE D'UN ARTICLE VALIDÉ DANS LE COCKPIT.
+ * LA PUBLICATION AUTOMATIQUE DE CE QU'ELIOTT VALIDE DANS LE COCKPIT : UN ARTICLE
+ * ET UNE PAGE PAR MÉTIER PAR JOUR OUVRÉ, CHACUN SON QUOTA (décision du 2026-10-31).
  *
- * Eliott valide un article au cockpit (hub Blog) : sa validation vaut feu vert.
- * Le travail planifié `.github/workflows/publier-article.yml` lance
- * `bun scripts/publier-articles.ts --auto` chaque heure ouvrée, et ce module
- * fait le reste, dans l'ordre :
+ * Eliott valide au cockpit (hub Blog) : sa validation vaut feu vert. Une page
+ * par métier est une validation de même nature, avec `article.kind = "metier"`,
+ * et son corps est une donnée : le JSON d'une entrée de `metiers.json`, sans sa
+ * date, jamais compilé. Le travail planifié `.github/workflows/publier-article.yml`
+ * lance `bun scripts/publier-articles.ts --auto` chaque heure ouvrée, et ce
+ * module fait le reste, dans l'ordre :
  *
- *   1. marque « Publié » au cockpit tout article du registre qui répond en ligne
- *      et ne l'était pas encore (un déploiement lent la veille, par exemple) ;
- *   2. s'arrête le samedi, le dimanche, et dès qu'un article est parti aujourd'hui :
- *      un article par jour ouvré, décision d'Eliott ;
- *   3. prend l'article validé le plus ancien, l'écrit dans le site avec son
- *      visuel, et passe les contrôles du site : types, lint, tests, build ;
+ *   1. marque « Publié » au cockpit tout article du registre et toute page de
+ *      `metiers.json` qui répond en ligne et ne l'était pas encore (un
+ *      déploiement lent la veille, par exemple) ;
+ *   2. s'arrête le samedi et le dimanche ; un article déjà parti aujourd'hui
+ *      n'arrête que les articles, une page datée d'aujourd'hui que les pages ;
+ *   3. prend le validé le plus ancien de chaque nature, l'écrit dans le site
+ *      avec son visuel, et passe les contrôles du site : types, lint, tests, build ;
  *   4. pousse sur `main` : Coolify déploie seul à chaque poussée ;
- *   5. attend que la page réponde 200, la marque « Publiée » au cockpit et
+ *   5. attend que chaque page réponde 200, la marque « Publiée » au cockpit et
  *      signale l'adresse aux moteurs qui lisent IndexNow (Bing, Yandex).
  *
- * UN ÉCHEC NE CASSE JAMAIS LE SITE. Contrôle rouge : rien n'est poussé, le
- * dossier revient à son état, l'article reste validé et sa carte au cockpit
- * dit pourquoi. Il n'est retenté que quand son texte change, ou le lendemain
- * (un échec passager ne le bloque pas pour toujours), et il ne bloque pas les
- * suivants. Build Coolify en échec : le site en ligne reste sur sa version
- * précédente, et la carte le dit aussi.
+ * UN ÉCHEC NE CASSE JAMAIS LE SITE, ET N'ARRÊTE PAS L'AUTRE NATURE. Contrôle
+ * rouge : rien n'est poussé, le dossier revient à son état, la validation reste
+ * validée et sa carte au cockpit dit pourquoi. Elle n'est retentée que quand son
+ * texte change, ou le lendemain (un échec passager ne la bloque pas pour
+ * toujours), et elle ne bloque pas les suivantes. Build Coolify en échec : le
+ * site en ligne reste sur sa version précédente, et la carte le dit aussi.
  *
  * Toutes les entrées et sorties sont injectées (`Outils`) : la chaîne entière
  * se teste sans réseau, sans git et sans build (`publication.test.ts`).
  */
 import { createHash } from "node:crypto";
-import type { ArticleCockpit, ArticleDuCockpit } from "../src/content/blog-cockpit";
+import type { ArticleCockpit, ArticleDuCockpit, PageMetierDuCockpit } from "../src/content/blog-cockpit";
+import { CHEMIN_HUB_METIERS, motifsDeRefus, pageDuCorps, type PageMetier } from "../src/content/metiers";
 
 export const SITE = "https://eliottbouquerel.fr";
 
-/** Un article validé, tel que `GET /api/agents/articles` du cockpit le rend. */
-export interface ArticleAPublier {
+/** Une validation, telle que `GET /api/agents/articles` du cockpit la rend. */
+interface Validation<C> {
   id: string;
   titre: string;
   corps: string;
-  article: ArticleDuCockpit;
+  article: C;
   /** Le dernier échec de publication, s'il y en a eu un. */
   publication?: { echec: string; le: string; empreinte: string } | null;
 }
 
+export type ArticleAPublier = Validation<ArticleDuCockpit>;
+export type PageAPublier = Validation<PageMetierDuCockpit>;
+export type AValider = ArticleAPublier | PageAPublier;
+
+/** Absence de `kind` : un article. */
+export const estPage = (a: AValider): a is PageAPublier => a.article.kind === "metier";
+
 export interface Cockpit {
-  /** Les articles validés, le plus anciennement validé d'abord. */
-  articles(): Promise<ArticleAPublier[]>;
-  /** Déclare l'article publié à cette adresse ; vrai si c'est fait ou déjà fait. */
+  /** Les validés des deux natures, le plus anciennement validé d'abord. */
+  articles(): Promise<AValider[]>;
+  /** Déclare la validation publiée à cette adresse ; vrai si c'est fait ou déjà fait. */
   publie(id: string, url: string): Promise<boolean>;
-  /** Pose le motif d'échec sur la carte de l'article, qui reste validé. */
+  /** Pose le motif d'échec sur la carte, qui reste validée. */
   echec(id: string, motif: string, empreinte: string): Promise<void>;
 }
 
@@ -58,12 +70,16 @@ export interface Resultat {
 export interface Outils {
   cockpit: Cockpit;
   registre(): ArticleCockpit[];
+  /** Les entrées de `metiers.json`, relues à chaque appel. */
+  pages(): PageMetier[];
   /** Le fichier du corps existe déjà dans le site. */
   existe(slug: string): boolean;
   /** Écrit le corps, le registre et les trois JPG du visuel. */
   ecrire(a: ArticleAPublier, date: string): Promise<void>;
-  /** Remet le dossier dans son état d'avant `ecrire` (rien n'a été poussé). */
-  annuler(): void;
+  /** Ajoute l'entrée à `metiers.json` et écrit les trois JPG du visuel. */
+  ecrirePage(a: PageAPublier, entree: PageMetier): Promise<void>;
+  /** Remet le dossier au commit `tete` : ce qui n'est pas parti disparaît, ce qui est parti reste. */
+  annuler(tete: string): void;
   executer(commande: string, args: readonly string[]): Resultat;
   enLigne(url: string): Promise<boolean>;
   indexNow(url: string): Promise<string>;
@@ -72,10 +88,20 @@ export interface Outils {
   journal(message: string): void;
 }
 
-export type Issue =
-  | { etat: "repos" | "deja-publie" | "rien"; confirmes: string[]; ignores: string[] }
-  | { etat: "publie"; url: string; confirmes: string[]; ignores: string[] }
-  | { etat: "echec"; motif: string; confirmes: string[]; ignores: string[] };
+/** Ce qu'une exécution a fait pour une nature. */
+export type Volet =
+  | { etat: "deja-publie" | "rien"; ignores: string[] }
+  | { etat: "publie"; url: string; ignores: string[] }
+  | { etat: "echec"; motif: string; ignores: string[] };
+
+/**
+ * L'issue d'une exécution : celle de l'article, à plat, et `page` dès qu'il y a
+ * quelque chose à dire des pages par métier.
+ */
+export type Issue = ({ etat: "repos"; ignores: string[] } | Volet) & { confirmes: string[]; page?: Volet };
+
+/** Vrai si l'une des deux natures a échoué : l'exécution sort en erreur. */
+export const enEchec = (i: Issue): boolean => i.etat === "echec" || i.page?.etat === "echec";
 
 /** Les contrôles du site, dans l'ordre du moins cher au plus cher. */
 export const CONTROLES: readonly (readonly string[])[] = [
@@ -88,12 +114,13 @@ export const CONTROLES: readonly (readonly string[])[] = [
 /** Au plus 20 minutes d'attente du déploiement, un relevé toutes les 10 secondes. */
 export const RELEVES_DEPLOIEMENT = 120;
 export const INTERVALLE_RELEVE = 10_000;
-/** Un échec se retente le lendemain même sans correction : un incident passager ne bloque pas l'article. */
+/** Un échec se retente le lendemain même sans correction : un incident passager ne bloque pas la validation. */
 const RETENTE_ECHEC = 24 * 3600_000;
 /** Le registre ne se relit en ligne que sur deux semaines : au-delà, tout est confirmé depuis longtemps. */
 const FENETRE_CONFIRMATION = 14 * 24 * 3600_000;
 
 export const urlArticle = (slug: string): string => `${SITE}/blog/${slug}`;
+export const urlPage = (slug: string): string => `${SITE}${CHEMIN_HUB_METIERS}/${slug}`;
 
 /** Jour de Paris, `AAAA-MM-JJ`. */
 export const jourDeParis = (d: Date): string =>
@@ -114,45 +141,90 @@ export function extrait(sortie: string, max = 600): string {
   return propre.length > max ? `…${propre.slice(-max)}` : propre;
 }
 
-/** Les articles du registre récents qui répondent en ligne, déclarés publiés au cockpit. */
+/** Tout ce que le site déclare publié et que le cockpit peut confirmer. */
+export function inscrits(o: Pick<Outils, "registre" | "pages">): { slug: string; date: string; id: string; url: string }[] {
+  return [
+    ...o.registre().map((a) => ({ slug: a.slug, date: a.date, id: a.validationId, url: urlArticle(a.slug) })),
+    ...o.pages().flatMap((p) =>
+      p.validationId ? [{ slug: p.slug, date: p.date, id: p.validationId, url: urlPage(p.slug) }] : [],
+    ),
+  ];
+}
+
+/** Les articles et les pages récents qui répondent en ligne, déclarés publiés au cockpit. */
 async function confirmerEnLigne(o: Outils): Promise<string[]> {
   const depuis = jourDeParis(new Date(o.maintenant().getTime() - FENETRE_CONFIRMATION));
   const confirmes: string[] = [];
-  for (const a of o.registre().filter((e) => e.date >= depuis)) {
-    const url = urlArticle(a.slug);
-    if ((await o.enLigne(url)) && (await o.cockpit.publie(a.validationId, url))) confirmes.push(url);
+  for (const { date, id, url } of inscrits(o)) {
+    if (date >= depuis && (await o.enLigne(url)) && (await o.cockpit.publie(id, url))) confirmes.push(url);
   }
   return confirmes;
 }
 
-/** Le premier article publiable, et ce qui a été écarté avec sa raison. */
-export function choisir(
-  articles: readonly ArticleAPublier[],
-  o: Pick<Outils, "registre" | "existe">,
+/** La première validation publiable de la liste, et ce qui a été écarté avec sa raison. */
+function premiere<T extends AValider>(
+  liste: readonly T[],
+  dejaLa: (slug: string) => boolean,
   maintenant: Date,
-): { article: ArticleAPublier | null; ignores: string[] } {
-  const connus = new Set(o.registre().map((a) => a.slug));
+): { retenue: T | null; ignores: string[] } {
   const ignores: string[] = [];
-  for (const a of articles) {
+  for (const a of liste) {
     const slug = a.article.slug;
     const echec = a.publication;
     if (!a.article.visuel) ignores.push(`${slug} : pas encore de visuel`);
-    else if (connus.has(slug) || o.existe(slug)) ignores.push(`${slug} : déjà présent sur le site`);
+    else if (dejaLa(slug)) ignores.push(`${slug} : déjà présent sur le site`);
     else if (
       echec?.empreinte === empreinte(a.corps) &&
       maintenant.getTime() - Date.parse(echec.le) < RETENTE_ECHEC
     ) {
       ignores.push(`${slug} : en échec, retenté quand son texte change ou demain`);
-    } else return { article: a, ignores };
+    } else return { retenue: a, ignores };
   }
-  return { article: null, ignores };
+  return { retenue: null, ignores };
+}
+
+/** Le premier article publiable, et ce qui a été écarté avec sa raison. Les pages par métier n'y entrent pas. */
+export function choisir(
+  validations: readonly AValider[],
+  o: Pick<Outils, "registre" | "existe">,
+  maintenant: Date,
+): { article: ArticleAPublier | null; ignores: string[] } {
+  const connus = new Set(o.registre().map((a) => a.slug));
+  const articles = validations.filter((a): a is ArticleAPublier => !estPage(a));
+  const { retenue, ignores } = premiere(articles, (slug) => connus.has(slug) || o.existe(slug), maintenant);
+  return { article: retenue, ignores };
+}
+
+/** La première page publiable, et ce qui a été écarté avec sa raison. */
+export function choisirPage(
+  validations: readonly AValider[],
+  o: Pick<Outils, "pages">,
+  maintenant: Date,
+): { page: PageAPublier | null; ignores: string[] } {
+  const connues = new Set(o.pages().map((p) => p.slug));
+  const { retenue, ignores } = premiere(validations.filter(estPage), (slug) => connues.has(slug), maintenant);
+  return { page: retenue, ignores };
+}
+
+/**
+ * L'entrée que la page ajoutera à `metiers.json`, datée de `date` : relue comme
+ * une donnée, puis soumise au refus que le site applique à ses propres pages.
+ * Lève une erreur lisible ; rien n'est alors écrit.
+ */
+export function entreePage(a: PageAPublier, date: string, toutes: readonly PageMetier[]): PageMetier {
+  const page = pageDuCorps(a.corps, a.article.slug, date, toutes.length);
+  const motifs = motifsDeRefus(page, toutes);
+  // Les plus courts d'abord : « trop proche de x » ne doit pas se perdre derrière vingt phrases reprises.
+  const lisibles = [...motifs].sort((a, b) => a.length - b.length);
+  if (lisibles.length > 0) throw new Error(`Page refusée : ${lisibles.join(" ; ")}`);
+  return { ...page, validationId: a.id };
 }
 
 /** Pousse le commit sur `main` ; si `main` a bougé entre-temps, rebase une fois et repousse. */
-function pousser(o: Outils, slug: string): Resultat {
+function pousser(o: Outils, message: string): Resultat {
   for (const args of [
     ["add", "src/content", "public/images"],
-    ["commit", "-m", `📝 Publier l'article ${slug}`],
+    ["commit", "-m", message],
   ]) {
     const r = o.executer("git", args);
     if (!r.ok) return r;
@@ -163,31 +235,102 @@ function pousser(o: Outils, slug: string): Resultat {
   return rebase.ok ? o.executer("git", ["push", "origin", "HEAD:main"]) : rebase;
 }
 
-async function attendreEnLigne(o: Outils, url: string): Promise<boolean> {
-  for (let i = 0; i < RELEVES_DEPLOIEMENT; i++) {
-    if (await o.enLigne(url)) return true;
-    await o.attendre(INTERVALLE_RELEVE);
-  }
-  return false;
-}
-
 /** Contrôles du site, puis poussée : le motif du premier échec, ou null si tout est passé. */
-function controlerEtPousser(o: Outils, slug: string): string | null {
+function controlerEtPousser(o: Outils, message: string, tete: string): string | null {
   for (const args of CONTROLES) {
     o.journal(`bun ${args.join(" ")}`);
     const r = o.executer("bun", args);
     if (!r.ok) {
-      o.annuler();
+      o.annuler(tete);
       return `Contrôle « bun ${args.join(" ")} » en échec, rien n'est parti :\n${extrait(r.sortie)}`;
     }
   }
-  const poussee = pousser(o, slug);
+  const poussee = pousser(o, message);
   if (poussee.ok) return null;
-  o.annuler();
+  o.annuler(tete);
   return `Poussée sur le site refusée, rien n'est parti :\n${extrait(poussee.sortie)}`;
 }
 
-/** La chaîne complète, un article au plus. */
+const texteErreur = (e: unknown): string => (e instanceof Error ? e.message : String(e));
+
+/** Pose le motif sur la carte. Un cockpit muet n'arrête pas l'autre nature : le journal le garde. */
+async function poserEchec(o: Outils, a: AValider, motif: string): Promise<void> {
+  try {
+    await o.cockpit.echec(a.id, motif, empreinte(a.corps));
+  } catch (e) {
+    o.journal(`Motif non posé sur la carte de ${a.article.slug} : ${texteErreur(e)}`);
+  }
+}
+
+/** Une validation partie sur `main`, en attente de sa page en ligne. */
+interface Partie {
+  etat: "partie";
+  a: AValider;
+  url: string;
+  ignores: string[];
+}
+
+/** Ce qui change d'une nature à l'autre. `preparer` lève une erreur lisible si rien ne peut s'écrire. */
+interface Envoi {
+  a: AValider;
+  url: string;
+  message: string;
+  preparer(): Promise<void>;
+}
+
+/** Écrit, contrôle et pousse une validation. Tout échec reste ici : l'autre nature part quand même. */
+async function envoyer(o: Outils, { a, url, message, preparer }: Envoi, ignores: string[]): Promise<Volet | Partie> {
+  o.journal(`Publication de ${a.article.slug}`);
+  // Pris ici et non au lancement : l'échec d'une page ne doit pas défaire l'article parti avant elle.
+  const tete = o.executer("git", ["rev-parse", "HEAD"]).sortie.trim();
+  let refus: string | null;
+  try {
+    await preparer();
+    refus = controlerEtPousser(o, message, tete);
+  } catch (e) {
+    o.annuler(tete);
+    // Le début et non la fin : les motifs de refus se lisent dans l'ordre, et le cockpit borne le texte.
+    refus = `Écriture refusée, rien n'est parti :\n${[...texteErreur(e)].slice(0, 2000).join("")}`;
+  }
+  if (!refus) return { etat: "partie", a, url, ignores };
+  await poserEchec(o, a, refus);
+  return { etat: "echec", motif: refus, ignores };
+}
+
+/** Les adresses qui répondent. Au plus 20 minutes pour les deux : leurs déploiements se suivent. */
+async function attendreEnLigne(o: Outils, parties: readonly Partie[]): Promise<ReadonlySet<string>> {
+  const enLigne = new Set<string>();
+  for (let i = 0; i < RELEVES_DEPLOIEMENT && enLigne.size < parties.length; i++) {
+    for (const { url } of parties) {
+      if (!enLigne.has(url) && (await o.enLigne(url))) enLigne.add(url);
+    }
+    if (enLigne.size < parties.length) await o.attendre(INTERVALLE_RELEVE);
+  }
+  return enLigne;
+}
+
+/** La page répond : la carte passe à « Publié » et les moteurs sont prévenus. Sinon la carte le dit. */
+async function conclure(o: Outils, v: Volet | Partie, enLigne: ReadonlySet<string>): Promise<Volet> {
+  if (v.etat !== "partie") return v;
+  const { a, url, ignores } = v;
+  if (!enLigne.has(url)) {
+    const motif =
+      "Poussé sur le site, mais la page ne répond pas après 20 minutes : le déploiement Coolify est à vérifier. " +
+      "Le site en ligne reste sur sa version précédente ; la publication sera confirmée dès que la page répondra.";
+    await poserEchec(o, a, motif);
+    return { etat: "echec", motif, ignores };
+  }
+  try {
+    await o.cockpit.publie(a.id, url);
+  } catch (e) {
+    // La page est en ligne : la prochaine exécution la confirmera (`confirmerEnLigne`).
+    o.journal(`Publication de ${a.article.slug} non confirmée au cockpit : ${texteErreur(e)}`);
+  }
+  o.journal(await o.indexNow(url));
+  return { etat: "publie", url, ignores };
+}
+
+/** La chaîne complète : au plus un article et au plus une page par jour ouvré, chacun son quota. */
 export async function publierAuto(o: Outils): Promise<Issue> {
   // L'annulation remet le dossier à son état de départ (`reset --hard`, `clean`) :
   // sur un dossier déjà modifié, elle effacerait un travail en cours. Rien ne part.
@@ -199,32 +342,46 @@ export async function publierAuto(o: Outils): Promise<Issue> {
   const maintenant = o.maintenant();
   const date = jourDeParis(maintenant);
   if (estWeekEnd(maintenant)) return { etat: "repos", confirmes, ignores: [] };
-  if (o.registre().some((a) => a.date === date)) return { etat: "deja-publie", confirmes, ignores: [] };
 
-  const { article, ignores } = choisir(await o.cockpit.articles(), o, maintenant);
-  if (!article) return { etat: "rien", confirmes, ignores };
+  const articleDuJour = o.registre().some((a) => a.date === date);
+  const pageDuJour = o.pages().some((p) => p.date === date);
+  const validations = articleDuJour && pageDuJour ? [] : await o.cockpit.articles();
 
-  const slug = article.article.slug;
-  const emp = empreinte(article.corps);
-  o.journal(`Publication de ${slug}`);
-  await o.ecrire(article, date);
-  const refus = controlerEtPousser(o, slug);
-  if (refus) {
-    await o.cockpit.echec(article.id, refus, emp);
-    return { etat: "echec", motif: refus, confirmes, ignores };
-  }
+  const volet = async (deja: boolean, envoi: Envoi | null, ignores: string[]): Promise<Volet | Partie> => {
+    if (deja) return { etat: "deja-publie", ignores: [] };
+    return envoi ? envoyer(o, envoi, ignores) : { etat: "rien", ignores };
+  };
 
-  const url = urlArticle(slug);
-  if (!(await attendreEnLigne(o, url))) {
-    const motif =
-      "Poussé sur le site, mais la page ne répond pas après 20 minutes : le déploiement Coolify est à vérifier. " +
-      "Le site en ligne reste sur sa version précédente ; l'article sera marqué publié dès qu'il répondra.";
-    await o.cockpit.echec(article.id, motif, emp);
-    return { etat: "echec", motif, confirmes, ignores };
-  }
-  await o.cockpit.publie(article.id, url);
-  o.journal(await o.indexNow(url));
-  return { etat: "publie", url, confirmes, ignores };
+  const { article, ignores } = choisir(validations, o, maintenant);
+  const pourArticle = await volet(
+    articleDuJour,
+    article && {
+      a: article,
+      url: urlArticle(article.article.slug),
+      message: `📝 Publier l'article ${article.article.slug}`,
+      preparer: () => o.ecrire(article, date),
+    },
+    ignores,
+  );
+
+  const { page, ignores: ignoresPages } = choisirPage(validations, o, maintenant);
+  const pourPage = await volet(
+    pageDuJour,
+    page && {
+      a: page,
+      url: urlPage(page.article.slug),
+      message: `📝 Publier la page métier ${page.article.slug}`,
+      preparer: () => o.ecrirePage(page, entreePage(page, date, o.pages())),
+    },
+    ignoresPages,
+  );
+
+  const parties = [pourArticle, pourPage].filter((v): v is Partie => v.etat === "partie");
+  const enLigne = await attendreEnLigne(o, parties);
+  const issueArticle = await conclure(o, pourArticle, enLigne);
+  const issuePage = await conclure(o, pourPage, enLigne);
+  const rienADire = issuePage.etat === "rien" && issuePage.ignores.length === 0;
+  return { ...issueArticle, confirmes, ...(rienADire ? {} : { page: issuePage }) };
 }
 
 /**
@@ -247,7 +404,7 @@ export function clientCockpit(base: string, jeton: string, lire: typeof fetch = 
     async articles() {
       const r = await lire(`${base}/api/agents/articles`, { headers: entetes });
       if (!r.ok) throw new Error(`Cockpit : ${r.status} sur la lecture des articles validés`);
-      const { articles } = (await r.json()) as { articles: ArticleAPublier[] };
+      const { articles } = (await r.json()) as { articles: AValider[] };
       return articles;
     },
     async publie(id, url) {
