@@ -63,6 +63,23 @@ describe("une page n'est publiée que si elle est propre à son métier", () => 
     expect(motifsDeRefus(copie, entreesMetier).join()).toContain("hydrocureuse");
   });
 
+  test("un paragraphe repris d'une autre page est refusé", () => {
+    const phrase = entreesMetier[1].resume;
+    const copie = { ...base, resume: phrase };
+    expect(motifsDeRefus(copie, entreesMetier).join()).toContain("repris d’une autre page");
+  });
+
+  test("une seule nature de bloc est refusée", () => {
+    const sections = base.blocs.filter((b) => b.type === "section");
+    const copie = { ...base, blocs: [...sections, ...sections] };
+    expect(motifsDeRefus(copie, entreesMetier).join()).toContain("une seule nature");
+  });
+
+  test("un lexique trop court est refusé", () => {
+    const copie = { ...base, lexique: base.lexique.slice(0, 2) };
+    expect(motifsDeRefus(copie, entreesMetier).join()).toContain("mots du métier");
+  });
+
   test("une entrée malformée est écartée par le refus, jamais servie vide", () => {
     expect(motifsDeRefus({ ...base, lexique: [] }, entreesMetier).length).toBeGreaterThan(0);
   });

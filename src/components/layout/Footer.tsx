@@ -295,7 +295,7 @@ export async function Footer({
   // sans aucune erreur visible.
   const subtext = footerCta?.subtext ?? "";
   const subtextEmphasis = footerCta?.subtextEmphasis?.[0] ?? "";
-  const [subtextBefore, subtextAfter = ""] = subtextEmphasis
+  const [subtextBefore, subtextAfter] = subtextEmphasis
     ? subtext.split(subtextEmphasis)
     : [subtext];
 

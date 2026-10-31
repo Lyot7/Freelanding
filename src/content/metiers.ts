@@ -27,7 +27,7 @@ import { blogPosts } from "./blog";
 import donnees from "./metiers.json";
 import { prestation } from "./offre";
 import type { BlocTheme, PageTheme } from "./page-theme";
-import { pagesSecteur } from "./pages-secteur";
+import { pagesSecteur, type SecteurSlug } from "./pages-secteur";
 
 export const CHEMIN_HUB_METIERS = "/logiciel-metier";
 
@@ -222,7 +222,7 @@ export interface EntreeHub {
  * requêtes, le négoce et la location servent le blog. Le hub les liste avec les
  * autres, et leurs thèmes les rendent voisines des pages par métier.
  */
-const THEMES_SECTEUR: Readonly<Record<string, readonly Theme[]>> = {
+const THEMES_SECTEUR: Readonly<Record<SecteurSlug, readonly Theme[]>> = {
   btp: ["chantier", "facturation", "planning", "terrain"],
   "location-materiel": ["location", "facturation", "stock", "planning"],
   "negoce-distribution": ["stock", "facturation", "relances"],
@@ -235,7 +235,7 @@ export const pagesHub: readonly EntreeHub[] = [
     libelle: p.marcheFilAriane,
     chemin: p.chemin,
     accroche: p.accroche,
-    themes: THEMES_SECTEUR[p.slug] ?? [],
+    themes: THEMES_SECTEUR[p.slug],
   })),
 ];
 
