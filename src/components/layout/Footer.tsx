@@ -220,6 +220,11 @@ function TestimonialCard({ person }: { person: FooterPerson }) {
   );
 }
 
+/** Ce qui précède et ce qui suit le fragment mis en avant ; sans fragment, tout est avant. */
+export function decouperAutour(texte: string, fragment: string): readonly string[] {
+  return fragment ? texte.split(fragment) : [texte];
+}
+
 /**
  * Icône sociale (14px, 22 mobile), opacité 0,5 → 0,8 au survol.
  *
@@ -295,9 +300,7 @@ export async function Footer({
   // sans aucune erreur visible.
   const subtext = footerCta?.subtext ?? "";
   const subtextEmphasis = footerCta?.subtextEmphasis?.[0] ?? "";
-  const [subtextBefore] = subtextEmphasis
-    ? subtext.split(subtextEmphasis)
-    : [subtext];
+  const [subtextBefore, subtextAfter] = decouperAutour(subtext, subtextEmphasis);
 
   // Style de lien inline (preset gdp728 : blanc, hover accent).
   // 200ms : durée MESURÉE sur le live. `transition-colors` seul retombait sur
@@ -441,6 +444,7 @@ export async function Footer({
               <p className="h-auto w-full max-w-[330px] whitespace-pre-wrap break-words text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60">
                 {subtextBefore}
                 <span className="text-foreground">{subtextEmphasis}</span>
+                {subtextAfter}
               </p>
             </div>
 

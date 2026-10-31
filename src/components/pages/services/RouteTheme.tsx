@@ -23,18 +23,7 @@ export function metadataTheme(id: IdPageTheme): Metadata {
 export async function RouteTheme({ id }: { id: IdPageTheme }) {
   const page = pageTheme(id);
   const site = await content.getSiteConfig();
-  /*
-   * LE SERVICE DÉCLARE L'OFFRE QUE LA PAGE AFFICHE. Pour l'automatisation, ce
-   * n'est pas la prestation de rattachement mais l'intégration IA : son nom et
-   * son plancher remplacent ceux de la prestation dans l'`Offer`.
-   */
-  const service = {
-    ...prestation(page.prestation),
-    nom: page.offre.nom,
-    plancher: page.offre.plancher,
-    periode: page.offre.periode,
-    resume: page.resume,
-  };
+  const service = { ...prestation(page.prestation), resume: page.resume };
 
   return (
     <>

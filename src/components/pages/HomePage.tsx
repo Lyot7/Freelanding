@@ -7,12 +7,14 @@ import { FaqSection } from "@/components/sections/FaqSection";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { LogicielSection } from "@/components/sections/LogicielSection";
 import { LogoBandSection } from "@/components/sections/LogoBandSection";
+import { MetiersSection } from "@/components/sections/MetiersSection";
 import { ServicesSection } from "@/components/sections/ServicesSection";
 import { ShowreelSection } from "@/components/sections/ShowreelSection";
 import { StatsSection } from "@/components/sections/StatsSection";
 import { TestimonialsSection } from "@/components/sections/TestimonialsSection";
 import { WhyUsSection } from "@/components/sections/WhyUsSection";
 import { WorksSection } from "@/components/sections/WorksSection";
+import { pagesHub } from "@/content/metiers";
 import { content } from "@/lib/content";
 
 /**
@@ -69,12 +71,11 @@ export async function HomePage() {
         bottomAccent="muted"
       />
     ),
-    /* « Pourquoi moi », sur fond clair, suit la section noire du logiciel,
-       qui a pris la place de la méthode le 2026-10-16 : la bande claire du
-       bas l'annonce. */
+    /* Pas de bande claire en bas : la section noire des métiers suit. */
     logiciel: home.logiciel ? (
-      <LogicielSection logiciel={home.logiciel} bottomAccent="muted" />
+      <LogicielSection logiciel={home.logiciel} />
     ) : null,
+    metiers: <MetiersSection metiers={home.metiers} entrees={pagesHub} />,
     numbers: <StatsSection numbers={home.numbers} />,
     /* Pas de bande en tête de la FAQ sur l'accueil : elle suit « Pourquoi
        moi », déjà clair, et la bande y recouvrait le bas de sa carte droite. */

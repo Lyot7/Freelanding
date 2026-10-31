@@ -5,7 +5,7 @@ import type {
   SiteConfig,
   WorkItem,
 } from "@/lib/content/types";
-import { PERIODES, type Prestation } from "@/content/offre";
+import type { Prestation } from "@/content/offre";
 import { absoluteUrl } from "@/lib/site-url";
 
 /**
@@ -133,20 +133,13 @@ function bornesPrix(prix: string | undefined) {
 
   if (!montants.length) return undefined;
 
-  // UNE OFFRE MENSUELLE (« à partir de 1 600 € par mois », le CTO à temps
-  // partagé) déclare son unité, comme dans `serviceSchema` : sans elle, Google
-  // lirait le plancher comme le prix d'un projet entier. Le suffixe vient de
-  // `PERIODES`, le même que `aPartirDe()` écrit dans la ligne de service.
-  const mensuel = prix.includes(PERIODES.mois);
-
   return compact({
-    "@type": mensuel ? "UnitPriceSpecification" : "PriceSpecification",
+    "@type": "PriceSpecification",
     priceCurrency: "EUR",
     minPrice: Math.min(...montants),
     // Absent quand la page n'annonce qu'un seul montant : déclarer un plafond
     // égal au plancher fermerait une offre que la page laisse ouverte.
     maxPrice: montants.length > 1 ? Math.max(...montants) : undefined,
-    unitCode: mensuel ? "MON" : undefined,
   });
 }
 
@@ -357,17 +350,41 @@ export function serviceSchema(
       name: prestation.nom,
       description: prestation.resume,
       priceCurrency: "EUR",
-      // UNE OFFRE MENSUELLE (le CTO à temps partagé) déclare son unité : un
-      // plancher sans elle se lirait comme le prix d'un projet entier.
       priceSpecification: {
-        "@type": prestation.periode ? "UnitPriceSpecification" : "PriceSpecification",
+        "@type": "PriceSpecification",
         priceCurrency: "EUR",
         minPrice: prestation.plancher,
         valueAddedTaxIncluded: false,
-        ...(prestation.periode === "mois" ? { unitCode: "MON" } : {}),
       },
     },
   });
+}
+
+/**
+ * LE HUB DES PAGES PAR MÉTIER : une collection et la liste de ce qu'elle porte,
+ * dans l'ordre affiché. Un moteur y lit d'un coup tous les métiers couverts.
+ */
+export function collectionSchema(
+  nom: string,
+  description: string,
+  chemin: string,
+  entrees: readonly { readonly libelle: string; readonly chemin: string }[],
+) {
+  return {
+    "@type": "CollectionPage",
+    name: nom,
+    description,
+    url: absoluteUrl(chemin),
+    mainEntity: {
+      "@type": "ItemList",
+      itemListElement: entrees.map((entree, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name: entree.libelle,
+        url: absoluteUrl(entree.chemin),
+      })),
+    },
+  };
 }
 
 /**

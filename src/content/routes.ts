@@ -1,8 +1,8 @@
 import type { ContentRoute } from "@/lib/content/types";
 import { blogPosts } from "./blog";
 import { prestations } from "./offre";
-import { CHEMIN_PAGE_CAEN, CHEMIN_PAGE_LOGICIEL_CAEN } from "./page-caen";
-import { CHEMIN_PRIX_SITE } from "./page-prix-site";
+import { CHEMIN_HUB_METIERS, pagesMetier } from "./metiers";
+import { CHEMIN_PAGE_LOGICIEL_CAEN } from "./page-caen";
 import { CHEMIN_PRIX_LOGICIEL, pagesSecteur } from "./pages-secteur";
 import { pagesTheme } from "./pages-theme";
 
@@ -44,20 +44,9 @@ export const contentRoutes: readonly ContentRoute[] = [
     }),
   ),
   /*
-   * PAGE LOCALE, à l'adresse reprise de l'ancien site (2026-09-23). Elle
-   * décline le site vitrine pour Caen et le Calvados ; voir `page-caen.ts`.
-   */
-  { pathname: CHEMIN_PAGE_CAEN, kind: "local" },
-  /*
-   * LA SOLUTION MÉTIER À CAEN (2026-10-02), pendant de la page précédente pour
-   * le logiciel ; voir `page-logiciel-caen.ts`.
+   * LE LOGICIEL MÉTIER À CAEN (2026-10-02) ; voir `page-logiciel-caen.ts`.
    */
   { pathname: CHEMIN_PAGE_LOGICIEL_CAEN, kind: "local" },
-  /*
-   * PRIX D'UN SITE INTERNET (2026-10-02) : les forfaits du site vitrine,
-   * expliqués. Voir `page-prix-site.ts`.
-   */
-  { pathname: CHEMIN_PRIX_SITE, kind: "page" },
   /*
    * PAGES SECTEUR de la solution métier (2026-10-02), dérivées de
    * `pages-secteur.ts` : ajouter un secteur suffit à l'annoncer au sitemap.
@@ -65,7 +54,20 @@ export const contentRoutes: readonly ContentRoute[] = [
   ...pagesSecteur.map(
     (p): ContentRoute => ({ pathname: p.chemin, kind: "secteur", contentSlug: p.slug }),
   ),
-  /* LES PRIX DE LA SOLUTION MÉTIER (2026-10-02) ; voir `page-prix-logiciel.ts`. */
+  /*
+   * LES PAGES PAR MÉTIER (2026-10-31), dérivées de `metiers.ts` : une page
+   * publiée entre seule au sitemap, à `llms.txt` et sur le hub.
+   */
+  { pathname: CHEMIN_HUB_METIERS, kind: "page" },
+  ...pagesMetier.map(
+    (p): ContentRoute => ({
+      pathname: p.chemin,
+      kind: "metier",
+      contentSlug: p.slug,
+      lastModified: p.date,
+    }),
+  ),
+  /* LES PRIX DU LOGICIEL MÉTIER (2026-10-02) ; voir `page-prix-logiciel.ts`. */
   { pathname: CHEMIN_PRIX_LOGICIEL, kind: "page" },
   /*
    * PAGES THÉMATIQUES (2026-10-15) : ERP, GMAO, automatisation, artisans, IA à

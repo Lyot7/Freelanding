@@ -3,9 +3,7 @@
  * `llms.txt`, le pied de page et les liens des piliers en sont dérivés. Règles
  * et types dans `page-theme.ts`.
  */
-import { pageArtisans } from "./page-artisans";
 import { pageAutomatisation } from "./page-automatisation";
-import { pageCto } from "./page-cto";
 import { pageErp } from "./page-erp";
 import { pageGmao } from "./page-gmao";
 import { pageIaCaen } from "./page-ia-caen";
@@ -15,9 +13,7 @@ export const pagesTheme: readonly PageTheme[] = [
   pageErp,
   pageGmao,
   pageAutomatisation,
-  pageArtisans,
   pageIaCaen,
-  pageCto,
 ];
 
 /** Une page par identifiant, pour que les routes ne dépendent pas de l'ordre. */

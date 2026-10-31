@@ -9,16 +9,17 @@
  *
  * DEMANDE D'ELIOTT DU 2026-10-15 : la carte SEO relève que le site n'a aucune
  * page pour son discours (temps repris, process, trésorerie, IA). L'offre
- * reste `integrationIA` d'`offre.ts`, hors de `prestations` : la page la
- * présente sans lui donner de place dans l'accordéon de l'accueil.
+ * est le logiciel métier depuis le 2026-10-31 : l'automatisation n'est plus une
+ * offre à part, c'est ce que le logiciel fait.
  *
  * L'ÉLÉMENT PROPRE À LA PAGE : six tâches chiffrées avant et après, total
  * calculé depuis les hypothèses ; et l'outil qu'Eliott utilise lui-même pour
  * son activité, décrit tel qu'il tourne.
  */
-import { aPartirDe, euros, integrationIA, prixPlancher } from "./offre";
+import { aPartirDe, euros, prestation, prixPlancher } from "./offre";
 import { CHEMIN_AUTOMATISATION, nombre, type PageTheme } from "./page-theme";
-import { RDV_HORS_PRESTATION } from "./rendez-vous";
+
+const LOGICIEL = prestation("logiciel");
 
 /*
  * HYPOTHÈSES DU CALCUL : minutes par semaine pour une PME d'une dizaine de
@@ -87,13 +88,12 @@ export const pageAutomatisation: PageTheme = {
   chemin: CHEMIN_AUTOMATISATION,
   seo: {
     titre: "Automatisation et IA pour PME · Eliott Bouquerel",
-    description: `Automatisation et IA pour votre PME : mails triés, commandes saisies, factures relancées, sur vos outils. Vous reprenez des heures, ${aPartirDe(integrationIA, " HT")}.`,
+    description: `Automatisation et IA pour votre PME : mails triés, commandes saisies, factures relancées, sur vos outils. Vous reprenez des heures, ${aPartirDe(LOGICIEL, " HT")}.`,
   },
   h1: "Automatisation et IA pour PME",
-  resume: `J’installe l’IA dans les outils que vous utilisez déjà, sur les tâches que votre équipe refait chaque semaine : trier les mails, saisir les commandes, relancer les factures. Vous reprenez des heures pour le travail qui demande quelqu’un. Comptez ${aPartirDe(integrationIA, " HT")} pour un premier usage.`,
+  resume: `J’installe l’IA dans les outils que vous utilisez déjà, sur les tâches que votre équipe refait chaque semaine : trier les mails, saisir les commandes, relancer les factures. Vous reprenez des heures pour le travail qui demande quelqu’un. Comptez ${aPartirDe(LOGICIEL, " HT")} pour un premier usage.`,
   prestation: "logiciel",
-  rendezVous: RDV_HORS_PRESTATION.integrationIA,
-  offre: integrationIA,
+  offre: LOGICIEL,
   filAriane: [
     { libelle: "Accueil", href: "/" },
     { libelle: "Prestations", href: "/#services" },
@@ -191,7 +191,7 @@ export const pageAutomatisation: PageTheme = {
             description: "Quand le tableur partagé devient lui-même la tâche répétitive.",
           },
           {
-            libelle: "La Solution métier",
+            libelle: "Le logiciel métier",
             href: "/services/logiciel-metier",
             description: "Quand l’automatisation demande un outil entier.",
           },
@@ -206,12 +206,12 @@ export const pageAutomatisation: PageTheme = {
     items: [
       {
         question: "Combien coûte une automatisation avec l’IA ?",
-        answer: `Un premier usage branché sur un outil que vous utilisez déjà démarre à ${prixPlancher(integrationIA)} HT. Le prix monte avec le nombre d’usages, les règles de votre métier à appliquer et le nombre d’outils à relier. L’abonnement au modèle d’IA est à votre nom, payé directement à son éditeur.`,
+        answer: `Un premier usage branché sur un outil que vous utilisez déjà démarre à ${prixPlancher(LOGICIEL)} HT. Le prix monte avec le nombre d’usages, les règles de votre métier à appliquer et le nombre d’outils à relier. L’abonnement au modèle d’IA est à votre nom, payé directement à son éditeur.`,
       },
       {
         question: "Faut-il changer nos logiciels ?",
         answer:
-          "Non. L’automatisation se branche sur votre messagerie, votre logiciel de gestion ou vos tableurs. Quand il manque un outil entier, je le chiffre à part avec La Solution métier.",
+          "Non. L’automatisation se branche sur votre messagerie, votre logiciel de gestion ou vos tableurs. Quand il manque un outil entier, je le chiffre à part avec le logiciel métier.",
       },
       {
         question: "L’IA peut-elle se tromper ?",

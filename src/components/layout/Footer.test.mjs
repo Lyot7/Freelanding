@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test";
 
-import { Footer } from "./Footer";
+import { decouperAutour, Footer } from "./Footer";
 
 /**
  * Composant SERVEUR asynchrone sans hook : l'appeler directement exécute son
@@ -23,5 +23,15 @@ describe("Footer", () => {
   it("monte toujours les glyphes sociaux exposés", async () => {
     const element = await Footer();
     expect(trouveIconeSociale(element)).toBe(true);
+  });
+});
+
+describe("decouperAutour", () => {
+  it("garde ce qui suit le fragment mis en avant", () => {
+    expect(decouperAutour("Avant. Fort. Après.", "Fort.")).toEqual(["Avant. ", " Après."]);
+  });
+
+  it("rend tout le texte quand aucun fragment n'est donné", () => {
+    expect(decouperAutour("Tout le texte.", "")).toEqual(["Tout le texte."]);
   });
 });

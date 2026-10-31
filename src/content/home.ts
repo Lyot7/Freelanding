@@ -2,64 +2,55 @@ import type { HeroComparaison, HomeContent } from "@/lib/content/types";
 import { slugsMisEnAvant } from "@/content/blog";
 import { faqItems } from "@/content/faq";
 import { services } from "@/content/services";
-import { euros, prestation, prixPlancher, repereAgenceSite } from "@/content/offre";
+import { CHEMIN_HUB_METIERS } from "@/content/metiers";
+import { euros, prestation, prixPlancher, repereAgenceLogiciel } from "@/content/offre";
 import { lienRendezVous } from "@/content/rendez-vous";
 import { howWeDoItStats, reputationStats } from "@/content/stats";
 
-const ENTREE_VITRINE = prixPlancher(prestation("vitrine"));
-const ENTREE_LOGICIEL = prixPlancher(prestation("logiciel"));
+const LOGICIEL = prestation("logiciel");
+const ENTREE_LOGICIEL = prixPlancher(LOGICIEL);
 
 /*
- * LE POSITIONNEMENT D'ELIOTT, décision du 2026-10-15 : « je fais le travail
- * d'une agence pour deux fois moins cher ». « Jusqu'à » le garde vrai sur les
- * deux offres : le site d'entrée vaut la moitié de la médiane d'un site de PME
- * en agence (preuve chiffrée plus bas), le logiciel s'en rapproche sans
- * l'atteindre sur un premier outil. Chiffres et source : `offre.ts`.
+ * UNE SEULE OFFRE DEPUIS LE 2026-10-31, décision d'Eliott du 2026-10-30. Ce qui
+ * se vend : une contrainte qui disparaît et du temps gagné. Le temps humain
+ * revient à ce qui rend la personne indispensable, et l'IA fait le sale boulot.
+ *
+ * « JUSQU'À DEUX FOIS MOINS CHER » EST PARTI AVEC LE SITE VITRINE : seule sa
+ * comparaison le rendait exact (`offre.ts`). Le logiciel se compare à livrable
+ * égal, chiffre d'agence écrit à côté du mien.
  */
-const POSITIONNEMENT = "La qualité d’une agence, jusqu’à deux fois moins cher.";
+const POSITIONNEMENT = "Logiciel métier sur mesure, sans agence entre vous et le code.";
 
-/*
- * LES DEUX PORTES, qui forment ensemble le seul h1 de l'accueil. Mots
- * d'Eliott du 2026-10-15 : « un site qui vous ramène des clients, un outil
- * qui vous rend des heures ». Chaque porte mène à sa prestation et porte son
- * prix d'entrée.
- */
+/* LE H1 DE L'ACCUEIL, mots d'Eliott du 2026-10-15. */
 const PORTES = [
   {
-    lines: ["Un site qui vous", "ramène des clients."],
-    href: `/services/${prestation("vitrine").slug}`,
-    price: `dès ${ENTREE_VITRINE} HT`,
-  },
-  {
-    lines: ["Un outil qui vous", "rend des heures."],
-    href: `/services/${prestation("logiciel").slug}`,
+    lines: ["Un logiciel qui vous", "rend des heures."],
+    href: `/services/${LOGICIEL.slug}`,
     price: `dès ${ENTREE_LOGICIEL} HT`,
   },
 ] as const;
 
 const TITRE_ACCUEIL = PORTES.map((porte) => porte.lines.join(" ")).join(" ");
 
-/** Ce qui explique le prix, en une phrase, sous les deux portes. */
-const POURQUOI_CE_PRIX =
-  "Je conçois et je code moi-même, sans chef de projet ni structure à payer : votre budget va au produit.";
+/** Le message d'Eliott, sous le titre. */
+const CE_QUI_DISPARAIT =
+  "La tâche qui vous bloque disparaît. L’IA fait le sale boulot, le recopiage, les factures, les relances, et votre équipe revient à ce qui la rend indispensable.";
 
 /*
- * LE PRIX D'UNE AGENCE ET LE MIEN, POUR LE MÊME SITE, décision d'Eliott du
- * 2026-10-16. Le « 50 % du prix d'un site de PME en agence » rapportait mon
- * plancher à la MÉDIANE des agences : un visiteur y lisait « son prix le plus
- * bas contre leur prix moyen, forcément moitié moins, mais pour quelle
- * qualité ? ». La comparaison se fait donc à livrable égal : la fourchette
- * qu'une agence facture un site vitrine soigné, design et ergonomie compris,
- * contre ce que coûte le mien, qui comprend la même chose (`offre.ts`).
- * Chiffres et source : `repereAgenceSite`.
+ * LE PRIX D'UNE AGENCE ET LE MIEN, POUR LE MÊME LIVRABLE, décision d'Eliott du
+ * 2026-10-16 : un premier outil, des deux côtés. Chiffres et source :
+ * `repereAgenceLogiciel`.
  */
 function comparaisonAgence(): HeroComparaison {
-  const agence = repereAgenceSite;
+  const agence = repereAgenceLogiciel;
   return {
-    sujet: "Un site vitrine soigné, design et ergonomie compris",
+    sujet: "Un premier outil métier sur mesure",
     lignes: [
-      { qui: "En agence", prix: `${euros(agence.soigneMin).replace(/\s€$/u, "")} à ${euros(agence.soigneMax)}` },
-      { qui: "Avec moi", prix: `dès ${ENTREE_VITRINE}`, fort: true },
+      {
+        qui: "En agence",
+        prix: `${euros(agence.premierOutilMin).replace(/\s€$/u, "")} à ${euros(agence.premierOutilMax)}`,
+      },
+      { qui: "Avec moi", prix: `dès ${ENTREE_LOGICIEL}`, fort: true },
     ],
     source: {
       label: `${agence.source.nom}, ${agence.source.releve}`,
@@ -77,19 +68,18 @@ function comparaisonAgence(): HeroComparaison {
  */
 export const homeContent: HomeContent = {
   hero: {
-    // Au-dessus des deux portes : ce qui distingue Eliott d'une agence.
+    // Au-dessus du titre : ce qui est vendu, et ce qui distingue Eliott d'une agence.
     eyebrow: POSITIONNEMENT,
-    // LE H1 DE L'ACCUEIL : les deux portes mises bout à bout. Le héros rend
-    // chaque porte comme un lien vers sa prestation.
+    // LE H1 DE L'ACCUEIL. Le héros rend la porte comme un lien vers l'offre.
     title: TITRE_ACCUEIL,
     titleLines: PORTES.map((porte) => porte.lines.join(" ")),
     doors: PORTES,
-    subtitle: POURQUOI_CE_PRIX,
-    subtitleParagraphs: [{ text: POURQUOI_CE_PRIX }],
+    subtitle: CE_QUI_DISPARAIT,
+    subtitleParagraphs: [{ text: CE_QUI_DISPARAIT }],
     /*
      * UNE SEULE PREUVE DANS LE PREMIER ÉCRAN depuis le 2026-10-16 : le prix
-     * d'une agence et le mien, pour le même site. Le −92 % de Würth est sorti
-     * du héros, décision d'Eliott ; il reste dans la section chiffres.
+     * d'une agence et le mien, pour le même livrable. Le −92 % de Würth est
+     * sorti du héros, décision d'Eliott ; il reste dans la section chiffres.
      */
     comparison: comparaisonAgence(),
     // Fond du hero : macro d'un mouvement d'horlogerie, asset généré et
@@ -117,26 +107,23 @@ export const homeContent: HomeContent = {
   },
 
   /*
-   * LA SECTION NOIRE MONTRE LE LOGICIEL depuis le 2026-10-16, idée d'Eliott :
-   * « On vous compare avant d'appeler » parle au client du site vitrine, il
-   * en fallait une pour celui de l'outil. Elle remplace la prise de parole
-   * sur la méthode, dont elle garde la citation, qui parle de logiciel.
+   * LA SECTION NOIRE MONTRE LE LOGICIEL depuis le 2026-10-16, idée d'Eliott.
    *
    * LA DÉMONSTRATION EST UN EXEMPLE, et le dit : une tâche que la plupart des
    * PME refont à la main, découpée en étapes, sans durée inventée. Ce qui
    * change entre les deux onglets se compte : qui fait chaque étape.
    */
   logiciel: {
-    eyebrow: prestation("logiciel").nom,
+    eyebrow: LOGICIEL.nom,
     // Lignes de douze signes au plus : le titre est rendu à 92 px dans une
     // demi-colonne, comme celui du showreel.
     titleLines: ["Vos heures", "valent mieux", "qu’un", "tableur."],
     statement:
-      "Une commande arrive par mail, vous la recopiez dans un tableur, vous vérifiez le stock, puis vous retapez le devis. Je construis l’outil qui enchaîne ces étapes à votre place : il vous reste à relire et à envoyer.",
+      "Une commande arrive par mail, vous la recopiez dans un tableur, vous vérifiez le stock, puis vous retapez le devis. Je construis le logiciel qui enchaîne ces étapes à votre place. L’IA fait le sale boulot : il vous reste à relire et à envoyer.",
     statementEmphasis: ["il vous reste à relire et à envoyer."],
     cta: {
-      label: "Voir La Solution métier",
-      href: `/services/${prestation("logiciel").slug}`,
+      label: "Voir l’offre et le prix",
+      href: `/services/${LOGICIEL.slug}`,
     },
     demo: {
       titre: "Exemple : une commande reçue par mail",
@@ -163,25 +150,30 @@ export const homeContent: HomeContent = {
     },
   },
 
-  // showreel.ts — titre + phrase d'appui + affiche + lien vers les réalisations.
+  /* LA LISTE VIENT DE `pagesHub` : une page publiée y entre seule. */
+  metiers: {
+    titleLines: ["Votre métier", "a ses corvées."],
+    intro:
+      "Une location en jours réels, une fiche à retaper, un client à rappeler la veille. Trouvez la vôtre.",
+    cta: { label: "Tous les métiers", href: CHEMIN_HUB_METIERS },
+  },
+
+  /*
+   * LES RÉALISATIONS, RÉÉCRITES LE 2026-10-31 : « On vous compare avant
+   * d'appeler » parlait au client du site vitrine. Ce sont des produits réels,
+   * jamais présentés comme des logiciels livrés à un client : la section invite
+   * à regarder, elle n'affirme aucune référence.
+   *
+   * LIGNES DE 12 SIGNES AU PLUS, le titre est rendu à 92 px dans une demi-
+   * colonne de 683 px, aligné à droite dès 810.
+   */
   showreel: {
-    /*
-     * TITRE ET PHRASE CHOISIS PAR ELIOTT le 2026-09-24. « Je construis des
-     * outils qu'on garde » et « Où avancer semble évident… » parlaient d'Eliott
-     * et de style ; la section annonce les réalisations, elle dit donc pourquoi
-     * le client doit les regarder : son propre client compare avant d'appeler.
-     *
-     * LIGNES DE 12 SIGNES AU PLUS, le titre est rendu à 92 px dans une demi-
-     * colonne de 683 px, aligné à droite dès 810.
-     */
-    marquee: "On vous compare avant d’appeler.",
-    // Dix signes au plus par ligne : « vous compare » débordait sa colonne
-    // de 12 à 17 px entre 810 et 1200 (relevé du 2026-10-15).
-    marqueeLines: ["On vous", "compare", "avant", "d’appeler."],
+    marquee: "Regardez ce que je construis.",
+    marqueeLines: ["Regardez", "ce que je", "construis."],
     statement:
-      "Votre client ouvre votre site puis celui du concurrent, et il appelle celui qui rassure. Regardez ce que j’ai livré.",
+      "Avant de me confier votre métier, vous voulez voir du concret. Voici des produits que j’ai développés et mis en service, écran par écran.",
     // Rendue en noir 60 %, ce fragment passe en noir plein.
-    statementEmphasis: ["il appelle celui qui rassure."],
+    statementEmphasis: ["mis en service, écran par écran."],
     vintage: "2026©",
     /*
      * SEUL CONTRÔLE DE LA SECTION depuis le 2026-08-27, et il est enfin
@@ -238,20 +230,19 @@ export const homeContent: HomeContent = {
      * MECA SERVICES en alternance. Aucun n'est présenté comme client.
      */
     body: [
-      "Je suis développeur full-stack, installé à Caen, et je travaille seul. Du premier appel à la mise en ligne, vous parlez à celui qui conçoit et qui code votre projet.",
-      "Avant de me lancer, j’ai développé chez Médiapilote, Würth France, MeilleursBiens, puis MECA SERVICES, où je tenais aussi la boutique en ligne. J’y ai appris à partir de ce qu’un site ou un outil doit rapporter, et à décider avant la première ligne de code de ce qui ne se voit pas : la vitesse, l’architecture, ce que lisent les moteurs de recherche.",
-      /* LA VISION D'ELIOTT, ajoutée le 2026-10-16 à sa demande : du premium,
-         fini, rien au hasard, et le prix qui va avec. « Jusqu'à » garde la
-         phrase vraie, comme le positionnement du héros. */
-      "Je livre des sites et des outils finis. Chaque détail est décidé, testé et documenté avant de vous être remis : rien n’est laissé au hasard, et rien n’est bâclé pour tenir une date. C’est le niveau qu’une entreprise attend d’une agence, pour un prix jusqu’à deux fois moins élevé, parce qu’il ne paie que le travail.",
+      "Je suis développeur full-stack, installé à Caen, et je travaille seul. Du premier appel à la mise en service, vous parlez à celui qui conçoit et qui code votre logiciel.",
+      "Avant de me lancer, j’ai développé chez Médiapilote, Würth France, MeilleursBiens, puis MECA SERVICES, où je tenais aussi la boutique en ligne. J’y ai appris à partir de ce qu’un outil doit rapporter, et à regarder comment les gens travaillent avant d’écrire la première ligne de code.",
+      /* LE MESSAGE D'ELIOTT, 2026-10-30 : le temps humain revient à ce qui rend
+         la personne indispensable, l'IA fait le sale boulot. */
+      "Ma conviction : une machine ne remplace pas la personne qui connaît vos clients, elle la débarrasse de ce qui l’empêche de s’en occuper. Le recopiage et les factures partent au logiciel et à l’IA, et le temps rendu revient à ce qui rend votre équipe indispensable. Chaque détail est décidé, testé et documenté avant de vous être remis : rien n’est laissé au hasard.",
     ],
     // Emphase (source Framer) : ces expressions passent en noir plein au
     // milieu du paragraphe rendu à 70 %.
     highlights: [
       "je travaille seul",
-      "vous parlez à celui qui conçoit et qui code votre projet",
-      "partir de ce qu’un site ou un outil doit rapporter",
-      "rien n’est laissé au hasard",
+      "vous parlez à celui qui conçoit et qui code votre logiciel",
+      "partir de ce qu’un outil doit rapporter",
+      "ce qui rend votre équipe indispensable",
     ],
     /*
      * GRILLE D'INFOS ET COMPTEUR RENDUS le 2026-10-16 : Eliott trouvait la
@@ -302,11 +293,11 @@ export const homeContent: HomeContent = {
     title: "Personne ne vous tient en otage.",
     titleLines: ["Personne", "ne vous tient", "en otage."],
     intro:
-      "Vous avez tous les accès dès la mise en ligne, et vous changez de prestataire quand vous voulez.",
+      "Vous avez tous les accès dès la mise en service, et vous changez de prestataire quand vous voulez.",
     stats: reputationStats,
     // LE RENDEZ-VOUS EST LE CHEMIN PRINCIPAL du site. « Voir les réalisations »
     // est parti : la section des réalisations est juste au-dessus.
-    ctas: [{ label: "Réserver un appel", href: lienRendezVous("decouverte") }],
+    ctas: [{ label: "Réserver un appel", href: lienRendezVous("logiciel") }],
   },
 
   // section06.ts — prestations en accordéon.
@@ -317,10 +308,8 @@ export const homeContent: HomeContent = {
     // IDENTIQUE à `aboutContent.services.intro` : les deux pages rendent le même
     // bloc, et un chapô qui dérive est une page qui ne dit pas la même chose que
     // l’autre sans que personne le remarque.
-    // Élargi le 2026-10-16 aux quatre offres de l'accordéon : du site à
-    // l'outil, de l'IA au pilotage technique (`services.ts`).
     intro:
-      "Du site qui vous amène des clients à l’outil qui vous rend des heures, de l’IA dans vos logiciels au pilotage technique de votre entreprise. Je pars de votre façon de travailler, et je construis ce qui lui correspond.",
+      "Je pars de votre façon de travailler, et je construis le logiciel qui lui correspond : la contrainte disparaît, le temps revient à votre équipe.",
     items: services,
   },
 
@@ -439,53 +428,34 @@ export const homeContent: HomeContent = {
   },
 
   /*
-   * ORDRE DES SECTIONS, refait le 2026-09-24 (phase B, puis phase C).
+   * ORDRE DES SECTIONS, refait le 2026-10-31 pour une seule offre. Le logiciel
+   * au travail suit le héros, puis le visiteur se reconnaît dans son métier ;
+   * viennent ensuite qui le fait et ce qu'il a construit.
    *
-   * L'OFFRE SUIT `about` (phase B) : l'accordéon des prestations vient juste
-   * après, au lieu de trois sections plus bas. Le h1 est dans le héros depuis
-   * la phase E.
+   * LES DEUX SECTIONS À CARTES NOIRES restent séparées par les réalisations : les
+   * chiffres et « Pourquoi moi » se lisaient comme une seule, deux fois plus longue.
    *
-   * LES LOGOS SONT ENTRÉS DANS LE HÉROS (phase D), après être remontés sous
-   * lui en phase C : sous la ligne de flottaison, ils n'étaient pas vus avant
-   * de défiler. `logoBand` n'est donc plus une section de l'accueil ; la
-   * donnée reste ici, lue par le héros et par `/a-propos`. Toujours sans
-   * intitulé : rien ne présente ces entreprises comme des clients.
-   *
-   * LES CHIFFRES PASSENT AVANT LA MÉTHODE, « POURQUOI MOI » APRÈS (phase C).
-   * Les deux sections à cartes noires se suivaient et se lisaient comme une
-   * seule, deux fois plus longue. La méthode les sépare, et « Pourquoi moi »
-   * finit sur le rendez-vous juste avant la FAQ.
-   *
-   * L'ACCORDÉON DES PRESTATIONS A QUITTÉ L'ACCUEIL le 2026-10-16 : ses deux
-   * offres, leurs prix et leurs liens sont déjà les deux portes du héros, et
-   * son chapô (« Je pars de votre façon de travailler… ») redisait le sous-
-   * titre. Chaque offre a désormais sa section : le site vitrine avec « On
-   * vous compare avant d'appeler » et les réalisations, le logiciel avec la
-   * section noire qui le montre au travail. `home.services` reste dans la
-   * donnée : la section sait toujours le rendre.
-   *
-   * LES TARIFS NE SONT PLUS SUR L'ACCUEIL depuis le 2026-09-07 : chaque page de
-   * prestation porte son offre et sa prise de rendez-vous.
+   * L'ACCORDÉON (`services`) n'est pas sur l'accueil : le héros porte l'offre et
+   * son prix. Les tarifs vivent sur la page de l'offre et sur sa page de prix.
    */
   sectionOrder: [
     "hero",
+    "logiciel",
+    "metiers",
     "about",
+    "numbers",
     "showreel",
     "works",
-    "numbers",
-    "logiciel",
     "whyUs",
     "faq",
     "articles",
   ],
 
   seo: {
-    // Mot-clé en tête, marque en fin. « Développeur web freelance » portait
-    // une intention emploi (carte SEO du 2026-10-15) : le titre nomme les
-    // deux offres.
-    title: "Site internet et logiciel sur mesure à Caen · Eliott Bouquerel",
+    // Mot-clé en tête, marque en fin.
+    title: "Logiciel métier sur mesure · Eliott Bouquerel",
     description:
-      "Sites internet et logiciels métier sur mesure à Caen. La qualité d’une agence, jusqu’à deux fois moins cher. En visio partout en France.",
+      "Le logiciel métier qui fait disparaître la tâche qui vous bloque. L’IA fait le sale boulot, votre équipe reprend son temps. Basé à Caen, en visio partout.",
     ogImage: {
       src: "/images/og.jpg",
       alt: "Eliott Bouquerel",

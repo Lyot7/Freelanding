@@ -13,13 +13,9 @@
  * (validation en liste fermée, composition des notes). Ni réseau, ni horloge,
  * ni `process.env`.
  */
-import { aPartirDe, ctoReferentIA, euros, integrationIA, prestations } from "@/content/offre";
+import { aPartirDe, euros, prestations } from "@/content/offre";
 import type { Offre } from "@/content/offre";
-import {
-  RDV_HORS_PRESTATION,
-  RDV_PAR_PRESTATION,
-  rendezVousContent,
-} from "@/content/rendez-vous";
+import { RDV_PAR_PRESTATION, rendezVousContent } from "@/content/rendez-vous";
 import type { IdRendezVous, OptionQuestion } from "@/content/rendez-vous";
 
 const questions = rendezVousContent.questionnaire;
@@ -40,49 +36,12 @@ export interface TrancheBudget extends OptionQuestion {
 }
 
 /**
- * Les offres sans prestation, sous les clefs de `RDV_HORS_PRESTATION` : un
- * sujet ajouté là-bas sans son offre ici casse le typage.
- */
-const OFFRES_HORS_PRESTATION: Readonly<Record<keyof typeof RDV_HORS_PRESTATION, Offre>> = {
-  integrationIA,
-  cto: ctoReferentIA,
-};
-
-/**
- * Offres concernées par un type de rendez-vous.
- *
- * DÉDUIT DE `RDV_PAR_PRESTATION` ET DE `RDV_HORS_PRESTATION`, pas d'une
- * troisième table : un type vers lequel aucune offre ne pointe (« decouverte »)
- * couvre toutes les prestations.
+ * Offres concernées par un type de rendez-vous : un type vers lequel aucune
+ * offre ne pointe (« decouverte ») couvre toutes les prestations.
  */
 export function offresDuRendezVous(id: IdRendezVous): readonly Offre[] {
   const liees: Offre[] = prestations.filter((p) => RDV_PAR_PRESTATION[p.id] === id);
-  for (const [clef, sujet] of Object.entries(RDV_HORS_PRESTATION)) {
-    if (sujet === id && Object.hasOwn(OFFRES_HORS_PRESTATION, clef)) {
-      liees.push(OFFRES_HORS_PRESTATION[clef as keyof typeof OFFRES_HORS_PRESTATION]);
-    }
-  }
   return liees.length > 0 ? liees : prestations;
-}
-
-/** Les questions posées à un sujet, au-delà de l'objectif et de l'échéance. */
-export interface QuestionsRendezVous {
-  /** Tranche de budget, obligatoire quand elle est posée. */
-  readonly budget: boolean;
-  /** Outil où vit la tâche à automatiser, obligatoire quand il est posé. */
-  readonly outil: boolean;
-}
-
-/**
- * PAS DE BUDGET POUR LE CTO : son prix est un forfait mensuel, et des tranches
- * de projet (« De 3 200 € à 6 400 € ») ne lui diraient rien qui serve. L'OUTIL
- * POUR L'IA SEULE : c'est lui qui dit si la tâche se branche telle quelle.
- */
-const SANS_BUDGET: readonly IdRendezVous[] = ["cto"];
-const AVEC_OUTIL: readonly IdRendezVous[] = ["ia"];
-
-export function questionsDuRendezVous(id: IdRendezVous): QuestionsRendezVous {
-  return { budget: !SANS_BUDGET.includes(id), outil: AVEC_OUTIL.includes(id) };
 }
 
 /**
@@ -95,37 +54,10 @@ export function questionsDuRendezVous(id: IdRendezVous): QuestionsRendezVous {
  */
 const MULTIPLES_PLANCHER = [1, 2, 4] as const;
 
-/**
- * ÉCART MINIMAL ENTRE DEUX BORNES VOISINES, depuis le 2026-10-16. Le logiciel
- * descendu à 3 500 € HT, le rendez-vous « decouverte » posait une tranche
- * « De 3 000 € à 3 500 € » : trop étroite pour qu'un visiteur s'y range, et
- * inutile à Eliott. Une borne que la suivante ne dépasse pas d'au moins moitié
- * s'efface ; la tranche du dessous l'absorbe.
- */
-const ECART_MIN_BORNES = 1.5;
-
-/**
- * Bornes des tranches, en ordre croissant.
- *
- * UNE PRESTATION : son plancher, puis ses multiples.
- *
- * PLUSIEURS (le rendez-vous « decouverte ») : le plancher de chacune, puis les
- * multiples de la plus chère. Ce qui dit quelle famille est à portée, sans
- * multiplier les tranches. Un plancher trop proche du suivant s'efface
- * (`ECART_MIN_BORNES`) : la plus chère et ses multiples restent toujours, leur
- * rapport étant de deux.
- */
+/** Bornes des tranches, en ordre croissant : le plancher, puis ses multiples. */
 export function bornesBudget(id: IdRendezVous): readonly number[] {
-  const concernees = offresDuRendezVous(id);
-  const haute = plusChere(concernees);
-  const montants = [
-    ...concernees.map((p) => p.plancher),
-    ...MULTIPLES_PLANCHER.map((m) => haute.plancher * m),
-  ];
-  const triees = [...new Set(montants)].sort((a, b) => a - b);
-  return triees.filter(
-    (borne, i) => i === triees.length - 1 || triees[i + 1] >= borne * ECART_MIN_BORNES,
-  );
+  const haute = plusChere(offresDuRendezVous(id));
+  return MULTIPLES_PLANCHER.map((m) => haute.plancher * m);
 }
 
 function plusChere(liste: readonly Offre[]): Offre {
@@ -178,17 +110,16 @@ const TRANCHES_RETIREES: Readonly<Record<string, number>> = {
   "18000-36000": 18000,
   "plus-36000": 36000,
   /*
-   * LES TRANCHES DU LOGICIEL À 6 000 € HT, publiées jusqu'au 2026-10-16 sur
-   * « logiciel » et « decouverte ». Celles que le site garde (« 3000-6000 »,
-   * « 6000-12000 » et « moins-3000 », toujours servies au « site ») ne sont
-   * rattachées que pour les sujets qui ne les proposent plus.
+   * LES TRANCHES DU LOGICIEL À 3 500 € ET CELLES DU SITE, publiées jusqu'au
+   * 2026-10-31. « moins-6000 » et « 6000-12000 » restent servies.
    */
   "moins-3000": 0,
-  "moins-6000": 0,
+  "moins-3500": 0,
+  "3000-3500": 3000,
   "3000-6000": 3000,
-  "6000-12000": 6000,
-  "12000-24000": 12000,
-  "plus-24000": 24000,
+  "3500-7000": 3500,
+  "7000-14000": 7000,
+  "plus-14000": 14000,
 };
 
 /**
@@ -206,18 +137,38 @@ export function rattacherTranche(id: IdRendezVous, valeur: string): string {
   return tranche?.id ?? valeur;
 }
 
+/**
+ * LES OBJECTIFS RETIRÉS LE 2026-10-31 avec le site, l'IA et le CTO. Un onglet
+ * ouvert avant le déploiement les envoie encore : les refuser ferait perdre le
+ * rendez-vous ou le message. Ils se rangent sous « Autre chose ».
+ */
+const OBJECTIFS_RETIRES: readonly string[] = [
+  "google",
+  "demandes",
+  "concurrents",
+  "remplacer",
+  "mails",
+  "saisie",
+  "redaction",
+  "documents",
+  "decisions",
+  "devis",
+  "ia",
+  "equipe",
+];
+
+/** Ramène un objectif retiré sur « autre » ; toute autre valeur revient telle quelle. */
+export function rattacherObjectif(valeur: string): string {
+  return OBJECTIFS_RETIRES.includes(valeur) ? "autre" : valeur;
+}
+
 /** Objectifs proposés pour un type de rendez-vous. */
 export function optionsObjectif(id: IdRendezVous): readonly OptionQuestion[] {
   return questions.objectif.options[id];
 }
 
-/** Légende de la question d'objectif : celle du sujet, sinon la commune. */
-export function legendeObjectif(id: IdRendezVous): string {
-  return questions.objectif.legendeParType[id] ?? questions.objectif.legende;
-}
-
-/** Outils proposés au sujet « ia ». */
-export const OPTIONS_OUTIL: readonly OptionQuestion[] = questions.outil.options;
+/** Légende de la question d'objectif. */
+export const LEGENDE_OBJECTIF = questions.objectif.legende;
 
 /** Échéances proposées, identiques pour tous les types. */
 export const OPTIONS_ECHEANCE: readonly OptionQuestion[] = questions.echeance.options;
@@ -282,11 +233,8 @@ export function retourBudget(
 /** Réponses validées au questionnaire, telles que le serveur les a acceptées. */
 export interface ReponsesQuestionnaire {
   readonly type: IdRendezVous;
-  /** Absent pour un sujet sans budget (`questionsDuRendezVous`). */
-  readonly budget?: string;
+  readonly budget: string;
   readonly objectif: string;
-  /** Présent pour le seul sujet qui pose la question de l'outil. */
-  readonly outil?: string;
   readonly echeance?: string;
   readonly message?: string;
 }
@@ -306,26 +254,19 @@ function libelle(options: readonly OptionQuestion[], id: string): string {
 export function composerNotes(reponses: ReponsesQuestionnaire): string {
   const { notes } = rendezVousContent;
   const lignes: string[] = [];
-  if (reponses.budget !== undefined) {
-    const retourCalcule = retourBudget(reponses.type, reponses.budget);
-    let forfait: string = notes.aCaler;
-    if (retourCalcule?.type === "aucun") forfait = notes.aucunForfait;
-    if (retourCalcule?.type === "aPortee") {
-      forfait = retourCalcule.lignes
-        .map((ligne) => ligne.prestation)
-        .join(" · ");
-    }
-    lignes.push(
-      `${notes.budget} : ${libelle(tranchesBudget(reponses.type), reponses.budget)}`,
-      `${notes.forfait} : ${forfait}`,
-    );
+  const retourCalcule = retourBudget(reponses.type, reponses.budget);
+  let forfait: string = notes.aCaler;
+  if (retourCalcule?.type === "aucun") forfait = notes.aucunForfait;
+  if (retourCalcule?.type === "aPortee") {
+    forfait = retourCalcule.lignes.map((ligne) => ligne.prestation).join(" · ");
   }
+  lignes.push(
+    `${notes.budget} : ${libelle(tranchesBudget(reponses.type), reponses.budget)}`,
+    `${notes.forfait} : ${forfait}`,
+  );
   lignes.push(
     `${notes.objectif} : ${libelle(optionsObjectif(reponses.type), reponses.objectif)}`,
   );
-  if (reponses.outil) {
-    lignes.push(`${notes.outil} : ${libelle(OPTIONS_OUTIL, reponses.outil)}`);
-  }
   if (reponses.echeance) {
     lignes.push(`${notes.echeance} : ${libelle(OPTIONS_ECHEANCE, reponses.echeance)}`);
   }
@@ -343,7 +284,8 @@ export function composerNotes(reponses: ReponsesQuestionnaire): string {
  * couvre toutes les prestations.
  */
 const RDV_PAR_TYPE_PROJET: Readonly<Record<string, IdRendezVous>> = {
-  "Un site": "site",
+  "Un logiciel métier": "logiciel",
+  /* Un onglet ouvert avant le 2026-10-31 envoie encore l'ancien libellé. */
   "Une solution métier": "logiciel",
 };
 

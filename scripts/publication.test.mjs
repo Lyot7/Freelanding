@@ -24,7 +24,7 @@ const article = (slug, autre = {}) => ({
     slug,
     description: "Une description.",
     motCle: { requete: "requête" },
-    pageServie: { url: "/services/site-vitrine" },
+    pageServie: { url: "/services/logiciel-metier" },
     visuel: { svg: "<svg/>", alt: "Un visuel" },
   },
   ...autre,

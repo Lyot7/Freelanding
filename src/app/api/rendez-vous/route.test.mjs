@@ -1,10 +1,10 @@
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
-import { integrationIA } from "../../../content/offre.ts";
+import { prestation } from "../../../content/offre.ts";
 import { POST } from "./route.ts";
 
 /**
- * LA ROUTE DE RÉSERVATION, VUE DU NAVIGATEUR, pour les sujets « ia » et
- * « cto » du 2026-10-16. Rien ne part chez Cal.com : sans clef Turnstile, une
+ * LA ROUTE DE RÉSERVATION, VUE DU NAVIGATEUR, pour les deux sujets qui restent
+ * depuis le 2026-10-31 : « logiciel » et « decouverte ». Rien ne part chez Cal.com : sans clef Turnstile, une
  * demande valide s'arrête au captcha en 503, APRÈS la validation. Un 503 prouve
  * donc que la demande a passé la validation ; un 400 dit quel champ l'a
  * arrêtée.
@@ -12,8 +12,8 @@ import { POST } from "./route.ts";
 
 const VARIABLES = {
   CAL_COM_USERNAME: "eliott-bouquerel",
-  CAL_COM_EVENT_IA: "7514252",
-  CAL_COM_EVENT_CTO: "7514277",
+  CAL_COM_EVENT_LOGICIEL: "7514252",
+  CAL_COM_EVENT_DECOUVERTE: "7514277",
   TURNSTILE_SECRET_KEY: "",
 };
 const avant = {};
@@ -56,48 +56,51 @@ function reserver(corps) {
   );
 }
 
-describe("POST /api/rendez-vous — sujet « cto »", () => {
-  it("passe la validation sans budget, avec le besoin et l'échéance", async () => {
-    const reponse = await reserver({ type: "cto", objectif: "devis", echeance: "vite" });
+const PLANCHER = prestation("logiciel").plancher;
+const tranche = `${PLANCHER}-${PLANCHER * 2}`;
+
+describe("POST /api/rendez-vous — sujet « decouverte »", () => {
+  it("passe la validation avec le budget, le besoin et l'échéance", async () => {
+    const reponse = await reserver({
+      type: "decouverte",
+      budget: tranche,
+      objectif: "conseil",
+      echeance: "vite",
+    });
     expect(reponse.status).toBe(503);
   });
 
+  it("exige le budget : plus aucun sujet n'en est dispensé", async () => {
+    const reponse = await reserver({ type: "decouverte", objectif: "conseil" });
+    expect(reponse.status).toBe(400);
+    expect((await reponse.json()).champ).toBe("budget");
+  });
+
   it("refuse un besoin hors de sa liste, en nommant le champ", async () => {
-    const reponse = await reserver({ type: "cto", objectif: "google" });
+    const reponse = await reserver({ type: "decouverte", budget: tranche, objectif: "tableur" });
     expect(reponse.status).toBe(400);
     expect((await reponse.json()).champ).toBe("objectif");
   });
 });
 
-describe("POST /api/rendez-vous — sujet « ia »", () => {
-  const tranche = `${integrationIA.plancher}-${integrationIA.plancher * 2}`;
-
-  it("exige l'outil, et le dit au visiteur", async () => {
-    const reponse = await reserver({ type: "ia", budget: tranche, objectif: "mails" });
-    expect(reponse.status).toBe(400);
-    expect(await reponse.json()).toEqual({
-      message: "Choisissez l’outil où se fait cette tâche.",
-      champ: "outil",
-    });
+describe("POST /api/rendez-vous — sujet « logiciel »", () => {
+  it("passe la validation avec la tâche et une tranche de son plancher", async () => {
+    const reponse = await reserver({ type: "logiciel", budget: tranche, objectif: "tableur" });
+    expect(reponse.status).toBe(503);
   });
 
-  it("passe la validation avec la tâche, l'outil et une tranche de son plancher", async () => {
+  it("ne demande plus d'outil, et ignore un outil envoyé par un ancien onglet", async () => {
     const reponse = await reserver({
-      type: "ia",
+      type: "logiciel",
       budget: tranche,
-      objectif: "saisie",
-      outil: "tableur",
+      objectif: "tache",
+      outil: "crm",
     });
     expect(reponse.status).toBe(503);
   });
 
   it("refuse une tâche hors de sa liste avec le message commun", async () => {
-    const reponse = await reserver({
-      type: "ia",
-      budget: tranche,
-      objectif: "devis",
-      outil: "crm",
-    });
+    const reponse = await reserver({ type: "logiciel", budget: tranche, objectif: "conseil" });
     expect(reponse.status).toBe(400);
     expect(await reponse.json()).toEqual({
       message: "Choisissez la réponse la plus proche de votre cas.",
@@ -107,8 +110,7 @@ describe("POST /api/rendez-vous — sujet « ia »", () => {
 });
 
 describe("POST /api/rendez-vous — chaque refus nomme son champ", () => {
-  const tranche = `${integrationIA.plancher}-${integrationIA.plancher * 2}`;
-  const valide = { type: "ia", budget: tranche, objectif: "mails", outil: "crm" };
+  const valide = { type: "logiciel", budget: tranche, objectif: "tache" };
   const loin = new Date(Date.now() + 400 * 24 * 3600 * 1000).toISOString();
 
   it.each([
@@ -118,7 +120,7 @@ describe("POST /api/rendez-vous — chaque refus nomme son champ", () => {
     ["message", { message: "x".repeat(5_000) }],
     ["creneau", { debut: loin }],
     ["duree", { duree: 0.5 }],
-    ["type", { type: "site" }],
+    ["type", { type: "inconnu" }],
     ["budget", { budget: "" }],
     ["echeance", { echeance: "demain" }],
   ])("%s", async (champ, surcharge) => {

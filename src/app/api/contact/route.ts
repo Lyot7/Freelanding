@@ -62,6 +62,9 @@ const limiteur = creerLimiteur(LIMITE_CONTACT);
 /** Types de projet acceptés : la liste affichée par les formulaires, et elle seule. */
 const TYPES_PROJET = siteConfig.footerForm?.selectOptions ?? [];
 
+/* Un onglet ouvert avant le 2026-10-31 envoie encore les anciens libellés. */
+const TYPES_ACCEPTES = [...TYPES_PROJET, "Une solution métier", "Un site"];
+
 const EMAIL_CONTACT = siteConfig.contact.email || EMAIL_CONTACT_PAR_DEFAUT;
 
 /** Repli affiché au prospect chaque fois que l’envoi ne peut pas aboutir. */
@@ -134,7 +137,7 @@ export async function POST(requete: Request): Promise<Response> {
   }
 
   const validation = validerSoumission(corps, {
-    typesProjetAutorises: TYPES_PROJET,
+    typesProjetAutorises: TYPES_ACCEPTES,
     maintenantMs: Date.now(),
   });
   if (!validation.ok) {

@@ -2,12 +2,11 @@ import { content } from "@/lib/content";
 import { absoluteUrl } from "@/lib/site-url";
 import { blogPosts } from "@/content/blog";
 import { aPartirDe, prestations as offre } from "@/content/offre";
-import { pageCaen } from "@/content/page-caen";
+import { CHEMIN_HUB_METIERS, hubMetiers, pagesMetier } from "@/content/metiers";
 import { pageLogicielCaen } from "@/content/page-logiciel-caen";
 import { pagePrixLogiciel } from "@/content/page-prix-logiciel";
 import { pagesSecteur } from "@/content/pages-secteur";
 import { pagesTheme } from "@/content/pages-theme";
-import { pagePrixSite } from "@/content/page-prix-site";
 import { CHEMIN_PROFIL_TEXTE, CHEMIN_PROMPT_TEXTE } from "@/content/vue-agent";
 
 /**
@@ -62,7 +61,7 @@ export async function GET(): Promise<Response> {
     "",
     `> ${site.meta.description}`,
     "",
-    `Développeur web indépendant. Zone d’intervention : ${site.contact.address}.`,
+    `Développeur indépendant de logiciels métier sur mesure. Zone d’intervention : ${site.contact.address}.`,
     `Contact : ${site.contact.email}. ${site.contact.responseTime}`,
     "",
     "## Prestations",
@@ -92,16 +91,13 @@ export async function GET(): Promise<Response> {
       ),
     ),
     ligne(
-      pageCaen.h1,
-      pageCaen.chemin,
-      "le site vitrine pour les entreprises de Caen et du Calvados",
-    ),
-    ligne(
       pageLogicielCaen.h1,
       pageLogicielCaen.chemin,
       "le logiciel métier sur mesure pour les PME de Caen, du Calvados, de la Manche et de l’Orne",
     ),
-    ligne(pagePrixSite.h1, pagePrixSite.chemin, pagePrixSite.noteLlms),
+    ligne(hubMetiers.h1, CHEMIN_HUB_METIERS, "toutes les pages par métier"),
+    /* PAGES PAR MÉTIER, dérivées de `metiers.ts`. */
+    ...pagesMetier.map((p) => ligne(p.h1, p.chemin, p.noteLlms)),
     /* PAGES SECTEUR de la solution métier, dérivées de `pages-secteur.ts`. */
     ...pagesSecteur.map((p) => ligne(p.h1, p.chemin, p.noteLlms)),
     ligne(pagePrixLogiciel.h1, pagePrixLogiciel.chemin, pagePrixLogiciel.noteLlms),

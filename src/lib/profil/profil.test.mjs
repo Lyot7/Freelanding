@@ -196,11 +196,17 @@ describe("profil : contenu facultatif absent", () => {
     expect(profil.blocs.every((bloc) => bloc.type !== "paragraph" || bloc.text.trim() !== "")).toBe(true);
   });
 
-  it("garde le premier service sans lien de rendez-vous, et les suivants avec", async () => {
-    const texte = profilEnMarkdown(await construireProfil(sourcesDepouillees));
-    const premier = texte.split(`### ${premierService.title}`)[1].split("\n### ")[0];
-    expect(premier).not.toContain("Réserver un appel\u00A0:");
-    expect(texte).toContain(`Réserver un appel\u00A0: ${absoluteUrl(autresServices[0].rdvHref)}`);
+  it("n'écrit un lien de rendez-vous que pour le service qui en porte un", async () => {
+    // Depuis le 2026-10-31, l'accordéon n'a plus qu'une ligne : le service sans
+    // lien n'en écrit pas, et le même service avec son lien l'écrit.
+    expect(homeReel.services.items).toHaveLength(1);
+    expect(autresServices).toEqual([]);
+    const sans = profilEnMarkdown(await construireProfil(sourcesDepouillees));
+    const ligneSans = sans.split(`### ${premierService.title}`)[1].split("\n### ")[0];
+    expect(ligneSans).not.toContain("Réserver un appel\u00A0:");
+    const avec = profilEnMarkdown(await construireProfil());
+    const ligneAvec = avec.split(`### ${premierService.title}`)[1].split("\n### ")[0];
+    expect(ligneAvec).toContain(`Réserver un appel\u00A0: ${absoluteUrl(premierService.rdvHref)}`);
   });
 
   it("donne le même prix plancher quel que soit l'ordre des prestations", async () => {

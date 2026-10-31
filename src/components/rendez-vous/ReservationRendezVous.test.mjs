@@ -4,20 +4,22 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 
 import { rendezVousContent } from "@/content/rendez-vous";
-import { integrationIA } from "@/content/offre";
+import { prestation } from "@/content/offre";
 import { ReservationRendezVous } from "./ReservationRendezVous";
 
 /**
- * LE STEPPER, PARCOURU COMME UN VISITEUR, pour les sujets « ia » et « cto » du
- * 2026-10-16 : le CTO ne voit aucune tranche de budget, l'IA répond en plus à
- * la question de l'outil, et ce que le navigateur envoie suit ces questions.
+ * LE STEPPER, PARCOURU COMME UN VISITEUR, pour les deux sujets qui restent
+ * depuis le 2026-10-31 : « logiciel » et « decouverte ». Les deux posent le
+ * budget, le besoin et l'échéance, sans question d'outil, et ce que le
+ * navigateur envoie suit ces questions.
  *
  * Rien ne sort du processus : `fetch` est remplacé, la clef Turnstile est posée
  * par `scripts/test-turnstile-env.mjs` et le widget est factice.
  */
 
 const C = rendezVousContent;
-const TRANCHE_IA = `${integrationIA.plancher}-${integrationIA.plancher * 2}`;
+const PLANCHER = prestation("logiciel").plancher;
+const TRANCHE = `${PLANCHER}-${PLANCHER * 2}`;
 
 const CRENEAUX = {
   fenetre: {
@@ -220,33 +222,50 @@ describe("ReservationRendezVous — les questions suivent le sujet", () => {
     }
   });
 
-  it("CTO : ni budget ni outil, le besoin d'abord, et un envoi sans budget", async () => {
+  it("deux sujets seulement, et aucune question d'outil", async () => {
+    contexte = installerDom();
+    simulerServeur([]);
+    montage = await monter();
+    const { conteneur } = montage;
+    expect(C.types.map((t) => t.id)).toEqual(["logiciel", "decouverte"]);
+    for (const type of C.types) expect(texte(conteneur)).toContain(type.nom);
+    await cliquer(bouton(conteneur, C.types[0].nom));
+    await allerAuProjet(conteneur);
+    expect(conteneur.querySelector('input[type=radio][name$="-outil"]')).toBeNull();
+    expect(C.questionnaire).not.toHaveProperty("outil");
+  });
+
+  it("découverte : budget, besoin puis échéance, et un envoi qui porte les trois", async () => {
     contexte = installerDom();
     const envois = simulerServeur([{ status: 200, corps: { ok: true } }]);
     montage = await monter();
     const { conteneur } = montage;
 
     // Le sujet se choisit dans la liste : rien n'est présélectionné.
-    await cliquer(bouton(conteneur, C.types.find((t) => t.id === "cto").nom));
+    await cliquer(bouton(conteneur, C.types.find((t) => t.id === "decouverte").nom));
     await allerAuProjet(conteneur);
 
-    expect(texte(conteneur)).not.toContain(C.questionnaire.budget.legende);
-    expect(texte(conteneur)).not.toContain(C.questionnaire.outil.legende);
-    expect(texte(conteneur)).toContain(C.questionnaire.objectif.legendeParType.cto);
+    expect(texte(conteneur)).toContain(C.questionnaire.budget.legende);
+    expect(texte(conteneur)).toContain(C.questionnaire.objectif.legende);
 
-    // Sans réponse, l'erreur porte sur le besoin, et le focus y va.
+    // Sans réponse, l'erreur porte sur le budget, et le focus y va.
     await cliquer(bouton(conteneur, C.actions.continuer));
-    expect(texte(conteneur)).toContain(C.questionnaire.objectif.erreur);
-    expect(document.activeElement?.getAttribute("name")).toMatch(/-objectif$/u);
+    expect(texte(conteneur)).toContain(C.questionnaire.budget.erreur);
+    expect(document.activeElement?.getAttribute("name")).toMatch(/-budget$/u);
 
-    await choisir(conteneur, "objectif", "devis");
+    await choisir(conteneur, "budget", TRANCHE);
+    await choisir(conteneur, "objectif", "conseil");
     await choisir(conteneur, "echeance", "vite");
     await allerAuxCoordonnees(conteneur);
     await soumettre(conteneur);
 
     expect(envois).toHaveLength(1);
-    expect(envois[0]).toMatchObject({ type: "cto", objectif: "devis", echeance: "vite" });
-    expect(envois[0]).not.toHaveProperty("budget");
+    expect(envois[0]).toMatchObject({
+      type: "decouverte",
+      budget: TRANCHE,
+      objectif: "conseil",
+      echeance: "vite",
+    });
     expect(envois[0]).not.toHaveProperty("outil");
     expect(texte(conteneur)).toContain(C.succes.titre);
 
@@ -255,44 +274,37 @@ describe("ReservationRendezVous — les questions suivent le sujet", () => {
     expect(texte(conteneur)).toContain(C.etapes.sujet);
   });
 
-  it("IA : budget, tâche puis outil, chacun exigé dans l'ordre affiché", async () => {
+  it("logiciel : budget puis besoin, chacun exigé dans l'ordre affiché", async () => {
     contexte = installerDom();
     const envois = simulerServeur([
-      { status: 400, corps: { message: "Choisissez l’outil où se fait cette tâche.", champ: "outil" } },
+      { status: 400, corps: { message: "Cette réponse n’est pas proposée.", champ: "objectif" } },
       { status: 400, corps: { message: "Indiquez votre nom.", champ: "nom" } },
       { status: 409, corps: { message: "Ce créneau vient d’être pris.", champ: "creneau" } },
       { status: 200, corps: { ok: true } },
     ]);
-    montage = await monter("ia");
+    montage = await monter("logiciel");
     const { conteneur } = montage;
     await act(async () => attendre(20));
     await allerAuProjet(conteneur);
 
     expect(texte(conteneur)).toContain(C.questionnaire.budget.legende);
-    expect(texte(conteneur)).toContain(C.questionnaire.objectif.legendeParType.ia);
-    expect(texte(conteneur)).toContain(C.questionnaire.outil.legende);
-    // Les tranches de l'IA viennent de son plancher, et le retour la nomme.
-    await choisir(conteneur, "budget", TRANCHE_IA);
-    expect(texte(conteneur)).toContain(integrationIA.nom);
+    expect(texte(conteneur)).toContain(C.questionnaire.objectif.legende);
+    // Les tranches viennent du plancher du logiciel, et le retour le nomme.
+    await choisir(conteneur, "budget", TRANCHE);
+    expect(texte(conteneur)).toContain(prestation("logiciel").nom);
 
-    // Budget répondu, tâche manquante : le focus va à la tâche.
+    // Budget répondu, besoin manquant : l'erreur et le focus vont au besoin.
     await cliquer(bouton(conteneur, C.actions.continuer));
+    expect(texte(conteneur)).toContain(C.questionnaire.objectif.erreur);
     expect(document.activeElement?.getAttribute("name")).toMatch(/-objectif$/u);
-    await choisir(conteneur, "objectif", "mails");
-
-    // Tâche répondue, outil manquant : l'erreur et le focus vont à l'outil.
-    await cliquer(bouton(conteneur, C.actions.continuer));
-    expect(texte(conteneur)).toContain(C.questionnaire.outil.erreur);
-    expect(document.activeElement?.getAttribute("name")).toMatch(/-outil$/u);
-
-    await choisir(conteneur, "outil", "messagerie");
+    await choisir(conteneur, "objectif", "tableur");
     await allerAuxCoordonnees(conteneur);
 
-    // Le serveur refuse l'outil : retour à la question, erreur affichée.
+    // Le serveur refuse le besoin : retour à la question, erreur affichée.
     await soumettre(conteneur);
-    expect(texte(conteneur)).toContain(C.questionnaire.outil.erreur);
-    await choisir(conteneur, "outil", "tableur");
-    expect(texte(conteneur)).not.toContain(C.questionnaire.outil.erreur);
+    expect(texte(conteneur)).toContain(C.questionnaire.objectif.erreur);
+    await choisir(conteneur, "objectif", "tache");
+    expect(texte(conteneur)).not.toContain(C.questionnaire.objectif.erreur);
 
     // Un refus sur un autre champ laisse le visiteur sur ses coordonnées.
     await allerAuxCoordonnees(conteneur);
@@ -308,18 +320,18 @@ describe("ReservationRendezVous — les questions suivent le sujet", () => {
     await soumettre(conteneur);
     expect(envois).toHaveLength(4);
     expect(envois[3]).toMatchObject({
-      type: "ia",
-      budget: TRANCHE_IA,
-      objectif: "mails",
-      outil: "tableur",
+      type: "logiciel",
+      budget: TRANCHE,
+      objectif: "tache",
     });
+    expect(envois[3]).not.toHaveProperty("outil");
     expect(texte(conteneur)).toContain(C.succes.titre);
   });
 
-  it("IA : sans aucune réponse, le budget est demandé le premier", async () => {
+  it("logiciel : sans aucune réponse, le budget est demandé le premier", async () => {
     contexte = installerDom();
     simulerServeur([]);
-    montage = await monter("ia");
+    montage = await monter("logiciel");
     const { conteneur } = montage;
     await act(async () => attendre(20));
     await allerAuProjet(conteneur);

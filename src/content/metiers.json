@@ -1,0 +1,572 @@
+[
+  {
+    "slug": "echafaudage",
+    "date": "2026-10-31",
+    "libelle": "Échafaudage",
+    "h1": "Logiciel d’échafaudage",
+    "seo": {
+      "titre": "Logiciel pour échafaudeur sur mesure · Eliott Bouquerel",
+      "description": "Logiciel de location et de facturation pour échafaudeurs : location en jours réels, situations de travaux préparées seules, avoirs. Sur mesure, sans abonnement."
+    },
+    "resume": "Votre location se compte en jours réels, par tranche, et se facture en situations. Votre logiciel du bâtiment compte en unités, alors quelqu’un refait le calcul à la main chaque fin de mois. Je construis le logiciel qui fait ce sale boulot à sa place.",
+    "accroche": "La location en jours réels, les situations de fin de mois et les factures contestées.",
+    "noteLlms": "le logiciel métier pour la location et le montage d’échafaudage : location calendaire, situations de travaux, avoirs",
+    "themes": [
+      "facturation",
+      "location",
+      "chantier",
+      "planning"
+    ],
+    "lexique": [
+      "situation",
+      "tranche",
+      "conducteur",
+      "modificatif",
+      "pré-facture",
+      "démontage",
+      "avoir",
+      "cumul"
+    ],
+    "image": {
+      "alt": "Dessin au trait d’une façade d’échafaudage, une travée surlignée"
+    },
+    "titreOffre": "Le prix d’un logiciel d’échafaudage",
+    "blocs": [
+      {
+        "type": "tableau",
+        "id": "calculs",
+        "titre": "Ce que votre logiciel ne sait pas compter",
+        "paragraphes": [
+          "Un logiciel de devis du bâtiment raisonne en unités. Votre location court entre deux dates, ligne par ligne, avec ses clauses. L’écart se rattrape à la main, puis se conteste sur la facture."
+        ],
+        "legende": "Les règles de location d’un échafaudeur, à la main et dans le logiciel",
+        "colonnes": [
+          "Votre règle",
+          "À la main",
+          "Dans le logiciel"
+        ],
+        "lignes": [
+          [
+            "Un mois et dix jours",
+            "La personne qui facture compte les jours en plus, à chaque situation, pour chaque ligne",
+            "Mois entiers et jours restants calculés entre deux dates, selon votre convention"
+          ],
+          [
+            "Un prix du jour à part",
+            "Il ne vaut pas le prix du mois divisé par trente, et il se retape poste par poste",
+            "Chaque poste garde son prix au jour, à la semaine ou au mois"
+          ],
+          [
+            "L’unité commencée est due",
+            "La clause est dans vos conditions générales, le calcul dans la tête de celui qui facture",
+            "La clause et la durée minimale du devis s’appliquent d’elles-mêmes"
+          ],
+          [
+            "Mois de date à date ou mois civil",
+            "Deux conventions donnent deux montants, et c’est la ligne que le conducteur conteste",
+            "Vous choisissez une fois, elle vaut pour tous les chantiers"
+          ],
+          [
+            "La fin de location",
+            "Elle part du mail de fin de travaux plus votre délai, et ce mail dort dans une boîte",
+            "La date du mail arrête la location, le mail reste dans le dossier du chantier"
+          ],
+          [
+            "La ligne datée",
+            "Les périodes se tapent à la main, tronquées ou oubliées",
+            "Chaque ligne porte sa période, sans saisie"
+          ]
+        ]
+      },
+      {
+        "type": "etapes",
+        "id": "affaire",
+        "titre": "Une affaire, du devis à la situation finale",
+        "paragraphes": [
+          "Voici le trajet d’un chantier dans un logiciel construit pour ce métier. Chaque date se saisit une fois, au moment où elle arrive."
+        ],
+        "etapes": [
+          {
+            "titre": "Devis à tranches",
+            "corps": "Transport aller, montage, location, démontage, filet, transport retour : chaque tranche garde sa date de montage et son rythme de facturation.",
+            "passe": "Le devis signé se fige."
+          },
+          {
+            "titre": "Lancement",
+            "corps": "Le montage lance le contrat. Le tableur des démarrages et des fins de chantier laisse la place à une liste reliée aux factures.",
+            "passe": "La location court."
+          },
+          {
+            "titre": "Modificatif",
+            "corps": "Un filet retiré, une location ajoutée, un prix changé : chaque modificatif s’ajoute, daté, sans toucher au devis signé.",
+            "passe": "Le prix suivant le sait."
+          },
+          {
+            "titre": "Situation de fin de mois",
+            "corps": "Toutes les situations se préparent d’un coup. Chacune reprend le cumul exécuté, déduit le cumul déjà facturé et facture la différence.",
+            "passe": "Vous relisez."
+          },
+          {
+            "titre": "Pré-facture",
+            "corps": "Le conducteur de travaux reçoit une pré-facture sans numéro. Le numéro tombe à l’émission, jamais avant.",
+            "passe": "La facture part."
+          },
+          {
+            "titre": "Situation finale",
+            "corps": "Le mail de fin de travaux arrête la location. La dernière situation porte le démontage, la casse, le manquant et le nettoyage."
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "id": "contestation",
+        "titre": "Trois semaines plus tard, le conducteur conteste",
+        "paragraphes": [
+          "« Le chantier s’est arrêté deux jours avant. » Une facture émise ne se modifie pas, et l’avoir suivi d’une nouvelle facture prend assez de temps pour qu’on soit tenté de corriger directement. Le logiciel rend le bon geste plus rapide que le mauvais.",
+          "La facture électronique resserre le sujet : la réception est obligatoire pour toutes les entreprises depuis le 1er septembre 2026, et l’émission le sera pour les PME au 1er septembre 2027."
+        ],
+        "points": [
+          {
+            "titre": "Un avoir en un clic",
+            "corps": "L’avoir cite la facture d’origine, la nouvelle facture repart, la comptabilité suit."
+          },
+          {
+            "titre": "Un numéro sans trou",
+            "corps": "Il s’attribue à l’émission, avec une séquence continue."
+          },
+          {
+            "titre": "La TVA par chantier",
+            "corps": "Taux par ligne, autoliquidation réglée chantier par chantier, mention écrite sur la facture."
+          },
+          {
+            "titre": "Plusieurs comptes de vente",
+            "corps": "Transport, location et prestation partent chacun sur leur compte : votre comptable ne ressaisit plus."
+          },
+          {
+            "titre": "Les clients publics",
+            "corps": "Dépôt sur Chorus Pro, avec les références que ce circuit réclame."
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "id": "equipes",
+        "titre": "Ce que vos équipes n’auront pas à saisir",
+        "paragraphes": [
+          "Vos monteurs n’ont pas choisi ce métier pour remplir des écrans, et toute fonction qui dépend d’une saisie sur le chantier est fragile. Je pars de ce qui existe déjà : le devis, la date de montage, le mail de fin de travaux.",
+          "Le temps rendu au bureau revient à ce qui demande un humain : le chiffrage, le client, le chantier qui se complique."
+        ],
+        "points": [
+          {
+            "titre": "Le stock pièce par pièce attendra",
+            "corps": "Suivre chaque tube demande un équipement de traçage, et plusieurs équipes chargent en même temps le matin. Je vous le dis avant de vous le vendre."
+          },
+          {
+            "titre": "Le devis signé reste lisible",
+            "corps": "La version signée se consulte telle qu’elle a été acceptée, modificatifs à côté."
+          },
+          {
+            "titre": "Votre planning repris",
+            "corps": "Le fichier des démarrages et des fins de chantier entre dans le logiciel, chantiers en cours compris."
+          }
+        ]
+      }
+    ],
+    "faq": {
+      "eyebrow": "Échafaudage",
+      "titleLines": [
+        "Avant de",
+        "décider."
+      ],
+      "items": [
+        {
+          "question": "Pourquoi pas une plateforme comptable ?",
+          "answer": "Elle sait produire une situation. Elle ne compte pas une location au prorata calendaire et ne suit pas un contrat qui court d’un mois sur l’autre. Le logiciel prépare la facture, et votre plateforme comptable la reçoit avec la bonne ventilation."
+        },
+        {
+          "question": "Que deviennent mes chantiers en cours ?",
+          "answer": "Je les reprends avec leurs cumuls déjà facturés, pour que la prochaine situation déduise les bons montants. On cale la bascule sur l’échéance de votre abonnement actuel, pour éviter de payer deux fois."
+        },
+        {
+          "question": "Mes équipes devront-elles saisir quelque chose ?",
+          "answer": "Rien d’obligatoire au départ. Le logiciel vit au bureau et se nourrit du devis, des dates de montage et des mails de fin de travaux. Le reste viendra quand vos équipes le demanderont."
+        },
+        {
+          "question": "Si un calcul de TVA est faux, qui répond ?",
+          "answer": "Moi, puisque je l’ai écrit. Une erreur du logiciel se corrige dans le cadre de la maintenance, une fonction nouvelle se chiffre avant d’être faite. Le code vit dans votre dépôt, et un autre développeur peut le reprendre."
+        }
+      ]
+    }
+  },
+  {
+    "slug": "centre-de-pneus",
+    "date": "2026-10-31",
+    "libelle": "Centre de pneus",
+    "h1": "Logiciel pour centre de pneus",
+    "seo": {
+      "titre": "Logiciel pour centre de pneus sur mesure · Eliott Bouquerel",
+      "description": "Logiciel pour centre de pneus : fiche d’intervention sans papier, ordre de réparation préchiffré, bons de commande relancés, stock réparti entre vos dépôts."
+    },
+    "resume": "Le dépanneur remplit sa fiche, le bureau la retape, le client attend l’ordre de réparation pour émettre son bon de commande, et la facture attend le tout. Je construis le logiciel qui supprime cette ressaisie et qui rend ce temps à votre exploitation.",
+    "accroche": "La fiche d’intervention, les bons de commande des grands comptes et le stock entre dépôts.",
+    "noteLlms": "le logiciel métier pour les centres de pneus et le dépannage de flottes : fiche d’intervention, ordre de réparation, bons de commande, stock multi-dépôts",
+    "themes": [
+      "terrain",
+      "stock",
+      "facturation",
+      "flotte",
+      "relances"
+    ],
+    "lexique": [
+      "matricule",
+      "ordre de réparation",
+      "bon de commande",
+      "dépanneur",
+      "dimension",
+      "jumelé",
+      "hauteur de gomme",
+      "numéro de parc"
+    ],
+    "image": {
+      "alt": "Dessin au trait de la sculpture d’un pneu vue de face, un pain de gomme surligné"
+    },
+    "titreOffre": "Le prix d’un logiciel pour centre de pneus",
+    "blocs": [
+      {
+        "type": "section",
+        "id": "ressaisie",
+        "titre": "Votre argent attend sur une fiche papier",
+        "paragraphes": [
+          "Le retard avant facturation se creuse surtout chez vous : la fiche attend d’être retapée, puis l’ordre de réparation attend de partir. Sans ordre de réparation, pas de bon de commande. Sans bon de commande, pas de facture.",
+          "Un loueur refacture le pneu à son locataire à la restitution de l’engin : il veut le montant le jour même. Et un technicien payé à l’opération attend lui aussi que le dossier avance."
+        ],
+        "points": [
+          {
+            "titre": "Chaque case cochée devient une ligne",
+            "corps": "Pneu, dépose et pose, démontage et remontage, accessoire, déplacement : le catalogue et les remises du client chiffrent la fiche à sa clôture."
+          },
+          {
+            "titre": "Deux remises à la suite",
+            "corps": "Les deux taux s’enchaînent par famille et par client, sans s’additionner. Vous ne gardez que l’exception."
+          },
+          {
+            "titre": "Le déplacement par tranche",
+            "corps": "La tranche de kilomètres se déduit de la position, sans choix à la main."
+          },
+          {
+            "titre": "Un PDF dès la clôture",
+            "corps": "L’ordre de réparation part seul, avec la fiche du technicien pour les clients qui l’exigent."
+          }
+        ]
+      },
+      {
+        "type": "tableau",
+        "id": "fiche",
+        "titre": "Ce que le téléphone du dépanneur doit savoir",
+        "paragraphes": [
+          "Un outil de dépannage standard fait entrer le technicien dans ses cases, et il finit abandonné. Celui-ci part de la fiche papier que vos équipes connaissent déjà, case par case."
+        ],
+        "legende": "Les champs de la fiche d’intervention, leur problème et leur traitement",
+        "colonnes": [
+          "Sur la fiche",
+          "Le problème",
+          "Dans le logiciel"
+        ],
+        "lignes": [
+          [
+            "Dimension",
+            "« 315 70R22.5 » sur la fiche, « 315/70R22.5 » en gestion, une autre écriture dans le mail du client",
+            "La saisie se lit et se range sous le bon code article"
+          ],
+          [
+            "Matricule",
+            "Noté de façon irrégulière, alors qu’il tranche un litige",
+            "Bloquant à la clôture, avec une issue : matricule illisible, photo du flanc"
+          ],
+          [
+            "Position",
+            "Essieu, côté, intérieur ou extérieur, simple ou jumelé : l’erreur est vite faite sur une remorque",
+            "Le technicien touche la roue sur le schéma du véhicule"
+          ],
+          [
+            "Compteur",
+            "Kilomètres pour un camion, heures pour un engin ou un chariot",
+            "La catégorie du véhicule choisit le bon compteur et les bonnes listes"
+          ],
+          [
+            "Numéro de parc",
+            "Le loueur le réclame en plus de l’immatriculation",
+            "Le champ n’apparaît que pour les clients qui l’exigent"
+          ],
+          [
+            "Hauteur de gomme",
+            "Demandée au confrère, rarement rendue",
+            "La mesure et la photo restent dans le dossier du pneu"
+          ]
+        ],
+        "note": "Cinq écrans au plus, de gros boutons, une page web qui s’ouvre sur le téléphone, et une règle : ne demander au technicien que ce que lui seul peut constater sur place."
+      },
+      {
+        "type": "etapes",
+        "id": "dossier",
+        "titre": "De l’appel du chauffeur au paiement, un seul dossier",
+        "paragraphes": [
+          "L’information existe déjà chez vous, mais elle se trouve rarement là où le bureau la cherche. Le dossier la garde au même endroit, du premier appel à l’encaissement."
+        ],
+        "etapes": [
+          {
+            "titre": "Appel",
+            "corps": "Un dossier numéroté s’ouvre pendant l’appel, par n’importe qui au bureau. Les questions viennent dans l’ordre utile, et le chauffeur envoie sa position par un lien."
+          },
+          {
+            "titre": "Répartition",
+            "corps": "Libres, en route, en intervention : le responsable voit qui part, avec quel matériel. Le jugement reste le sien."
+          },
+          {
+            "titre": "Clôture",
+            "corps": "Le technicien clôture depuis son téléphone. Le client reçoit le PDF et n’a plus à rappeler pour savoir si c’est fait."
+          },
+          {
+            "titre": "Bon de commande",
+            "corps": "Le dossier attend le BC et relance selon la règle de chaque compte. Le BC reçu se range dans le dossier."
+          },
+          {
+            "titre": "Rapprochement",
+            "corps": "BC et ordre de réparation se comparent : référence, lignes, montant. Un écart de centimes ou un chiffre manquant alerte avant l’envoi."
+          },
+          {
+            "titre": "Facture",
+            "corps": "Numéro de commande, centre de coût, code service, SIRET : elle refuse de partir s’il manque une référence, puis suit le canal du client, portail, adresse dédiée ou Chorus Pro."
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "id": "stock",
+        "titre": "Le pneu qui dort dans l’autre dépôt",
+        "paragraphes": [
+          "Un client qui attend une disponibilité ne rappelle pas : il commande ailleurs, sans regarder le prix. Pendant ce temps, le bon pneu est peut-être dans un autre de vos dépôts, et la question se pose par téléphone, dépôt par dépôt."
+        ],
+        "points": [
+          {
+            "titre": "La disponibilité en une recherche",
+            "corps": "Par dimension, tous dépôts confondus, commandes en cours comprises."
+          },
+          {
+            "titre": "Ne pas acheter deux fois",
+            "corps": "Une ligne manquante se cherche d’abord chez vous, puis part en commande."
+          },
+          {
+            "titre": "Les transferts rattachés",
+            "corps": "Le bon de transfert se relie à la fiche d’intervention qui l’a déclenché."
+          },
+          {
+            "titre": "Un achat qui respire",
+            "corps": "Les demandes arrivent regroupées à la personne qui achète, et les relances orales s’arrêtent."
+          }
+        ]
+      }
+    ],
+    "faq": {
+      "eyebrow": "Centre de pneus",
+      "titleLines": [
+        "Vos",
+        "questions."
+      ],
+      "items": [
+        {
+          "question": "Est-ce un doublon de mon logiciel de gestion ?",
+          "answer": "Facturation, stock et liste des prestations peuvent y rester. L’outil prépare la fiche, l’ordre de réparation et le dossier ; si votre logiciel n’a ni API ni import, le bureau dépose le PDF ou reprend les lignes. Il n’y a pas de seconde chaîne de facturation."
+        },
+        {
+          "question": "Mes techniciens vont-ils s’en servir ?",
+          "answer": "Une partie d’entre eux n’aime pas le numérique, et c’est normal. On l’essaie avec deux techniciens pendant deux semaines, sur vos cas réels, camion articulé, engin, chariot, avant de déployer."
+        },
+        {
+          "question": "Et quand il n’y a pas de réseau ?",
+          "answer": "La fiche se remplit sur le téléphone et part dès que le réseau revient. Le technicien ne repasse pas par le papier."
+        },
+        {
+          "question": "Un client peut-il suivre son dossier lui-même ?",
+          "answer": "Oui. Une page de suivi par numéro de dossier, sans compte à créer, et un espace avec la liste des dossiers pour un compte entreprise. L’appel reste possible pour l’urgence et le litige."
+        }
+      ]
+    }
+  },
+  {
+    "slug": "transport-routier",
+    "date": "2026-10-31",
+    "libelle": "Transport routier",
+    "h1": "Logiciel de transport routier",
+    "seo": {
+      "titre": "Logiciel de transport (TMS) sur mesure · Eliott Bouquerel",
+      "description": "Logiciel pour transporteur routier : rendez-vous de livraison confirmés, réponses des clients par nom, preuve de prévenance, à côté de votre TMS. Sur mesure."
+    },
+    "resume": "Votre logiciel d’exploitation monte la tournée. Tout ce qui la précède se fait encore à côté : le tableur de brouillon, les SMS de rendez-vous, le pointage de qui a répondu. Je construis ce qui manque autour de votre TMS, pour que l’exploitant revienne à l’exploitation.",
+    "accroche": "Les rendez-vous de livraison, le pointage des réponses et la preuve de prévenance, autour de votre TMS.",
+    "noteLlms": "le logiciel métier pour le transport routier : rendez-vous de livraison, réponses des destinataires, preuve de prévenance, raccordement au TMS",
+    "themes": [
+      "planning",
+      "flotte",
+      "relances",
+      "terrain"
+    ],
+    "lexique": [
+      "tournée",
+      "exploitant",
+      "rendez-vous",
+      "créneau",
+      "preuve de prévenance",
+      "conducteur",
+      "dépôt",
+      "lettre de voiture"
+    ],
+    "image": {
+      "alt": "Dessin au trait d’un réseau de points de livraison, une tournée surlignée"
+    },
+    "titreOffre": "Le prix d’un logiciel de transport",
+    "blocs": [
+      {
+        "type": "tableau",
+        "id": "rythme",
+        "titre": "Jour A, jour B, jour C : où part la journée de l’exploitant",
+        "paragraphes": [
+          "Sur une tournée de livraison avec rendez-vous, l’horloge est simple : les messages partent en fin de journée, les réponses tombent avant midi le lendemain, le camion roule le jour d’après. C’est au milieu que le temps se perd."
+        ],
+        "legende": "Le rythme d’une tournée avec rendez-vous, à la main et dans le logiciel",
+        "colonnes": [
+          "Moment",
+          "À la main",
+          "Dans le logiciel"
+        ],
+        "lignes": [
+          [
+            "Arrivage au dépôt",
+            "Le fichier global se recopie dans un tableur de brouillon, livraison par livraison",
+            "Les commandes arrivent dans une liste prête à répartir"
+          ],
+          [
+            "Jour A, fin de journée",
+            "Le fichier de rendez-vous part dans un outil de SMS marketing",
+            "Chaque destinataire reçoit sa date et son créneau depuis la tournée elle-même"
+          ],
+          [
+            "Jour B, avant midi",
+            "L’outil donne un camembert : combien ont répondu, jamais qui. L’exploitant reconstitue la liste",
+            "Les réponses s’affichent par nom, avec ce qui reste à traiter"
+          ],
+          [
+            "Jour B, relances",
+            "Les silencieux se rappellent un par un, et un décalage se reporte dans plusieurs fichiers",
+            "La relance part seule, et l’exploitant garde les cas qui demandent un appel"
+          ],
+          [
+            "Jour C, livraison",
+            "Le conducteur ne voit pas ce que le client a répondu",
+            "L’accès et le créneau confirmés suivent la tournée jusqu’à son téléphone"
+          ]
+        ]
+      },
+      {
+        "type": "section",
+        "id": "pour-rien",
+        "titre": "Le camion qui roule pour rien",
+        "paragraphes": [
+          "Un 44 tonnes arrive, le client est absent, ou le chemin ne passe pas. La livraison est perdue, le créneau aussi, et les suivants prennent du retard. Ce coût se décide la veille, dans une réponse que personne n’a eu le temps de lire."
+        ],
+        "points": [
+          {
+            "titre": "La question de l’accès",
+            "corps": "Largeur, pente, hauteur, chemin de terre, endroit de dépôt, chariot embarqué : le client répond avant que la tournée soit validée."
+          },
+          {
+            "titre": "La preuve de prévenance",
+            "corps": "Chaque message et chaque réponse sont datés et rangés par destinataire. Si le délai du donneur d’ordre saute, vous prouvez que vous avez prévenu."
+          },
+          {
+            "titre": "L’historique d’un destinataire",
+            "corps": "D’un arrivage à l’autre, vous retrouvez qui ne répond jamais et quelle adresse pose problème."
+          },
+          {
+            "titre": "Les réponses d’un absent",
+            "corps": "Elles restent visibles par toute l’exploitation quand un exploitant est en congé."
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "id": "tms",
+        "titre": "Garder votre TMS, ajouter ce qui lui manque",
+        "paragraphes": [
+          "Un logiciel d’exploitation du marché fait bien son travail : puits de commandes, optimisation de trajet, documents signés et photos côté conducteur. S’il vous convient, gardez-le. Je construis ce qu’il ne couvre pas et je le raccorde par son import ou son API.",
+          "Le sur mesure se justifie aussi quand vos ordres de transport, vos lettres de voiture ou votre facturation passent encore par plusieurs ressaisies. On regarde alors où part le temps, ordre par ordre, avant de parler de modules."
+        ],
+        "points": [
+          {
+            "titre": "La tournée poussée au TMS",
+            "corps": "Une tournée validée part dans votre logiciel d’exploitation, sans seconde saisie."
+          },
+          {
+            "titre": "Le délai du donneur d’ordre",
+            "corps": "Chaque livraison affiche ce qu’il reste avant l’échéance, depuis son arrivée au dépôt."
+          },
+          {
+            "titre": "Une course, tous ses documents",
+            "corps": "Ordre, lettre de voiture et preuve de livraison se rattachent à la même course."
+          }
+        ]
+      },
+      {
+        "type": "etapes",
+        "id": "essai",
+        "titre": "Commencer par un seul arrivage",
+        "paragraphes": [
+          "Un logiciel de transport se juge sur une vraie tournée. Le premier lot tient sur un arrivage, puis il grandit si vos exploitants le demandent."
+        ],
+        "etapes": [
+          {
+            "titre": "Votre fichier",
+            "corps": "Vous me donnez un fichier de rendez-vous réel, celui que vos exploitants montent déjà."
+          },
+          {
+            "titre": "Votre message",
+            "corps": "On écrit le SMS avec vos mots : date, créneau, question d’accès, réponse attendue."
+          },
+          {
+            "titre": "Le tableau des réponses",
+            "corps": "Dès le premier envoi, l’exploitant voit qui a répondu quoi, et qui reste à appeler."
+          },
+          {
+            "titre": "Le raccordement",
+            "corps": "Une fois l’usage adopté, la tournée validée part vers votre TMS."
+          }
+        ]
+      }
+    ],
+    "faq": {
+      "eyebrow": "Transport routier",
+      "titleLines": [
+        "Ce qu’on",
+        "me demande."
+      ],
+      "items": [
+        {
+          "question": "Dois-je changer de TMS ?",
+          "answer": "Non, sauf s’il vous freine. Le logiciel se branche à côté, par l’import que votre TMS accepte déjà, souvent un fichier de tournée. Vos conducteurs gardent leur outil."
+        },
+        {
+          "question": "Les SMS sont-ils compris dans le prix ?",
+          "answer": "Les envois se règlent à l’opérateur, sur un compte à votre nom, au tarif qu’il vous fait. Je construis l’envoi et le suivi des réponses, et vous gardez la main sur ce poste."
+        },
+        {
+          "question": "Le destinataire choisit-il son créneau ?",
+          "answer": "C’est vous qui décidez. Par défaut, l’exploitation fixe la date et le créneau, et le destinataire confirme. Le choix du créneau s’ajoute si vos tournées le permettent."
+        },
+        {
+          "question": "Mes conducteurs ont-ils quelque chose à installer ?",
+          "answer": "Non. Ils reçoivent leur tournée comme aujourd’hui, avec en plus ce que le client a répondu sur l’accès et le créneau."
+        }
+      ]
+    }
+  }
+]

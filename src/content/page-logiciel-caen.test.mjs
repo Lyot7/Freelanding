@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { euros, prestation, prixPlancher, repereAgenceLogiciel } from "./offre.ts";
-import { CHEMIN_PAGE_LOGICIEL_CAEN, pageCaen } from "./page-caen.ts";
+import { CHEMIN_PAGE_LOGICIEL_CAEN } from "./page-caen.ts";
 import { lienVersPageLogicielCaen, pageLogicielCaen } from "./page-logiciel-caen.ts";
 import { pagesSecteur } from "./pages-secteur.ts";
 import { contentRoutes } from "./routes.ts";
@@ -80,11 +80,10 @@ describe("la page du logiciel à Caen est cherchable", () => {
     expect(route?.kind).toBe("local");
   });
 
-  test("la page pilier et la page de Caen du site vitrine la lient", () => {
+  test("la page pilier la lie", () => {
     const pilier = (lienLocalParPrestation.logiciel ?? []).flatMap((l) => l.liens);
     expect(pilier.map((l) => l.href)).toContain(CHEMIN_PAGE_LOGICIEL_CAEN);
     expect(lienVersPageLogicielCaen.href).toBe(CHEMIN_PAGE_LOGICIEL_CAEN);
-    expect(pageCaen.contexte.liens.map((l) => l.href)).toContain(CHEMIN_PAGE_LOGICIEL_CAEN);
   });
 
   test("ses liens internes visent des pages servies ou le rendez-vous", () => {

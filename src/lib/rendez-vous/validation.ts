@@ -24,14 +24,13 @@ import {
   MOTIF_EMAIL,
   normaliserTexte,
 } from "@/lib/contact/validation";
-import { estIdRendezVous } from "./config";
+import { resoudreSujet } from "./config";
 import { HORIZON_JOURS } from "./creneaux";
 import { estDureePlausible } from "./durees";
 import {
+  rattacherObjectif,
   OPTIONS_ECHEANCE,
-  OPTIONS_OUTIL,
   optionsObjectif,
-  questionsDuRendezVous,
   rattacherTranche,
   tranchesBudget,
 } from "./questionnaire";
@@ -61,21 +60,15 @@ export interface ReservationValide {
   readonly email: string;
   /** Absent quand le prospect n'a rien écrit. */
   readonly message?: string;
-  /**
-   * Identifiant de tranche, pris dans `tranchesBudget(type)`. Absent pour un
-   * sujet sans budget (`questionsDuRendezVous`), même si le client en envoie un.
-   */
-  readonly budget?: string;
+  readonly budget: string;
   /** Identifiant d'objectif, pris dans `optionsObjectif(type)`. */
   readonly objectif: string;
-  /** Identifiant d'outil, pris dans `OPTIONS_OUTIL`, pour le seul sujet « ia ». */
-  readonly outil?: string;
   /** Facultative : absente quand le prospect n'a rien coché. */
   readonly echeance?: string;
 }
 
 /** Champs du questionnaire, tels que le serveur les nomme dans un rejet. */
-type ChampQuestionnaire = "budget" | "objectif" | "outil" | "echeance";
+type ChampQuestionnaire = "budget" | "objectif" | "echeance";
 
 export type MotifRejetReservation =
   | { readonly type: "corps_illisible" }
@@ -178,8 +171,9 @@ export function validerReservation(
     return { ok: false, motif: { type: "trop_rapide" } };
   }
 
-  const type = champs.type;
-  if (!estIdRendezVous(type) || !options.typesAutorises.includes(type)) {
+  /* Un sujet retiré se traduit : un onglet ouvert avant le 2026-10-31 l'envoie. */
+  const type = resoudreSujet(champs.type);
+  if (!type || !options.typesAutorises.includes(type)) {
     return {
       ok: false,
       motif: { type: "champ_invalide", champ: "type", raison: "hors_liste" },
@@ -248,29 +242,18 @@ export function validerReservation(
     };
   }
 
-  /*
-   * UNE QUESTION QUE LE SUJET NE POSE PAS N'EST PAS LUE : un budget envoyé
-   * pour « cto », ou un outil pour « site », n'atteint jamais les notes.
-   */
-  const questionsPosees = questionsDuRendezVous(type);
-  let budgetRetenu: string | undefined;
-  if (questionsPosees.budget) {
-    const budget = lireChoix(
-      { ...champs, budget: rattacherTranche(type, lireChaine(champs, "budget").trim()) },
-      "budget",
-      tranchesBudget(type),
-    );
-    if (!budget.ok) return budget;
-    budgetRetenu = budget.valeur;
-  }
-  const objectif = lireChoix(champs, "objectif", optionsObjectif(type));
+  const budget = lireChoix(
+    { ...champs, budget: rattacherTranche(type, lireChaine(champs, "budget").trim()) },
+    "budget",
+    tranchesBudget(type),
+  );
+  if (!budget.ok) return budget;
+  const objectif = lireChoix(
+    { ...champs, objectif: rattacherObjectif(lireChaine(champs, "objectif").trim()) },
+    "objectif",
+    optionsObjectif(type),
+  );
   if (!objectif.ok) return objectif;
-  let outilRetenu: string | undefined;
-  if (questionsPosees.outil) {
-    const outil = lireChoix(champs, "outil", OPTIONS_OUTIL);
-    if (!outil.ok) return outil;
-    outilRetenu = outil.valeur;
-  }
   const echeance = lireChoixFacultatif(champs, "echeance", OPTIONS_ECHEANCE);
   if (!echeance.ok) return echeance;
 
@@ -285,9 +268,8 @@ export function validerReservation(
       nom,
       email,
       ...(message.length > 0 ? { message } : {}),
-      ...(budgetRetenu !== undefined ? { budget: budgetRetenu } : {}),
+      budget: budget.valeur,
       objectif: objectif.valeur,
-      ...(outilRetenu !== undefined ? { outil: outilRetenu } : {}),
       ...(echeance.valeur ? { echeance: echeance.valeur } : {}),
     },
   };

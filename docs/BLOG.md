@@ -183,3 +183,26 @@ Payload aurait été le choix d'un CMS si les articles étaient écrits dans une
 interface. Ils sont écrits par un agent qui a accès au disque : le formulaire
 devenait un obstacle, et un schéma de collection interdisait la mise en page
 variable qu'on cherchait.
+
+## Les pages par métier
+
+`/logiciel-metier` (le hub) et `/logiciel-metier/<metier>`. Une page est une entrée
+de `src/content/metiers.json`, relue par `src/content/metiers.ts` : ajouter l'entrée
+suffit à la publier sur le hub, au sitemap, à `llms.txt` et dans le maillage.
+
+Le visuel : un SVG dans la même grammaire que ceux du blog (`docs/visuels-metiers/`),
+rendu par `rendreVisuelMetier` de `scripts/visuel-article.mjs`. Le sujet du dessin se
+place à gauche : le titre occupe la moitié droite du héros.
+
+**Une page n'est publiée que si son contenu est propre au métier.** `motifsDeRefus`
+refuse moins de quatre blocs, une seule nature de bloc, moins de six mots du métier,
+un mot du lexique absent du texte, un paragraphe repris, le même enchaînement de
+blocs qu'une autre page, plus de 5 % de suites de trois mots communes avec une autre.
+`metiers.test.mjs` fait rougir `bun run test` dès qu'une entrée est refusée.
+
+Le maillage se calcule : `themes` donne les voisins et les articles. Une page ne
+cite jamais une autre page à la main. Aucun montant dans le fichier : le prix vient
+d'`offre.ts` au rendu.
+
+Le branchement au circuit de publication (cockpit, `routine-blog`) n'est pas fait :
+il attend la décision d'Eliott (`~/vault/wiki/business/metiers-file-editoriale.md`).

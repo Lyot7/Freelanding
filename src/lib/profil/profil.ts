@@ -3,15 +3,12 @@ import type { ContentBlock, Stat } from "@/lib/content/types";
 import { absoluteUrl } from "@/lib/site-url";
 import {
   aPartirDe,
-  ctoReferentIA,
   euros,
-  integrationIA,
   prestations,
   prixAffiche,
   type Offre,
   type Prestation,
 } from "@/content/offre";
-import { CHEMIN_AUTOMATISATION, CHEMIN_CTO } from "@/content/page-theme";
 import { lienRendezVous, rendezVousContent } from "@/content/rendez-vous";
 import { CHEMIN_PROFIL_TEXTE, vueAgentContent } from "@/content/vue-agent";
 
@@ -87,15 +84,6 @@ interface OffreAvecPage {
   readonly page: string;
 }
 
-/**
- * Les offres sans prestation propre, présentes dans l'accordéon depuis le
- * 2026-10-16 : leur page est une page thématique, pas `/services/<slug>`.
- */
-const OFFRES_HORS_PRESTATION: readonly OffreAvecPage[] = [
-  { offre: integrationIA, page: CHEMIN_AUTOMATISATION },
-  { offre: ctoReferentIA, page: CHEMIN_CTO },
-];
-
 function blocsOffre(offre: Offre): ContentBlock[] {
   return [
     p(T.offres.plancher(prixAffiche(offre, "\u00A0HT"))),
@@ -169,7 +157,6 @@ export async function construireProfil(
   blocs.push(h2(T.sections.offres), p(home.services.intro ?? ""), ...T.offres.prix.map(p));
   const offres: readonly OffreAvecPage[] = [
     ...sources.prestations.map((offre) => ({ offre, page: `/services/${offre.slug}` })),
-    ...OFFRES_HORS_PRESTATION,
   ];
   for (const service of home.services.items) {
     const trouvee = offres.find((candidate) => service.cta?.href === candidate.page);

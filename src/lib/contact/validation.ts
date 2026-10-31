@@ -21,6 +21,7 @@ import {
   OPTIONS_ECHEANCE,
   libelleOption,
   optionsObjectif,
+  rattacherObjectif,
   rattacherTranche,
   rendezVousDuTypeProjet,
   tranchesBudget,
@@ -238,7 +239,12 @@ export function validerSoumission(
     // Une tranche publiée avant un changement de plancher, envoyée par un
     // onglet resté ouvert, se rattache à la tranche actuelle, comme à la
     // prise de rendez-vous : la refuser ferait perdre le message.
-    const id = champ === "budget" ? rattacherTranche(idRendezVous, brut) : brut;
+    const id =
+      champ === "budget"
+        ? rattacherTranche(idRendezVous, brut)
+        : champ === "objectif"
+          ? rattacherObjectif(brut)
+          : brut;
     const libelle = libelleOption(options, id);
     if (libelle === undefined) {
       return {

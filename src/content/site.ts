@@ -27,24 +27,16 @@ export const siteConfig: SiteConfig = {
   // points d'appel concatenent `name + mark`, une chaine vide n'y casse rien.
   brand: { name: "Bouquerel", mark: "", given: "Eliott" },
   /*
-   * « OUTILS MÉTIER » A CÉDÉ LA PLACE AUX « LOGICIELS » le 2026-09-02, pour
-   * suivre la hiérarchie d'offres qu'Eliott a posée le même jour : sites et
-   * logiciels sont les deux offres phares, les outils sur mesure viennent au
-   * second rang, au même niveau que les automatisations et les audits. La
-   * baseline du logotype est lue sur toutes les pages : elle porte les deux
-   * offres de tête, pas la troisième.
+   * UNE SEULE OFFRE DEPUIS LE 2026-10-31 : la baseline du logotype est lue sur
+   * toutes les pages. LE FRAGMENT DOIT EXISTER DANS `tagline`, sinon `Header`
+   * concatène le texte entier et le fragment introuvable.
    */
-  tagline: "Sites et logiciels sur mesure",
-  // Fragment de la baseline rendu en couleur pleine dans l'en-tête.
-  /* LE FRAGMENT DOIT EXISTER DANS `tagline`, sinon `Header` concatène le
-   texte entier ET le fragment introuvable : la baseline affichait
-   « Sites et logiciels sur mesureoutils métier » après le changement de
-   tagline du 2026-09-02. Le composant met en blanc plein ce qui est listé
-   ici, en gris ce qui l'entoure : c'est donc l'offre de tête qui est
-   soulignée, pas le mot « sur mesure » qui suit. */
-  taglineEmphasis: ["logiciels"],
+  tagline: "Logiciels métier sur mesure",
+  taglineEmphasis: ["Logiciels métier"],
   nav: [
     { label: "Accueil", href: "/" },
+    { label: "Logiciel métier", href: "/services/logiciel-metier" },
+    { label: "Par métier", href: "/logiciel-metier" },
     { label: "Réalisations", href: "/realisations" },
     { label: "Blog", href: "/blog" },
     { label: "À propos", href: "/a-propos" },
@@ -54,6 +46,8 @@ export const siteConfig: SiteConfig = {
   // de la colonne « Navigation » du pied de page (qui, elle, contient « 404 »).
   menuNav: [
     { label: "Accueil", href: "/" },
+    { label: "Logiciel métier", href: "/services/logiciel-metier" },
+    { label: "Par métier", href: "/logiciel-metier" },
     { label: "Réalisations", href: "/realisations" },
     { label: "À propos", href: "/a-propos" },
     { label: "Blog", href: "/blog" },
@@ -73,7 +67,7 @@ export const siteConfig: SiteConfig = {
   primaryCta: {
     label: "RÉSERVER UN APPEL",
     shortLabel: "RÉSERVER",
-    href: lienRendezVous("decouverte"),
+    href: lienRendezVous("logiciel"),
   },
   contact: {
     // Domaine arrêté : eliottbouquerel.fr (site servi sur
@@ -143,6 +137,8 @@ export const siteConfig: SiteConfig = {
    */
   footerNav: [
     { label: "Accueil", href: "/" },
+    { label: "Logiciel métier", href: "/services/logiciel-metier" },
+    { label: "Par métier", href: "/logiciel-metier" },
     { label: "Réalisations", href: "/realisations" },
     { label: "À propos", href: "/a-propos" },
     { label: "Blog", href: "/blog" },
@@ -245,11 +241,14 @@ export const siteConfig: SiteConfig = {
   // Titres des deux colonnes du pied de page (habillage, pas de l'éditorial).
   footerColumnLabels: { contact: "Contact", navigation: "Navigation" },
   footerCta: {
-    heading: "Démarrons votre projet.",
-    // Le sous-texte annonce la bascule du dessous : deux lignes à écrire, ou
-    // un appel en visio préparé par trois questions.
+    heading: "Montrez-moi ce qui vous bloque.",
+    /*
+     * LA PHRASE DISCRÈTE, décision d'Eliott du 2026-10-30 : une seule offre,
+     * « en restant ouvert aux propositions ». Pas de bloc d'offre : une autre
+     * demande se dit ici, sur toutes les pages, et nulle part ailleurs.
+     */
     subtext:
-      "Un cahier des charges complet ou une simple idée : écrivez-moi deux lignes, ou réservez un appel en visio.",
+      "Une tâche à faire disparaître : écrivez-moi deux lignes, ou réservez un appel en visio. Une autre demande ? Dites-la quand même, je vous réponds franchement.",
     subtextEmphasis: ["réservez un appel en visio."],
   },
   footerForm: {
@@ -264,11 +263,11 @@ export const siteConfig: SiteConfig = {
     emailPlaceholder: "exemple@email.com",
     selectLabel: "Que cherchez-vous ?",
     messageLabel: "Votre message, si vous voulez",
-    messagePlaceholder: "Deux lignes sur votre projet suffisent.",
+    messagePlaceholder: "Deux lignes sur ce qui vous bloque suffisent.",
     selectOptions: [
-      "Un site",
-      "Une solution métier",
+      "Un logiciel métier",
       "Je ne sais pas encore",
+      "Une autre demande",
     ],
     questionnaire: {
       budget: {
@@ -308,7 +307,7 @@ export const siteConfig: SiteConfig = {
     ],
   },
   // La source distingue la casse du bouton flottant de celle de la nav.
-  floatingCta: { label: "Réserver un appel", href: lienRendezVous("decouverte") },
+  floatingCta: { label: "Réserver un appel", href: lienRendezVous("logiciel") },
   meta: {
     // « ® » RETIRÉ DES TITRES le 2026-09-01. Le symbole avait été vidé de
     // `brand.mark` le 2026-08-29 pour la raison écrite en tête de ce fichier :
@@ -318,7 +317,7 @@ export const siteConfig: SiteConfig = {
     // exposées de tout le site : elles sortent dans l'onglet du navigateur et
     // dans chaque résultat Google, là où la fausse allégation se lit le plus.
     // Le retrait n'était donc pas fait, il était seulement invisible à l'écran.
-    defaultTitle: "Eliott Bouquerel · Site internet et logiciel sur mesure à Caen",
+    defaultTitle: "Eliott Bouquerel · Logiciel métier sur mesure",
     // GABARIT DOCUMENTAIRE, plus branché sur `Metadata` depuis le
     // 2026-08-28 : toutes les pages posent leur titre en `absolute`
     // (`pageMetadata`), et le laisser déclaré dans le layout faisait écrire la
@@ -326,7 +325,7 @@ export const siteConfig: SiteConfig = {
     // séparateur, celle que suivent les titres écrits à la main.
     titleTemplate: "%s · Eliott Bouquerel",
     description:
-      "Des sites qui amènent des clients et des logiciels métier sur mesure pour TPE et PME. La qualité d’une agence, jusqu’à deux fois moins cher. Basé à Caen, en visio partout en France.",
+      "Le logiciel métier qui fait disparaître la tâche qui vous bloque. L’IA fait le sale boulot, votre équipe reprend son temps. Basé à Caen, en visio partout en France.",
     ogImage: {
       src: "/images/og.jpg",
       alt: "Eliott Bouquerel",

@@ -184,7 +184,7 @@ export const pageErp: PageTheme = {
         titre: "Pour aller plus loin",
         items: [
           {
-            libelle: "La Solution métier en détail",
+            libelle: "Le logiciel métier en détail",
             href: CHEMIN_PILIER,
             description: "Ce qui est compris, et ce qui fait varier le prix.",
           },

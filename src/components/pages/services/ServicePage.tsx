@@ -13,7 +13,7 @@ import {
 } from "@/components/pages/services/HeroPhoto";
 import { herosPages } from "@/content/heros-pages";
 import type { SiteConfig } from "@/lib/content/types";
-import { periode, prixPlancher, type Offre, type Prestation } from "@/content/offre";
+import { prixPlancher, type Offre, type Prestation } from "@/content/offre";
 import {
   lienLocalParPrestation,
   marchesFilAriane,
@@ -24,7 +24,6 @@ import {
 import type { LienLocal, PageLocale } from "@/content/page-caen";
 import type { PagePrix } from "@/content/page-prix-logiciel";
 import type { PageSecteur, SectionSecteur } from "@/content/pages-secteur";
-import type { PagePrixSite } from "@/content/page-prix-site";
 import { RDV_PAR_PRESTATION } from "@/content/rendez-vous";
 
 /**
@@ -140,7 +139,6 @@ export function OffreDetail({
             {prixPlancher(offre)}
             <span className="ml-[8px] align-baseline text-[13px] font-medium uppercase tracking-[-0.01em] text-white/50">
               {servicePageLabels.horsTaxes}
-              {periode(offre)}
             </span>
           </span>
         </p>
@@ -255,7 +253,7 @@ export function SectionDeuxMoities({
       />
       <div className="relative mx-auto grid w-full max-w-[1440px] gap-[30px] tablet:grid-cols-2 tablet:gap-x-0 tablet:gap-y-[30px]">
         <div className="flex flex-col gap-[16px] tablet:pr-[30px] desktop:pr-[40px]">
-          <h2 className="accent-room max-w-[460px] text-[26px] font-semibold uppercase leading-[0.95] tracking-[-0.04em] tablet:text-[34px]">
+          <h2 className="accent-room max-w-[460px] text-balance text-[26px] font-semibold uppercase leading-[0.95] tracking-[-0.04em] tablet:text-[34px]">
             {titre}
           </h2>
           {paragraphes.map((paragraphe) => (
@@ -372,14 +370,14 @@ export function ServicePage({
   prestation: Prestation;
   site: SiteConfig;
   /**
-   * Page qui décline la prestation : une ville (`/creation-site-internet-caen`),
+   * Page qui décline la prestation : une ville (`/logiciel-sur-mesure-caen`),
    * un secteur (`/services/logiciel-metier/btp`) ou les prix
-   * (`/services/logiciel-metier/prix`, `/services/site-vitrine/prix`). Elle
+   * (`/services/logiciel-metier/prix`). Elle
    * remplace le H1, le chapô, la FAQ et prolonge le fil d'Ariane ; les
    * périmètres, les prix et la prise de rendez-vous restent ceux de la
    * prestation.
    */
-  local?: PageLocale | PageSecteur | PagePrix | PagePrixSite;
+  local?: PageLocale | PageSecteur | PagePrix;
 }) {
   // Le lien vers la page locale ne s'affiche que sur la page de prestation :
   // sur la page locale elle-même, il pointerait vers la page courante.

@@ -41,12 +41,12 @@ export const aboutContent: AboutContent = {
     eyebrow: "Eliott Bouquerel, développeur freelance à Caen",
     title: "À propos.",
     subtitle:
-      "Je construis seul les sites et les outils des entreprises qui veulent des résultats.",
+      "Je construis seul les logiciels métier des entreprises qui veulent reprendre leur temps.",
     // Fragments du sous-titre rendus en blanc plein (le reste est atténué).
     subtitleParagraphs: [
       {
-        text: "Je construis seul les sites et les outils des entreprises qui veulent des résultats.",
-        emphasis: ["seul", "veulent des résultats."],
+        text: "Je construis seul les logiciels métier des entreprises qui veulent reprendre leur temps.",
+        emphasis: ["seul", "veulent reprendre leur temps."],
       },
     ],
   },
@@ -78,10 +78,10 @@ export const aboutContent: AboutContent = {
    * « Qui je suis » et son chapô sont fondus dans ces trois paragraphes.
    */
   body: [
-    "Je ne vends pas un site. Je vends ce qu’il vous rapporte : des clients qui vous trouvent, une image qui vous place au-dessus, un prétexte pour décrocher un rendez-vous. Un site qui impressionne et qui n’amène rien, ça existe, et c’est même devenu courant.",
-    "Ce que je construis est pensé pour être trouvé et pour convaincre : référencement naturel, conversion, expérience utilisateur, ergonomie, accessibilité, marketing. Sur un projet à quelques centaines d’euros, ces étapes sautent faute de temps. C’est pour ça que je facture au-dessus, et que ce que je livre n’a pas grand-chose à voir.",
-    "Je travaille seul, par choix. Dans une agence, votre projet passe d’un commercial à un chef de projet puis à plusieurs métiers, avec des frais qui courent qu’il avance ou non. Avec moi, vous parlez à celui qui conçoit et qui code, du premier appel à la mise en ligne, et je tiens le projet d’un bout à l’autre.",
-    "Il y a une part du travail que vous ne verrez jamais, et c’est la plus importante : l’architecture décidée avant le premier écran, des outils choisis sur ce qu’ils coûteront à faire vivre, des tests de vitesse, de référencement et d’accessibilité passés par des outils extérieurs aux miens, des pannes qui disent pourquoi elles arrivent, du code documenté pour qu’un autre puisse reprendre. Vous achetez de ne jamais avoir à découvrir ces points-là. Ma barre sur chaque projet : n’avoir aucun regret sur ce que j’ai livré.",
+    "Je ne vends pas un logiciel. Je vends une contrainte qui disparaît et du temps qui revient. Le recopiage, les factures, les relances : l’IA et le logiciel font le sale boulot, et votre équipe revient à ce qui la rend indispensable, connaître vos clients et décider.",
+    "Je commence par regarder comment vous travaillez vraiment : qui saisit quoi, où ça se recopie, ce qui se perd entre deux outils. Un logiciel qui ne suit pas votre façon de faire finit abandonné au profit du tableur. Celui que je construis part de vos documents, de vos mots et de vos cas particuliers.",
+    "Je travaille seul, par choix. Dans une agence, votre projet passe d’un commercial à un chef de projet puis à plusieurs métiers, avec des frais qui courent qu’il avance ou non. Avec moi, vous parlez à celui qui conçoit et qui code, du premier appel à la mise en service, et je tiens le projet d’un bout à l’autre.",
+    "Il y a une part du travail que vous ne verrez jamais, et c’est la plus importante : l’architecture décidée avant le premier écran, des outils choisis sur ce qu’ils coûteront à faire vivre, des tests passés avant chaque mise en service, des sauvegardes vérifiées, des pannes qui disent pourquoi elles arrivent, du code documenté pour qu’un autre puisse reprendre. Vous achetez de ne jamais avoir à découvrir ces points-là. Ma barre sur chaque projet : n’avoir aucun regret sur ce que j’ai livré.",
   ],
   // Les quatre membres d'équipe du template (Anna Schneider, Jennifer Peterson,
   // Erik Voss, Liam Torres) sont des personas fictifs : ils n'existent pas et
@@ -106,7 +106,7 @@ export const aboutContent: AboutContent = {
             periode: "Depuis juil. 2026",
             structure: "Indépendant",
             lieu: "Normandie, et à distance",
-            role: "Développeur full-stack : sites, outils métier, logiciels",
+            role: "Développeur full-stack : logiciels métier sur mesure",
             nature: "Freelance",
           },
           {
@@ -171,7 +171,7 @@ export const aboutContent: AboutContent = {
             role: "BUT MMI, Métiers du multimédia et de l’internet, parcours développement web",
             nature: "Bac+3",
             apport:
-              "Le développement au centre, entouré de tout ce qui fait qu’un site se lit, se comprend et donne envie d’agir.",
+              "Le développement au centre, entouré de tout ce qui fait qu’un outil se comprend et donne envie de s’en servir.",
             domaines: [
               "Développement web",
               "Design et ergonomie",
@@ -190,7 +190,7 @@ export const aboutContent: AboutContent = {
     eyebrow: "Services",
     // IDENTIQUE à `homeContent.services.intro` (même section, deux pages).
     intro:
-      "Du site qui vous amène des clients à l’outil qui vous rend des heures, de l’IA dans vos logiciels au pilotage technique de votre entreprise. Je pars de votre façon de travailler, et je construis ce qui lui correspond.",
+      "Je pars de votre façon de travailler, et je construis le logiciel qui lui correspond : la contrainte disparaît, le temps revient à votre équipe.",
     items: services,
   },
   // `testimonial` ABSENT depuis le 2026-09-01. Il portait « Sophie Andersen »,
@@ -217,7 +217,7 @@ export const aboutContent: AboutContent = {
     // `brand.mark` ne passe pas par là.
     title: "Eliott Bouquerel, développeur freelance à Caen",
     description:
-      "Développeur full stack freelance à Caen, et partout en France à distance. Je construis des sites qui amènent des clients et des outils métier qui rendent des heures.",
+      "Développeur full stack freelance à Caen, et partout en France à distance. Je construis les logiciels métier qui rendent des heures aux entreprises.",
   },
 };
 

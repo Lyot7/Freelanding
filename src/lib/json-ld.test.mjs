@@ -2,12 +2,13 @@ import { describe, expect, test } from "bun:test";
 import {
   articleSchema,
   businessSchema,
+  collectionSchema,
   datasetSchema,
   personSchema,
   profilePageSchema,
 } from "./json-ld.ts";
 import { homeContent } from "../content/home.ts";
-import { ctoReferentIA } from "../content/offre.ts";
+import { prestation } from "../content/offre.ts";
 import { siteConfig } from "../content/site.ts";
 
 /**
@@ -29,18 +30,15 @@ describe("JSON-LD de l'entité", () => {
     expect(business.address).not.toHaveProperty("streetAddress");
   });
 
-  test("déclare le prix mensuel du CTO avec son unité, et les projets sans", () => {
-    const cto = business.hasOfferCatalog.itemListElement.find((offre) => offre.name === ctoReferentIA.nom);
-    expect(cto.priceSpecification).toEqual({
-      "@type": "UnitPriceSpecification",
-      priceCurrency: "EUR",
-      minPrice: ctoReferentIA.plancher,
-      unitCode: "MON",
-    });
-    const projets = business.hasOfferCatalog.itemListElement.filter((offre) => offre.name !== ctoReferentIA.nom);
-    expect(projets).toHaveLength(homeContent.services.items.length - 1);
-    for (const offre of projets) {
+  test("déclare le plancher du logiciel, un prix de projet, sans unité mensuelle", () => {
+    // Le CTO à temps partagé, seule offre mensuelle, a quitté le site le
+    // 2026-10-31 : plus aucune offre ne déclare `unitCode`.
+    const offres = business.hasOfferCatalog.itemListElement;
+    expect(offres).toHaveLength(homeContent.services.items.length);
+    expect(offres.map((offre) => offre.name)).toEqual([prestation("logiciel").nom]);
+    for (const offre of offres) {
       expect(offre.priceSpecification["@type"]).toBe("PriceSpecification");
+      expect(offre.priceSpecification.minPrice).toBe(prestation("logiciel").plancher);
       expect(offre.priceSpecification).not.toHaveProperty("unitCode");
     }
   });
@@ -50,6 +48,25 @@ describe("JSON-LD de l'entité", () => {
     expect(business.logo.url).toMatch(/^https?:\/\/[^/]+\//);
     expect(business.logo.width).toBeGreaterThanOrEqual(112);
     expect(business.logo.height).toBeGreaterThanOrEqual(112);
+  });
+});
+
+describe("JSON-LD du hub des métiers", () => {
+  test("liste les pages dans l'ordre affiché, en URL absolues", () => {
+    const hub = collectionSchema("Logiciels par métier", "Description", "/logiciel-metier", [
+      { libelle: "Échafaudage", chemin: "/logiciel-metier/echafaudage" },
+      { libelle: "Centre de pneus", chemin: "/logiciel-metier/centre-de-pneus" },
+    ]);
+    expect(hub["@type"]).toBe("CollectionPage");
+    expect(hub.url).toMatch(/^https?:\/\/[^/]+\/logiciel-metier$/u);
+    expect(hub.mainEntity["@type"]).toBe("ItemList");
+    expect(hub.mainEntity.itemListElement.map((e) => [e.position, e.name])).toEqual([
+      [1, "Échafaudage"],
+      [2, "Centre de pneus"],
+    ]);
+    for (const element of hub.mainEntity.itemListElement) {
+      expect(element.url).toMatch(/^https?:\/\/[^/]+\/logiciel-metier\/[a-z-]+$/u);
+    }
   });
 });
 

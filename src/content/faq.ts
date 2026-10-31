@@ -3,10 +3,12 @@ import {
   plancherSuivi,
   prestation,
   prixPlancher,
-  repereAgenceSite,
+  repereAgenceLogiciel,
   tauxSuivi,
 } from "@/content/offre";
 import type { FaqItem } from "@/lib/content/types";
+
+const LOGICIEL = prestation("logiciel");
 
 /**
  * Source unique de la FAQ. Rendue à l'identique sur la page d'accueil, sur
@@ -72,7 +74,7 @@ import type { FaqItem } from "@/lib/content/types";
  * nulle part ailleurs sur le site. Sont sorties : les maquettes (la section
  * méthode le dit), le site à quelques centaines d'euros, l'agence (la page À
  * propos le dit), la rédaction du contenu (les pages de prestation le disent). La hausse
- * possible du suivi est fusionnée dans « après la mise en ligne ».
+ * possible du suivi est fusionnée dans « après la mise en service ».
  *
  * LA DURÉE EST ENTRÉE, parce que le site ne publie aucun délai chiffré. La réponse dit où la date est
  * écrite (au devis, avant signature) et de quoi elle dépend, sans inventer de
@@ -81,22 +83,19 @@ import type { FaqItem } from "@/lib/content/types";
 export const faqItems: FaqItem[] = [
   {
     question: "Combien coûte un projet, et comment c’est facturé ?",
-    /* Les planchers sont lus dans `offre.ts`. L'échéancier se dit sans
-       ses pourcentages depuis le 2026-10-26, décision d'Eliott : un
-       paiement en trois fois affiché devient la norme attendue, alors
-       qu'Eliott le propose lui-même au devis. Les CGV gardent le défaut.
+    /* Le plancher est lu dans `offre.ts`. L'échéancier se dit sans ses
+       pourcentages depuis le 2026-10-26, décision d'Eliott : un paiement en
+       trois fois affiché devient la norme attendue, alors qu'Eliott le propose
+       lui-même au devis. Les CGV gardent le défaut.
 
-       LE REPÈRE D'AGENCE (2026-10-15) vient lui aussi d'`offre.ts`, avec sa
-       source et sa date. Depuis le 2026-10-16, il compare à livrable égal
-       (un site vitrine soigné) et non plus mon plancher à la médiane des
-       agences, décision d'Eliott. Une réponse de FAQ n'a pas de champ de lien : le
-       lien vers la source est posé sur `/services/site-vitrine/prix`. */
-    answer: `Un site démarre à ${prixPlancher(prestation("vitrine"))} HT, une solution métier à ${prixPlancher(prestation("logiciel"))} HT. Un site vitrine soigné, design et ergonomie compris, se facture ${euros(repereAgenceSite.soigneMin)} à ${euros(repereAgenceSite.soigneMax)} en agence selon ${repereAgenceSite.source.nom} (${repereAgenceSite.source.releve}). Le mien comprend la même chose et coûte moins cher, parce que je conçois et je code moi-même, sans chef de projet ni structure à payer. Au-delà du plancher, le prix dépend de votre projet : le nombre de pages ou de modules, les outils à relier, la reprise de vos données. Je fixe le montant au devis, avant de commencer, et il ne bouge plus. Vous le réglez selon un échéancier écrit au devis et étalé jusqu’à la livraison : vous ne payez jamais tout d’avance.`,
+       LE REPÈRE D'AGENCE vient lui aussi d'`offre.ts`, avec sa source et sa
+       date, et compare à livrable égal (un premier outil). */
+    answer: `Un logiciel métier démarre à ${prixPlancher(LOGICIEL)} HT. En agence, un premier outil se facture ${euros(repereAgenceLogiciel.premierOutilMin)} à ${euros(repereAgenceLogiciel.premierOutilMax)} selon ${repereAgenceLogiciel.source.nom} (${repereAgenceLogiciel.source.releve}). Je coûte moins cher parce que je conçois et je code moi-même, sans chef de projet ni structure à payer. Au-delà du plancher, le prix dépend du nombre de modules, des outils à relier et de la reprise de vos données. Je fixe le montant au devis, avant de commencer, et il ne bouge plus. Vous le réglez selon un échéancier écrit au devis et étalé jusqu’à la livraison : vous ne payez jamais tout d’avance.`,
   },
   {
     question: "Combien de temps ça prend ?",
     answer:
-      "La date de mise en ligne est écrite dans le devis, avant que vous signiez. Elle dépend de votre projet et de la rapidité de vos retours : vos photos, votre relecture des textes, vos réponses à mes questions. Je ne mène qu’un projet à la fois : une fois le devis signé, je travaille sur le vôtre, et vous le voyez avancer sur une adresse en ligne.",
+      "La date de mise en service est écrite dans le devis, avant que vous signiez. Elle dépend de votre projet et de la rapidité de vos retours : vos exemples de documents, vos accès, vos réponses à mes questions. Je ne mène qu’un projet à la fois : une fois le devis signé, je travaille sur le vôtre, et vous le voyez avancer sur une adresse en ligne.",
   },
   {
     question: "Est-ce que je reste propriétaire de ce que vous construisez ?",
@@ -104,24 +103,13 @@ export const faqItems: FaqItem[] = [
       "Oui, entièrement. Les droits sur le code vous sont cédés au paiement intégral, c’est écrit dans mes conditions générales de vente. Le code vit sur votre dépôt et votre serveur, vos données et votre fichier client restent chez vous, et aucun abonnement n’est nécessaire pour continuer à vous servir de ce que je vous ai livré. Vous n’êtes captif de personne, moi compris : un autre développeur peut reprendre le travail, il est documenté pour ça.",
   },
   {
-    question: "J’ai déjà un site ou un logiciel. Vous le reprenez ?",
+    question: "J’ai déjà un logiciel. Vous le reprenez ?",
     answer:
       "Par défaut, je construis du neuf. Reprendre du code écrit par quelqu’un d’autre est risqué, et je ne m’y engage pas à l’aveugle. La reprise reste possible si votre logiciel repose sur une base JavaScript récente et qu’il est correctement construit : je commence alors par un audit de son code, qui répond à cette question-là et à aucune autre. Sur du PHP ou du Laravel, je n’y touche pas, et je vous le dis avant que ça vous coûte quoi que ce soit. Dans les autres cas, je vous propose un outil neuf qui vit à côté de l’ancien, sans y toucher.",
   },
   {
-    question: "Que se passe-t-il après la mise en ligne ?",
-    /* Le taux et le plancher du suivi sont lus dans `offre.ts`. L'exemple
-       chiffré (mensualité d'un projet de référence) est parti le 2026-10-05
-       avec le prix ferme du palier du milieu : aucun projet de référence ne tient
-       sans palier publié.
-
-       LA CLAUSE DE HAUSSE, ajoutée le 2026-08-27 et fusionnée ici le
-       2026-09-24. Un forfait de suivi engage un prix sur une charge qui peut
-       bouger. Elle reste BORNÉE, et c'est ce qui la rend acceptable : un seul
-       déclencheur nommé, l'annonce avant et non après, un montant et une
-       date, et le droit de dire non. L'hébergement est au nom du client : la
-       machine plus grosse passe par SA facture, le suivi bouge parce qu'il y
-       a plus à surveiller. */
-    answer: `Je ne disparais pas. Je propose un suivi mensuel qui revient à ${tauxSuivi()} du prix du projet par an, avec un minimum de ${plancherSuivi()} par mois. Il couvre ce qui existe : mises à jour, sauvegardes vérifiées, corrections. Une demande nouvelle fait l’objet d’un devis, parce qu’elle n’était pas au cadrage. Ce montant ne bouge que dans un cas : votre site reçoit beaucoup plus de monde, ou votre hébergeur augmente ses prix. Il faut alors une machine plus puissante, payée sur votre facture d’hébergement, qui est à votre nom, et un suivi plus large. Je vous préviens avant, avec le nouveau montant et la date, et rien ne change tant que vous n’avez pas dit oui. Vous n’avez pas besoin de ce suivi pour continuer à vous servir de ce que je vous ai livré.`,
+    question: "Que se passe-t-il après la mise en service ?",
+    /* Le taux et le plancher de la maintenance sont lus dans `offre.ts`. */
+    answer: `Je ne disparais pas. Je propose une maintenance mensuelle qui revient à ${tauxSuivi()} du prix du logiciel par an, avec un minimum de ${plancherSuivi()} HT par mois. Elle couvre ce qui existe : mises à jour, sauvegardes vérifiées, corrections. Une fonction nouvelle fait l’objet d’un devis, parce qu’elle n’était pas au cadrage. Ce montant ne bouge que si votre logiciel reçoit beaucoup plus de trafic ou si votre hébergeur augmente ses prix. Il faut alors une machine plus puissante, payée sur votre facture d’hébergement, qui est à votre nom, et un suivi plus large. Je vous préviens avant, avec le nouveau montant et la date, et rien ne change tant que vous n’avez pas dit oui.`,
   },
 ];

@@ -52,8 +52,20 @@ describe("CorpsSur : un texte qui n'a pas été relu reste du texte", () => {
   });
 
   it("rend le prix d'une offre connue, et laisse une offre inconnue en clair", () => {
-    expect(rendu('Comptez <Prix offre="vitrine" />.')).toContain("€");
+    expect(rendu('Comptez <Prix offre="logiciel" />.')).toContain("€");
+    expect(rendu('Comptez <Prix offre="logiciel" suivi />.')).toContain("par mois");
     expect(rendu('Comptez <Prix offre="inconnue" />.')).toContain("&lt;Prix offre=&quot;inconnue&quot; /&gt;");
+  });
+
+  it("laisse en clair le prix d'une offre retirée le 2026-10-31", () => {
+    // Le site vitrine, l'intégration IA et le CTO n'ont plus de prix : la
+    // balise reste visible (et un test d'article la repère) au lieu de lever
+    // une erreur au rendu de la page.
+    for (const offre of ["vitrine", "ia", "cto"]) {
+      const sortie = rendu(`Comptez <Prix offre="${offre}" />.`);
+      expect(sortie).toContain(`&lt;Prix offre=&quot;${offre}&quot; /&gt;`);
+      expect(sortie).not.toContain("€");
+    }
   });
 
   it("rend les formes plus rares comme MDX", async () => {

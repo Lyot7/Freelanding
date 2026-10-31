@@ -4,7 +4,7 @@ import {
   PREAVIS_MINIMAL_MS,
   validerReservation,
 } from "./validation.ts";
-import { integrationIA, prestation } from "../../content/offre.ts";
+import { prestation } from "../../content/offre.ts";
 
 /**
  * UNE RÉSERVATION N'EST PAS UN E-MAIL DE PLUS. Elle pose un événement dans
@@ -15,17 +15,17 @@ import { integrationIA, prestation } from "../../content/offre.ts";
 
 const MAINTENANT = Date.UTC(2026, 8, 1, 13, 0, 0);
 const DEBUT_HUMAIN = MAINTENANT - 10_000;
-const TYPES = ["site", "ia", "cto", "decouverte"];
+const TYPES = ["logiciel", "decouverte"];
 
 function valider(surcharge = {}) {
   return validerReservation(
     {
-      type: "site",
+      type: "logiciel",
       debut: new Date(MAINTENANT + 48 * 3600 * 1000).toISOString(),
       nom: "Camille Renard",
       email: "camille@exemple.fr",
-      budget: "3000-6000",
-      objectif: "google",
+      budget: "6000-12000",
+      objectif: "tableur",
       debutMs: DEBUT_HUMAIN,
       ...surcharge,
     },
@@ -38,7 +38,7 @@ describe("validerReservation — chemin nominal", () => {
     const resultat = valider({ nom: "  Camille   Renard  " });
     expect(resultat.ok).toBe(true);
     expect(resultat.reservation.nom).toBe("Camille Renard");
-    expect(resultat.reservation.type).toBe("site");
+    expect(resultat.reservation.type).toBe("logiciel");
     // Cal.com exige l'instant en UTC, quel que soit le décalage écrit.
     expect(resultat.reservation.debutUtc).toBe("2026-09-03T13:00:00.000Z");
   });
@@ -51,8 +51,8 @@ describe("validerReservation — chemin nominal", () => {
 
   it("laisse le message absent quand il est vide", () => {
     expect(valider({ message: "   " }).reservation.message).toBeUndefined();
-    expect(valider({ message: "Refonte du site." }).reservation.message).toBe(
-      "Refonte du site.",
+    expect(valider({ message: "Sortir du tableur." }).reservation.message).toBe(
+      "Sortir du tableur.",
     );
   });
 });
@@ -71,7 +71,42 @@ describe("validerReservation — le type", () => {
   it("refuse un type connu mais NON CONFIGURÉ", () => {
     // `logiciel` existe dans le contenu ; il n'est pas dans `typesAutorises`.
     // Sans ce contrôle, une requête forgée réserverait sur une variable vide.
-    expect(valider({ type: "logiciel" }).ok).toBe(false);
+    const resultat = validerReservation(
+      {
+        type: "logiciel",
+        debut: new Date(MAINTENANT + 48 * 3600 * 1000).toISOString(),
+        nom: "Camille Renard",
+        email: "camille@exemple.fr",
+        budget: "6000-12000",
+        objectif: "tableur",
+        debutMs: DEBUT_HUMAIN,
+      },
+      { typesAutorises: ["decouverte"], maintenantMs: MAINTENANT },
+    );
+    expect(resultat.ok).toBe(false);
+    expect(resultat.motif).toEqual({
+      type: "champ_invalide",
+      champ: "type",
+      raison: "hors_liste",
+    });
+  });
+
+  it("traduit le sujet retiré d'un onglet resté ouvert, sans perdre le rendez-vous", () => {
+    const attendus = { site: "decouverte", cto: "decouverte", ia: "logiciel", outil: "logiciel" };
+    for (const [type, traduit] of Object.entries(attendus)) {
+      const resultat = valider({ type, objectif: "google" });
+      expect(resultat.ok, type).toBe(true);
+      expect(resultat.reservation.type).toBe(traduit);
+      expect(resultat.reservation.objectif).toBe("autre");
+    }
+  });
+
+  it("refuse un type inconnu", () => {
+    expect(valider({ type: "inconnu" }).motif).toEqual({
+      type: "champ_invalide",
+      champ: "type",
+      raison: "hors_liste",
+    });
   });
 });
 
@@ -161,8 +196,8 @@ describe("validerReservation — le questionnaire", () => {
   it("garde les trois réponses, échéance comprise", () => {
     const resultat = valider({ echeance: "trimestre" });
     expect(resultat.ok).toBe(true);
-    expect(resultat.reservation.budget).toBe("3000-6000");
-    expect(resultat.reservation.objectif).toBe("google");
+    expect(resultat.reservation.budget).toBe("6000-12000");
+    expect(resultat.reservation.objectif).toBe("tableur");
     expect(resultat.reservation.echeance).toBe("trimestre");
   });
 
@@ -184,83 +219,56 @@ describe("validerReservation — le questionnaire", () => {
     });
   });
 
-  it("rattache une tranche des anciens forfaits à la tranche actuelle", () => {
-    expect(valider({ budget: "4800-7200" }).reservation.budget).toBe("3000-6000");
+  it("rattache une tranche des anciens forfaits et de l'ancien plancher à la tranche actuelle", () => {
+    expect(valider({ budget: "4800-7200" }).reservation.budget).toBe("moins-6000");
+    expect(valider({ budget: "3000-6000" }).reservation.budget).toBe("moins-6000");
     expect(valider({ budget: "plus-7200" }).reservation.budget).toBe("6000-12000");
+    expect(valider({ budget: "7000-14000" }).reservation.budget).toBe("6000-12000");
+    expect(valider({ budget: "plus-14000" }).reservation.budget).toBe("12000-24000");
   });
 
   it("accepte « je ne sais pas encore » comme budget", () => {
     expect(valider({ budget: "inconnu" }).ok).toBe(true);
   });
 
+  it("exige le budget pour chaque sujet, la découverte comprise", () => {
+    // Plus de sujet sans budget depuis le retrait du CTO (2026-10-31).
+    for (const type of TYPES) {
+      expect(valider({ type, budget: "" }).motif).toEqual({
+        type: "champ_invalide",
+        champ: "budget",
+        raison: "requis",
+      });
+    }
+  });
+
   it("refuse une réponse hors de la liste du type choisi", () => {
-    // Le haut du rendez-vous « logiciel » (deux à quatre fois son plancher)
-    // n'est pas une tranche du « site ».
-    const plancher = prestation("logiciel").plancher;
-    expect(valider({ budget: `${plancher * 2}-${plancher * 4}` }).motif).toEqual({
+    // Une tranche qui n'est ni actuelle ni une ancienne tranche rattachée.
+    expect(valider({ budget: "3500-9000" }).motif).toEqual({
       type: "champ_invalide",
       champ: "budget",
       raison: "hors_liste",
     });
-    // `tableur` est un objectif du « logiciel », pas du « site ».
-    expect(valider({ objectif: "tableur" }).motif.champ).toBe("objectif");
+    // `conseil` est un objectif de la « decouverte », pas du « logiciel ».
+    expect(valider({ objectif: "conseil" }).motif.champ).toBe("objectif");
+    expect(valider({ objectif: "inconnu" }).motif.champ).toBe("objectif");
     expect(valider({ echeance: "demain" }).motif.champ).toBe("echeance");
     expect(valider({ budget: 3000 }).motif.raison).toBe("requis");
   });
 
   it("lit les tranches du type réellement demandé", () => {
-    // Tranche propre à « decouverte » : deux et quatre fois le plancher du
-    // logiciel, lu dans `offre.ts` pour suivre un plancher qui bouge.
+    // Deux et quatre fois le plancher du logiciel, lu dans `offre.ts` pour
+    // suivre un plancher qui bouge.
     const plancher = prestation("logiciel").plancher;
     const resultat = valider({
       type: "decouverte",
       budget: `${plancher * 2}-${plancher * 4}`,
-      objectif: "tache",
+      objectif: "conseil",
     });
     expect(resultat.ok).toBe(true);
   });
-});
 
-describe("validerReservation — les questions propres à l'IA et au CTO", () => {
-  it("accepte le CTO sans budget, et ignore un budget envoyé quand même", () => {
-    const sans = valider({ type: "cto", budget: "", objectif: "devis", echeance: "vite" });
-    expect(sans.ok).toBe(true);
-    expect(sans.reservation).not.toHaveProperty("budget");
-    expect(sans.reservation.objectif).toBe("devis");
-    expect(sans.reservation.echeance).toBe("vite");
-    const avec = valider({ type: "cto", budget: "3000-6000", objectif: "decisions" });
-    expect(avec.ok).toBe(true);
-    expect(avec.reservation).not.toHaveProperty("budget");
-  });
-
-  it("refuse au CTO un besoin hors de sa liste", () => {
-    expect(valider({ type: "cto", objectif: "google" }).motif).toEqual({
-      type: "champ_invalide",
-      champ: "objectif",
-      raison: "hors_liste",
-    });
-  });
-
-  it("exige de l'IA la tâche, l'outil et une tranche tirée de son plancher", () => {
-    const tranche = `${integrationIA.plancher}-${integrationIA.plancher * 2}`;
-    const ok = valider({ type: "ia", budget: tranche, objectif: "mails", outil: "messagerie" });
-    expect(ok.ok).toBe(true);
-    expect(ok.reservation.outil).toBe("messagerie");
-    expect(ok.reservation.budget).toBe(tranche);
-    expect(valider({ type: "ia", budget: tranche, objectif: "mails" }).motif).toEqual({
-      type: "champ_invalide",
-      champ: "outil",
-      raison: "requis",
-    });
-    expect(
-      valider({ type: "ia", budget: tranche, objectif: "mails", outil: "fax" }).motif.raison,
-    ).toBe("hors_liste");
-    expect(
-      valider({ type: "ia", budget: "", objectif: "mails", outil: "crm" }).motif.champ,
-    ).toBe("budget");
-  });
-
-  it("ne garde pas d'outil pour un sujet qui ne le pose pas", () => {
+  it("n'accepte plus de question d'outil : une réponse envoyée n'atteint jamais la réservation", () => {
     const resultat = valider({ outil: "crm" });
     expect(resultat.ok).toBe(true);
     expect(resultat.reservation).not.toHaveProperty("outil");

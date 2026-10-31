@@ -385,7 +385,7 @@ export interface WorkItem extends SluggedContent {
    * sur le rendez-vous « logiciel », celui qui a lu une page produit sur
    * « site ». Absent : « découverte ».
    */
-  sujetRendezVous?: "site" | "logiciel" | "decouverte";
+  sujetRendezVous?: "logiciel" | "decouverte";
   cover: ImageAsset;
   /**
    * Fond du hero de la page projet, quand la couverture ne peut pas y servir.
@@ -917,6 +917,12 @@ export interface HomeContent {
    * faq | testimonials | articles. Les logos ne sont plus une section de
    * l'accueil : ils vivent dans le bas du héros, avec la ligne de preuve.
    */
+  /** Le renvoi vers les pages par métier, sous la démonstration du logiciel. */
+  metiers: {
+    titleLines: readonly string[];
+    intro: string;
+    cta: Link;
+  };
   sectionOrder: string[];
 }
 
@@ -1179,6 +1185,8 @@ export type ContentRouteKind =
   | "local"
   /** Solution métier déclinée pour un secteur (`/services/logiciel-metier/btp`). */
   | "secteur"
+  /** Page par métier (`/logiciel-metier/echafaudage`), voir `metiers.ts`. */
+  | "metier"
   /** Page thématique (`/services/automatisation`), voir `page-theme.ts`. */
   | "theme";
 

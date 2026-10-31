@@ -1,3 +1,54 @@
+# Usage des skills design — passage à une seule offre, 2026-10-31
+
+Demande d'Eliott : le site vend à 100 % le logiciel métier ; hub et pages par métier.
+Travail visuel public fait par l'agent principal ; seuls la relève de matière métier,
+le relevé Search Console et Semrush et la mise à jour des tests ont été délégués.
+
+Captures, 1440 × 900 et 390 × 844, bandeau cookies fermé, pli et pleine hauteur :
+
+- `docs/captures/2026-10-31/avant/` : treize pages en ligne avant le changement.
+- `docs/captures/2026-10-31/apres/` : les mêmes écrans, plus le hub et les trois pages.
+- `docs/visuels-metiers/` : les sources SVG.
+
+## impeccable
+
+Références lues : `SKILL.md`, `brand.md`, `critique.md`, début de `layout.md` et de
+`polish.md`. Registre : brand. Contexte : `PRODUCT.md` du dossier principal, périmé
+(il décrit encore la reconstruction du gabarit) ; `DESIGN.md` annonce un accent
+`#ff4500` alors que `globals.css` porte `#c8f24a`, seule valeur retenue.
+
+Écart assumé : la critique demande deux évaluations isolées par sous-agents et une
+question à Eliott. Elle a été faite sur le rendu réel par l'agent principal, seul,
+pour ne pas multiplier les contextes ; `visiteurs` fait ensuite un jugement extérieur.
+
+| Sous-commande | Constat sur le rendu capturé | Ce qui a changé |
+| --- | --- | --- |
+| critique | Héros : le numéro « 01 » et la colonne de porte n'ont plus de sens avec une seule offre. | Numéro retiré, titre élargi de 80 à 108 px : la phrase unique prend le poids des deux portes. |
+| critique | Page métier : le carré volt du dessin tombait sous le H1. | Sujet des trois SVG déplacé à gauche, au-dessus du chapô : le titre reste net. |
+| layout | Bande claire au bas de la section logiciel, héritée de l'ancien ordre : elle pointait vers une section devenue noire. | Bande retirée. |
+| layout | Hub : des cartes auraient répété icône, titre, texte. | Liste en lignes, nom du métier en grand, ce que la page couvre à côté, sur la grille à filet central du site. |
+| typeset | Veuves dans les titres de blocs (« LE CAMION QUI ROULE POUR / RIEN »). | `text-balance` sur les h2 des blocs. |
+| polish | Le pied de page coupait son sous-texte après le fragment en emphase : la phrase discrète n'apparaissait pas. | Le reste de la phrase est rendu. |
+
+## taste-skill
+
+| Règle | Application |
+| --- | --- |
+| Point focal relié au produit (règle 7) | Chaque page métier a son dessin tiré du métier : façade et travée, sculpture et pain de gomme, réseau et tournée. Un seul élément volt par dessin. |
+| Anti-3 colonnes, anti-cartes (règle 4, section 7) | Hub et accueil en lignes séparées par des filets. |
+| Hiérarchie par opacité (règle 8) | Nom à 100 %, description à 60 ou 70 %. |
+| Anti-centre (règle 3) | Héros de métier asymétrique, dessin à gauche, titre à droite. |
+
+## emil-design-eng
+
+| Point | Application |
+| --- | --- |
+| Courbe | `cubic-bezier(0.23, 1, 0.32, 1)` sur le survol des lignes, 200 ms ; propriétés nommées, jamais `transition: all`. |
+| Réponse à l'appui | `active:translate-y-[1px]` en 150 ms sur chaque ligne. |
+| Survol sur tactile | Variante `hover:` de Tailwind 4, déjà limitée aux pointeurs qui survolent. Aucune animation ajoutée au chargement : la liste se revoit à chaque visite. |
+
+---
+
 # Usage des skills design — refonte du 2026-10-15
 
 Demande d'Eliott : positionnement « qualité d'agence, jusqu'à deux fois moins

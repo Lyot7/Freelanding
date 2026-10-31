@@ -15,23 +15,23 @@
  * (`page-automatisation.ts`) chiffre des tâches de bureau ; celle-ci part des
  * métiers du territoire, sans reprendre un seul de ses paragraphes.
  */
-import { aPartirDe, integrationIA, prixPlancher } from "./offre";
-import { CHEMIN_PAGE_CAEN, CHEMIN_PAGE_LOGICIEL_CAEN } from "./page-caen";
+import { aPartirDe, prestation, prixPlancher } from "./offre";
+import { CHEMIN_PAGE_LOGICIEL_CAEN } from "./page-caen";
 import { CHEMIN_AUTOMATISATION, CHEMIN_IA_CAEN, type PageTheme } from "./page-theme";
-import { RDV_HORS_PRESTATION } from "./rendez-vous";
+
+const LOGICIEL = prestation("logiciel");
 
 export const pageIaCaen: PageTheme = {
   id: "automatisation-ia-caen",
   chemin: CHEMIN_IA_CAEN,
   seo: {
     titre: "Automatisation et IA à Caen · Eliott Bouquerel",
-    description: `Automatisation et IA pour les PME de Caen et de Normandie : je choisis la tâche, je code l’outil et je le branche sur vos logiciels, ${aPartirDe(integrationIA, " HT")}.`,
+    description: `Automatisation et IA pour les PME de Caen et de Normandie : je choisis la tâche, je code l’outil et je le branche sur vos logiciels, ${aPartirDe(LOGICIEL, " HT")}.`,
   },
   h1: "Automatisation et IA à Caen",
-  resume: `Basé à Caen, j’installe l’IA dans les outils des PME du Calvados, de la Manche et de l’Orne. Je choisis la tâche avec vous, je code l’automatisation et je la branche moi-même sur vos logiciels. Rendez-vous en visio, ${aPartirDe(integrationIA, " HT")} pour un premier usage.`,
+  resume: `Basé à Caen, j’installe l’IA dans les outils des PME du Calvados, de la Manche et de l’Orne. Je choisis la tâche avec vous, je code l’automatisation et je la branche moi-même sur vos logiciels. Rendez-vous en visio, ${aPartirDe(LOGICIEL, " HT")} pour un premier usage.`,
   prestation: "logiciel",
-  rendezVous: RDV_HORS_PRESTATION.integrationIA,
-  offre: integrationIA,
+  offre: LOGICIEL,
   zones: {
     villes: ["Caen"],
     departements: ["Calvados", "Manche", "Orne"],
@@ -61,11 +61,6 @@ export const pageIaCaen: PageTheme = {
             libelle: "Logiciel sur mesure à Caen",
             href: CHEMIN_PAGE_LOGICIEL_CAEN,
             description: "Quand la tâche demande un outil entier.",
-          },
-          {
-            libelle: "Création de site internet à Caen",
-            href: CHEMIN_PAGE_CAEN,
-            description: "Le site qui fait venir les demandes que l’IA triera.",
           },
         ],
       },
@@ -142,7 +137,7 @@ export const pageIaCaen: PageTheme = {
     items: [
       {
         question: "Combien coûte une automatisation IA pour une PME caennaise ?",
-        answer: `Un premier usage démarre à ${prixPlancher(integrationIA)} HT, branché sur un outil que vous utilisez déjà. Le prix suit le nombre d’usages et d’outils à relier, et se fixe au devis. Être à Caen ne change pas le calcul.`,
+        answer: `Un premier usage démarre à ${prixPlancher(LOGICIEL)} HT, branché sur un outil que vous utilisez déjà. Le prix suit le nombre d’usages et d’outils à relier, et se fixe au devis. Être à Caen ne change pas le calcul.`,
       },
       {
         question: "Vous déplacez-vous dans nos locaux ?",

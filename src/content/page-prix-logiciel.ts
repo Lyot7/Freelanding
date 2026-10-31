@@ -260,14 +260,14 @@ export const pagePrixLogiciel: PagePrix = {
       id: "devis",
       titre: "Comment votre prix est fixé",
       paragraphes: [
-        "Le prix se fixe en 2 rendez-vous en visio. Au premier, vous décrivez le problème et votre budget ; au second, je vous présente le devis : modules retenus, raccordements, prix ferme et date de mise en ligne.",
+        "Le prix se fixe en 2 rendez-vous en visio. Au premier, vous décrivez le problème et votre budget ; au second, je vous présente le devis : modules retenus, raccordements, prix ferme et date de mise en service.",
         "Une fois le devis signé, le montant ne bouge plus. Une demande nouvelle en cours de route reçoit son propre devis, que vous acceptez ou non.",
       ],
       liens: {
         titre: "À lire aussi",
         items: [
           {
-            libelle: "La solution métier",
+            libelle: "Le logiciel métier",
             href: CHEMIN_PILIER,
             description: "La page de l’offre, avec la prise de rendez-vous.",
           },
@@ -295,7 +295,7 @@ export const pagePrixLogiciel: PagePrix = {
             "À la signature, à la première version qui fonctionne, puis à la livraison.",
         },
         {
-          titre: "Une date de mise en ligne",
+          titre: "Une date de mise en service",
           corps:
             "Écrite au devis. Je ne mène qu’un projet à la fois, ce qui me permet de la tenir.",
         },
