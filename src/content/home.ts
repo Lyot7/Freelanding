@@ -19,7 +19,7 @@ const ENTREE_LOGICIEL = prixPlancher(LOGICIEL);
  * comparaison le rendait exact (`offre.ts`). Le logiciel se compare à livrable
  * égal, chiffre d'agence écrit à côté du mien.
  */
-const POSITIONNEMENT = "Logiciel métier sur mesure, sans agence entre vous et le code.";
+const POSITIONNEMENT = "Logiciel métier sur mesure, et il vous appartient.";
 
 /* LE H1 DE L'ACCUEIL, mots d'Eliott du 2026-10-15. */
 const PORTES = [
@@ -34,7 +34,7 @@ const TITRE_ACCUEIL = PORTES.map((porte) => porte.lines.join(" ")).join(" ");
 
 /** Le message d'Eliott, sous le titre. */
 const CE_QUI_DISPARAIT =
-  "La tâche qui vous bloque disparaît. L’IA fait le sale boulot, le recopiage, les factures, les relances, et votre équipe revient à ce qui la rend indispensable.";
+  "La tâche qui vous bloque disparaît. L’IA fait le sale boulot, le recopiage et les factures, et votre équipe revient à ce qui la rend indispensable.";
 
 /*
  * LE PRIX D'UNE AGENCE ET LE MIEN, POUR LE MÊME LIVRABLE, décision d'Eliott du
@@ -74,6 +74,10 @@ export const homeContent: HomeContent = {
     title: TITRE_ACCUEIL,
     titleLines: PORTES.map((porte) => porte.lines.join(" ")),
     doors: PORTES,
+    /* Test des visiteurs du 2026-10-31 : le métier nommé dès le premier écran,
+       et une porte pour qui n'est pas prêt à appeler. */
+    avantMetiers: "Par métier",
+    offerLink: { label: "Voir l’offre et le prix", href: `/services/${LOGICIEL.slug}` },
     subtitle: CE_QUI_DISPARAIT,
     subtitleParagraphs: [{ text: CE_QUI_DISPARAIT }],
     /*

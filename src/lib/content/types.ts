@@ -609,7 +609,9 @@ export interface HeroContent {
    * Ligne de preuve du bas du héros, à côté des logos : un résultat mesuré,
    * son libellé et, quand elle existe, la page qui le détaille.
    */
-  /** Les deux portes du héros, qui composent ensemble le h1. */
+  /** Amorce de la ligne des métiers, au premier écran. */
+  avantMetiers?: string;
+  /** Les portes du héros, qui composent ensemble le h1. */
   doors?: readonly HeroDoor[];
   /** Preuves du premier écran, dans l'ordre d'affichage. */
   proofs?: readonly HeroProof[];

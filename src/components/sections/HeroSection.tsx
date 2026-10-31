@@ -427,10 +427,13 @@ export function HeroSection({
   hero,
   site,
   logos,
+  metiers = [],
 }: {
   hero: HeroContent;
   site: SiteConfig;
   logos?: ReactNode;
+  /** Les pages par métier, nommées au premier écran. */
+  metiers?: readonly { readonly libelle: string; readonly chemin: string }[];
 }) {
   const media = hero.media;
   const hasVideo = media?.kind === "video" && Boolean(media.src);
@@ -512,9 +515,36 @@ export function HeroSection({
               >
                 {uiLabels.services.rdvLabel}
               </a>
+              {hero.offerLink ? (
+                <a
+                  href={hero.offerLink.href}
+                  className="text-[13px] font-semibold tracking-[-0.01em] text-foreground underline underline-offset-[3px]"
+                >
+                  {hero.offerLink.label}
+                </a>
+              ) : null}
               <Fondateur person={hero.person} />
             </div>
           </div>
+
+          {metiers.length > 0 ? (
+            <nav
+              aria-label={hero.avantMetiers}
+              className="hero-fond mt-[16px] flex flex-wrap items-baseline gap-x-[14px] gap-y-[4px] text-[13px] font-medium leading-[1.3] tracking-[-0.01em]"
+              style={delai(660)}
+            >
+              <span className="text-foreground-60">{hero.avantMetiers}</span>
+              {metiers.map((metier) => (
+                <a
+                  key={metier.chemin}
+                  href={metier.chemin}
+                  className="text-foreground underline decoration-white/30 underline-offset-[3px] transition-[text-decoration-color] duration-150 hover:decoration-accent"
+                >
+                  {metier.libelle}
+                </a>
+              ))}
+            </nav>
+          ) : null}
 
           <div
             className="hero-fond mt-[16px] flex flex-col gap-[10px] tablet:flex-row tablet:flex-wrap tablet:items-center tablet:gap-x-[28px]"
