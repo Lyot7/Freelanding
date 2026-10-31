@@ -7,6 +7,7 @@ import {
   CHEMIN_HUB_METIERS,
   articlesDe,
   entreesMetier,
+  lirePage,
   motifsDeRefus,
   pageMetier,
   pagesHub,
@@ -64,6 +65,37 @@ describe("une page n'est publiée que si elle est propre à son métier", () => 
 
   test("une entrée malformée est écartée par le refus, jamais servie vide", () => {
     expect(motifsDeRefus({ ...base, lexique: [] }, entreesMetier).length).toBeGreaterThan(0);
+  });
+});
+
+describe("le fichier de données se relit avant de servir", () => {
+  const page = entreesMetier[0];
+  const CAS = [
+    ["entrée", null],
+    ["slug", { ...page, slug: "Pas Un Slug" }],
+    ["date", { ...page, date: "hier" }],
+    ["h1", { ...page, h1: "" }],
+    ["resume", { ...page, resume: 3 }],
+    ["seo", { ...page, seo: { titre: "t" } }],
+    ["themes", { ...page, themes: ["inconnu"] }],
+    ["lexique", { ...page, lexique: [] }],
+    ["image", { ...page, image: {} }],
+    ["titreOffre", { ...page, titreOffre: "" }],
+    ["blocs", { ...page, blocs: [{ ...page.blocs[0], type: "inconnu" }] }],
+    ["blocs", { ...page, blocs: [{ id: "a" }] }],
+    ["blocs", { ...page, blocs: [{ ...page.blocs[0], paragraphes: [] }] }],
+    ["faq", { ...page, faq: null }],
+    ["faq", { ...page, faq: { ...page.faq, items: [] } }],
+  ];
+
+  for (const [champ, entree] of CAS) {
+    test(`une entrée au champ ${champ} invalide casse le build en le nommant`, () => {
+      expect(() => lirePage(entree, 7)).toThrow(`metiers.json, entrée 7 : ${champ} invalide`);
+    });
+  }
+
+  test("une entrée valide revient telle quelle, pour chaque nature de bloc", () => {
+    for (const entree of entreesMetier) expect(lirePage(entree, 0)).toBe(entree);
   });
 });
 
@@ -135,6 +167,10 @@ describe("le maillage se génère depuis les données", () => {
       for (const article of articles) expect(blogPosts).toContain(article);
     });
   }
+
+  test("une page sans thème commun n'a aucun voisin", () => {
+    expect(voisinsDe({ chemin: "/x", themes: [] })).toEqual([]);
+  });
 
   test("une page inconnue n'existe pas", () => {
     expect(pageMetier("plombier")).toBeUndefined();

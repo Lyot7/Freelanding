@@ -3,7 +3,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { blogPosts, blogContent } from "./blog.ts";
 import { contentRoutes } from "./routes.ts";
-import { IDS_RENDEZ_VOUS } from "./rendez-vous.ts";
+import { resoudreSujet } from "../lib/rendez-vous/config.ts";
 import { prestation, prixPlancher } from "./offre.ts";
 
 /**
@@ -169,7 +169,8 @@ describe("corps des articles", () => {
       ].map((m) => m[1]);
       expect([fichier, sujets.length > 0]).toEqual([fichier, true]);
       for (const sujet of sujets) {
-        expect([fichier, IDS_RENDEZ_VOUS.includes(sujet)]).toEqual([fichier, true]);
+        // Un article validé avec un ancien sujet reste publiable : le lien se traduit.
+        expect([fichier, resoudreSujet(sujet) !== undefined]).toEqual([fichier, true]);
       }
     }
   });

@@ -24,10 +24,11 @@ import {
   MOTIF_EMAIL,
   normaliserTexte,
 } from "@/lib/contact/validation";
-import { estIdRendezVous } from "./config";
+import { resoudreSujet } from "./config";
 import { HORIZON_JOURS } from "./creneaux";
 import { estDureePlausible } from "./durees";
 import {
+  rattacherObjectif,
   OPTIONS_ECHEANCE,
   optionsObjectif,
   rattacherTranche,
@@ -170,8 +171,9 @@ export function validerReservation(
     return { ok: false, motif: { type: "trop_rapide" } };
   }
 
-  const type = champs.type;
-  if (!estIdRendezVous(type) || !options.typesAutorises.includes(type)) {
+  /* Un sujet retiré se traduit : un onglet ouvert avant le 2026-10-31 l'envoie. */
+  const type = resoudreSujet(champs.type);
+  if (!type || !options.typesAutorises.includes(type)) {
     return {
       ok: false,
       motif: { type: "champ_invalide", champ: "type", raison: "hors_liste" },
@@ -246,7 +248,11 @@ export function validerReservation(
     tranchesBudget(type),
   );
   if (!budget.ok) return budget;
-  const objectif = lireChoix(champs, "objectif", optionsObjectif(type));
+  const objectif = lireChoix(
+    { ...champs, objectif: rattacherObjectif(lireChaine(champs, "objectif").trim()) },
+    "objectif",
+    optionsObjectif(type),
+  );
   if (!objectif.ok) return objectif;
   const echeance = lireChoixFacultatif(champs, "echeance", OPTIONS_ECHEANCE);
   if (!echeance.ok) return echeance;

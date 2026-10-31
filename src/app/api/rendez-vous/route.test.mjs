@@ -109,25 +109,6 @@ describe("POST /api/rendez-vous — sujet « logiciel »", () => {
   });
 });
 
-describe("POST /api/rendez-vous — les sujets retirés le 2026-10-31", () => {
-  // Les variables Cal.com des anciens événements peuvent rester posées sur le
-  // serveur : elles n'ouvrent aucune réservation.
-  it.each(["site", "ia", "cto", "outil"])("refuse « %s » en nommant le champ type", async (type) => {
-    process.env.CAL_COM_EVENT_SITE = "1";
-    process.env.CAL_COM_EVENT_IA = "2";
-    process.env.CAL_COM_EVENT_CTO = "3";
-    try {
-      const reponse = await reserver({ type, budget: tranche, objectif: "tache" });
-      expect(reponse.status).toBe(400);
-      expect((await reponse.json()).champ).toBe("type");
-    } finally {
-      delete process.env.CAL_COM_EVENT_SITE;
-      delete process.env.CAL_COM_EVENT_IA;
-      delete process.env.CAL_COM_EVENT_CTO;
-    }
-  });
-});
-
 describe("POST /api/rendez-vous — chaque refus nomme son champ", () => {
   const valide = { type: "logiciel", budget: tranche, objectif: "tache" };
   const loin = new Date(Date.now() + 400 * 24 * 3600 * 1000).toISOString();
@@ -139,7 +120,7 @@ describe("POST /api/rendez-vous — chaque refus nomme son champ", () => {
     ["message", { message: "x".repeat(5_000) }],
     ["creneau", { debut: loin }],
     ["duree", { duree: 0.5 }],
-    ["type", { type: "site" }],
+    ["type", { type: "inconnu" }],
     ["budget", { budget: "" }],
     ["echeance", { echeance: "demain" }],
   ])("%s", async (champ, surcharge) => {

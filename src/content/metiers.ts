@@ -106,7 +106,7 @@ const estQuestion = (v: unknown): boolean =>
   estObjet(v) && estTexte(v.question) && estTexte(v.answer);
 
 /** Relit une entrée du fichier ; lève une erreur qui nomme ce qui manque. */
-function lirePage(v: unknown, index: number): PageMetier {
+export function lirePage(v: unknown, index: number): PageMetier {
   const champ = (nom: string) => new Error(`metiers.json, entrée ${index} : ${nom} invalide`);
   if (!estObjet(v)) throw champ("entrée");
   const { slug, date, libelle, h1, seo, resume, accroche, noteLlms } = v;

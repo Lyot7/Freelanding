@@ -137,6 +137,31 @@ export function rattacherTranche(id: IdRendezVous, valeur: string): string {
   return tranche?.id ?? valeur;
 }
 
+/**
+ * LES OBJECTIFS RETIRÉS LE 2026-10-31 avec le site, l'IA et le CTO. Un onglet
+ * ouvert avant le déploiement les envoie encore : les refuser ferait perdre le
+ * rendez-vous ou le message. Ils se rangent sous « Autre chose ».
+ */
+const OBJECTIFS_RETIRES: readonly string[] = [
+  "google",
+  "demandes",
+  "concurrents",
+  "remplacer",
+  "mails",
+  "saisie",
+  "redaction",
+  "documents",
+  "decisions",
+  "devis",
+  "ia",
+  "equipe",
+];
+
+/** Ramène un objectif retiré sur « autre » ; toute autre valeur revient telle quelle. */
+export function rattacherObjectif(valeur: string): string {
+  return OBJECTIFS_RETIRES.includes(valeur) ? "autre" : valeur;
+}
+
 /** Objectifs proposés pour un type de rendez-vous. */
 export function optionsObjectif(id: IdRendezVous): readonly OptionQuestion[] {
   return questions.objectif.options[id];

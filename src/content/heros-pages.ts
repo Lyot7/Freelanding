@@ -93,56 +93,6 @@ export const herosPages: {
     },
   },
   prestations: {
-    "site-vitrine": {
-      src: "/images/heros/page-site-vitrine.jpg",
-      alt: "Devanture de boutique en bois peint, vitrines et porte vitrée, en plein soleil dans une rue de Paris",
-      width: 2400,
-      height: 1350,
-      cadrage: { x: 35, y: 40 },
-      credit: {
-        prefixe: "Photo :",
-        auteur: {
-          libelle: "Ricardalovesmonuments",
-          href: "https://commons.wikimedia.org/wiki/File:Mariage_Fr%C3%A8res,_90_Rue_Montorgueil,_75002_Paris,_14_September_2019.jpg",
-        },
-        licence: {
-          libelle: "CC BY-SA 4.0",
-          href: "https://creativecommons.org/licenses/by-sa/4.0/deed.fr",
-        },
-        modification: "retouchée",
-      },
-      og: {
-        src: "/images/og-page-site-vitrine.jpg",
-        alt: "Devanture de boutique en bois peint, vitrines et porte vitrée, en plein soleil dans une rue de Paris",
-        width: 1200,
-        height: 630,
-      },
-    },
-    "outil-metier": {
-      src: "/images/heros/page-outil-metier.jpg",
-      alt: "Pied à coulisse en acier posé en diagonale sur un plan de travail en bois clair",
-      width: 2400,
-      height: 1350,
-      cadrage: { x: 26, y: 40 },
-      credit: {
-        prefixe: "Photo :",
-        auteur: {
-          libelle: "Santeri Viinamäki",
-          href: "https://commons.wikimedia.org/wiki/File:Vernier_caliper_2016.jpg",
-        },
-        licence: {
-          libelle: "CC BY-SA 4.0",
-          href: "https://creativecommons.org/licenses/by-sa/4.0/deed.fr",
-        },
-        modification: "retouchée",
-      },
-      og: {
-        src: "/images/og-page-outil-metier.jpg",
-        alt: "Pied à coulisse en acier posé en diagonale sur un plan de travail en bois clair",
-        width: 1200,
-        height: 630,
-      },
-    },
     "logiciel-metier": {
       src: "/images/heros/page-logiciel-metier.jpg",
       alt: "Caisse enregistreuse mécanique ancienne en bois verni et laiton, posée sur un meuble en bois",

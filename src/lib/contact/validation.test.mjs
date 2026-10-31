@@ -311,7 +311,16 @@ describe("validerSoumission — questionnaire de /contact", () => {
     expect(resultat.soumission.objectif).toBe("Sortir du tableur partagé");
   });
 
-  it("refuse les types retirés (« Un site ») tant qu'ils ne sont pas autorisés", () => {
+  it("accepte « Un site » d'un onglet resté ouvert, objectif retiré rangé sous « Autre chose »", () => {
+    const resultat = validerSoumission(
+      soumissionProjet({ typeProjet: "Un site", budget: "", objectif: "google" }),
+      { typesProjetAutorises: [...TYPES, "Un site"], maintenantMs: MAINTENANT },
+    );
+    expect(resultat.ok).toBe(true);
+    expect(resultat.soumission.objectif).toBe("Autre chose");
+  });
+
+  it("refuse un type inconnu de la liste", () => {
     const resultat = valider(soumissionProjet({ typeProjet: "Un site" }));
     expect(resultat.ok).toBe(false);
     expect(resultat.motif).toEqual({

@@ -91,19 +91,22 @@ describe("validerReservation — le type", () => {
     });
   });
 
-  it("refuse les types retirés le 2026-10-31 (site, ia, cto), même autorisés", () => {
-    // `resoudreSujet` traduit ces noms dans l'URL ; une réservation, elle,
-    // doit désigner un type existant, sans quoi elle partirait sur un
-    // événement Cal.com que le sélecteur ne propose plus.
-    for (const type of ["site", "ia", "cto", "outil"]) {
-      const resultat = valider({ type });
-      expect(resultat.ok, type).toBe(false);
-      expect(resultat.motif).toEqual({
-        type: "champ_invalide",
-        champ: "type",
-        raison: "hors_liste",
-      });
+  it("traduit le sujet retiré d'un onglet resté ouvert, sans perdre le rendez-vous", () => {
+    const attendus = { site: "decouverte", cto: "decouverte", ia: "logiciel", outil: "logiciel" };
+    for (const [type, traduit] of Object.entries(attendus)) {
+      const resultat = valider({ type, objectif: "google" });
+      expect(resultat.ok, type).toBe(true);
+      expect(resultat.reservation.type).toBe(traduit);
+      expect(resultat.reservation.objectif).toBe("autre");
     }
+  });
+
+  it("refuse un type inconnu", () => {
+    expect(valider({ type: "inconnu" }).motif).toEqual({
+      type: "champ_invalide",
+      champ: "type",
+      raison: "hors_liste",
+    });
   });
 });
 
@@ -248,7 +251,7 @@ describe("validerReservation — le questionnaire", () => {
     });
     // `conseil` est un objectif de la « decouverte », pas du « logiciel ».
     expect(valider({ objectif: "conseil" }).motif.champ).toBe("objectif");
-    expect(valider({ objectif: "google" }).motif.champ).toBe("objectif");
+    expect(valider({ objectif: "inconnu" }).motif.champ).toBe("objectif");
     expect(valider({ echeance: "demain" }).motif.champ).toBe("echeance");
     expect(valider({ budget: 3000 }).motif.raison).toBe("requis");
   });

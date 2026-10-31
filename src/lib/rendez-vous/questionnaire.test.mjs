@@ -3,6 +3,7 @@ import { aPartirDe, euros, prestation } from "../../content/offre.ts";
 import { IDS_RENDEZ_VOUS, rendezVousContent } from "../../content/rendez-vous.ts";
 import { siteConfig } from "../../content/site.ts";
 import {
+  rattacherObjectif,
   BUDGET_INCONNU,
   bornesBudget,
   composerNotes,
@@ -26,6 +27,14 @@ import {
 const logiciel = prestation("logiciel");
 const bornes = (p) => [1, 2, 4].map((m) => p.plancher * m);
 const sansInsecable = (texte) => texte.replace(/[\u00a0\u202f]/gu, " ");
+
+describe("rattacherObjectif", () => {
+  it("range un objectif retiré sous « autre » et laisse les autres intacts", () => {
+    expect(rattacherObjectif("google")).toBe("autre");
+    expect(rattacherObjectif("equipe")).toBe("autre");
+    expect(rattacherObjectif("tache")).toBe("tache");
+  });
+});
 
 describe("offresDuRendezVous", () => {
   it("relie « logiciel » à son offre, et « decouverte » à toutes les prestations", () => {
