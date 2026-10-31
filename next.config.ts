@@ -119,12 +119,11 @@ const nextConfig: NextConfig = {
        * Ancien site SvelteKit : les pages d'offre et la page locale « identité »
        * (2026-09-23). Elles répondaient 404 depuis la refonte Next.js alors que
        * Google les avait indexées. Chacune vise la page qui porte aujourd'hui la
-       * même intention. `/creation-site-internet-caen` n'est PAS ici : l'adresse
-       * est reprise telle quelle par la page locale, elle n'a rien à rediriger.
+       * même intention.
        */
-      { source: "/creation-site-internet", destination: "/services/site-vitrine", statusCode: 301 },
+      { source: "/creation-site-internet", destination: "/services/logiciel-metier", statusCode: 301 },
       { source: "/logiciel-sur-mesure", destination: "/services/logiciel-metier", statusCode: 301 },
-      { source: "/developpeur-web-caen", destination: "/creation-site-internet-caen", statusCode: 301 },
+      { source: "/developpeur-web-caen", destination: "/logiciel-sur-mesure-caen", statusCode: 301 },
       /* Francisation des slugs légaux (2026-08-28). */
       {
         source: "/legal/privacy-policy",
@@ -218,6 +217,23 @@ const nextConfig: NextConfig = {
       /* L'Outil est devenu le premier palier de La Solution métier le
          2026-09-23 : sa page a fusionné avec celle du logiciel métier. */
       { source: "/services/outil-metier", destination: "/services/logiciel-metier", statusCode: 301 },
+      /*
+       * UNE SEULE OFFRE, décision d'Eliott du 2026-10-30, en ligne le 2026-10-31.
+       * Ces pages vendaient le site vitrine ou le CTO à temps partagé. Chacune
+       * vise la page qui porte le plus proche de son intention : la ville pour
+       * la ville, le prix pour le prix. Le blog garde ses adresses.
+       */
+      { source: "/services/site-vitrine", destination: "/services/logiciel-metier", statusCode: 301 },
+      { source: "/services/site-vitrine/prix", destination: "/services/logiciel-metier/prix", statusCode: 301 },
+      { source: "/services/site-vitrine/artisans", destination: "/logiciel-metier", statusCode: 301 },
+      { source: "/creation-site-internet-caen", destination: "/logiciel-sur-mesure-caen", statusCode: 301 },
+      { source: "/services/cto-referent-ia", destination: "/services/logiciel-metier", statusCode: 301 },
+      /* Le transport passe sur le gabarit des pages métier (2026-10-31). */
+      {
+        source: "/services/logiciel-metier/transport",
+        destination: "/logiciel-metier/transport-routier",
+        statusCode: 301,
+      },
     ];
   },
 

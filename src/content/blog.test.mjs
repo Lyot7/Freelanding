@@ -270,12 +270,9 @@ describe("articles de décision et de prix", () => {
   const ARTICLES = {
     "logiciel-sur-mesure-ou-odoo": "logiciel",
     "remplacer-excel-par-un-logiciel": "logiciel",
-    "refonte-site-internet-pme": "vitrine",
-    "site-sur-mesure-ou-wordpress": "vitrine",
   };
   const CHEMINS = {
     logiciel: ["/services/logiciel-metier", "/services/logiciel-metier/prix"],
-    vitrine: ["/services/site-vitrine", "/services/site-vitrine/prix"],
   };
   const corps = (slug) => readFileSync(join(DOSSIER, `${slug}.mdx`), "utf8");
   const mots = (texte) =>

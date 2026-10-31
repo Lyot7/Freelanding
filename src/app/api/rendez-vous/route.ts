@@ -79,8 +79,6 @@ function messageRejet(motif: MotifRejetReservation): {
         return { message: "Choisissez une tranche de budget.", champ: "budget" };
       case "objectif":
         return { message: "Choisissez la réponse la plus proche de votre cas.", champ: "objectif" };
-      case "outil":
-        return { message: "Choisissez l’outil où se fait cette tâche.", champ: "outil" };
       case "echeance":
         return { message: "Cette échéance n’est pas proposée.", champ: "echeance" };
     }

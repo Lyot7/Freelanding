@@ -576,7 +576,7 @@ export const workItems: WorkItem[] = [
   },
   {
     slug: "nslysium",
-    sujetRendezVous: "site",
+    sujetRendezVous: "logiciel",
     title: "NSLysium",
     /* Le commanditaire du workshop était une équipe d'étudiants d'une autre
        formation. L'écrire « CLIENT : ÉTUDIANTS » laisserait croire à une
@@ -665,13 +665,13 @@ export const workContent: WorkContent = {
   hero: {
     title: "Sélection de projets",
     subtitle:
-      "Je construis des sites qui rapportent. Voilà à quoi ça ressemble en pratique.",
+      "Je construis des outils qui servent. Voilà à quoi ça ressemble en pratique.",
     // Le live rend DEUX paragraphes de polarité opposée : le premier atténué
     // avec le verbe en blanc plein, le second en blanc plein avec son amorce
     // redescendue à 60 %. L'espace finale du fragment est significative (elle
     // appartient au span sur le live).
     subtitleParagraphs: [
-      { text: "Je construis des sites qui rapportent.", emphasis: ["rapportent"] },
+      { text: "Je construis des outils qui servent.", emphasis: ["servent"] },
       {
         text: "Voilà à quoi ça ressemble en pratique.",
         emphasis: ["Voilà à quoi ça "],

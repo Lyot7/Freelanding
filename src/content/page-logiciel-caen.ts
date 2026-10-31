@@ -34,11 +34,7 @@ import {
   repereAgenceLogiciel,
   tauxSuivi,
 } from "./offre";
-import {
-  CHEMIN_PAGE_CAEN,
-  CHEMIN_PAGE_LOGICIEL_CAEN,
-  type PageLocale,
-} from "./page-caen";
+import { CHEMIN_PAGE_LOGICIEL_CAEN, type PageLocale } from "./page-caen";
 import { CHEMIN_PRIX_LOGICIEL, pagesSecteur } from "./pages-secteur";
 
 const LOGICIEL = prestation("logiciel");
@@ -64,7 +60,7 @@ export const pageLogicielCaen: PageLocale = {
     titreLiens: "Pour aller plus loin",
     liens: [
       {
-        libelle: "La solution métier",
+        libelle: "Le logiciel métier",
         href: CHEMIN_PILIER,
         description: "Ce qui est compris, et ce qui fait varier le prix.",
       },
@@ -72,11 +68,6 @@ export const pageLogicielCaen: PageLocale = {
         libelle: "Le prix d’un logiciel sur mesure",
         href: CHEMIN_PRIX_LOGICIEL,
         description: "Ce qui fait varier le prix, et le calcul face à un abonnement.",
-      },
-      {
-        libelle: "Création de site internet à Caen",
-        href: CHEMIN_PAGE_CAEN,
-        description: "Quand il vous faut d’abord un site pour présenter votre entreprise.",
       },
       {
         libelle: "Automatisation et IA à Caen",
@@ -164,7 +155,7 @@ export const pageLogicielCaen: PageLocale = {
         {
           titre: "Le prix est-il ferme ?",
           corps:
-            "Oui. Le devis fixe les modules, le prix et la date de mise en ligne, et ce prix ne bouge plus. Une demande nouvelle en cours de route fait l’objet d’un devis séparé.",
+            "Oui. Le devis fixe les modules, le prix et la date de mise en service, et ce prix ne bouge plus. Une demande nouvelle en cours de route fait l’objet d’un devis séparé.",
         },
         {
           titre: "Qui écrit le code ?",
@@ -246,7 +237,7 @@ export const pageLogicielCaen: PageLocale = {
         {
           titre: "2. Le devis relu ensemble",
           corps:
-            "Un second rendez-vous en visio pour parcourir les modules, le prix ferme et la date de mise en ligne.",
+            "Un second rendez-vous en visio pour parcourir les modules, le prix ferme et la date de mise en service.",
         },
         {
           titre: "3. Le développement, module par module",

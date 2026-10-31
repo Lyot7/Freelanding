@@ -11,11 +11,10 @@
  * `offre.ts`, seule source des montants.
  */
 import type { Prestation, PrestationId } from "./offre";
-import { lienVersPageCaen } from "./page-caen";
 import { lienVersPageLogicielCaen } from "./page-logiciel-caen";
 import { avantLienPrix, pagePrixLogiciel } from "./page-prix-logiciel";
-import { lienVersPagePrixSite } from "./page-prix-site";
-import { avantLiensSecteur, pagesSecteur } from "./pages-secteur";
+import { pagesHub } from "./metiers";
+import { avantLiensSecteur } from "./pages-secteur";
 import { pageTheme } from "./pages-theme";
 
 /** Lien vers une page thématique, sous l’offre de son pilier. */
@@ -72,16 +71,10 @@ export const servicePageSeo: Record<
     readonly h1: string;
   }
 > = {
-  vitrine: {
-    titre: "Création de site internet sur mesure · Eliott Bouquerel",
-    description:
-      "Un site vitrine sur mesure, rapide et optimisé pour le référencement, qui convertit vos visiteurs en clients. Livré sans abonnement, à vous ensuite.",
-    h1: "Site internet sur mesure",
-  },
   logiciel: {
     titre: "Logiciel métier sur mesure pour PME · Eliott Bouquerel",
     description:
-      "Remplacez Excel par un logiciel de gestion adapté à votre métier : devis, suivi client, stock. Développement sur mesure pour PME, sans abonnement.",
+      "Remplacez Excel par un logiciel de gestion fait pour votre métier : la tâche qui vous bloque disparaît, l’IA fait le sale boulot. Sur mesure, sans abonnement.",
     h1: "Logiciel métier sur mesure pour PME",
   },
 };
@@ -96,7 +89,7 @@ export const servicePageLabels = {
   /**
    * FIL D'ARIANE, repris du motif déjà en place sur `/work/*`.
    *
-   * La dernière marche porte `prestation.nom` — « Site vitrine », « La Solution métier » —
+   * La dernière marche porte `prestation.nom` (« Logiciel métier »)
    * et c'est elle qui garde le nom de catalogue lisible sur la page, une fois
    * que le H1 est passé aux mots que le client tape.
    *
@@ -208,9 +201,9 @@ export function marchesFilAriane(
 
 /**
  * LIENS VERS LES DÉCLINAISONS D'UNE PRESTATION, posés sous ses périmètres : le
- * site vitrine mène à la page de Caen, la solution métier à ses pages secteur,
- * à sa page de prix et à sa page de Caen. Une ligne sobre par famille, une
- * amorce et des liens : la page pilier ne devient pas un sommaire.
+ * logiciel métier mène à ses pages par métier, à sa page de prix et à sa page
+ * de Caen. Une ligne sobre par famille, une amorce et des liens : la page
+ * pilier ne devient pas un sommaire.
  */
 export interface LiensDeclinaisons {
   readonly avant: string;
@@ -220,15 +213,10 @@ export interface LiensDeclinaisons {
 export const lienLocalParPrestation: Partial<
   Record<PrestationId, readonly LiensDeclinaisons[]>
 > = {
-  vitrine: [
-    { avant: avantLienPrix, liens: [lienVersPagePrixSite] },
-    { avant: avantLiensSecteur, liens: [lienTheme("artisans")] },
-    { avant: lienVersPageCaen.avant, liens: [lienVersPageCaen] },
-  ],
   logiciel: [
     {
       avant: avantLiensSecteur,
-      liens: pagesSecteur.map((p) => ({ libelle: p.libelleLien, href: p.chemin })),
+      liens: pagesHub.map((p) => ({ libelle: p.libelle, href: p.chemin })),
     },
     {
       avant: "Par besoin :",
@@ -236,7 +224,6 @@ export const lienLocalParPrestation: Partial<
         lienTheme("erp-sur-mesure"),
         lienTheme("maintenance-sav"),
         lienTheme("automatisation"),
-        lienTheme("cto-referent-ia"),
       ],
     },
     {

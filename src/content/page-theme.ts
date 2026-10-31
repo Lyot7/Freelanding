@@ -91,9 +91,7 @@ export type IdPageTheme =
   | "erp-sur-mesure"
   | "maintenance-sav"
   | "automatisation"
-  | "artisans"
-  | "automatisation-ia-caen"
-  | "cto-referent-ia";
+  | "automatisation-ia-caen";
 
 export interface PageTheme {
   readonly id: IdPageTheme;
@@ -158,6 +156,4 @@ export const pourcent = (n: number): string =>
 export const CHEMIN_ERP = "/services/logiciel-metier/erp-sur-mesure";
 export const CHEMIN_GMAO = "/services/logiciel-metier/maintenance-sav";
 export const CHEMIN_AUTOMATISATION = "/services/automatisation";
-export const CHEMIN_ARTISANS = "/services/site-vitrine/artisans";
 export const CHEMIN_IA_CAEN = "/automatisation-ia-caen";
-export const CHEMIN_CTO = "/services/cto-referent-ia";

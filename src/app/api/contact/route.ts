@@ -59,8 +59,11 @@ export const dynamic = "force-dynamic";
  */
 const limiteur = creerLimiteur(LIMITE_CONTACT);
 
-/** Types de projet acceptés : la liste affichée par les formulaires, et elle seule. */
-const TYPES_PROJET = siteConfig.footerForm?.selectOptions ?? [];
+/**
+ * Types de projet acceptés : la liste affichée par les formulaires. L'ancien
+ * libellé reste accepté : un onglet ouvert avant le 2026-10-31 l'envoie encore.
+ */
+const TYPES_PROJET = [...(siteConfig.footerForm?.selectOptions ?? []), "Une solution métier"];
 
 const EMAIL_CONTACT = siteConfig.contact.email || EMAIL_CONTACT_PAR_DEFAUT;
 

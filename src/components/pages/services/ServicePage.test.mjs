@@ -4,7 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 
 import { herosPages } from "@/content/heros-pages";
 import { prestations } from "@/content/offre";
-import { pageCaen } from "@/content/page-caen";
+import { pageLogicielCaen } from "@/content/page-logiciel-caen";
 import { pagesSecteur } from "@/content/pages-secteur";
 import { pagesTheme } from "@/content/pages-theme";
 import { marchesFilAriane, servicePageLabels } from "@/content/service-pages";
@@ -43,7 +43,7 @@ describe("FilAriane", () => {
   const marches = [
     { libelle: "Accueil", href: "/" },
     { libelle: "Prestations", href: "/#services" },
-    { libelle: "Site vitrine" },
+    { libelle: "Logiciel métier" },
   ];
   const html = renderToStaticMarkup(createElement(FilAriane, { marches }));
 
@@ -51,7 +51,7 @@ describe("FilAriane", () => {
     expect(html).toMatch(new RegExp(`^<nav aria-label="${servicePageLabels.filAriane.intitule}"`));
     expect(html).toContain('href="/"');
     expect(html).toContain('href="/#services"');
-    expect(html).toMatch(/<span aria-current="page"[^>]*>Site vitrine<\/span><\/li><\/ol>/);
+    expect(html).toMatch(/<span aria-current="page"[^>]*>Logiciel métier<\/span><\/li><\/ol>/);
     expect(html.match(/aria-current/g)).toHaveLength(1);
   });
 
@@ -64,7 +64,8 @@ describe("FilAriane", () => {
 
 describe("ServicePage, fil d'Ariane en pied de page", async () => {
   const site = await content.getSiteConfig();
-  const [siteVitrine] = prestations;
+  // Depuis le 2026-10-31, la seule prestation est le logiciel métier.
+  const [logiciel] = prestations;
   const heroLogiciel = herosPages.prestations["logiciel-metier"];
 
   afterEach(() => {
@@ -72,10 +73,11 @@ describe("ServicePage, fil d'Ariane en pied de page", async () => {
   });
 
   it("clôt <main> sur la page de prestation", () => {
-    const main = principal(ServicePage({ prestation: siteVitrine, site }));
+    expect(prestations.map((p) => p.slug)).toEqual(["logiciel-metier"]);
+    const main = principal(ServicePage({ prestation: logiciel, site }));
     const fil = dernier(main);
     expect(fil.type).toBe(FilAriane);
-    expect(fil.props.marches).toEqual(marchesFilAriane(siteVitrine, undefined));
+    expect(fil.props.marches).toEqual(marchesFilAriane(logiciel, undefined));
     // Plus aucun fil dans le héros.
     const enTete = trouve(main, (noeud) => noeud.type === "section");
     expect(trouve(enTete, (noeud) => noeud.type === FilAriane)).toBeNull();
@@ -83,24 +85,22 @@ describe("ServicePage, fil d'Ariane en pied de page", async () => {
 
   it("prolonge le fil d'une page secteur, l'omet sur une page de ville", () => {
     const secteur = pagesSecteur[0];
-    const logiciel = prestations.find((p) => p.slug === "logiciel-metier");
     const filSecteur = dernier(principal(ServicePage({ prestation: logiciel, site, local: secteur })));
     expect(filSecteur.type).toBe(FilAriane);
     expect(filSecteur.props.marches).toEqual(marchesFilAriane(logiciel, secteur));
 
-    const mainCaen = principal(ServicePage({ prestation: siteVitrine, site, local: pageCaen }));
+    const mainCaen = principal(ServicePage({ prestation: logiciel, site, local: pageLogicielCaen }));
     expect(trouve(mainCaen, (noeud) => noeud.type === FilAriane)).toBeNull();
   });
 
   it("divise la hauteur du héros par le zoom, avec ou sans photo", () => {
     const avecPhoto = trouve(
-      principal(ServicePage({ prestation: siteVitrine, site })),
+      principal(ServicePage({ prestation: logiciel, site })),
       (noeud) => noeud.type === "section",
     );
     expect(avecPhoto.props.className).toContain("min-h-[calc(85svh/var(--zoom-ecran,1))]");
     expect(avecPhoto.props.className).toContain("tablet:min-h-[calc(70svh/var(--zoom-ecran,1))]");
 
-    const logiciel = prestations.find((p) => p.slug === "logiciel-metier");
     herosPages.prestations["logiciel-metier"] = undefined;
     const sansPhoto = trouve(
       principal(ServicePage({ prestation: logiciel, site })),

@@ -4,17 +4,14 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   aPartirDe,
-  CTO_QUATRE_JOURS,
-  ctoReferentIA,
   euros,
-  integrationIA,
   prestation,
   prestations,
   prixPlancher,
   plancherSuivi,
   repereAgenceLogiciel,
-  repereAgenceSite,
   suiviMensuel,
+  suiviMensuelHT,
   tauxSuivi,
 } from "./offre.ts";
 import { services } from "./services.ts";
@@ -26,14 +23,12 @@ import { contentRoutes } from "./routes.ts";
 import {
   IDS_RENDEZ_VOUS,
   PARAM_SUJET,
-  RDV_HORS_PRESTATION,
   RDV_PAR_PRESTATION,
   lienRendezVous,
 } from "./rendez-vous.ts";
-import { CHEMIN_AUTOMATISATION, CHEMIN_CTO } from "./page-theme.ts";
 
-/** Toutes les offres publiées : les deux prestations, l'intégration IA, le CTO. */
-const OFFRES = [...prestations, integrationIA, ctoReferentIA];
+/** Toutes les offres publiées : depuis le 2026-10-31, le logiciel métier seul. */
+const OFFRES = [...prestations];
 
 /**
  * L'OFFRE N'ANNONCE QU'UN PRIX PAR PRESTATION, SON PLANCHER, ET CE PRIX NE
@@ -64,54 +59,60 @@ const PALIERS_SUPPRIMES = [
 ];
 
 describe("un plancher par offre, écrit une seule fois", () => {
-  test("deux prestations à page dédiée, slugs uniques", () => {
-    expect(prestations.map((p) => p.id)).toEqual(["vitrine", "logiciel"]);
+  test("une seule prestation, le logiciel métier, au slug unique", () => {
+    // Décision d'Eliott du 2026-10-30, appliquée le 2026-10-31 : une seule
+    // offre. Le site vitrine, l'intégration IA et le CTO n'existent plus.
+    expect(prestations.map((p) => p.id)).toEqual(["logiciel"]);
+    expect(prestation("logiciel").nom).toBe("Logiciel métier");
     const slugs = prestations.map((p) => p.slug);
     expect(new Set(slugs).size).toBe(slugs.length);
   });
 
-  test("les planchers arrêtés par Eliott", () => {
-    // Montants de décision, pas de calcul : les figer ici fait échouer toute
+  test("le plancher arrêté par Eliott", () => {
+    // Montant de décision, pas de calcul : le figer ici fait échouer toute
     // modification involontaire, et oblige une modification voulue à passer
-    // par ce test. Le logiciel descend de 6 000 à 3 500 € le 2026-10-16 (un
-    // outil à une fonction), le CTO à temps partagé arrive le même jour.
-    expect(prestation("vitrine").plancher).toBe(3000);
-    expect(prestation("logiciel").plancher).toBe(3500);
-    expect(integrationIA.plancher).toBe(2500);
-    expect(ctoReferentIA.plancher).toBe(1600);
-    expect(CTO_QUATRE_JOURS).toBe(3200);
+    // par ce test. Le plancher revient à 6 000 € le 2026-10-31, celui de la
+    // grille et des mails (le site affichait 3 500 € depuis le 2026-10-16).
+    expect(prestation("logiciel").plancher).toBe(6000);
   });
 
-  test("seul le CTO est mensuel, et son prix le dit", () => {
-    for (const offre of [...prestations, integrationIA]) {
+  test("les anciennes offres ne sont plus exportées", () => {
+    // Un retour de l'intégration IA, du CTO ou du site vitrine passerait par
+    // ce module : on le vérifie sur la source, commentaires retirés.
+    const source = readFileSync(fileURLToPath(new URL("./offre.ts", import.meta.url)), "utf8")
+      .replace(/\/\*[\s\S]*?\*\//g, " ")
+      .replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+    for (const nom of ["integrationIA", "ctoReferentIA", "CTO_QUATRE_JOURS", "repereAgenceSite", "PERIODES"]) {
+      expect(source, `« ${nom} » est revenu dans offre.ts`).not.toContain(nom);
+    }
+    expect(() => prestation("vitrine")).toThrow();
+  });
+
+  test("le projet est payé une fois : aucune offre n'est mensuelle", () => {
+    for (const offre of OFFRES) {
       expect(offre.periode, `« ${offre.nom} » est un projet, payé une fois`).toBeUndefined();
+      expect(aPartirDe(offre)).not.toMatch(/par mois/u);
     }
-    expect(ctoReferentIA.periode).toBe("mois");
-    expect(aPartirDe(ctoReferentIA)).toBe(`à partir de ${euros(1600)} par mois`);
-    expect(aPartirDe(ctoReferentIA, " HT")).toBe(`à partir de ${euros(1600)} HT par mois`);
   });
 
-  test("le CTO dit son temps, son engagement et ce qu'ajoutent quatre jours", () => {
-    const tout = [...ctoReferentIA.inclus, ...ctoReferentIA.faitMonter, ctoReferentIA.horsOffre];
-    expect(ctoReferentIA.inclus.some((l) => /deux jours de travail chaque mois/iu.test(l))).toBe(true);
-    for (const attendu of [/comité mensuel en visio/u, /devis/u, /feuille de route/u, /outils d’IA/u, /48\u00A0h/u]) {
-      expect(ctoReferentIA.inclus.some((l) => attendu.test(l)), String(attendu)).toBe(true);
-    }
-    const quatreJours = ctoReferentIA.faitMonter.find((l) => /^quatre jours/iu.test(l));
-    expect(quatreJours).toContain(euros(CTO_QUATRE_JOURS));
-    expect(tout.some((l) => /recrutement/u.test(l))).toBe(true);
-    expect(tout.some((l) => /gouvernance de vos données/u.test(l))).toBe(true);
-    expect(tout.some((l) => /déplacements occasionnels, sur devis/u.test(l))).toBe(true);
-    expect(ctoReferentIA.horsOffre).toMatch(/trois mois/u);
-    expect(ctoReferentIA.horsOffre).toMatch(/un mois de préavis/u);
-    // Le mot désigne les forfaits supprimés le 2026-10-05.
-    for (const texte of tout) expect(texte).not.toMatch(/\bpaliers?\b/iu);
+  test("le suivi suit la règle du logiciel : 18 % par an, 125 € au minimum, aux 5 € supérieurs", () => {
+    expect(tauxSuivi()).toBe("18\u202F%");
+    expect(plancherSuivi()).toBe(euros(125));
+    // 6 000 € x 18 % / 12 = 90 € : le plancher de 125 € mord.
+    expect(suiviMensuelHT(6000)).toBe(125);
+    // 12 000 € x 18 % / 12 = 180 €, déjà un multiple de 5.
+    expect(suiviMensuelHT(12000)).toBe(180);
+    // 13 000 € x 18 % / 12 = 195 € ; 13 500 € donne 202,5 € arrondi à 203 puis à 205 €.
+    expect(suiviMensuelHT(13000)).toBe(195);
+    expect(suiviMensuelHT(13500)).toBe(205);
   });
 
   test("le logiciel reste moins cher qu'un premier outil en agence, à livrable égal", () => {
-    // Le plancher couvre un outil à une fonction : il se compare au premier
-    // outil d'une agence, jamais à leur médiane.
+    // Le plancher couvre un premier outil : il se compare au premier outil
+    // d'une agence (8 000 à 10 000 €), jamais à leur médiane.
     expect(prestation("logiciel").plancher).toBeLessThan(repereAgenceLogiciel.premierOutilMin);
+    expect(repereAgenceLogiciel.premierOutilMin).toBeLessThan(repereAgenceLogiciel.premierOutilMax);
+    expect(repereAgenceLogiciel.premierOutilMax).toBeLessThan(repereAgenceLogiciel.mediane);
   });
 
   test("plus aucun palier : ni forfaits, ni prix ferme par forfait, ni délai", () => {
@@ -124,7 +125,7 @@ describe("un plancher par offre, écrit une seule fois", () => {
   });
 
   test("le prix affiché est le plancher, formaté, précédé de « à partir de »", () => {
-    for (const offre of [...prestations, integrationIA]) {
+    for (const offre of prestations) {
       expect(prixPlancher(offre)).toBe(euros(offre.plancher));
       expect(aPartirDe(offre)).toBe(`à partir de ${euros(offre.plancher)}`);
     }
@@ -140,19 +141,6 @@ describe("un plancher par offre, écrit une seule fois", () => {
       // Une ligne ne peut pas être à la fois comprise et facteur de hausse.
       const lignes = [...offre.inclus, ...offre.faitMonter];
       expect(new Set(lignes).size, `ligne répétée dans « ${offre.nom} »`).toBe(lignes.length);
-    }
-  });
-
-  test("les textes du site vitrine sont écrits par Eliott, et compris", () => {
-    // Décision d'Eliott du 2026-10-05 : « je prépare des textes préfaits pour
-    // qu'ils soient optimisés SEO […] Donc c'est dans mon prix. » Le site
-    // disait « Tes textes mis en page » : le visiteur comprenait qu'il devait
-    // les écrire.
-    const vitrine = prestation("vitrine");
-    expect(vitrine.inclus.some((l) => /textes écrits par moi/iu.test(l))).toBe(true);
-    const tout = [vitrine.resume, vitrine.horsOffre, ...vitrine.inclus, ...vitrine.faitMonter];
-    for (const texte of tout) {
-      expect(/textes mis en page|textes que (?:tu fournis|vous fournissez)/iu.test(texte), texte).toBe(false);
     }
   });
 
@@ -231,14 +219,14 @@ describe("l'offre et la FAQ vouvoient", () => {
 
   test("la réponse prix de la FAQ cite le repère d'agence, sa source et sa date", () => {
     const reponse = faqItems.find((f) => /Combien coûte un projet/u.test(f.question))?.answer;
-    // À livrable égal : la fourchette d'un site vitrine soigné, jamais mon
-    // plancher contre leur médiane.
-    expect(reponse).toContain(euros(repereAgenceSite.soigneMin));
-    expect(reponse).toContain(euros(repereAgenceSite.soigneMax));
+    // À livrable égal : le premier outil d'une agence contre mon plancher,
+    // jamais mon plancher contre leur médiane.
+    expect(reponse).toContain(euros(repereAgenceLogiciel.premierOutilMin));
+    expect(reponse).toContain(euros(repereAgenceLogiciel.premierOutilMax));
     expect(reponse).not.toContain("médiane");
-    expect(reponse).toContain(repereAgenceSite.source.nom);
-    expect(reponse).toContain(repereAgenceSite.source.releve);
-    expect(prestation("vitrine").plancher).toBeLessThan(repereAgenceSite.soigneMin);
+    expect(reponse).toContain(repereAgenceLogiciel.source.nom);
+    expect(reponse).toContain(repereAgenceLogiciel.source.releve);
+    expect(prestation("logiciel").plancher).toBeLessThan(repereAgenceLogiciel.premierOutilMin);
   });
 });
 
@@ -292,14 +280,16 @@ describe("le site annonce le même prix que le module", () => {
     }
   });
 
-  test("l'intégration IA et le CTO mènent à leur page thématique, déclarée au manifeste", () => {
+  test("les pages des offres retirées sont sorties du manifeste", () => {
     const chemins = contentRoutes.map((r) => r.pathname);
-    for (const [offre, chemin] of [
-      [integrationIA, CHEMIN_AUTOMATISATION],
-      [ctoReferentIA, CHEMIN_CTO],
+    for (const retire of [
+      "/services/site-vitrine",
+      "/services/site-vitrine/prix",
+      "/services/site-vitrine/artisans",
+      "/services/cto-referent-ia",
+      "/creation-site-internet-caen",
     ]) {
-      expect(chemins, `${chemin} manque au manifeste`).toContain(chemin);
-      expect(services.find((s) => s.title === offre.nom)?.cta?.href).toBe(chemin);
+      expect(chemins, `${retire} est revenu au manifeste`).not.toContain(retire);
     }
   });
 
@@ -328,20 +318,14 @@ describe("le site annonce le même prix que le module", () => {
         sujet,
       );
     }
-    // Les trois prestations chiffrées passent par la table, jamais par leur
-    // propre identifiant : « vitrine » n'est pas un sujet de rendez-vous.
+    // La prestation passe par la table, jamais par son propre identifiant.
     for (const p of prestations) {
       const presta = services.find((s) => s.title === p.nom);
       expect(presta.rdvHref).toBe(lienRendezVous(RDV_PAR_PRESTATION[p.id]));
     }
-    expect(RDV_PAR_PRESTATION.vitrine).toBe("site");
-    // Les deux offres sans prestation passent par leur propre table.
-    expect(services.find((s) => s.title === integrationIA.nom)?.rdvHref).toBe(
-      lienRendezVous(RDV_HORS_PRESTATION.integrationIA),
-    );
-    expect(services.find((s) => s.title === ctoReferentIA.nom)?.rdvHref).toBe(
-      lienRendezVous(RDV_HORS_PRESTATION.cto),
-    );
+    expect(RDV_PAR_PRESTATION.logiciel).toBe("logiciel");
+    // Deux sujets seulement : le logiciel, et la découverte pour tout le reste.
+    expect([...IDS_RENDEZ_VOUS]).toEqual(["logiciel", "decouverte"]);
   });
 
   test("le préfixe du prix n'est écrit qu'à un seul endroit", () => {
@@ -421,7 +405,7 @@ describe("le site annonce le même prix que le module", () => {
     // euros se fige ; exprimé en part du projet, il suit la grille tout seul.
     const suivi = faqItems
       .map((item) => item.answer)
-      .find((a) => /suivi mensuel/i.test(a));
+      .find((a) => /(?:suivi|maintenance) mensuel/i.test(a));
     expect(suivi, "la réponse sur le suivi a disparu de la FAQ").toBeDefined();
     expect(suivi, "le taux de suivi de la FAQ a divergé du module").toContain(
       tauxSuivi(),
@@ -440,7 +424,7 @@ describe("le site annonce le même prix que le module", () => {
     // Le plancher mord sur le bas de l'offre : aucun projet ne doit pouvoir
     // sortir un suivi inférieur, ce qui arriverait si le pourcentage était
     // appliqué seul.
-    for (const offre of [...prestations, integrationIA]) {
+    for (const offre of prestations) {
       expect(suiviMensuel(offre.plancher)).toBe(plancherSuivi());
     }
     expect(suiviMensuel(1)).toBe(plancherSuivi());
@@ -461,7 +445,7 @@ describe("le site annonce le même prix que le module", () => {
     // ligne ? » : la FAQ passe à cinq entrées, la clause garde ses trois
     // engagements.
     const question = faqItems.find((item) =>
-      /après la mise en ligne/i.test(item.question),
+      /après la mise en service/i.test(item.question),
     );
     const clause = question?.answer;
     expect(question, "la clause de hausse du suivi a disparu de la FAQ").toBeDefined();
@@ -566,19 +550,14 @@ describe("la section tarifs ne peut pas diverger de l'offre", () => {
  * qu'Eliott vend. Une ligne qui n'est pas dans `offre.ts` n'y rentre pas par la
  * petite porte.
  */
-describe("l'accordéon porte les quatre offres", () => {
-  test("une ligne par offre, dans l'ordre décidé le 2026-10-16, numérotées", () => {
-    // Du site à l'outil, de l'IA au pilotage technique.
-    expect(services.map((s) => s.title)).toEqual([
-      prestation("vitrine").nom,
-      prestation("logiciel").nom,
-      integrationIA.nom,
-      ctoReferentIA.nom,
-    ]);
-    expect(services.map((s) => s.number)).toEqual(["01", "02", "03", "04"]);
+describe("l'accordéon porte l'offre unique", () => {
+  test("une seule ligne, numérotée 01", () => {
+    // Décision d'Eliott du 2026-10-30 : une seule offre, le logiciel métier.
+    expect(services.map((s) => s.title)).toEqual([prestation("logiciel").nom]);
+    expect(services.map((s) => s.number)).toEqual(["01"]);
   });
 
-  test("chaque ligne a deux paragraphes et une image distincte", () => {
+  test("la ligne a deux paragraphes et une image", () => {
     for (const s of services) {
       expect(s.body.length, s.title).toBe(2);
       for (const paragraphe of s.body) expect(paragraphe.length, s.title).toBeGreaterThan(40);
@@ -595,8 +574,7 @@ describe("l'accordéon porte les quatre offres", () => {
     }
   });
 
-  test("le prix du CTO est mensuel dans l'accordéon", () => {
-    const cto = services.find((s) => s.title === ctoReferentIA.nom);
-    expect(cto.price).toMatch(/ par mois$/u);
+  test("le prix de l'accordéon est un plancher en euros, sans période", () => {
+    expect(services[0].price).toBe(`à partir de ${euros(6000)}`);
   });
 });

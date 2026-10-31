@@ -11,7 +11,6 @@ import {
   suiviMensuelHT,
   tauxSuivi,
 } from "./offre.ts";
-import { pageCaen } from "./page-caen.ts";
 import { pageLogicielCaen } from "./page-logiciel-caen.ts";
 import { pagePrixLogiciel } from "./page-prix-logiciel.ts";
 import { CHEMIN_PRIX_LOGICIEL, pagesSecteur } from "./pages-secteur.ts";
@@ -26,9 +25,9 @@ import { siteConfig } from "./site.ts";
  * justes : le plancher et le suivi viennent de `offre.ts`, et la comparaison
  * avec un abonnement est recalculée ici depuis ses hypothèses.
  *
- * En fin de fichier, l'unicité des 7 pages déclinées (4 secteurs, 2 pages de
- * Caen, la page de prix) : des pages qui se recopient passent pour du contenu
- * produit en série.
+ * En fin de fichier, l'unicité des pages déclinées (les pages secteur, la page
+ * locale de Caen, la page de prix) : des pages qui se recopient passent pour du
+ * contenu produit en série.
  */
 
 const LOGICIEL = prestation("logiciel");
@@ -222,7 +221,7 @@ describe("la page de prix ne promet que ce qui est vrai", () => {
 });
 
 /* ------------------------------------------------------------------------ */
-/* LES 7 PAGES DÉCLINÉES NE SE RECOPIENT PAS                                 */
+/* LES PAGES DÉCLINÉES NE SE RECOPIENT PAS                                   */
 /* ------------------------------------------------------------------------ */
 
 /** Une page déclinée ramenée à ses champs comparables. */
@@ -245,33 +244,34 @@ function fiche(p, nom) {
   };
 }
 
-const SEPT = [
+const DECLINEES = [
   ...pagesSecteur.map((p) => fiche(p, p.slug)),
-  fiche(pageCaen, "caen"),
   fiche(pageLogicielCaen, "logiciel-caen"),
   fiche(page, "prix"),
 ];
 
-describe("les 7 pages déclinées ne se recopient pas", () => {
-  test("il y a bien 7 pages", () => {
-    expect(SEPT.length).toBe(7);
+describe("les pages déclinées ne se recopient pas", () => {
+  test("il y a les pages secteur, la page de Caen du logiciel et la page de prix", () => {
+    // La page de Caen du site vitrine a été supprimée le 2026-10-31.
+    expect(DECLINEES.length).toBe(pagesSecteur.length + 2);
+    expect(DECLINEES.length).toBeGreaterThan(2);
   });
 
   for (const champ of ["titre", "description", "h1", "titreOffre"]) {
     test(`aucun ${champ} n'est partagé`, () => {
-      const valeurs = SEPT.map((f) => f[champ]);
+      const valeurs = DECLINEES.map((f) => f[champ]);
       expect(new Set(valeurs).size).toBe(valeurs.length);
     });
   }
 
   test("aucune question de FAQ n'est partagée", () => {
-    const questions = SEPT.flatMap((f) => f.questions);
+    const questions = DECLINEES.flatMap((f) => f.questions);
     expect(new Set(questions).size).toBe(questions.length);
   });
 
   test("aucun bloc de texte n'est partagé entre 2 pages", () => {
     const vus = new Map();
-    for (const f of SEPT) {
+    for (const f of DECLINEES) {
       for (const bloc of f.blocs) {
         const autre = vus.get(bloc);
         expect(autre === undefined || autre === f.nom, `bloc partagé (${autre}, ${f.nom}) : ${bloc}`).toBe(true);

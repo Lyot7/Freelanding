@@ -1,4 +1,6 @@
+import Image from "next/image";
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { SvgSprite } from "@/components/SvgSprite";
 import { FloatingNav, Footer, Header } from "@/components/layout";
 import { FaqSection } from "@/components/sections/FaqSection";
@@ -25,8 +27,9 @@ import { servicePageLabels } from "@/content/service-pages";
 import type { SiteConfig } from "@/lib/content/types";
 
 /**
- * PAGE THÉMATIQUE : ERP, GMAO, automatisation, artisans, IA à Caen. Contenu
- * et règles dans `src/content/page-theme.ts`.
+ * PAGE THÉMATIQUE : ERP, GMAO, automatisation, IA à Caen, et depuis le
+ * 2026-10-31 les pages par métier (`metiers.ts`), qui ajoutent leur visuel et
+ * leur maillage. Contenu et règles dans `src/content/page-theme.ts`.
  *
  * MÊME GRAMMAIRE QUE LES PAGES DE PRESTATION (héros coupé par le filet
  * médian, deux tons alternés, l'offre, le rendez-vous, la FAQ), et c'est le
@@ -40,7 +43,7 @@ function EnTeteBloc({ bloc, ton }: { bloc: BlocTheme; ton: Ton }) {
   const t = TONS[ton];
   return (
     <div className="flex flex-col gap-[16px]">
-      <h2 className="accent-room max-w-[560px] text-[26px] font-semibold uppercase leading-[0.95] tracking-[-0.04em] tablet:text-[34px]">
+      <h2 className="accent-room max-w-[560px] text-balance text-[26px] font-semibold uppercase leading-[0.95] tracking-[-0.04em] tablet:text-[34px]">
         {bloc.titre}
       </h2>
       {bloc.paragraphes.map((paragraphe) => (
@@ -283,9 +286,15 @@ const graine = (chemin: string): number =>
 export function PageTheme({
   page,
   site,
+  visuel,
+  maillage,
 }: {
-  page: ContenuPageTheme;
+  page: Omit<ContenuPageTheme, "id">;
   site: SiteConfig;
+  /** Visuel du héros, à la place du fond animé. */
+  visuel?: { readonly src: string; readonly alt: string };
+  /** Liens vers les pages voisines, entre l'offre et la FAQ. */
+  maillage?: ReactNode;
 }) {
   return (
     <>
@@ -293,7 +302,24 @@ export function PageTheme({
       <Header site={site} />
       <main id="main-content" tabIndex={-1}>
         <section className="relative flex min-h-[calc(70svh/var(--zoom-ecran,1))] items-end overflow-hidden bg-background px-[20px] pb-[60px] pt-[140px] text-foreground tablet:px-[24px] tablet:pb-[90px] desktop:px-[30px]">
-          <GradientWaveBackdrop seed={graine(page.chemin)} />
+          {visuel ? (
+            <>
+              <Image
+                src={visuel.src}
+                alt={visuel.alt}
+                fill
+                priority
+                sizes="100vw"
+                className="object-cover object-center"
+              />
+              <span
+                aria-hidden
+                className="pointer-events-none absolute inset-0 z-[1] bg-[linear-gradient(to_top,#0b0b0b_8%,rgba(11,11,11,.72)_48%,rgba(11,11,11,.35)_100%)]"
+              />
+            </>
+          ) : (
+            <GradientWaveBackdrop seed={graine(page.chemin)} />
+          )}
           <Grain opacity={0.05} className="z-[1]" />
           <span className="absolute inset-y-0 left-1/2 z-[1] w-px bg-white/10" />
           <div className="relative z-[2] mx-auto grid w-full max-w-[1440px] gap-[20px] tablet:grid-cols-2 tablet:items-end tablet:gap-x-0 tablet:gap-y-[30px]">
@@ -346,6 +372,8 @@ export function PageTheme({
             <OffreDetail offre={page.offre} href="#rendez-vous" />
           </div>
         </section>
+
+        {maillage}
 
         <FaqSection
           faq={[...page.faq.items]}

@@ -13,10 +13,11 @@ import { tranchesBudget } from "../rendez-vous/questionnaire.ts";
  * formulaire continue de dire « envoyé » —, d'où ces tests.
  */
 
+// Les trois types proposés depuis le 2026-10-31 (`siteConfig.footerForm`).
 const TYPES = [
-  "Un site",
-  "Une solution métier",
+  "Un logiciel métier",
   "Je ne sais pas encore",
+  "Une autre demande",
 ];
 
 const MAINTENANT = 1_700_000_000_000;
@@ -35,7 +36,7 @@ function soumissionProjet(surcharge = {}) {
     nom: "Jean Dupont",
     email: "jean@example.com",
     typeProjet: TYPES[0],
-    message: "Bonjour, je cherche un site pour mon atelier de menuiserie.",
+    message: "Bonjour, je cherche un logiciel pour mon atelier de menuiserie.",
     debutMs: DEBUT_HUMAIN,
     ...surcharge,
   };
@@ -50,7 +51,7 @@ describe("validerSoumission — cas nominal", () => {
       nom: "Jean Dupont",
       email: "jean@example.com",
       typeProjet: TYPES[0],
-      message: "Bonjour, je cherche un site pour mon atelier de menuiserie.",
+      message: "Bonjour, je cherche un logiciel pour mon atelier de menuiserie.",
     });
   });
 
@@ -72,11 +73,11 @@ describe("validerSoumission — cas nominal", () => {
       nom: "Alex Martin",
       email: "alex@example.fr",
       typeProjet: TYPES[1],
-      message: "Je voudrais refaire le site de mon garage.",
+      message: "Je voudrais un logiciel pour mon garage.",
       debutMs: DEBUT_HUMAIN,
     });
     expect(resultat.ok).toBe(true);
-    expect(resultat.soumission.message).toBe("Je voudrais refaire le site de mon garage.");
+    expect(resultat.soumission.message).toBe("Je voudrais un logiciel pour mon garage.");
   });
 
   it("refuse une intention inconnue", () => {
@@ -261,16 +262,17 @@ describe("validerSoumission — normalisation", () => {
 describe("validerSoumission — questionnaire de /contact", () => {
   it("accepte les réponses de la liste du type choisi et les rend en libellés", () => {
     const resultat = valider(
-      soumissionProjet({ budget: "inconnu", objectif: "google", echeance: "vite" }),
+      soumissionProjet({ budget: "inconnu", objectif: "tableur", echeance: "vite" }),
     );
     expect(resultat.ok).toBe(true);
     expect(resultat.soumission.budget).toBe("Je ne sais pas encore");
-    expect(resultat.soumission.objectif).toBe("Être trouvé sur Google");
+    expect(resultat.soumission.objectif).toBe("Sortir du tableur partagé");
     expect(resultat.soumission.echeance).toBe("Dès que possible");
   });
 
   it("refuse un objectif qui n'appartient pas au type de projet", () => {
-    const resultat = valider(soumissionProjet({ objectif: "tableur" }));
+    // « conseil » est un objectif de la découverte, pas du logiciel.
+    const resultat = valider(soumissionProjet({ objectif: "conseil" }));
     expect(resultat.ok).toBe(false);
     expect(resultat.motif).toEqual({
       type: "champ_invalide",
@@ -286,24 +288,45 @@ describe("validerSoumission — questionnaire de /contact", () => {
   });
 
   it("rattache une tranche du logiciel à 6 000 € à la tranche actuelle", () => {
-    // Un onglet ouvert avant le 2026-10-16 propose encore les tranches du
-    // logiciel calculées sur 6 000 € : son message doit passer.
+    // Un onglet ouvert avant le 2026-10-31 propose encore les tranches du
+    // logiciel calculées sur 3 500 € : son message doit passer.
     const resultat = valider(
-      soumissionProjet({ typeProjet: TYPES[1], budget: "6000-12000", objectif: "tableur" }),
+      soumissionProjet({ typeProjet: TYPES[0], budget: "7000-14000", objectif: "tableur" }),
     );
     expect(resultat.ok).toBe(true);
     const attendue = tranchesBudget("logiciel").find(
-      (t) => t.bas !== undefined && t.bas <= 6000 && (t.haut === undefined || 6000 < t.haut),
+      (t) => t.bas !== undefined && t.bas <= 7000 && (t.haut === undefined || 7000 < t.haut),
     );
     expect(resultat.soumission.budget).toBe(attendue.libelle);
   });
 
-  it("prend les listes de la découverte quand le type n'est pas tranché", () => {
-    const resultat = valider(
-      soumissionProjet({ typeProjet: TYPES[2], objectif: "tache" }),
+  it("lit les listes du logiciel pour l'ancien libellé « Une solution métier », quand il est autorisé", () => {
+    // La validation traduit l'ancien libellé (`rendezVousDuTypeProjet`) ; c'est
+    // à l'appelant de l'autoriser.
+    const resultat = validerSoumission(
+      soumissionProjet({ typeProjet: "Une solution métier", objectif: "tableur" }),
+      { typesProjetAutorises: [...TYPES, "Une solution métier"], maintenantMs: MAINTENANT },
     );
     expect(resultat.ok).toBe(true);
-    expect(resultat.soumission.objectif).toBe("Supprimer une tâche faite à la main");
+    expect(resultat.soumission.objectif).toBe("Sortir du tableur partagé");
+  });
+
+  it("refuse les types retirés (« Un site ») tant qu'ils ne sont pas autorisés", () => {
+    const resultat = valider(soumissionProjet({ typeProjet: "Un site" }));
+    expect(resultat.ok).toBe(false);
+    expect(resultat.motif).toEqual({
+      type: "champ_invalide",
+      champ: "typeProjet",
+      raison: "hors_liste",
+    });
+  });
+
+  it("prend les listes de la découverte quand le type n'est pas tranché", () => {
+    const resultat = valider(
+      soumissionProjet({ typeProjet: TYPES[1], objectif: "conseil" }),
+    );
+    expect(resultat.ok).toBe(true);
+    expect(resultat.soumission.objectif).toBe("Avoir un avis sur un projet");
   });
 
   it("tolère un questionnaire absent", () => {

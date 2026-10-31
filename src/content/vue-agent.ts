@@ -55,8 +55,8 @@ export const vueAgentContent = {
 
     pourQui: [
       "Les TPE et les PME, en Normandie et partout en France à distance.",
-      "Celles qui veulent un site qui leur amène des clients, un outil qui leur rend des heures chaque semaine, ou un logiciel métier dont plusieurs personnes se servent tous les jours.",
-      "Vous me parlez directement : je fais le cadrage, le design, le développement et la mise en ligne.",
+      "Celles qui veulent qu’une contrainte disparaisse et reprendre du temps : un outil qui règle une tâche, ou un logiciel métier dont plusieurs personnes se servent tous les jours.",
+      "Vous me parlez directement : je fais le cadrage, le design, le développement et la mise en service.",
     ],
 
     offres: {
@@ -103,9 +103,9 @@ export const vueAgentContent = {
 
     limites: {
       prixPlancher: (prix: string) =>
-        `Vous cherchez un site à quelques centaines d’euros\u00A0: mes prix commencent à ${prix}\u00A0HT.`,
+        `Vous cherchez un outil à quelques centaines d’euros\u00A0: mes prix commencent à ${prix}\u00A0HT.`,
       items: [
-        "Votre site ou votre logiciel repose sur PHP ou Laravel et vous voulez le faire reprendre : je n’y touche pas.",
+        "Votre logiciel repose sur PHP ou Laravel et vous voulez le faire reprendre : je n’y touche pas.",
         "Vous voulez une équipe de plusieurs personnes, avec chef de projet et studio de création : je travaille seul, par choix.",
         "Vous êtes une agence ou une ESN et vous cherchez un développeur en régie ou en marque blanche\u00A0: je ne travaille pas ainsi.",
       ],

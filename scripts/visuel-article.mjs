@@ -70,6 +70,16 @@ export function rendreVisuel(slug, svg, racine = ".") {
   return rendre(svg, (nom) => fichiers[nom]);
 }
 
+/** Écrit le héros et l'image de partage d'une page par métier (`metiers.ts`). */
+export function rendreVisuelMetier(slug, svg, racine = ".") {
+  const fichiers = {
+    heros: `${racine}/public/images/heros/metier-${slug}.jpg`,
+    vignette: `${racine}/public/images/metiers/${slug}.jpg`,
+    partage: `${racine}/public/images/og-metier-${slug}.jpg`,
+  };
+  return rendre(svg, (nom) => fichiers[nom]);
+}
+
 /** `bun scripts/visuel-article.mjs <fichier.svg> [dossier]` : rend un SVG hors circuit, pour le régler. */
 if (import.meta.main) {
   const [fichier, dossier = "."] = process.argv.slice(2);

@@ -44,10 +44,7 @@ export type CibleEvenement =
 
 /** Nom de la variable d'environnement portant chaque type de rendez-vous. */
 export const VARIABLES_EVENEMENT: Readonly<Record<IdRendezVous, string>> = {
-  site: "CAL_COM_EVENT_SITE",
   logiciel: "CAL_COM_EVENT_LOGICIEL",
-  ia: "CAL_COM_EVENT_IA",
-  cto: "CAL_COM_EVENT_CTO",
   decouverte: "CAL_COM_EVENT_DECOUVERTE",
 };
 
@@ -129,6 +126,9 @@ export function estIdRendezVous(valeur: unknown): valeur is IdRendezVous {
  */
 const SUJETS_RENOMMES: Readonly<Record<string, IdRendezVous>> = {
   outil: "logiciel",
+  ia: "logiciel",
+  site: "decouverte",
+  cto: "decouverte",
 };
 
 /**

@@ -1,22 +1,14 @@
 import { describe, expect, it } from "bun:test";
-import {
-  aPartirDe,
-  ctoReferentIA,
-  euros,
-  integrationIA,
-  prestation,
-} from "../../content/offre.ts";
-import { rendezVousContent } from "../../content/rendez-vous.ts";
+import { aPartirDe, euros, prestation } from "../../content/offre.ts";
+import { IDS_RENDEZ_VOUS, rendezVousContent } from "../../content/rendez-vous.ts";
 import { siteConfig } from "../../content/site.ts";
 import {
   BUDGET_INCONNU,
   bornesBudget,
   composerNotes,
-  legendeObjectif,
-  OPTIONS_OUTIL,
+  LEGENDE_OBJECTIF,
   offresDuRendezVous,
   optionsObjectif,
-  questionsDuRendezVous,
   rattacherTranche,
   rendezVousDuTypeProjet,
   retourBudget,
@@ -31,67 +23,41 @@ import {
  * qui s'affiche au-delà), et l'absence de tout nom de forfait.
  */
 
-const vitrine = prestation("vitrine");
 const logiciel = prestation("logiciel");
 const bornes = (p) => [1, 2, 4].map((m) => p.plancher * m);
 const sansInsecable = (texte) => texte.replace(/[\u00a0\u202f]/gu, " ");
 
 describe("offresDuRendezVous", () => {
-  it("relie chaque sujet à son offre, et « decouverte » aux prestations", () => {
-    expect(offresDuRendezVous("site")).toEqual([vitrine]);
+  it("relie « logiciel » à son offre, et « decouverte » à toutes les prestations", () => {
     expect(offresDuRendezVous("logiciel")).toEqual([logiciel]);
-    expect(offresDuRendezVous("ia")).toEqual([integrationIA]);
-    expect(offresDuRendezVous("cto")).toEqual([ctoReferentIA]);
-    expect(offresDuRendezVous("decouverte")).toEqual([vitrine, logiciel]);
+    expect(offresDuRendezVous("decouverte")).toEqual([logiciel]);
   });
 });
 
-describe("questionsDuRendezVous — les questions suivent le sujet", () => {
-  it("ne pose pas de budget au CTO, et l'outil à l'IA seule", () => {
-    expect(questionsDuRendezVous("cto")).toEqual({ budget: false, outil: false });
-    expect(questionsDuRendezVous("ia")).toEqual({ budget: true, outil: true });
-    for (const id of ["site", "logiciel", "decouverte"]) {
-      expect(questionsDuRendezVous(id)).toEqual({ budget: true, outil: false });
-    }
-  });
-
-  it("donne à l'IA et au CTO leur légende, aux autres la légende commune", () => {
+describe("le questionnaire est le même pour chaque sujet", () => {
+  it("pose toujours le budget, sans question d'outil ni légende propre à un sujet", () => {
+    // Depuis le 2026-10-31, plus de sujet sans budget (le CTO) ni de question
+    // « outil » (l'intégration IA) : ces deux offres n'existent plus.
     const { objectif } = rendezVousContent.questionnaire;
-    expect(legendeObjectif("ia")).toBe(objectif.legendeParType.ia);
-    expect(legendeObjectif("cto")).toBe(objectif.legendeParType.cto);
-    expect(legendeObjectif("site")).toBe(objectif.legende);
-  });
-
-  it("tire les tranches de l'IA de son propre plancher", () => {
-    const [a, b, c] = bornes(integrationIA);
-    expect(tranchesBudget("ia").map((t) => t.id)).toEqual([
-      `moins-${a}`,
-      `${a}-${b}`,
-      `${b}-${c}`,
-      `plus-${c}`,
-      BUDGET_INCONNU,
-    ]);
-    const retour = retourBudget("ia", `${a}-${b}`);
-    expect(retour.type).toBe("aPortee");
-    expect(retour.lignes.map((l) => l.prestation)).toEqual([integrationIA.nom]);
+    expect(objectif).not.toHaveProperty("legendeParType");
+    expect(LEGENDE_OBJECTIF).toBe(objectif.legende);
+    for (const id of IDS_RENDEZ_VOUS) {
+      expect(tranchesBudget(id).length, id).toBeGreaterThan(2);
+      expect(optionsObjectif(id).length, id).toBeGreaterThan(2);
+    }
   });
 });
 
 describe("bornesBudget et tranchesBudget", () => {
-  it("pose le plancher puis ses multiples pour un sujet à une seule prestation", () => {
-    expect(bornesBudget("site")).toEqual(bornes(vitrine));
-    expect(bornesBudget("logiciel")).toEqual(bornes(logiciel));
-  });
-
-  it("couvre les deux prestations pour « decouverte » sans multiplier les tranches", () => {
-    // Plancher de chaque prestation, puis les multiples de la plus chère ; le
-    // plancher du site, trop proche de celui du logiciel, s'efface.
-    expect(vitrine.plancher * 1.5).toBeGreaterThan(logiciel.plancher);
-    expect(bornesBudget("decouverte")).toEqual(bornes(logiciel));
+  it("pose le plancher puis ses multiples, pour chaque sujet", () => {
+    for (const id of IDS_RENDEZ_VOUS) {
+      expect(bornesBudget(id), id).toEqual(bornes(logiciel));
+    }
+    expect(bornesBudget("logiciel")).toEqual([6000, 12000, 24000]);
   });
 
   it("ne pose jamais deux bornes voisines à moins de moitié d’écart", () => {
-    for (const id of ["site", "logiciel", "decouverte"]) {
+    for (const id of IDS_RENDEZ_VOUS) {
       const b = bornesBudget(id);
       for (let i = 0; i < b.length - 1; i += 1) {
         expect(b[i + 1] / b[i]).toBeGreaterThanOrEqual(1.5);
@@ -99,7 +65,20 @@ describe("bornesBudget et tranchesBudget", () => {
     }
   });
 
-  it("propose à « decouverte » des tranches lisibles, sans la tranche étroite site-logiciel", () => {
+  it("encadre le plancher : sous le premier, entre chaque, au-dessus du dernier, puis « je ne sais pas »", () => {
+    const [a, b, c] = bornes(logiciel);
+    for (const id of IDS_RENDEZ_VOUS) {
+      expect(tranchesBudget(id).map((t) => t.id)).toEqual([
+        `moins-${a}`,
+        `${a}-${b}`,
+        `${b}-${c}`,
+        `plus-${c}`,
+        BUDGET_INCONNU,
+      ]);
+    }
+  });
+
+  it("écrit les libellés avec les montants formatés de l’offre", () => {
     const { budget } = rendezVousContent.questionnaire;
     const [a, b, c] = bornes(logiciel);
     expect(tranchesBudget("decouverte").map((t) => t.libelle)).toEqual([
@@ -109,34 +88,10 @@ describe("bornesBudget et tranchesBudget", () => {
       budget.plusDe(euros(c)),
       budget.inconnu,
     ]);
-    expect(tranchesBudget("decouverte").map((t) => t.id)).not.toContain(
-      `${vitrine.plancher}-${logiciel.plancher}`,
-    );
-  });
-
-  it("encadre les planchers : sous le premier, entre chaque, au-dessus du dernier, puis « je ne sais pas »", () => {
-    const [a, b, c] = bornes(vitrine);
-    expect(tranchesBudget("site").map((t) => t.id)).toEqual([
-      `moins-${a}`,
-      `${a}-${b}`,
-      `${b}-${c}`,
-      `plus-${c}`,
-      BUDGET_INCONNU,
-    ]);
-    expect(tranchesBudget("decouverte")).toHaveLength(bornesBudget("decouverte").length + 2);
-  });
-
-  it("écrit les libellés avec les montants formatés de l’offre", () => {
-    const [a, b] = bornes(vitrine);
-    const tranche = tranchesBudget("site")[1];
-    expect(tranche.libelle).toBe(rendezVousContent.questionnaire.budget.entre(euros(a), euros(b)));
-    expect(tranchesBudget("site").at(-1).libelle).toBe(
-      rendezVousContent.questionnaire.budget.inconnu,
-    );
   });
 
   it("donne des identifiants uniques à chaque sujet", () => {
-    for (const id of ["site", "logiciel", "ia", "cto", "decouverte"]) {
+    for (const id of IDS_RENDEZ_VOUS) {
       const ids = tranchesBudget(id).map((t) => t.id);
       expect(new Set(ids).size).toBe(ids.length);
       const objectifs = optionsObjectif(id).map((o) => o.id);
@@ -149,18 +104,20 @@ describe("retourBudget — ce que vous pouvez espérer", () => {
   const { retour: R } = rendezVousContent;
 
   it("dit franchement que rien ne tient sous le plancher", () => {
-    const retour = retourBudget("site", tranchesBudget("site")[0].id);
-    expect(retour.type).toBe("aucun");
-    expect(retour.texte).toBe(R.aucun(euros(vitrine.plancher)));
+    for (const id of IDS_RENDEZ_VOUS) {
+      const retour = retourBudget(id, tranchesBudget(id)[0].id);
+      expect(retour.type).toBe("aucun");
+      expect(retour.texte).toBe(R.aucun(euros(logiciel.plancher)));
+    }
   });
 
   it("au-dessus du plancher, donne la prestation, son prix de départ et la suite au devis", () => {
-    const retour = retourBudget("site", tranchesBudget("site")[2].id);
+    const retour = retourBudget("logiciel", tranchesBudget("logiciel")[2].id);
     expect(retour.type).toBe("aPortee");
     expect(retour.lignes).toEqual([
       {
-        prestation: vitrine.nom,
-        prix: R.prixPlancher(euros(vitrine.plancher)),
+        prestation: logiciel.nom,
+        prix: R.prixPlancher(euros(logiciel.plancher)),
         texte: R.aPortee,
       },
     ]);
@@ -172,27 +129,25 @@ describe("retourBudget — ce que vous pouvez espérer", () => {
     expect(retour.lignes[0].prix).toBe(R.prixPlancher(euros(logiciel.plancher)));
   });
 
-  it("sur « decouverte », donne une ligne par prestation à portée, nommée", () => {
+  it("sur « decouverte », donne la même ligne que sur « logiciel »", () => {
     const tranche = `${logiciel.plancher}-${logiciel.plancher * 2}`;
     const retour = retourBudget("decouverte", tranche);
-    expect(retour.lignes.map((l) => l.prestation)).toEqual([vitrine.nom, logiciel.nom]);
+    expect(retour.lignes.map((l) => l.prestation)).toEqual([logiciel.nom]);
+    expect(retour).toEqual(retourBudget("logiciel", tranche));
   });
 
-  it("sur « decouverte », écarte la prestation hors de portée", () => {
-    const tranche = `moins-${logiciel.plancher}`;
-    const retour = retourBudget("decouverte", tranche);
-    expect(retour.lignes.map((l) => l.prestation)).toEqual([vitrine.nom]);
-  });
-
-  it("« je ne sais pas » renvoie à l’appel, avec le prix de départ de chaque prestation", () => {
-    const site = retourBudget("site", BUDGET_INCONNU);
-    expect(site.type).toBe("inconnu");
-    expect(site.reperes).toEqual([R.repere(vitrine.nom, aPartirDe(vitrine, " HT"))]);
-    expect(retourBudget("decouverte", BUDGET_INCONNU).reperes).toHaveLength(2);
+  it("« je ne sais pas » renvoie à l’appel, avec le prix de départ du logiciel", () => {
+    for (const id of IDS_RENDEZ_VOUS) {
+      const inconnu = retourBudget(id, BUDGET_INCONNU);
+      expect(inconnu.type).toBe("inconnu");
+      expect(inconnu.reperes).toEqual([R.repere(logiciel.nom, aPartirDe(logiciel, " HT"))]);
+    }
   });
 
   it("ne calcule rien pour une tranche qui n’appartient pas au sujet", () => {
-    expect(retourBudget("site", `${logiciel.plancher * 2}-${logiciel.plancher * 4}`)).toBe(undefined);
+    // Une tranche de l'ancien site vitrine, retirée le 2026-10-31.
+    expect(retourBudget("logiciel", "moins-3000")).toBe(undefined);
+    expect(retourBudget("decouverte", "3000-6000")).toBe(undefined);
   });
 
   it("aucun texte du retour ne nomme un forfait ni un palier", () => {
@@ -207,22 +162,22 @@ describe("composerNotes — ce qu'Eliott lit dans son agenda", () => {
   const { notes } = rendezVousContent;
 
   it("pose une réponse par ligne, ce qui est à portée, puis le message", () => {
-    const [a, b] = bornes(vitrine);
+    const [a, b] = bornes(logiciel);
     const texte = composerNotes({
-      type: "site",
+      type: "logiciel",
       budget: `${a}-${b}`,
-      objectif: "google",
+      objectif: "tableur",
       echeance: "trimestre",
-      message: "Refonte du site.",
+      message: "Sortir du tableur partagé.",
     });
     const lignes = texte.split("\n");
     expect(lignes).toEqual([
-      sansInsecable(`${notes.budget} : ${tranchesBudget("site")[1].libelle}`),
-      sansInsecable(`${notes.forfait} : ${vitrine.nom}`),
-      sansInsecable(`${notes.objectif} : ${optionsObjectif("site")[0].libelle}`),
+      sansInsecable(`${notes.budget} : ${tranchesBudget("logiciel")[1].libelle}`),
+      sansInsecable(`${notes.forfait} : ${logiciel.nom}`),
+      sansInsecable(`${notes.objectif} : ${optionsObjectif("logiciel")[1].libelle}`),
       sansInsecable(`${notes.echeance} : ${rendezVousContent.questionnaire.echeance.options[1].libelle}`),
       "",
-      "Refonte du site.",
+      "Sortir du tableur partagé.",
     ]);
   });
 
@@ -234,38 +189,26 @@ describe("composerNotes — ce qu'Eliott lit dans son agenda", () => {
 
   it("dit que rien ne tient sous le plancher", () => {
     const texte = composerNotes({
-      type: "site",
-      budget: tranchesBudget("site")[0].id,
+      type: "logiciel",
+      budget: tranchesBudget("logiciel")[0].id,
       objectif: "autre",
     });
     expect(texte).toContain(sansInsecable(`${notes.forfait} : ${notes.aucunForfait}`));
   });
 
-  it("écrit pour le CTO le besoin et l'échéance, sans ligne de budget", () => {
+  it("n'écrit plus de ligne d'outil, même pour une ancienne réponse", () => {
     const texte = composerNotes({
-      type: "cto",
-      objectif: "devis",
-      echeance: "vite",
-    });
-    expect(texte.split("\n")).toEqual([
-      sansInsecable(`${notes.objectif} : ${optionsObjectif("cto")[1].libelle}`),
-      sansInsecable(`${notes.echeance} : ${rendezVousContent.questionnaire.echeance.options[0].libelle}`),
-    ]);
-  });
-
-  it("écrit pour l'IA la tâche puis l'outil, après le budget", () => {
-    const texte = composerNotes({
-      type: "ia",
+      type: "decouverte",
       budget: BUDGET_INCONNU,
-      objectif: "mails",
+      objectif: "relier",
       outil: "messagerie",
     });
     expect(texte.split("\n")).toEqual([
       sansInsecable(`${notes.budget} : ${rendezVousContent.questionnaire.budget.inconnu}`),
       sansInsecable(`${notes.forfait} : ${notes.aCaler}`),
-      sansInsecable(`${notes.objectif} : ${optionsObjectif("ia")[0].libelle}`),
-      sansInsecable(`${notes.outil} : ${OPTIONS_OUTIL[0].libelle}`),
+      sansInsecable(`${notes.objectif} : ${optionsObjectif("decouverte")[1].libelle}`),
     ]);
+    expect(notes).not.toHaveProperty("outil");
   });
 
   it("ne laisse aucune espace insécable dans le texte brut", () => {
@@ -280,28 +223,38 @@ describe("composerNotes — ce qu'Eliott lit dans son agenda", () => {
 
 describe("rendezVousDuTypeProjet", () => {
   it("relie chaque type du formulaire de contact à un rendez-vous", () => {
-    const [site, solution, inconnu] = siteConfig.footerForm.selectOptions;
-    expect(rendezVousDuTypeProjet(site)).toBe("site");
-    expect(rendezVousDuTypeProjet(solution)).toBe("logiciel");
-    expect(rendezVousDuTypeProjet(inconnu)).toBe("decouverte");
+    const options = siteConfig.footerForm.selectOptions;
+    expect(options.map(rendezVousDuTypeProjet)).toEqual(
+      options.map((o) => (o === "Un logiciel métier" ? "logiciel" : "decouverte")),
+    );
+    expect(rendezVousDuTypeProjet("Un logiciel métier")).toBe("logiciel");
+    // Un onglet ouvert avant le 2026-10-31 envoie encore l'ancien libellé.
+    expect(rendezVousDuTypeProjet("Une solution métier")).toBe("logiciel");
+    expect(rendezVousDuTypeProjet("Je ne sais pas encore")).toBe("decouverte");
+    // Les types retirés (site, intégration IA, CTO) retombent sur la découverte.
+    expect(rendezVousDuTypeProjet("Un site internet")).toBe("decouverte");
+    expect(rendezVousDuTypeProjet("toString")).toBe("decouverte");
   });
 });
 
 describe("rattacherTranche — tranches du logiciel à 6 000 €", () => {
-  it("ramène chaque ancienne tranche du logiciel à la tranche actuelle qui contient sa borne basse", () => {
+  it("ramène chaque ancienne tranche à la tranche actuelle qui contient sa borne basse", () => {
     const [a, b, c] = bornes(logiciel);
-    for (const id of ["logiciel", "decouverte"]) {
+    for (const id of IDS_RENDEZ_VOUS) {
       expect(rattacherTranche(id, "moins-6000")).toBe(`moins-${a}`);
       expect(rattacherTranche(id, "moins-3000")).toBe(`moins-${a}`);
+      expect(rattacherTranche(id, "moins-3500")).toBe(`moins-${a}`);
+      expect(rattacherTranche(id, "3000-6000")).toBe(`moins-${a}`);
       expect(rattacherTranche(id, "6000-12000")).toBe(`${a}-${b}`);
+      expect(rattacherTranche(id, "7000-14000")).toBe(`${a}-${b}`);
       expect(rattacherTranche(id, "12000-24000")).toBe(`${b}-${c}`);
+      expect(rattacherTranche(id, "plus-14000")).toBe(`${b}-${c}`);
       expect(rattacherTranche(id, "plus-24000")).toBe(`plus-${c}`);
     }
   });
 
-  it("laisse au site les tranches qu’il propose toujours", () => {
-    for (const valeur of ["moins-3000", "3000-6000", "6000-12000"]) {
-      expect(rattacherTranche("site", valeur)).toBe(valeur);
-    }
+  it("rend telle quelle une valeur qui n'est pas une ancienne tranche", () => {
+    expect(rattacherTranche("logiciel", BUDGET_INCONNU)).toBe(BUDGET_INCONNU);
+    expect(rattacherTranche("logiciel", "toString")).toBe("toString");
   });
 });

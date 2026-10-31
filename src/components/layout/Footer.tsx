@@ -295,7 +295,7 @@ export async function Footer({
   // sans aucune erreur visible.
   const subtext = footerCta?.subtext ?? "";
   const subtextEmphasis = footerCta?.subtextEmphasis?.[0] ?? "";
-  const [subtextBefore] = subtextEmphasis
+  const [subtextBefore, subtextAfter = ""] = subtextEmphasis
     ? subtext.split(subtextEmphasis)
     : [subtext];
 
@@ -441,6 +441,7 @@ export async function Footer({
               <p className="h-auto w-full max-w-[330px] whitespace-pre-wrap break-words text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60">
                 {subtextBefore}
                 <span className="text-foreground">{subtextEmphasis}</span>
+                {subtextAfter}
               </p>
             </div>
 

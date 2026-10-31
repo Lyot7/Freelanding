@@ -47,8 +47,10 @@ const ROUTES = [
   "/work/wurth-creation-de-compte",
   "/blog",
   ...blogPosts.map(({ slug }) => `/blog/${slug}`),
-  "/services/site-vitrine",
   "/services/logiciel-metier",
+  // Hub des métiers et une page par métier (2026-10-31).
+  "/logiciel-metier",
+  "/logiciel-metier/echafaudage",
   "/contact",
   // Vue agent (2026-09-23) : le profil y écrit ses liens en clair.
   "/legal/mentions-legales",

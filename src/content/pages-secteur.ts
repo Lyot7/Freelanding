@@ -46,7 +46,6 @@ const CHEMIN_PILIER = `/services/${LOGICIEL.slug}`;
 
 export type SecteurSlug =
   | "btp"
-  | "transport"
   | "location-materiel"
   | "negoce-distribution";
 
@@ -310,7 +309,7 @@ const pageBtp: PageSecteur = {
     },
     {
       id: "methode",
-      titre: "Le projet, de l’appel à la mise en ligne",
+      titre: "Le projet, de l’appel à la mise en service",
       paragraphes: [
         "Avant de dessiner un écran, je relève où l’information se perd : tableurs, situations, feuilles de pointage. Chez Würth France, dans la distribution de fournitures professionnelles, cette méthode appliquée à un parcours de création de compte a donné −92 % d’erreurs, mesuré en interne.",
       ],
@@ -318,7 +317,7 @@ const pageBtp: PageSecteur = {
         titre: "Pour aller plus loin",
         items: [
           {
-            libelle: "La solution métier en détail",
+            libelle: "Le logiciel métier en détail",
             href: CHEMIN_PILIER,
             description: "Ce qui est compris, et ce qui fait varier le prix.",
           },
@@ -345,7 +344,7 @@ const pageBtp: PageSecteur = {
         {
           titre: "2. Le devis, relu ensemble",
           corps:
-            "Les modules, le prix ferme et la date de mise en ligne, présentés lors d’un second rendez-vous.",
+            "Les modules, le prix ferme et la date de mise en service, présentés lors d’un second rendez-vous.",
         },
         {
           titre: "3. Le logiciel avance sous vos yeux",
@@ -388,7 +387,7 @@ const pageBtp: PageSecteur = {
       {
         question: "Peut-on reprendre mes devis et mes chantiers en cours ?",
         answer:
-          "Oui. Vos tableurs et les exports de votre logiciel actuel sont nettoyés et chargés avant la mise en ligne, chantiers ouverts compris. Cette reprise est chiffrée au devis.",
+          "Oui. Vos tableurs et les exports de votre logiciel actuel sont nettoyés et chargés avant la mise en service, chantiers ouverts compris. Cette reprise est chiffrée au devis.",
       },
       // Vise « logiciel devis facture BTP » (carte SEO du 2026-10-15).
       {
@@ -415,261 +414,6 @@ const pageBtp: PageSecteur = {
  * celle du BTP (à l'ordre et au jour, et non à la personne et à la semaine) :
  * le calcul suit l'unité de travail du métier.
  */
-const TR_ORDRES_JOUR = 45;
-const TR_MINUTES_ORDRE = 4;
-const TR_JOURS = 220;
-const TR_COUT_HORAIRE = 35;
-const TR_HEURES_JOUR = (TR_ORDRES_JOUR * TR_MINUTES_ORDRE) / 60;
-const TR_HEURES_AN = TR_HEURES_JOUR * TR_JOURS;
-const TR_COUT_AN = TR_HEURES_AN * TR_COUT_HORAIRE;
-
-const pageTransport: PageSecteur = {
-  slug: "transport",
-  chemin: cheminSecteur("transport"),
-  seo: {
-    titre: "Logiciel de gestion de transport (TMS) · Eliott Bouquerel",
-    description: `TMS sur mesure pour votre entreprise de transport routier : ordres, tournées, CMR, preuves de livraison, facturation. Prix : ${aPartirDe(LOGICIEL, " HT")}, au devis.`,
-  },
-  h1: "Logiciel de gestion de transport",
-  resume: `Un logiciel de gestion de transport sur mesure, ou TMS, reçoit vos ordres de transport, organise les tournées, suit chaque livraison jusqu’à la preuve signée et prépare la facture. Il vise les PME du transport routier que les mails et les tableurs ne suivent plus. Son prix démarre à ${prixPlancher(LOGICIEL)} HT, et suit le nombre de modules.`,
-  marcheFilAriane: "Transport",
-  libelleLien: "logiciel de gestion de transport",
-  noteLlms:
-    "TMS sur mesure pour les PME du transport routier : ordres de transport, tournées, lettres de voiture et CMR, facturation",
-  accroche: "Ordres, tournées, preuves de livraison et facturation.",
-  sections: [
-    {
-      id: "metier",
-      titre: "De l’ordre de transport à la facture, 4 ressaisies",
-      paragraphes: [
-        "Un ordre arrive par mail, par téléphone ou dans le fichier d’un chargeur. L’exploitant le recopie dans le planning, le planning part au conducteur par message, la lettre de voiture se remplit à la main, et la preuve de livraison revient en photo ou en papier froissé le lendemain.",
-        "En fin de mois, la facturation reprend tout : le poids, les palettes, l’attente au quai, la surcharge gazole. Chaque étape recopie la précédente, et chaque copie peut faire tomber une ligne facturable.",
-      ],
-      points: [
-        {
-          titre: "Ordres de transport",
-          corps:
-            "Un format par chargeur, des adresses incomplètes, des créneaux de livraison noyés dans le corps du mail.",
-        },
-        {
-          titre: "Tournées et affrètement",
-          corps:
-            "L’exploitant arbitre entre vos camions et un confrère affrété de mémoire, sans voir la marge de chaque option.",
-        },
-        {
-          titre: "Lettres de voiture et CMR",
-          corps:
-            "Un document par envoi, la CMR pour l’international, et les réserves du destinataire à reporter quand il en émet.",
-        },
-        {
-          titre: "POD et litiges",
-          corps:
-            "Quand la preuve de livraison met une journée à refaire surface, la contestation du client traîne et la facture attend.",
-        },
-        {
-          titre: "Facturation et indexation gazole",
-          corps:
-            "Des grilles au poids, à la palette ou au mètre de plancher, des prestations annexes, et une surcharge gazole recalculée selon la clause de chaque contrat.",
-        },
-        {
-          titre: "Conducteurs et temps de service",
-          corps:
-            "Les heures de conduite, de travail et de repos à rapprocher des tournées prévues, sans reprendre à la main les fichiers du chronotachygraphe.",
-        },
-      ],
-    },
-    {
-      id: "modules",
-      titre: "De l’ordre au POD : ce que fait votre TMS sur mesure",
-      paragraphes: [
-        "Un TMS sur mesure suit votre exploitation telle qu’elle tourne : vos chargeurs, vos grilles tarifaires, votre affrètement. Le nombre de modules retenus fait l’essentiel du prix.",
-        "L’ordre importé ou saisi une seule fois devient la mission du conducteur, puis la ligne de facture, sans nouvelle frappe entre les deux.",
-      ],
-      points: [
-        {
-          titre: "Prise d’ordres",
-          corps:
-            "L’import des fichiers de vos chargeurs, ou la saisie par vos clients sur un espace à leur nom, avec contrôle des adresses et des créneaux.",
-        },
-        {
-          titre: "Planning et tournées",
-          corps:
-            "Le planning par camion et par conducteur, un ordre glissé d’une tournée à l’autre, et l’affrètement à un confrère avec sa marge affichée.",
-        },
-        {
-          titre: "Application conducteur",
-          corps:
-            "La mission sur le téléphone, la signature du destinataire, les photos et les réserves, et le POD renvoyé au bureau dès la remise.",
-        },
-        {
-          titre: "Documents de transport",
-          corps:
-            "Lettre de voiture et CMR produites depuis l’ordre, prêtes à imprimer, puis archivées avec la preuve de livraison.",
-        },
-        {
-          titre: "Facturation transport",
-          corps:
-            "Tarifs au poids, à la palette, au mètre de plancher ou au forfait, indexation gazole appliquée, factures regroupées par client en fin de mois.",
-        },
-      ],
-    },
-    {
-      id: "calcul",
-      titre: "Le prix d’une ressaisie de 4 minutes",
-      paragraphes: [
-        `Prenez une exploitation qui reçoit ${TR_ORDRES_JOUR} ordres de transport par jour. Recopier un ordre du mail vers le planning, puis vers la lettre de voiture et la facture, prend ${TR_MINUTES_ORDRE} minutes au total. La ressaisie occupe ${TR_HEURES_JOUR} heures par jour, soit ${TR_HEURES_AN} heures sur ${TR_JOURS} jours ouvrés.`,
-        `À ${euros(TR_COUT_HORAIRE)} l’heure chargée, elle coûte ${euros(TR_COUT_AN)} par an, sans compter les lignes oubliées à la facturation. Un TMS sur mesure démarre à ${prixPlancher(LOGICIEL)} HT, payé une fois. Remplacez ces hypothèses par vos chiffres : si le résultat tombe loin sous le prix de votre devis, gardez vos outils actuels.`,
-      ],
-      points: [
-        {
-          titre: `Hypothèse 1 : ${TR_ORDRES_JOUR} ordres par jour`,
-          corps:
-            "Pour trouver le vôtre, comptez les ordres d’une semaine ordinaire et divisez par 5.",
-        },
-        {
-          titre: `Hypothèse 2 : ${TR_MINUTES_ORDRE} minutes par ordre`,
-          corps:
-            "La saisie dans le planning, la reprise sur la lettre de voiture, puis la ligne de facture en fin de mois.",
-        },
-        {
-          titre: `Hypothèse 3 : ${euros(TR_COUT_HORAIRE)} l’heure`,
-          corps:
-            "Le salaire chargé d’un exploitant ou d’une assistante d’exploitation, avec les frais de son poste de travail.",
-        },
-        {
-          titre: `Hypothèse 4 : ${TR_JOURS} jours ouvrés`,
-          corps: "Une année sans les week-ends, les jours fériés ni les congés.",
-        },
-      ],
-    },
-    {
-      id: "marche",
-      titre: "TMS du marché ou TMS sur mesure ?",
-      paragraphes: [
-        "Les éditeurs de TMS couvrent bien le cas général, sur abonnement : ordres, planning, documents de transport, facturation. Pour une flotte en lot complet ou en messagerie classique, avec des chargeurs qui envoient des ordres propres, un TMS du marché fait le travail et démarre plus vite qu’un développement.",
-        "Le sur mesure prend le relais quand votre exploitation a ses propres règles, ou quand votre TMS tient l’essentiel et qu’une partie de votre journée se passe encore dans des tableurs à côté.",
-      ],
-      liens: {
-        titre: "Pour comparer",
-        items: [
-          {
-            libelle: "Outil sur mesure ou abonnements SaaS",
-            href: CHEMIN_ARTICLE_SAAS,
-            description:
-              "Avant de payer une licence de plus par camion ou par poste.",
-          },
-        ],
-      },
-      points: [
-        {
-          titre: "Un TMS du marché suffit",
-          corps:
-            "Des règles de tarification courantes, peu d’échanges de fichiers avec vos chargeurs, et une équipe prête à suivre les écrans de l’éditeur.",
-        },
-        {
-          titre: "Le sur mesure se justifie",
-          corps:
-            "Des chargeurs qui imposent leur format, une activité mixte entre transport et entreposage, ou une tarification que votre TMS ne sait pas calculer.",
-        },
-        {
-          titre: "Garder votre TMS",
-          corps: `À partir de ${prixPlancher(LOGICIEL)} HT, je branche la pièce manquante sur votre TMS actuel : l’import des ordres d’un gros chargeur, ou le calcul de l’indexation gazole.`,
-        },
-        {
-          titre: "Votre outil, vos données",
-          corps:
-            "Une fois livré, le logiciel vous appartient : code, base et hébergement. Aucune licence par camion ni par utilisateur ne s’ajoute quand la flotte grandit.",
-        },
-      ],
-    },
-    {
-      id: "methode",
-      titre: "La méthode, appliquée à votre exploitation",
-      paragraphes: [
-        "Je commence par relever où l’information se perd : quel ordre a été retapé, quelle ligne a sauté de la facture, quel POD a manqué. C’est la méthode suivie chez Würth France, dans un autre secteur, la distribution, sur un parcours de création de compte : −92 % d’erreurs, mesuré en interne.",
-      ],
-      liens: {
-        titre: "Pour aller plus loin",
-        items: [
-          {
-            libelle: "La solution métier",
-            href: CHEMIN_PILIER,
-            description: "Ce qui est compris, ligne à ligne, et ce qui fait varier le prix.",
-          },
-          LIEN_PRIX,
-          {
-            libelle: "Le cas Würth France",
-            href: CHEMIN_WURTH,
-            description:
-              "Un formulaire repris en partant des erreurs réellement commises.",
-          },
-          {
-            libelle: "Réserver un appel",
-            href: "#rendez-vous",
-            description: "Un créneau en visio pour parler de votre exploitation.",
-          },
-        ],
-      },
-      points: [
-        {
-          titre: "1. Un premier appel en visio",
-          corps:
-            "Sans frais. En réservant, vous répondez à 3 questions, budget, objectif et échéance, et je vous dis pendant l’appel ce que votre budget couvre.",
-        },
-        {
-          titre: "2. Un devis présenté à 2",
-          corps:
-            "Il ne part jamais seul par e-mail : je vous le présente lors d’un second rendez-vous, avec les modules, le prix ferme et la date de mise en ligne.",
-        },
-        {
-          titre: "3. Des modules testés sur de vrais ordres",
-          corps:
-            "Un seul projet à la fois. Chaque module arrive sur une adresse en ligne, et votre équipe d’exploitation l’essaie sur ses ordres du jour avant la livraison.",
-        },
-        {
-          titre: "4. Un logiciel à votre nom",
-          corps:
-            "Code dans votre dépôt, hébergement à votre nom, documentation remise : vous changez de prestataire quand vous le décidez.",
-        },
-      ],
-    },
-  ],
-  calcul: {
-    heuresParAn: TR_HEURES_AN,
-    coutHoraire: TR_COUT_HORAIRE,
-    coutAnnuel: TR_COUT_AN,
-  },
-  titreOffre: "Prix d’un TMS sur mesure : ce qui le fait varier",
-  faq: {
-    eyebrow: "FAQ",
-    titleLines: ["Votre TMS", "sur mesure."],
-    items: [
-      {
-        question: "Combien coûte un TMS sur mesure ?",
-        answer: `Le prix démarre à ${prixPlancher(LOGICIEL)} HT et monte avec les modules retenus, de l’import des ordres d’un chargeur jusqu’à la prise d’ordres, le planning et la facturation réunis. Un TMS qui dialogue dans les 2 sens avec vos autres systèmes coûte davantage. Le devis fixe le montant.`,
-      },
-      {
-        question: "Le logiciel peut-il importer les ordres de mes clients ?",
-        answer: `Oui, quand le chargeur envoie un fichier ou dispose d’une interface d’échange : chaque format compte comme un raccordement, chiffré au devis. Un ordre rédigé en texte libre passe par un formulaire qui contrôle adresses et créneaux.`,
-      },
-      {
-        question: "Mes conducteurs devront-ils installer une application ?",
-        answer:
-          "Non. La mission s’ouvre depuis un lien, dans le navigateur du téléphone : signature du destinataire, photos, réserves. Pour les zones sans réseau, je prévois au devis un envoi différé : la preuve part dès que le téléphone capte.",
-      },
-      {
-        question: "Le TMS calcule-t-il l’indexation gazole ?",
-        answer:
-          "Oui. Vous saisissez pour chaque contrat l’indice de référence et la part du gazole dans le prix, et le logiciel recalcule la surcharge à chaque nouvelle valeur de l’indice, puis l’ajoute aux factures concernées.",
-      },
-      {
-        question: "Avez-vous déjà développé un TMS ?",
-        answer:
-          "Non, pas pour une entreprise de transport. Le projet que je peux vous montrer chiffres à l’appui vient de la distribution : le parcours de création de compte de l’eShop de Würth France. J’en apporte la manière de faire : relever où l’information se perd, construire module par module, tester sur de vrais ordres.",
-      },
-    ],
-  },
-};
 
 /* ------------------------------------------------------------------------ */
 /* LOCATION DE MATÉRIEL                                                      */
@@ -841,7 +585,7 @@ const pageLocation: PageSecteur = {
         titre: "Pour aller plus loin",
         items: [
           {
-            libelle: "La solution métier",
+            libelle: "Le logiciel métier",
             href: CHEMIN_PILIER,
             description: "Ce qui est compris, et la liste de ce qui fait varier le prix.",
           },
@@ -1110,7 +854,7 @@ const pageNegoce: PageSecteur = {
               "Le parcours de création de compte de l’eShop, expliqué de bout en bout.",
           },
           {
-            libelle: "La solution métier en détail",
+            libelle: "Le logiciel métier en détail",
             href: CHEMIN_PILIER,
             description: "Ce qui est compris dès le plancher, et ce qui fait monter le prix.",
           },
@@ -1131,7 +875,7 @@ const pageNegoce: PageSecteur = {
         {
           titre: "2. Le devis, prix ferme compris",
           corps:
-            "Présenté lors d’un second rendez-vous : les modules, les raccordements à votre ERP ou à votre comptabilité, le prix et la date de mise en ligne.",
+            "Présenté lors d’un second rendez-vous : les modules, les raccordements à votre ERP ou à votre comptabilité, le prix et la date de mise en service.",
         },
         {
           titre: "3. Testé sur de vraies commandes",
@@ -1187,7 +931,6 @@ const pageNegoce: PageSecteur = {
 /** Toutes les pages secteur, dans l'ordre où la page pilier les liste. */
 export const pagesSecteur: readonly PageSecteur[] = [
   pageBtp,
-  pageTransport,
   pageLocation,
   pageNegoce,
 ];

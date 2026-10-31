@@ -5,7 +5,6 @@ import { blogPosts } from "./blog.ts";
 import { herosPages } from "./heros-pages.ts";
 import { legalDocuments } from "./legal.ts";
 import { prestations } from "./offre.ts";
-import { pageCaen } from "./page-caen.ts";
 
 /**
  * AUCUNE PAGE SANS PHOTO EN HÉROS.
@@ -23,7 +22,6 @@ const tous = [
   herosPages.introuvable,
   ...Object.values(herosPages.prestations),
   ...Object.values(herosPages.legal),
-  pageCaen.heroImage,
   ...blogPosts.map((p) => p.heroImage),
 ];
 

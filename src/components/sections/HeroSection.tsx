@@ -24,11 +24,10 @@ import { DemanderAssistant } from "@/components/pages/agent/DemanderAssistant";
 /**
  * Héros de l'accueil, refait le 2026-10-15.
  *
- * DEUX PORTES. Eliott : « un site qui vous ramène des clients, un outil qui
- * vous rend des heures ». Le h1 EST la liste des deux offres : chaque porte est
- * un lien vers sa prestation, avec son prix d'entrée. Au-dessus, la phrase qui
- * le distingue d'une agence ; en bas, deux preuves, dont la comparaison de prix
- * sourcée.
+ * UNE PORTE DEPUIS LE 2026-10-31 (une seule offre). Le h1 est un lien vers
+ * l'offre, avec son prix d'entrée. Au-dessus, ce qui est vendu ; en bas, la
+ * comparaison de prix sourcée. `doors` reste une liste : le jour où il en
+ * faudrait une seconde, le gabarit la rend.
  *
  * CE QUI EST PARTI, et pourquoi. Le logotype géant « Bouquerel » redisait le
  * logo de l'en-tête et prenait le premier rang de lecture au titre ; le cadre
@@ -69,17 +68,10 @@ function Porte({ porte, index }: { porte: HeroDoor; index: number }) {
     <a
       href={porte.href}
       data-part="hero-porte"
-      className="hero-porte group relative grid grid-cols-[minmax(0,1fr)_auto] items-end gap-x-[16px] gap-y-[10px] py-[16px] text-foreground no-underline tablet:grid-cols-[48px_minmax(0,1fr)_auto_auto] tablet:gap-y-0 tablet:py-[24px]"
+      className="hero-porte group relative grid grid-cols-[minmax(0,1fr)_auto] items-end gap-x-[16px] gap-y-[10px] py-[16px] text-foreground no-underline tablet:grid-cols-[minmax(0,1fr)_auto_auto] tablet:gap-y-0 tablet:py-[24px]"
       style={delai(base)}
     >
-      <span
-        aria-hidden
-        className="hero-fond col-start-1 row-start-1 hidden self-start pt-[10px] text-[13px] font-medium tabular-nums leading-none tracking-[-0.01em] text-foreground-60 tablet:block"
-        style={delai(base + 200)}
-      >
-        {String(index + 1).padStart(2, "0")}
-      </span>
-      <span className="hero-porte-titre col-start-1 row-start-1 min-w-0 tablet:col-start-2 text-[clamp(31px,calc(8.6vw/var(--zoom-ecran,1)),46px)] font-semibold leading-[0.95] tracking-[-0.045em] tablet:text-[clamp(46px,calc(5.6vw/var(--zoom-ecran,1)),80px)] tablet:leading-[0.92]">
+      <span className="hero-porte-titre col-start-1 row-start-1 min-w-0 text-[clamp(38px,calc(11vw/var(--zoom-ecran,1)),60px)] font-semibold leading-[0.95] tracking-[-0.045em] tablet:text-[clamp(56px,calc(7.4vw/var(--zoom-ecran,1)),108px)] tablet:leading-[0.92]">
         {porte.lines.map((ligne, i) => (
           <span key={ligne} className="hero-ligne">
             <span
@@ -93,13 +85,13 @@ function Porte({ porte, index }: { porte: HeroDoor; index: number }) {
         ))}
       </span>
       <span
-        className="hero-fond col-start-1 row-start-2 whitespace-nowrap text-[13px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60 transition-colors duration-200 group-hover:text-foreground tablet:col-start-3 tablet:row-start-1 tablet:self-end tablet:pb-[16px] tablet:text-[14px]"
+        className="hero-fond col-start-1 row-start-2 whitespace-nowrap text-[13px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60 transition-colors duration-200 group-hover:text-foreground tablet:col-start-2 tablet:row-start-1 tablet:self-end tablet:pb-[16px] tablet:text-[14px]"
         style={delai(base + 260)}
       >
         {porte.price}
       </span>
       <span
-        className="hero-fond col-start-2 row-start-1 self-end tablet:col-start-4"
+        className="hero-fond col-start-2 row-start-1 self-end tablet:col-start-3"
         style={delai(base + 300)}
       >
         <span className="hero-porte-fleche flex h-[44px] w-[44px] items-center justify-center rounded-full border border-white/20 text-foreground">
@@ -491,7 +483,7 @@ export function HeroSection({
             </p>
           ) : null}
 
-          {/* LE SEUL h1 DE L'ACCUEIL : les deux portes. `id="services"` : la
+          {/* LE SEUL h1 DE L'ACCUEIL : l'offre, depuis le 2026-10-31. `id="services"` : la
               marche « Prestations » des fils d'Ariane (`/#services`) y mène
               depuis que l'accordéon a quitté l'accueil (2026-10-16). */}
           <h1 id="services" data-part="hero-titre" className="hero-portes m-0 mt-[18px] tablet:mt-[34px]">
@@ -515,7 +507,7 @@ export function HeroSection({
               style={delai(620)}
             >
               <a
-                href={lienRendezVous("decouverte")}
+                href={lienRendezVous("logiciel")}
                 className="hero-cta flex h-[48px] flex-none items-center justify-center bg-accent px-[20px] text-[13px] font-semibold uppercase leading-none tracking-[-0.01em] text-accent-ink no-underline"
               >
                 {uiLabels.services.rdvLabel}

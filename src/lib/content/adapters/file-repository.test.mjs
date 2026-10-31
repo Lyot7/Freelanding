@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test";
 
+import { pagesMetier } from "../../../content/metiers.ts";
 import { createFileContentRepository } from "./file-repository";
 
 /**
@@ -29,9 +30,8 @@ const PAGES_FIXES = [
   "/a-propos",
   "/blog",
   "/realisations",
-  "/creation-site-internet-caen",
   "/logiciel-sur-mesure-caen",
-  "/services/site-vitrine/prix",
+  "/logiciel-metier",
   "/services/logiciel-metier/prix",
   "/realisations/kpsull",
   "/realisations/wurth-creation-de-compte",
@@ -48,11 +48,12 @@ describe("file content repository", () => {
     const routes = await repository.getRoutes();
     const pathnames = routes.map(({ pathname }) => pathname);
 
-    // Les routes DÉRIVÉES (articles, prestations, pages secteur) sont écartées
-    // ici : elles ont chacune leur propre test d'invariant
-    // (`pages-secteur.test.mjs` pour les secteurs). Ce qui reste doit
-    // correspondre, dans l'ordre, aux pages écrites à la main dans le manifeste.
-    const derivees = new Set(["post", "service", "secteur", "theme"]);
+    // Les routes DÉRIVÉES (articles, prestations, pages secteur, pages par
+    // métier) sont écartées ici : elles ont chacune leur propre test
+    // d'invariant (`pages-secteur.test.mjs` pour les secteurs, `metiers.test.mjs`
+    // pour les métiers). Ce qui reste doit correspondre, dans l'ordre, aux pages
+    // écrites à la main dans le manifeste, hub des métiers compris.
+    const derivees = new Set(["post", "service", "secteur", "theme", "metier"]);
     const fixes = routes
       .filter(({ kind }) => !derivees.has(kind))
       .map(({ pathname }) => pathname);
@@ -60,6 +61,19 @@ describe("file content repository", () => {
     // Aucun doublon : une route servie deux fois produirait deux entrées de
     // sitemap pour une même page.
     expect(new Set(pathnames).size).toBe(pathnames.length);
+  });
+
+  it("annonce exactement un chemin par page métier publiée, et aucun autre", async () => {
+    // Les pages par métier sont dérivées de `metiers.ts` : une page publiée
+    // entre seule au sitemap, un brouillon n'y entre pas.
+    const routes = await repository.getRoutes();
+    const metiers = routes
+      .filter(({ kind }) => kind === "metier")
+      .map(({ pathname }) => pathname)
+      .sort();
+    expect(metiers).toEqual(pagesMetier.map((p) => p.chemin).sort());
+    expect(metiers.length).toBeGreaterThan(0);
+    for (const chemin of metiers) expect(chemin.startsWith("/logiciel-metier/")).toBe(true);
   });
 
   it("annonce exactement un chemin par article publié, et aucun autre", async () => {
