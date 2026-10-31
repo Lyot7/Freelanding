@@ -9,6 +9,7 @@ import {
   entreesMetier,
   lirePage,
   motifsDeRefus,
+  pageDuCorps,
   pageMetier,
   pagesHub,
   pagesMetier,
@@ -87,6 +88,8 @@ describe("une page n'est publiée que si elle est propre à son métier", () => 
 
 describe("le fichier de données se relit avant de servir", () => {
   const page = entreesMetier[0];
+  const TABLEAU = page.blocs.find((b) => b.type === "tableau");
+  const ETAPES = page.blocs.find((b) => b.type === "etapes");
   const CAS = [
     ["entrée", null],
     ["slug", { ...page, slug: "Pas Un Slug" }],
@@ -101,6 +104,12 @@ describe("le fichier de données se relit avant de servir", () => {
     ["blocs", { ...page, blocs: [{ ...page.blocs[0], type: "inconnu" }] }],
     ["blocs", { ...page, blocs: [{ id: "a" }] }],
     ["blocs", { ...page, blocs: [{ ...page.blocs[0], paragraphes: [] }] }],
+    ["blocs", { ...page, blocs: [{ ...page.blocs[0], liens: { titre: "t", items: [] } }] }],
+    ["blocs", { ...page, blocs: [{ ...page.blocs[0], liens: "pas un objet" }] }],
+    ["blocs", { ...page, blocs: [{ ...TABLEAU, total: "pas une liste" }] }],
+    ["blocs", { ...page, blocs: [{ ...TABLEAU, note: { texte: "un objet" } }] }],
+    ["blocs", { ...page, blocs: [{ ...ETAPES, etapes: [{ ...ETAPES.etapes[0], passe: 3 }] }] }],
+    ["validationId", { ...page, validationId: 3 }],
     ["faq", { ...page, faq: null }],
     ["faq", { ...page, faq: { ...page.faq, items: [] } }],
   ];
@@ -113,6 +122,55 @@ describe("le fichier de données se relit avant de servir", () => {
 
   test("une entrée valide revient telle quelle, pour chaque nature de bloc", () => {
     for (const entree of entreesMetier) expect(lirePage(entree, 0)).toBe(entree);
+  });
+
+  test("les champs optionnels bien formés passent", () => {
+    const liens = { titre: "Voir", items: [{ href: "/a", libelle: "A", description: "Le lien A" }] };
+    const entree = {
+      ...page,
+      validationId: "une-validation",
+      blocs: [
+        { ...TABLEAU, liens, total: ["Total"], note: "Une note" },
+        { ...ETAPES, etapes: [{ ...ETAPES.etapes[0], passe: "La suite" }] },
+      ],
+    };
+    expect(lirePage(entree, 0)).toBe(entree);
+  });
+});
+
+describe("le corps d'une validation du cockpit", () => {
+  const sansDate = { ...entreesMetier[0], date: undefined };
+  const corps = JSON.stringify(sansDate);
+
+  test("se relit et prend la date du jour", () => {
+    const page = pageDuCorps(corps, sansDate.slug, "2026-11-02", 3);
+    expect(page.date).toBe("2026-11-02");
+    expect(page.h1).toBe(sansDate.h1);
+  });
+
+  test("n'impose ni sa date, ni sa validation, ni un champ inconnu", () => {
+    const brut = JSON.stringify({ ...sansDate, date: "1999-01-01", validationId: "x", reassurance: { a: 1 } });
+    const page = pageDuCorps(brut, sansDate.slug, "2026-11-02", 3);
+    expect(page.date).toBe("2026-11-02");
+    expect(page).not.toHaveProperty("validationId");
+    expect(page).not.toHaveProperty("reassurance");
+  });
+
+  test("illisible, il le dit", () => {
+    expect(() => pageDuCorps("<mdx/>", "a", "2026-11-02", 3)).toThrow("n’est pas un JSON lisible");
+  });
+
+  test("autre chose qu'un objet est refusé par la relecture", () => {
+    expect(() => pageDuCorps("[1]", "a", "2026-11-02", 3)).toThrow("metiers.json, entrée 3 : entrée invalide");
+  });
+
+  test("un champ manquant se nomme", () => {
+    const brut = JSON.stringify({ ...sansDate, faq: null });
+    expect(() => pageDuCorps(brut, sansDate.slug, "2026-11-02", 3)).toThrow("faq invalide");
+  });
+
+  test("le slug doit être celui de la validation", () => {
+    expect(() => pageDuCorps(corps, "autre", "2026-11-02", 3)).toThrow("différent de la validation");
   });
 });
 

@@ -1,15 +1,22 @@
 import { describe, expect, it } from "bun:test";
+import { entreesMetier } from "../src/content/metiers.ts";
 import {
   CONTROLES,
   RELEVES_DEPLOIEMENT,
   choisir,
+  choisirPage,
   clientCockpit,
   empreinte,
+  enEchec,
+  entreePage,
+  estPage,
   estWeekEnd,
   extrait,
+  inscrits,
   publierAuto,
   repondEnLigne,
   signalerIndexNow,
+  urlPage,
 } from "./publication.ts";
 
 /** Jeudi 15 octobre 2026, 10 h à Paris. */
@@ -30,6 +37,17 @@ const article = (slug, autre = {}) => ({
   ...autre,
 });
 
+/** Une page par métier validée : son corps est une entrée de `metiers.json`, sans date. */
+const page = (slug, autre = {}) => ({
+  id: `id-${slug}`,
+  titre: `Page ${slug}`,
+  corps: JSON.stringify({ ...entreesMetier[0], date: undefined, slug }),
+  article: { kind: "metier", slug, visuel: { svg: "<svg/>", alt: "Un visuel" } },
+  ...autre,
+});
+
+const entreeMetier = (slug, date, validationId) => ({ ...entreesMetier[0], slug, date, validationId });
+
 const entree = (slug, date) => ({
   slug,
   title: slug,
@@ -45,30 +63,49 @@ const entree = (slug, date) => ({
 function monde(o) {
   const traces = [];
   const registre = [...(o.registre ?? [])];
+  const pages = [...(o.pages ?? [])];
   let releves = 0;
+  let commits = 0;
   const outils = {
     cockpit: {
-      articles: async () => o.articles ?? [],
+      articles: async () => {
+        traces.push("lecture du cockpit");
+        return o.articles ?? [];
+      },
       publie: async (id, url) => {
         traces.push(`publie ${id} ${url}`);
+        if (o.publieLeve) throw new Error("cockpit coupé");
         return true;
       },
       echec: async (id, motif) => {
         traces.push(`echec ${id} ${motif.split("\n")[0]}`);
+        traces.push(`motif ${id} ${motif}`);
+        if (o.echecLeve) throw new Error("cockpit coupé");
       },
     },
     registre: () => registre,
+    pages: () => pages,
     existe: (slug) => slug === "fichier-deja-la",
     ecrire: async (a, date) => {
+      if (o.ecrireLeve) throw o.ecrireLeve;
       traces.push(`ecrire ${a.article.slug} ${date}`);
       registre.unshift(entree(a.article.slug, date));
     },
-    annuler: () => traces.push("annuler"),
+    ecrirePage: async (a, e) => {
+      traces.push(`ecrirePage ${a.article.slug} ${e.date} ${e.validationId}`);
+      pages.push(e);
+    },
+    annuler: (tete) => {
+      traces.push("annuler", `annuler vers ${tete}`);
+    },
     executer: (commande, args) => {
       const ligne = `${commande} ${args.join(" ")}`;
       if (ligne === "git status --porcelain") return { ok: true, sortie: o.sale ? " M src/content/blog.ts\n" : "" };
+      if (ligne === "git rev-parse HEAD") return { ok: true, sortie: `commit-${commits}\n` };
       traces.push(ligne);
-      return { ok: !o.echoue?.(ligne), sortie: `sortie de ${ligne}\nerreur détaillée` };
+      const ok = !o.echoue?.(ligne);
+      if (ok && commande === "git" && args[0] === "commit") commits++;
+      return { ok, sortie: `sortie de ${ligne}\nerreur détaillée` };
     },
     enLigne: async (url) => (o.enLigne ?? (() => false))(url, releves++),
     indexNow: async (url) => `IndexNow ${url}`,
@@ -97,8 +134,10 @@ describe("publierAuto : la validation d'Eliott vaut feu vert", () => {
 
   it("à blanc : rien de validé, rien d'écrit ni de poussé", async () => {
     const { outils, traces } = monde({});
-    expect(await publierAuto(outils)).toEqual({ etat: "rien", confirmes: [], ignores: [] });
-    expect(traces).toEqual([]);
+    const issue = await publierAuto(outils);
+    expect(issue).toEqual({ etat: "rien", confirmes: [], ignores: [] });
+    expect(enEchec(issue)).toBe(false);
+    expect(traces).toEqual(["lecture du cockpit"]);
   });
 
   it("un article par jour ouvré : rien le week-end, rien si un article est parti aujourd'hui", async () => {
@@ -166,10 +205,233 @@ describe("publierAuto : la validation d'Eliott vaut feu vert", () => {
   });
 });
 
+describe("la page par métier : son quota, sa chaîne, ses échecs à elle", () => {
+  const COMMIT_ARTICLE = "git commit -m 📝 Publier l'article un-article";
+  const COMMIT_PAGE = "git commit -m 📝 Publier la page métier garage-automobile";
+  const URL_ARTICLE = "https://eliottbouquerel.fr/blog/un-article";
+  const URL_PAGE = "https://eliottbouquerel.fr/logiciel-metier/garage-automobile";
+  const LES_DEUX = [article("un-article"), page("garage-automobile")];
+
+  it("une exécution publie l'article et la page, chacun son commit, datés du jour", async () => {
+    const { outils, traces } = monde({ articles: LES_DEUX, enLigne: () => true });
+    const issue = await publierAuto(outils);
+    expect(issue).toMatchObject({
+      etat: "publie",
+      url: URL_ARTICLE,
+      page: { etat: "publie", url: URL_PAGE },
+    });
+    expect(traces).toContain("ecrire un-article 2026-10-15");
+    expect(traces).toContain("ecrirePage garage-automobile 2026-10-15 id-garage-automobile");
+    expect(traces).toContain(COMMIT_ARTICLE);
+    expect(traces).toContain(COMMIT_PAGE);
+    expect(traces.filter((t) => t === "bun run build")).toHaveLength(2);
+    expect(traces.filter((t) => t === "git push origin HEAD:main")).toHaveLength(2);
+    expect(traces).toContain(`publie id-un-article ${URL_ARTICLE}`);
+    expect(traces).toContain(`publie id-garage-automobile ${URL_PAGE}`);
+    expect(traces).toContain(`journal IndexNow ${URL_PAGE}`);
+    expect(enEchec(issue)).toBe(false);
+  });
+
+  it("le corps d'une page n'est jamais écrit comme un article", async () => {
+    const { outils, traces } = monde({ articles: [page("garage-automobile")], enLigne: () => true });
+    const issue = await publierAuto(outils);
+    expect(issue).toMatchObject({ etat: "rien", page: { etat: "publie", url: URL_PAGE } });
+    expect(traces.some((t) => t.startsWith("ecrire "))).toBe(false);
+  });
+
+  it("un article sans kind suit sa chaîne seul, et l'issue ne parle pas de page", async () => {
+    const { outils, traces } = monde({ articles: [article("un-article")], enLigne: () => true });
+    const issue = await publierAuto(outils);
+    expect(issue).toEqual({ etat: "publie", url: URL_ARTICLE, confirmes: [], ignores: [] });
+    expect(traces.some((t) => t.startsWith("ecrirePage"))).toBe(false);
+  });
+
+  it("quotas indépendants : un article du jour n'arrête pas la page, une page du jour n'arrête pas l'article", async () => {
+    const articleParti = monde({
+      articles: LES_DEUX,
+      registre: [entree("ce-matin", "2026-10-15")],
+      enLigne: (url) => url === URL_PAGE,
+    });
+    expect(await publierAuto(articleParti.outils)).toMatchObject({ etat: "deja-publie", page: { etat: "publie" } });
+    expect(articleParti.traces.some((t) => t.startsWith("ecrire "))).toBe(false);
+
+    const pageDuJour = monde({
+      articles: LES_DEUX,
+      pages: [entreeMetier("ce-matin", "2026-10-15")],
+      enLigne: (url) => url === URL_ARTICLE,
+    });
+    expect(await publierAuto(pageDuJour.outils)).toMatchObject({ etat: "publie", page: { etat: "deja-publie" } });
+    expect(pageDuJour.traces.some((t) => t.startsWith("ecrirePage"))).toBe(false);
+  });
+
+  it("une page d'hier ne compte pas dans le quota du jour", async () => {
+    const { outils } = monde({
+      articles: [page("garage-automobile")],
+      pages: [],
+      enLigne: () => true,
+    });
+    outils.pages = () => [{ ...entreesMetier[1], date: "2026-10-14" }];
+    expect((await publierAuto(outils)).page).toMatchObject({ etat: "publie" });
+  });
+
+  it("les deux quotas pris : le cockpit n'est même pas lu", async () => {
+    const { outils, traces } = monde({
+      articles: LES_DEUX,
+      registre: [entree("ce-matin", "2026-10-15")],
+      pages: [entreeMetier("ce-matin", "2026-10-15")],
+    });
+    expect(await publierAuto(outils)).toMatchObject({ etat: "deja-publie", page: { etat: "deja-publie" } });
+    expect(traces).toEqual([]);
+  });
+
+  it("le week-end, rien pour personne", async () => {
+    const { outils, traces } = monde({ articles: LES_DEUX, maintenant: SAMEDI });
+    expect(await publierAuto(outils)).toEqual({ etat: "repos", confirmes: [], ignores: [] });
+    expect(traces).toEqual([]);
+  });
+
+  it("l'échec de l'article n'empêche pas la page", async () => {
+    let builds = 0;
+    const { outils, traces } = monde({
+      articles: LES_DEUX,
+      echoue: (ligne) => ligne === "bun run build" && builds++ === 0,
+      enLigne: () => true,
+    });
+    const issue = await publierAuto(outils);
+    expect(issue).toMatchObject({ etat: "echec", page: { etat: "publie", url: URL_PAGE } });
+    expect(traces).toContain("echec id-un-article Contrôle « bun run build » en échec, rien n'est parti :");
+    expect(traces).not.toContain(COMMIT_ARTICLE);
+    expect(traces).toContain(COMMIT_PAGE);
+    expect(enEchec(issue)).toBe(true);
+  });
+
+  it("l'échec de la page n'empêche pas l'article et ne le défait pas", async () => {
+    let builds = 0;
+    const { outils, traces } = monde({
+      articles: LES_DEUX,
+      echoue: (ligne) => ligne === "bun run build" && builds++ === 1,
+      enLigne: () => true,
+    });
+    const issue = await publierAuto(outils);
+    expect(issue).toMatchObject({ etat: "publie", url: URL_ARTICLE, page: { etat: "echec" } });
+    expect(traces).toContain(COMMIT_ARTICLE);
+    expect(traces).not.toContain(COMMIT_PAGE);
+    expect(traces).toContain("annuler vers commit-1");
+    expect(traces).toContain(`publie id-un-article ${URL_ARTICLE}`);
+    expect(traces).toContain("echec id-garage-automobile Contrôle « bun run build » en échec, rien n'est parti :");
+    expect(enEchec(issue)).toBe(true);
+  });
+
+  it("corps illisible : motif sur la carte, rien d'écrit, rien de poussé, l'article part", async () => {
+    const illisible = page("garage-automobile", { corps: "pas du JSON {" });
+    const { outils, traces } = monde({ articles: [article("un-article"), illisible], enLigne: () => true });
+    const issue = await publierAuto(outils);
+    expect(issue).toMatchObject({ etat: "publie", page: { etat: "echec" } });
+    expect(issue.page.motif).toContain("n’est pas un JSON lisible");
+    expect(traces).toContain("echec id-garage-automobile Écriture refusée, rien n'est parti :");
+    expect(traces.some((t) => t.startsWith("ecrirePage"))).toBe(false);
+    expect(traces).not.toContain(COMMIT_PAGE);
+    expect(traces.filter((t) => t === "git push origin HEAD:main")).toHaveLength(1);
+  });
+
+  it("entrée refusée par lirePage ou motifsDeRefus : le motif le dit, rien n'est poussé", async () => {
+    const sansH1 = page("garage-automobile", {
+      corps: JSON.stringify({ ...JSON.parse(page("garage-automobile").corps), h1: "" }),
+    });
+    const parLirePage = monde({ articles: [sansH1] });
+    expect((await publierAuto(parLirePage.outils)).page.motif).toContain("h1 invalide");
+    expect(parLirePage.traces.some((t) => t.startsWith("git push"))).toBe(false);
+
+    const copie = page("garage-automobile");
+    const parRefus = monde({ articles: [copie], pages: [entreeMetier("autre-metier", "2026-10-01")] });
+    const { page: volet } = await publierAuto(parRefus.outils);
+    expect(volet.motif).toContain("Page refusée");
+    expect(volet.motif).toContain("trop proche de autre-metier");
+    expect(parRefus.traces.some((t) => t.startsWith("git push"))).toBe(false);
+  });
+
+  it("une écriture qui lève ne casse pas la chaîne : la carte de l'article le dit, la page part", async () => {
+    const { outils, traces } = monde({
+      articles: LES_DEUX,
+      ecrireLeve: new Error("Visuel refusé : élément interdit"),
+      enLigne: () => true,
+    });
+    const issue = await publierAuto(outils);
+    expect(issue).toMatchObject({ etat: "echec", page: { etat: "publie" } });
+    expect(issue.motif).toContain("Visuel refusé");
+    expect(traces).toContain("annuler");
+    expect(traces).toContain("echec id-un-article Écriture refusée, rien n'est parti :");
+  });
+
+  it("une erreur qui n'en est pas une reste lisible", async () => {
+    const { outils } = monde({ articles: [article("un-article")], ecrireLeve: "texte brut" });
+    expect((await publierAuto(outils)).motif).toContain("texte brut");
+  });
+
+  it("un cockpit muet sur le motif n'arrête pas l'autre nature, le journal le garde", async () => {
+    let builds = 0;
+    const { outils, traces } = monde({
+      articles: LES_DEUX,
+      echecLeve: true,
+      echoue: (ligne) => ligne === "bun run build" && builds++ === 0,
+      enLigne: () => true,
+    });
+    expect(await publierAuto(outils)).toMatchObject({ etat: "echec", page: { etat: "publie" } });
+    expect(traces).toContain("journal Motif non posé sur la carte de un-article : cockpit coupé");
+  });
+
+  it("un cockpit muet après la mise en ligne ne fait pas passer la page pour un échec", async () => {
+    const { outils, traces } = monde({ articles: [page("garage-automobile")], publieLeve: true, enLigne: () => true });
+    expect((await publierAuto(outils)).page).toMatchObject({ etat: "publie" });
+    expect(traces).toContain("journal Publication de garage-automobile non confirmée au cockpit : cockpit coupé");
+  });
+
+  it("une seule des deux répond : chacune son issue, et 20 minutes d'attente au total", async () => {
+    let attentes = 0;
+    const { outils, traces } = monde({ articles: LES_DEUX, enLigne: (url) => url === URL_ARTICLE });
+    outils.attendre = async () => {
+      attentes++;
+    };
+    const issue = await publierAuto(outils);
+    expect(issue).toMatchObject({ etat: "publie", page: { etat: "echec" } });
+    expect(issue.page.motif).toContain("déploiement Coolify");
+    expect(attentes).toBe(RELEVES_DEPLOIEMENT);
+    expect(traces.filter((t) => t.startsWith("publie"))).toEqual([`publie id-un-article ${URL_ARTICLE}`]);
+    expect(traces.some((t) => t.startsWith("echec id-garage-automobile Poussé sur le site"))).toBe(true);
+  });
+
+  it("confirme une page récente qui répond enfin, jamais une page écrite à la main", async () => {
+    const { outils, traces } = monde({
+      pages: [
+        entreeMetier("hier", "2026-10-14", "id-hier"),
+        entreeMetier("ancienne", "2026-09-10", "id-ancienne"),
+        entreeMetier("a-la-main", "2026-10-14"),
+      ],
+      enLigne: () => true,
+    });
+    const issue = await publierAuto(outils);
+    expect(issue.confirmes).toEqual([urlPage("hier")]);
+    expect(traces.filter((t) => t.startsWith("publie"))).toEqual([`publie id-hier ${urlPage("hier")}`]);
+  });
+
+  it("inscrits : articles et pages validés, avec leur adresse", () => {
+    const liste = inscrits({
+      registre: () => [entree("a", "2026-10-14")],
+      pages: () => [entreeMetier("b", "2026-10-14", "id-b"), entreeMetier("c", "2026-10-14")],
+    });
+    expect(liste).toEqual([
+      { slug: "a", date: "2026-10-14", id: "id-a", url: "https://eliottbouquerel.fr/blog/a" },
+      { slug: "b", date: "2026-10-14", id: "id-b", url: "https://eliottbouquerel.fr/logiciel-metier/b" },
+    ]);
+  });
+});
+
 describe("dossier modifié", () => {
   it("ne touche à rien sur un dossier déjà modifié", async () => {
-    const { outils, traces } = monde({ articles: [article("a")], sale: true });
-    expect(await publierAuto(outils)).toMatchObject({ etat: "echec" });
+    const { outils, traces } = monde({ articles: [article("a"), page("b")], sale: true });
+    const issue = await publierAuto(outils);
+    expect(issue).toMatchObject({ etat: "echec" });
+    expect(enEchec(issue)).toBe(true);
     expect(traces).toEqual([]);
   });
 });
@@ -193,6 +455,68 @@ describe("choisir", () => {
   it("retente le lendemain un échec sur le même texte", () => {
     const hier = article("hier", { publication: { echec: "x", le: "2026-10-14T07:00:00Z", empreinte: empreinte("Corps de hier.") } });
     expect(choisir([hier], { registre: () => [], existe: () => false }, JEUDI).article).toBe(hier);
+  });
+});
+
+describe("choisirPage", () => {
+  it("écarte sans visuel, déjà présente, ou en échec sur le même texte, et ignore les articles", () => {
+    const enEchecMemeTexte = page("en-echec");
+    enEchecMemeTexte.publication = {
+      echec: "x",
+      le: "2026-10-15T07:00:00Z",
+      empreinte: empreinte(enEchecMemeTexte.corps),
+    };
+    const sansVisuel = page("sans-visuel");
+    sansVisuel.article.visuel = undefined;
+    const { page: retenue, ignores } = choisirPage(
+      [article("un-article"), sansVisuel, page("deja-la"), enEchecMemeTexte, page("bonne")],
+      { pages: () => [entreeMetier("deja-la", "2026-10-01")] },
+      JEUDI,
+    );
+    expect(retenue?.article.slug).toBe("bonne");
+    expect(ignores).toEqual([
+      "sans-visuel : pas encore de visuel",
+      "deja-la : déjà présent sur le site",
+      "en-echec : en échec, retenté quand son texte change ou demain",
+    ]);
+  });
+
+  it("une page écartée se dit dans l'issue, même sans rien publier", async () => {
+    const sansVisuel = page("sans-visuel");
+    sansVisuel.article.visuel = undefined;
+    const { outils } = monde({ articles: [sansVisuel] });
+    expect(await publierAuto(outils)).toEqual({
+      etat: "rien",
+      confirmes: [],
+      ignores: [],
+      page: { etat: "rien", ignores: ["sans-visuel : pas encore de visuel"] },
+    });
+  });
+
+  it("choisir n'écrit jamais une page comme un article, un article sans kind reste un article", () => {
+    const outils = { registre: () => [], existe: () => false };
+    expect(choisir([page("p")], outils, JEUDI)).toEqual({ article: null, ignores: [] });
+    const nul = article("a");
+    nul.article.kind = null;
+    expect(estPage(nul)).toBe(false);
+    expect(choisir([page("p"), nul], outils, JEUDI).article).toBe(nul);
+  });
+});
+
+describe("entreePage", () => {
+  it("relit le corps, pose la date et la validation", () => {
+    const e = entreePage(page("garage-automobile"), "2026-10-15", []);
+    expect(e).toMatchObject({ slug: "garage-automobile", date: "2026-10-15", validationId: "id-garage-automobile" });
+  });
+
+  it("refuse un corps dont le slug n'est pas celui de la validation", () => {
+    const a = page("garage-automobile", { article: { kind: "metier", slug: "autre" } });
+    expect(() => entreePage(a, "2026-10-15", [])).toThrow("Slug du corps (garage-automobile) différent de la validation (autre)");
+  });
+
+  it("garde le rang de la future entrée dans son message", () => {
+    const a = page("x", { corps: "[]" });
+    expect(() => entreePage(a, "2026-10-15", [entreeMetier("y", "2026-10-01")])).toThrow("metiers.json, entrée 1 : entrée invalide");
   });
 });
 

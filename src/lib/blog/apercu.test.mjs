@@ -2,7 +2,16 @@ import { describe, expect, it } from "bun:test";
 import { blogPosts } from "../../content/blog.ts";
 import { dureeLecture, entreeDuCockpit, rubriquePour } from "../../content/blog-cockpit.ts";
 import { sommaireDeLArticle, sommaireDuTexte } from "./sommaire.ts";
-import { articleDApercu, chargerApercu, demandeApercu, lireReponse, uriSvg } from "./apercu.ts";
+import { entreesMetier } from "../../content/metiers.ts";
+import {
+  articleDApercu,
+  chargerApercu,
+  demandeApercu,
+  estPageApercu,
+  lireReponse,
+  pageDApercu,
+  uriSvg,
+} from "./apercu.ts";
 
 const ID = "51250e11-5b57-4399-b845-f62846b0484b";
 const SIG = "a".repeat(43);
@@ -115,5 +124,56 @@ describe("métadonnées partagées avec la publication", () => {
       { id: "un-titre", titre: "Un **titre**" },
       { id: "deux", titre: "Deux" },
     ]);
+  });
+});
+
+describe("la page par métier en aperçu", () => {
+  const sansDate = { ...entreesMetier[0], date: undefined };
+  const SVG = "<svg xmlns='http://www.w3.org/2000/svg'/>";
+  const reponseMetier = {
+    titre: "Échafaudage",
+    corps: JSON.stringify(sansDate),
+    article: { kind: "metier", slug: sansDate.slug, visuel: { svg: SVG, alt: "Un visuel" } },
+  };
+  const apercu = (autre = {}) => lireReponse(ID, { ...reponseMetier, ...autre });
+
+  it("lireReponse garde kind, le slug et le visuel, sans exiger ce qui ne sert qu'aux articles", () => {
+    const lu = apercu();
+    expect(lu?.article).toEqual({ kind: "metier", slug: sansDate.slug, visuel: { svg: SVG, alt: "Un visuel" } });
+    expect(estPageApercu(lu)).toBe(true);
+  });
+
+  it("sans kind, c'est un article, avec ses exigences", () => {
+    expect(estPageApercu(lireReponse(ID, reponse))).toBe(false);
+    expect(lireReponse(ID, { ...reponse, article: { slug: "a" } })).toBeNull();
+    expect(lireReponse(ID, { ...reponse, article: { kind: "metier" } })).toBeNull();
+  });
+
+  it("une page propre se montre sans motif, avec son visuel en SVG", () => {
+    const rendu = pageDApercu(apercu(), "2026-10-15", []);
+    expect(rendu.motifs).toEqual([]);
+    expect(rendu.page).toMatchObject({ slug: sansDate.slug, date: "2026-10-15", chemin: `/logiciel-metier/${sansDate.slug}` });
+    expect(rendu.visuel).toEqual({ src: uriSvg(SVG), alt: sansDate.image.alt });
+  });
+
+  it("une page qui ne partirait pas se montre avec ses motifs", () => {
+    const copie = JSON.stringify({ ...sansDate, slug: "copie" });
+    const lu = apercu({ corps: copie, article: { kind: "metier", slug: "copie" } });
+    const rendu = pageDApercu(lu, "2026-10-15");
+    expect(rendu.motifs.join()).toContain(`trop proche de ${sansDate.slug}`);
+    expect(rendu.visuel.src).toStartWith("data:image/svg+xml;base64,");
+  });
+
+  it("par défaut elle se compare aux entrées du fichier, sans se compter elle-même", () => {
+    expect(pageDApercu(apercu(), "2026-10-15").motifs).toEqual([]);
+  });
+
+  it("un corps invalide donne un message, jamais une exception", () => {
+    expect(pageDApercu(apercu({ corps: "pas du JSON" }), "2026-10-15")).toEqual({
+      illisible: "Le corps de la page n’est pas un JSON lisible",
+    });
+    const sansFaq = JSON.stringify({ ...sansDate, faq: null });
+    expect(pageDApercu(apercu({ corps: sansFaq }), "2026-10-15").illisible).toContain("faq invalide");
+    expect(pageDApercu(apercu({ article: { kind: "metier", slug: "autre" } }), "2026-10-15").illisible).toContain("différent");
   });
 });
