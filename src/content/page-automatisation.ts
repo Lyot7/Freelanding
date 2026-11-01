@@ -25,7 +25,7 @@ const LOGICIEL = prestation("logiciel");
  * HYPOTHÈSES DU CALCUL : minutes par semaine pour une PME d'une dizaine de
  * personnes au bureau, 45 semaines travaillées, 40 € l'heure chargée.
  */
-const TACHES = [
+export const TACHES_BUREAU = [
   {
     tache: "Trier les mails entrants",
     avant: "Une personne lit tout le matin et transfère",
@@ -65,7 +65,7 @@ const TACHES = [
 ] as const;
 const SEMAINES = 45;
 const COUT_HORAIRE = 40;
-const MINUTES_SEMAINE = TACHES.reduce((total, t) => total + t.minutes, 0);
+const MINUTES_SEMAINE = TACHES_BUREAU.reduce((total, t) => total + t.minutes, 0);
 const HEURES_AN = (MINUTES_SEMAINE * SEMAINES) / 60;
 const COUT_AN = HEURES_AN * COUT_HORAIRE;
 
@@ -113,7 +113,7 @@ export const pageAutomatisation: PageTheme = {
       ],
       legende: "Six tâches répétitives, avant et après automatisation, avec le temps rendu par semaine",
       colonnes: ["Tâche", "Aujourd’hui", "Avec l’automatisation", "Temps rendu par semaine"],
-      lignes: TACHES.map((t) => [t.tache, t.avant, t.apres, duree(t.minutes)]),
+      lignes: TACHES_BUREAU.map((t) => [t.tache, t.avant, t.apres, duree(t.minutes)]),
       total: ["Total", "", "", duree(MINUTES_SEMAINE)],
       note: `Hypothèses : une PME d’une dizaine de personnes au bureau, ${SEMAINES} semaines travaillées, ${euros(COUT_HORAIRE)} l’heure chargée. Sur une année, ${nombre(HEURES_AN)} heures, soit ${euros(COUT_AN)}. Remplacez ces minutes par les vôtres : une seule de ces tâches suffit souvent à payer le projet.`,
     },

@@ -609,8 +609,6 @@ export interface HeroContent {
    * Ligne de preuve du bas du héros, à côté des logos : un résultat mesuré,
    * son libellé et, quand elle existe, la page qui le détaille.
    */
-  /** Amorce de la ligne des métiers, au premier écran. */
-  avantMetiers?: string;
   /** Les portes du héros, qui composent ensemble le h1. */
   doors?: readonly HeroDoor[];
   /** Preuves du premier écran, dans l'ordre d'affichage. */
@@ -855,16 +853,24 @@ export interface HomeAboutSection {
   image?: ImageAsset;
 }
 
-/** Une étape d'une tâche, faite par vous ou par l'outil. */
-export interface EtapeDemo {
+/** Une tâche de la semaine : sa part de la plus longue, sa durée dans les deux cas. */
+export interface TacheDemo {
   libelle: string;
-  /** `true` : l'outil la fait seul. */
-  auto: boolean;
+  /** Longueur de la barre, de 0 à 1. */
+  part: number;
+  main: string;
+  outil: string;
+}
+
+/** Un grand chiffre et ce qu'il compte. */
+export interface CompteurDemo {
+  valeur: string;
+  libelle: string;
 }
 
 /**
- * La section qui montre un logiciel métier au travail : une même tâche,
- * faite à la main puis par l'outil.
+ * La section qui montre ce qu'un logiciel métier rend : une semaine de bureau,
+ * à la main puis avec le logiciel.
  */
 export interface LogicielDemoContent {
   eyebrow: string;
@@ -874,15 +880,16 @@ export interface LogicielDemoContent {
   statementEmphasis?: readonly string[];
   cta: Link;
   demo: {
-    /** Intitulé de la fenêtre (« Exemple : une commande reçue par mail »). */
+    /** Intitulé de la fenêtre. */
     titre: string;
     onglets: { main: string; outil: string };
-    /** Libellés de la colonne de droite (« Vous », « Automatique »). */
-    acteurs: { vous: string; outil: string };
-    main: readonly EtapeDemo[];
-    outil: readonly EtapeDemo[];
-    /** Bilan sous la liste, par onglet. */
-    bilan: { main: string; outil: string };
+    taches: readonly TacheDemo[];
+    /** Le total de la semaine, par onglet. */
+    compteur: { main: CompteurDemo; outil: CompteurDemo };
+    /** Ce qui revient au client, affiché avec le logiciel. */
+    gain: CompteurDemo & { avant: string; detail: string };
+    /** Les hypothèses de l'exemple. */
+    note: string;
   };
 }
 
@@ -919,12 +926,6 @@ export interface HomeContent {
    * faq | testimonials | articles. Les logos ne sont plus une section de
    * l'accueil : ils vivent dans le bas du héros, avec la ligne de preuve.
    */
-  /** Le renvoi vers les pages par métier, sous la démonstration du logiciel. */
-  metiers: {
-    titleLines: readonly string[];
-    intro: string;
-    cta: Link;
-  };
   sectionOrder: string[];
 }
 

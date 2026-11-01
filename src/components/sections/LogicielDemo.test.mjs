@@ -85,7 +85,8 @@ async function monter() {
   const onglet = (cle) => conteneur.querySelector(`[role="tab"][id$="-onglet-${cle}"]`);
   const selectionne = () =>
     conteneur.querySelector('[role="tab"][aria-selected="true"]').textContent;
-  const compte = () => conteneur.querySelector('[role="tabpanel"] > p > span').textContent;
+  const compte = () =>
+    conteneur.querySelector('[role="tabpanel"] > div > p > span').textContent;
   const etapes = () =>
     [...conteneur.querySelectorAll('[role="tabpanel"] li')].map((li) => li.textContent);
   const demonter = async () => {
@@ -124,12 +125,12 @@ describe("LogicielDemo", () => {
     expect(main.getAttribute("aria-controls")).toBe(panneau.id);
     expect(panneau.getAttribute("aria-labelledby")).toBe(main.id);
 
-    expect(vue.etapes()).toHaveLength(demo.main.length);
-    expect(vue.etapes()[0]).toContain(demo.main[0].libelle);
-    expect(vue.etapes()[0]).toContain(demo.acteurs.vous);
+    expect(vue.etapes()).toHaveLength(demo.taches.length);
+    expect(vue.etapes()[0]).toContain(demo.taches[0].libelle);
+    expect(vue.etapes()[0]).toContain(demo.taches[0].main);
     // Cinq étapes à la main, toutes pour le visiteur.
-    expect(vue.compte()).toBe(String(demo.main.filter((e) => !e.auto).length));
-    expect(vue.conteneur.textContent).toContain(demo.bilan.main);
+    expect(vue.compte()).toBe(demo.compteur.main.valeur);
+    expect(vue.conteneur.textContent).not.toContain(demo.gain.valeur);
     await vue.demonter();
   });
 
@@ -158,9 +159,10 @@ describe("LogicielDemo", () => {
       vue.onglet("outil").id,
     );
     // Une seule étape reste au visiteur avec l'outil.
-    expect(vue.compte()).toBe("1");
-    expect(vue.etapes()[0]).toContain(demo.acteurs.outil);
-    expect(vue.conteneur.textContent).toContain(demo.bilan.outil);
+    expect(vue.compte()).toBe(demo.compteur.outil.valeur);
+    expect(vue.etapes()[0]).toContain(demo.taches[0].outil);
+    expect(vue.compte()).toBe(demo.compteur.outil.valeur);
+    expect(vue.conteneur.textContent).toContain(demo.gain.valeur);
 
     await presser("ArrowLeft");
     expect(vue.selectionne()).toBe(demo.onglets.main);
@@ -180,7 +182,7 @@ describe("LogicielDemo", () => {
       vue.onglet("outil").click();
     });
     expect(vue.selectionne()).toBe(demo.onglets.outil);
-    expect(vue.compte()).toBe("1");
+    expect(vue.compte()).toBe(demo.compteur.outil.valeur);
     await vue.demonter();
   });
 
@@ -208,7 +210,7 @@ describe("LogicielDemo", () => {
       delais[0]();
     });
     expect(vue.selectionne()).toBe(demo.onglets.outil);
-    expect(vue.compte()).toBe("1");
+    expect(vue.compte()).toBe(demo.compteur.outil.valeur);
     await vue.demonter();
   });
 

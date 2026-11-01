@@ -2,12 +2,30 @@ import type { HeroComparaison, HomeContent } from "@/lib/content/types";
 import { slugsMisEnAvant } from "@/content/blog";
 import { faqItems } from "@/content/faq";
 import { services } from "@/content/services";
-import { CHEMIN_HUB_METIERS } from "@/content/metiers";
 import { euros, prestation, prixPlancher, repereAgenceLogiciel } from "@/content/offre";
+import { TACHES_BUREAU } from "@/content/page-automatisation";
 import { lienRendezVous } from "@/content/rendez-vous";
 import { howWeDoItStats, reputationStats } from "@/content/stats";
 
 const LOGICIEL = prestation("logiciel");
+
+/* LE GAIN DE L'ACCUEIL, dérivé des hypothèses de `page-automatisation.ts`. */
+const PART_RELECTURE = 0.2;
+const SEMAINES_AN = 45;
+const reste = (minutes: number): number => Math.round(minutes * PART_RELECTURE);
+const MINUTES_SEMAINE = TACHES_BUREAU.reduce((total, t) => total + t.minutes, 0);
+const MINUTES_MAX = Math.max(...TACHES_BUREAU.map((t) => t.minutes));
+const MINUTES_RENDUES = MINUTES_SEMAINE - reste(MINUTES_SEMAINE);
+const HEURES_RENDUES_AN = Math.round((MINUTES_RENDUES * SEMAINES_AN) / 60);
+
+/** « 2 h 30 », « 36 min », « 11 h » : la durée telle qu'elle s'écrit. */
+export function duree(minutes: number): string {
+  const heures = Math.floor(minutes / 60);
+  const reliquat = minutes % 60;
+  if (heures === 0) return `${reliquat}\u00A0min`;
+  if (reliquat === 0) return `${heures}\u00A0h`;
+  return `${heures}\u00A0h\u00A0${String(reliquat).padStart(2, "0")}`;
+}
 const ENTREE_LOGICIEL = prixPlancher(LOGICIEL);
 
 /*
@@ -74,9 +92,7 @@ export const homeContent: HomeContent = {
     title: TITRE_ACCUEIL,
     titleLines: PORTES.map((porte) => porte.lines.join(" ")),
     doors: PORTES,
-    /* Test des visiteurs du 2026-10-31 : le métier nommé dès le premier écran,
-       et une porte pour qui n'est pas prêt à appeler. */
-    avantMetiers: "Par métier",
+    /* Test des visiteurs du 2026-10-31 : une porte pour qui n'est pas prêt à appeler. */
     offerLink: { label: "Voir l’offre et le prix", href: `/services/${LOGICIEL.slug}` },
     subtitle: CE_QUI_DISPARAIT,
     subtitleParagraphs: [{ text: CE_QUI_DISPARAIT }],
@@ -112,10 +128,12 @@ export const homeContent: HomeContent = {
 
   /*
    * LA SECTION NOIRE MONTRE LE LOGICIEL depuis le 2026-10-16, idée d'Eliott.
+   * ELLE MONTRE LE GAIN depuis le 2026-11-01, à sa demande : six tâches qui
+   * parlent à tous les métiers sans en citer un, leur durée à la main, ce qui
+   * reste à relire, et les heures rendues.
    *
-   * LA DÉMONSTRATION EST UN EXEMPLE, et le dit : une tâche que la plupart des
-   * PME refont à la main, découpée en étapes, sans durée inventée. Ce qui
-   * change entre les deux onglets se compte : qui fait chaque étape.
+   * LA DÉMONSTRATION EST UN EXEMPLE, et le dit : les durées sont les hypothèses
+   * affichées de `/services/automatisation`, le total en est dérivé.
    */
   logiciel: {
     eyebrow: LOGICIEL.nom,
@@ -123,43 +141,33 @@ export const homeContent: HomeContent = {
     // demi-colonne, comme celui du showreel.
     titleLines: ["Vos heures", "valent mieux", "qu’un", "tableur."],
     statement:
-      "Une commande arrive par mail, vous la recopiez dans un tableur, vous vérifiez le stock, puis vous retapez le devis. Je construis le logiciel qui enchaîne ces étapes à votre place. L’IA fait le sale boulot : il vous reste à relire et à envoyer.",
-    statementEmphasis: ["il vous reste à relire et à envoyer."],
+      "Trier, recopier, relancer, rapprocher : une semaine de bureau part là-dedans. Je construis le logiciel qui le fait à votre place. L’IA fait le sale boulot, il vous reste à relire, et le temps revient à ce qui vous rend indispensable.",
+    statementEmphasis: ["le temps revient à ce qui vous rend indispensable."],
     cta: {
       label: "Voir l’offre et le prix",
       href: `/services/${LOGICIEL.slug}`,
     },
     demo: {
-      titre: "Exemple : une commande reçue par mail",
-      onglets: { main: "À la main", outil: "Avec l’outil" },
-      acteurs: { vous: "Vous", outil: "Automatique" },
-      main: [
-        { libelle: "Lire la commande dans le mail", auto: false },
-        { libelle: "Recopier chaque ligne dans le tableur", auto: false },
-        { libelle: "Vérifier le stock article par article", auto: false },
-        { libelle: "Retaper le devis dans un document", auto: false },
-        { libelle: "Envoyer le devis et noter de relancer", auto: false },
-      ],
-      outil: [
-        { libelle: "La commande est lue dès son arrivée", auto: true },
-        { libelle: "Les lignes entrent dans votre base", auto: true },
-        { libelle: "Le stock est vérifié, les manques signalés", auto: true },
-        { libelle: "Le devis est prêt, à vos prix", auto: true },
-        { libelle: "Vous relisez et vous envoyez", auto: false },
-      ],
-      bilan: {
-        main: "Cinq étapes pour vous, à chaque commande.",
-        outil: "Une étape pour vous : relire et envoyer.",
+      titre: "Une semaine de bureau, en exemple",
+      onglets: { main: "À la main", outil: "Avec le logiciel" },
+      taches: TACHES_BUREAU.map((tache) => ({
+        libelle: tache.tache,
+        part: tache.minutes / MINUTES_MAX,
+        main: duree(tache.minutes),
+        outil: duree(reste(tache.minutes)),
+      })),
+      compteur: {
+        main: { valeur: duree(MINUTES_SEMAINE), libelle: "de saisie par semaine" },
+        outil: { valeur: duree(reste(MINUTES_SEMAINE)), libelle: "de relecture par semaine" },
       },
+      gain: {
+        valeur: duree(MINUTES_RENDUES),
+        avant: duree(0),
+        libelle: "rendues chaque semaine",
+        detail: `Soit ${HEURES_RENDUES_AN} heures par an pour vos clients, vos décisions et le travail qui demande un humain.`,
+      },
+      note: `Exemple pour un bureau d’une dizaine de personnes, sur ${SEMAINES_AN} semaines. Il reste un cinquième du temps pour relire. Vos chiffres se mesurent pendant l’appel.`,
     },
-  },
-
-  /* LA LISTE VIENT DE `pagesHub` : une page publiée y entre seule. */
-  metiers: {
-    titleLines: ["Votre métier", "a ses corvées."],
-    intro:
-      "Une location en jours réels, une fiche à retaper, un client à rappeler la veille. Trouvez la vôtre.",
-    cta: { label: "Tous les métiers", href: CHEMIN_HUB_METIERS },
   },
 
   /*
@@ -432,24 +440,20 @@ export const homeContent: HomeContent = {
   },
 
   /*
-   * ORDRE DES SECTIONS, refait le 2026-10-31 pour une seule offre. Le logiciel
-   * au travail suit le héros, puis le visiteur se reconnaît dans son métier ;
-   * viennent ensuite qui le fait et ce qu'il a construit.
+   * ORDRE DES SECTIONS : celui de la page d'origine, décision d'Eliott du
+   * 2026-11-01. Qui je suis, ce que j'ai construit, les chiffres, puis le
+   * logiciel au travail : la section métiers et sa liste sont retirées, l'accueil
+   * parle à chaque métier sans le citer.
    *
-   * LES DEUX SECTIONS À CARTES NOIRES restent séparées par les réalisations : les
-   * chiffres et « Pourquoi moi » se lisaient comme une seule, deux fois plus longue.
-   *
-   * L'ACCORDÉON (`services`) n'est pas sur l'accueil : le héros porte l'offre et
-   * son prix. Les tarifs vivent sur la page de l'offre et sur sa page de prix.
+   * LES DEUX SECTIONS À CARTES NOIRES restent séparées par le logiciel.
    */
   sectionOrder: [
     "hero",
-    "logiciel",
-    "metiers",
     "about",
-    "numbers",
     "showreel",
     "works",
+    "numbers",
+    "logiciel",
     "whyUs",
     "faq",
     "articles",

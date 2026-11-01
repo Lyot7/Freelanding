@@ -192,18 +192,16 @@ describe("HeroSection, comparaison de prix", async () => {
   });
 });
 
-describe("HeroSection, les métiers au premier écran", () => {
-  it("lie chaque métier et la page de l'offre", () => {
-    const metiers = [{ libelle: "Échafaudage", chemin: "/logiciel-metier/echafaudage" }];
-    const rendu = JSON.stringify(HeroSection({ hero: homeContent.hero, site: siteConfig, metiers }));
-    expect(rendu).toContain("/logiciel-metier/echafaudage");
+describe("HeroSection, le lien vers l'offre", () => {
+  it("lie l'offre sans lister aucun métier", () => {
+    const rendu = JSON.stringify(HeroSection({ hero: homeContent.hero, site: siteConfig }));
     expect(rendu).toContain(homeContent.hero.offerLink.label);
+    expect(rendu).not.toContain("/logiciel-metier/");
   });
 
-  it("n'affiche ni métiers ni lien d'offre quand ils manquent", () => {
+  it("n'affiche pas le lien quand il manque", () => {
     const hero = { ...homeContent.hero, offerLink: undefined };
     const rendu = JSON.stringify(HeroSection({ hero, site: siteConfig }));
-    expect(rendu).not.toContain("/logiciel-metier/");
-    expect(rendu).not.toContain(homeContent.hero.avantMetiers);
+    expect(rendu).not.toContain(homeContent.hero.offerLink.label);
   });
 });

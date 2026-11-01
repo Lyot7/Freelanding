@@ -62,6 +62,14 @@ concurrent), bandeau cookies raccourci. Écart sur 30 visiteurs : indicatif, pas
 Faux signaux écartés : contraste du bouton volt (texte sombre sur volt, l'outil lit
 mal les deux couches), lien La Fabrique du Net (403 aux robots seulement).
 
+## Reprise du 2026-11-01, demande d'Eliott
+
+| Constat | Ce qui a changé |
+| --- | --- |
+| « Votre projet n'attend personne » remontée : l'ordre d'origine cassé. | Ordre d'origine rétabli. |
+| Liste des métiers au héros : infinie à mesure des publications. | Retirée du héros et de l'accueil ; le hub reste au menu. L'accueil parle à chaque métier sans le citer. |
+| Démonstration en étapes : elle disait qui fait quoi, jamais ce qu'on gagne. | Une semaine de bureau : six tâches, barres qui se rétractent au cinquième, total qui baisse, 8 h 48 rendues en aplat volt, 396 heures par an. Hypothèses affichées. Barres en `transform`, 700 ms, courbe d'Emil, décalage de 60 ms, coupées en mouvement réduit. |
+
 ---
 
 # Usage des skills design — refonte du 2026-10-15
