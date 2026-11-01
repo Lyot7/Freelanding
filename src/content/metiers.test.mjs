@@ -3,7 +3,6 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { blogPosts } from "./blog.ts";
 import {
-  ANCRE_BESOINS,
   versPageTheme,
   ARTICLES_MAX,
   CHEMIN_HUB_METIERS,
@@ -279,10 +278,9 @@ describe("une page de fonction garde sa place", () => {
     expect(pageDuCorps(corps, entree.slug, entree.date, 0).nature).toBe("fonction");
   });
 
-  test("son fil d'Ariane mène à la liste des besoins, celui d'un métier au hub", () => {
+  test("son fil d'Ariane mène au hub, comme celui d'un métier", () => {
     const page = { ...pagesMetier[0], nature: "fonction" };
-    expect(versPageTheme(page).filAriane[1].href).toBe(`${CHEMIN_HUB_METIERS}#${ANCRE_BESOINS}`);
-    expect(versPageTheme(pagesMetier[0]).filAriane[1].href).toBe(CHEMIN_HUB_METIERS);
+    expect(versPageTheme(page).filAriane[1].href).toBe(CHEMIN_HUB_METIERS);
   });
 });
 

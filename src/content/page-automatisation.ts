@@ -28,42 +28,36 @@ const LOGICIEL = prestation("logiciel");
 export const TACHES_BUREAU = [
   {
     tache: "Trier les mails entrants",
-    moyen: "ia",
     avant: "Une personne lit tout le matin et transfère",
     apres: "Chaque mail classé à l’arrivée, envoyé à la bonne personne, réponse en brouillon",
     minutes: 150,
   },
   {
     tache: "Saisir les commandes reçues en PDF",
-    moyen: "logiciel",
     avant: "Recopiées ligne à ligne dans votre logiciel",
     apres: "Lignes extraites et proposées à la validation",
     minutes: 180,
   },
   {
     tache: "Relancer les factures échues",
-    moyen: "logiciel",
     avant: "Quand quelqu’un y pense",
     apres: "Relance partie à l’échéance, facture jointe, ton adapté au client",
     minutes: 60,
   },
   {
     tache: "Rédiger les comptes rendus",
-    moyen: "ia",
     avant: "Notes éparses, recopiées le soir",
     apres: "Compte rendu et tâches tirés de la note vocale",
     minutes: 90,
   },
   {
     tache: "Répondre aux demandes de devis simples",
-    moyen: "ia",
     avant: "Le même chiffrage retapé à chaque demande",
     apres: "Premier chiffrage tiré de votre grille, à relire",
     minutes: 120,
   },
   {
     tache: "Rapprocher la banque et les factures",
-    moyen: "logiciel",
     avant: "À la main, en fin de mois",
     apres: "Seuls les écarts vous sont signalés",
     minutes: 60,

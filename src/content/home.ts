@@ -27,7 +27,6 @@ export function duree(minutes: number): string {
   return `${heures}\u00A0h\u00A0${String(reliquat).padStart(2, "0")}`;
 }
 const ENTREE_LOGICIEL = prixPlancher(LOGICIEL);
-const MOYENS_TACHE = { ia: "Outil d’IA", logiciel: "Logiciel" } as const;
 
 /*
  * UNE SEULE OFFRE DEPUIS LE 2026-10-31, décision d'Eliott du 2026-10-30. Ce qui
@@ -35,10 +34,10 @@ const MOYENS_TACHE = { ia: "Outil d’IA", logiciel: "Logiciel" } as const;
  * revient à ce qui rend la personne indispensable, et l'IA fait le sale boulot.
  *
  * « JUSQU'À DEUX FOIS MOINS CHER » EST PARTI AVEC LE SITE VITRINE : seule sa
- * comparaison le rendait exact (`offre.ts`). Le logiciel se compare à livrable
- * égal, chiffre d'agence écrit à côté du mien.
+ * comparaison le rendait exact (`offre.ts`). Le héros dit « une fraction » et
+ * chiffre ce qu'une agence facture à côté du mien, source écrite.
  */
-const POSITIONNEMENT = "Logiciel sur mesure, IA et accompagnement.";
+const POSITIONNEMENT = "Une fraction de ce qu’une agence facture.";
 
 /*
  * LE H1 DE L'ACCUEIL. Depuis le 2026-11-01, décision d'Eliott : le temps gagné
@@ -66,11 +65,11 @@ const CE_QUI_DISPARAIT =
 function comparaisonAgence(): HeroComparaison {
   const agence = repereAgenceLogiciel;
   return {
-    sujet: "Un premier outil métier sur mesure",
+    sujet: "Un logiciel métier sur mesure",
     lignes: [
       {
         qui: "En agence",
-        prix: `${euros(agence.premierOutilMin).replace(/\s€$/u, "")} à ${euros(agence.premierOutilMax)}`,
+        prix: `${euros(agence.premierOutilMin).replace(/\s€$/u, "")} à ${euros(agence.mediane)}`,
       },
       { qui: "Avec moi", prix: `dès ${ENTREE_LOGICIEL}`, fort: true },
     ],
@@ -145,19 +144,30 @@ export const homeContent: HomeContent = {
     // demi-colonne, comme celui du showreel.
     titleLines: ["Vos heures", "valent mieux", "qu’un", "tableur."],
     statement:
-      "Trier, recopier, relancer, rapprocher : une semaine de bureau part là-dedans, quel que soit votre métier. Chaque tâche a son remède, un outil d’IA ou un logiciel. L’IA fait le sale boulot, il vous reste à relire, et le temps revient à ce qui vous rend indispensable.",
-    statementEmphasis: ["le temps revient à ce qui vous rend indispensable."],
+      "Trier, recopier, relancer, rapprocher : une semaine de bureau part là-dedans, quel que soit votre métier. L’IA fait le sale boulot, vous validez, et le temps revient à ce qui vous rend indispensable.",
+    statementEmphasis: ["vous validez, et le temps revient à ce qui vous rend indispensable."],
     cta: { label: "Voir comment", href: "#moyens" },
     demo: {
       titre: "Une semaine de bureau, en exemple",
       onglets: { main: "À la main", outil: "Avec moi" },
       taches: TACHES_BUREAU.map((tache) => ({
         libelle: tache.tache,
-        moyen: MOYENS_TACHE[tache.moyen],
         part: tache.minutes / MINUTES_MAX,
         main: duree(tache.minutes),
-        outil: duree(reste(tache.minutes)),
       })),
+      /* UN CIRCUIT RÉEL : celui qu'Eliott fait tourner sur sa propre boîte mail. */
+      parcours: {
+        titre: "Un mail, de A à Z",
+        etapes: [
+          { titre: "Le mail arrive", detail: "« Bonjour, il me faudrait un devis pour la semaine prochaine. »" },
+          { titre: "L’IA le classe", detail: "Demande de devis, client connu, à traiter aujourd’hui." },
+          { titre: "Le brouillon est prêt", detail: "Écrit avec vos prix, votre ton et l’historique du client." },
+          { titre: "Vous validez", detail: "Vous relisez, vous corrigez si besoin.", validation: true },
+          { titre: "C’est parti", detail: "Réponse envoyée, fiche client à jour, relance posée." },
+        ],
+        bouton: "Valider et envoyer",
+        preuve: "Ce circuit tourne chaque jour sur ma propre boîte mail.",
+      },
       compteur: {
         main: { valeur: duree(MINUTES_SEMAINE), libelle: "de saisie par semaine" },
         outil: { valeur: duree(reste(MINUTES_SEMAINE)), libelle: "de relecture par semaine" },

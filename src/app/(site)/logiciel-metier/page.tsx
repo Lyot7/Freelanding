@@ -6,13 +6,7 @@ import { GradientWaveBackdrop } from "@/components/effects/GradientWaveBackdrop"
 import { Grain } from "@/components/effects/Grain";
 import { FloatingNav, Footer, Header } from "@/components/layout";
 import { PlanMetiers } from "@/components/pages/metiers/ListeMetiers";
-import {
-  ANCRE_BESOINS,
-  CHEMIN_HUB_METIERS,
-  hubMetiers,
-  pagesBesoin,
-  pagesHub,
-} from "@/content/metiers";
+import { CHEMIN_HUB_METIERS, hubMetiers, pagesBesoin } from "@/content/metiers";
 import { lienRendezVous } from "@/content/rendez-vous";
 import { content } from "@/lib/content";
 import { collectionSchema, filArianeSchema, graph } from "@/lib/json-ld";
@@ -23,17 +17,14 @@ export const metadata: Metadata = pageMetadata(
   CHEMIN_HUB_METIERS,
 );
 
-/** `/logiciel-metier` : le hub, qui liste toutes les pages publiées. */
+/** `/logiciel-metier` : le hub, par besoin depuis le 2026-11-01, décision d'Eliott. */
 export default async function HubMetiers() {
   const site = await content.getSiteConfig();
   return (
     <>
       <JsonLd
         data={graph(
-          collectionSchema(hubMetiers.h1, hubMetiers.seo.description, CHEMIN_HUB_METIERS, [
-            ...pagesHub,
-            ...pagesBesoin,
-          ]),
+          collectionSchema(hubMetiers.h1, hubMetiers.seo.description, CHEMIN_HUB_METIERS, pagesBesoin),
           filArianeSchema([
             { libelle: hubMetiers.filAccueil, href: "/" },
             { libelle: hubMetiers.filHub },
@@ -60,14 +51,8 @@ export default async function HubMetiers() {
           className="relative bg-background px-[20px] pb-[60px] text-foreground tablet:px-[24px] tablet:pb-[90px] desktop:px-[30px]"
         >
           <div className="relative mx-auto flex w-full max-w-[1440px] flex-col gap-[40px]">
-            <h2 className="sr-only">{hubMetiers.titreListe}</h2>
-            <PlanMetiers entrees={pagesHub} />
-            <div id={ANCRE_BESOINS} className="flex scroll-mt-[100px] flex-col gap-[20px]">
-              <h2 className="accent-room m-0 text-[26px] font-semibold uppercase leading-[0.95] tracking-[-0.04em] tablet:text-[34px]">
-                {hubMetiers.besoins.titre}
-              </h2>
-              <PlanMetiers entrees={pagesBesoin} />
-            </div>
+            <h2 className="sr-only">{hubMetiers.besoins.titre}</h2>
+            <PlanMetiers entrees={pagesBesoin} />
             <div className="grid gap-[12px] tablet:grid-cols-2">
               <h2 className="accent-room m-0 text-[26px] font-semibold uppercase leading-[0.95] tracking-[-0.04em] tablet:pr-[30px] tablet:text-[34px]">
                 {hubMetiers.autre.titre}

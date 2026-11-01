@@ -92,9 +92,9 @@ export function euros(montant: number): string {
  * LE PLANCHER : 6 000 € HT, CELUI DE LA GRILLE (`offre-grille-prix.md` du
  * vault), repris au passage à une seule offre, le 2026-10-31. Le site affichait
  * 3 500 € HT depuis le 2026-10-16 alors que les mails annonçaient 6 000 € HT :
- * deux prix pour la même offre. Comparaison aux agences à livrable égal : leur
- * premier outil (`repereAgenceLogiciel.premierOutilMin`) contre ce plancher,
- * jamais ce plancher contre leur médiane.
+ * deux prix pour la même offre. L'accueil montre ce qu'une agence facture, du
+ * premier outil à la médiane d'un projet (décision d'Eliott du 2026-11-01) ; la
+ * FAQ compare à livrable égal, premier outil contre plancher.
  *
  * VOUVOIEMENT depuis le 2026-10-15, décision d'Eliott. Eliott dit « je » : il
  * est seul, c'est son argument face aux agences. Le « nous » n'existe nulle part.

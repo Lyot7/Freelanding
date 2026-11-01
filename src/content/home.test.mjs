@@ -51,15 +51,13 @@ describe("accueil", () => {
     expect(JSON.stringify(homeContent.hero)).not.toContain("Würth");
   });
 
-  test("le héros compare les prix à livrable égal, sourcé", () => {
+  test("le héros montre ce qu'une agence facture, sourcé", () => {
     const comparaison = homeContent.hero.comparison;
     const [agence, moi] = comparaison?.lignes ?? [];
-    expect(comparaison?.sujet).toMatch(/premier outil/u);
-    // Les deux bornes de l'agence sont écrites (8 000 à 10 000 €), jamais une
-    // médiane seule.
-    expect(agence?.prix).toContain(euros(repereAgenceLogiciel.premierOutilMax));
+    expect(comparaison?.sujet).toMatch(/logiciel métier/u);
+    // Du premier outil à la médiane d'un projet, décision d'Eliott du 2026-11-01.
     expect(agence?.prix).toContain(euros(repereAgenceLogiciel.premierOutilMin).replace(/\s€$/u, ""));
-    expect(agence?.prix).not.toContain(euros(repereAgenceLogiciel.mediane));
+    expect(agence?.prix).toContain(euros(repereAgenceLogiciel.mediane));
     expect(moi?.prix).toContain(prixPlancher(prestation("logiciel")));
     expect(moi?.fort).toBe(true);
     expect(comparaison?.source.href).toBe(repereAgenceLogiciel.source.href);
@@ -93,9 +91,15 @@ describe("accueil", () => {
     expect(JSON.stringify(moyens).toLowerCase()).not.toContain("sitpo");
   });
 
-  test("chaque tâche de la démonstration montre son remède", () => {
-    const remedes = new Set(homeContent.logiciel.demo.taches.map((t) => t.moyen));
-    expect(remedes.size).toBe(2);
+  test("le parcours de la démonstration passe par une validation humaine", () => {
+    const { etapes } = homeContent.logiciel.demo.parcours;
+    expect(etapes.filter((e) => e.validation)).toHaveLength(1);
+    expect(etapes.at(-1).validation).toBeUndefined();
+  });
+
+  test("le héros dit ce qu'une agence facture et chiffre l'écart", () => {
+    expect(homeContent.hero.eyebrow).toContain("agence");
+    expect(homeContent.hero.comparison.lignes[0].prix).toContain("30");
   });
 
   test("la démonstration montre un gain dérivé de ses hypothèses, jamais écrit à la main", () => {

@@ -184,7 +184,7 @@ export const siteConfig: SiteConfig = {
   // la mention du formulaire gardent les intitulés complets.
   legalLinks: [
     /* UN SEUL LIEN VERS LE HUB, pour Google : une page sans lien entrant ne s'indexe pas. */
-    { label: "Par métier et par besoin", shortLabel: "Par métier", href: "/logiciel-metier" },
+    { label: "Par besoin", href: "/logiciel-metier" },
     { label: "Mentions légales", shortLabel: "Mentions légales", href: "/legal/mentions-legales" },
     {
       label: "Politique de confidentialité",
