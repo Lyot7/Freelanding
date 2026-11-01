@@ -91,10 +91,10 @@ describe("accueil", () => {
     expect(JSON.stringify(moyens).toLowerCase()).not.toContain("sitpo");
   });
 
-  test("le parcours de la démonstration passe par une validation humaine", () => {
-    const { etapes } = homeContent.logiciel.demo.parcours;
-    expect(etapes.filter((e) => e.validation)).toHaveLength(1);
-    expect(etapes.at(-1).validation).toBeUndefined();
+  test("la semaine rend exactement le gain annoncé", () => {
+    const { jours } = homeContent.logiciel.demo;
+    expect(jours.map((j) => j.main)).toEqual([150, 180, 90, 120, 120].map(duree));
+    expect(jours.map((j) => j.rendu)).toEqual([120, 144, 72, 96, 96].map(duree));
   });
 
   test("le héros dit ce qu'une agence facture et chiffre l'écart", () => {
@@ -104,8 +104,8 @@ describe("accueil", () => {
 
   test("la démonstration montre un gain dérivé de ses hypothèses, jamais écrit à la main", () => {
     const demo = homeContent.logiciel?.demo;
-    expect(demo?.taches).toHaveLength(6);
-    expect(Math.max(...demo.taches.map((t) => t.part))).toBe(1);
+    expect(demo?.jours).toHaveLength(5);
+    expect(Math.max(...demo.jours.map((j) => j.part))).toBe(1);
     expect(demo.compteur.main.valeur).toBe(duree(660));
     expect(demo.compteur.outil.valeur).toBe(duree(132));
     expect(demo.gain.valeur).toBe(duree(528));

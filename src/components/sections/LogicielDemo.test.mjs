@@ -18,7 +18,6 @@ import { LogicielDemo } from "./LogicielDemo";
  */
 const demo = homeContent.logiciel.demo;
 const DELAI_BASCULE = 1400;
-const DELAIS_PARCOURS = [900, 3500];
 
 function installerDom() {
   const dom = new JSDOM("<!doctype html><html><body></body></html>", {
@@ -50,20 +49,14 @@ function installerDom() {
   // Seul le délai de bascule est intercepté : React garde ses propres minuteurs.
   const delais = [];
   const annules = [];
-  const parcours = [];
   const poser = precedent.setTimeout;
   const annuler = precedent.clearTimeout;
   globalThis.setTimeout = (rappel, ms, ...reste) => {
-    if (DELAIS_PARCOURS.includes(ms)) {
-      parcours.push({ rappel, ms });
-      return { parcours: true };
-    }
     if (ms !== DELAI_BASCULE) return poser(rappel, ms, ...reste);
     delais.push(rappel);
     return { delai: delais.length };
   };
   globalThis.clearTimeout = (id) => {
-    if (id && typeof id === "object" && "parcours" in id) return undefined;
     if (id && typeof id === "object" && "delai" in id) {
       annules.push(id.delai);
       return undefined;
@@ -78,7 +71,6 @@ function installerDom() {
     observateurs,
     delais,
     annules,
-    parcours,
     restaurer: () => Object.assign(globalThis, precedent),
   };
 }
@@ -133,9 +125,9 @@ describe("LogicielDemo", () => {
     expect(main.getAttribute("aria-controls")).toBe(panneau.id);
     expect(panneau.getAttribute("aria-labelledby")).toBe(main.id);
 
-    expect(vue.etapes()).toHaveLength(demo.taches.length);
-    expect(vue.etapes()[0]).toContain(demo.taches[0].libelle);
-    expect(vue.etapes()[0]).toContain(demo.taches[0].main);
+    expect(vue.etapes()).toHaveLength(demo.jours.length);
+    expect(vue.etapes()[0]).toContain(demo.jours[0].tache);
+    expect(vue.etapes()[0]).toContain(demo.jours[0].main);
     // Cinq étapes à la main, toutes pour le visiteur.
     expect(vue.compte()).toBe(demo.compteur.main.valeur);
     expect(vue.conteneur.textContent).not.toContain(demo.gain.valeur);
@@ -166,8 +158,12 @@ describe("LogicielDemo", () => {
     expect(vue.conteneur.querySelector('[role="tabpanel"]').getAttribute("aria-labelledby")).toBe(
       vue.onglet("outil").id,
     );
+    // Le gain et la preuve n'apparaissent qu'avec moi.
+    expect(vue.conteneur.textContent).toContain(demo.preuve);
     expect(vue.compte()).toBe(demo.compteur.outil.valeur);
-    expect(vue.conteneur.textContent).toContain(demo.parcours.etapes[0].titre);
+    expect(vue.etapes()[0]).toContain(demo.jours[0].rendu);
+    expect(vue.compte()).toBe(demo.compteur.outil.valeur);
+    expect(vue.conteneur.textContent).toContain(demo.gain.valeur);
 
     await presser("ArrowLeft");
     expect(vue.selectionne()).toBe(demo.onglets.main);
@@ -177,51 +173,6 @@ describe("LogicielDemo", () => {
     const entree = await presser("Enter");
     expect(entree.defaultPrevented).toBe(false);
     expect(vue.selectionne()).toBe(demo.onglets.main);
-    await vue.demonter();
-  });
-
-  it("déroule la tâche jusqu'à la validation, et le bouton la finit", async () => {
-    contexte = installerDom();
-    const { parcours } = contexte;
-    const vue = await monter();
-    await act(async () => {
-      vue.onglet("outil").click();
-    });
-    const suivant = async () => {
-      await act(async () => {
-        parcours.shift().rappel();
-      });
-    };
-    expect(vue.conteneur.textContent).not.toContain(demo.gain.valeur);
-    const bouton = () =>
-      [...vue.conteneur.querySelectorAll("button")].find((b) => b.textContent === demo.parcours.bouton);
-    expect(bouton()).toBeUndefined();
-    await suivant();
-    await suivant();
-    await suivant();
-    expect(parcours.at(-1).ms).toBe(3500);
-    await act(async () => {
-      bouton().click();
-    });
-    expect(bouton()).toBeUndefined();
-    expect(vue.conteneur.textContent).toContain(demo.gain.valeur);
-    expect(vue.conteneur.textContent).toContain(demo.parcours.preuve);
-    await vue.demonter();
-  });
-
-  it("finit seul si le visiteur se contente de regarder", async () => {
-    contexte = installerDom();
-    const { parcours } = contexte;
-    const vue = await monter();
-    await act(async () => {
-      vue.onglet("outil").click();
-    });
-    for (let i = 0; i < demo.parcours.etapes.length - 1; i += 1) {
-      await act(async () => {
-        parcours.at(-1).rappel();
-      });
-    }
-    expect(vue.conteneur.textContent).toContain(demo.gain.valeur);
     await vue.demonter();
   });
 

@@ -14,7 +14,6 @@ const PART_RELECTURE = 0.2;
 const SEMAINES_AN = 45;
 const reste = (minutes: number): number => Math.round(minutes * PART_RELECTURE);
 const MINUTES_SEMAINE = TACHES_BUREAU.reduce((total, t) => total + t.minutes, 0);
-const MINUTES_MAX = Math.max(...TACHES_BUREAU.map((t) => t.minutes));
 const MINUTES_RENDUES = MINUTES_SEMAINE - reste(MINUTES_SEMAINE);
 const HEURES_RENDUES_AN = Math.round((MINUTES_RENDUES * SEMAINES_AN) / 60);
 
@@ -27,6 +26,31 @@ export function duree(minutes: number): string {
   return `${heures}\u00A0h\u00A0${String(reliquat).padStart(2, "0")}`;
 }
 const ENTREE_LOGICIEL = prixPlancher(LOGICIEL);
+
+const minutesDe = (...indices: readonly number[]): number =>
+  indices.reduce((total, i) => total + TACHES_BUREAU[i].minutes, 0);
+
+/* LA SEMAINE DE LA DÉMONSTRATION : les six tâches de `page-automatisation.ts`, posées sur cinq jours. */
+const SEMAINE = [
+  { jour: "Lundi", tache: "Mails", taches: [0] },
+  { jour: "Mardi", tache: "Commandes", taches: [1] },
+  { jour: "Mercredi", tache: "Comptes rendus", taches: [3] },
+  { jour: "Jeudi", tache: "Devis", taches: [4] },
+  { jour: "Vendredi", tache: "Relances, banque", taches: [2, 5] },
+] as const;
+
+const MINUTES_JOUR_MAX = Math.max(...SEMAINE.map((j) => minutesDe(...j.taches)));
+
+const JOURS_BUREAU = SEMAINE.map(({ jour, tache, taches }) => {
+  const minutes = minutesDe(...taches);
+  return {
+    jour,
+    tache,
+    part: minutes / MINUTES_JOUR_MAX,
+    main: duree(minutes),
+    rendu: duree(minutes - reste(minutes)),
+  };
+});
 
 /*
  * UNE SEULE OFFRE DEPUIS LE 2026-10-31, décision d'Eliott du 2026-10-30. Ce qui
@@ -150,24 +174,10 @@ export const homeContent: HomeContent = {
     demo: {
       titre: "Une semaine de bureau, en exemple",
       onglets: { main: "À la main", outil: "Avec moi" },
-      taches: TACHES_BUREAU.map((tache) => ({
-        libelle: tache.tache,
-        part: tache.minutes / MINUTES_MAX,
-        main: duree(tache.minutes),
-      })),
-      /* UN CIRCUIT RÉEL : celui qu'Eliott fait tourner sur sa propre boîte mail. */
-      parcours: {
-        titre: "Un mail, de A à Z",
-        etapes: [
-          { titre: "Le mail arrive", detail: "« Bonjour, il me faudrait un devis pour la semaine prochaine. »" },
-          { titre: "L’IA le classe", detail: "Demande de devis, client connu, à traiter aujourd’hui." },
-          { titre: "Le brouillon est prêt", detail: "Écrit avec vos prix, votre ton et l’historique du client." },
-          { titre: "Vous validez", detail: "Vous relisez, vous corrigez si besoin.", validation: true },
-          { titre: "C’est parti", detail: "Réponse envoyée, fiche client à jour, relance posée." },
-        ],
-        bouton: "Valider et envoyer",
-        preuve: "Ce circuit tourne chaque jour sur ma propre boîte mail.",
-      },
+      jours: JOURS_BUREAU,
+      relire: "Relire",
+      votreMetier: "Votre métier",
+      preuve: "Je fais tourner ça chaque jour sur ma propre boîte mail.",
       compteur: {
         main: { valeur: duree(MINUTES_SEMAINE), libelle: "de saisie par semaine" },
         outil: { valeur: duree(reste(MINUTES_SEMAINE)), libelle: "de relecture par semaine" },
