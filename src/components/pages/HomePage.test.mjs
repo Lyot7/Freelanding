@@ -1,9 +1,7 @@
 import { afterEach, describe, expect, it } from "bun:test";
 
 import { LogicielSection } from "@/components/sections/LogicielSection";
-import { MetiersSection } from "@/components/sections/MetiersSection";
 import { homeContent } from "@/content/home";
-import { pagesHub } from "@/content/metiers";
 import { HomePage } from "./HomePage";
 
 /**
@@ -27,28 +25,18 @@ describe("HomePage, section du logiciel", () => {
     homeContent.logiciel = logiciel;
   });
 
-  it("rend la démonstration du logiciel juste après le héros, sans bande claire", async () => {
+  it("rend la démonstration du logiciel avec la bande claire du bas", async () => {
     const sections = sectionsRendues(await HomePage());
     const cles = sections.map((section) => section.cle);
     expect(cles).not.toContain("methode");
+    expect(cles).not.toContain("metiers");
     expect(cles).toEqual(homeContent.sectionOrder);
-    expect(cles.indexOf("logiciel")).toBe(cles.indexOf("hero") + 1);
-    expect(cles.indexOf("metiers")).toBe(cles.indexOf("logiciel") + 1);
 
     const { element } = sections.find((section) => section.cle === "logiciel");
     expect(element.type).toBe(LogicielSection);
     expect(element.props.logiciel).toBe(logiciel);
-    // La section des métiers, noire, suit : aucune bande claire en bas.
-    expect(element.props.bottomAccent).toBeUndefined();
-  });
-
-  it("rend la section des métiers avec la liste du hub", async () => {
-    const sections = sectionsRendues(await HomePage());
-    const { element } = sections.find((section) => section.cle === "metiers");
-    expect(element.type).toBe(MetiersSection);
-    expect(element.props.metiers).toBe(homeContent.metiers);
-    expect(element.props.entrees).toBe(pagesHub);
-    expect(pagesHub.length).toBeGreaterThan(0);
+    // « Pourquoi moi », sur fond clair, suit : la bande claire l'annonce.
+    expect(element.props.bottomAccent).toBe("muted");
   });
 
   it("n'en rend aucune quand le contenu n'a pas de logiciel", async () => {

@@ -6,15 +6,17 @@ import type { LogicielDemoContent } from "@/lib/content/types";
 type Onglet = "main" | "outil";
 
 /**
- * UNE MÊME TÂCHE, FAITE À LA MAIN PUIS PAR L'OUTIL.
+ * UNE SEMAINE DE BUREAU, À LA MAIN PUIS AVEC LE LOGICIEL.
  *
- * La fenêtre s'ouvre sur « À la main » et bascule une seule fois sur « Avec
- * l'outil » quand elle est à moitié visible : le visiteur voit la différence
- * sans avoir à cliquer. Dès qu'il touche un onglet, plus rien ne bascule seul.
+ * Le gain se voit : chaque barre porte la durée d'une tâche et se rétracte à ce
+ * qui reste à relire, le total baisse et les heures rendues apparaissent en
+ * volt. La fenêtre s'ouvre sur « À la main » et bascule une seule fois quand
+ * elle est à moitié visible ; dès que le visiteur touche un onglet, plus rien ne
+ * bascule seul.
  *
- * Les onglets suivent le motif ARIA (flèches gauche et droite, un seul arrêt
- * de tabulation). La pastille glisse en `transform`, comme celle du pied de
- * page ; les étapes entrent en fondu décalé, coupé en mouvement réduit.
+ * Les barres s'animent en `transform`, via `.logiciel-barre`, coupé en mouvement
+ * réduit. Les onglets suivent le motif ARIA (flèches gauche et droite, un seul
+ * arrêt de tabulation).
  */
 export function LogicielDemo({ demo }: { demo: LogicielDemoContent["demo"] }) {
   const [onglet, setOnglet] = useState<Onglet>("main");
@@ -48,8 +50,8 @@ export function LogicielDemo({ demo }: { demo: LogicielDemoContent["demo"] }) {
   };
 
   const ordre: readonly Onglet[] = ["main", "outil"];
-  const etapes = demo[onglet];
-  const restantes = etapes.filter((etape) => !etape.auto).length;
+  const avecLogiciel = onglet === "outil";
+  const compteur = demo.compteur[onglet];
 
   return (
     <div
@@ -57,12 +59,7 @@ export function LogicielDemo({ demo }: { demo: LogicielDemoContent["demo"] }) {
       className="relative w-full border border-white/10 bg-surface-1 text-foreground"
     >
       <div className="flex flex-col gap-[14px] border-b border-white/10 px-[16px] py-[14px] tablet:px-[20px] min-[1360px]:flex-row min-[1360px]:items-center min-[1360px]:justify-between">
-        <p className="m-0 flex items-center gap-[10px] text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60">
-          <span aria-hidden className="flex gap-[4px]">
-            <span className="h-[6px] w-[6px] bg-white/20" />
-            <span className="h-[6px] w-[6px] bg-white/20" />
-            <span className="h-[6px] w-[6px] bg-white/20" />
-          </span>
+        <p className="m-0 text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60">
           {demo.titre}
         </p>
         <div
@@ -80,7 +77,7 @@ export function LogicielDemo({ demo }: { demo: LogicielDemoContent["demo"] }) {
           <span
             aria-hidden
             className="logiciel-pastille absolute inset-y-[4px] left-[4px] w-[calc(50%-4px)] rounded-[50px] bg-accent"
-            style={{ transform: onglet === "outil" ? "translateX(100%)" : "none" }}
+            style={{ transform: avecLogiciel ? "translateX(100%)" : "none" }}
           />
           {ordre.map((cle) => (
             <button
@@ -108,48 +105,68 @@ export function LogicielDemo({ demo }: { demo: LogicielDemoContent["demo"] }) {
         aria-labelledby={`${base}-onglet-${onglet}`}
         aria-live="polite"
       >
-        <ol key={onglet} className="m-0 list-none p-0">
-          {etapes.map((etape, index) => (
-            <li
-              key={etape.libelle}
-              className="logiciel-etape grid grid-cols-[2.2ch_1fr_auto] items-baseline gap-[12px] border-b border-white/10 px-[16px] py-[14px] tablet:px-[20px]"
-              style={{ animationDelay: `${index * 70}ms` }}
-            >
-              <span className="text-[12px] font-medium leading-none text-foreground-60 tabular-nums">
-                {String(index + 1).padStart(2, "0")}
-              </span>
-              <span className="text-[15px] font-medium leading-[1.3] tracking-[-0.01em] tablet:text-[16px]">
-                {etape.libelle}
-              </span>
-              <span
-                className={`flex items-center gap-[6px] whitespace-nowrap text-[11px] font-medium uppercase leading-none tracking-[-0.01em] ${
-                  etape.auto ? "text-accent" : "text-foreground-60"
-                }`}
-              >
+        <div className="grid grid-cols-2 border-b border-white/10">
+          <p className="m-0 flex flex-col gap-[6px] border-r border-white/10 px-[16px] py-[18px] tablet:px-[20px]">
+            <span className="text-[40px] font-semibold leading-[1] tracking-[-0.04em] tabular-nums desktop:text-[52px]">
+              {compteur.valeur}
+            </span>
+            <span className="text-[13px] font-medium leading-[1.25] tracking-[-0.01em] text-foreground-60">
+              {compteur.libelle}
+            </span>
+          </p>
+          <p
+            className={`logiciel-gain m-0 flex flex-col gap-[6px] px-[16px] py-[18px] tablet:px-[20px] ${
+              avecLogiciel ? "bg-accent text-accent-ink" : "text-foreground/30"
+            }`}
+          >
+            <span className="text-[40px] font-semibold leading-[1] tracking-[-0.04em] tabular-nums desktop:text-[52px]">
+              {avecLogiciel ? demo.gain.valeur : demo.gain.avant}
+            </span>
+            <span className="text-[13px] font-medium leading-[1.25] tracking-[-0.01em]">
+              {demo.gain.libelle}
+            </span>
+          </p>
+        </div>
+
+        <ul className="m-0 flex list-none flex-col gap-[12px] p-[16px] tablet:px-[20px]">
+          {demo.taches.map((tache, index) => (
+            <li key={tache.libelle} className="flex flex-col gap-[5px]">
+              <span className="flex items-baseline justify-between gap-[12px] text-[14px] font-medium leading-[1.25] tracking-[-0.01em]">
+                {tache.libelle}
                 <span
-                  aria-hidden
-                  className={`h-[6px] w-[6px] ${etape.auto ? "bg-accent" : "border border-white/40"}`}
+                  className={`whitespace-nowrap tabular-nums ${
+                    avecLogiciel ? "text-accent" : "text-foreground-60"
+                  }`}
+                >
+                  {tache[onglet]}
+                </span>
+              </span>
+              <span aria-hidden className="block h-[6px] w-full bg-white/[0.06]">
+                <span
+                  className={`logiciel-barre block h-full ${avecLogiciel ? "bg-accent" : "bg-white/50"}`}
+                  style={{
+                    width: `${tache.part * 100}%`,
+                    transform: `scaleX(${avecLogiciel ? 0.2 : 1})`,
+                    transitionDelay: `${index * 60}ms`,
+                  }}
                 />
-                {etape.auto ? demo.acteurs.outil : demo.acteurs.vous}
               </span>
             </li>
           ))}
-        </ol>
-        <p
-          key={`bilan-${onglet}`}
-          className="logiciel-etape m-0 flex items-center gap-[12px] px-[16px] py-[18px] text-[16px] font-medium leading-[1.3] tracking-[-0.01em] tablet:px-[20px] tablet:text-[18px]"
-          style={{ animationDelay: `${etapes.length * 70}ms` }}
-        >
-          <span
-            aria-hidden
-            className={`flex h-[28px] min-w-[28px] items-center justify-center px-[6px] text-[13px] font-semibold tabular-nums ${
-              onglet === "outil" ? "bg-accent text-accent-ink" : "bg-white/10 text-foreground"
+        </ul>
+
+        <div className="flex flex-col gap-[6px] border-t border-white/10 px-[16px] py-[14px] tablet:px-[20px]">
+          <p
+            className={`m-0 text-[15px] font-medium leading-[1.35] tracking-[-0.01em] transition-opacity duration-300 ${
+              avecLogiciel ? "opacity-100" : "opacity-40"
             }`}
           >
-            {restantes}
-          </span>
-          {demo.bilan[onglet]}
-        </p>
+            {demo.gain.detail}
+          </p>
+          <p className="m-0 text-[12px] font-medium leading-[1.35] tracking-[-0.01em] text-foreground-60">
+            {demo.note}
+          </p>
+        </div>
       </div>
     </div>
   );

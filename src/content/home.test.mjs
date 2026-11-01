@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { homeContent } from "./home.ts";
+import { duree, homeContent } from "./home.ts";
 import { siteConfig } from "./site.ts";
 import { uiLabels } from "./ui.ts";
 import { euros, prestation, prixPlancher, repereAgenceLogiciel } from "./offre.ts";
@@ -20,17 +20,14 @@ describe("accueil", () => {
     expect(homeContent.logoBand?.logos.length).toBeGreaterThan(0);
   });
 
-  test("l'ordre des sections est celui décidé le 2026-10-31, pour une seule offre", () => {
-    // Le logiciel au travail suit le héros, puis le visiteur se reconnaît dans
-    // son métier, avant de savoir qui le fait et ce qu'il a construit.
+  test("l'ordre des sections est celui de la page d'origine, décision du 2026-11-01", () => {
     expect(ordre).toEqual([
       "hero",
-      "logiciel",
-      "metiers",
       "about",
-                  "numbers",
       "showreel",
       "works",
+      "numbers",
+      "logiciel",
       "whyUs",
       "faq",
       "articles",
@@ -43,9 +40,9 @@ describe("accueil", () => {
     expect(homeContent.featuredWorkSlugs.length).toBeGreaterThan(0);
   });
 
-  test("la section des métiers mène au hub, et le hub est la route fixe /logiciel-metier", () => {
-    expect(homeContent.metiers?.cta.href).toBe("/logiciel-metier");
-    expect(homeContent.metiers?.titleLines.length).toBeGreaterThan(0);
+  test("l'accueil ne liste aucun métier : il parle à chacun sans le citer", () => {
+    expect(ordre).not.toContain("metiers");
+    expect(JSON.stringify(homeContent.hero)).not.toContain("/logiciel-metier/");
   });
 
   test("le chiffre Würth n'est plus dans le héros", () => {
@@ -82,16 +79,27 @@ describe("accueil", () => {
 
   test("les offres ne sont pas redites sous le héros, chacune a sa section", () => {
     expect(ordre).not.toContain("services");
-    expect(ordre.indexOf("metiers")).toBe(ordre.indexOf("logiciel") + 1);
+    expect(ordre.indexOf("showreel")).toBe(ordre.indexOf("about") + 1);
     expect(ordre).toContain("logiciel");
     expect(homeContent.logiciel?.cta.href).toBe("/services/logiciel-metier");
   });
 
-  test("la démonstration du logiciel compte les étapes qui vous restent", () => {
+  test("la démonstration montre un gain dérivé de ses hypothèses, jamais écrit à la main", () => {
     const demo = homeContent.logiciel?.demo;
-    expect(demo?.main.every((etape) => !etape.auto)).toBe(true);
-    expect(demo?.outil.filter((etape) => !etape.auto)).toHaveLength(1);
-    expect(demo?.main).toHaveLength(demo?.outil.length ?? -1);
+    expect(demo?.taches).toHaveLength(6);
+    expect(Math.max(...demo.taches.map((t) => t.part))).toBe(1);
+    expect(demo.compteur.main.valeur).toBe(duree(660));
+    expect(demo.compteur.outil.valeur).toBe(duree(132));
+    expect(demo.gain.valeur).toBe(duree(528));
+    expect(demo.gain.detail).toContain("396 heures");
+    expect(demo.note).toMatch(/exemple/iu);
+  });
+
+  test("une durée s'écrit en minutes, en heures, ou les deux", () => {
+    expect(duree(36)).toBe("36\u00A0min");
+    expect(duree(120)).toBe("2\u00A0h");
+    expect(duree(132)).toBe("2\u00A0h\u00A012");
+    expect(duree(65)).toBe("1\u00A0h\u00A005");
   });
 
   test("le titre du héros est une seule porte, vers l'offre unique", () => {

@@ -1,8 +1,6 @@
 import { describe, expect, it } from "bun:test";
 
 import { PageTheme } from "@/components/pages/services/PageTheme";
-import { MetiersSection } from "@/components/sections/MetiersSection";
-import { homeContent } from "@/content/home";
 import { pagesHub, pagesMetier, versPageTheme, visuelMetier } from "@/content/metiers";
 import { siteConfig } from "@/content/site";
 import { MESSAGES_METIER } from "@/lib/blog/apercu";
@@ -44,16 +42,6 @@ describe("ListeMetiers", () => {
 
   it("change de filet sur fond clair", () => {
     expect(ListeMetiers({ entrees: pagesHub, ton: "clair" }).props.className).toContain("border-black");
-  });
-});
-
-describe("MetiersSection", () => {
-  it("rend le titre, l'intro, le renvoi au hub et tous les métiers", () => {
-    const rendu = MetiersSection({ metiers: homeContent.metiers, entrees: pagesHub });
-    expect(texte(rendu)).toContain(homeContent.metiers.titleLines[0]);
-    expect(texte(rendu)).toContain(homeContent.metiers.intro);
-    expect(liens(rendu)).toContain(homeContent.metiers.cta.href);
-    expect(liens(rendu)).toContain(pagesHub[0].chemin);
   });
 });
 
