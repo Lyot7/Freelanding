@@ -270,7 +270,7 @@ export function WorkCard({ work, index }: { work: WorkItem; index?: number }) {
           filet passe DERRIÈRE l'image du projet, comme sur le live. Quand il était
           déclaré après, un hit-test au centre de la carte renvoyait le filet et non
           l'image : une ligne pâle traversait visiblement le visuel. */}
-      <div className="absolute left-[calc(50%-0.5px)] top-0 z-[1] h-full w-px bg-foreground opacity-[0.18]" />
+      <div className="absolute left-[calc(50%-0.5px)] top-0 z-[1] h-full w-px hidden tablet:block bg-foreground opacity-[0.18]" />
 
       {/* framer-7nnyja + framer-1l83zgi : wrapper de contenu (sticky aplati) */}
       <div className="relative z-[1] flex w-full flex-1 flex-col items-center justify-center px-[20px]">

@@ -60,7 +60,7 @@ const JOURS_BUREAU = SEMAINE.map(({ jour, tache, taches }) => {
  * comparaison le rendait exact (`offre.ts`). Le héros dit « une fraction » et
  * chiffre ce qu'une agence facture à côté du mien, source écrite.
  */
-const POSITIONNEMENT = "Une fraction de ce qu’une agence facture.";
+const POSITIONNEMENT = "Logiciels sur mesure et IA pour les PME, à Caen et à distance.";
 
 /*
  * LE H1 DE L'ACCUEIL. Depuis le 2026-11-01, décision d'Eliott : le temps gagné
@@ -68,9 +68,9 @@ const POSITIONNEMENT = "Une fraction de ce qu’une agence facture.";
  */
 const PORTES = [
   {
-    lines: ["Je vous rends", "des heures."],
-    href: "#moyens",
-    price: "Sur devis",
+    lines: ["Votre métier mérite", "moins de papier."],
+    href: "#logiciel",
+    price: "Voir ce que vous y gagnez",
   },
 ] as const;
 
@@ -78,7 +78,7 @@ const TITRE_ACCUEIL = PORTES.map((porte) => porte.lines.join(" ")).join(" ");
 
 /** Le message d'Eliott, sous le titre. */
 const CE_QUI_DISPARAIT =
-  "Je construis votre logiciel sur mesure et j’installe l’IA dans vos outils. La tâche qui vous bloque disparaît, et votre équipe revient à ce qui la rend indispensable.";
+  "Commandes à recopier, mails à trier, factures à relancer : je construis le logiciel ou j’installe l’IA qui s’en charge, pour une fraction de ce qu’une agence facture.";
 
 /*
  * CE QU'UNE AGENCE FACTURE, ET LE MIEN SUR DEVIS (décision d'Eliott du
@@ -119,7 +119,7 @@ export const homeContent: HomeContent = {
     titleLines: PORTES.map((porte) => porte.lines.join(" ")),
     doors: PORTES,
     /* Test des visiteurs du 2026-10-31 : une porte pour qui n'est pas prêt à appeler. */
-    offerLink: { label: "Voir comment", href: "#moyens" },
+    offerLink: { label: "Voir mes réalisations", href: "/realisations" },
     subtitle: CE_QUI_DISPARAIT,
     subtitleParagraphs: [{ text: CE_QUI_DISPARAIT }],
     /*
@@ -493,8 +493,9 @@ export const homeContent: HomeContent = {
   },
 
   /*
-   * ORDRE DES SECTIONS : celui de la page d'origine, décision d'Eliott du
-   * 2026-11-01. Qui je suis, ce que j'ai construit, les chiffres, puis le
+   * ORDRE DES SECTIONS, repris le 2026-11-01 pour la vente : ce qu'on y gagne et
+   * comment d'abord, puis qui, les preuves, les garanties, les dernières questions.
+   * Le design reste celui d'origine, seule la place change. Avant : Qui je suis, ce que j'ai construit, les chiffres, puis le
    * logiciel au travail : la section métiers et sa liste sont retirées, l'accueil
    * parle à chaque métier sans le citer.
    *
@@ -502,15 +503,15 @@ export const homeContent: HomeContent = {
    */
   sectionOrder: [
     "hero",
-    "about",
-    "showreel",
-    "works",
-    "numbers",
     "logiciel",
     "moyens",
+    "about",
+    "numbers",
+    "showreel",
+    "works",
     "whyUs",
-    "faq",
     "articles",
+    "faq",
   ],
 
   seo: {

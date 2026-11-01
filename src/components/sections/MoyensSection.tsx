@@ -22,7 +22,7 @@ export function MoyensSection({ moyens }: { moyens: MoyensContent }) {
             <p className="m-0 text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/60">
               {moyens.eyebrow}
             </p>
-            <h2 className="m-0 flex flex-col text-[44px] font-semibold uppercase leading-[0.86] tracking-[-0.05em] tablet:text-[60px] desktop:text-[80px]">
+            <h2 className="m-0 flex flex-col text-[44px] font-semibold uppercase leading-[0.96] tracking-[-0.05em] tablet:text-[60px] desktop:text-[80px]">
               {moyens.titleLines.map((ligne) => (
                 <span key={ligne} className="accent-room block">
                   {ligne}

@@ -475,7 +475,7 @@ export function WhyUsSection({ whyUs }: { whyUs: HomeContent["whyUs"] }) {
       </div>
 
       {/* framer-1uiizu3 : filet vertical central (noir 8%) */}
-      <div className="absolute left-[calc(50%-0.5px)] top-0 z-0 h-full w-px bg-background opacity-[0.08]" />
+      <div className="absolute left-[calc(50%-0.5px)] top-0 z-0 h-full w-px hidden tablet:block bg-background opacity-[0.08]" />
     </section>
   );
 }

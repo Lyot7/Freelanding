@@ -359,7 +359,7 @@ export function ShowreelSection({ showreel }: { showreel: ShowreelContent }) {
       </div>
 
       {/* framer-ok755s : filet vertical central (noir 8 %) */}
-      <div className="absolute left-[calc(50%-0.5px)] top-0 z-[1] h-full w-px overflow-hidden bg-background opacity-[0.08]" />
+      <div className="absolute left-[calc(50%-0.5px)] top-0 z-[1] h-full w-px hidden tablet:block overflow-hidden bg-background opacity-[0.08]" />
     </section>
   );
 }

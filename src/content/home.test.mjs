@@ -20,18 +20,18 @@ describe("accueil", () => {
     expect(homeContent.logoBand?.logos.length).toBeGreaterThan(0);
   });
 
-  test("l'ordre des sections est celui de la page d'origine, décision du 2026-11-01", () => {
+  test("l'ordre vend d'abord le gain, puis qui, les preuves et les garanties", () => {
     expect(ordre).toEqual([
       "hero",
-      "about",
-      "showreel",
-      "works",
-      "numbers",
       "logiciel",
       "moyens",
+      "about",
+      "numbers",
+      "showreel",
+      "works",
       "whyUs",
-      "faq",
       "articles",
+      "faq",
     ]);
     expect(new Set(ordre).size).toBe(ordre.length);
     // « works » se rend depuis `featuredWorkSlugs`, les autres depuis leur clef.
@@ -77,7 +77,7 @@ describe("accueil", () => {
 
   test("les offres ne sont pas redites sous le héros, chacune a sa section", () => {
     expect(ordre).not.toContain("services");
-    expect(ordre.indexOf("showreel")).toBe(ordre.indexOf("about") + 1);
+    expect(ordre.indexOf("showreel")).toBe(ordre.indexOf("numbers") + 1);
     expect(ordre).toContain("logiciel");
     expect(homeContent.logiciel?.cta.href).toBe("#moyens");
   });
@@ -99,7 +99,7 @@ describe("accueil", () => {
   });
 
   test("le héros dit ce qu'une agence facture et chiffre l'écart", () => {
-    expect(homeContent.hero.eyebrow).toContain("agence");
+    expect(homeContent.hero.subtitle).toContain("agence");
     expect(homeContent.hero.comparison.lignes[0].prix).toContain("30");
   });
 
@@ -123,10 +123,10 @@ describe("accueil", () => {
 
   test("le titre du héros est une seule porte, vers les trois moyens", () => {
     const portes = homeContent.hero.doors ?? [];
-    expect(portes.map((porte) => porte.href)).toEqual(["#moyens"]);
-    expect(homeContent.hero.title).toBe("Je vous rends des heures.");
+    expect(portes.map((porte) => porte.href)).toEqual(["#logiciel"]);
+    expect(homeContent.hero.title).toBe("Votre métier mérite moins de papier.");
     expect(homeContent.hero.titleLines?.join(" ")).toBe(homeContent.hero.title);
-    expect(portes[0]?.price).toBe("Sur devis");
+    expect(portes[0]?.price).toBe("Voir ce que vous y gagnez");
     expect(homeContent.about.title).not.toBe(homeContent.hero.title);
     expect(homeContent.about.titleLines?.join(" ")).toBe(homeContent.about.title);
   });

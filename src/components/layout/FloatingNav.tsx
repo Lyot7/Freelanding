@@ -339,7 +339,7 @@ export function FloatingNav({ site }: { site: SiteConfig }) {
                 retrait de 16 px par-dessus celui du panneau. Sans lui le panneau
                 mesurait 294,2 px de haut contre 308,2 sur la source, et les deux
                 colonnes s'écartaient sur 366 px de largeur utile au lieu de 336. */}
-            <div className="flex items-stretch justify-between gap-[24px] px-[16px] pt-[16px]">
+            <div className="flex flex-col gap-[20px] px-[16px] pt-[16px] min-[400px]:flex-row min-[400px]:items-stretch min-[400px]:justify-between min-[400px]:gap-[24px]">
               <div className="flex flex-col items-start gap-[9px] select-none">
                 <p className={labelCls}>{uiLabels.chrome.menuColumnLabel}</p>
                 <nav
@@ -360,12 +360,12 @@ export function FloatingNav({ site }: { site: SiteConfig }) {
                 </nav>
               </div>
 
-              <div className="flex flex-col items-end justify-between gap-[24px] text-right select-none">
-                <div className="flex flex-col items-end gap-[9px]">
+              <div className="flex flex-col items-start justify-between gap-[24px] text-left select-none min-[400px]:items-end min-[400px]:text-right">
+                <div className="flex flex-col items-start gap-[9px] min-[400px]:items-end">
                   <p className={labelCls}>
                     {uiLabels.chrome.contactColumnLabel}
                   </p>
-                  <div className="flex flex-col items-end gap-[8px]">
+                  <div className="flex flex-col items-start gap-[8px] min-[400px]:items-end">
                     <a
                       href={`mailto:${contact.email}`}
                       tabIndex={tab}
@@ -392,7 +392,7 @@ export function FloatingNav({ site }: { site: SiteConfig }) {
                     liens étaient écrits en dur, en anglais, et retrouvés par
                     leur libellé anglais : la troisième obligation française
                     (mentions légales) n'apparaissait donc pas. */}
-                <div className="flex flex-col items-end gap-[8px]">
+                <div className="flex flex-col items-start gap-[8px] min-[400px]:items-end">
                   {legalLinks.map((link) => (
                     <HoverPrefetchLink
                       key={link.href}

@@ -85,6 +85,7 @@ function Porte({ porte, index }: { porte: HeroDoor; index: number }) {
         ))}
       </span>
       <span
+        aria-hidden
         className="hero-fond col-start-1 row-start-2 whitespace-nowrap text-[13px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60 transition-colors duration-200 group-hover:text-foreground tablet:col-start-2 tablet:row-start-1 tablet:self-end tablet:pb-[16px] tablet:text-[14px]"
         style={delai(base + 260)}
       >

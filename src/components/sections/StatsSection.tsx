@@ -299,7 +299,7 @@ export function StatsSection({ numbers }: { numbers: StatsSectionContent }) {
       </div>
 
       {/* framer-1hqjbn5 : filet vertical central (blanc 18%) */}
-      <div className="absolute left-[calc(50%-0.5px)] top-0 z-[1] h-full w-px bg-accent-ink opacity-[0.18]" />
+      <div className="absolute left-[calc(50%-0.5px)] top-0 z-[1] h-full w-px hidden tablet:block bg-accent-ink opacity-[0.18]" />
     </section>
   );
 }
