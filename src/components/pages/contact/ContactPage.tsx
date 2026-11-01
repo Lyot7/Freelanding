@@ -35,7 +35,7 @@ function Availability({
   timeZone?: string;
 }) {
   return (
-    <div className="text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60">
+    <div className="micro text-foreground-60">
       <AvailabilityMeter
         availability={availability}
         stacked
@@ -69,7 +69,7 @@ function ContactHero({
       <GradientWaveBackdrop seed={82} />
       {/* RELEVÉ sur `/contact` : hôte 1440 × 810, z-1, opacité 0,05. Nous
           étions à 0,07 PLUS le calque global de 0,05, soit un grain doublé. */}
-      <Grain opacity={0.05} className="z-[1]" />
+      <Grain className="z-[1]" />
       <span
         aria-hidden
         className="absolute inset-y-0 left-1/2 z-[2] hidden w-px bg-white/[0.08] tablet:block"
@@ -96,7 +96,7 @@ function ContactHero({
             duration={0.9}
             delay={0.12}
           >
-            <h1 className="col-start-1 m-0 text-[63px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] text-foreground tablet:col-start-2 tablet:text-[78px] desktop:text-[98px]">
+            <h1 className="col-start-1 m-0 text-[63px] titre-marque text-foreground tablet:col-start-2 tablet:text-[78px] desktop:text-[98px]">
               {contact.hero.title}
             </h1>
           </Reveal>
@@ -113,7 +113,7 @@ function ContactHero({
                 // plein, ce qui supprimait tout contraste avec les emphases.
                 // `self-start` : sur le live la boîte fait la hauteur du texte,
                 // ici le grid l'étirait à 167 px.
-                className="max-w-[280px] self-start text-left text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60 tablet:text-right"
+                className="max-w-[280px] self-start text-left text-[14px] font-medium leading-[1.35] tracking-[-0.01em] text-foreground-60 tablet:text-right"
                 trigger="appear"
                 appearId="contact-hero-chapo"
                 initialOpacity={0.001}
@@ -176,7 +176,7 @@ function ContactHero({
                 >
                   {/* RELEVÉ sur `/contact` : hôte 136 × 167 à 1440, z-3,
                       opacité 0,06. */}
-                  <Grain opacity={0.06} className="z-[3]" />
+                  <Grain matiere="photo" className="z-[3]" />
                 </ParallaxBackdrop>
               </div>
             ) : null}
@@ -224,7 +224,7 @@ function ContactDetails({ contact }: { contact: ContactContent }) {
     <div className="grid w-full grid-cols-1 gap-[20px] tablet:grid-cols-2 tablet:gap-0">
       {/* La source n'affiche PAS ce libellé en dessous de 810 : il n'apparaît
           qu'à partir du moment où la carte passe en deux colonnes. */}
-      <p className="hidden text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/60 tablet:block">
+      <p className="hidden micro text-background/60 tablet:block">
         {contact.detailsEyebrow}
       </p>
       {/* Écart image → bloc e-mail/adresse MESURÉ sur la source : 30 sous 810
@@ -269,7 +269,7 @@ function ContactDetails({ contact }: { contact: ContactContent }) {
           >
             {/* RELEVÉ sur `/contact` : hôte 690 × 303 à 1440, z-3,
                 opacité 0,09 (nous étions à 0,08). */}
-            <Grain opacity={0.09} className="z-[3]" />
+            <Grain matiere="photo" className="z-[3]" />
           </ParallaxCover>
         </div>
         {/* Écart e-mail → groupe adresse/téléphone : 16 en mobile, 28 au-dessus
@@ -292,7 +292,7 @@ function ContactDetails({ contact }: { contact: ContactContent }) {
           </a>
           <div className="flex flex-col gap-[16px]">
             <div className="flex flex-col gap-[5px]">
-              <span className="text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/60">
+              <span className="micro text-background/60">
                 {card.addressLabel}
               </span>
               <span className="text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-background">
@@ -306,7 +306,7 @@ function ContactDetails({ contact }: { contact: ContactContent }) {
                 laisse donc aucun espace résiduel. */}
             {card.phone ? (
               <div className="flex flex-col gap-[5px]">
-                <span className="text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/60">
+                <span className="micro text-background/60">
                   {card.phoneLabel}
                 </span>
                 <a
@@ -360,7 +360,7 @@ function ContactBody({ contact }: { contact: ContactContent }) {
           <div className="w-full tablet:ml-auto tablet:w-3/4">
             <Reveal
               as="p"
-              className="w-full max-w-[900px] pb-[16px] text-[22px] font-medium leading-[1.2] tracking-[-0.02em] tablet:pb-[40px] tablet:leading-[1.1] tablet:text-[26px] tablet:tracking-[-0.01em] desktop:text-[32px]"
+              className="w-full max-w-[900px] pb-[16px] text-[22px] font-medium leading-[1.2] tracking-[-0.01em] tablet:pb-[40px] tablet:leading-[1.1] tablet:text-[26px] tablet:tracking-[-0.01em] desktop:text-[32px]"
               initialOpacity={0}
               initialY={30}
               duration={0.75}
@@ -379,7 +379,7 @@ function ContactBody({ contact }: { contact: ContactContent }) {
               deux lignes en bande mobile. */}
           {[reply, capacity].filter(Boolean).map((paragraph) => (
             <div key={paragraph} className="pr-[20px]">
-              <p className="text-[15px] font-medium leading-[1.3] tracking-[-0.01em] text-background/60 tablet:max-w-[300px]">
+              <p className="text-[16px] font-medium leading-[1.3] tracking-[-0.01em] text-background/60 tablet:max-w-[300px]">
                 {paragraph}
               </p>
             </div>
@@ -401,6 +401,7 @@ export async function ContactPage() {
   return (
     <>
       <Header site={site} />
+      <FloatingNav site={site} />
       {/* Cible du lien d'évitement (voir SkipLink.tsx et focus.css). */}
       <main id="main-content" tabIndex={-1}>
         <ContactHero contact={contact} timeZone={site.contact.timezone} />
@@ -413,7 +414,6 @@ export async function ContactPage() {
         <FaqSection faq={[...contact.faq]} />
       </main>
       <Footer />
-      <FloatingNav site={site} />
     </>
   );
 }

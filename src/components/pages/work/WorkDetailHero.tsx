@@ -88,7 +88,7 @@ export function WorkDetailHero({ work }: { work: WorkItem }) {
       <div className="absolute inset-x-0 bottom-0 h-[78%] bg-gradient-to-t from-black/85 via-black/60 to-transparent" />
       {/* MANQUANT jusqu'ici : `/work/box-mode` n'avait aucun grain de section.
           RELEVÉ sur le live : hôte 1440 × 810, z-1, opacité 0,08. */}
-      <Grain opacity={0.08} className="z-[1]" />
+      <Grain matiere="photo" className="z-[1]" />
       {/* `hidden tablet:block` : la source ne trace AUCUN filet central sous
           810, nous en posions un (x 195, hauteur 810) sur toute la plage mobile.
           Son jumeau dans `WorkNarrative.tsx` porte déjà la garde, elle manquait
@@ -115,7 +115,7 @@ export function WorkDetailHero({ work }: { work: WorkItem }) {
             {/* INTERLIGNAGE 0,9 et non 0,82 (2026-10-15) : le tréma de
                 « WÜRTH » montait entre les lettres de la ligne du dessus et se
                 lisait comme un point (« DE.COMPTE »). */}
-            <h1 className="m-0 text-[63px] font-semibold uppercase leading-[0.9] tracking-[-0.05em] tablet:text-[78px] desktop:text-[98px]">
+            <h1 className="m-0 text-[63px] font-semibold uppercase leading-[0.9] tracking-[-0.045em] tablet:text-[78px] desktop:text-[98px]">
               {work.title}
             </h1>
           </Reveal>
@@ -137,7 +137,7 @@ export function WorkDetailHero({ work }: { work: WorkItem }) {
               220 px — avec `ml-[-220px]` et 360 px de large, le bloc débordait de
               142 px à droite de la médiane. Restent 2 px d'écart, imputables à la
               gouttière de 4 px de notre grille là où la source fait un 50/50 sec. */
-              className="mt-[20px] max-w-[360px] text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-white tablet:mt-[30px] tablet:ml-[-330px] tablet:max-w-[330px] tablet:text-right"
+              className="mt-[20px] max-w-[360px] text-[14px] font-medium leading-[1.35] tracking-[-0.01em] text-white tablet:mt-[30px] tablet:ml-[-330px] tablet:max-w-[330px] tablet:text-right"
             >
               {work.excerpt}
             </Reveal>

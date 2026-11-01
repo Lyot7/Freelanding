@@ -55,7 +55,7 @@ import { articlesDuCockpit } from "./blog-cockpit";
 /** Le seul auteur du blog. Repris de la carte du hero et du pied de page. */
 const eliott = {
   name: "Eliott Bouquerel",
-  role: "Développeur freelance",
+  role: "Développeur à Caen",
   avatar: {
     src: "/images/eliott-bouquerel-avatar.jpg",
     alt: "Eliott Bouquerel",

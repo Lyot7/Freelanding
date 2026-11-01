@@ -568,7 +568,7 @@ function ServiceRow({
                       Le calque de parallaxe n'est pas concerné : son bloc
                       conteneur reste le SECOND calque, et ses débords de 7 % s'y
                       rapportent comme avant. */}
-                  <Grain opacity={0.07} className="z-[3]" />
+                  <Grain matiere="photo" className="z-[3]" />
                 </motion.div>
               </div>
             </div>
@@ -653,7 +653,7 @@ export function ServicesSection({
             <div className="relative flex w-full flex-row items-start gap-[10px] overflow-visible tablet:w-px tablet:flex-[1_0_0]">
               {/* framer-9f2eim : "Services" (preset wwtw0z, 12px uppercase, blanc 60%) */}
               {eyebrow ? (
-                <p className="whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60">
+                <p className="whitespace-pre micro text-foreground-60">
                   {eyebrow}
                 </p>
               ) : null}
@@ -680,7 +680,7 @@ export function ServicesSection({
               <LineReveal
                 as="p"
                 text={intro}
-                className="w-px max-w-[560px] flex-[1_0_0] whitespace-pre-wrap text-left text-[22px] font-medium leading-[1.1] tracking-[-0.02em] text-foreground tablet:text-[26px] desktop:text-[32px]"
+                className="w-px max-w-[560px] flex-[1_0_0] whitespace-pre-wrap text-left text-[22px] font-medium leading-[1.1] tracking-[-0.01em] text-foreground tablet:text-[26px] desktop:text-[32px]"
                 lineClassName="overflow-hidden"
                 initialY={60}
                 duration={0.49}

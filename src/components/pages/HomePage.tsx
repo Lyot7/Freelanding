@@ -94,6 +94,7 @@ export async function HomePage() {
           autres routes rendent le header sans appear-id, et le relevé rAF du
           live le confirme au runtime). Voir la prop `appear` de `Header`. */}
       <Header site={site} appear />
+      <FloatingNav site={site} />
       {/* Cible du lien d'évitement (voir SkipLink.tsx et focus.css). */}
       <main id="main-content" tabIndex={-1}>
         {home.sectionOrder.map((section) => (
@@ -103,7 +104,6 @@ export async function HomePage() {
         ))}
       </main>
       <Footer />
-      <FloatingNav site={site} />
     </>
   );
 }

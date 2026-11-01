@@ -36,18 +36,18 @@ export function LogicielSection({
     <section
       id="logiciel"
       data-section="logiciel"
-      className="relative flex w-full flex-col items-center overflow-hidden bg-background px-[20px] pb-[60px] pt-[48px] text-foreground tablet:px-[24px] tablet:pb-[100px] tablet:pt-[80px] desktop:px-[30px]"
+      className="relative flex w-full flex-col items-center overflow-hidden bg-background py-section px-[20px] text-foreground tablet:px-[24px] desktop:px-[30px]"
     >
       <span aria-hidden className="absolute inset-y-0 left-1/2 z-[1] hidden w-px bg-white/10 tablet:block" />
 
       <div className="relative z-[2] grid w-full max-w-[1440px] gap-[36px] tablet:grid-cols-2 tablet:gap-x-0 tablet:gap-y-[60px]">
         <div className="flex flex-col gap-[24px] tablet:pr-[24px] desktop:pr-[30px]">
-          <p className="m-0 text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60">
+          <p className="m-0 micro text-foreground-60">
             {logiciel.eyebrow}
           </p>
-          <h2 className="m-0 flex flex-col text-[clamp(40px,calc(12vw/var(--zoom-ecran,1)),52px)] font-semibold uppercase leading-[0.82] tracking-[-0.05em] desktop:text-[clamp(68px,calc(6vw/var(--zoom-ecran,1)),92px)]">
+          <h2 className="m-0 flex flex-col titre-marque titre-section ">
             {logiciel.titleLines.map((ligne, i) => (
-              <span key={ligne} className="accent-room descender-room block overflow-hidden leading-[0.82]">
+              <span key={ligne} className="accent-room descender-room block overflow-hidden leading-display">
                 <Reveal
                   as="span"
                   className="inline-block whitespace-pre"
@@ -65,7 +65,7 @@ export function LogicielSection({
             as="p"
             initialOpacity={0.001}
             delay={0.2}
-            className="m-0 max-w-[46ch] text-[16px] font-medium leading-[1.45] tracking-[-0.01em] text-foreground-60 tablet:text-[17px] desktop:text-[18px]"
+            className="m-0 max-w-[46ch] text-[16px] font-medium leading-[1.45] tracking-[-0.01em] text-foreground-60 tablet:text-[18px] desktop:text-[18px]"
           >
             <Highlighted
               text={logiciel.statement}
@@ -75,7 +75,7 @@ export function LogicielSection({
           </Reveal>
           <Link
             href={logiciel.cta.href}
-            className="logiciel-cta flex h-[48px] w-fit items-center justify-center bg-accent px-[20px] text-[13px] font-semibold uppercase leading-none tracking-[-0.01em] text-accent-ink no-underline"
+            className="cta-primaire w-fit"
           >
             {logiciel.cta.label}
           </Link>
@@ -111,7 +111,7 @@ export function LogicielSection({
             ) : null}
           </Reveal>
         </div>
-        <p className="m-0 w-full text-[20px] font-medium leading-[1.2] tracking-[-0.02em] tablet:self-end tablet:pl-[24px] tablet:text-right desktop:pl-[30px] desktop:text-[26px]">
+        <p className="m-0 w-full text-[22px] font-medium leading-[1.2] tracking-[-0.01em] tablet:self-end tablet:pl-[24px] tablet:text-right desktop:pl-[30px] desktop:text-[26px]">
           <LineReveal
             text={methodePromise.quote}
             className="block w-full"

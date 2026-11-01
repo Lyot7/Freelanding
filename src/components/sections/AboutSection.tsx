@@ -13,7 +13,7 @@ import { useParallaxLayerY } from "@/components/motion/ParallaxImage";
 import { urlImageFond } from "@/lib/image-fond";
 import { Grain } from "@/components/effects/Grain";
 import { Highlighted } from "@/components/ui";
-import { facteurDeChasse } from "@/lib/ajustement-titre";
+import { APPROCHE_MARQUE, facteurDeChasse, GRAISSE_900 } from "@/lib/ajustement-titre";
 
 /**
  * AboutSection — reconstruction fidèle (CSS Framer → Tailwind responsive) de la
@@ -63,10 +63,10 @@ import { facteurDeChasse } from "@/lib/ajustement-titre";
 
 /** Preset wwtw0z (framer-global) : 12px, 500, uppercase, ls -0.01em, lh 1.2. */
 const PRESET_WWTW0Z =
-  "text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em]";
+  "micro";
 /** Preset 1hgnchr (framer-global) : 13px, 500, casse normale, ls -0.01em, lh 1.2. */
 const PRESET_1HGNCHR =
-  "text-[13px] font-medium leading-[1.2] tracking-[-0.01em]";
+  "text-[14px] font-medium leading-[1.2] tracking-[-0.01em]";
 
 /**
  * Titre fit-text : une ligne par entrée, masquée en overflow, slide-up.
@@ -126,12 +126,14 @@ function TitleFitText({
   /* La ligne la plus large décide du corps de TOUTES les lignes : plus le
      facteur est grand, plus la ligne est longue, donc plus le corps est petit.
      Prendre le maximum garantit qu'aucune ligne ne déborde du cadre. */
-  const facteurMax = Math.max(...lignes.map((l) => facteurDeChasse(l))).toFixed(3);
+  const facteurMax = (
+    Math.max(...lignes.map((l) => facteurDeChasse(l, APPROCHE_MARQUE))) * GRAISSE_900
+  ).toFixed(3);
   return (
     // framer-17vvig5-container : titre (code-component), aligné à droite.
     // Les `text-[…]` restent : ils donnent le corps hérité si une ligne ne
     // portait pas le sien, et l'em de référence du reste de la boîte.
-    <h2 className="relative m-0 flex w-full flex-col justify-center p-0 text-right text-[52px] font-semibold uppercase leading-[0.95] tracking-[-0.05em] text-accent-ink [--fit-plafond:52px] [container-type:inline-size] tablet:text-[68px] tablet:[--fit-plafond:68px] desktop:text-[92px] desktop:[--fit-plafond:92px]">
+    <h2 className="titre-marque titre-section relative m-0 flex w-full flex-col justify-center p-0 text-right text-accent-ink [--fit-plafond:clamp(40px,calc(12vw/var(--zoom-ecran,1)),52px)] [container-type:inline-size] tablet:[--fit-plafond:clamp(48px,calc(6vw/var(--zoom-ecran,1)),92px)]">
       {lignes.map((ligne, i) => (
         <span
           key={ligne + i}
@@ -157,7 +159,7 @@ function TitleFitText({
              « LOGICIELS », qui se lisait « LOGICIEĽS ». La valeur tenable se
              calcule (cf. `src/lib/ajustement-titre.ts`) : 0,910 pour l'encre
              d'un « É », plus les 4 % de marge qu'exige l'audit des accents. */
-          /* `tracking-[-0.05em]` EST REPOSÉ ICI, alors qu'il est déjà sur le
+          /* `tracking-[-0.045em]` EST REPOSÉ ICI, alors qu'il est déjà sur le
              titre. Ce n'est pas une redite : `letter-spacing` en `em` se résout
              une seule fois, sur le corps de l'élément qui le DÉCLARE, puis
              s'hérite en pixels. Déclaré sur le titre à 92 px, il valait -4,6 px
@@ -167,7 +169,7 @@ function TitleFitText({
              défaut allait dans le pire sens typographique — plus le texte est
              petit, plus il était resserré. Redéclaré sur la ligne, il se résout
              sur le corps de la ligne. */
-          className="accent-room descender-room block w-full overflow-hidden text-right leading-[0.95em] tracking-[-0.05em]"
+          className="accent-room descender-room block w-full overflow-hidden text-right leading-[0.95em] tracking-[-0.045em]"
           /* LA TAILLE EST PORTÉE PAR LA LIGNE, pas par le titre. C'est ce qui
              permet à `leading`, `tracking`, `accent-room` et `descender-room`,
              tous en em, de suivre le corps de CETTE ligne. */
@@ -205,7 +207,7 @@ function TitleFitText({
  *  template était une preuve sociale fabriquée écrite en dur. */
 function Counter({ value, suffix }: { value: string; suffix?: string }) {
   return (
-    <div className="relative flex items-center gap-0 text-[44px] font-semibold tracking-[-0.07em] leading-[normal] text-accent-ink tablet:text-[52px] desktop:text-[78px]">
+    <div className="relative flex items-center gap-0 text-[44px] font-semibold tracking-[-0.045em] leading-[normal] text-accent-ink tablet:text-[52px] desktop:text-[78px]">
       <span>{value}</span>
       {suffix ? <span>{suffix}</span> : null}
     </div>
@@ -331,7 +333,7 @@ function AboutImage({ src, alt }: { src?: string; alt?: string }) {
             cadre, comme la source : le grain y redevient du grain argentique et
             il reprend sa place. C'est l'aplat qui rendait le grain visible, pas
             le grain qui était de trop. */}
-        <Grain opacity={0.09} className="z-[3]" />
+        <Grain matiere="photo" className="z-[3]" />
       </motion.div>
     </div>
   );
@@ -430,7 +432,7 @@ export function AboutSection({
                   /* TEXTE COURANT depuis le 2026-09-24 : 16 à 18 px en casse
                      normale, sur une colonne élargie (90 % puis 80 %) pour
                      garder une soixantaine de signes par ligne. */
-                  className="relative m-0 h-auto w-full max-w-[62ch] whitespace-pre-wrap break-words text-[16px] font-medium leading-[1.45] tracking-[-0.01em] text-accent-ink/70 tablet:text-[17px] desktop:text-[18px]"
+                  className="relative m-0 h-auto w-full max-w-[62ch] whitespace-pre-wrap break-words text-[16px] font-medium leading-[1.45] tracking-[-0.01em] text-accent-ink/70 tablet:text-[18px] desktop:text-[18px]"
                 >
                   <Highlighted text={para} highlights={bodyHighlights} highlightClassName="text-accent-ink" />
                 </Reveal>
@@ -468,7 +470,7 @@ export function AboutSection({
       </div>
 
       {/* framer-1jrf812 : filet vertical central (blanc 18 %) */}
-      <div className="absolute left-[calc(50%-0.5px)] top-0 z-[1] h-full w-px bg-accent-ink opacity-[0.18]" />
+      <div className="absolute left-[calc(50%-0.5px)] top-0 z-[1] hidden h-full w-px bg-accent-ink opacity-[0.18] tablet:block" />
     </section>
   );
 }

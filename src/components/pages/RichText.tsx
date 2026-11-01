@@ -141,7 +141,7 @@ export function RichText({
    * plus grand que l'écart entre deux paragraphes. C'est ce contraste, et non
    * la taille des titres, qui rend une page longue parcourable.
    */
-  const body = bodySize === 15 ? "text-[16px]" : "text-[15px]";
+  const body = bodySize === 15 ? "text-[16px]" : "text-[16px]";
   return (
     <div className={className}>
       {blocks.map((block, index) => {
@@ -167,12 +167,12 @@ export function RichText({
             <h2
               key={key}
               id={idDeTitre(block.text)}
-              className={`${common} scroll-mt-[100px] text-[18px] tracking-[-0.03em] tablet:text-[24px] desktop:text-[30px]`}
+              className={`${common} scroll-mt-[100px] text-[18px] tracking-[-0.045em] tablet:text-[22px] desktop:text-[26px]`}
             >
               {block.text}
             </h2>
           ) : (
-            <h3 key={key} className={`${common} text-[22px] tracking-[-0.04em]`}>
+            <h3 key={key} className={`${common} text-[22px] tracking-[-0.045em]`}>
               {block.text}
             </h3>
           );
@@ -189,7 +189,7 @@ export function RichText({
             // ajoutait un marqueur absent de la source et décalait le texte.
             <List
               key={key}
-              className={`mt-[22px] space-y-[10px] text-[15px] font-medium leading-[1.65] tracking-[-0.005em] text-background/75 ${
+              className={`mt-[22px] space-y-[10px] text-[16px] font-medium leading-[1.65] tracking-[-0.01em] text-background/75 ${
                 ordered ? "list-decimal pl-[20px]" : "list-none pl-0"
               }`}
             >
@@ -211,7 +211,7 @@ export function RichText({
             // coupure et avalait donc la ligne vide. Les pages légales n'ont
             // que des retours simples (`contactDetails.join("\n")`) et rendent
             // identiquement sous les deux valeurs.
-            className={`mt-[22px] whitespace-pre-wrap ${body} font-medium leading-[1.65] tracking-[-0.005em] text-background/75 first:mt-0`}
+            className={`mt-[22px] whitespace-pre-wrap ${body} font-medium leading-[1.65] tracking-[-0.01em] text-background/75 first:mt-0`}
           >
             {linkify(block.text, liens)}
           </p>

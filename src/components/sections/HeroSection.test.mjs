@@ -139,6 +139,20 @@ describe("HeroSection, comparaison de prix", async () => {
     expect(html.match(/<h1\b/g)).toHaveLength(1);
   });
 
+  it("le h1 vaut exactement le titre : ni prix, ni lien, ni flèche", () => {
+    const html = rendre(heroSansVideo);
+    const h1 = html.match(/<h1\b[^>]*>(.*?)<\/h1>/s)?.[1] ?? "";
+    expect(h1.replace(/<[^>]+>/g, "")).toBe("Je vous rends des heures.");
+    expect(h1).not.toContain("<a ");
+    expect(h1).not.toContain("<svg");
+  });
+
+  it("dit sous le bouton la durée de l'appel, gratuit et sans engagement", () => {
+    const html = rendre(heroSansVideo);
+    expect(html).toContain(`data-part="hero-note-cta"`);
+    expect(html).toContain(homeContent.hero.ctaNote);
+  });
+
   it("nomme le sujet, puis chaque ligne avec son prix, le mien seul en accent", () => {
     const html = rendre(heroSansVideo);
     const bloc = html.slice(html.indexOf('data-part="comparaison"'));
@@ -147,11 +161,12 @@ describe("HeroSection, comparaison de prix", async () => {
     let curseur = bloc.indexOf(comparaison.sujet);
     for (const ligne of comparaison.lignes) {
       const motif = new RegExp(
-        `${ligne.qui}<span class="[^"]*${ligne.fort ? "text-accent" : "text-foreground"}"[^>]*>${ligne.prix}</span>`,
+        `${ligne.qui}<span class="[^"]*${ligne.fort ? "text-accent" : "text-foreground"}"[^>]*>${ligne.prix.replace(/\s/gu, "\\s")}</span>`,
       );
       expect(bloc).toMatch(motif);
       const position = bloc.indexOf(ligne.prix);
       expect(position).toBeGreaterThan(curseur);
+      expect(bloc).toContain(ligne.detail);
       curseur = position;
     }
     expect(bloc).not.toContain("<dl");

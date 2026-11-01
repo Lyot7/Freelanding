@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useId, type ReactNode } from "react";
 import { ImageProgressive } from "@/components/ui/ImageProgressive";
 import { Reveal } from "@/components/motion/Reveal";
 import type { LogoBand } from "@/lib/content/types";
@@ -72,11 +72,11 @@ const CELL =
    parce que la cellule est blanche : sur ce fond, l'encre est celle du fond du
    site, pas celle de son texte. */
 const CELL_NOM =
-  "text-[18px] font-semibold uppercase leading-[1.05] tracking-[-0.03em] text-background tablet:text-[20px]";
+  "text-[18px] font-semibold uppercase leading-[1.05] tracking-[-0.045em] text-background tablet:text-[22px]";
 // `/65` et non `/55` : sur la cellule blanche, 55 % d'encre donnait 4,37:1,
 // sous le seuil AA de 4,5:1 pour un texte de 12 px.
 const CELL_DETAIL =
-  "text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/65 tablet:text-[12px]";
+  "micro text-background/65 tablet:text-[12px]";
 
 /* Échelle des logos dans le héros. Les tailles de `home.ts` sont calibrées à
    surface optique égale pour une cellule de 140 px : les réduire d'un même
@@ -135,9 +135,16 @@ function Cellule({ logo }: { logo: Logo }): ReactNode {
    l'inverse de sa luminance. Le fond blanc disparaît, l'encre sombre devient
    blanche, l'anticrénelage est conservé. Un `invert()` CSS aurait laissé un
    rectangle noir autour de chaque logo. */
-function RangeeHeros({ logos }: { logos: readonly Logo[] }): ReactNode {
+function RangeeHeros({
+  logos,
+  titre,
+}: {
+  logos: readonly Logo[];
+  titre?: string;
+}): ReactNode {
+  const idTitre = useId();
   return (
-    <>
+    <div className="flex flex-col gap-[10px] desktop:flex-row desktop:items-center desktop:gap-[20px]">
       <svg aria-hidden width="0" height="0" className="absolute">
         {/* Région du filtre = boîte de l'image. Par défaut elle déborde de
             10 % de chaque côté, sur des pixels transparents que la matrice
@@ -158,7 +165,17 @@ function RangeeHeros({ logos }: { logos: readonly Logo[] }): ReactNode {
           />
         </filter>
       </svg>
-      <ul className="m-0 flex list-none flex-row flex-wrap items-center gap-x-[20px] gap-y-[10px] p-0 opacity-70 tablet:gap-x-[32px]">
+      {/* L'INTITULÉ EST LU AVANT LES LOGOS : sans lui, trois logos sur un site de
+          prestataire se lisent comme des clients, et ce sont des employeurs. */}
+      {titre ? (
+        <p id={idTitre} className="micro m-0 whitespace-pre text-white/60">
+          {titre}
+        </p>
+      ) : null}
+      <ul
+        aria-labelledby={titre ? idTitre : undefined}
+        className="m-0 flex list-none flex-row flex-wrap items-center gap-x-[20px] gap-y-[10px] p-0 opacity-80 tablet:gap-x-[32px]"
+      >
         {logos.map((logo) => (
           <li key={logo.name} className="flex items-center">
             {logo.image ? (
@@ -178,14 +195,14 @@ function RangeeHeros({ logos }: { logos: readonly Logo[] }): ReactNode {
                 className="object-contain"
               />
             ) : (
-              <span className="text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground">
+              <span className="micro text-foreground">
                 {logo.name}
               </span>
             )}
           </li>
         ))}
       </ul>
-    </>
+    </div>
   );
 }
 
@@ -204,7 +221,7 @@ export function LogoBandSection({
   }
 
   if (variant === "heros") {
-    return <RangeeHeros logos={logos} />;
+    return <RangeeHeros logos={logos} titre={logoBand.title} />;
   }
 
   return (
@@ -220,7 +237,7 @@ export function LogoBandSection({
             « clients ». Même gouttière horizontale que les autres sections. */}
         {logoBand.title ? (
           <div className="flex w-full max-w-[1440px] flex-col items-start px-[20px] tablet:px-[24px] desktop:px-[30px]">
-            <p className="text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60">
+            <p className="micro text-foreground-60">
               {logoBand.title}
             </p>
           </div>

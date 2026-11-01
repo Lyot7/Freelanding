@@ -36,7 +36,7 @@ export const contactContent: ContactContent = {
   },
   intro: [
     "Chaque projet commence par une conversation. Dites-moi ce que vous cherchez à régler, et je vous dirai honnêtement si je suis la bonne personne pour le faire.",
-    "Je vous réponds sous 24 heures ouvrées, franchement, même si c’est pour vous dire « ce projet n’est pas pour moi ».",
+    "Je vous réponds sous 24 h ouvrées, franchement, même si c’est pour vous dire « ce projet n’est pas pour moi ».",
     // « JE VOUS DONNE UNE DATE DE DÉMARRAGE ESTIMÉE » A ÉTÉ RETIRÉ le
     // 2026-08-31 : c'est un engagement de planning qu'aucun mot d'Eliott ne
     // porte, sur la page même où le visiteur écrit. À sa place, ce que le
@@ -60,7 +60,7 @@ export const contactContent: ContactContent = {
     // d'une carte de visite, un plan large rend le visage illisible.
     person: {
       name: "Eliott Bouquerel",
-      role: "Développeur freelance",
+      role: "Développeur à Caen",
       avatar: {
         src: "/images/eliott-nature-carte.jpg",
         // Le nom est écrit en toutes lettres à trois centimètres de là : le
@@ -90,6 +90,6 @@ export const contactContent: ContactContent = {
     // 2026-08-29, qui n'avait vidé que `brand.mark`.
     title: "Contact · Eliott Bouquerel",
     description:
-      "Dites-moi ce que vous cherchez à régler. Je vous réponds sous 24 heures ouvrées, même si c’est pour vous dire que ce n’est pas pour moi. Normandie, et France à distance.",
+      "Dites-moi ce que vous cherchez à régler. Je vous réponds sous 24 h ouvrées, même si c’est pour vous dire que ce n’est pas pour moi. Normandie, et France à distance.",
   },
 };

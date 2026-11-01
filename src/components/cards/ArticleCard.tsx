@@ -44,7 +44,7 @@ const FONT = "[font-family:var(--font-sans)]";
  */
 function ArticleDate({ iso }: { iso: string }) {
   return (
-    <p className="text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-[rgba(11,11,11,0.6)]">
+    <p className="micro text-[rgba(11,11,11,0.6)]">
       <time dateTime={`${iso}T00:00:00.000Z`}>{formatShortDate(iso)}</time>
     </p>
   );
@@ -90,7 +90,7 @@ function CoverCard({ post }: { post: BlogPost }) {
             (section « Articles », calques 342 × 440 / 517 / 302 à 1440) : z-3,
             opacité 0,08, et DÉRIVANT — il était posé en `inset-0` figé, donc
             invisible en tant que grain et absent de l'inventaire animé. */}
-        <Grain opacity={0.08} className="z-[3]" />
+        <Grain matiere="photo" className="z-[3]" />
       </div>
 
       {/* framer-1n68hzi : bloc texte (mobile: pr16 ; ≥810: px16 ; ≥1200: px20) */}

@@ -139,7 +139,7 @@ function NumberCounter({
     <div className="relative h-[50px] w-auto tablet:h-[60px] desktop:h-[74px]">
       <div
         className={
-          "flex items-center gap-0 text-[44px] font-medium tracking-[-0.07em] leading-[normal] tablet:text-[52px] desktop:text-[64px] " +
+          "flex items-center gap-0 text-[44px] font-medium tracking-[-0.045em] leading-[normal] tablet:text-[52px] desktop:text-[58px] " +
           colorClass
         }
       >
@@ -157,10 +157,9 @@ function NumberCounter({
  * masquée au-dessus (opacity 0) ; le hover fait glisser l'une hors du clip et
  * l'autre en place (bonus pur CSS, sans JS). `colorClass` colore texte + flèche.
  */
-function SwapLink({ cta, colorClass }: { cta: LinkData; colorClass: string }) {
-  const cls =
-    "group relative inline-flex w-min cursor-pointer flex-row items-center justify-end gap-[4px] overflow-hidden whitespace-pre text-[13px] font-medium leading-[1.2] tracking-[-0.01em] no-underline " +
-    colorClass;
+function SwapLink({ cta }: { cta: LinkData }) {
+  // L'ACTION PRINCIPALE DE LA CARTE, donc un bouton : volt sur la carte noire.
+  const cls = "cta-primaire group relative cursor-pointer gap-[4px] overflow-hidden whitespace-pre";
   // Course de 14px et durée de 105ms : valeurs MESURÉES sur le live. C'est le
   // survol le plus rapide du site — nous étions à 300ms, presque trois fois
   // trop lent. La course est exprimée en pixels absolus (et non en 140%) parce
@@ -184,7 +183,7 @@ function SwapLink({ cta, colorClass }: { cta: LinkData; colorClass: string }) {
       <Icon
         name="arrow-up-right"
         size={15}
-        className={`shrink-0 transition-opacity duration-[105ms] ease-out group-hover:opacity-50 motion-reduce:transition-none ${colorClass}`}
+        className="shrink-0 transition-opacity duration-[105ms] ease-out group-hover:opacity-50 motion-reduce:transition-none"
       />
     </>
   );
@@ -259,11 +258,11 @@ function Title({
     <div className="accent-clip-titre relative order-1 flex w-full flex-row items-start justify-start gap-0 overflow-clip tablet:order-none tablet:w-px tablet:flex-[1_0_0]">
       {/* framer-1kk4nz3-container : conteneur du code-component */}
       <div className="relative flex h-auto w-px flex-[1_0_0] flex-col gap-[20px] pb-[10px] tablet:gap-[30px] tablet:pb-[50px]">
-        <h2 className="relative m-0 flex w-full max-w-full flex-col justify-center p-0 text-left text-[52px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] text-background tablet:text-[68px] desktop:text-[92px]">
+        <h2 className="titre-marque titre-section relative m-0 flex w-full max-w-full flex-col justify-center p-0 text-left text-background">
           {lines.map((line, i) => (
             <span
               key={line}
-              className="accent-room descender-room mb-0 block w-full overflow-hidden text-left leading-[0.82]"
+              className="accent-room descender-room mb-0 block w-full overflow-hidden text-left leading-display"
             >
               <Reveal
                 as="span"
@@ -324,7 +323,7 @@ export function WhyUsSection({ whyUs }: { whyUs: HomeContent["whyUs"] }) {
   }));
 
   return (
-    // framer-5mbkz6 : section (fond #e9e9e9, flex col centrée)
+    // framer-5mbkz6 : section (fond papier, flex col centrée)
     <section
       data-section="whyus"
       className={
@@ -342,7 +341,7 @@ export function WhyUsSection({ whyUs }: { whyUs: HomeContent["whyUs"] }) {
           {/* framer-fdv2eb : Label (colonne mobile, order 0) */}
           <div className="relative order-0 flex w-full flex-col items-start gap-[8px] overflow-visible tablet:w-px tablet:flex-[1_0_0] tablet:flex-row tablet:gap-[10px]">
             {/* framer-1q56wxs : « Why us? » (preset wwtw0z, noir 60%) */}
-            <p className={"m-0 h-auto w-auto whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] " + DARK_60}>
+            <p className={"m-0 h-auto w-auto whitespace-pre micro " + DARK_60}>
               {eyebrow}
             </p>
           </div>
@@ -375,7 +374,7 @@ export function WhyUsSection({ whyUs }: { whyUs: HomeContent["whyUs"] }) {
                 >
                   <Reveal
                     as="div"
-                    className={`relative flex h-[220px] w-full flex-col items-center justify-between p-[20px] tablet:aspect-[1.34643] tablet:h-[280px] tablet:w-[377px] ${
+                    className={`relative flex min-h-[220px] w-full flex-col items-center justify-between gap-[16px] p-[20px] tablet:aspect-[1.34643] tablet:h-[280px] tablet:w-[377px] ${
                       sombre ? "bg-background" : "bg-foreground"
                     }`}
                     initialOpacity={0.001}
@@ -386,14 +385,14 @@ export function WhyUsSection({ whyUs }: { whyUs: HomeContent["whyUs"] }) {
                       colorClass={sombre ? undefined : DARK_60}
                     />
                     {/* framer-aazft / framer-7fg37k : rangée [nombre | lien] */}
-                    <div className="relative flex w-full flex-row items-end justify-between gap-[10px] overflow-hidden">
+                    <div className="relative flex w-full flex-col items-stretch gap-[10px] overflow-hidden">
                       <NumberCounter
                         stat={stat}
                         prefix={stat.prefix ?? ""}
                         suffix={stat.suffix ?? ""}
                         colorClass={encre}
                       />
-                      {cta ? <SwapLink cta={cta} colorClass={encre} /> : null}
+                      {cta ? <SwapLink cta={cta} /> : null}
                     </div>
                   </Reveal>
                 </div>
@@ -475,7 +474,7 @@ export function WhyUsSection({ whyUs }: { whyUs: HomeContent["whyUs"] }) {
       </div>
 
       {/* framer-1uiizu3 : filet vertical central (noir 8%) */}
-      <div className="absolute left-[calc(50%-0.5px)] top-0 z-0 h-full w-px bg-background opacity-[0.08]" />
+      <div className="absolute left-[calc(50%-0.5px)] top-0 z-0 hidden h-full w-px bg-background opacity-[0.08] tablet:block" />
     </section>
   );
 }

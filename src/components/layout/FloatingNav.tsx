@@ -15,20 +15,21 @@ const useIsoLayoutEffect =
   typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 /**
- * Seuil de scroll déclenchant le montage du dock. MESURÉ sur le live par sondes
- * successives avec rechargement complet : absent à 0, 1 et 2 px, présent et
- * visible à 5 px. Le dock apparaît donc au tout premier geste de scroll.
+ * Le dock arrive une fois le héros presque passé, et repart au retour au-dessus
+ * de ce seuil : posé plus tôt, il recouvrait la source La Fabrique du Net et les
+ * logos. Une fraction de la fenêtre, lue à chaque événement.
  */
-const REVEAL_SCROLL_PX = 2;
+const SEUIL_DOCK = 0.85;
 
 /**
- * Course verticale de l'entrée, en px. MESURÉE sur le live : le dock arrive de
- * `translateY ≈ 70` et rejoint 0, l'opacité restant à 1 du début à la fin (aucun
- * fondu, aucun changement de `display` ni de `visibility`). À +70, la pastille a
- * son bord haut à 900 pour une fenêtre de 900 : elle est donc exactement hors
- * champ, ce qui suffit à la masquer sans toucher à l'opacité.
+ * Course verticale, en px : le bouton (50), son retrait bas et l'encoche d'un
+ * téléphone (34 au plus), pour le garer entièrement sous le bord.
  */
-const REVEAL_Y = 70;
+const REVEAL_Y = 90;
+
+/** Courbe de la charte pour tout ce qui entre : départ franc, arrivée douce. */
+const ENTREE = { type: "spring", visualDuration: 0.3, bounce: 0 } as const;
+const SORTIE = { duration: 0.24, ease: "easeIn" } as const;
 
 /**
  * FloatingNav — port FIDÈLE du menu flottant du gabarit Framer d'origine
@@ -37,20 +38,14 @@ const REVEAL_Y = 70;
  * reproduits en CSS performant (transform + opacity, GPU) — zéro invention.
  *
  * Comportement source vérifié LIVE :
- *   - Dock MONTÉ AU PREMIER SCROLL, pas au chargement. Mesuré : au chargement
- *     frais son hôte `framer-xm6233-container` a un `textContent` de 0 caractère,
- *     et le dock est absent du DOM ; il apparaît entre 2 et 5 px de scroll, puis
- *     ne se rétracte JAMAIS (vérifié en remontant à 0 : il reste affiché).
- *     Entrée : `translateY 70 → 0` en ~550 ms, profil exponentiel sans
- *     dépassement, opacité constante à 1. Voir REVEAL_SCROLL_PX / REVEAL_Y.
- *     (Une version antérieure de ce fichier affirmait l'inverse — dock persistant
- *     sans animation — sur la base d'une capture prise dans un document au rAF
- *     gelé, où toute animation est figée à t=0. Le relevé était invalide.)
+ *   - Dock en bas à droite depuis le 2026-11-01 : hors de l'axe du filet central,
+ *     il ne recouvre plus la colonne de texte. Il apparaît sous le héros, se
+ *     retire au pied de page, et porte l'action une fois `#logiciel` passé.
  *   - VOILE plein écran `rgba(18,18,18,0.3)` (framer-o5yu5p), opacité 0 → 1 sur la
  *     même chronologie que le panneau. (Affirmé absent dans une version antérieure
  *     de ce fichier, sur la base d'une capture au rAF gelé où son opacité restait
  *     figée à 0. Mesure refaite dans un Chrome réel : il existe bien.)
- *   - Ouverture panneau : `opacity 0→1` + `transform scale(.9) translateY(20px)→none`,
+ *   - Ouverture panneau (depuis son coin bas droit) : `opacity 0→1` + `scale(.9) translateY(20px)→none`,
  *     ~300ms, ease-out sans overshoot (`cubic-bezier(.2,.8,.2,1)`), opacity `ease-out`.
  *     Propriétés animées : opacity + transform uniquement (pas de height).
  *   - Burger→croix : barres haut/bas `rotate(±45deg)`, médiane `opacity 0`, même 300ms.
@@ -153,40 +148,54 @@ export function FloatingNav({ site }: { site: SiteConfig }) {
   // libellés traduits ET le retrait des sections éteintes.
   const menuLinks = site.menuNav ?? site.nav;
   const [open, setOpen] = useState(false);
+  const burgerActif = useRef(false);
 
-  // Apparition au premier scroll, IRRÉVERSIBLE (fidèle au live).
-  //
-  // L'état de REPOS est le dock MASQUÉ (translaté de REVEAL_Y, donc juste sous le
-  // bord bas), et non plus visible. L'ancien repos « visible » était payé cher :
-  // relevé en rAF sur `/contact`, notre pastille restait AFFICHÉE à y=830 pour
-  // une fenêtre de 900 pendant les 320 premières millisecondes, puis glissait
-  // jusqu'à 900 une fois l'hydratation passée — une pastille qui apparaît puis
-  // s'en va, sur les 18 pages. La source, elle, ne monte PAS le dock avant le
-  // premier scroll : son hôte `.framer-11cf560-container` est absent du DOM sur
-  // les 193 images des 3 premières secondes.
-  //
-  // Sans JavaScript le dock reste donc hors champ, exactement comme la source ;
-  // la navigation reste servie par le header (≥810) et par le pied de page.
+  // L'état de REPOS est le dock MASQUÉ, juste sous le bord bas : une pastille
+  // visible au chargement puis retirée à l'hydratation clignotait sur toutes les
+  // pages. Sans JavaScript, la navigation reste servie par l'en-tête et le pied.
   const [revealed, setRevealed] = useState(false);
+  // Le pied de page a son propre formulaire et ses propres liens.
+  const [piedVisible, setPiedVisible] = useState(false);
+  // L'action n'apparaît qu'une fois la démonstration lue. Seul l'accueil porte
+  // `#logiciel` ; `#rendez-vous` la replie, la réservation est alors sous les yeux.
+  const [logicielPasse, setLogicielPasse] = useState(false);
+  const [rendezVousVu, setRendezVousVu] = useState(false);
 
   useIsoLayoutEffect(() => {
-    // Si la page est déjà scrollée (rechargement en cours de page, restauration
-    // de position, ancre), le dock doit être là immédiatement, sans entrée.
-    if (window.scrollY > REVEAL_SCROLL_PX) {
-      setRevealed(true);
-    }
+    // Rechargement en cours de page, ancre : le dock est là tout de suite.
+    const lire = () => {
+      // Lu au défilement et non par un observateur : un saut d'ancre ou un
+      // rechargement franchit la section sans jamais la croiser.
+      const logiciel = document.getElementById("logiciel");
+      const rendezVous = document.getElementById("rendez-vous");
+      setLogicielPasse(logiciel ? logiciel.getBoundingClientRect().bottom < 0 : false);
+      setRendezVousVu(
+        rendezVous ? rendezVous.getBoundingClientRect().top < window.innerHeight : false,
+      );
+      // Tant que le clavier est sur le burger, le dock reste : le retirer ferait
+      // perdre le focus.
+      if (burgerActif.current) return;
+      setRevealed(window.scrollY > window.innerHeight * SEUIL_DOCK);
+    };
+    lire();
+    window.addEventListener("scroll", lire, { passive: true });
+    return () => window.removeEventListener("scroll", lire);
   }, []);
 
   useEffect(() => {
-    if (revealed) return;
-    const onScroll = () => {
-      if (window.scrollY > REVEAL_SCROLL_PX) setRevealed(true);
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [revealed]);
+    const pied = document.querySelector("footer");
+    if (!pied) return;
+    const observateur = new IntersectionObserver(([entree]) => {
+      if (entree) setPiedVisible(entree.isIntersecting);
+    });
+    observateur.observe(pied);
+    return () => observateur.disconnect();
+  }, []);
 
-  const shown = revealed;
+  const shown = open || revealed;
+  // Fondu et non translation : le dock s'efface devant le pied, sans glisser.
+  const efface = piedVisible && !open;
+  const avecAction = logicielPasse && !rendezVousVu && !open;
 
   // Fermeture Échap.
   useEffect(() => {
@@ -249,8 +258,9 @@ export function FloatingNav({ site }: { site: SiteConfig }) {
 
   const closeMenu = () => setOpen(false);
   const tab = open ? 0 : -1;
+  const action = site.floatingCta ?? primaryCta;
   const labelCls =
-    "m-0 whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60";
+    "micro m-0 whitespace-pre text-foreground-60";
 
   return (
     <div
@@ -260,20 +270,9 @@ export function FloatingNav({ site }: { site: SiteConfig }) {
       aria-modal={open || undefined}
       aria-label={open ? "Menu de navigation" : undefined}
       data-part="floating-nav"
-      /*
-       * CENTRÉE EN BAS, comme sur la source. Décision d'Eliott, après un essai
-       * en bas à droite.
-       *
-       * CE QUE ÇA IMPLIQUE, et ce qui est fait pour. À x = 720 sur une fenêtre
-       * de 1440, la pastille tombe sur le filet vertical qui sépare les deux
-       * colonnes du site ET sur le premier caractère de la colonne de texte des
-       * pages d'article. Son fond était translucide à 80 % : sur les pages à
-       * fond clair, les lettres transparaissaient floutées dessous et la
-       * pastille se lisait comme une tache posée sur le texte. C'est le défaut
-       * signalé. L'opacité du fond règle ça sans la déplacer (voir la pastille
-       * plus bas).
-       */
-      className="pointer-events-none fixed inset-0 z-[9] flex flex-col items-center justify-end p-[20px]"
+      // EN BAS À DROITE depuis le 2026-11-01 : au centre, la pastille tombait sur
+      // le filet et sur le premier caractère de la colonne de texte des articles.
+      className="pointer-events-none fixed inset-0 z-[9] flex flex-col items-end justify-end pb-[max(16px,env(safe-area-inset-bottom))] pr-[16px]"
     >
       {/* framer-o5yu5p : voile plein écran — ferme au clic hors menu.
           MESURÉ sur le live dans un Chrome réel : `rgba(18,18,18,0.3)`, opacité
@@ -305,10 +304,14 @@ export function FloatingNav({ site }: { site: SiteConfig }) {
           exponentielle de constante de temps ~86 ms (ratio ~0,82 toutes les 17 ms),
           95 % à ~300 ms, fin ~550 ms. `bounce: 0` supprime tout rebond. */}
       <motion.div
-        className="relative flex flex-col items-center"
+        className="relative flex flex-col items-end"
         initial={false}
-        animate={{ y: shown ? 0 : REVEAL_Y }}
-        transition={{ type: "spring", visualDuration: 0.3, bounce: 0 }}
+        animate={
+          efface
+            ? { y: shown ? 0 : REVEAL_Y, opacity: 0, transitionEnd: { visibility: "hidden" } }
+            : { y: shown ? 0 : REVEAL_Y, opacity: 1, visibility: "visible" }
+        }
+        transition={{ y: shown ? ENTREE : SORTIE, opacity: { duration: 0.2 } }}
       >
         {/* Panneau (e5omt8) — absolute au-dessus du burger ; anim opacity+scale+translateY. */}
         <div
@@ -318,16 +321,12 @@ export function FloatingNav({ site }: { site: SiteConfig }) {
           style={{
             transitionTimingFunction: EASE,
             transform: open
-              ? "translateX(-50%) scale(1) translateY(0)"
-              : "translateX(-50%) scale(0.9) translateY(20px)",
+              ? "scale(1) translateY(0)"
+              : "scale(0.9) translateY(20px)",
           }}
-          // Origine de l'échelle au CENTRE (défaut), pas en bas. MESURÉ : à
-          // `scale(0.9) translateY(20)` la source place le haut du panneau à
-          // y=537,2 pour une position finale de 501,8 et une hauteur réduite de
-          // 277,4 — c'est exactement le résultat d'une mise à l'échelle centrée
-          // (655,9 - 138,7 + 20). `origin-bottom` le posait à 550,6, soit 13 px
-          // trop bas pendant toute l'ouverture.
-          className={`absolute bottom-[70px] left-1/2 w-[min(400px,calc(calc(100vw/var(--zoom-ecran,1))-40px))] overflow-hidden bg-[rgba(23,23,23,0.89)] transition-[opacity,transform,backdrop-filter] duration-300 before:pointer-events-none before:absolute before:inset-0 before:z-[2] before:border before:border-[rgba(255,255,255,0.1)] before:content-[''] motion-reduce:transition-none ${
+          // S'ouvre depuis le coin du dock, qui l'a fait naître. `max-h` et le
+          // défilement : le panneau tient en 320 × 568.
+          className={`absolute bottom-[70px] right-0 left-auto max-h-[calc(100svh-110px)] w-[min(400px,calc(calc(100vw/var(--zoom-ecran,1))-32px))] origin-bottom-right translate-x-0 overflow-y-auto bg-[rgba(23,23,23,0.89)] transition-[opacity,transform,backdrop-filter] duration-300 before:pointer-events-none before:absolute before:inset-0 before:z-[2] before:border before:border-[rgba(255,255,255,0.1)] before:content-[''] motion-reduce:transition-none ${
             open
               ? "pointer-events-auto opacity-100 [backdrop-filter:blur(9px)]"
               : "pointer-events-none opacity-0 [backdrop-filter:blur(0px)]"
@@ -339,12 +338,12 @@ export function FloatingNav({ site }: { site: SiteConfig }) {
                 retrait de 16 px par-dessus celui du panneau. Sans lui le panneau
                 mesurait 294,2 px de haut contre 308,2 sur la source, et les deux
                 colonnes s'écartaient sur 366 px de largeur utile au lieu de 336. */}
-            <div className="flex items-stretch justify-between gap-[24px] px-[16px] pt-[16px]">
+            <div className="flex flex-col gap-[20px] px-[16px] pt-[16px] min-[400px]:flex-row min-[400px]:items-stretch min-[400px]:justify-between min-[400px]:gap-[24px]">
               <div className="flex flex-col items-start gap-[9px] select-none">
                 <p className={labelCls}>{uiLabels.chrome.menuColumnLabel}</p>
                 <nav
                   aria-label={uiLabels.chrome.floatingNavLabel}
-                  className="flex flex-col items-start gap-[8px]"
+                  className="flex flex-col items-start gap-0"
                 >
                   {menuLinks.map((link) => (
                     <HoverPrefetchLink
@@ -352,7 +351,7 @@ export function FloatingNav({ site }: { site: SiteConfig }) {
                       href={link.href}
                       tabIndex={tab}
                       onClick={closeMenu}
-                      className="whitespace-pre text-[18px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground no-underline transition-colors duration-200 ease-[cubic-bezier(0.44,0,0.56,1)] hover:text-accent motion-reduce:transition-none min-[810px]:text-[20px]"
+                      className="whitespace-pre py-[11px] text-[18px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground no-underline transition-colors duration-200 ease-[cubic-bezier(0.44,0,0.56,1)] hover:text-accent motion-reduce:transition-none min-[810px]:text-[22px]"
                     >
                       {link.label}
                     </HoverPrefetchLink>
@@ -360,16 +359,16 @@ export function FloatingNav({ site }: { site: SiteConfig }) {
                 </nav>
               </div>
 
-              <div className="flex flex-col items-end justify-between gap-[24px] text-right select-none">
-                <div className="flex flex-col items-end gap-[9px]">
+              <div className="flex flex-col items-start justify-between gap-[24px] text-left select-none min-[400px]:items-end min-[400px]:text-right">
+                <div className="flex flex-col items-start gap-[9px] min-[400px]:items-end">
                   <p className={labelCls}>
                     {uiLabels.chrome.contactColumnLabel}
                   </p>
-                  <div className="flex flex-col items-end gap-[8px]">
+                  <div className="flex flex-col items-start gap-[8px] min-[400px]:items-end">
                     <a
                       href={`mailto:${contact.email}`}
                       tabIndex={tab}
-                      className="whitespace-pre text-[16px] font-medium leading-[1.1] tracking-[-0.02em] text-foreground no-underline transition-colors duration-200 hover:text-accent motion-reduce:transition-none"
+                      className="whitespace-pre text-[16px] font-medium leading-[1.1] tracking-[-0.01em] text-foreground no-underline transition-colors duration-200 hover:text-accent motion-reduce:transition-none"
                     >
                       {contact.email}
                     </a>
@@ -380,7 +379,7 @@ export function FloatingNav({ site }: { site: SiteConfig }) {
                       <a
                         href={`tel:${contact.phone.replace(/[^+\d]/g, "")}`}
                         tabIndex={tab}
-                        className="whitespace-pre text-[16px] font-medium leading-[1.1] tracking-[-0.02em] text-foreground no-underline transition-colors duration-200 hover:text-accent motion-reduce:transition-none"
+                        className="whitespace-pre text-[16px] font-medium leading-[1.1] tracking-[-0.01em] text-foreground no-underline transition-colors duration-200 hover:text-accent motion-reduce:transition-none"
                       >
                         {contact.phone}
                       </a>
@@ -392,14 +391,14 @@ export function FloatingNav({ site }: { site: SiteConfig }) {
                     liens étaient écrits en dur, en anglais, et retrouvés par
                     leur libellé anglais : la troisième obligation française
                     (mentions légales) n'apparaissait donc pas. */}
-                <div className="flex flex-col items-end gap-[8px]">
+                <div className="flex flex-col items-start gap-[8px] min-[400px]:items-end">
                   {legalLinks.map((link) => (
                     <HoverPrefetchLink
                       key={link.href}
                       href={link.href}
                       tabIndex={tab}
                       onClick={closeMenu}
-                      className="whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60 underline decoration-[#ffffff21] underline-offset-[3px] transition-[color,text-decoration-color,text-underline-offset] duration-200 hover:text-foreground hover:underline-offset-4 motion-reduce:transition-none"
+                      className="micro whitespace-normal text-foreground-60 underline decoration-[#ffffff21] underline-offset-[3px] transition-[color,text-decoration-color,text-underline-offset] duration-200 hover:text-foreground hover:underline-offset-4 motion-reduce:transition-none"
                     >
                       {link.label}
                     </HoverPrefetchLink>
@@ -408,12 +407,12 @@ export function FloatingNav({ site }: { site: SiteConfig }) {
               </div>
             </div>
 
-            {/* CTA « START A PROJECT » — enfant du panneau, pleine largeur, fond #0b0b0b. */}
+            {/* L'action du panneau, pleine largeur, en volt. */}
             <HoverPrefetchLink
               href={primaryCta.href}
               tabIndex={tab}
               onClick={closeMenu}
-              className="group relative flex h-[50px] w-full items-center justify-center overflow-hidden bg-background px-[16px] no-underline"
+              className="group relative flex h-[50px] w-full items-center justify-center overflow-hidden bg-accent px-[16px] no-underline"
             >
               {/* 14,4 px et non 15 : le cadre clippant de la source mesure
                   12,97 px sous l'échelle 0,9 du panneau, soit 14,41 px avant
@@ -421,10 +420,36 @@ export function FloatingNav({ site }: { site: SiteConfig }) {
               <span className="relative block h-[14.4px] overflow-hidden">
                 <SwapCopies
                   travel={22}
-                  textClassName="text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-foreground"
+                  textClassName="text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-accent-ink"
                 >
                   {primaryCta.label}
                 </SwapCopies>
+              </span>
+            </HoverPrefetchLink>
+          </div>
+        </div>
+
+        <div className="pointer-events-none flex items-stretch">
+        {/* L'action, ouverte à gauche du menu une fois la démonstration passée. */}
+        <div className="dock-action" data-ouvert={avecAction}>
+          <div>
+            <HoverPrefetchLink
+              href={action.href}
+              tabIndex={avecAction ? 0 : -1}
+              aria-hidden={!avecAction}
+              className={`flex h-[50px] items-center whitespace-pre bg-accent px-[16px] text-[12px] font-semibold uppercase leading-none tracking-[-0.01em] text-accent-ink no-underline ${
+                avecAction ? "pointer-events-auto" : "pointer-events-none"
+              }`}
+            >
+              <span className="dock-action-texte">
+                {primaryCta.shortLabel ? (
+                  <>
+                    <span className="min-[390px]:hidden">{primaryCta.shortLabel}</span>
+                    <span className="hidden min-[390px]:inline">{action.label}</span>
+                  </>
+                ) : (
+                  action.label
+                )}
               </span>
             </HoverPrefetchLink>
           </div>
@@ -435,14 +460,15 @@ export function FloatingNav({ site }: { site: SiteConfig }) {
           ref={burgerRef}
           type="button"
           onClick={() => setOpen((v) => !v)}
-          // Le dock est monté au premier SCROLL (fidèle à la source), donc au
-          // chargement il est translaté de 70px, entièrement hors de la fenêtre.
-          // Il restait pourtant dans l'ordre de tabulation : au clavier, on
-          // atteignait un bouton invisible, situé sous le bord bas, sans aucun
-          // moyen de savoir où on était. Le focus le révèle donc, exactement
-          // comme le ferait un premier geste de défilement. Aucun changement
-          // pour la souris, donc aucune perte de fidélité.
-          onFocus={() => setRevealed(true)}
+          // Garé hors écran en haut de page, il reste dans l'ordre de tabulation :
+          // le focus le révèle et le garde tant qu'il y est, comme un défilement.
+          onFocus={() => {
+            burgerActif.current = true;
+            setRevealed(true);
+          }}
+          onBlur={() => {
+            burgerActif.current = false;
+          }}
           aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
           aria-expanded={open}
           aria-controls={PANEL_ID}
@@ -453,28 +479,14 @@ export function FloatingNav({ site }: { site: SiteConfig }) {
               rgba(20,20,20,0.8) (mesuré sur le live — très subtil, 3/255). */}
           <span
             aria-hidden
-            /*
-             * FOND À 96 %, ET NON 80 % COMME SUR LA SOURCE.
-             *
-             * La pastille est posée au centre bas, donc sur le filet séparateur
-             * et sur le début de la colonne de texte des articles. À 80 %, le
-             * texte noir dessous transparaissait, flouté par le
-             * `backdrop-filter` : calculé sur le gris clair des pages
-             * d'article (232), le fond rendait 65 et une lettre 18, un écart
-             * qui se voit franchement. À 96 %, l'écart tombe de 43 à 9 points
-             * de gris, sous le seuil du perceptible.
-             *
-             * La source peut se permettre 80 % : son site est sombre partout, il
-             * n'y a jamais de texte noir derrière cette pastille. Le flou est
-             * conservé, il travaille encore sur les fonds sombres et sur la
-             * vidéo du hero.
-             */
+            // Fond à 96 % : la pastille peut passer sur du texte noir.
             className="absolute inset-[1px] bg-[rgba(23,23,23,0.96)] transition-colors duration-[385ms] [backdrop-filter:blur(8px)] group-hover:bg-[rgba(20,20,20,0.96)] motion-reduce:transition-none"
           />
           <span className="relative z-[1] flex items-center justify-center">
             <BurgerIcon open={open} />
           </span>
         </button>
+        </div>
       </motion.div>
     </div>
   );

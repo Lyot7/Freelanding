@@ -123,7 +123,7 @@ export function WorkExplorer({
 
               Typographie relevée : 12 px / interligne 14,4 / chasse -0,12,
               contre 11 / 16,5 / -0,11 chez nous. */}
-          <p className="shrink-0 text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-white/60 tablet:order-3 tablet:col-span-2 tablet:text-right">
+          <p className="shrink-0 micro text-white/60 tablet:order-3 tablet:col-span-2 tablet:text-right">
             {siteConfig.copyright}
           </p>
           </div>
@@ -157,7 +157,7 @@ export function WorkExplorer({
         </div>
       ) : (
         <div className="flex min-h-[calc(60vh/var(--zoom-ecran,1))] flex-col items-center justify-center gap-[20px] px-[20px] text-center">
-          <p className="text-[28px] font-semibold uppercase leading-[0.9] tracking-[-0.04em]">
+          <p className="text-[26px] font-semibold uppercase leading-[0.9] tracking-[-0.045em]">
             {uiLabels.filters.workEmptyLabel}
           </p>
           <button
@@ -167,7 +167,7 @@ export function WorkExplorer({
               setQuery("");
             }}
             // Focus : voir `src/app/focus.css` (source de vérité unique).
-            className="min-h-[44px] border border-white/20 px-[18px] text-[12px] font-medium uppercase hover:border-white"
+            className="min-h-[44px] border border-white/20 px-[18px] micro hover:border-white"
           >
             {uiLabels.filters.workResetLabel}
           </button>

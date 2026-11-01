@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "bun:test";
 import { AppRouterContext } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { createElement } from "react";
@@ -44,7 +45,8 @@ describe("Unités de fenêtre divisées par le zoom des grands écrans", async (
 
   it("WorkCardPin : la rangée et la piste épinglée suivent le zoom", () => {
     const html = rendre(WorkCardPin, { work, index: 0 });
-    expect(html).toContain("desktop:h-[calc(100vh/var(--zoom-ecran,1))]");
+    expect(html).toContain('w-full h-[calc(100vh/var(--zoom-ecran,1))]');
+    expect(html).not.toContain("h-[800px]");
     expect(html).toContain("h-[calc(300vh/var(--zoom-ecran,1))]");
     expect(html).toContain("sticky top-0 flex h-[calc(100vh/var(--zoom-ecran,1))]");
     expect(html).not.toMatch(SANS_ZOOM);
@@ -52,7 +54,8 @@ describe("Unités de fenêtre divisées par le zoom des grands écrans", async (
 
   it("RelatedWork : la rangée et le titre calé sur la colonne de 1440", () => {
     const html = rendre(RelatedWork, { work });
-    expect(html).toContain("desktop:h-[calc(100vh/var(--zoom-ecran,1))]");
+    expect(html).toContain('w-full h-[calc(100vh/var(--zoom-ecran,1))]');
+    expect(html).not.toContain("h-[800px]");
     expect(html).toContain("left-[max(20px,calc((calc(100vw/var(--zoom-ecran,1))-1440px)/2))]");
     expect(html).not.toMatch(SANS_ZOOM);
   });
@@ -65,15 +68,14 @@ describe("Unités de fenêtre divisées par le zoom des grands écrans", async (
     expect(html).not.toMatch(SANS_ZOOM);
   });
 
-  it("ArticlesSection : le corps du titre, à 68 px comme à 64 px en tablette", () => {
+  it("ArticlesSection : le titre suit l'échelle de la charte, divisée par le zoom", () => {
     const accueil = rendre(ArticlesSection, { posts: posts.slice(0, 2) });
-    expect(accueil).toContain("text-[clamp(40px,calc(13.6vw/var(--zoom-ecran,1)),52px)]");
-    expect(accueil).toContain("desktop:text-[min(92px,calc((calc(50vw/var(--zoom-ecran,1))-60px)/6.6))]");
-    expect(accueil).toContain("tablet:text-[clamp(52px,calc(7.2vw/var(--zoom-ecran,1)),68px)]");
+    expect(accueil).toContain("titre-section");
     expect(accueil).not.toMatch(SANS_ZOOM);
 
-    const aPropos = rendre(ArticlesSection, { posts: posts.slice(0, 2), headingTabletPx: 64 });
-    expect(aPropos).toContain("tablet:text-[clamp(52px,calc(7.2vw/var(--zoom-ecran,1)),64px)]");
+    const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
+    expect(css).toContain("clamp(40px, calc(12vw / var(--zoom-ecran, 1)), 52px)");
+    expect(css).toContain("clamp(48px, calc(6vw / var(--zoom-ecran, 1)), 92px)");
   });
 
   it("Header : le logo et le menu se calent sur la colonne de 1440 au bureau", () => {

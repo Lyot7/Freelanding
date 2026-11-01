@@ -601,6 +601,8 @@ export interface HeroContent {
    * l'accordéon, qui porte les fourchettes.
    */
   offerLink?: Link;
+  /** Sous le bouton de rendez-vous : durée de l'appel, coût, engagement. */
+  ctaNote?: string;
   /** Séparateur inséré entre ces mots. */
   serviceWordsSeparator?: string;
   /** Personne mise en avant à côté du sous-titre (carte fondateur). */
@@ -623,7 +625,7 @@ export interface HeroContent {
  */
 export interface HeroComparaison {
   sujet: string;
-  lignes: readonly { qui: string; prix: string; fort?: boolean }[];
+  lignes: readonly { qui: string; prix: string; detail?: string; fort?: boolean }[];
   source: { label: string; href: string };
 }
 
@@ -641,9 +643,6 @@ export interface HeroProof {
 export interface HeroDoor {
   /** Lignes du titre, rendues chacune sur sa ligne dès la tablette. */
   lines: readonly string[];
-  href: string;
-  /** Le prix, tel qu'il s'affiche (« Sur devis »). */
-  price: string;
 }
 
 /** Bloc « Showreel » — marquee défilant + phrase manifeste + millésime. */
@@ -873,6 +872,17 @@ export interface CompteurDemo {
  * La section qui montre ce qu'un logiciel métier rend : une semaine de bureau,
  * à la main puis avec le logiciel.
  */
+/** Le cadran du héros : la semaine de la démonstration, qui recule. */
+export interface CadranContent {
+  depart: number;
+  arrivee: number;
+  taches: readonly string[];
+  gain: { valeur: string; libelle: string };
+  exemple: Link;
+  /** La même chose en une phrase, pour qui ne voit pas le cadran. */
+  phrase: string;
+}
+
 /** Les trois moyens de rendre du temps, sous la démonstration. */
 export interface MoyensContent {
   eyebrow: string;

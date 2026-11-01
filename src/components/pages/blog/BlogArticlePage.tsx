@@ -100,13 +100,13 @@ function RelatedArticle({ post }: { post: BlogPost }) {
           className="transition-transform duration-[400ms] ease-[cubic-bezier(0.44,0,0.56,1)] group-hover:scale-[1.1] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
         >
           {/* `.framer-30jb7g-container` : grain z-3, opacité 0.09 sur le live. */}
-          <Grain opacity={0.09} className="z-[3]" />
+          <Grain matiere="photo" className="z-[3]" />
         </ParallaxBackdrop>
       </div>
 
       {/* `.framer-1ok5z9n` — bloc texte, au-dessus de la photo. */}
       <div className="relative z-[2] flex w-full flex-col items-start gap-[18px] tablet:gap-[30px]">
-        <h2 className="m-0 max-w-[420px] p-0 text-[22px] font-medium leading-[1.1] tracking-[-0.01em] tablet:text-[24px] desktop:text-[26px]">
+        <h2 className="m-0 max-w-[420px] p-0 text-[22px] font-medium leading-[1.1] tracking-[-0.01em] tablet:text-[22px] desktop:text-[26px]">
           {post.title}
         </h2>
         {/* `.framer-1hvs5m` — colonne gap 40 sous 810, ligne alignée bas au-dessus. */}
@@ -132,7 +132,7 @@ function RelatedArticle({ post }: { post: BlogPost }) {
             </div>
           </div>
           {/* `.framer-1vp0sjr` — catégorie / date, gap 10, séparateur à 20 %. */}
-          <div className="flex shrink-0 items-center gap-[10px] text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em]">
+          <div className="flex shrink-0 items-center gap-[10px] micro">
             <span className="text-white/60">{post.category}</span>
             <span className="text-white opacity-20">/</span>
             <time
@@ -168,6 +168,7 @@ export function BlogArticlePage({
     <>
       <SvgSprite />
       <Header site={site} />
+      <FloatingNav site={site} />
       {/* Cible du lien d'évitement (voir SkipLink.tsx et focus.css). */}
       <main id="main-content" tabIndex={-1}>
         {/* MESURÉ sur le live : le héros n'a pas de hauteur fixe, il vaut
@@ -211,7 +212,7 @@ export function BlogArticlePage({
           )}
           {/* RELEVÉ sur `/blog/stop-hiding-your-prices` : hôte 1440 × 810,
               z-1, opacité 0,09 (nous étions à 0,08 sans z). */}
-          <Grain opacity={0.09} className="z-[1]" />
+          <Grain className="z-[1]" />
           {/* RANGÉES : la source en pose TROIS, séparées de 30 px exactement
               (h1 469,7→581,2 · chapô 611,2→640 · bloc auteur 670→720 à 1440),
               le bloc auteur venant se caler sur 720, soit 810 moins ses 90 px de
@@ -249,7 +250,7 @@ export function BlogArticlePage({
                   autres H1 du site. Nous rendions 48 / 64 / 72 en ×0,84 et
                   -0,055em. Le plafond `max-w-[780px]` est retiré : la colonne
                   n'excède jamais 690 px, il n'a jamais rien borné. */}
-              <h1 className="text-[40px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] tablet:text-[56px] desktop:text-[68px]">
+              <h1 className="text-[40px] titre-marque tablet:text-[56px] desktop:text-[58px]">
                 {post.title}
               </h1>
             </Reveal>
@@ -257,7 +258,7 @@ export function BlogArticlePage({
                 interlettrage -0,01em, blanc PLEIN (et non à 80 %), et une
                 largeur de 250px constante quelle que soit la fenêtre. Nous
                 étions à 11px sans interlettrage dans une boîte de 340. */}
-            <p className={`order-2 max-w-[250px] text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-white tablet:col-start-1 tablet:row-start-2 tablet:justify-self-end tablet:self-end tablet:text-right${post.heroImage ? ` ${VOILE_TEXTE}` : ""}`}>
+            <p className={`order-2 max-w-[250px] text-[14px] font-medium leading-[1.35] tracking-[-0.01em] text-white tablet:col-start-1 tablet:row-start-2 tablet:justify-self-end tablet:self-end tablet:text-right${post.heroImage ? ` ${VOILE_TEXTE}` : ""}`}>
               {post.excerpt}
             </p>
             {/* TROISIÈME rangée, et non la seconde partagée avec le chapô.
@@ -325,7 +326,7 @@ export function BlogArticlePage({
                 La boîte est AJUSTÉE AU TEXTE sur le live (69,9 px à 810,
                 74,2 px à 1440) et non étalée sur la demi-colonne : elle est
                 poussée à droite sous 810 et calée à gauche au-dessus. */}
-            <p className="ml-auto w-fit text-[12px] font-medium uppercase leading-[1] tracking-[-0.01em] text-background/60 tablet:ml-0">
+            <p className="ml-auto w-fit micro text-background/60 tablet:ml-0">
               {post.readingTime ?? blogContent.readingTimeFallback}
             </p>
             {/* Rembourrage bas du bloc « temps de lecture » relevé sur le live :
@@ -367,7 +368,7 @@ export function BlogArticlePage({
                   d'avoir au moins quatre blocs dans le bon ordre pour ne pas
                   sortir déformé. Le corps est maintenant un flux MDX que
                   l'article structure lui-même ; ces trois zones ont disparu. */}
-                <p className="text-[22px] font-medium leading-[1.1] tracking-[-0.02em] tablet:-ml-[50%] tablet:w-[150%] tablet:max-w-[900px] tablet:text-[26px] tablet:tracking-[-0.01em] desktop:text-[32px]">
+                <p className="text-[22px] font-medium leading-[1.1] tracking-[-0.01em] tablet:-ml-[50%] tablet:w-[150%] tablet:max-w-[900px] tablet:text-[26px] tablet:tracking-[-0.01em] desktop:text-[32px]">
                   {post.excerpt}
                 </p>
               </div>
@@ -430,11 +431,11 @@ export function BlogArticlePage({
                 </div>
                 {/* Chaque ligne monte derrière son propre masque, décalée de 100 ms
                 — motif identique au titre de `ArticlesSection`. */}
-                <h2 className="order-0 m-0 flex w-full flex-col p-0 text-[52px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] text-background tablet:order-none tablet:w-px tablet:flex-[1_0_0] tablet:text-[64px] desktop:text-[92px]">
+                <h2 className="order-0 m-0 flex w-full flex-col p-0 titre-marque titre-section text-background tablet:order-none tablet:w-px tablet:flex-[1_0_0] ">
                   {blogContent.relatedTitleLines.map((line, i) => (
                     <span
                       key={line}
-                      className="accent-room descender-room block w-full overflow-hidden leading-[0.82]"
+                      className="accent-room descender-room block w-full overflow-hidden leading-display"
                     >
                       <Reveal
                         as="span"
@@ -479,7 +480,6 @@ export function BlogArticlePage({
         ) : null}
       </main>
       <Footer />
-      <FloatingNav site={site} />
     </>
   );
 }

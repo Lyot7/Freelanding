@@ -81,28 +81,19 @@ function SeeMoreButton({ cta }: { cta?: { label: string; href: string } }) {
  * 53 px à 810 sur la home (68 px) et de 27 px sur `/a-propos` (64 px), rogné par
  * le masque de ligne. Le corps suit la largeur jusqu'au repère de la source.
  */
-const HEADING_TABLET = {
-  68: "tablet:text-[clamp(52px,calc(7.2vw/var(--zoom-ecran,1)),68px)]",
-  64: "tablet:text-[clamp(52px,calc(7.2vw/var(--zoom-ecran,1)),64px)]",
-} as const;
-
-export type ArticlesHeadingTabletPx = keyof typeof HEADING_TABLET;
-
 /**
  * Titre géant du bloc (`.framer-jfbt41` h2, 92/68 ou 64/52px), en deux lignes
  * masquées. Les lignes viennent de `articles.titleLines` : elles étaient
  * recopiées en anglais dans le JSX.
  */
 function Heading({
-  tabletPx,
   lines,
 }: {
-  tabletPx: ArticlesHeadingTabletPx;
   lines: readonly string[];
 }) {
   // `block` est déjà posé par `LineReveal` sur chaque ligne.
   const lineClass =
-  "accent-room descender-room w-full overflow-hidden text-left leading-[0.82]";
+  "accent-room descender-room w-full overflow-hidden text-left leading-display";
   return (
     // framer-jfbt41-container
     <div className="relative h-auto w-full flex-[1_0_0] tablet:w-px">
@@ -118,7 +109,7 @@ function Heading({
       <LineReveal
         as="h2"
         lines={[...lines]}
-        className={`relative m-0 flex w-full flex-col justify-center p-0 text-left text-[clamp(40px,calc(13.6vw/var(--zoom-ecran,1)),52px)] font-semibold uppercase leading-[0.82] tracking-[-0.05em] text-background desktop:text-[min(92px,calc((calc(50vw/var(--zoom-ecran,1))-60px)/6.6))] ${HEADING_TABLET[tabletPx]}`}
+        className={`relative m-0 flex w-full flex-col justify-center p-0 text-left titre-marque titre-section text-background`}
         lineClassName={lineClass}
       />
     </div>
@@ -128,7 +119,6 @@ function Heading({
 export function ArticlesSection({
   posts,
   compactTop = false,
-  headingTabletPx = 68,
   titleLines = homeContent.articles.titleLines ?? [],
   cta = homeContent.articles.cta,
 }: {
@@ -137,13 +127,6 @@ export function ArticlesSection({
   titleLines?: readonly string[];
   /** Bouton du bloc (« Voir plus » → /blog). */
   cta?: { label: string; href: string };
-  /**
-   * Corps du titre entre 810 et 1199. 68px sur la home, 64px sur `/about`
-   * (mesuré des deux côtés à 810, 1024 et 1199 : la ligne fait 55,76px de haut
-   * en 68px contre 52,48px en 64px, soit 6,5px sur les deux lignes du titre —
-   * exactement le résidu de +7 que traînait `/about` dans cette bande).
-   */
-  headingTabletPx?: ArticlesHeadingTabletPx;
   /**
    * Retrait haut réduit en MOBILE (sous 810).
    *
@@ -195,7 +178,7 @@ export function ArticlesSection({
           </div>
           {/* framer-6tyelc : bloc titre (order 0 mobile, au-dessus) */}
           <div className="accent-clip-titre relative order-0 flex w-full flex-row items-start overflow-clip tablet:order-none tablet:w-px tablet:flex-[1_0_0]">
-            <Heading tabletPx={headingTabletPx} lines={titleLines} />
+            <Heading lines={titleLines} />
           </div>
         </div>
 
@@ -231,7 +214,7 @@ export function ArticlesSection({
       </div>
 
       {/* framer-1ogjggt : filet vertical central (noir 8%) */}
-      <div className="absolute left-[calc(50%-0.5px)] top-0 z-0 h-full w-px bg-background opacity-[0.08]" />
+      <div className="absolute left-[calc(50%-0.5px)] top-0 z-0 hidden h-full w-px bg-background opacity-[0.08] tablet:block" />
     </section>
   );
 }

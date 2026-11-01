@@ -18,7 +18,7 @@ import { uiLabels } from "@/content/ui";
  *
  * Périmètre RÉEL de la section source : 3 compteurs (60+, 1.4s, 80%) disposés
  * dans une grille décorative à points, + colonne droite (titre + témoignage) +
- * filet vertical central, sur fond orange (--accent #ff4500). Les compteurs
+ * filet vertical central, sur fond volt (--accent). Les compteurs
  * sont pilotés par `stats` (3 premiers items). Les valeurs "12+" et "4.9" de
  * stats.ts proviennent d'une AUTRE section Framer ("Why us?", number.ts) — voir
  * rapport de fidélité.
@@ -56,7 +56,7 @@ function Dot({ side }: { side: "left" | "right" }) {
       <div
         data-part="dot"
         className={
-          "absolute top-0 z-[1] aspect-square h-[8px] w-[8px] rounded-full bg-accent-ink " +
+          "absolute top-0 z-[1] aspect-square h-[8px] w-[8px] bg-accent-ink " +
           (side === "left"
             ? "left-0"
             : "right-0 tablet:right-[24px] desktop:right-0")
@@ -76,7 +76,7 @@ function Counter({ stat, speedMs }: { stat: Stat; speedMs: number }) {
             monte de 0 à la valeur et ne sait pas descendre. Lu par les lecteurs
             d'écran : sans lui, « −92 % » s'annoncerait comme un gain. */}
         {stat.prefix ? (
-          <span className="text-[44px] font-semibold tracking-[-0.07em] leading-[normal] text-accent-ink tablet:text-[52px] desktop:text-[58px]"
+          <span className="text-[44px] font-semibold tracking-[-0.045em] leading-[normal] text-accent-ink tablet:text-[52px] desktop:text-[58px]"
           >
             {stat.prefix}
           </span>
@@ -85,8 +85,8 @@ function Counter({ stat, speedMs }: { stat: Stat; speedMs: number }) {
           value={stat.value}
           suffix={stat.suffix}
           speedMs={speedMs}
-          // `uppercase` : le live rend l'unité en capitale (« 3.2S », pas « 3.2s »).
-          className="flex items-center gap-0 text-[44px] font-semibold uppercase tracking-[-0.07em] leading-[normal] text-accent-ink tablet:text-[52px] desktop:text-[58px]"
+          // Sans `uppercase` : « 24H » est une faute, l'unité reste en minuscule.
+          className="flex items-center gap-0 text-[44px] font-semibold tracking-[-0.045em] leading-[normal] text-accent-ink tablet:text-[52px] desktop:text-[58px]"
         />
       </div>
       {/* framer-13pncuw : libellé. TEXTE COURANT depuis le 2026-09-24 : 16 px
@@ -142,7 +142,7 @@ function Testimonial({ testimonial }: { testimonial: TestimonialContent }) {
       {/* framer-n1faye : description (preset wwtw0z, uppercase 12px, blanc 60%) */}
       {/* Encre à 80 % et non 60 : sur l'aplat accent, 60 % tombait sous le
           contraste AA de 4,5:1 pour du 12 px (relevé Lighthouse). */}
-      <p className="h-auto w-full max-w-[340px] whitespace-pre-wrap break-words text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-accent-ink/80">
+      <p className="h-auto w-full max-w-[340px] whitespace-pre-wrap break-words text-[14px] font-medium leading-[1.35] tracking-[-0.01em] text-accent-ink/80">
         {/* Les fragments en emphase viennent de la DONNÉE (`Testimonial.highlights`).
             Ils étaient recopiés en dur, en anglais : l'emphase disparaissait dès
             que la citation passait au français. */}
@@ -193,7 +193,7 @@ function Testimonial({ testimonial }: { testimonial: TestimonialContent }) {
               ) : null}
               {/* framer-1p875q0 : société (preset 1hgnchr, 13px) */}
               {author.company ? (
-                <p className="h-auto w-auto whitespace-pre text-[13px] font-medium leading-[1.2] tracking-[-0.01em] text-accent-ink">
+                <p className="h-auto w-auto whitespace-pre text-[14px] font-medium leading-[1.2] tracking-[-0.01em] text-accent-ink">
                   {author.company}
                 </p>
               ) : null}
@@ -223,7 +223,7 @@ export function StatsSection({ numbers }: { numbers: StatsSectionContent }) {
       <div className="relative flex w-full max-w-[1440px] flex-col items-start gap-[12px] tablet:gap-[30px]">
         {/* framer-kqrkbn : Label (preset wwtw0z, uppercase 12px, blanc 70%) */}
         {numbers.eyebrow ? (
-          <p data-part="label" className="h-auto w-auto whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-accent-ink/70">
+          <p data-part="label" className="h-auto w-auto whitespace-pre micro text-accent-ink/70">
             {numbers.eyebrow}
           </p>
         ) : null}
@@ -247,14 +247,14 @@ export function StatsSection({ numbers }: { numbers: StatsSectionContent }) {
             {/* framer-1xsiil0-container : conteneur titre */}
             <div className="relative h-auto w-full max-w-[360px] tablet:max-w-[440px] desktop:max-w-[600px]">
               {/* framer-1xsiil0 h2 (92/68/52px, ls -0.05em, lh 0.82) */}
-              <h2 className="relative m-0 flex w-full max-w-full flex-col justify-center p-0 text-left text-[52px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] text-accent-ink tablet:text-[68px] desktop:text-[92px]">
+              <h2 className="titre-marque titre-section relative m-0 flex w-full max-w-full flex-col justify-center p-0 text-left text-accent-ink">
                 {numbers.titleLines?.length ? (
                   /* LIGNES DÉCLARÉES PAR LA DONNÉE : le titre est écrit pour
                      tomber sur ces coupures-là, à toutes les largeurs. */
                   numbers.titleLines.map((ligne, i) => (
                     <span
                       key={ligne}
-                      className="accent-room descender-room block w-full overflow-hidden leading-[0.82]"
+                      className="accent-room descender-room block w-full overflow-hidden leading-display"
                     >
                       <Reveal
                         as="span"
@@ -299,7 +299,7 @@ export function StatsSection({ numbers }: { numbers: StatsSectionContent }) {
       </div>
 
       {/* framer-1hqjbn5 : filet vertical central (blanc 18%) */}
-      <div className="absolute left-[calc(50%-0.5px)] top-0 z-[1] h-full w-px bg-accent-ink opacity-[0.18]" />
+      <div className="absolute left-[calc(50%-0.5px)] top-0 z-[1] hidden h-full w-px bg-accent-ink opacity-[0.18] tablet:block" />
     </section>
   );
 }

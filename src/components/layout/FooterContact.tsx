@@ -112,11 +112,12 @@ export function FooterContact({
           document.getElementById(`${base}-onglet-${suivant}`)?.focus();
         }}
       >
-        {/* Pastille volt qui glisse sous l'onglet actif : une seule boîte
-            déplacée en `transform`, jamais deux fonds qui s'échangent. */}
+        {/* Pastille qui glisse sous l'onglet actif : une seule boîte déplacée
+            en `transform`. Elle reste discrète : le volt appartient à l'action,
+            pas à l'onglet déjà choisi. */}
         <span
           aria-hidden
-          className="footer-onglet-pastille absolute inset-y-[4px] left-[4px] w-[calc(50%-4px)] bg-accent"
+          className="footer-onglet-pastille absolute inset-y-[4px] left-[4px] w-[calc(50%-4px)] bg-white/10"
           style={{ transform: onglet === "message" ? "translateX(0)" : "translateX(100%)" }}
         />
         {onglets.map(({ id, libelle }) => {
@@ -132,7 +133,7 @@ export function FooterContact({
               tabIndex={actif ? 0 : -1}
               onClick={() => setOnglet(id)}
               className={`footer-onglet relative z-[1] flex min-h-[44px] items-center justify-center px-[12px] text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] ${
-                actif ? "text-accent-ink" : "text-foreground-60 hover:text-foreground"
+                actif ? "text-foreground" : "text-foreground-60 hover:text-foreground"
               }`}
             >
               {libelle}

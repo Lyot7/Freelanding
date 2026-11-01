@@ -12,12 +12,12 @@ import { LogicielDemo } from "./LogicielDemo";
  * visible, jamais après un geste du visiteur, et le compte des étapes qui
  * restent à faire à la main.
  *
- * L'observateur de visibilité et le délai de 1,4 s sont pilotés à la main :
+ * L'observateur de visibilité et le délai de 0,9 s sont pilotés à la main :
  * le test déclenche l'entrée dans l'écran et l'échéance du délai quand il le
  * décide, sans attendre en temps réel.
  */
 const demo = homeContent.logiciel.demo;
-const DELAI_BASCULE = 1400;
+const DELAI_BASCULE = 900;
 
 function installerDom() {
   const dom = new JSDOM("<!doctype html><html><body></body></html>", {
@@ -187,13 +187,13 @@ describe("LogicielDemo", () => {
     await vue.demonter();
   });
 
-  it("bascule seule sur l'outil une fois la fenêtre à moitié visible", async () => {
+  it("bascule seule sur l'outil une fois la semaine sous les yeux", async () => {
     contexte = installerDom();
     const { observateurs, delais } = contexte;
     const vue = await monter();
     const [observateur] = observateurs;
-    expect(observateur.options).toEqual({ threshold: 0.5 });
-    expect(observateur.cible).toBe(vue.conteneur.firstElementChild);
+    expect(observateur.options).toEqual({ threshold: 0.6 });
+    expect(observateur.cible).toBe(vue.conteneur.querySelector('[role="tabpanel"] ul'));
 
     // Hors écran (ou entrée vide) : rien n'est programmé.
     observateur.rappel([]);
@@ -201,7 +201,7 @@ describe("LogicielDemo", () => {
     expect(delais).toHaveLength(0);
     expect(observateur.deconnecte).toBe(false);
 
-    // À moitié visible : l'observateur se retire, la bascule attend 1,4 s.
+    // Visible : l'observateur se retire, la bascule attend 0,9 s.
     observateur.rappel([{ isIntersecting: true }]);
     expect(observateur.deconnecte).toBe(true);
     expect(delais).toHaveLength(1);
@@ -212,6 +212,19 @@ describe("LogicielDemo", () => {
     });
     expect(vue.selectionne()).toBe(demo.onglets.outil);
     expect(vue.compte()).toBe(demo.compteur.outil.valeur);
+    await vue.demonter();
+  });
+
+  it("n'écrase jamais le texte : le volt monte en translation, sans annonce en boucle", async () => {
+    contexte = installerDom();
+    const vue = await monter();
+    const rendu = vue.conteneur.querySelector(".logiciel-rendu");
+    expect(rendu.style.transform).toBe("translateY(100%)");
+    await act(async () => {
+      vue.onglet("outil").click();
+    });
+    expect(rendu.style.transform).toBe("none");
+    expect(vue.conteneur.querySelector('[role="tabpanel"]').hasAttribute("aria-live")).toBe(false);
     await vue.demonter();
   });
 

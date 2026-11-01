@@ -60,25 +60,28 @@ const JOURS_BUREAU = SEMAINE.map(({ jour, tache, taches }) => {
  * comparaison le rendait exact (`offre.ts`). Le héros dit « une fraction » et
  * chiffre ce qu'une agence facture à côté du mien, source écrite.
  */
-const POSITIONNEMENT = "Une fraction de ce qu’une agence facture.";
+const POSITIONNEMENT = "Logiciel sur mesure et IA, pour une fraction du prix d’une agence.";
 
 /*
  * LE H1 DE L'ACCUEIL. Depuis le 2026-11-01, décision d'Eliott : le temps gagné
  * d'abord, pour tous les métiers, et le moyen ensuite (logiciel, IA, accompagnement).
+ *
+ * UN SIMPLE TITRE depuis le 2026-11-01 : il valait « Je vous rends des
+ * heures.Sur devis » à la lecture et doublait le lien « Voir une semaine rendue ».
  */
-const PORTES = [
-  {
-    lines: ["Je vous rends", "des heures."],
-    href: "#moyens",
-    price: "Sur devis",
-  },
-] as const;
+const PORTES = [{ lines: ["Je vous rends", "des heures."] }] as const;
 
 const TITRE_ACCUEIL = PORTES.map((porte) => porte.lines.join(" ")).join(" ");
 
 /** Le message d'Eliott, sous le titre. */
 const CE_QUI_DISPARAIT =
-  "Je construis votre logiciel sur mesure et j’installe l’IA dans vos outils. La tâche qui vous bloque disparaît, et votre équipe revient à ce qui la rend indispensable.";
+  "Mails à trier, commandes à recopier, factures à relancer : je construis le logiciel ou j’installe l’IA qui s’en charge. Vous relisez, et votre équipe revient à ce qui la rend indispensable.";
+
+/*
+ * LA DURÉE DE L'APPEL, relevée chez Cal.com le 2026-11-01 : le bouton du héros
+ * ouvre le sujet « logiciel », qui propose 30, 45 ou 60 minutes (45 par défaut).
+ */
+const NOTE_APPEL = "De 30 à 60 minutes en visio, gratuit et sans engagement";
 
 /*
  * CE QU'UNE AGENCE FACTURE, ET LE MIEN SUR DEVIS (décision d'Eliott du
@@ -92,9 +95,15 @@ function comparaisonAgence(): HeroComparaison {
     lignes: [
       {
         qui: "En agence",
-        prix: `${euros(agence.premierOutilMin).replace(/\s€$/u, "")} à ${euros(agence.mediane)}`,
+        prix: `dès ${euros(agence.premierOutilMin)}`,
+        detail: `${euros(agence.mediane)} en médiane`,
       },
-      { qui: "Avec moi", prix: SUR_DEVIS, fort: true },
+      {
+        qui: "Avec moi",
+        prix: SUR_DEVIS,
+        detail: "sans chef de projet ni structure à payer",
+        fort: true,
+      },
     ],
     source: {
       label: `${agence.source.nom}, ${agence.source.releve}`,
@@ -114,12 +123,13 @@ export const homeContent: HomeContent = {
   hero: {
     // Au-dessus du titre : ce qui est vendu, et ce qui distingue Eliott d'une agence.
     eyebrow: POSITIONNEMENT,
-    // LE H1 DE L'ACCUEIL. Le héros rend la porte comme un lien vers l'offre.
+    // LE H1 DE L'ACCUEIL, un titre et rien d'autre.
     title: TITRE_ACCUEIL,
     titleLines: PORTES.map((porte) => porte.lines.join(" ")),
     doors: PORTES,
     /* Test des visiteurs du 2026-10-31 : une porte pour qui n'est pas prêt à appeler. */
-    offerLink: { label: "Voir comment", href: "#moyens" },
+    offerLink: { label: "Voir une semaine rendue", href: "#logiciel" },
+    ctaNote: NOTE_APPEL,
     subtitle: CE_QUI_DISPARAIT,
     subtitleParagraphs: [{ text: CE_QUI_DISPARAIT }],
     /*
@@ -142,7 +152,7 @@ export const homeContent: HomeContent = {
     // rendu en texte juste à côté, la vignette est décorative au sens WCAG.
     person: {
       name: "Eliott Bouquerel",
-      role: "Développeur à Caen",
+      role: "Développeur à Caen · réponse sous 24 h ouvrées",
       avatar: {
         src: "/images/eliott-bouquerel-avatar.jpg",
         alt: "",
@@ -162,21 +172,22 @@ export const homeContent: HomeContent = {
    * affichées de `/services/automatisation`, le total en est dérivé.
    */
   logiciel: {
-    eyebrow: "Le temps gagné",
+    eyebrow: "(Le temps gagné)",
     // Lignes de douze signes au plus : le titre est rendu à 92 px dans une
     // demi-colonne, comme celui du showreel.
     titleLines: ["Vos heures", "valent mieux", "qu’un", "tableur."],
     statement:
-      "Trier, recopier, relancer, rapprocher : une semaine de bureau part là-dedans, quel que soit votre métier. L’IA fait le sale boulot, vous validez, et le temps revient à ce qui vous rend indispensable.",
-    statementEmphasis: ["vous validez, et le temps revient à ce qui vous rend indispensable."],
-    cta: { label: "Voir comment", href: "#moyens" },
+      "Trier, recopier, relancer, rapprocher : une semaine de bureau part là-dedans, quel que soit votre métier. L’IA fait le sale boulot, vous validez.",
+    statementEmphasis: ["vous validez."],
+    // Le rendez-vous et non `#moyens` : la section des moyens suit juste après.
+    cta: { label: "Chiffrer ma semaine", href: lienRendezVous("logiciel") },
     demo: {
       titre: "Une semaine de bureau, en exemple",
       onglets: { main: "À la main", outil: "Avec moi" },
       jours: JOURS_BUREAU,
       relire: "Relire",
       votreMetier: "Votre métier",
-      preuve: "Je fais tourner ça chaque jour sur ma propre boîte mail.",
+      preuve: "Mes propres mails sont triés de cette façon, chaque jour.",
       compteur: {
         main: { valeur: duree(MINUTES_SEMAINE), libelle: "de saisie par semaine" },
         outil: { valeur: duree(reste(MINUTES_SEMAINE)), libelle: "de relecture par semaine" },
@@ -197,7 +208,7 @@ export const homeContent: HomeContent = {
    * Le prix n'est écrit que pour le logiciel : l'accompagnement se chiffre au devis.
    */
   moyens: {
-    eyebrow: "Trois façons de vous rendre ces heures",
+    eyebrow: "(Trois façons de vous rendre ces heures)",
     titleLines: ["Le bon remède", "pour chaque", "corvée."],
     intro:
       "Une corvée ne se règle pas toujours avec un logiciel. Je regarde où part votre temps, puis je prends le moyen le plus simple.",
@@ -205,19 +216,19 @@ export const homeContent: HomeContent = {
       {
         titre: "Installer l’IA dans vos outils",
         corps:
-          "Mails, comptes rendus, devis simples : vos équipes s’en servent sur leurs vraies tâches, sans rien remplacer.",
+          "Vos journées partent en mails, comptes rendus et devis simples. L’IA s’en charge dans les outils que vous avez déjà, et vos équipes valident.",
         lien: { label: "Voir l’automatisation", href: "/services/automatisation" },
       },
       {
         titre: "Construire le logiciel qui manque",
         corps:
-          "Votre façon de travailler n’entre dans aucun outil du marché : je le construis, et il vous appartient. Le prix se fixe au devis.",
-        lien: { label: "En parler", href: lienRendezVous("logiciel") },
+          "Aucun outil du marché ne suit votre façon de travailler. Je construis celui qui la suit, et il vous appartient. Le prix se fixe au devis.",
+        lien: { label: "Parler de votre outil", href: lienRendezVous("logiciel") },
       },
       {
         titre: "Si besoin, devenir votre référent",
         corps:
-          "Mes missions sont le plus souvent ponctuelles. Certaines entreprises préfèrent un interlocuteur régulier : je deviens alors leur référent IA ou développement, voire leur recherche et développement.",
+          "Mes missions sont ponctuelles. Si vous préférez un interlocuteur régulier, je deviens votre référent IA, développement ou R&D.",
         lien: { label: "Voir cette option", href: "/services/automatisation#referent" },
       },
     ],
@@ -239,7 +250,7 @@ export const homeContent: HomeContent = {
       "Avant de me confier votre métier, vous voulez voir du concret. Voici des produits que j’ai développés et mis en service, écran par écran.",
     // Rendue en noir 60 %, ce fragment passe en noir plein.
     statementEmphasis: ["mis en service, écran par écran."],
-    vintage: "2026©",
+    vintage: "(Réalisations)",
     /*
      * SEUL CONTRÔLE DE LA SECTION depuis le 2026-08-27, et il est enfin
      * cliquable. Le bouton « Showreel » qui l'accompagnait a été supprimé : il
@@ -295,11 +306,11 @@ export const homeContent: HomeContent = {
      * MECA SERVICES en alternance. Aucun n'est présenté comme client.
      */
     body: [
-      "Je suis développeur full-stack, installé à Caen, et je travaille seul. Du premier appel à la mise en service, vous parlez à celui qui conçoit et qui code votre logiciel.",
+      "Je suis développeur, installé à Caen, et je travaille seul. Du premier appel à la mise en service, vous parlez à celui qui conçoit et qui code votre logiciel.",
       "Avant de me lancer, j’ai développé chez Médiapilote, Würth France, MeilleursBiens, puis MECA SERVICES, où je tenais aussi la boutique en ligne. J’y ai appris à partir de ce qu’un outil doit rapporter, et à regarder comment les gens travaillent avant d’écrire la première ligne de code.",
       /* LE MESSAGE D'ELIOTT, 2026-10-30 : le temps humain revient à ce qui rend
          la personne indispensable, l'IA fait le sale boulot. */
-      "Ma conviction : une machine ne remplace pas la personne qui connaît vos clients, elle la débarrasse de ce qui l’empêche de s’en occuper. Le recopiage et les factures partent au logiciel et à l’IA, et le temps rendu revient à ce qui rend votre équipe indispensable. Chaque détail est décidé, testé et documenté avant de vous être remis : rien n’est laissé au hasard.",
+      "Ma conviction : une machine ne remplace pas la personne qui connaît vos clients, elle la débarrasse de ce qui l’empêche de s’en occuper. Le recopiage et les factures partent au logiciel et à l’IA, et le temps rendu revient à vos clients et à vos décisions. Chaque détail est décidé, testé et documenté avant de vous être remis : rien n’est laissé au hasard.",
     ],
     // Emphase (source Framer) : ces expressions passent en noir plein au
     // milieu du paragraphe rendu à 70 %.
@@ -307,7 +318,7 @@ export const homeContent: HomeContent = {
       "je travaille seul",
       "vous parlez à celui qui conçoit et qui code votre logiciel",
       "partir de ce qu’un outil doit rapporter",
-      "ce qui rend votre équipe indispensable",
+      "vos clients et à vos décisions",
     ],
     /*
      * GRILLE D'INFOS ET COMPTEUR RENDUS le 2026-10-16 : Eliott trouvait la
@@ -315,8 +326,8 @@ export const homeContent: HomeContent = {
      * le métier, le lieu et le parcours ; « 1 projet à la fois » reste à la
      * section chiffres.
      */
-    launchedLabel: "Développeur full-stack",
-    projectsLabel: "Caen, et en visio",
+    launchedLabel: "Développeur à Caen",
+    projectsLabel: "En visio partout",
     counter: {
       value: "4",
       caption: "entreprises où j’ai développé avant de me lancer",
@@ -346,13 +357,13 @@ export const homeContent: HomeContent = {
     // le possessif prend sa ligne.
     titleLines: ["Votre", "projet", "n’attend", "personne."],
     intro:
-      "Je ne mène qu’un chantier à la fois, alors votre message a sa réponse sous 24 h ouvrées.",
+      "Je ne mène qu’un chantier à la fois, alors votre message a sa réponse sous 24 h ouvrées.",
     stats: howWeDoItStats,
   },
 
   // number.ts — « Pourquoi moi ? » : une carte chiffrée + appel.
   whyUs: {
-    eyebrow: "Pourquoi moi ?",
+    eyebrow: "(Pourquoi moi ?)",
     // TITRE ET SOUS-TITRE CHOISIS PAR ELIOTT le 2026-09-24 (remplacent « Ce
     // qui est vérifiable. »). La carte porte le chiffre qui le prouve.
     title: "Personne ne vous tient en otage.",
@@ -416,7 +427,7 @@ export const homeContent: HomeContent = {
   // ORDRE CHRONOLOGIQUE, du plus ancien au plus récent : la bande se lit alors
   // comme un parcours, pas comme un palmarès rangé par prestige.
   /*
-   * TROIS LOGOS, SANS INTITULÉ NI DATE, décision d'Eliott du 2026-09-02 :
+   * TROIS LOGOS, SANS DATE NI MENTION DE STAGE, décision d'Eliott du 2026-09-02 :
    * « retire les mentions de en alternance ou en stage chez, retire les
    * années, je veux juste les logos ».
    *
@@ -430,11 +441,13 @@ export const homeContent: HomeContent = {
    * disaient la NATURE du lien. Sans elles, trois logos alignés sur un site de
    * prestataire se lisent comme une page de références clients. Ce sont des
    * employeurs, Eliott n'a aucun client à ce jour, et c'est exactement la
-   * fausse déclaration que le retrait du 2026-08-10 voulait éviter. Le
-   * `logoBand.title` reste dans le type et le composant sait le rendre :
-   * remettre une ligne suffit à refermer l'ambiguïté.
+   * fausse déclaration que le retrait du 2026-08-10 voulait éviter.
+   *
+   * L'INTITULÉ REVIENT LE 2026-11-01, sans date ni contrat : « J'ai développé
+   * chez » referme l'ambiguïté et respecte l'esprit de la décision du 09-02.
    */
   logoBand: {
+    title: "J’ai développé chez",
     logos: [
       {
         name: "Médiapilote",
@@ -487,7 +500,7 @@ export const homeContent: HomeContent = {
 
   // Habillage du bloc FAQ (les questions viennent de faq.ts).
   faqSection: {
-    eyebrow: "FAQ",
+    eyebrow: "(FAQ)",
     titleLines: ["Avant de", "commencer."],
     cta: { label: "Poser une question", href: "/contact" },
   },
@@ -517,7 +530,7 @@ export const homeContent: HomeContent = {
     // Mot-clé en tête, marque en fin.
     title: "Logiciel métier sur mesure · Eliott Bouquerel",
     description:
-      "Le logiciel métier qui fait disparaître la tâche qui vous bloque. L’IA fait le sale boulot, votre équipe reprend son temps. Basé à Caen, en visio partout.",
+      "Je construis le logiciel ou j’installe l’IA qui prend en charge vos mails, commandes et factures. Vous relisez, votre équipe reprend son temps. Caen et visio.",
     ogImage: {
       src: "/images/og.jpg",
       alt: "Eliott Bouquerel",

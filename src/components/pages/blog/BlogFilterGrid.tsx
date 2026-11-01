@@ -120,10 +120,10 @@ function BlogIndexCard({
       <span className="absolute inset-0 bg-gradient-to-b from-black/5 via-black/10 to-black/75" />
       {/* RELEVÉ sur `/blog` : huit cartes, hôte 688 × 688 à 1440, z-3,
           opacité 0,09 (nous étions à 0,08 sans z déclaré). */}
-      <Grain opacity={0.09} className="z-[3]" />
+      <Grain matiere="photo" className="z-[3]" />
 
       <div className="relative z-[1] mt-auto flex w-full flex-col gap-[18px] tablet:gap-[30px]">
-        <h2 className="max-w-[420px] text-[22px] font-medium leading-[1.1] tracking-[-0.01em] tablet:text-[24px] desktop:text-[26px]">
+        <h2 className="max-w-[420px] text-[22px] font-medium leading-[1.1] tracking-[-0.01em] tablet:text-[22px] desktop:text-[26px]">
           {post.title}
         </h2>
         {/* COLONNE sous 810, rangée au-dessus — la forme que `RelatedArticle`
@@ -160,7 +160,7 @@ function BlogIndexCard({
               </p>
             </div>
           </div>
-          <div className="flex shrink-0 items-center gap-[10px] text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-white/60">
+          <div className="flex shrink-0 items-center gap-[10px] micro text-white/60">
             <span>{post.category}</span>
             <span>/</span>
             <time dateTime={post.date}>{formatShortDate(post.date)}</time>
@@ -245,7 +245,7 @@ export function BlogFilterGrid({
                 className="w-full bg-transparent text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground placeholder:text-white/50 tablet:text-[13px] tablet:font-normal"
               />
             </label>
-            <span className="w-[57.09375px] flex-none text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-white/60 tablet:mb-[1.6px] tablet:w-auto tablet:flex-1 tablet:text-right">
+            <span className="w-[57.09375px] flex-none micro text-white/60 tablet:mb-[1.6px] tablet:w-auto tablet:flex-1 tablet:text-right">
               {vintage}
             </span>
           </div>

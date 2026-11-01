@@ -31,14 +31,13 @@ export const siteConfig: SiteConfig = {
    * toutes les pages. LE FRAGMENT DOIT EXISTER DANS `tagline`, sinon `Header`
    * concatène le texte entier et le fragment introuvable.
    */
-  tagline: "Logiciels métier sur mesure",
-  taglineEmphasis: ["Logiciels métier"],
+  tagline: "Logiciel sur mesure et IA",
+  taglineEmphasis: ["Logiciel sur mesure"],
   nav: [
-    { label: "Accueil", href: "/" },
+    { label: "Comment", href: "/#moyens" },
     { label: "Réalisations", href: "/realisations" },
-    { label: "Blog", href: "/blog" },
     { label: "À propos", href: "/a-propos" },
-    { label: "Contact", href: "/contact" },
+    { label: "Blog", href: "/blog" },
   ],
   // Panneau du menu flottant — ordre source, différent de la nav d'en-tête et
   // de la colonne « Navigation » du pied de page (qui, elle, contient « 404 »).
@@ -94,22 +93,22 @@ export const siteConfig: SiteConfig = {
     // Le reste de la France suit, à distance, sans se restreindre à une région :
     // c'est le fond de l'activité, et `areaServed` en fait une zone à part
     // entière dans le JSON-LD.
-    address: "Calvados, Manche, Orne, et France à distance",
+    address: "Calvados, Manche, Orne et France à distance",
     addressLabel: "Zone d’intervention",
-    hours: ["Lun. au ven. : 9h - 18h"],
+    hours: ["Lun. au ven. : 9 h à 18 h"],
     // PAS DE LIENS SEO DANS LE PIED DE PAGE (décision d'Eliott du 2026-10-15) :
     // lister les pages Caen, prix et thématiques sous la zone d'intervention se
     // lisait comme du remplissage pour Google. Elles restent reliées depuis leur
     // pilier (`lienLocalParPrestation`) et entre elles.
     responseTime:
-      "Je réponds à chaque message sous 24 heures ouvrées.",
+      "Je réponds à chaque message sous 24 h ouvrées.",
     responseTimeLabel: "Délai de réponse",
     localTimeLabel: "Heure locale",
     timezone: "Europe/Paris",
     // Interlocuteur mis en avant dans le pied de page : Eliott, qui est seul.
     person: {
       name: "Eliott Bouquerel",
-      role: "Développeur freelance",
+      role: "Développeur à Caen",
       note: "C’est moi qui lis votre message, et moi qui vous réponds.",
       // Portrait réel, lu par les données structurées (`Person.image`).
       avatar: {

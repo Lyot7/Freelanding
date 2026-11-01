@@ -106,7 +106,7 @@ function posterDe(poster: ShowreelContent["poster"]) {
 
 // Preset wwtw0z : Geist 12px / 500 / -0.01em / 120% / uppercase.
 const PRESET_WWTW0Z =
-  "m-0 text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em]";
+  "m-0 micro";
 
 /**
  * Titre du showreel : des lignes empilées, révélées en cascade.
@@ -132,17 +132,13 @@ function Headline({
   return (
     // framer-1dj4y9g-container : conteneur du code-component (flex:none;width:100%)
     <div data-part="headline" className="relative w-full flex-none">
-      {/* h2 : 52px text-left (mobile) → 68px text-right (tablette) → 92px (desktop) */}
-      {/* 68 px PLAFONNÉS À 7,8 vw entre 810 et 1199 : à 810, « TE COMPARE »
-          mesure 399 px à 68 px pour une demi-colonne de 381, et la ligne se
-          repliait. À 7,8 vw elle en fait 371 ; dès 872 px le corps revient à 68. */}
-      <h2 className="relative m-0 flex w-full flex-col justify-center p-0 text-left text-[52px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] text-background tablet:text-right tablet:text-[min(68px,calc(7.8vw/var(--zoom-ecran,1)))] desktop:text-[92px]">
+      <h2 className="relative m-0 flex w-full flex-col justify-center p-0 text-left titre-marque titre-section text-background tablet:text-right ">
         {lines.map((word, i) => (
           // span externe = masque du slide-up (overflow-hidden), l'alignement
           // du texte est hérité du h2.
           <span
             key={`${word}-${i}`}
-            className="accent-room descender-room block w-full overflow-hidden leading-[0.82]"
+            className="accent-room descender-room block w-full overflow-hidden leading-display"
           >
             <Reveal
               as="span"
@@ -359,7 +355,7 @@ export function ShowreelSection({ showreel }: { showreel: ShowreelContent }) {
       </div>
 
       {/* framer-ok755s : filet vertical central (noir 8 %) */}
-      <div className="absolute left-[calc(50%-0.5px)] top-0 z-[1] h-full w-px overflow-hidden bg-background opacity-[0.08]" />
+      <div className="absolute left-[calc(50%-0.5px)] top-0 z-[1] hidden h-full w-px overflow-hidden bg-background opacity-[0.08] tablet:block" />
     </section>
   );
 }

@@ -155,7 +155,7 @@ export const rendezVousContent: ContenuRendezVous = {
   eyebrow: "Prendre rendez-vous",
   titre: "Réserver un créneau",
   chapeau:
-    "Choisissez un sujet, une durée et une heure, puis répondez à trois questions sur votre projet : vous savez avant l’appel ce que votre budget permet. Le lien de visioconférence part par e-mail dans la foulée.",
+    "Choisissez un sujet, une durée et une heure, puis répondez à trois questions sur votre projet : l’appel part de votre situation. Le lien de visioconférence part par e-mail dans la foulée.",
   noteFuseau: "Heures affichées à l’heure de Paris.",
   garanties: [
     "Gratuit et sans engagement",

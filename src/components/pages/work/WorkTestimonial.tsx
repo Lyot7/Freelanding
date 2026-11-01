@@ -46,7 +46,7 @@ export function WorkTestimonial({
       {/* MANQUANT jusqu'ici. RELEVÉ sur `/work/box-mode` : section
           « Testimonial », hôte 1440 × 881 à 1440 (810 × 837 à 810, 390 × 620 à
           390), z-2, opacité 0,05. */}
-      <Grain opacity={0.05} className="z-[2]" />
+      <Grain className="z-[2]" />
       {/* CACHE CLAIR de la couture récit / témoignage, miroir exact de celui que
           `WorkNarrative` porte à son propre haut (là il est à DROITE et déborde
           vers le haut, ici il est à GAUCHE et déborde vers le bas). Sans lui les
@@ -77,7 +77,7 @@ export function WorkTestimonial({
       <div className="relative z-[2] mx-auto mt-[30px] w-full max-w-[1440px]">
         <div className={row}>
           <div>
-            <p className="text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-white/60">
+            <p className="micro text-white/60">
               {uiLabels.work.testimonialEyebrow}
             </p>
             {/* Plafond de 520 px à TOUTES les largeurs, jamais 350 ni 381 : sur
@@ -93,14 +93,14 @@ export function WorkTestimonial({
                 par `motion-sweep` tout en les laissant se replier naturellement
                 sur une seule ligne quand la place existe.
                 Composant SERVEUR : `duration` / `delay`, jamais `framerTween`. */}
-            <h2 className="mt-[12px] max-w-[520px] text-[52px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] tablet:ml-auto tablet:mt-[50px] tablet:text-right tablet:text-[68px] desktop:text-[92px]">
+            <h2 className="mt-[12px] max-w-[520px] titre-marque titre-section tablet:ml-auto tablet:mt-[50px] tablet:text-right ">
               {uiLabels.work.testimonialTitleLines.map((line, i) => (
                 // L'espace est écrit ENTRE les deux masques, jamais dedans : un
                 // `inline-block` est insécable, la coupure de ligne ne peut se
                 // produire qu'entre les deux.
                 <Fragment key={line}>
                   {i > 0 ? " " : null}
-                  <span className="inline-block overflow-hidden align-bottom leading-[0.82]">
+                  <span className="inline-block overflow-hidden align-bottom leading-display">
                     <Reveal
                       as="span"
                       className="inline-block whitespace-pre-wrap"
@@ -197,7 +197,7 @@ export function WorkTestimonial({
                 que `motion-sweep` relevait en trois SPAN de citation non
                 appariés — le découpage de `LineReveal` étant mesuré sur le
                 rendu réel, il héritait fidèlement de la mauvaise largeur. */}
-            <blockquote className="m-0 max-w-[550px] text-[22px] font-medium leading-[1.1] tracking-[-0.02em] tablet:text-right tablet:text-[26px] desktop:text-[32px]">
+            <blockquote className="m-0 max-w-[550px] text-[22px] font-medium leading-[1.1] tracking-[-0.01em] tablet:text-right tablet:text-[26px] desktop:text-[32px]">
               <LineReveal
                 text={`${uiLabels.work.quoteOpen}${testimonial.quote}${uiLabels.work.quoteClose}`}
                 className="block"

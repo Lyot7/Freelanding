@@ -36,7 +36,7 @@ describe("LogicielSection", () => {
     expect(html).toContain(`href="${logiciel.cta.href}"`);
     expect(html).toContain(logiciel.cta.label);
     // Le fragment mis en avant est rendu dans sa propre classe de couleur.
-    expect(html).toMatch(/class="text-foreground"[^>]*>vous validez, et le temps revient à ce qui vous rend indispensable\./);
+    expect(html).toMatch(/class="text-foreground"[^>]*>vous validez\./);
     expect(html).toContain('role="tablist"');
     expect(html).toContain(logiciel.demo.titre);
   });
@@ -55,7 +55,7 @@ describe("LogicielSection", () => {
 
   it("rend le paragraphe sans fragment mis en avant quand il n'y en a pas", () => {
     const html = rendre({ logiciel: { ...logiciel, statementEmphasis: undefined } });
-    expect(html).toContain("le temps revient à ce qui vous rend indispensable.");
+    expect(html).toContain("L’IA fait le sale boulot, vous validez.");
     expect(html).not.toMatch(/class="text-foreground"[^>]*>le temps revient/);
   });
 

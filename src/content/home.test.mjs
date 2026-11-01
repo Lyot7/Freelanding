@@ -3,6 +3,7 @@ import { duree, homeContent } from "./home.ts";
 import { siteConfig } from "./site.ts";
 import { uiLabels } from "./ui.ts";
 import { euros, repereAgenceLogiciel, SUR_DEVIS } from "./offre.ts";
+import { lienRendezVous, rendezVousContent } from "./rendez-vous.ts";
 
 /**
  * L'ACCUEIL, ce que la relecture d'écran ne garde pas.
@@ -56,15 +57,19 @@ describe("accueil", () => {
     const [agence, moi] = comparaison?.lignes ?? [];
     expect(comparaison?.sujet).toMatch(/logiciel métier/u);
     // Du premier outil à la médiane d'un projet, décision d'Eliott du 2026-11-01.
-    expect(agence?.prix).toContain(euros(repereAgenceLogiciel.premierOutilMin).replace(/\s€$/u, ""));
-    expect(agence?.prix).toContain(euros(repereAgenceLogiciel.mediane));
+    expect(agence?.prix).toContain(euros(repereAgenceLogiciel.premierOutilMin));
+    expect(agence?.detail).toContain(euros(repereAgenceLogiciel.mediane));
     expect(moi?.prix).toBe(SUR_DEVIS);
     expect(moi?.fort).toBe(true);
     expect(comparaison?.source.href).toBe(repereAgenceLogiciel.source.href);
   });
 
-  test("la bande des logos ne porte aucun intitulé qui en ferait des clients", () => {
-    expect(homeContent.logoBand?.title).toBeUndefined();
+  test("la bande des logos dit qu'il s'agit d'employeurs, jamais de clients", () => {
+    const titre = homeContent.logoBand?.title ?? "";
+    expect(titre).toMatch(/développé chez/u);
+    expect(titre).not.toMatch(/client|confiance|référence/iu);
+    // Ni date ni mention de contrat : décision d'Eliott du 2026-09-02.
+    expect(titre).not.toMatch(/\d|stage|alternance/iu);
   });
 
   test("les deux sections à cartes noires ne se suivent pas", () => {
@@ -79,7 +84,9 @@ describe("accueil", () => {
     expect(ordre).not.toContain("services");
     expect(ordre.indexOf("showreel")).toBe(ordre.indexOf("about") + 1);
     expect(ordre).toContain("logiciel");
-    expect(homeContent.logiciel?.cta.href).toBe("#moyens");
+    // La section des moyens suit : l'action mène au rendez-vous, pas à la voisine.
+    expect(homeContent.logiciel?.cta.href).toBe(lienRendezVous("logiciel"));
+    expect(homeContent.hero.offerLink?.href).toBe("#logiciel");
   });
 
   test("trois moyens rendent le temps, sans aucun nom de prospect", () => {
@@ -100,7 +107,7 @@ describe("accueil", () => {
 
   test("le héros dit ce qu'une agence facture et chiffre l'écart", () => {
     expect(homeContent.hero.eyebrow).toContain("agence");
-    expect(homeContent.hero.comparison.lignes[0].prix).toContain("30");
+    expect(homeContent.hero.comparison.lignes[0].detail).toContain("30");
   });
 
   test("la démonstration montre un gain dérivé de ses hypothèses, jamais écrit à la main", () => {
@@ -121,14 +128,29 @@ describe("accueil", () => {
     expect(duree(65)).toBe("1\u00A0h\u00A005");
   });
 
-  test("le titre du héros est une seule porte, vers les trois moyens", () => {
+  test("le titre du héros est un titre, ni lien ni prix", () => {
     const portes = homeContent.hero.doors ?? [];
-    expect(portes.map((porte) => porte.href)).toEqual(["#moyens"]);
+    expect(portes).toHaveLength(1);
+    expect(Object.keys(portes[0] ?? {})).toEqual(["lines"]);
     expect(homeContent.hero.title).toBe("Je vous rends des heures.");
     expect(homeContent.hero.titleLines?.join(" ")).toBe(homeContent.hero.title);
-    expect(portes[0]?.price).toBe("Sur devis");
     expect(homeContent.about.title).not.toBe(homeContent.hero.title);
     expect(homeContent.about.titleLines?.join(" ")).toBe(homeContent.about.title);
+  });
+
+  test("« indispensable » n'est dit qu'une fois, dans le héros", () => {
+    // Tout ce que l'accueil rend sous le héros.
+    const { hero, about, logiciel, moyens, showreel, whyUs, numbers, faq } = homeContent;
+    expect(hero.subtitle).toContain("indispensable");
+    const reste = { about, logiciel, moyens, showreel, whyUs, numbers, faq };
+    expect(JSON.stringify(reste)).not.toContain("indispensable");
+  });
+
+  test("la durée annoncée sous le bouton est celle du sujet ouvert par le bouton", () => {
+    const logiciel = rendezVousContent.types.find((type) => type.id === "logiciel");
+    expect(logiciel?.duree).toContain("30");
+    expect(logiciel?.duree).toContain("60");
+    expect(homeContent.hero.ctaNote).toMatch(/30 à 60\sminutes/u);
   });
 
   test("le héros dit ce qui explique le prix, sans montant", () => {

@@ -102,14 +102,14 @@ function SubmitButton({
   // `leading-[1.2]` et non `leading-[16px]` : le cadre clippant de la source
   // mesure 15,59 px (13 px × 1,2), le nôtre en mesurait 16.
   const textCls =
-    "text-[13px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-[#0b0b0b]";
+    "text-[14px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-accent-ink";
   return (
     <div className="h-[50px] w-full tablet:w-auto">
       <button
         type={onClick ? "button" : "submit"}
         onClick={onClick}
         disabled={enCours}
-        className="group relative flex h-[50px] w-full flex-none flex-row items-center justify-center gap-[15px] overflow-hidden bg-foreground px-[20px] transition-opacity disabled:cursor-progress disabled:opacity-60 tablet:w-min"
+        className="group relative flex h-[50px] w-full flex-none flex-row items-center justify-center gap-[15px] overflow-hidden bg-accent px-[20px] transition-opacity disabled:cursor-progress disabled:opacity-60 tablet:w-min"
       >
         <span className="relative block h-[15.6px] overflow-hidden">
           <SwapCopies travel={12} textClassName={textCls}>
@@ -156,11 +156,11 @@ function QuestionField({
           aria-invalid={enErreur || undefined}
           className="block h-[54px] w-full appearance-none border-0 bg-transparent p-[16px] text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground tablet:h-[50px] tablet:text-[14px]"
         >
-          <option value="" disabled={requis} className="text-[#0b0b0b]">
+          <option value="" disabled={requis} className="text-background">
             {placeholder}
           </option>
           {options.map((option) => (
-            <option key={option.id} value={option.id} className="text-[#0b0b0b]">
+            <option key={option.id} value={option.id} className="text-background">
               {option.libelle}
             </option>
           ))}
@@ -210,7 +210,7 @@ function Progression({
                 faite || courante ? "bg-accent" : "bg-white/15"
               }`}
             />
-            <span className="flex flex-col gap-[4px] pt-[10px] text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em]">
+            <span className="flex flex-col gap-[4px] pt-[10px] micro">
               <span className={faite || courante ? "text-accent" : "text-foreground-60"}>
                 {String(index + 1).padStart(2, "0")}
               </span>
@@ -350,7 +350,7 @@ export function FooterContactForm({
               className="block h-[54px] w-full appearance-none border-0 bg-transparent p-[16px] text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground tablet:h-[50px] tablet:text-[14px]"
             >
               {footerForm.selectOptions.map((opt) => (
-                <option key={opt} value={opt} className="text-[#0b0b0b]">
+                <option key={opt} value={opt} className="text-background">
                   {opt}
                 </option>
               ))}
@@ -438,7 +438,7 @@ export function FooterContactForm({
             <button
               type="button"
               onClick={() => setEtape((courante) => Math.max(courante - 1, 0))}
-              className="flex h-[50px] w-full items-center justify-center border border-white/10 px-[20px] text-[13px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground transition-colors hover:border-white/35 motion-reduce:transition-none tablet:w-auto"
+              className="flex h-[50px] w-full items-center justify-center border border-white/10 px-[20px] text-[14px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground transition-colors hover:border-white/35 motion-reduce:transition-none tablet:w-auto"
             >
               {etapes.retour}
             </button>

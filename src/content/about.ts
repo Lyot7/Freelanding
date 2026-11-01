@@ -21,7 +21,7 @@ const aboutStats = [
   { value: "92 %", label: "D’erreurs en moins sur un parcours d’inscription refait chez Würth France" },
   { value: "100 %", label: "Du code, des accès et des données à votre nom" },
   { value: "0 €", label: "D’abonnement imposé pour utiliser ce que je livre" },
-  { value: "24h", label: "Pour répondre à chaque message, en heures ouvrées" },
+  { value: "24 h", label: "Pour répondre à chaque message, en heures ouvrées" },
 ] as const;
 
 /**

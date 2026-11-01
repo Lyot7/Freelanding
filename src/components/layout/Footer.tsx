@@ -167,7 +167,7 @@ function TestimonialCard({ person }: { person: FooterPerson }) {
         >
           {/* framer-30jb7g : grain sur la photo (opacity .07) */}
           <div className="pointer-events-none absolute inset-0 z-[3] select-none">
-            <Grain opacity={0.07} />
+            <Grain matiere="photo" />
           </div>
         </ParallaxCover>
 
@@ -211,7 +211,7 @@ function TestimonialCard({ person }: { person: FooterPerson }) {
         </p>
         {/* framer-1pe9chb : rôle (preset 11kvajf, 11px, rgba(11,11,11,.6), aligné droite) */}
         {person.role ? (
-          <p className="h-auto w-full whitespace-pre-wrap break-words text-right text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-[rgba(11,11,11,0.6)]">
+          <p className="h-auto w-full whitespace-pre-wrap break-words text-right text-[14px] font-medium leading-[1.35] tracking-[-0.01em] text-[rgba(11,11,11,0.6)]">
             {person.role}
           </p>
         ) : null}
@@ -241,7 +241,7 @@ function SocialIcon({ social }: { social: Link }) {
       target="_blank"
       rel="noopener noreferrer"
       aria-label={`${uiLabels.chrome.socialLinkPrefix}${social.label}`}
-      className="group relative flex aspect-square h-[22px] w-[22px] flex-none items-center justify-center text-foreground"
+      className="group relative -m-[11px] grid size-[44px] flex-none place-items-center text-foreground"
     >
       {/* MESURÉ sur le live : l'opacité va de 0.5 à 0.80 (et non 1), de façon
           asymptotique et lente — 0.661 à 102 ms, 0.781 à 304 ms, 0.80 à ~700 ms.
@@ -249,7 +249,7 @@ function SocialIcon({ social }: { social: Link }) {
           vite. */}
       <SocialGlyph
         social={social}
-        className="block h-full w-full opacity-50 transition-opacity duration-700 ease-out group-hover:opacity-80 motion-reduce:transition-none"
+        className="block h-[22px] w-[22px] opacity-50 transition-opacity duration-700 ease-out group-hover:opacity-80 motion-reduce:transition-none"
       />
     </a>
   );
@@ -319,10 +319,10 @@ export async function Footer({
   const navLinkCls =
     "relative h-auto w-auto whitespace-pre text-[18px] font-medium leading-[1.2] tracking-[-0.01em] " +
     inlineLinkCls +
-    " desktop:text-[20px]";
+    " desktop:text-[22px]";
   // Petit label de section (preset 11kvajf 11px, blanc 60 %, uppercase).
   const sectionLabelCls =
-    "relative h-auto w-auto whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60";
+    "relative h-auto w-auto whitespace-pre micro text-foreground-60";
 
   return (
     <>
@@ -356,7 +356,7 @@ export async function Footer({
 
       {/* framer-f8amnx "Grain" : grain plein footer (z-2, opacity .08) */}
       <div className="pointer-events-none absolute inset-0 z-[2] select-none">
-        <Grain opacity={0.08} />
+        <Grain />
       </div>
 
       {/* framer-50743m "Line" : filet vertical central (blanc 10 %, hidden mobile) */}
@@ -389,7 +389,7 @@ export async function Footer({
                       conteneur `flex`, donc retirer le bloc entier ne laisse
                       aucun blanc résiduel. */}
                   {contact.phone ? (
-                    <p className="relative h-auto w-auto whitespace-pre text-[22px] font-medium leading-[1.1] tracking-[-0.01em] tablet:text-[24px] desktop:text-[26px]">
+                    <p className="relative h-auto w-auto whitespace-pre text-[22px] font-medium leading-[1.1] tracking-[-0.01em] tablet:text-[22px] desktop:text-[26px]">
                       <a
                         href={`tel:${contact.phone.replace(/[^\d+]/g, "")}`}
                         target="_blank"
@@ -410,7 +410,7 @@ export async function Footer({
               </div>
               {/* framer-10bgy7h : response time (preset wwtw0z 12px, blanc 60 %) */}
               {contact.responseTime ? (
-                <p className="h-auto w-full max-w-[260px] whitespace-pre-wrap break-words text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60">
+                <p className="h-auto w-full max-w-[260px] whitespace-pre-wrap break-words text-[14px] font-medium leading-[1.35] tracking-[-0.01em] text-foreground-60">
                   {contact.responseTime}
                 </p>
               ) : null}
@@ -437,11 +437,11 @@ export async function Footer({
                   62 px au seul palier fautif — 408 x 62/68 = 372, sous les 381
                   disponibles. `scripts/word-break-audit.mjs` vérifie qu'aucun
                   mot ne se recoupe ailleurs. */}
-              <h2 className="relative m-0 w-full max-w-full whitespace-pre-wrap p-0 text-left text-[clamp(40px,calc(13.6vw/var(--zoom-ecran,1)),52px)] font-semibold uppercase leading-[0.82] tracking-[-0.05em] text-foreground tablet:max-w-[390px] desktop:max-w-none tablet:text-[62px] desktop:text-[92px]">
+              <h2 className="titre-marque titre-section relative m-0 w-full max-w-full whitespace-pre-wrap p-0 text-left text-foreground">
                 {footerCta?.heading}
               </h2>
               {/* framer-dak6ek : sous-texte (preset wwtw0z 12px, blanc 60 % + emphase blanche) */}
-              <p className="h-auto w-full max-w-[330px] whitespace-pre-wrap break-words text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60">
+              <p className="h-auto w-full max-w-[330px] whitespace-pre-wrap break-words text-[14px] font-medium leading-[1.35] tracking-[-0.01em] text-foreground-60">
                 {subtextBefore}
                 <span className="text-foreground">{subtextEmphasis}</span>
                 {subtextAfter}
@@ -520,7 +520,7 @@ export async function Footer({
               « Confidentialité » en fin de défilement. */}
           <div className="relative order-1 flex w-full flex-col items-start justify-end overflow-visible pb-[70px] tablet:order-none tablet:h-full tablet:pb-0">
             {/* framer-mqix49 "Legal Links" (gap 32) */}
-            <div className="relative flex w-full flex-wrap tablet:w-min tablet:flex-nowrap flex-row items-center gap-[32px] overflow-visible">
+            <div className="relative grid w-full grid-cols-2 gap-y-[8px] py-[6px] overflow-visible tablet:flex tablet:w-min tablet:flex-row tablet:flex-nowrap tablet:items-center tablet:gap-[32px] tablet:py-0">
               {/* FORME COURTE ICI, et ici seulement. Les trois liens légaux
                   partagent une ligne : en toutes lettres, « Politique de
                   confidentialité » (168 px) et « Conditions générales » les
@@ -532,13 +532,13 @@ export async function Footer({
               {legalLinks.map((l) => (
                 <p
                   key={l.href}
-                  className="relative h-auto w-auto whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em]"
+                  className="relative h-auto w-auto whitespace-pre micro"
                 >
                   <HoverPrefetchLink
                     href={l.href}
                     // `transition-colors` ne couvre PAS `text-underline-offset` :
                     // le soulignement sautait d'un cran au lieu de glisser.
-                    className="text-foreground-60 underline decoration-[rgba(255,255,255,0.13)] underline-offset-[3px] transition-[color,text-underline-offset] duration-200 hover:text-foreground hover:underline-offset-[4px]"
+                    className="cible-44 text-foreground-60 underline decoration-[rgba(255,255,255,0.13)] underline-offset-[3px] transition-[color,text-underline-offset] duration-200 hover:text-foreground hover:underline-offset-[4px]"
                   >
                     {l.shortLabel ?? l.label}
                   </HoverPrefetchLink>
@@ -586,7 +586,7 @@ export async function Footer({
                        débordait son propre lien de 19 à 35px, sur les 18 pages. */
                     <p
                       key={l.href}
-                      className="relative h-auto whitespace-pre-wrap break-words text-[18px] leading-[1.2] desktop:text-[20px]"
+                      className="relative h-auto whitespace-pre-wrap break-words text-[18px] leading-[1.2] desktop:text-[22px]"
                     >
                       <HoverPrefetchLink
                         href={l.href}
@@ -609,7 +609,7 @@ export async function Footer({
                 <div className="relative flex w-full flex-col items-start gap-[16px] overflow-visible">
                   {/* framer-i62a53 : adresse (preset 1r5vzwr 18/20px, blanc) */}
                   {contact.address ? (
-                    <p className="relative h-auto w-full whitespace-pre-wrap break-words text-[18px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground desktop:text-[20px]">
+                    <p className="relative h-auto w-full whitespace-pre-wrap break-words text-[18px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground desktop:text-[22px]">
                       {contact.address}
                     </p>
                   ) : null}
@@ -659,7 +659,7 @@ export async function Footer({
                 Next.js » et « Par Eliott Bouquerel » : trois crédits qui se
                 coupaient selon la largeur et redisaient le nom déjà écrit
                 ici. */}
-            <p className="m-0 whitespace-nowrap text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60">
+            <p className="m-0 whitespace-nowrap micro text-foreground-60">
               {copyrightLong}
             </p>
           </div>

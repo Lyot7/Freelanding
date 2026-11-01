@@ -8,6 +8,8 @@ import type { SiteConfig } from "@/lib/content/types";
 interface LogoProps {
   brand: SiteConfig["brand"];
   className?: string;
+  /** En volt : réservé au logo posé sur le héros de l'accueil. */
+  volt?: boolean;
 }
 
 /**
@@ -22,15 +24,14 @@ interface LogoProps {
  * de sa couleur, pour que le chrome et le hero puissent diverger sans dupliquer
  * 6 Ko de chemins.
  *
- * BLANC ici, volt dans le hero. Le chrome est le repère neutre, présent sur
- * toutes les pages et sur des fonds variables ; l'accent est réservé au seul
- * endroit où le nom EST le sujet de la page.
+ * BLANC partout, volt sur le héros de l'accueil. Le chrome est le repère neutre,
+ * présent sur toutes les pages et sur des fonds variables.
  *
  * Le ® reste un nœud de texte à part : il vient de la donnée (`brand.mark`), il
  * n'a pas à être gravé dans le dessin, et Eliott peut le retirer sans toucher au
  * logotype. Le nom accessible vient lui aussi de la donnée.
  */
-export function Logo({ brand, className }: LogoProps) {
+export function Logo({ brand, className, volt = false }: LogoProps) {
   return (
     <Link
       href="/"
@@ -43,7 +44,11 @@ export function Logo({ brand, className }: LogoProps) {
           capitale, soit la hauteur exacte du logotype précédent, entièrement en
           capitales. Le mot occupe 115 px de large, contre 164 avant : le
           dessin est plus compact à hauteur d'œil égale. */}
-      <BouquerelWordmark className="block h-[24px] w-auto flex-none text-foreground" />
+      <BouquerelWordmark
+        className={`block h-[24px] w-auto flex-none transition-colors duration-300 motion-reduce:transition-none ${
+          volt ? "text-volt" : "text-foreground"
+        }`}
+      />
       {/* 4 px de retrait haut sur le ® : la boîte du logotype commence au
           sommet de l'ASCENDANTE (le « l »), la capitale ne débute qu'à 66/376
           de la boîte, soit 4,2 px à 24 px de haut. Sans ce retrait le ® flotte

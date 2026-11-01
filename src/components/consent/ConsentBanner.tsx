@@ -135,7 +135,7 @@ function CategoryRow({
       </div>
       {locked ? (
         <span
-          className="mt-[2px] flex-none whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-white/70"
+          className="mt-[2px] flex-none whitespace-pre micro text-white/70"
           aria-describedby={bodyId}
         >
           {consentCopy.alwaysOn}
@@ -404,7 +404,7 @@ export function ConsentBanner() {
                   qu'une fois le panneau déplié, où il sert de repère. */}
               <div className="flex flex-col gap-[8px]">
                 {panelOpen ? (
-                  <p className="whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-white/60">
+                  <p className="whitespace-pre micro text-white/60">
                     {consentCopy.eyebrow}
                   </p>
                 ) : null}
@@ -412,7 +412,7 @@ export function ConsentBanner() {
                   id={titleId}
                   className={
                     panelOpen
-                      ? "accent-room text-[18px] font-semibold uppercase leading-[1.05] tracking-[-0.03em] text-foreground"
+                      ? "accent-room text-[18px] font-semibold uppercase leading-[1.05] tracking-[-0.045em] text-foreground"
                       : "sr-only"
                   }
                 >

@@ -88,6 +88,14 @@ const CHASSE_INCONNUE = 0.991;
 export const APPROCHE_TITRE = 0.05;
 
 /**
+ * Charte du 2026-11-01 : les titres passent en Geist 900, interlettrés à -0,045 em.
+ * La table reste celle du 600 ; ce coefficient la met à la chasse du 900.
+ * Relevé au canvas sur six lignes de l'accueil : de 1,035 à 1,064, majoré.
+ */
+export const GRAISSE_900 = 1.07;
+export const APPROCHE_MARQUE = 0.045;
+
+/**
  * Combien de fois la ligne tient dans son propre corps, interlettrage compris.
  *
  * `largeur_rendue = facteur × taille_de_police`. La taille qui remplit un cadre

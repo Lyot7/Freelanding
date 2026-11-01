@@ -30,6 +30,17 @@ describe("AnimatedCounter value logic", () => {
     expect(nextCounterValue(1.4, 1.4, 0.1, 1)).toBe(1.4);
   });
 
+  test("garde la fine insécable avant l'unité, sans la compter", () => {
+    expect(parseCounterValue("24\u202Fh", "\u202Fh")).toEqual({
+      end: 24,
+      suffix: "\u202Fh",
+      precision: 0,
+      increment: 1,
+    });
+    expect(parseCounterValue("92", "\u202F%").suffix).toBe("\u202F%");
+    expect(parseCounterValue("24\u202Fh").suffix).toBe("\u202Fh");
+  });
+
   test("formats integers and decimals like the source Counter", () => {
     expect(formatCounterValue(60, 0)).toBe("60");
     expect(formatCounterValue(1.4, 1)).toBe("1.4");

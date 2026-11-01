@@ -43,7 +43,7 @@ const SECTION_CLS =
 const HALF = "w-full tablet:w-px tablet:flex-[1_0_0]";
 
 const PARAGRAPH_CLS =
-  "whitespace-pre-wrap text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em]";
+  "whitespace-pre-wrap text-[14px] font-medium leading-[1.35] tracking-[-0.01em]";
 
 function SubtitleParagraph({ part }: { part: HeroSubtitleParagraph }) {
   // Polarité inversée : le paragraphe passe en blanc plein et ce sont ses
@@ -73,7 +73,7 @@ export function WorkHero({ hero }: { hero: HeroContent }) {
       {/* MANQUANT jusqu'ici : `/work` n'avait aucun grain de section, le calque
           global inventé le masquait. RELEVÉ sur le live : hôte 1440 × 810 à
           1440 de fenêtre, z-1, opacité 0,05, motif 256 × 256. */}
-      <Grain opacity={0.05} className="z-[1]" />
+      <Grain className="z-[1]" />
       <div
         aria-hidden
         className="absolute inset-y-0 left-1/2 z-[1] w-px bg-white/[0.08]"
@@ -93,7 +93,7 @@ export function WorkHero({ hero }: { hero: HeroContent }) {
             >
               {/* Corps plafonné et non fixe : « PROJETS » demandait 319 px pour
                   280 disponibles à 320, et 395 pour 381 à 810. */}
-              <h1 className="m-0 text-[clamp(44px,calc(17.2vw/var(--zoom-ecran,1)),63px)] font-semibold uppercase leading-[0.82] tracking-[-0.05em] tablet:text-[clamp(60px,calc(9.2vw/var(--zoom-ecran,1)),78px)] desktop:text-[98px]">
+              <h1 className="m-0 text-[clamp(44px,calc(17.2vw/var(--zoom-ecran,1)),63px)] titre-marque tablet:text-[clamp(60px,calc(9.2vw/var(--zoom-ecran,1)),78px)] desktop:text-[98px]">
                 {hero.title}
               </h1>
             </Reveal>

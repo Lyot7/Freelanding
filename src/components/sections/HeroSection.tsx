@@ -24,10 +24,8 @@ import { DemanderAssistant } from "@/components/pages/agent/DemanderAssistant";
 /**
  * Héros de l'accueil, refait le 2026-10-15.
  *
- * UNE PORTE DEPUIS LE 2026-10-31 (une seule offre). Le h1 est un lien vers
- * l'offre, avec son prix d'entrée. Au-dessus, ce qui est vendu ; en bas, la
- * comparaison de prix sourcée. `doors` reste une liste : le jour où il en
- * faudrait une seconde, le gabarit la rend.
+ * UN TITRE DEPUIS LE 2026-11-01. Le h1 ne porte ni lien ni prix : au-dessus, ce
+ * qui est vendu ; en bas, la comparaison de prix sourcée.
  *
  * CE QUI EST PARTI, et pourquoi. Le logotype géant « Bouquerel » redisait le
  * logo de l'en-tête et prenait le premier rang de lecture au titre ; le cadre
@@ -36,10 +34,9 @@ import { DemanderAssistant } from "@/components/pages/agent/DemanderAssistant";
  * spécialement beau ».
  *
  * MOUVEMENT. Une seule entrée orchestrée, en CSS (`globals.css`, bloc
- * `.hero-*`) : les filets se tracent de gauche à droite, chaque ligne du titre
+ * `.hero-*`) : chaque ligne du titre
  * monte depuis son masque, les preuves suivent. Le CSS tourne hors du fil
- * principal, donc l'entrée reste fluide pendant que la page s'hydrate. Au
- * survol (souris seulement), la porte visée s'allume et l'autre s'efface.
+ * principal, donc l'entrée reste fluide pendant que la page s'hydrate.
  * `prefers-reduced-motion` ramène tout à un fondu.
  */
 
@@ -48,68 +45,36 @@ function delai(ms: number): CSSProperties {
   return { "--d": `${ms}ms` } as CSSProperties;
 }
 
-function Fleche() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden className="h-[18px] w-[18px]">
-      <path
-        d="M5 12h13M13 6l6 6-6 6"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="square"
-      />
-    </svg>
-  );
-}
-
 function Porte({ porte, index }: { porte: HeroDoor; index: number }) {
   const base = 120 + index * 160;
   return (
-    <a
-      href={porte.href}
+    <span
       data-part="hero-porte"
-      className="hero-porte group relative grid grid-cols-[minmax(0,1fr)_auto] items-end gap-x-[16px] gap-y-[10px] py-[16px] text-foreground no-underline tablet:grid-cols-[minmax(0,1fr)_auto_auto] tablet:gap-y-0 tablet:py-[24px]"
-      style={delai(base)}
+      className="titre-marque block py-[16px] text-[clamp(38px,calc(11vw/var(--zoom-ecran,1)),60px)] text-foreground tablet:py-[24px] tablet:text-[clamp(56px,calc(7.4vw/var(--zoom-ecran,1)),108px)]"
     >
-      <span className="hero-porte-titre col-start-1 row-start-1 min-w-0 text-[clamp(38px,calc(11vw/var(--zoom-ecran,1)),60px)] font-semibold leading-[0.95] tracking-[-0.045em] tablet:text-[clamp(56px,calc(7.4vw/var(--zoom-ecran,1)),108px)] tablet:leading-[0.92]">
-        {porte.lines.map((ligne, i) => (
-          <span key={ligne} className="hero-ligne">
-            <span
-              className={i === 0 ? "hero-ligne-amorce" : undefined}
-              style={delai(base + i * 90)}
-            >
-              {ligne}
-              {i < porte.lines.length - 1 ? " " : null}
-            </span>
+      {porte.lines.map((ligne, i) => (
+        <span key={ligne} className="hero-ligne">
+          <span
+            className={i === 0 ? "hero-ligne-amorce" : undefined}
+            style={delai(base + i * 90)}
+          >
+            {ligne}
+            {i < porte.lines.length - 1 ? " " : null}
           </span>
-        ))}
-      </span>
-      <span
-        className="hero-fond col-start-1 row-start-2 whitespace-nowrap text-[13px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60 transition-colors duration-200 group-hover:text-foreground tablet:col-start-2 tablet:row-start-1 tablet:self-end tablet:pb-[16px] tablet:text-[14px]"
-        style={delai(base + 260)}
-      >
-        {porte.price}
-      </span>
-      <span
-        className="hero-fond col-start-2 row-start-1 self-end tablet:col-start-3"
-        style={delai(base + 300)}
-      >
-        <span className="hero-porte-fleche flex h-[44px] w-[44px] items-center justify-center rounded-full border border-white/20 text-foreground">
-          <Fleche />
         </span>
-      </span>
-    </a>
+      ))}
+    </span>
   );
 }
 
 function Preuve({ preuve, ordre }: { preuve: HeroProof; ordre: number }) {
   const valeur = (
-    <span className="whitespace-nowrap text-[24px] font-medium leading-none tracking-[-0.03em] text-foreground tablet:text-[28px]">
+    <span className="whitespace-nowrap text-[22px] font-medium leading-none tracking-[-0.045em] text-foreground tablet:text-[26px]">
       {preuve.value}
     </span>
   );
   const libelle = (
-    <span className="min-w-0 max-w-[34ch] text-[12px] font-medium uppercase leading-[1.25] tracking-[-0.01em] text-foreground-60 [text-wrap:balance]">
+    <span className="min-w-0 max-w-[34ch] micro text-foreground-60 [text-wrap:balance]">
       {preuve.label}
       {preuve.source ? (
         <>
@@ -119,7 +84,7 @@ function Preuve({ preuve, ordre }: { preuve: HeroProof; ordre: number }) {
               href={preuve.source.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-foreground-60 underline decoration-white/30 underline-offset-[3px] transition-colors duration-200 hover:text-foreground"
+              className="cible-44 text-foreground-60 underline decoration-white/30 underline-offset-[3px] transition-colors duration-200 hover:text-foreground"
             >
               {preuve.source.label}
             </a>
@@ -158,20 +123,25 @@ function Comparaison({ comparaison }: { comparaison: HeroComparaison }) {
   return (
     <p
       data-part="comparaison"
-      className="hero-fond m-0 flex flex-wrap items-baseline gap-x-[16px] gap-y-[6px] text-[12px] font-medium uppercase leading-[1.3] tracking-[-0.01em] text-foreground-60"
+      className="hero-fond m-0 flex flex-wrap items-baseline gap-x-[16px] gap-y-[6px] micro text-foreground-60"
       style={delai(760)}
     >
       <span>{comparaison.sujet}</span>
       {comparaison.lignes.map((ligne) => (
-        <span key={ligne.qui} className="flex items-baseline gap-[6px] whitespace-nowrap">
+        <span key={ligne.qui} className="flex flex-wrap items-baseline gap-x-[6px]">
           {ligne.qui}
           <span
-            className={`text-[15px] normal-case tracking-[-0.02em] ${
+            className={`text-[14px] normal-case tracking-[-0.01em] ${
               ligne.fort ? "text-accent" : "text-foreground"
             }`}
           >
             {ligne.prix}
           </span>
+          {ligne.detail ? (
+            <span className="text-[14px] normal-case tracking-[-0.01em] text-foreground-60">
+              {ligne.detail}
+            </span>
+          ) : null}
         </span>
       ))}
       <span className="normal-case">
@@ -180,7 +150,7 @@ function Comparaison({ comparaison }: { comparaison: HeroComparaison }) {
           href={comparaison.source.href}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-foreground-60 underline decoration-white/30 underline-offset-[3px] transition-colors duration-200 hover:text-foreground"
+          className="cible-44 text-foreground-60 underline decoration-white/30 underline-offset-[3px] transition-colors duration-200 hover:text-foreground"
         >
           {comparaison.source.label}
         </a>
@@ -203,7 +173,7 @@ function Fondateur({ person }: { person: HeroContent["person"] }) {
         />
       ) : null}
       <span className="flex flex-col gap-[2px]">
-        <span className="text-[13px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground">
+        <span className="text-[14px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground">
           {person.name}
         </span>
         <span className="text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground-60">
@@ -469,13 +439,13 @@ export function HeroSection({
         aria-hidden
         className="pointer-events-none absolute inset-y-0 left-1/2 z-[1] hidden w-px bg-white/[0.07] tablet:block"
       />
-      <Grain opacity={0.1} className="z-[1]" />
+      <Grain matiere="photo" className="z-[1]" />
 
       <div className="relative z-[2] mx-auto flex w-full max-w-[1440px] flex-1 flex-col px-[20px] tablet:px-[24px] desktop:px-[30px]">
         <div className="flex flex-1 flex-col justify-center">
           {hero.eyebrow ? (
             <p
-              className="hero-fond m-0 flex max-w-[30ch] tablet:max-w-none items-baseline gap-[12px] text-[16px] font-medium leading-[1.25] tracking-[-0.02em] text-foreground tablet:text-[20px] desktop:text-[22px]"
+              className="hero-fond m-0 flex max-w-[30ch] tablet:max-w-none items-baseline gap-[12px] text-[16px] font-medium leading-[1.25] tracking-[-0.01em] text-foreground tablet:text-[22px] desktop:text-[22px]"
               style={delai(0)}
             >
               <span aria-hidden className="hero-pastille relative top-[-2px] h-[8px] w-[8px] flex-none bg-accent" />
@@ -488,7 +458,7 @@ export function HeroSection({
               depuis que l'accordéon a quitté l'accueil (2026-10-16). */}
           <h1 id="services" data-part="hero-titre" className="hero-portes m-0 mt-[18px] tablet:mt-[34px]">
             {portes.map((porte, index) => (
-              <Porte key={porte.href} porte={porte} index={index} />
+              <Porte key={porte.lines.join(" ")} porte={porte} index={index} />
             ))}
           </h1>
 
@@ -496,7 +466,7 @@ export function HeroSection({
             {sousTitre ? (
               <p
                 data-part="hero-pour-qui"
-                className="hero-fond m-0 max-w-[46ch] text-[15px] font-medium leading-[1.4] tracking-[-0.01em] text-foreground-60 tablet:text-[17px]"
+                className="hero-fond m-0 max-w-[44ch] text-[16px] font-medium leading-[1.4] tracking-[-0.01em] text-white/80 tablet:text-[18px]"
                 style={delai(520)}
               >
                 {sousTitre}
@@ -506,17 +476,18 @@ export function HeroSection({
               className="hero-fond flex flex-col items-start gap-[16px] tablet:flex-row tablet:flex-wrap tablet:items-center tablet:gap-x-[28px]"
               style={delai(620)}
             >
-              <a
-                href={lienRendezVous("logiciel")}
-                className="hero-cta flex h-[48px] flex-none items-center justify-center bg-accent px-[20px] text-[13px] font-semibold uppercase leading-none tracking-[-0.01em] text-accent-ink no-underline"
-              >
-                {uiLabels.services.rdvLabel}
-              </a>
+              <div className="flex flex-col gap-[8px]">
+                <a href={lienRendezVous("logiciel")} className="cta-primaire">
+                  {uiLabels.services.rdvLabel}
+                </a>
+                {hero.ctaNote ? (
+                  <p data-part="hero-note-cta" className="m-0 text-[12px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground-60">
+                    {hero.ctaNote}
+                  </p>
+                ) : null}
+              </div>
               {hero.offerLink ? (
-                <a
-                  href={hero.offerLink.href}
-                  className="text-[13px] font-semibold tracking-[-0.01em] text-foreground underline underline-offset-[3px]"
-                >
+                <a href={hero.offerLink.href} className="cta-lien cible-44 text-foreground">
                   {hero.offerLink.label}
                 </a>
               ) : null}
@@ -534,11 +505,11 @@ export function HeroSection({
                   availability={site.availability}
                   variant="hero"
                   timeZone={site.contact.timezone}
-                  className="m-0 text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground"
+                  className="m-0 micro text-foreground"
                 />
               </div>
             ) : null}
-            <DemanderAssistant className="m-0 text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em]" />
+            <DemanderAssistant className="m-0 micro" />
           </div>
         </div>
 
