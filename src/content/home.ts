@@ -141,6 +141,15 @@ export const homeContent: HomeContent = {
     // Fond du hero : macro d'un mouvement d'horlogerie, asset généré et
     // possédé (2026-08-10), calibré sombre par `scripts/hero-loop.mjs`
     // (moyenne 13,7/255) pour porter du texte blanc.
+    cadran: {
+      depart: MINUTES_SEMAINE,
+      arrivee: reste(MINUTES_SEMAINE),
+      taches: TACHES_BUREAU.map((tache) => tache.tache),
+      gain: { valeur: duree(MINUTES_RENDUES), libelle: "rendues par semaine" },
+      exemple: { label: "Exemple, le détail plus bas", href: "#logiciel" },
+      exempleCourt: "en exemple",
+      phrase: `Exemple : ${duree(MINUTES_SEMAINE)} de saisie par semaine deviennent ${duree(reste(MINUTES_SEMAINE))} de relecture, soit ${duree(MINUTES_RENDUES)} rendues.`,
+    },
     media: {
       kind: "video",
       src: "/videos/hero-loop.mp4",
@@ -227,11 +236,85 @@ export const homeContent: HomeContent = {
       },
       {
         titre: "Si besoin, devenir votre référent",
+        option: "(En option)",
         corps:
           "Mes missions sont ponctuelles. Si vous préférez un interlocuteur régulier, je deviens votre référent IA, développement ou R&D.",
         lien: { label: "Voir cette option", href: "/services/automatisation#referent" },
       },
     ],
+  },
+
+  /* LES RÉALISATIONS DE L'ACCUEIL : le seul résultat mesuré d'abord, puis le produit mené seul. */
+  preuves: {
+    eyebrow: "(Réalisations)",
+    titleLines: ["Regardez", "ce que je", "construis."],
+    statement:
+      "Un parcours refait chez Würth France, une marketplace montée seul. Chaque fiche montre le problème de départ et ce que j’ai construit.",
+    lien: { label: "Toutes les réalisations", href: "/realisations" },
+    projets: [
+      {
+        slug: "wurth-creation-de-compte",
+        titre: "Création de compte, Würth",
+        chiffre: "−92 %",
+        resume:
+          "SIRET vérifié pendant la saisie, adresse tirée du registre : −92 % d’erreurs et de sollicitations du support, mesuré en interne.",
+        medias: [
+          { src: "/work/wurth/mockup.jpg", alt: "Le parcours de création de compte Würth sur écran" },
+          { src: "/work/wurth/03-siret-adresse-remplie.png", alt: "Le SIRET vérifié et l’adresse remplie pendant la saisie" },
+          { src: "/work/wurth/resultat-92.jpg", alt: "Le résultat mesuré, moins 92 % d’erreurs" },
+        ],
+      },
+      {
+        slug: "kpsull",
+        titre: "Kpsull",
+        resume: "Une marketplace entière, catalogue, recherche, panier et comptes, conçue et développée en propre.",
+        medias: [
+          { src: "/work/kpsull/mockup-poster.jpg", video: "/work/kpsull/mockup.mp4", alt: "La marketplace Kpsull en vidéo" },
+          { src: "/work/kpsull/catalogue.jpg", alt: "Le catalogue de Kpsull" },
+          { src: "/work/kpsull/createurs.jpg", alt: "La page des créateurs de Kpsull" },
+        ],
+      },
+    ],
+  },
+
+  /* TITRE CHOISI PAR ELIOTT le 2026-09-24, gardé. */
+  confiance: {
+    eyebrow: "(Pourquoi moi ?)",
+    titleLines: ["Personne", "ne vous tient", "en otage."],
+    otage: {
+      lignes: ["Le code", "L’hébergement", "Les données"],
+      avant: "chez moi",
+      apres: "chez vous",
+      conclusion: "Tout est à votre nom. Vous changez de prestataire quand vous voulez.",
+    },
+    tuiles: [
+      { chiffre: "0", titre: "intermédiaire", corps: "Ni chef de projet ni structure à payer. C’est de là que vient la fraction." },
+      { chiffre: "1", titre: "chantier à la fois", corps: "Votre projet n’attend personne." },
+      { chiffre: "24 h", titre: "ouvrées", corps: "Pour répondre à votre message." },
+    ],
+    verifier: {
+      titre: "(Vérifiez avant d’appeler)",
+      liens: [
+        { label: "Voir le parcours Würth", href: "/realisations/wurth-creation-de-compte" },
+        { label: "Voir Kpsull", href: "/realisations/kpsull" },
+        { label: "Lire les CGV", href: "/legal/conditions-generales-de-vente" },
+      ],
+    },
+    cta: { label: "Réserver un appel", href: lienRendezVous("logiciel") },
+  },
+
+  rencontre: {
+    titleLines: ["Moi,", "c’est Eliott."],
+    citation: "Si un abonnement à quarante euros règle votre problème, je vous le dirai.",
+    paragraphes: [
+      "Je suis développeur à Caen et je travaille seul. Du premier appel à la mise en service, vous parlez à celui qui conçoit et qui code votre logiciel.",
+      "Avant de me lancer, j’ai développé chez Médiapilote, Würth France, MeilleursBiens et MECA SERVICES. J’y ai appris à regarder comment les gens travaillent avant d’écrire la première ligne de code.",
+      "Je vous dis aussi ce que je ne fais pas : je ne reprends pas un logiciel écrit en PHP ou en Laravel, et si votre projet n’est pas pour moi, je vous le dis pendant l’appel.",
+    ],
+    cta: { label: "Réserver un appel", href: lienRendezVous("logiciel") },
+    parcours: { label: "Mon parcours", href: "/a-propos" },
+    portrait: { src: "/images/eliott-nature-vertical.jpg", alt: "Eliott Bouquerel, en extérieur" },
+    signataire: "Eliott Bouquerel, développeur à Caen",
   },
 
   /*
@@ -499,6 +582,8 @@ export const homeContent: HomeContent = {
   faq: faqItems,
 
   // Habillage du bloc FAQ (les questions viennent de faq.ts).
+  lectures: { titre: "(Pour aller plus loin)", tous: "Tous les guides" },
+
   faqSection: {
     eyebrow: "(FAQ)",
     titleLines: ["Avant de", "commencer."],
@@ -513,18 +598,7 @@ export const homeContent: HomeContent = {
    *
    * LES DEUX SECTIONS À CARTES NOIRES restent séparées par le logiciel.
    */
-  sectionOrder: [
-    "hero",
-    "about",
-    "showreel",
-    "works",
-    "numbers",
-    "logiciel",
-    "moyens",
-    "whyUs",
-    "faq",
-    "articles",
-  ],
+  sectionOrder: ["hero", "logiciel", "moyens", "preuves", "confiance", "rencontre", "faq"],
 
   seo: {
     // Mot-clé en tête, marque en fin.

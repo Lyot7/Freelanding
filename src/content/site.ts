@@ -237,6 +237,12 @@ export const siteConfig: SiteConfig = {
   footerColumnLabels: { contact: "Contact", navigation: "Navigation" },
   footerCta: {
     heading: "Montrez-moi ce qui vous bloque.",
+    lettre: {
+      portrait: { src: "/images/eliott-nature-vertical.jpg", alt: "Eliott Bouquerel, en extérieur" },
+      texte:
+        "Dites-moi quelle tâche vous prend le plus de temps. Je vous réponds moi-même sous 24 h ouvrées, et si je ne suis pas la bonne personne, je vous le dis.",
+      signataire: "Eliott Bouquerel, développeur à Caen",
+    },
     /*
      * LA PHRASE DISCRÈTE, décision d'Eliott du 2026-10-30 : une seule offre,
      * « en restant ouvert aux propositions ». Pas de bloc d'offre : une autre

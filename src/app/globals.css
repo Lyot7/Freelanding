@@ -1117,3 +1117,31 @@ html[data-consent-choisi] [data-consent-attente] {
   .logiciel-pastille { transition: none; }
   .logiciel-rendu { transition: none; }
 }
+
+/* Le cadran du héros : après le recul, seule la trotteuse continue, cran par cran. */
+.hero-trotteuse {
+  animation: hero-trotteuse 60s steps(60) infinite;
+}
+@keyframes hero-trotteuse {
+  to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-trotteuse { animation: none; }
+}
+
+/* Les trois façons : la ligne au milieu de l'écran reste pleine, les autres s'effacent. */
+.moyen-ligne {
+  transition: opacity 280ms ease-out;
+}
+.moyen-titre {
+  transition: transform 420ms var(--courbe-sortie, cubic-bezier(0.16, 1, 0.3, 1));
+}
+@media (min-width: 1200px) and (prefers-reduced-motion: no-preference) {
+  .moyen-ligne[data-active="false"] { opacity: 0.32; }
+  .moyens-lignes:has(a:hover) .moyen-ligne { opacity: 0.32; }
+  .moyens-lignes:has(a:hover) .moyen-ligne:has(a:hover) { opacity: 1; }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .moyen-ligne a:hover .moyen-titre { transform: translateX(10px); }
+}
+.moyen-ligne a:focus-visible .moyen-titre { transform: translateX(10px); }

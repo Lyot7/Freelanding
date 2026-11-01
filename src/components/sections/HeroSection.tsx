@@ -14,12 +14,11 @@ import { useDepixelisation } from "@/components/motion/useDepixelisation";
 import { recadrageCover } from "@/lib/images/recadrage";
 import type { HeroComparaison, HeroContent, HeroDoor, HeroProof, SiteConfig } from "@/lib/content/types";
 import { ScrollParallax } from "@/components/motion/ScrollParallax";
+import { HeroCadran } from "@/components/sections/HeroCadran";
 import { Grain } from "@/components/effects/Grain";
 import { ImageProgressive } from "@/components/ui/ImageProgressive";
-import { AvailabilityMeter } from "@/components/ui";
 import { lienRendezVous } from "@/content/rendez-vous";
 import { uiLabels } from "@/content/ui";
-import { DemanderAssistant } from "@/components/pages/agent/DemanderAssistant";
 
 /**
  * Héros de l'accueil, refait le 2026-10-15.
@@ -50,12 +49,11 @@ function Porte({ porte, index }: { porte: HeroDoor; index: number }) {
   return (
     <span
       data-part="hero-porte"
-      className="titre-marque block py-[16px] text-[clamp(38px,calc(11vw/var(--zoom-ecran,1)),60px)] text-foreground tablet:py-[24px] tablet:text-[clamp(56px,calc(7.4vw/var(--zoom-ecran,1)),108px)]"
+      className="titre-marque block text-[clamp(38px,calc(11.4vw/var(--zoom-ecran,1)),60px)] leading-[0.92] text-foreground tablet:text-[clamp(60px,min(calc(9.4vw/var(--zoom-ecran,1)),calc(21vh/var(--zoom-ecran,1))),150px)]"
     >
       {porte.lines.map((ligne, i) => (
         <span key={ligne} className="hero-ligne">
           <span
-            className={i === 0 ? "hero-ligne-amorce" : undefined}
             style={delai(base + i * 90)}
           >
             {ligne}
@@ -432,16 +430,16 @@ export function HeroSection({
           mécanisme reste visible à droite et sous les preuves. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 z-[1] bg-[linear-gradient(180deg,rgba(11,11,11,0.55)_0%,rgba(11,11,11,0.78)_55%,rgba(11,11,11,0.96)_100%)] tablet:bg-[linear-gradient(90deg,rgba(11,11,11,0.94)_0%,rgba(11,11,11,0.84)_48%,rgba(11,11,11,0.42)_100%)]"
-      />
-      {/* Filet central, signature de la grille du site. */}
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-y-0 left-1/2 z-[1] hidden w-px bg-white/[0.07] tablet:block"
+        className="pointer-events-none absolute inset-0 z-[1] bg-[linear-gradient(180deg,rgba(11,11,11,0.55)_0%,rgba(11,11,11,0.78)_55%,rgba(11,11,11,0.96)_100%)] tablet:bg-[linear-gradient(90deg,rgba(11,11,11,0.92)_0%,rgba(11,11,11,0.7)_38%,rgba(11,11,11,0.1)_70%,transparent_100%)]"
       />
       <Grain matiere="photo" className="z-[1]" />
+      {hero.cadran ? (
+        <div className="absolute right-[-42%] top-[72px] z-[1] w-[110vw] opacity-50 tablet:right-[-4%] tablet:top-1/2 tablet:z-[2] tablet:w-[min(46vw,78vh)] tablet:-translate-y-1/2 tablet:opacity-100">
+          <HeroCadran cadran={hero.cadran} />
+        </div>
+      ) : null}
 
-      <div className="relative z-[2] mx-auto flex w-full max-w-[1440px] flex-1 flex-col px-[20px] tablet:px-[24px] desktop:px-[30px]">
+      <div className="pointer-events-none relative z-[3] mx-auto flex w-full max-w-[1440px] flex-1 flex-col px-[20px] [&_a]:pointer-events-auto tablet:px-[24px] desktop:px-[30px]">
         <div className="flex flex-1 flex-col justify-center">
           {hero.eyebrow ? (
             <p
@@ -462,7 +460,7 @@ export function HeroSection({
             ))}
           </h1>
 
-          <div className="mt-[22px] flex flex-col gap-[20px] tablet:mt-[30px] desktop:flex-row desktop:items-end desktop:justify-between desktop:gap-[48px]">
+          <div className="mt-[22px] flex max-w-[640px] flex-col gap-[20px] tablet:mt-[30px]">
             {sousTitre ? (
               <p
                 data-part="hero-pour-qui"
@@ -495,22 +493,11 @@ export function HeroSection({
             </div>
           </div>
 
-          <div
-            className="hero-fond mt-[16px] flex flex-col gap-[10px] tablet:flex-row tablet:flex-wrap tablet:items-center tablet:gap-x-[28px]"
-            style={delai(700)}
-          >
-            {site.availability ? (
-              <div data-part="hero-delai">
-                <AvailabilityMeter
-                  availability={site.availability}
-                  variant="hero"
-                  timeZone={site.contact.timezone}
-                  className="m-0 micro text-foreground"
-                />
-              </div>
-            ) : null}
-            <DemanderAssistant className="m-0 micro" />
-          </div>
+          {hero.cadran ? (
+            <a href={hero.cadran.exemple.href} className="hero-fond mt-[16px] text-[14px] font-medium tracking-[-0.01em] text-white/80 no-underline tablet:hidden" style={delai(700)}>
+              <span className="text-accent">{hero.cadran.gain.valeur}</span> {hero.cadran.gain.libelle}, {hero.cadran.exempleCourt}
+            </a>
+          ) : null}
         </div>
 
         {preuves.length > 0 || hero.comparison || logos ? (

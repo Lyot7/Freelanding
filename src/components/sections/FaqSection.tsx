@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import type { FaqItem } from "@/lib/content/types";
@@ -199,6 +200,7 @@ export function FaqSection({
   titleLines = homeContent.faqSection?.titleLines ?? [],
   cta = homeContent.faqSection?.cta,
   topAccent = true,
+  aside,
 }: {
   faq: FaqItem[];
   eyebrow?: string;
@@ -211,6 +213,8 @@ export function FaqSection({
    * recouvre le bas de sa voisine.
    */
   topAccent?: boolean;
+  /** Sous le titre : de quoi aller plus loin, sur l'accueil seulement. */
+  aside?: ReactNode;
 }) {
   // Item 01 ouvert par défaut (source : premier item = "Desktop open").
   const [openItems, setOpenItems] = useState<Set<number>>(() => new Set([0]));
@@ -221,7 +225,7 @@ export function FaqSection({
       data-section="faq"
       className={
         FONT +
-        " relative flex w-full flex-col items-center justify-start gap-[10px] overflow-visible bg-muted " +
+        " surface-light relative flex w-full flex-col items-center justify-start gap-[10px] overflow-visible bg-muted " +
         "p-[20px] " +
         "tablet:px-[24px] tablet:pt-[30px] tablet:pb-[80px] " +
         "desktop:px-[30px]"
@@ -233,13 +237,13 @@ export function FaqSection({
       ) : null}
 
       {/* framer-1sm0lew : Container (max 1440, aligné à gauche) */}
-      <div className="relative flex w-full max-w-[1440px] flex-col items-start gap-[10px] tablet:gap-[30px]">
+      <div className="relative flex w-full max-w-[1440px] flex-col items-start gap-[10px] tablet:grid tablet:grid-cols-12 tablet:gap-x-[20px]">
         {/* framer-evxos : rangée titre (pleine largeur) */}
-        <div className="relative flex w-full flex-row items-start overflow-visible">
+        <div className="relative flex w-full flex-row items-start overflow-visible tablet:sticky tablet:top-[100px] tablet:col-span-5 tablet:self-start">
           {/* framer-ro3v3f : colonne titre — 50% à droite desktop/tablet, pleine largeur mobile */}
-          <div className="relative flex w-px flex-[1_0_0] flex-col items-end justify-end gap-[12px] overflow-visible tablet:w-1/2 tablet:flex-none tablet:gap-[40px]">
+          <div className="relative flex w-full flex-col items-start gap-[12px] overflow-visible tablet:gap-[28px]">
             {/* framer-1xefvys : eyebrow FAQ */}
-            <div className="relative flex w-full flex-col items-start overflow-visible tablet:items-end">
+            <div className="relative flex w-full flex-col items-start overflow-visible">
               {/* framer-zvi6rv : eyebrow FAQ (12px, 60% noir, uppercase) */}
               <p
                 className="micro h-auto w-auto whitespace-pre"
@@ -253,12 +257,12 @@ export function FaqSection({
               <h2
                 /* `.titre-section` borne déjà le corps à la colonne : « COMMENCER. »
                    tient de 320 à 1440. Aligné sur son étiquette sous 810. */
-                className="titre-marque titre-section relative m-0 flex w-full flex-col justify-center p-0 text-left tablet:text-right"
+                className="titre-marque relative m-0 flex w-full flex-col justify-center p-0 text-left text-[clamp(40px,calc(12vw/var(--zoom-ecran,1)),52px)] tablet:text-[calc(5.2vw/var(--zoom-ecran,1))]"
                 style={{ color: INK }}
               >
                 <Reveal
                   as="span"
-                  className="accent-room descender-room block overflow-hidden text-left tablet:text-right"
+                  className="accent-room descender-room block overflow-hidden text-left"
                   initialOpacity={0.001}
                   initialY={40}
                   transition={{ type: "tween", duration: 0.7, delay: 0.05 }}
@@ -267,7 +271,7 @@ export function FaqSection({
                 </Reveal>
                 <Reveal
                   as="span"
-                  className="accent-room descender-room block overflow-hidden text-left tablet:text-right"
+                  className="accent-room descender-room block overflow-hidden text-left"
                   initialOpacity={0.001}
                   initialY={40}
                   transition={{ type: "tween", duration: 0.7, delay: 0.12 }}
@@ -276,13 +280,14 @@ export function FaqSection({
                 </Reveal>
               </h2>
             </div>
+            {aside}
           </div>
         </div>
 
         {/* framer-17aidnj : rangée accordéon (pleine largeur, contenu justifié à droite) */}
-        <div className="relative flex w-full flex-row items-center justify-end overflow-hidden">
+        <div className="relative flex w-full flex-row items-center justify-end overflow-hidden tablet:col-span-7">
           {/* framer-1xmkit9 : colonne accordéon + bouton — 50% à droite desktop/tablet */}
-          <div className="relative flex w-px flex-[1_0_0] flex-col items-start gap-[20px] overflow-hidden tablet:w-1/2 tablet:flex-none tablet:gap-[40px]">
+          <div className="relative flex w-full flex-col items-start gap-[20px] overflow-hidden tablet:gap-[40px]">
             {/* framer-1rofdpl-container > framer-32t3hq : liste accordéon */}
             <div className="relative w-full">
               <div className="relative flex w-full flex-col items-start overflow-hidden">

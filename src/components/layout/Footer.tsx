@@ -5,13 +5,15 @@ import { HoverPrefetchLink } from "@/components/ui/HoverPrefetchLink";
 import { ConsentPreferencesLink } from "@/components/consent/ConsentPreferencesLink";
 import { content } from "@/lib/content";
 import { Reveal } from "@/components/motion/Reveal";
+import { SignatureTracee } from "@/components/motion/SignatureTracee";
+import Image from "next/image";
+import { DemanderAssistant } from "@/components/pages/agent/DemanderAssistant";
 import { Grain } from "@/components/effects/Grain";
 import { ParallaxCover } from "@/components/effects/ParallaxCover";
 import { BrandB } from "@/components/brand/BrandB";
 import { SocialGlyph } from "@/components/layout/SocialGlyph";
 import type { Link } from "@/lib/content/types";
 import { uiLabels } from "@/content/ui";
-import { Logo } from "./Logo";
 // Le formulaire est un composant CLIENT ; le pied de page reste serveur.
 import { FooterContactForm } from "./FooterContactForm";
 import { Suspense } from "react";
@@ -107,118 +109,7 @@ function CardBrandMark() {
 
 /* ------------------------------- Sous-blocs ---------------------------------- */
 
-type FooterPerson = { name: string; role?: string; note?: string };
 
-/**
- * Carte du pied de page : portrait + surcouches + bloc blanc (mot + rôle).
- *
- * ASSETS REMPLACÉS LE 2026-08-10. Les trois visuels de ce composant venaient du
- * template et étaient les plus exposés du site : ils sont rendus sur les NEUF
- * routes. Deux d'entre eux montraient la photo d'une inconnue immédiatement à
- * côté du nom d'Eliott, tiré de `siteConfig.contact.person` — le même défaut que
- * l'avatar du hero. Ils portent désormais son vrai portrait, et le fond reprend
- * le mécanisme d'horlogerie du hero, ce qui raccorde le haut et le bas de page.
- */
-function TestimonialCard({ person }: { person: FooterPerson }) {
-  return (
-    <div className="relative flex w-full flex-col overflow-visible">
-      {/* framer-1tnsau9 "User Image" : photo au ratio 1.504 */}
-      <div className="relative aspect-[1.504] w-full overflow-visible">
-        {/* framer-salh3b : photo + grain (inset-0). La photo est sur-cadrée de
-            7 % et DÉRIVE au scroll, comme sur la source ; elle était posée en
-            `inset-0` sans sur-cadrage ni mouvement. Ce visuel est celui du bloc
-            témoignage, présent sur /about, /blog, /contact et /work. */}
-        <ParallaxCover
-          /* PHOTO NATURELLE depuis le 2026-08-26. Ce cadre servait le portrait
-             DÉTOURÉ sur aplat vert, sans filtre : c'était le plus grand aplat
-             vert du site, rendu sur les NEUF routes, et il occupait la moitié de
-             la carte. La photo d'origine est recadrée au rapport 1,504 du cadre,
-             sujet légèrement à gauche pour que le nom et la vignette ancrés en
-             bas à droite tombent sur l'étang et non sur le buste.
-             `grayscale` : la carte, son bloc blanc et le pied de page entier
-             sont monochromes, et l'accent du site est un vert citron. Servir ici
-             une photo de fin de journée en couleur y introduirait une seconde
-             famille chromatique (bleus du ciel, verts des arbres) à côté de
-             l'accent. Le détourage vert reste employé sur la vignette ronde de
-             cette même carte : lui EST l'accent. */
-          src="/images/eliott-nature-paysage.jpg"
-          imgClassName="grayscale"
-          overshoot={0.07}
-          /* APPARITION DU VISUEL, absente jusqu'ici sur les NEUF routes : le
-             pied de page est le seul bloc commun à tout le site, et sa photo
-             était le manque le plus répandu du projet. Il ne pouvait pas être
-             vu par `motion-sweep`, qui apparie par contenu textuel : un cadre
-             d'image n'a pas de texte.
-             RELEVÉ sur `/live-proxy/legal/terms-of-service` à 1440 : le cadre
-             `.framer-milu93` de 345 × 229 est en `overflow: clip` et contient
-             UN SEUL calque masqué, `.framer-1ambeg8-container`, à `opacity: 0`
-             et `scale(1.1)` ; son enfant est à `opacity: 1` sans transform, il
-             n'y a donc pas ici le motif à deux calques imbriqués de l'accordéon
-             d'`/about`. Le grain (`.framer-30jb7g-container`) est son FRÈRE et
-             ne fond pas avec l'image.
-             Course relevée image par image après franchissement du seuil :
-             opacité 0,017 à 87 ms · 0,051 à 187 · 0,114 à 288 · 0,270 à 396 ·
-             0,677 à 496 · 0,835 à 596 · 0,906 à 694 · 0,949 à 796 · 0,974 à 895
-             · 0,989 à 995 · 0,997 à 1096 · 0,999 à 1146. L'échelle suit la même
-             progression, (1,1 - échelle) / 0,1 valant l'opacité à chaque image.
-             C'est exactement la loi commune de `mediaReveal` : 1,17 s sur
-             `cubic-bezier(0.68, 0, 0, 1)`, aucun délai, aucun échelonnement. */
-          reveal
-        >
-          {/* framer-30jb7g : grain sur la photo (opacity .07) */}
-          <div className="pointer-events-none absolute inset-0 z-[3] select-none">
-            <Grain matiere="photo" />
-          </div>
-        </ParallaxCover>
-
-        {/* framer-145m0vj "Darken" : dégradé bas (0 → rgba(0,0,0,.78)) */}
-        <div className="absolute inset-x-0 bottom-0 z-0 h-[100px] overflow-hidden bg-[linear-gradient(180deg,rgba(0,0,0,0)_0%,rgba(0,0,0,0.78)_100%)]" />
-
-        {/* framer-l5x7vw "Icons" : marque décorative (masquée en mobile).
-            La HAUTEUR et le débord sont ceux du décor d'origine ; seule la
-            largeur suit désormais le rapport du monogramme (660,6 / 642 =
-            1,029), au lieu des 115 px d'un dessin deux fois plus large. */}
-        <span className="absolute right-[-21px] top-[-30px] z-[3] hidden h-[58px] w-[60px] tablet:block desktop:right-[-29px] desktop:top-[-38px] desktop:h-[76px] desktop:w-[78px]">
-          <CardBrandMark />
-        </span>
-
-        {/* framer-100sfvm "User Info" : nom + avatar, ancrés bas-droite */}
-        <div className="absolute bottom-[15px] right-[15px] z-[3] flex w-min flex-row items-center gap-[12px]">
-          {/* framer-1e9xkpe : nom (preset 2okhk1, 14px, blanc) */}
-          <p className="relative h-auto w-auto whitespace-pre text-[14px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground">
-            {person.name}
-          </p>
-          {/* framer-re4yws : avatar 36px (37 mobile), rounded 50px */}
-          <div className="relative aspect-square h-[37px] w-[37px] flex-none overflow-hidden rounded-[50px] tablet:h-[36px] tablet:w-[36px]">
-            {/* 37 px à l'écran, pas les 83 du fichier : `width`/`height` sont la
-                boîte D'AFFICHAGE, c'est elle qui décide de la variante servie. */}
-            <ImageProgressive
-              src="/images/eliott-bouquerel-avatar.jpg"
-              alt=""
-              width={37}
-              height={37}
-              className="block h-full w-full rounded-[inherit] object-cover object-center"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* framer-1bz9lop "Quote" : bloc blanc au-dessus de la photo (relative, en flux) */}
-      <div className="relative z-[3] flex w-full flex-col items-end gap-[10px] bg-foreground p-[14px]">
-        {/* framer-zxx5xd : note (preset 2okhk1, 14px, #0b0b0b, aligné droite) */}
-        <p className="h-auto w-full max-w-[260px] whitespace-pre-wrap break-words text-right text-[14px] font-medium leading-[1.3] tracking-[-0.01em] text-[#0b0b0b]">
-          {person.note}
-        </p>
-        {/* framer-1pe9chb : rôle (preset 11kvajf, 11px, rgba(11,11,11,.6), aligné droite) */}
-        {person.role ? (
-          <p className="h-auto w-full whitespace-pre-wrap break-words text-right text-[14px] font-medium leading-[1.35] tracking-[-0.01em] text-[rgba(11,11,11,0.6)]">
-            {person.role}
-          </p>
-        ) : null}
-      </div>
-    </div>
-  );
-}
 
 /** Ce qui précède et ce qui suit le fragment mis en avant ; sans fragment, tout est avant. */
 export function decouperAutour(texte: string, fragment: string): readonly string[] {
@@ -267,7 +158,6 @@ export async function Footer({
   sujetRendezVous?: IdRendezVous;
 } = {}) {
   const {
-    brand,
     footerNav = [],
     contact,
     footerForm,
@@ -278,7 +168,7 @@ export async function Footer({
     footerColumnLabels,
   } = await content.getSiteConfig();
 
-  const person = contact.person;
+  const lettre = footerCta?.lettre;
   // Mêmes types de rendez-vous que la section de `/contact` : ceux dont
   // l'événement Cal.com est configuré. Aucun = pas d'onglet rendez-vous.
   const { typesDisponibles } = resoudreConfiguration();
@@ -359,18 +249,28 @@ export async function Footer({
         <Grain />
       </div>
 
-      {/* framer-50743m "Line" : filet vertical central (blanc 10 %, hidden mobile) */}
-      <div className="absolute bottom-0 left-[calc(50%-0.5px)] top-0 z-[1] hidden w-px bg-foreground opacity-10 tablet:block" />
-
       {/* framer-1omt5a8 "Container" : contenu (z-3, max 1440) */}
       <div className="relative z-[3] flex w-full max-w-[1440px] flex-col items-start gap-[30px] tablet:gap-[60px]">
+        <h2 className="titre-marque m-0 w-full text-[clamp(44px,calc(10.2vw/var(--zoom-ecran,1)),150px)] text-foreground">
+          {footerCta?.heading}
+        </h2>
+
         {/* framer-3kfqth "1 row" : col gauche (carte/contact/logo) + col droite (CTA/form) */}
         <div className="relative flex w-full flex-col gap-[30px] tablet:grid tablet:auto-rows-[minmax(0,1fr)] tablet:grid-cols-[repeat(2,minmax(50px,1fr))] tablet:grid-rows-[repeat(1,minmax(0,1fr))] tablet:justify-center tablet:gap-0">
           {/* framer-8vf8h5 "Column" : carte + contact + logo (order 1 mobile) */}
           <div className="relative order-1 flex w-full flex-col items-start justify-center gap-[20px] overflow-visible tablet:order-none tablet:h-full tablet:justify-between tablet:gap-0 tablet:self-start">
             {/* framer-egln9i : carte témoignage (w 50 % dès tablet) */}
             <div className="relative flex w-full flex-col items-start overflow-visible tablet:w-[50%]">
-              {person ? <TestimonialCard person={person} /> : null}
+              {lettre ? (
+                <div className="flex flex-col gap-[14px]">
+                  <div className="relative hidden aspect-[4/5] w-full overflow-hidden tablet:block">
+                    <Image src={lettre.portrait.src} alt={lettre.portrait.alt} fill sizes="25vw" className="object-cover" />
+                  </div>
+                  <p className="m-0 text-[18px] font-medium leading-[1.35] tracking-[-0.01em] text-foreground">{lettre.texte}</p>
+                  <SignatureTracee className="w-[180px] text-foreground" />
+                  <p className="micro m-0 text-foreground-60">{lettre.signataire}</p>
+                </div>
+              ) : null}
             </div>
 
             {/* framer-fa2dar "Contact Info" */}
@@ -408,6 +308,7 @@ export async function Footer({
                   </p>
                 </div>
               </div>
+              <DemanderAssistant className="micro m-0 text-foreground-60" />
               {/* framer-10bgy7h : response time (preset wwtw0z 12px, blanc 60 %) */}
               {contact.responseTime ? (
                 <p className="h-auto w-full max-w-[260px] whitespace-pre-wrap break-words text-[14px] font-medium leading-[1.35] tracking-[-0.01em] text-foreground-60">
@@ -419,7 +320,6 @@ export async function Footer({
             {/* framer-gveyot "Logo" : strictement le même nœud que le header sur
                 la source (même symbole #svg409374339_341 en `<use>`, fill blanc,
                 135×26, gap 14px) → on réutilise la primitive partagée. */}
-            <Logo brand={brand} className="w-min" />
           </div>
 
           {/* framer-1offil1 "Column" : CTA + formulaire (order 0 mobile) */}
@@ -437,9 +337,6 @@ export async function Footer({
                   62 px au seul palier fautif — 408 x 62/68 = 372, sous les 381
                   disponibles. `scripts/word-break-audit.mjs` vérifie qu'aucun
                   mot ne se recoupe ailleurs. */}
-              <h2 className="titre-marque titre-section relative m-0 w-full max-w-full whitespace-pre-wrap p-0 text-left text-foreground">
-                {footerCta?.heading}
-              </h2>
               {/* framer-dak6ek : sous-texte (preset wwtw0z 12px, blanc 60 % + emphase blanche) */}
               <p className="h-auto w-full max-w-[330px] whitespace-pre-wrap break-words text-[14px] font-medium leading-[1.35] tracking-[-0.01em] text-foreground-60">
                 {subtextBefore}
@@ -664,6 +561,11 @@ export async function Footer({
             </p>
           </div>
         </div>
+        <div
+          aria-hidden
+          className="w-full bg-accent [mask:url(/logo-bouquerel.svg)_left/contain_no-repeat]"
+          style={{ aspectRatio: "1808 / 376" }}
+        />
       </div>
     </Reveal>
     </>

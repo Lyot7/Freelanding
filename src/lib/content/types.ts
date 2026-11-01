@@ -272,6 +272,12 @@ export interface SiteConfig {
   /** Bloc CTA du footer (« Start a project. » + sous-texte). */
   footerCta?: {
     heading: string;
+    /** La lettre signée, à gauche du formulaire. */
+    lettre?: {
+      portrait: { src: string; alt: string };
+      texte: string;
+      signataire: string;
+    };
     subtext?: string;
     /** Fragments du sous-texte rendus en blanc plein. */
     subtextEmphasis?: readonly string[];
@@ -576,6 +582,8 @@ export interface TeamMember extends Person {
 export type HeroSubtitleParagraph = EmphasizedText;
 
 export interface HeroContent {
+  /** Le cadran qui montre le temps rendu. */
+  cadran?: CadranContent;
   eyebrow?: string;
   title: string;
   /**
@@ -879,6 +887,8 @@ export interface CadranContent {
   taches: readonly string[];
   gain: { valeur: string; libelle: string };
   exemple: Link;
+  /** « exemple », sous le titre sur téléphone. */
+  exempleCourt: string;
   /** La même chose en une phrase, pour qui ne voit pas le cadran. */
   phrase: string;
 }
@@ -888,7 +898,43 @@ export interface MoyensContent {
   eyebrow: string;
   titleLines: readonly string[];
   intro: string;
-  lignes: readonly { titre: string; corps: string; lien: Link }[];
+  lignes: readonly { titre: string; corps: string; lien: Link; option?: string }[];
+}
+
+/** Les réalisations de l'accueil : un discours fixe, deux colonnes d'écrans réels. */
+export interface PreuvesContent {
+  eyebrow: string;
+  titleLines: readonly string[];
+  statement: string;
+  lien: Link;
+  projets: readonly {
+    slug: string;
+    titre: string;
+    chiffre?: string;
+    resume: string;
+    medias: readonly { src: string; alt: string; video?: string }[];
+  }[];
+}
+
+/** Ce que le visiteur risque, et ce qu'il peut vérifier seul. */
+export interface ConfianceContent {
+  eyebrow: string;
+  titleLines: readonly string[];
+  otage: { lignes: readonly string[]; avant: string; apres: string; conclusion: string };
+  tuiles: readonly { chiffre: string; titre: string; corps: string }[];
+  verifier: { titre: string; liens: readonly Link[] };
+  cta: Link;
+}
+
+/** Qui parle, en point d'orgue de la page. */
+export interface RencontreContent {
+  titleLines: readonly string[];
+  citation: string;
+  paragraphes: readonly string[];
+  cta: Link;
+  parcours: Link;
+  portrait: { src: string; alt: string };
+  signataire: string;
 }
 
 export interface LogicielDemoContent {
@@ -922,6 +968,11 @@ export interface HomeContent {
   logiciel?: LogicielDemoContent;
   /** Les trois moyens de rendre du temps. */
   moyens: MoyensContent;
+  preuves: PreuvesContent;
+  confiance: ConfianceContent;
+  rencontre: RencontreContent;
+  /** Les lectures sous le titre de la FAQ. */
+  lectures: { titre: string; tous: string };
   showreel: ShowreelContent;
   about: HomeAboutSection;
   /** Projets mis en avant sur la home, dans l'ordre éditorial. */

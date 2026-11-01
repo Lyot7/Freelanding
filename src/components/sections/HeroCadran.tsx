@@ -97,7 +97,7 @@ export function HeroCadran({ cadran }: { cadran: CadranContent }) {
         </div>
       ) : null}
 
-      <p className="absolute inset-x-0 top-[62%] m-0 flex flex-col items-center gap-[6px] text-center">
+      <p className="absolute inset-x-0 top-[62%] m-0 hidden flex-col tablet:flex items-center gap-[6px] text-center">
         <span className="sr-only">{cadran.phrase}</span>
         <span
           aria-hidden
@@ -116,7 +116,7 @@ export function HeroCadran({ cadran }: { cadran: CadranContent }) {
       </p>
       <a
         href={cadran.exemple.href}
-        className={`pointer-events-auto absolute inset-x-0 top-[calc(62%+clamp(36px,5.4vw,80px))] mx-auto flex w-fit flex-col items-center gap-[4px] text-center no-underline transition-opacity duration-300 ${
+        className={`pointer-events-auto absolute inset-x-0 top-[calc(62%+clamp(36px,5.4vw,80px))] mx-auto hidden w-fit tablet:flex flex-col items-center gap-[4px] text-center no-underline transition-opacity duration-300 ${
           arretes ? "opacity-100" : "opacity-0"
         }`}
       >
