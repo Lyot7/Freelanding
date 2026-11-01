@@ -22,14 +22,13 @@ export function BlogIndexPage({
     <>
       <SvgSprite />
       <Header site={site} />
-      <FloatingNav site={site} />
       {/* Cible du lien d'évitement (voir SkipLink.tsx et focus.css). */}
       <main id="main-content" tabIndex={-1}>
         <section className="relative flex h-[calc(90svh/var(--zoom-ecran,1))] items-end overflow-hidden bg-background px-[20px] pb-[20px] pt-[140px] text-foreground tablet:px-[24px] tablet:pb-[30px] desktop:px-[30px]">
           <HeroPhoto image={herosPages.blog} hauteur={{ mobile: "90vh", tablette: "90vh" }} />
           {/* RELEVÉ sur `/blog` : hôte 1440 × 810, z-1, opacité 0,05. Nous
               étions à 0,08, plus le calque global inventé de 0,05. */}
-          <Grain className="z-[1]" />
+          <Grain opacity={0.05} className="z-[1]" />
           <span className="absolute inset-y-0 left-1/2 z-[1] w-px bg-white/10" />
           {/* DEUX RANGÉES séparées de 30 px, et non une seule rangée calée en
               bas avec une marge sous le titre. Preuve sur la source :
@@ -52,7 +51,7 @@ export function BlogIndexPage({
                   titre anglais : le saut de ligne forcé reste celui de la
                   source, seul le texte vient désormais du contenu. */}
               {/* Corps plafonné : « DERNIERS » débordait de 8 px à 320. */}
-              <h1 className="text-[clamp(44px,calc(17.2vw/var(--zoom-ecran,1)),63px)] titre-marque tablet:text-[78px] desktop:text-[98px]">
+              <h1 className="text-[clamp(44px,calc(17.2vw/var(--zoom-ecran,1)),63px)] font-semibold uppercase leading-[0.82] tracking-[-0.05em] tablet:text-[78px] desktop:text-[98px]">
                 {(blog.hero.titleLines ?? [blog.hero.title]).map((line, index) => (
                   <Fragment key={line}>
                     {index > 0 ? <br /> : null}
@@ -68,7 +67,7 @@ export function BlogIndexPage({
                 sous-chaînes du sous-titre traduit, l'emphase disparaissait donc
                 en silence. Ils viennent maintenant de
                 `blogContent.hero.subtitleParagraphs[0].emphasis`. */}
-            <p className="max-w-[280px] text-[14px] font-medium leading-[1.35] tracking-[-0.01em] text-white/60 tablet:col-start-1 tablet:row-start-2 tablet:justify-self-end tablet:text-right">
+            <p className="max-w-[280px] text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-white/60 tablet:col-start-1 tablet:row-start-2 tablet:justify-self-end tablet:text-right">
               <Highlighted
                 text={heroSubtitle?.text ?? blog.hero.subtitle ?? ""}
                 highlights={[...(heroSubtitle?.emphasis ?? [])]}
@@ -98,6 +97,7 @@ export function BlogIndexPage({
             l'accueil, le contact et les trois pages qui vendent. */}
       </main>
       <Footer />
+      <FloatingNav site={site} />
     </>
   );
 }

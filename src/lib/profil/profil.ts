@@ -174,6 +174,7 @@ export async function construireProfil(
         ? [`${T.methode.reponse}${DP} ${minuscule(contact.responseTime)}`]
         : []),
     ]),
+    ...(home.numbers.testimonial ? [p(`«\u00A0${home.numbers.testimonial.quote}\u00A0»`)] : []),
   );
 
   /* Réalisations. */

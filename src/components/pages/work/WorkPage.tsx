@@ -12,7 +12,6 @@ export async function WorkPage() {
   return (
     <>
       <Header site={site} />
-      <FloatingNav site={site} />
       {/* Cible du lien d'évitement (voir SkipLink.tsx et focus.css). */}
       <main id="main-content" tabIndex={-1}>
         <WorkHero hero={page.hero} />
@@ -25,6 +24,7 @@ export async function WorkPage() {
             restent sur l'accueil, le contact et les trois pages de prestation. */}
       </main>
       <Footer />
+      <FloatingNav site={site} />
     </>
   );
 }

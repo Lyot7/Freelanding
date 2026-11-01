@@ -29,7 +29,7 @@ export function ApercuMetier({ apercu, site }: { apercu: Apercu; site: SiteConfi
       {motifs.length > 0 ? (
         <aside
           role="alert"
-          className="relative z-[60] bg-foreground px-[20px] py-[20px] text-[16px] font-medium leading-[1.4] text-background tablet:px-[24px] desktop:px-[30px]"
+          className="relative z-[60] bg-foreground px-[20px] py-[20px] text-[15px] font-medium leading-[1.4] text-background tablet:px-[24px] desktop:px-[30px]"
         >
           <p className="font-semibold">{MESSAGES_METIER.refus}</p>
           <ul className="mt-[8px] list-disc pl-[20px]">

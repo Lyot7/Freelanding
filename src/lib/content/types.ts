@@ -142,6 +142,43 @@ export interface EmphasizedText {
   inverted?: boolean;
 }
 
+/**
+ * Bandeau de disponibilité du hero et de la page contact.
+ *
+ * LA JAUGE EST OPTIONNELLE DEPUIS LE 2026-09-01, et c'est le point important.
+ * `slotsLeft` était obligatoire : le type exigeait donc un chiffre de créneaux
+ * pris pour pouvoir afficher un bandeau de disponibilité, et ce chiffre était
+ * écrit à la main. Le site annonçait « 2/4 », c'est à dire deux projets en
+ * cours, alors qu'Eliott n'avait aucun client. Un type qui rend une affirmation
+ * publique obligatoire fabrique la fausse déclaration tout seul.
+ *
+ * Sans `slotsLeft`, le bandeau ne rend QUE son libellé : une phrase vraie, sans
+ * décompte. Le jour où des créneaux réels sont tenus quelque part, remplir les
+ * deux champs rallume la jauge sans toucher au composant.
+ */
+export interface Availability {
+  label: string;
+  /**
+   * Fragments du libellé rendus en BLANC PLEIN, le reste restant en gris.
+   *
+   * Sans cette donnée, le rendu déduisait l'emphase du DERNIER ESPACE du
+   * libellé : « CRÉNEAUX EN AOÛT » mettait « AOÛT » en blanc par coïncidence,
+   * mais « CRÉNEAUX AOÛT 2026 » aurait mis « 2026 ». Le choix appartient à
+   * l'éditeur, pas à une règle typographique devinée.
+   *
+   * Vide : tout le libellé est rendu d'un seul ton.
+   */
+  labelHighlights?: readonly string[];
+  /**
+   * Créneaux ENCORE LIBRES. Absent : aucune jauge, aucun décompte, seul le
+   * libellé est rendu. Un chiffre ici est une affirmation publique sur le plan
+   * de charge : il n'a sa place que s'il est tenu ailleurs que dans ce fichier.
+   */
+  slotsLeft?: number;
+  /** Nombre total de segments de la jauge. */
+  totalSlots?: number;
+}
+
 /** Identité de contenu indépendante de la source (fichiers, MDX, futur CMS). */
 export interface SluggedContent {
   slug: string;
@@ -229,17 +266,12 @@ export interface SiteConfig {
   copyright: string; // "2019-26©"
   /** Copyright long du footer. Ex. « © 2026 la marque d'origine. All rights reserved. » */
   copyrightLong?: string;
+  availability?: Availability;
   /** Titres des colonnes du footer (« Contact », « Navigation »). */
   footerColumnLabels?: { contact: string; navigation: string };
   /** Bloc CTA du footer (« Start a project. » + sous-texte). */
   footerCta?: {
     heading: string;
-    /** La lettre signée, à gauche du formulaire. */
-    lettre?: {
-      portrait: { src: string; alt: string };
-      texte: string;
-      signataire: string;
-    };
     subtext?: string;
     /** Fragments du sous-texte rendus en blanc plein. */
     subtextEmphasis?: readonly string[];
@@ -250,31 +282,30 @@ export interface SiteConfig {
     modes?: {
       /** Nom accessible de la bascule. */
       label: string;
-      message: { titre: string; detail: string };
-      rendezVous: {
-        titre: string;
-        /** Précède le prochain créneau réel, absent si l'agenda ne répond pas. */
-        prochain: string;
-        /** Ce que le visiteur retire de l'appel, sous les onglets. */
-        promesse: string;
-      };
+      message: string;
+      rendezVous: string;
     };
-    messageLabel: string;
-    messagePlaceholder: string;
-    emailLabel: string;
-    emailPlaceholder?: string;
     nameLabel: string;
     namePlaceholder?: string;
-    /** Types acceptés par le serveur : le formulaire ne les demande plus. */
+    emailLabel: string;
+    emailPlaceholder?: string;
+    /** Message court, facultatif. */
+    messageLabel?: string;
+    messagePlaceholder?: string;
+    selectLabel: string;
     selectOptions: string[];
-    /** Budget et échéance, facultatifs et repliés. */
-    precisions: {
-      ouvrir: string;
+    /** Mêmes questions que la prise de rendez-vous ; les listes en viennent. */
+    questionnaire: {
       budget: ContactFieldContent;
+      objectif: ContactFieldContent;
       echeance: ContactFieldContent;
     };
-    /** Sous le bouton d'envoi. */
-    delaiReponse: string;
+    /** Le formulaire se remplit en trois étapes, une seule affichée. */
+    etapes: {
+      titres: readonly [string, string, string];
+      continuer: string;
+      retour: string;
+    };
     submitLabel: string;
     disclaimer: string;
     /** Découpage du disclaimer autour de ses deux liens. */
@@ -545,8 +576,6 @@ export interface TeamMember extends Person {
 export type HeroSubtitleParagraph = EmphasizedText;
 
 export interface HeroContent {
-  /** Le cadran qui montre le temps rendu. */
-  cadran?: CadranContent;
   eyebrow?: string;
   title: string;
   /**
@@ -572,8 +601,6 @@ export interface HeroContent {
    * l'accordéon, qui porte les fourchettes.
    */
   offerLink?: Link;
-  /** Sous le bouton de rendez-vous : durée de l'appel, coût, engagement. */
-  ctaNote?: string;
   /** Séparateur inséré entre ces mots. */
   serviceWordsSeparator?: string;
   /** Personne mise en avant à côté du sous-titre (carte fondateur). */
@@ -596,7 +623,7 @@ export interface HeroContent {
  */
 export interface HeroComparaison {
   sujet: string;
-  lignes: readonly { qui: string; prix: string; detail?: string; fort?: boolean }[];
+  lignes: readonly { qui: string; prix: string; fort?: boolean }[];
   source: { label: string; href: string };
 }
 
@@ -614,6 +641,39 @@ export interface HeroProof {
 export interface HeroDoor {
   /** Lignes du titre, rendues chacune sur sa ligne dès la tablette. */
   lines: readonly string[];
+  href: string;
+  /** Le prix, tel qu'il s'affiche (« Sur devis »). */
+  price: string;
+}
+
+/** Bloc « Showreel » — marquee défilant + phrase manifeste + millésime. */
+export interface ShowreelContent {
+  /** Texte du marquee défilant (répété dans l'UI). Ex. « We build websites. » */
+  marquee: string;
+  /**
+   * Découpage du titre en LIGNES, une entrée par ligne.
+   *
+   * Le titre était découpé automatiquement à chaque espace : un mot par ligne.
+   * La phrase anglaise de la source en compte trois, la française sept, et le
+   * bloc rendait « JE / CONSTRUIS / DES / SITES / ET / DES / OUTILS. » — quatre
+   * lignes d'un ou deux caractères dans un corps de 92 px. Le découpage est une
+   * décision de mise en page, elle appartient donc à la donnée, comme
+   * `hero.titleLines` ou `about.teamTitleLines`. Sans ce champ, le composant
+   * retombe sur l'ancien comportement mot à mot.
+   */
+  marqueeLines?: readonly string[];
+  /** Phrase manifeste sous le marquee. */
+  statement: string;
+  /** Fragments de la phrase manifeste rendus en noir plein. */
+  statementEmphasis?: readonly string[];
+  /** Millésime affiché à côté du marquee. Ex. « 2019-26© ». */
+  vintage: string;
+  /** Lien d'appel (« ↓ SEE THE WORK »). */
+  cta?: Link;
+  /** Caractère précédant le libellé du lien (« ↓ »). */
+  ctaPrefix?: string;
+  /** Affiche figée de la vidéo. */
+  poster?: ImageAsset;
 }
 
 /** Une prestation (bloc accordéon « Services », section06). */
@@ -662,6 +722,29 @@ export interface ServicesSection {
   eyebrow?: string; // « Services »
   intro?: string; // « Every project starts with understanding… »
   items: ServiceItem[];
+}
+
+/**
+ * Section de chiffres réutilisable (« How we do it » = numbers.ts,
+ * « Built on reputation » = number.ts). Peut embarquer un témoignage
+ * (Quote Stack) et des CTA contextuels.
+ */
+export interface StatsSection {
+  eyebrow?: string; // « How we do it » | « Why us? »
+  title?: string; // « Built on reputation »
+  /**
+   * Découpage du titre en lignes, une entrée par ligne rendue. Les titres de
+   * ces sections sont écrits pour tomber sur des lignes précises (12 signes au
+   * plus à 92 px) : le découpage automatique les coupait ailleurs.
+   */
+  titleLines?: readonly string[];
+  /** Phrase d'appui sous le titre, en texte courant. */
+  intro?: string;
+  stats: Stat[];
+  /** Témoignage intégré à la section (référencé depuis testimonials.ts). */
+  testimonial?: Testimonial;
+  /** CTA de la section (« Our Reviews », « Start a Project »…). */
+  ctas?: Link[];
 }
 
 /**
@@ -719,16 +802,55 @@ export interface FaqSection {
   cta?: Link; // « Ask a question »
 }
 
+/** Section « Articles » de la home (référence des articles depuis blog.ts). */
+export interface ArticlesSection {
+  eyebrow?: string; // « News and updates. »
+  /** Découpage du grand titre en lignes (« News and » / « updates. »). */
+  titleLines?: readonly string[];
+  cta?: Link; // « See more »
+  /** Slugs des articles mis en avant sur la home (ordre d'affichage). */
+  featuredSlugs: string[];
+}
+
 export interface PageSeo {
   title: string;
   description: string;
   ogImage?: ImageAsset;
 }
 
-/** Ce qui nourrit le profil texte des assistants, sans section à l'écran. */
+/** Bloc « Strategy before pixels. » de la home (section About). */
 export interface HomeAboutSection {
   title: string;
+  /**
+   * Découpage du titre en LIGNES, une entrée par ligne.
+   *
+   * Sans ce champ le rendu retombe sur UN MOT PAR LIGNE, le découpage du
+   * template anglais. Il tenait tant que le titre valait trois mots ; il
+   * fabrique une colonne d'une ligne par mot dès qu'il en porte une phrase.
+   * Le découpage d'un titre est une décision de mise en page, elle appartient
+   * donc à la donnée, comme `hero.titleLines`, `showreel.marqueeLines` ou
+   * `about.teamTitleLines`.
+   *
+   * Chaque ligne est ensuite AJUSTÉE À LA LARGEUR du cadre (cf.
+   * `src/lib/ajustement-titre.ts`) : la longueur d'une ligne décide de sa
+   * taille de corps, elle ne peut plus la faire déborder.
+   */
+  titleLines?: readonly string[];
   body: string[];
+  /** Fragments des paragraphes rendus en blanc plein. */
+  highlights?: string[];
+  /** Libellé de gauche de la grille d'infos (« Launched »). */
+  launchedLabel?: string;
+  /** Libellé de droite de la grille d'infos (« 24+ projects »). */
+  projectsLabel?: string;
+  /** Millésime affiché au-dessus du titre (« 2019-26© »). */
+  vintage?: string;
+  /** Compteur du coin inférieur droit (« 12+ » + légende). */
+  counter?: { value: string; suffix?: string; caption?: string };
+  /** Lien de bas de colonne (« About us »). */
+  cta?: Link;
+  /** Photo de la colonne droite. */
+  image?: ImageAsset;
 }
 
 /** Une journée de la démonstration : sa corvée, à la main puis rendue. */
@@ -751,61 +873,12 @@ export interface CompteurDemo {
  * La section qui montre ce qu'un logiciel métier rend : une semaine de bureau,
  * à la main puis avec le logiciel.
  */
-/** Le cadran du héros : la semaine de la démonstration, qui recule. */
-export interface CadranContent {
-  depart: number;
-  arrivee: number;
-  taches: readonly string[];
-  gain: { valeur: string; libelle: string };
-  exemple: Link;
-  /** « exemple », sous le titre sur téléphone. */
-  exempleCourt: string;
-  /** La même chose en une phrase, pour qui ne voit pas le cadran. */
-  phrase: string;
-}
-
 /** Les trois moyens de rendre du temps, sous la démonstration. */
 export interface MoyensContent {
   eyebrow: string;
   titleLines: readonly string[];
   intro: string;
-  lignes: readonly { titre: string; corps: string; lien: Link; option?: string }[];
-}
-
-/** Les réalisations de l'accueil : un discours fixe, deux colonnes d'écrans réels. */
-export interface PreuvesContent {
-  eyebrow: string;
-  titleLines: readonly string[];
-  statement: string;
-  lien: Link;
-  projets: readonly {
-    slug: string;
-    titre: string;
-    chiffre?: string;
-    resume: string;
-    medias: readonly { src: string; alt: string; video?: string }[];
-  }[];
-}
-
-/** Ce que le visiteur risque, et ce qu'il peut vérifier seul. */
-export interface ConfianceContent {
-  eyebrow: string;
-  titleLines: readonly string[];
-  otage: { lignes: readonly string[]; avant: string; apres: string; conclusion: string };
-  tuiles: readonly { chiffre: string; titre: string; corps: string }[];
-  verifier: { titre: string; liens: readonly Link[] };
-  cta: Link;
-}
-
-/** Qui parle, en point d'orgue de la page. */
-export interface RencontreContent {
-  titleLines: readonly string[];
-  citation: string;
-  paragraphes: readonly string[];
-  cta: Link;
-  parcours: Link;
-  portrait: { src: string; alt: string };
-  signataire: string;
+  lignes: readonly { titre: string; corps: string; lien: Link }[];
 }
 
 export interface LogicielDemoContent {
@@ -839,27 +912,34 @@ export interface HomeContent {
   logiciel?: LogicielDemoContent;
   /** Les trois moyens de rendre du temps. */
   moyens: MoyensContent;
-  preuves: PreuvesContent;
-  confiance: ConfianceContent;
-  rencontre: RencontreContent;
-  /** Les lectures sous le titre de la FAQ. */
-  lectures: { titre: string; tous: string; slugs: readonly string[] };
-  /** Lu par le profil texte des assistants. */
+  showreel: ShowreelContent;
   about: HomeAboutSection;
-  numbers: { title?: string };
-  whyUs: { stats: Stat[] };
-  /** Prestations, lues par le JSON-LD et les profils texte. */
+  /** Projets mis en avant sur la home, dans l'ordre éditorial. */
+  featuredWorkSlugs: readonly string[];
+  /** « How we do it » — grille de chiffres + témoignage intégré (numbers.ts). */
+  numbers: StatsSection;
+  /** « Built on reputation » — bloc « Why us? » (number.ts). */
+  whyUs: StatsSection;
+  /** Prestations en accordéon (section06). */
   services: ServicesSection;
+  /**
+   * Carrousel témoignages (section10). ABSENT tant qu'aucun client réel n'a
+   * parlé : la section vide n'est plus composée.
+   */
+  testimonials?: TestimonialsSection;
   /** Bande de logos (section11). */
   logoBand?: LogoBand;
+  /** Articles mis en avant (référence blog.ts). */
+  articles: ArticlesSection;
   faq?: FaqItem[];
   /** Habillage de la section FAQ (surtitre, titre, lien d'appel). */
   faqSection?: FaqSection;
   seo: PageSeo;
   /**
    * Ordre d'affichage des sections de la home — source unique de la composition.
-   * Les logos ne sont plus une section de l'accueil : ils vivent dans le bas du
-   * héros, avec la ligne de preuve.
+   * Valeurs : hero | about | showreel | works | whyUs | services | numbers |
+   * faq | testimonials | articles. Les logos ne sont plus une section de
+   * l'accueil : ils vivent dans le bas du héros, avec la ligne de preuve.
    */
   sectionOrder: string[];
 }
@@ -906,6 +986,7 @@ export interface AboutContent {
   /** Découpage du titre de la section équipe (« The » / « team. »). */
   teamTitleLines?: readonly string[];
   stats: readonly Stat[];
+  services: ServicesSection;
   /**
    * Témoignage de la page « à propos ». OPTIONNEL depuis le 2026-09-01 : le
    * champ était obligatoire, donc la page ne pouvait pas compiler sans citer
@@ -913,6 +994,7 @@ export interface AboutContent {
    * du template. Un type qui exige une parole de client en fabrique une.
    */
   testimonial?: Testimonial;
+  articles: ArticlesSection;
   seo: PageSeo;
 }
 
@@ -925,10 +1007,21 @@ export interface ContactCardContent {
   person: Person & { note?: string };
   email: string;
   phone: string;
+  address: string;
+  /** Libellé au-dessus de l'adresse postale (« Address »). */
+  addressLabel?: string;
+  /** Libellé au-dessus du téléphone (« Phone »). */
+  phoneLabel?: string;
+  availability?: Availability;
 }
 
 export interface ContactContent {
   hero: HeroContent;
+  intro: readonly string[];
+  /** Surtitre du bloc coordonnées (« Contact us »). */
+  detailsEyebrow?: string;
+  /** Photo du studio, à gauche des coordonnées. */
+  cover?: ImageAsset;
   contactCard: ContactCardContent;
   faq: FaqItem[];
   seo: PageSeo;
@@ -1033,6 +1126,8 @@ export interface UiLabels {
     blogSearchPlaceholder: string;
     blogEmptyLabel: string;
     workArchiveLabel: string;
+    workSearchLabel: string;
+    workSearchPlaceholder: string;
     workCountSuffix: string; // « projects shown »
     workEmptyLabel: string;
     workResetLabel: string;

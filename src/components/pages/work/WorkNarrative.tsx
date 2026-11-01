@@ -11,7 +11,7 @@ import { uiLabels } from "@/content/ui";
 import { ComparateurAvantApres } from "./ComparateurAvantApres";
 
 const LABEL =
-  "micro text-background/60";
+  "text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/60";
 /*
  * Échelle typographique MESURÉE sur la source aux trois largeurs. Le chapô
  * (`overview`) et les titres de section ne partagent PAS la même : 22/26/32
@@ -19,9 +19,9 @@ const LABEL =
  * deux, ce qui allongeait la page de plus de 500px en tablette et en mobile.
  */
 const OVERVIEW =
-  "text-[22px] font-medium leading-[1.1] tracking-[-0.01em] text-background tablet:text-[26px] tablet:tracking-[-0.01em] desktop:text-[32px]";
+  "text-[22px] font-medium leading-[1.1] tracking-[-0.02em] text-background tablet:text-[26px] tablet:tracking-[-0.01em] desktop:text-[32px]";
 const TITLE =
-  "text-[22px] font-medium leading-[1.1] tracking-[-0.01em] text-background tablet:text-[22px] desktop:text-[26px]";
+  "text-[22px] font-medium leading-[1.1] tracking-[-0.01em] text-background tablet:text-[24px] desktop:text-[26px]";
 /*
  * Titre d'affichage de section (« Le problème. »). Il est CALÉ À DROITE de la
  * moitié gauche à partir de 810 et plafonné à 320 / 400 / 570 : sa position
@@ -54,8 +54,8 @@ const TITLE =
  * découpé en lignes), ce qui déplaçait la seconde ligne de 140px.
  */
 const DISPLAY =
-  "w-full text-[52px] titre-marque text-background " +
-  "max-w-[320px] tablet:ml-auto tablet:max-w-[400px] tablet:text-right tablet:text-[58px] desktop:max-w-[570px] desktop:text-[92px]";
+  "w-full text-[52px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] text-background " +
+  "max-w-[320px] tablet:ml-auto tablet:max-w-[400px] tablet:text-right tablet:text-[68px] desktop:max-w-[570px] desktop:text-[92px]";
 const BODY =
   "text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-background/60";
 
@@ -68,7 +68,7 @@ const BODY =
  * `ease-out` qui partirait vite.
  */
 const HOVER_300 =
-  "transition-all duration-300 ease-[var(--courbe-vive)] motion-reduce:transition-none";
+  "transition-all duration-300 ease-[cubic-bezier(0.68,0,0,1)] motion-reduce:transition-none";
 const DOT_SWAP = HOVER_300;
 
 /**
@@ -111,7 +111,7 @@ function FactRow({
           280 de large), repliait ses DEUX colonnes et prenait 64,78 au lieu de
           50,39, soit les +16 que la page traînait à cette seule largeur. */}
       <dt className={`${LABEL} tablet:whitespace-pre`}>{label}</dt>
-      <dd className="m-0 ml-auto text-right tablet:whitespace-pre micro text-background">
+      <dd className="m-0 ml-auto text-right tablet:whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background">
         {children}
       </dd>
     </div>
@@ -328,7 +328,7 @@ function BlocEtape({
       >
         <div className="flex items-center gap-[12px]">
           {step ? (
-            <span className="micro text-background/60">
+            <span className="text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/60">
               {step}
             </span>
           ) : null}
@@ -466,7 +466,7 @@ export function WorkNarrative({
               mise à l'échelle et sans resserrement de l'écart. */}
           <Link
             href="/realisations"
-            className={`group flex h-[20px] w-fit items-center gap-[10px] self-start micro text-background ${DOT_SWAP} hover:gap-[7px]`}
+            className={`group flex h-[20px] w-fit items-center gap-[10px] self-start text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background ${DOT_SWAP} hover:gap-[7px]`}
           >
             <span className="relative block h-[20px] w-[20px] flex-none">
               {/* Pastille A : visible au repos, sort par la gauche en rétrécissant. */}
@@ -601,7 +601,7 @@ export function WorkNarrative({
             {uiLabels.work.problemTitleLines.map((line, i) => (
               <span
                 key={line}
-                className="accent-room descender-room block w-full overflow-hidden leading-display"
+                className="accent-room descender-room block w-full overflow-hidden leading-[0.82]"
               >
                 <Reveal
                   as="span"
@@ -689,7 +689,7 @@ export function WorkNarrative({
               {/* Vignette → libellé : `gap` déclaré du bloc vidéo, 20 sous 810
                   et 30 à partir de 810. Le 19px valait 1px de retard en
                   mobile. */}
-              <span className={`mt-[20px] flex items-center gap-[10px] tablet:mt-[30px] micro tablet:justify-end ${HOVER_300} group-hover:gap-[14px]`}>
+              <span className={`mt-[20px] flex items-center gap-[10px] tablet:mt-[30px] text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] tablet:justify-end ${HOVER_300} group-hover:gap-[14px]`}>
                 {uiLabels.work.playVideoLabel}
                 <svg
                   aria-hidden
@@ -697,7 +697,7 @@ export function WorkNarrative({
                   className={`h-[28px] w-[28px] flex-none ${HOVER_300} group-hover:scale-110`}
                   fill="none"
                 >
-                  <circle cx="14" cy="14" r="14" fill="var(--background)" />
+                  <circle cx="14" cy="14" r="14" fill="#0B0B0B" />
                   <path d="M19 14L11.5 18.3301L11.5 9.66987L19 14Z" fill="white" />
                 </svg>
               </span>
@@ -759,7 +759,7 @@ export function WorkNarrative({
                       poussait les deux nombres au bord droit de leur colonne,
                       donc décalés de toute la largeur du bloc par rapport à la
                       source. Visible à l'écran, pas seulement à la mesure. */}
-                  <p className="text-[39px] font-medium leading-[1.2] tracking-[-0.045em] text-background tablet:text-[52px] desktop:text-[56px]">
+                  <p className="text-[39px] font-medium leading-[1.2] tracking-[-0.03em] text-background tablet:text-[52px] desktop:text-[56px]">
                     {metric.value}
                   </p>
                   <p className={`${LABEL} max-w-[150px]`}>

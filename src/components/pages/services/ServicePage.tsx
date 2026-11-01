@@ -77,7 +77,7 @@ export function FilAriane({ marches }: { marches: readonly MarcheFilAriane[] }) 
       aria-label={filAriane.intitule}
       className="bg-muted px-[20px] pb-[28px] pt-[8px] tablet:px-[24px] desktop:px-[30px]"
     >
-      <ol className="mx-auto flex w-full max-w-[1440px] flex-wrap items-center gap-x-[10px] gap-y-[4px] text-[14px] font-medium leading-[1.3] tracking-[-0.01em] text-[rgba(11,11,11,0.55)]">
+      <ol className="mx-auto flex w-full max-w-[1440px] flex-wrap items-center gap-x-[10px] gap-y-[4px] text-[13px] font-medium leading-[1.3] tracking-[-0.01em] text-[rgba(11,11,11,0.55)]">
         {marches.map((marche, index) => (
           <li key={marche.libelle} className="flex items-center gap-[10px]">
             {index > 0 ? <span aria-hidden>{filAriane.separateur}</span> : null}
@@ -131,7 +131,7 @@ export function OffreDetail({
         className="absolute left-0 right-0 top-0 h-px bg-[rgba(255,255,255,0.1)]"
       />
       <div className="flex flex-col gap-[20px] tablet:pr-[30px] desktop:pr-[40px]">
-        <p className="text-[32px] font-semibold leading-[1] tracking-[-0.045em] desktop:text-[44px]">
+        <p className="text-[32px] font-semibold leading-[1] tracking-[-0.04em] desktop:text-[44px]">
           {servicePageLabels.prixOffre}
         </p>
         <ListeOffre titre={servicePageLabels.inclus} lignes={offre.inclus} />
@@ -141,7 +141,7 @@ export function OffreDetail({
         <ListeOffre titre={servicePageLabels.faitMonter} lignes={offre.faitMonter} />
         <Link
           href={href}
-          className="flex h-[30px] w-fit flex-none items-center justify-center bg-accent px-[10px] text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-accent-ink no-underline transition-opacity duration-200 hover:opacity-80 motion-reduce:transition-none"
+          className="flex h-[30px] w-fit flex-none items-center justify-center bg-accent px-[10px] text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-background no-underline transition-opacity duration-200 hover:opacity-80 motion-reduce:transition-none"
         >
           <span className="accent-room">{servicePageLabels.cta}</span>
         </Link>
@@ -237,7 +237,7 @@ export function SectionDeuxMoities({
   return (
     <section
       data-section={dataSection}
-      className={`relative px-[20px] py-section tablet:px-[24px]  desktop:px-[30px] ${t.section}`}
+      className={`relative px-[20px] py-[60px] tablet:px-[24px] tablet:py-[90px] desktop:px-[30px] ${t.section}`}
     >
       <span
         aria-hidden
@@ -245,13 +245,13 @@ export function SectionDeuxMoities({
       />
       <div className="relative mx-auto grid w-full max-w-[1440px] gap-[30px] tablet:grid-cols-2 tablet:gap-x-0 tablet:gap-y-[30px]">
         <div className="flex flex-col gap-[16px] tablet:pr-[30px] desktop:pr-[40px]">
-          <h2 className="accent-room max-w-[460px] text-balance text-[26px] titre-marque tablet:text-[34px]">
+          <h2 className="accent-room max-w-[460px] text-balance text-[26px] font-semibold uppercase leading-[0.95] tracking-[-0.04em] tablet:text-[34px]">
             {titre}
           </h2>
           {paragraphes.map((paragraphe) => (
             <p
               key={paragraphe}
-              className={`max-w-[460px] text-[16px] font-medium leading-[1.45] tracking-[-0.01em] ${t.attenue}`}
+              className={`max-w-[460px] text-[15px] font-medium leading-[1.45] tracking-[-0.01em] ${t.attenue}`}
             >
               {paragraphe}
             </p>
@@ -272,7 +272,7 @@ export function SectionDeuxMoities({
                       {...(/^https?:/u.test(lien.href)
                         ? { target: "_blank", rel: "noopener noreferrer" }
                         : {})}
-                      className={`w-fit text-[16px] font-semibold leading-[1.3] tracking-[-0.01em] underline underline-offset-[3px] transition-[text-decoration-color,text-underline-offset] duration-200 hover:underline-offset-[4px] ${t.lien}`}
+                      className={`w-fit text-[15px] font-semibold leading-[1.3] tracking-[-0.01em] underline underline-offset-[3px] transition-[text-decoration-color,text-underline-offset] duration-200 hover:underline-offset-[4px] ${t.lien}`}
                     >
                       {lien.libelle}
                     </Link>
@@ -288,7 +288,7 @@ export function SectionDeuxMoities({
         <ul className="flex flex-col gap-[18px] tablet:pl-[30px] desktop:pl-[40px]">
           {points.map((point) => (
             <li key={point.titre} className="flex flex-col gap-[6px]">
-              <h3 className="text-[16px] font-semibold leading-[1.3] tracking-[-0.01em]">
+              <h3 className="text-[15px] font-semibold leading-[1.3] tracking-[-0.01em]">
                 {point.titre}
               </h3>
               <p className={`text-[14px] font-medium leading-[1.45] tracking-[-0.01em] ${t.attenue}`}>
@@ -387,7 +387,6 @@ export function ServicePage({
     <>
       <SvgSprite />
       <Header site={site} />
-      <FloatingNav site={site} />
       <main id="main-content" tabIndex={-1}>
         {/* PLUS HAUT SUR MOBILE QUAND LE HÉROS PORTE UNE PHOTO. Le texte est
             calé en bas : à 70svh, le titre de quatre lignes remontait jusqu'au
@@ -400,7 +399,7 @@ export function ServicePage({
           ) : (
             <GradientWaveBackdrop seed={51} />
           )}
-          <Grain className="z-[1]" />
+          <Grain opacity={0.05} className="z-[1]" />
           <span className="absolute inset-y-0 left-1/2 z-[1] w-px bg-white/10" />
           {/* `items-end` À PARTIR DE 810, ET C'EST LE CŒUR DU HÉROS.
               La dernière rangée porte DEUX blocs, un par moitié : le résumé à
@@ -441,7 +440,7 @@ export function ServicePage({
                   quelques centimètres au-dessus. */}
               {/* Corps plafonné par la colonne dès 810 : « TRANSPORT » (5,55 em) sortait
                   de 53 px à 78 px de corps (relevé du 2026-10-15). */}
-              <h1 className="max-w-[510px] text-[63px] titre-marque tablet:text-[min(78px,calc((calc(50vw/var(--zoom-ecran,1))-24px)/5.7))] desktop:text-[98px]">
+              <h1 className="max-w-[510px] text-[63px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] tablet:text-[min(78px,calc((calc(50vw/var(--zoom-ecran,1))-24px)/5.7))] desktop:text-[98px]">
                 {local?.h1 ?? servicePageSeo[prestation.id].h1}
               </h1>
             </Reveal>
@@ -461,7 +460,7 @@ export function ServicePage({
                 gabarit de la source). Le résumé de gauche est calé à droite,
                 donc sans ce retrait les deux textes se collent au pixel près et
                 se lisent comme une seule phrase cassée en deux. */}
-            <p className={`micro text-white/50 tablet:col-start-2 tablet:row-start-3 tablet:pl-[30px] desktop:pl-[40px]${heroImage ? ` ${VOILE_TEXTE}` : ""}`}>
+            <p className={`text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-white/50 tablet:col-start-2 tablet:row-start-3 tablet:pl-[30px] desktop:pl-[40px]${heroImage ? ` ${VOILE_TEXTE}` : ""}`}>
               {servicePageLabels.chapoPrix}
             </p>
           </div>
@@ -485,7 +484,7 @@ export function ServicePage({
             la moitié gauche, comme le H1 tient dans la droite. */}
         <section
           data-section="packs"
-          className="relative bg-background px-[20px] py-section text-foreground tablet:px-[24px]  desktop:px-[30px]"
+          className="relative bg-background px-[20px] py-[60px] text-foreground tablet:px-[24px] tablet:py-[90px] desktop:px-[30px]"
         >
           <span
             aria-hidden
@@ -493,14 +492,14 @@ export function ServicePage({
           />
           <div className="relative mx-auto flex w-full max-w-[1440px] flex-col">
             <div className="grid gap-[16px] pb-[30px] tablet:grid-cols-2 tablet:items-end tablet:gap-0 tablet:pb-[40px]">
-              <h2 className="accent-room max-w-[460px] text-[26px] titre-marque tablet:pr-[30px] tablet:text-[34px] desktop:pr-[40px]">
+              <h2 className="accent-room max-w-[460px] text-[26px] font-semibold uppercase leading-[0.95] tracking-[-0.04em] tablet:pr-[30px] tablet:text-[34px] desktop:pr-[40px]">
                 {local?.titreOffre ?? servicePageLabels.titreOffre}
               </h2>
               {/* LA RÉASSURANCE SE LIT AU MOMENT DU CHOIX, en vis-à-vis du
                   titre et sur sa ligne d'appui, comme le chapô du héros :
                   devant une offre, le lecteur cherche d'abord comment le prix se fixe
                   et si le montant peut bouger. */}
-              <p className="max-w-[440px] text-[16px] font-medium leading-[1.45] tracking-[-0.01em] text-white/80 tablet:pl-[30px] desktop:pl-[40px]">
+              <p className="max-w-[440px] text-[15px] font-medium leading-[1.45] tracking-[-0.01em] text-white/80 tablet:pl-[30px] desktop:pl-[40px]">
                 {servicePageLabels.reassurance}
               </p>
             </div>
@@ -540,11 +539,11 @@ export function ServicePage({
         {local ? null : (
           <section
             data-section="mission"
-            className="relative bg-background px-[20px] py-section text-foreground tablet:px-[24px]  desktop:px-[30px]"
+            className="relative bg-background px-[20px] py-[60px] text-foreground tablet:px-[24px] tablet:py-[90px] desktop:px-[30px]"
           >
             <div className="relative mx-auto flex w-full max-w-[1440px] flex-col gap-[30px]">
               <div className="grid gap-[16px] tablet:grid-cols-2">
-                <h2 className="accent-room m-0 text-[26px] titre-marque tablet:pr-[30px] tablet:text-[34px]">
+                <h2 className="accent-room m-0 text-[26px] font-semibold uppercase leading-[0.95] tracking-[-0.04em] tablet:pr-[30px] tablet:text-[34px]">
                   {servicePageLabels.mission.titre}
                 </h2>
                 <p className="m-0 max-w-[46ch] text-[16px] font-medium leading-[1.45] tracking-[-0.01em] text-foreground-60 tablet:pl-[30px] desktop:pl-[40px]">
@@ -557,10 +556,10 @@ export function ServicePage({
                     <span className="text-[13px] font-semibold tabular-nums tracking-[-0.01em] text-foreground-60">
                       {index + 1}
                     </span>
-                    <span className="text-[22px] font-semibold uppercase leading-[1] tracking-[-0.045em]">
+                    <span className="text-[20px] font-semibold uppercase leading-[1] tracking-[-0.03em]">
                       {etape.titre}
                     </span>
-                    <span className="max-w-[36ch] text-[16px] font-medium leading-[1.4] tracking-[-0.01em] text-foreground-60">
+                    <span className="max-w-[36ch] text-[15px] font-medium leading-[1.4] tracking-[-0.01em] text-foreground-60">
                       {etape.corps}
                     </span>
                   </li>
@@ -573,7 +572,7 @@ export function ServicePage({
         <section
           id="devis"
           data-section="sur-mesure"
-          className="relative scroll-mt-[100px] bg-muted px-[20px] py-section text-background tablet:px-[24px]  desktop:px-[30px]"
+          className="relative scroll-mt-[100px] bg-muted px-[20px] py-[60px] text-background tablet:px-[24px] tablet:py-[90px] desktop:px-[30px]"
         >
           <span
             aria-hidden
@@ -581,10 +580,10 @@ export function ServicePage({
           />
           <div className="relative mx-auto grid w-full max-w-[1440px] gap-[40px] tablet:grid-cols-2 tablet:gap-x-0">
             <div className="flex flex-col gap-[16px] tablet:pr-[30px] desktop:pr-[40px]">
-              <h2 className="accent-room max-w-[420px] text-[26px] titre-marque tablet:text-[34px]">
+              <h2 className="accent-room max-w-[420px] text-[26px] font-semibold uppercase leading-[0.95] tracking-[-0.04em] tablet:text-[34px]">
                 {surMesureBloc.titre}
               </h2>
-              <p className="max-w-[460px] text-[16px] font-medium leading-[1.45] tracking-[-0.01em] text-background/70">
+              <p className="max-w-[460px] text-[15px] font-medium leading-[1.45] tracking-[-0.01em] text-background/70">
                 {prestation.horsOffre}
               </p>
             </div>
@@ -593,7 +592,7 @@ export function ServicePage({
                 {/* MÊME CORPS QUE LE TITRE D'EN FACE : le chemin qui mène au
                     rendez-vous ne peut pas peser moins que l'exception qu'il
                     côtoie. */}
-                <h3 className="accent-room max-w-[420px] text-[26px] titre-marque tablet:text-[34px]">
+                <h3 className="accent-room max-w-[420px] text-[26px] font-semibold uppercase leading-[0.95] tracking-[-0.04em] tablet:text-[34px]">
                   {surMesureBloc.titreQuestions}
                 </h3>
                 <p className="text-[14px] font-medium leading-[1.45] tracking-[-0.01em] text-background/70">
@@ -610,7 +609,7 @@ export function ServicePage({
                       {String(index + 1).padStart(2, "0")}
                     </span>
                     <div className="flex flex-col gap-[6px]">
-                      <p className="text-[16px] font-semibold leading-[1.3] tracking-[-0.01em]">
+                      <p className="text-[15px] font-semibold leading-[1.3] tracking-[-0.01em]">
                         {question.titre}
                       </p>
                       <p className="max-w-[460px] text-[14px] font-medium leading-[1.45] tracking-[-0.01em] text-background/70">
@@ -625,7 +624,7 @@ export function ServicePage({
                   le bouton de l'offre. */}
               <Link
                 href="#rendez-vous"
-                className="flex h-[30px] w-fit flex-none items-center justify-center bg-accent px-[10px] text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-accent-ink no-underline transition-opacity duration-200 hover:opacity-80 motion-reduce:transition-none"
+                className="flex h-[30px] w-fit flex-none items-center justify-center bg-accent px-[10px] text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-background no-underline transition-opacity duration-200 hover:opacity-80 motion-reduce:transition-none"
               >
                 <span className="accent-room">{surMesureBloc.cta}</span>
               </Link>
@@ -650,6 +649,7 @@ export function ServicePage({
           formulaire du site. La prestation lue EST le sujet : il y est
           présélectionné (`RDV_PAR_PRESTATION`, « vitrine » devient « site »). */}
       <Footer sujetRendezVous={RDV_PAR_PRESTATION[prestation.id]} />
+      <FloatingNav site={site} />
     </>
   );
 }

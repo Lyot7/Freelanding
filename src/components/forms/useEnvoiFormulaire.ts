@@ -42,8 +42,9 @@ export const NOM_CHAMP_PIEGE = "referenceInterne";
    réponse à chaque message sous 24 heures ouvrées. */
 const MESSAGES_SUCCES: Record<IntentionFormulaire, string> = {
   projet:
-    "Message envoyé. Un accusé de réception vient de partir vers votre boîte : je vous réponds sous 24 h ouvrées.",
-  footer: "C’est parti. Je vous réponds sous 24 h ouvrées.",
+    "Message envoyé. Un accusé de réception vient de partir vers votre boîte : je vous réponds sous 24 heures ouvrées.",
+  footer:
+    "Message envoyé. Un accusé de réception vient de partir vers votre boîte : je vous réponds sous 24 heures ouvrées.",
 };
 
 const MESSAGE_RESEAU =

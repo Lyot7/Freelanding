@@ -1,4 +1,4 @@
-import { PRIX_AU_DEVIS } from "@/content/offre";
+import { euros, PRIX_AU_DEVIS, repereAgenceLogiciel } from "@/content/offre";
 import type { FaqItem } from "@/lib/content/types";
 
 /**
@@ -60,10 +60,7 @@ import type { FaqItem } from "@/lib/content/types";
  * fait échouer `offre.test.mjs`.
  */
 /*
- * HUIT ENTRÉES DEPUIS LE 2026-11-01 : trois objections qui manquaient (le solo
- * indisponible, par où commencer, l'erreur de l'IA).
- *
- * CINQ ENTRÉES LE 2026-09-24, décision d'Eliott : la FAQ ne garde que
+ * CINQ ENTRÉES DEPUIS LE 2026-09-24, décision d'Eliott : la FAQ ne garde que
  * ce que le client se demande avant de réserver ET dont la réponse n'est écrite
  * nulle part ailleurs sur le site. Sont sorties : les maquettes (la section
  * méthode le dit), le site à quelques centaines d'euros, l'agence (la page À
@@ -82,19 +79,14 @@ export const faqItems: FaqItem[] = [
        trois fois affiché devient la norme attendue, alors qu'Eliott le propose
        lui-même au devis. Les CGV gardent le défaut.
 
-       LE REPÈRE D'AGENCE a quitté cette réponse le 2026-11-01 : le héros le
-       porte déjà, sourcé. */
-    answer: `${PRIX_AU_DEVIS} Il suit le nombre de modules, les outils à relier et la reprise de vos données. Vous réglez le montant selon un échéancier écrit au devis et étalé jusqu’à la livraison : vous ne payez jamais tout d’avance.`,
+       LE REPÈRE D'AGENCE vient lui aussi d'`offre.ts`, avec sa source et sa
+       date. */
+    answer: `${PRIX_AU_DEVIS} Il suit le nombre de modules, les outils à relier et la reprise de vos données. En agence, un premier outil se facture ${euros(repereAgenceLogiciel.premierOutilMin)} à ${euros(repereAgenceLogiciel.premierOutilMax)} selon ${repereAgenceLogiciel.source.nom} (${repereAgenceLogiciel.source.releve}). Je conçois et je code moi-même, sans chef de projet ni structure à payer. Vous réglez le montant selon un échéancier écrit au devis et étalé jusqu’à la livraison : vous ne payez jamais tout d’avance.`,
   },
   {
     question: "Combien de temps ça prend ?",
     answer:
       "La date de mise en service est écrite dans le devis, avant que vous signiez. Elle dépend de votre projet et de la rapidité de vos retours : vos exemples de documents, vos accès, vos réponses à mes questions. Je ne mène qu’un projet à la fois : une fois le devis signé, je travaille sur le vôtre, et vous le voyez avancer sur une adresse en ligne.",
-  },
-  {
-    question: "Vous travaillez seul. Et si vous n’êtes plus disponible ?",
-    answer:
-      "Tout est à votre nom : le logiciel, l’hébergement, les données. La documentation vous est remise avec le logiciel, et un autre développeur peut reprendre le travail sans passer par moi.",
   },
   {
     question: "Est-ce que je reste propriétaire de ce que vous construisez ?",
@@ -104,24 +96,11 @@ export const faqItems: FaqItem[] = [
   {
     question: "J’ai déjà un logiciel. Vous le reprenez ?",
     answer:
-      "Je construis du neuf, à côté de l’ancien et sans y toucher. Je reprends un logiciel seulement s’il repose sur une base JavaScript récente et bien construite, après un audit de son code. Sur du PHP ou du Laravel, je vous le dis dès le départ : je n’y touche pas.",
+      "Par défaut, je construis du neuf. Reprendre du code écrit par quelqu’un d’autre est risqué, et je ne m’y engage pas à l’aveugle. La reprise reste possible si votre logiciel repose sur une base JavaScript récente et qu’il est correctement construit : je commence alors par un audit de son code, qui répond à cette question-là et à aucune autre. Sur du PHP ou du Laravel, je n’y touche pas, et je vous le dis avant que ça vous coûte quoi que ce soit. Dans les autres cas, je vous propose un outil neuf qui vit à côté de l’ancien, sans y toucher.",
   },
   {
     question: "Que se passe-t-il après la mise en service ?",
-    /* La maintenance se chiffre au devis, comme le projet. La clause de hausse
-       garde son déclencheur et le droit de refuser (`offre.test.mjs`). */
-    answer:
-      "Je propose une maintenance mensuelle, chiffrée au devis avec le projet : mises à jour, sauvegardes vérifiées, corrections. Une fonction nouvelle fait l’objet d’un devis. Si le trafic ou votre hébergeur font changer le montant, je vous préviens avant, et rien ne bouge tant que vous n’avez pas dit oui.",
-  },
-  {
-    question: "Par où commencer si je ne sais pas quoi automatiser ?",
-    /* Durées du sujet « logiciel » relevées chez Cal.com le 2026-11-01. */
-    answer:
-      "Par un appel gratuit de 30 à 60 minutes. Vous me racontez votre semaine, on cherche ce qui prend le plus de temps, et je vous dis si un abonnement suffit.",
-  },
-  {
-    question: "Et si l’IA se trompe ?",
-    answer:
-      "Elle prépare, vous validez. Ce temps de relecture est compté dans l’exemple de la semaine.",
+    /* La maintenance se chiffre au devis, comme le projet. */
+    answer: `Je ne disparais pas. Je propose une maintenance mensuelle, chiffrée au devis avec le projet. Elle couvre ce qui existe : mises à jour, sauvegardes vérifiées, corrections. Une fonction nouvelle fait l’objet d’un devis, parce qu’elle n’était pas au cadrage. Ce montant ne bouge que si votre logiciel reçoit beaucoup plus de trafic ou si votre hébergeur augmente ses prix. Il faut alors une machine plus puissante, payée sur votre facture d’hébergement, qui est à votre nom, et un suivi plus large. Je vous préviens avant, avec le nouveau montant et la date, et rien ne change tant que vous n’avez pas dit oui.`,
   },
 ];

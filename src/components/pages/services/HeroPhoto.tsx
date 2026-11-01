@@ -129,12 +129,12 @@ export function HeroPhoto({
       {/* Mobile : du bas jusqu'au fil d'Ariane. */}
       <span
         aria-hidden
-        className="pointer-events-none absolute inset-0 z-[1] bg-[linear-gradient(to_top,var(--background)_0%,rgba(11,11,11,.8)_35%,rgba(0,0,0,.5)_58%,transparent_70%)] tablet:hidden"
+        className="pointer-events-none absolute inset-0 z-[1] bg-[linear-gradient(to_top,#0b0b0b_0%,rgba(11,11,11,.8)_35%,rgba(0,0,0,.5)_58%,transparent_70%)] tablet:hidden"
       />
       {/* À partir de 810 px : le bas (chapô, fourchette, crédit)… */}
       <span
         aria-hidden
-        className="pointer-events-none absolute inset-0 z-[1] hidden bg-[linear-gradient(to_top,var(--background)_0%,rgba(11,11,11,.8)_20%,transparent_45%)] tablet:block"
+        className="pointer-events-none absolute inset-0 z-[1] hidden bg-[linear-gradient(to_top,#0b0b0b_0%,rgba(11,11,11,.8)_20%,transparent_45%)] tablet:block"
       />
       {/* … et la colonne du titre, à droite, sous le ciel qui reste dégagé. */}
       <span

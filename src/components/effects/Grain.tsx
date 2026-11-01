@@ -48,10 +48,6 @@ const TEXTURE = "/images/grain.webp";
 
 const MARGE = "300px";
 
-/** Deux valeurs de charte, plus aucune à la main : sur une photo, sur un noir. */
-export const GRAIN_PHOTO = 0.07;
-export const GRAIN_NOIR = 0.09;
-
 let observateur: IntersectionObserver | null = null;
 
 function reduitLeMouvement() {
@@ -100,11 +96,11 @@ function obtenirObservateur() {
 }
 
 export function Grain({
-  matiere = "noir",
+  opacity = 0.08,
   className = "",
 }: {
-  /** La surface sous le grain : une photo ou une vidéo, ou un aplat noir. */
-  matiere?: "photo" | "noir";
+  /** Opacité RELEVÉE sur la source pour ce calque précis, jamais choisie. */
+  opacity?: number;
   /** Empilement de l'enveloppe (`z-[n]`), relevé lui aussi sur la source. */
   className?: string;
 }) {
@@ -139,10 +135,7 @@ export function Grain({
     >
       <span
         className="grain-layer grain-drift block"
-        style={{
-          backgroundImage: `url('${TEXTURE}')`,
-          opacity: matiere === "photo" ? GRAIN_PHOTO : GRAIN_NOIR,
-        }}
+        style={{ backgroundImage: `url('${TEXTURE}')`, opacity }}
       />
     </span>
   );

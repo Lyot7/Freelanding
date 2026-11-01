@@ -284,7 +284,7 @@ export function ParallaxImage({
         data-part="cover-image"
         className={
           "object-cover object-center transition-transform duration-[400ms] " +
-          "ease-[var(--courbe-sortie)] group-hover:scale-110 " +
+          "ease-[cubic-bezier(0.5,0,0.5,1)] group-hover:scale-110 " +
           "motion-reduce:transition-none motion-reduce:group-hover:scale-100 " +
           imgClassName
         }

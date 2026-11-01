@@ -108,6 +108,8 @@ export const uiLabels: UiLabels = {
     blogSearchPlaceholder: "RECHERCHE PAR NOM…",
     blogEmptyLabel: "Aucun article ne correspond à cette recherche.",
     workArchiveLabel: "Archive des projets",
+    workSearchLabel: "Rechercher un projet par nom ou par prestation",
+    workSearchPlaceholder: "RECHERCHE PAR NOM…",
     workCountSuffix: " projets affichés",
     workEmptyLabel: "Aucun projet ne correspond.",
     workResetLabel: "Réinitialiser les filtres",

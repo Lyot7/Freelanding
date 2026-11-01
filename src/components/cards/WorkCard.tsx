@@ -63,7 +63,7 @@ const FONT = "[font-family:var(--font-sans)]";
 // `whitespace-pre` : le live est en `white-space: pre` sur ces libellés. Sans lui,
 // « Web design » se cassait en deux lignes (mesuré 44×29 px au lieu de 72×14).
 const TXT =
-  "whitespace-pre text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground";
+  "whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground";
 
 function padIndex(n: number): string {
   return `(${String(n).padStart(2, "0")})`;
@@ -263,14 +263,14 @@ export function WorkCard({ work, index }: { work: WorkItem; index?: number }) {
 
       {/* framer-q8jnk9-container : grain de la carte. RELEVÉ sur `/` et `/work` :
           hôte 1440 × 900, z-2, opacité 0,1. */}
-      <Grain matiere="photo" className="z-[2]" />
+      <Grain opacity={0.1} className="z-[2]" />
 
       {/* framer-17jsry5 : filet vertical central (blanc 18%).
           Placé AVANT le contenu : à `z-index` égal, l'ordre du DOM décide, donc le
           filet passe DERRIÈRE l'image du projet, comme sur le live. Quand il était
           déclaré après, un hit-test au centre de la carte renvoyait le filet et non
           l'image : une ligne pâle traversait visiblement le visuel. */}
-      <div className="absolute left-[calc(50%-0.5px)] top-0 z-[1] hidden h-full w-px bg-foreground opacity-[0.18] tablet:block" />
+      <div className="absolute left-[calc(50%-0.5px)] top-0 z-[1] h-full w-px bg-foreground opacity-[0.18]" />
 
       {/* framer-7nnyja + framer-1l83zgi : wrapper de contenu (sticky aplati) */}
       <div className="relative z-[1] flex w-full flex-1 flex-col items-center justify-center px-[20px]">
@@ -380,7 +380,7 @@ export function WorkCardBackground({ work }: { work: WorkItem }) {
   const reducedMotion = prefersReducedMotion === true;
 
   return (
-    <div className="absolute inset-0 z-[1] overflow-hidden [filter:brightness(0.42)] tablet:[filter:brightness(0.6)]">
+    <div className="absolute inset-0 z-[1] overflow-hidden [filter:brightness(0.6)]">
       <WorkCardMedia
         media={media}
         reducedMotion={reducedMotion}
