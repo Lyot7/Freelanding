@@ -3,6 +3,8 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { blogPosts } from "./blog.ts";
 import {
+  ANCRE_BESOINS,
+  versPageTheme,
   ARTICLES_MAX,
   CHEMIN_HUB_METIERS,
   articlesDe,
@@ -11,6 +13,7 @@ import {
   motifsDeRefus,
   pageDuCorps,
   pageMetier,
+  pagesBesoin,
   pagesHub,
   pagesMetier,
   ressemblance,
@@ -257,5 +260,45 @@ describe("le maillage se génère depuis les données", () => {
 
   test("le prix n'est écrit nulle part dans le fichier de données", () => {
     expect(readFileSync(join("src", "content", "metiers.json"), "utf8")).not.toMatch(/\d\s?€/u);
+  });
+});
+
+describe("une page de fonction garde sa place", () => {
+  const entree = entreesMetier[0];
+
+  test("seule la nature « fonction » se relit", () => {
+    expect(lirePage({ ...entree, nature: "fonction" }, 0).nature).toBe("fonction");
+    expect(() => lirePage({ ...entree, nature: "ville" }, 0)).toThrow("nature invalide");
+  });
+
+  test("elle survit au corps d'une validation", () => {
+    const corps = JSON.stringify({ ...entree, nature: "fonction" });
+    expect(pageDuCorps(corps, entree.slug, entree.date, 0).nature).toBe("fonction");
+  });
+
+  test("son fil d'Ariane mène à la liste des besoins, celui d'un métier au hub", () => {
+    const page = { ...pagesMetier[0], nature: "fonction" };
+    expect(versPageTheme(page).filAriane[1].href).toBe(`${CHEMIN_HUB_METIERS}#${ANCRE_BESOINS}`);
+    expect(versPageTheme(pagesMetier[0]).filAriane[1].href).toBe(CHEMIN_HUB_METIERS);
+  });
+});
+
+describe("une requête, une adresse", () => {
+  test("un besoin déjà tenu garde son adresse et reçoit le lien du hub", () => {
+    const chemins = pagesBesoin.map((p) => p.chemin);
+    expect(new Set(chemins).size).toBe(chemins.length);
+    expect(chemins).toContain("/services/logiciel-metier/maintenance-sav");
+    expect(chemins).toContain("/blog/logiciel-gestion-de-stock");
+  });
+
+  test("aucun lien vers un article qui n'est pas publié", () => {
+    for (const { chemin } of pagesBesoin.filter((p) => p.chemin.startsWith("/blog/"))) {
+      expect(blogPosts.map((p) => `/blog/${p.slug}`)).toContain(chemin);
+    }
+  });
+
+  test("aucune page n'est à la fois métier et besoin", () => {
+    const metiers = pagesHub.map((p) => p.chemin);
+    for (const { chemin } of pagesBesoin) expect(metiers).not.toContain(chemin);
   });
 });

@@ -26,7 +26,13 @@
 import { blogPosts } from "./blog";
 import donnees from "./metiers.json";
 import { prestation } from "./offre";
-import type { BlocTheme, PageTheme } from "./page-theme";
+import {
+  CHEMIN_AUTOMATISATION,
+  CHEMIN_ERP,
+  CHEMIN_GMAO,
+  type BlocTheme,
+  type PageTheme,
+} from "./page-theme";
 import { pagesSecteur, type SecteurSlug } from "./pages-secteur";
 
 export const CHEMIN_HUB_METIERS = "/logiciel-metier";
@@ -48,6 +54,8 @@ export type Theme = (typeof THEMES)[number];
 /** Une entrée de `metiers.json`, telle que le gabarit la lit. */
 export interface PageMetier {
   readonly slug: string;
+  /** « fonction » : la page vise un besoin (planning, flotte), pas un métier. */
+  readonly nature?: "fonction";
   /** Date de publication, `<lastmod>` du sitemap. */
   readonly date: string;
   /** La validation du cockpit, marquée publiée une fois la page en ligne. Absente d'une page écrite à la main. */
@@ -125,9 +133,10 @@ const estQuestion = (v: unknown): boolean =>
 export function lirePage(v: unknown, index: number): PageMetier {
   const champ = (nom: string) => new Error(`metiers.json, entrée ${index} : ${nom} invalide`);
   if (!estObjet(v)) throw champ("entrée");
-  const { slug, date, validationId, libelle, h1, seo, resume, accroche, noteLlms } = v;
+  const { slug, nature, date, validationId, libelle, h1, seo, resume, accroche, noteLlms } = v;
   const { themes, lexique, image, titreOffre, blocs, faq } = v;
   if (!estTexte(slug) || !/^[a-z0-9]+(-[a-z0-9]+)*$/u.test(slug)) throw champ("slug");
+  if (nature !== undefined && nature !== "fonction") throw champ("nature");
   if (!estTexte(date) || !/^\d{4}-\d{2}-\d{2}$/u.test(date)) throw champ("date");
   if (validationId !== undefined && !estTexte(validationId)) throw champ("validationId");
   if (!estTexte(libelle) || !estTexte(h1)) throw champ("h1");
@@ -160,7 +169,7 @@ export function pageDuCorps(corps: string, slug: string, date: string, rang: num
   const { libelle, h1, seo, resume, accroche, noteLlms } = valeur;
   const { themes, lexique, image, titreOffre, blocs, faq } = valeur;
   const page = lirePage(
-    { slug: valeur.slug, date, libelle, h1, seo, resume, accroche, noteLlms, themes, lexique, image, titreOffre, blocs, faq },
+    { slug: valeur.slug, nature: valeur.nature, date, libelle, h1, seo, resume, accroche, noteLlms, themes, lexique, image, titreOffre, blocs, faq },
     rang,
   );
   if (page.slug !== slug) throw new Error(`Slug du corps (${page.slug}) différent de la validation (${slug})`);
@@ -250,11 +259,20 @@ export const pagesMetier: readonly PageMetierPubliee[] = entreesMetier
 export const pageMetier = (slug: string): PageMetierPubliee | undefined =>
   pagesMetier.find((p) => p.slug === slug);
 
-/** Une ligne d'une liste de métiers. */
-export interface EntreeHub {
+const estFonction = (page: { readonly nature?: "fonction" }): boolean => page.nature === "fonction";
+
+/** Les pages qui visent un besoin plutôt qu'un métier. */
+export const pagesFonction: readonly PageMetierPubliee[] = pagesMetier.filter(estFonction);
+
+/** Une ligne d'une liste du hub. */
+export interface LigneHub {
   readonly libelle: string;
   readonly chemin: string;
   readonly accroche: string;
+}
+
+/** Une ligne de la liste des métiers : ses thèmes la relient à ses voisines. */
+export interface EntreeHub extends LigneHub {
   readonly themes: readonly Theme[];
 }
 
@@ -269,9 +287,9 @@ const THEMES_SECTEUR: Readonly<Record<SecteurSlug, readonly Theme[]>> = {
   "negoce-distribution": ["stock", "facturation", "relances"],
 };
 
-/** Tout ce que le hub liste : pages par métier, puis pages secteur. */
+/** Les métiers du hub : pages par métier, puis pages secteur. */
 export const pagesHub: readonly EntreeHub[] = [
-  ...pagesMetier,
+  ...pagesMetier.filter((p) => !estFonction(p)),
   ...pagesSecteur.map((p) => ({
     libelle: p.marcheFilAriane,
     chemin: p.chemin,
@@ -285,7 +303,7 @@ const communs = (a: readonly Theme[], b: readonly Theme[]): number =>
 
 /** Les 3 métiers les plus proches par leurs thèmes, à égalité dans l'ordre du hub. */
 export function voisinsDe(page: { readonly chemin: string; readonly themes: readonly Theme[] }): readonly EntreeHub[] {
-  return pagesHub
+  return [...pagesHub, ...pagesFonction]
     .filter((p) => p.chemin !== page.chemin)
     .map((entree, rang) => ({ entree, rang, score: communs(entree.themes, page.themes) }))
     .filter((p) => p.score > 0)
@@ -327,7 +345,9 @@ export function versPageTheme(page: PageMetierPubliee): Omit<PageTheme, "id"> {
     libelleLien: page.libelle,
     filAriane: [
       { libelle: hubMetiers.filAccueil, href: "/" },
-      { libelle: hubMetiers.filHub, href: CHEMIN_HUB_METIERS },
+      estFonction(page)
+        ? { libelle: hubMetiers.besoins.titre, href: `${CHEMIN_HUB_METIERS}#${ANCRE_BESOINS}` }
+        : { libelle: hubMetiers.filHub, href: CHEMIN_HUB_METIERS },
       { libelle: page.libelle },
     ],
   };
@@ -338,6 +358,8 @@ export const visuelMetier = (slug: string) => ({
   heros: `/images/heros/metier-${slug}.jpg`,
   partage: `/images/og-metier-${slug}.jpg`,
 });
+
+export const ANCRE_BESOINS = "besoins";
 
 /** Le hub, et les libellés du maillage. Aucun texte dans les composants. */
 export const hubMetiers = {
@@ -352,6 +374,53 @@ export const hubMetiers = {
   filAccueil: "Accueil",
   filHub: "Par métier",
   titreListe: "Les métiers",
+  besoins: {
+    titre: "Par besoin",
+    pages: [
+      {
+        libelle: "ERP sur mesure",
+        chemin: CHEMIN_ERP,
+        accroche: "Du devis à la facture, un seul outil au lieu de cinq.",
+      },
+      {
+        libelle: "GMAO et SAV",
+        chemin: CHEMIN_GMAO,
+        accroche: "Les pannes, les visites planifiées et le rapport du technicien.",
+      },
+      {
+        libelle: "Automatisation",
+        chemin: CHEMIN_AUTOMATISATION,
+        accroche: "Les tâches répétitives de votre bureau, faites sans vous.",
+      },
+    ],
+    articles: [
+      {
+        slug: "logiciel-gestion-de-stock",
+        libelle: "Gestion de stock",
+        accroche: "Un stock juste entre vos dépôts, vos commandes et vos inventaires.",
+      },
+      {
+        slug: "logiciel-gestion-intervention",
+        libelle: "Gestion des interventions",
+        accroche: "De la demande du client à la facture, sans fiche à retaper.",
+      },
+      {
+        slug: "logiciel-gestion-de-production",
+        libelle: "Gestion de production",
+        accroche: "Les ordres de fabrication et la charge de l’atelier, à jour.",
+      },
+      {
+        slug: "logiciel-gestion-de-commande",
+        libelle: "Gestion des commandes",
+        accroche: "Chaque commande suivie, de la saisie à la livraison.",
+      },
+      {
+        slug: "crm-sur-mesure",
+        libelle: "CRM sur mesure",
+        accroche: "Vos clients et vos relances, suivis à votre façon.",
+      },
+    ],
+  },
   autre: {
     titre: "Votre métier n’est pas dans la liste ?",
     corps:
@@ -359,8 +428,21 @@ export const hubMetiers = {
     cta: "Réserver un appel",
   },
   maillage: {
-    voisins: "Métiers voisins",
+    voisins: "Pages voisines",
     articles: "À lire aussi",
-    hub: "Tous les métiers",
+    hub: "Toutes les pages",
   },
 } as const;
+
+/*
+ * UNE REQUÊTE, UNE ADRESSE. Un besoin déjà tenu par une page ou un article garde
+ * son adresse : une seconde page sur la même requête les ferait se concurrencer.
+ * Le hub leur envoie son poids, puis liste les pages de fonction publiées.
+ */
+export const pagesBesoin: readonly LigneHub[] = [
+  ...hubMetiers.besoins.pages,
+  ...hubMetiers.besoins.articles
+    .filter((a) => blogPosts.some((post) => post.slug === a.slug))
+    .map((a) => ({ libelle: a.libelle, chemin: `/blog/${a.slug}`, accroche: a.accroche })),
+  ...pagesFonction,
+];

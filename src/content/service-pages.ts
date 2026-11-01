@@ -13,7 +13,7 @@
 import type { Prestation, PrestationId } from "./offre";
 import { lienVersPageLogicielCaen } from "./page-logiciel-caen";
 import { avantLienPrix, pagePrixLogiciel } from "./page-prix-logiciel";
-import { pagesHub } from "./metiers";
+import { pagesFonction, pagesHub, type LigneHub } from "./metiers";
 import { avantLiensSecteur } from "./pages-secteur";
 import { pageTheme } from "./pages-theme";
 
@@ -210,13 +210,15 @@ export interface LiensDeclinaisons {
   readonly liens: readonly { readonly libelle: string; readonly href: string }[];
 }
 
+const versLien = (p: LigneHub) => ({ libelle: p.libelle, href: p.chemin });
+
 export const lienLocalParPrestation: Partial<
   Record<PrestationId, readonly LiensDeclinaisons[]>
 > = {
   logiciel: [
     {
       avant: avantLiensSecteur,
-      liens: pagesHub.map((p) => ({ libelle: p.libelle, href: p.chemin })),
+      liens: pagesHub.map(versLien),
     },
     {
       avant: "Par besoin :",
@@ -224,6 +226,7 @@ export const lienLocalParPrestation: Partial<
         lienTheme("erp-sur-mesure"),
         lienTheme("maintenance-sav"),
         lienTheme("automatisation"),
+        ...pagesFonction.map(versLien),
       ],
     },
     {

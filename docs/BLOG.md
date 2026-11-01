@@ -211,7 +211,7 @@ d'`offre.ts` au rendu.
 
 Depuis le 2026-10-31, **un article ET une page par jour ouvré, chacun son quota**.
 Une page se valide au cockpit comme un article : une validation `ARTICLE_BLOG`
-avec `contexte.article.kind = "metier"`, `slug` et `visuel`. Sans `kind`, c'est un
+avec `contexte.article.kind = "metier"`, `slug` et `visuel`. Une page qui vise un besoin plutôt qu'un métier porte `"nature": "fonction"` dans son corps : même circuit, même contrôle, mais elle rejoint la liste « Par besoin » du hub. Sans `kind`, c'est un
 article, et rien ne change pour lui. Le corps est le JSON d'une entrée de
 `metiers.json`, sans `date` : une donnée, **jamais compilée**.
 

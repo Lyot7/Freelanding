@@ -6,7 +6,13 @@ import { GradientWaveBackdrop } from "@/components/effects/GradientWaveBackdrop"
 import { Grain } from "@/components/effects/Grain";
 import { FloatingNav, Footer, Header } from "@/components/layout";
 import { ListeMetiers } from "@/components/pages/metiers/ListeMetiers";
-import { CHEMIN_HUB_METIERS, hubMetiers, pagesHub } from "@/content/metiers";
+import {
+  ANCRE_BESOINS,
+  CHEMIN_HUB_METIERS,
+  hubMetiers,
+  pagesBesoin,
+  pagesHub,
+} from "@/content/metiers";
 import { lienRendezVous } from "@/content/rendez-vous";
 import { content } from "@/lib/content";
 import { collectionSchema, filArianeSchema, graph } from "@/lib/json-ld";
@@ -24,7 +30,10 @@ export default async function HubMetiers() {
     <>
       <JsonLd
         data={graph(
-          collectionSchema(hubMetiers.h1, hubMetiers.seo.description, CHEMIN_HUB_METIERS, pagesHub),
+          collectionSchema(hubMetiers.h1, hubMetiers.seo.description, CHEMIN_HUB_METIERS, [
+            ...pagesHub,
+            ...pagesBesoin,
+          ]),
           filArianeSchema([
             { libelle: hubMetiers.filAccueil, href: "/" },
             { libelle: hubMetiers.filHub },
@@ -53,6 +62,12 @@ export default async function HubMetiers() {
           <div className="relative mx-auto flex w-full max-w-[1440px] flex-col gap-[40px]">
             <h2 className="sr-only">{hubMetiers.titreListe}</h2>
             <ListeMetiers entrees={pagesHub} />
+            <div id={ANCRE_BESOINS} className="flex scroll-mt-[100px] flex-col gap-[20px]">
+              <h2 className="accent-room m-0 text-[26px] font-semibold uppercase leading-[0.95] tracking-[-0.04em] tablet:text-[34px]">
+                {hubMetiers.besoins.titre}
+              </h2>
+              <ListeMetiers entrees={pagesBesoin} />
+            </div>
             <div className="grid gap-[12px] tablet:grid-cols-2">
               <h2 className="accent-room m-0 text-[26px] font-semibold uppercase leading-[0.95] tracking-[-0.04em] tablet:pr-[30px] tablet:text-[34px]">
                 {hubMetiers.autre.titre}

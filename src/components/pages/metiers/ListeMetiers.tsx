@@ -1,8 +1,8 @@
 import Link from "next/link";
-import type { EntreeHub } from "@/content/metiers";
+import type { LigneHub } from "@/content/metiers";
 
 /**
- * LA LISTE DES MÉTIERS, sur le hub et sur l'accueil : une ligne par page publiée,
+ * LA LISTE DU HUB, reprise sous chaque page : une ligne par page publiée,
  * le nom en grand, ce que la page couvre à côté. Le visiteur se reconnaît au mot
  * de son métier ; des cartes le feraient lire trois fois plus de texte.
  */
@@ -10,7 +10,7 @@ export function ListeMetiers({
   entrees,
   ton = "sombre",
 }: {
-  entrees: readonly EntreeHub[];
+  entrees: readonly LigneHub[];
   ton?: "sombre" | "clair";
 }) {
   const filet = ton === "clair" ? "border-black/[0.12]" : "border-white/10";
