@@ -3,7 +3,7 @@ import type { ComponentPropsWithoutRef, ReactNode } from "react";
 
 /**
  * Button — CTA anguleux (radius 0) type "START A PROJECT".
- * - `primary` : fond accent orange, texte sombre.
+ * - `primary` : fond volt, texte encre.
  * - `outline` : bordure hairline, fond transparent.
  * - `ghost`   : sans bordure, hover surface.
  * Rend un <Link> next si `href` est fourni, sinon un <button>.
@@ -15,11 +15,12 @@ export type ButtonVariant = "primary" | "outline" | "ghost";
 // de vérité de l'indicateur clavier du site (anneau double clair + sombre).
 const BASE =
   "inline-flex items-center justify-center gap-2 font-mono text-xs uppercase tracking-tight " +
-  "min-h-[44px] px-6 rounded-none select-none transition-colors duration-200 " +
+  "min-h-[44px] px-6 rounded-none select-none transition-[color,background-color,transform] duration-100 " +
+  "active:scale-[0.97] motion-reduce:active:scale-100 " +
   "disabled:opacity-50 disabled:pointer-events-none";
 
 const VARIANTS: Record<ButtonVariant, string> = {
-  primary: "bg-accent text-background hover:bg-accent/90",
+  primary: "bg-accent text-accent-ink hover:bg-accent/90",
   outline: "border border-border text-foreground hover:bg-surface-2",
   ghost: "text-foreground hover:bg-surface-2",
 };

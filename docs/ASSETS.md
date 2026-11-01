@@ -23,7 +23,6 @@ Dernière revue : **2026-08-26**.
 | `images/eliott-nature-vertical.jpg` | Portrait en situation, 1100 × 1388 (rapport 0,7917, celui du cadre de la couverture À propos) | Photo personnelle `IMG_0738.HEIC`, recadrée |
 | `images/eliott-nature-paysage.jpg` | Portrait en situation, 1400 × 931 (rapport 1,504, celui de la carte du pied de page) | Même photo, autre recadrage, sujet décalé à gauche |
 | `images/eliott-nature-carte.jpg` | Portrait tête-et-épaules, 680 × 835 (rapport 136/167, celui de la carte du hero Contact) | Même photo, cadrage serré |
-| `images/eliott-nature-bloc.jpg` | Portrait pleine cadre, 1035 × 1623 (rapport 0,637584, celui du bloc « Crédible avant tout. » de l'accueil) | Même photo, plan taille resserré (fenêtre 1430 × 2243 à +1439/+1577 sur l'original orienté 4284 × 5712) |
 | `images/eliott-portrait-vertical.jpg` | Portrait **détouré** sur aplat accent | Même séance, détourage + chromakey sur `--accent` |
 | `images/eliott-portrait-citation.jpg` | Idem, cadrage citation | Idem |
 | `images/eliott-portrait-large.jpg` | Idem, cadrage paysage | Idem — **plus servi** depuis le 2026-08-26 |
@@ -66,7 +65,6 @@ fonctionne.
 
 | Fichier | Photographe | Licence | Traitement |
 | --- | --- | --- | --- |
-| `images/telephone-et-ordinateur.jpg` | Alejandro Escamilla | CC0 (domaine public), [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Man_with_smartphone_and_laptop_(Unsplash).jpg), publiée à l'origine sur [Unsplash](https://unsplash.com/photos/Dl6jeyfihLk) | Recadrage 1512 × 960, saturation 85 %, fond assombri à 80 % hors sujet, téléphone et ordinateur détourés en lignes volt (Canny dans un masque tracé à la main), vignette vers `#0b0b0b` |
 
 Elle remplace `escalier-lumiere-paysage.jpg` (Vladimir Khoteev, Unsplash)
 depuis le 2026-09-24, fichier supprimé faute d'usage restant. L'escalier

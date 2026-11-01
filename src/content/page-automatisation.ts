@@ -41,7 +41,7 @@ export const TACHES_BUREAU = [
   {
     tache: "Relancer les factures échues",
     avant: "Quand quelqu’un y pense",
-    apres: "Relance partie à l’échéance, facture jointe, ton adapté au client",
+    apres: "Relance préparée à l’échéance, facture jointe, ton adapté au client : vous validez",
     minutes: 60,
   },
   {

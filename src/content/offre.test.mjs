@@ -185,14 +185,13 @@ describe("l'offre et la FAQ vouvoient", () => {
     }
   });
 
-  test("la réponse prix de la FAQ cite le repère d'agence, sa source et sa date", () => {
+  test("le repère d'agence reste sourcé dans le héros, sans se redire dans la FAQ", () => {
     const reponse = faqItems.find((f) => /Combien coûte un projet/u.test(f.question))?.answer;
-    // À livrable égal : le premier outil d'une agence, jamais sa médiane.
-    expect(reponse).toContain(euros(repereAgenceLogiciel.premierOutilMin));
-    expect(reponse).toContain(euros(repereAgenceLogiciel.premierOutilMax));
-    expect(reponse).not.toContain("médiane");
-    expect(reponse).toContain(repereAgenceLogiciel.source.nom);
-    expect(reponse).toContain(repereAgenceLogiciel.source.releve);
+    expect(reponse).not.toContain(euros(repereAgenceLogiciel.premierOutilMin));
+    const { source } = homeContent.hero.comparison;
+    expect(source.href).toBe(repereAgenceLogiciel.source.href);
+    expect(source.label).toContain(repereAgenceLogiciel.source.nom);
+    expect(source.label).toContain(repereAgenceLogiciel.source.releve);
   });
 });
 

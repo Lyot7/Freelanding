@@ -13,10 +13,10 @@ export function PlanMetiers({ entrees }: { entrees: readonly LigneHub[] }) {
       {entrees.map((entree) => (
         <li key={entree.chemin}>
           <Link href={entree.chemin} className="group flex flex-col gap-[4px] no-underline">
-            <span className="text-[16px] font-semibold leading-[1.2] tracking-[-0.02em] underline-offset-[3px] group-hover:underline">
+            <span className="text-[16px] font-semibold leading-[1.2] tracking-[-0.01em] underline-offset-[3px] group-hover:underline">
               {entree.libelle}
             </span>
-            <span className="text-[13px] font-medium leading-[1.35] tracking-[-0.01em] text-white/60">
+            <span className="text-[14px] font-medium leading-[1.35] tracking-[-0.01em] text-white/60">
               {entree.accroche}
             </span>
           </Link>
@@ -41,21 +41,21 @@ export function ListeMetiers({
         <li key={entree.chemin} className={`border-t ${filet}`}>
           <Link
             href={entree.chemin}
-            className="group grid items-baseline gap-[6px] py-[18px] no-underline transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] active:translate-y-[1px] tablet:grid-cols-2 tablet:gap-0 tablet:py-[22px]"
+            className="group grid items-baseline gap-[6px] py-[18px] no-underline transition-transform duration-150 ease-[var(--courbe-vive)] active:translate-y-[1px] tablet:grid-cols-2 tablet:gap-0 tablet:py-[22px]"
           >
-            <span className="flex items-baseline gap-[12px] text-[26px] font-semibold uppercase leading-[1] tracking-[-0.04em] tablet:pr-[30px] tablet:text-[34px] desktop:text-[44px]">
+            <span className="flex items-baseline gap-[12px] text-[26px] font-semibold uppercase leading-[1] tracking-[-0.045em] tablet:pr-[30px] tablet:text-[34px] desktop:text-[44px]">
               <span
                 aria-hidden
-                className="text-[0.7em] opacity-0 transition-opacity duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:opacity-100 group-focus-visible:opacity-100"
+                className="text-[0.7em] opacity-0 transition-opacity duration-200 ease-[var(--courbe-vive)] group-hover:opacity-100 group-focus-visible:opacity-100"
               >
                 →
               </span>
-              <span className="-ml-[calc(0.7em+12px)] transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:translate-x-[calc(0.7em+12px)] group-focus-visible:translate-x-[calc(0.7em+12px)]">
+              <span className="-ml-[calc(0.7em+12px)] transition-transform duration-200 ease-[var(--courbe-vive)] group-hover:translate-x-[calc(0.7em+12px)] group-focus-visible:translate-x-[calc(0.7em+12px)]">
                 {entree.libelle}
               </span>
             </span>
             <span
-              className={`text-[15px] font-medium leading-[1.4] tracking-[-0.01em] tablet:pl-[30px] desktop:pl-[40px] ${attenue}`}
+              className={`text-[16px] font-medium leading-[1.4] tracking-[-0.01em] tablet:pl-[30px] desktop:pl-[40px] ${attenue}`}
             >
               {entree.accroche}
             </span>

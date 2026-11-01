@@ -33,15 +33,16 @@ export default async function HubMetiers() {
       />
       <SvgSprite />
       <Header site={site} />
+      <FloatingNav site={site} />
       <main id="main-content" tabIndex={-1}>
         <section className="relative flex min-h-[calc(56svh/var(--zoom-ecran,1))] items-end overflow-hidden bg-background px-[20px] pb-[50px] pt-[140px] text-foreground tablet:px-[24px] tablet:pb-[70px] desktop:px-[30px]">
           <GradientWaveBackdrop seed={41} />
-          <Grain opacity={0.05} className="z-[1]" />
+          <Grain className="z-[1]" />
           <div className="relative z-[2] mx-auto grid w-full max-w-[1440px] gap-[20px] tablet:grid-cols-2 tablet:items-end">
-            <h1 className="accent-room m-0 max-w-[620px] text-[52px] font-semibold uppercase leading-[0.85] tracking-[-0.05em] tablet:pr-[30px] tablet:text-[66px] desktop:text-[86px]">
+            <h1 className="accent-room m-0 max-w-[620px] text-[52px] titre-marque tablet:pr-[30px] tablet:text-[66px] desktop:text-[86px]">
               {hubMetiers.h1}
             </h1>
-            <p className="m-0 max-w-[46ch] text-[17px] font-medium leading-[1.4] tracking-[-0.01em] text-white/70 tablet:pl-[30px] desktop:pl-[40px]">
+            <p className="m-0 max-w-[46ch] text-[18px] font-medium leading-[1.4] tracking-[-0.01em] text-white/70 tablet:pl-[30px] desktop:pl-[40px]">
               {hubMetiers.resume}
             </p>
           </div>
@@ -54,11 +55,11 @@ export default async function HubMetiers() {
             <h2 className="sr-only">{hubMetiers.besoins.titre}</h2>
             <PlanMetiers entrees={pagesBesoin} />
             <div className="grid gap-[12px] tablet:grid-cols-2">
-              <h2 className="accent-room m-0 text-[26px] font-semibold uppercase leading-[0.95] tracking-[-0.04em] tablet:pr-[30px] tablet:text-[34px]">
+              <h2 className="accent-room m-0 text-[26px] titre-marque tablet:pr-[30px] tablet:text-[34px]">
                 {hubMetiers.autre.titre}
               </h2>
               <div className="flex flex-col items-start gap-[14px] tablet:pl-[30px] desktop:pl-[40px]">
-                <p className="m-0 max-w-[46ch] text-[15px] font-medium leading-[1.45] tracking-[-0.01em] text-white/70">
+                <p className="m-0 max-w-[46ch] text-[16px] font-medium leading-[1.45] tracking-[-0.01em] text-white/70">
                   {hubMetiers.autre.corps}
                 </p>
                 <Link
@@ -73,7 +74,6 @@ export default async function HubMetiers() {
         </section>
       </main>
       <Footer sujetRendezVous="logiciel" />
-      <FloatingNav site={site} />
     </>
   );
 }

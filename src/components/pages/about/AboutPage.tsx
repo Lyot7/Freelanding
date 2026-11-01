@@ -1,7 +1,5 @@
 import { ImageProgressive } from "@/components/ui/ImageProgressive";
 import Link from "next/link";
-import { ArticlesSection } from "@/components/sections/ArticlesSection";
-import { ServicesSection } from "@/components/sections/ServicesSection";
 import { TestimonialsSection } from "@/components/sections/TestimonialsSection";
 import { FloatingNav, Footer, Header } from "@/components/layout";
 import { Grain } from "@/components/effects/Grain";
@@ -10,16 +8,13 @@ import { Highlighted } from "@/components/ui";
 import { siteFeatures } from "@/content/features";
 import { aboutHeroImageAlt } from "@/content/about";
 import { Reveal } from "@/components/motion/Reveal";
+import { DUREE } from "@/components/motion/tempo";
 import { LineReveal } from "@/components/motion/LineReveal";
-import { AnimatedCounter } from "@/components/motion/AnimatedCounter";
+import { Rouleaux } from "@/components/motion/Rouleaux";
 import { Signature } from "@/components/sections/hero/Signature";
 import { ScrollParallax } from "@/components/motion/ScrollParallax";
 import { content } from "@/lib/content";
-import type {
-  AboutContent,
-  BlogPost,
-  Stat,
-} from "@/lib/content/types";
+import type { AboutContent, Stat } from "@/lib/content/types";
 
 /*
  * FOND DU HERO. Il n'a pas de champ dans le modèle de contenu, contrairement à
@@ -33,7 +28,6 @@ import type {
 const HERO_IMAGE = "/images/eliott-nature-paysage.jpg";
 /** Le portrait est le sujet de la page : il se décrit, il n'est pas décoratif. */
 const HERO_IMAGE_ALT = aboutHeroImageAlt;
-const COUNTER_SPEEDS = [10, 12, 40, 10] as const;
 
 function AboutHero({ about }: { about: AboutContent }) {
   // Le sous-titre et ses fragments en emphase viennent de la DONNÉE. Ils
@@ -81,7 +75,7 @@ function AboutHero({ about }: { about: AboutContent }) {
         className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[55%] bg-gradient-to-t from-black/80 via-black/35 to-transparent"
       />
       {/* RELEVÉ sur `/about` : hôte 1440 × 810, z-1, opacité 0,09. */}
-      <Grain opacity={0.09} className="z-[1]" />
+      <Grain className="z-[1]" />
       <span
         aria-hidden
         className="absolute inset-y-0 left-1/2 z-[2] hidden w-px bg-white/20 tablet:block"
@@ -109,7 +103,7 @@ function AboutHero({ about }: { about: AboutContent }) {
               dans la donnée, ouvre le titre à la taille du chapô, puis vient
               « À propos. » à 98 px. Le nom et le métier à 98 px en capitales
               déborderaient la demi-colonne mobile. */}
-          <h1 className="col-start-1 m-0 text-[63px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] text-foreground tablet:col-start-2 tablet:text-[78px] desktop:text-[98px]">
+          <h1 className="col-start-1 m-0 text-[63px] titre-marque text-foreground tablet:col-start-2 tablet:text-[78px] desktop:text-[98px]">
             {about.hero.eyebrow ? (
               <span className="mb-[16px] block text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground-60">
                 {about.hero.eyebrow}
@@ -125,14 +119,13 @@ function AboutHero({ about }: { about: AboutContent }) {
             appearId="about-hero-chapo"
             className="grid w-full grid-cols-1 tablet:grid-cols-2"
             initialOpacity={0.001}
-            initialY={28}
-            duration={0.8}
-            delay={0.24}
+            duration={DUREE.texte}
+            delay={0.12}
           >
             {/* Largeur déjà conforme (310 px). En revanche le texte était en
                 blanc PLEIN : le live le pose à 60 % et n'y met en blanc que les
                 fragments d'emphase portés par la donnée. */}
-            <p className="max-w-[310px] text-left text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60 tablet:justify-self-end tablet:text-right">
+            <p className="max-w-[310px] text-left text-[14px] font-medium leading-[1.35] tracking-[-0.01em] text-foreground-60 tablet:justify-self-end tablet:text-right">
               <Highlighted text={subtitleText} highlights={subtitleEmphasis} />
             </p>
           </Reveal>
@@ -142,26 +135,19 @@ function AboutHero({ about }: { about: AboutContent }) {
   );
 }
 
-function StatCell({ stat, speedMs }: { stat: Stat; speedMs: number }) {
+function StatCell({ stat }: { stat: Stat }) {
   return (
     // Chiffre MESURÉ sur la source : 34 / 52 / 54 px, graisse 600, chasse
     // -0,07em et interligne `normal` (71px de haut à 54px, soit ~1,31 — pas 1).
     // La cellule n'a pas de hauteur minimale ; l'écart interne passe de 12 à 15.
     <div className="flex flex-col items-start justify-start gap-[12px] tablet:gap-[15px]">
-      <AnimatedCounter
-        value={stat.value}
-        speedMs={speedMs}
-        // Hauteur RÉSERVÉE au chiffre sous 810. L'explication d'origine était
-        // inversée : re-mesuré à 390, l'hôte du compteur de la SOURCE fait 44 de
-        // haut avec 8 px d'écart au libellé, le nôtre 40 avec 12. Ce n'est donc
-        // pas la source qui borne à 40, c'est notre 40 + 12 qui reproduit son
-        // 44 + 8 — même somme, donc libellé au même endroit et pas de rangée
-        // identique des deux côtés (111 px). Le résultat était juste, le
-        // raisonnement non. À partir de 810 la boîte naturelle vaut 67 puis 70,
-        // exactement comme la source : on la laisse libre.
-        className="flex h-[40px] text-[34px] font-semibold leading-[normal] tracking-[-0.07em] text-background tablet:h-auto tablet:text-[52px] desktop:text-[54px]"
+      <Rouleaux
+        valeur={stat.value}
+        // Hauteur RÉSERVÉE au chiffre sous 810 : 40 + 12 d'écart placent le
+        // libellé au même endroit que la source. Au-dessus, la boîte naturelle.
+        className="h-[40px] text-[34px] font-semibold leading-[normal] tracking-[-0.045em] text-background tablet:h-auto tablet:text-[52px] desktop:text-[54px]"
       />
-      <p className="w-[150px] text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-[rgba(11,11,11,0.6)]">
+      <p className="w-[150px] text-[14px] font-medium leading-[1.35] tracking-[-0.01em] text-[rgba(11,11,11,0.6)]">
         {stat.label}
       </p>
     </div>
@@ -198,7 +184,7 @@ export function AboutStory({ about }: { about: AboutContent }) {
       <div className="relative flex w-full max-w-[1440px] flex-col">
         {/* Surtitre du bloc récit (« Contact us » dans la source) : lu dans la
             donnée, il était recopié en dur en anglais. */}
-        <p className="pb-[12px] text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-black/60 tablet:pb-[30px]">
+        <p className="pb-[12px] micro text-black/60 tablet:pb-[30px]">
           {about.storyEyebrow}
         </p>
 
@@ -212,10 +198,8 @@ export function AboutStory({ about }: { about: AboutContent }) {
               as="p"
               // 22 / 26 / 32 px. La chasse mobile est plus serrée (-0,02em) que
               // celle des paliers supérieurs (-0,01em) sur la source.
-              className="w-full max-w-[900px] pb-[16px] text-[22px] font-medium leading-[1.2] tracking-[-0.02em] tablet:pb-[40px] tablet:leading-[1.1] tablet:text-[26px] tablet:tracking-[-0.01em] desktop:text-[32px]"
+              className="w-full max-w-[900px] pb-[16px] text-[22px] font-medium leading-[1.2] tracking-[-0.01em] tablet:pb-[40px] tablet:leading-[1.1] tablet:text-[26px] tablet:tracking-[-0.01em] desktop:text-[32px]"
               initialOpacity={0}
-              initialY={30}
-              duration={0.75}
             >
               {lead}
             </Reveal>
@@ -226,7 +210,7 @@ export function AboutStory({ about }: { about: AboutContent }) {
           {suite.filter(Boolean).map((paragraph) => (
             <p
               key={paragraph}
-              className="m-0 max-w-[62ch] text-[16px] font-medium leading-[1.45] tracking-[-0.01em] text-background/70 tablet:text-[17px]"
+              className="m-0 max-w-[62ch] text-[16px] font-medium leading-[1.45] tracking-[-0.01em] text-background/70 tablet:text-[18px]"
             >
               <Highlighted
                 text={paragraph}
@@ -298,7 +282,7 @@ export function AboutStory({ about }: { about: AboutContent }) {
               >
                 {/* RELEVÉ sur `/about` : hôte 345 × 436 à 1440, z-3,
                     opacité 0,09 (nous étions à 0,08). */}
-                <Grain opacity={0.09} className="z-[3]" />
+                <Grain matiere="photo" className="z-[3]" />
               </ParallaxCover>
               {/* `surface-dark` : la signature est posée SUR la photo, qui ne
                   déclare aucun fond. Sans cette classe, elle hérite du gris
@@ -311,12 +295,8 @@ export function AboutStory({ about }: { about: AboutContent }) {
           {/* Gouttière de colonne NULLE sur la source, et interligne de rangée
               qui s'ouvre avec la largeur : 30 / 50 / 70. */}
           <div className="grid grid-cols-2 gap-x-0 gap-y-[30px] tablet:gap-y-[50px] tablet:pt-[50px] desktop:gap-y-[70px] desktop:pt-[100px]">
-            {about.stats.map((stat, index) => (
-              <StatCell
-                key={stat.label}
-                stat={stat}
-                speedMs={COUNTER_SPEEDS[index] ?? 10}
-              />
+            {about.stats.map((stat) => (
+              <StatCell key={stat.label} stat={stat} />
             ))}
           </div>
         </div>
@@ -340,9 +320,8 @@ export function AboutParcours({
   parcours: NonNullable<AboutContent["parcours"]>;
 }) {
   return (
-    // FOND CLAIR, dans le prolongement du récit : la section Services qui suit
-    // ouvre sur une encoche claire en haut à gauche, qui raccorde au gris du
-    // bloc précédent. Une section sombre intercalée l'aurait laissée orpheline.
+    // FOND CLAIR, dans le prolongement du récit. La page finit ici : le pied de
+    // page et sa lettre signée prennent le relais.
     <section className="relative flex w-full justify-center bg-muted px-[20px] pb-[50px] pt-[20px] text-background tablet:px-[24px] tablet:pb-[90px] tablet:pt-[40px] desktop:px-[30px] desktop:pb-[120px]">
       <span
         aria-hidden
@@ -350,14 +329,14 @@ export function AboutParcours({
       />
       <div className="relative grid w-full max-w-[1440px] grid-cols-1 gap-[36px] tablet:grid-cols-2 tablet:gap-0">
         <div className="flex flex-col gap-[12px] tablet:sticky tablet:top-[100px] tablet:items-end tablet:self-start tablet:pr-[30px] desktop:pr-[40px]">
-          <p className="text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/60">
+          <p className="micro text-background/60">
             {parcours.eyebrow}
           </p>
           <LineReveal
             as="h2"
             lines={[...parcours.titleLines]}
-            className="m-0 flex w-full flex-col p-0 text-left text-[52px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] tablet:text-right tablet:text-[64px] desktop:text-[92px]"
-            lineClassName="w-full overflow-hidden leading-[0.82]"
+            className="m-0 flex w-full flex-col p-0 text-left titre-marque titre-section tablet:text-right "
+            lineClassName="w-full overflow-hidden leading-display"
           />
         </div>
 
@@ -374,7 +353,7 @@ export function AboutParcours({
                   depuis le 2026-10-16 (demande d'Eliott) : chaque groupe ouvre
                   sur un vrai titre, son nombre d'étapes et un filet plein, là
                   où un surtitre gris de 12 px les laissait se confondre. */}
-              <h3 className="m-0 flex items-baseline justify-between gap-[12px] border-b-2 border-background pb-[14px] text-[26px] font-semibold uppercase leading-none tracking-[-0.04em] text-background desktop:text-[32px]">
+              <h3 className="m-0 flex items-baseline justify-between gap-[12px] border-b-2 border-background pb-[14px] text-[26px] font-semibold uppercase leading-none tracking-[-0.045em] text-background desktop:text-[32px]">
                 {groupe.titre}
                 <span className="text-[12px] font-medium tracking-[-0.01em] text-background/60 tabular-nums">
                   {String(groupe.etapes.length).padStart(2, "0")}
@@ -386,7 +365,7 @@ export function AboutParcours({
                     key={`${etape.structure}-${etape.periode}`}
                     className="grid grid-cols-1 gap-[8px] border-t border-black/10 py-[18px] tablet:grid-cols-[130px_1fr] tablet:gap-x-[20px] desktop:grid-cols-[180px_1fr] desktop:py-[22px]"
                   >
-                    <p className="m-0 text-[12px] font-medium uppercase leading-[1.3] tracking-[-0.01em] text-background/60 tablet:pt-[6px]">
+                    <p className="m-0 micro text-background/60 tablet:pt-[6px]">
                       {etape.periode}
                     </p>
                     <div className="flex min-w-0 flex-col gap-[6px]">
@@ -394,29 +373,29 @@ export function AboutParcours({
                         {etape.href ? (
                           <Link
                             href={etape.href}
-                            className="text-[20px] font-medium leading-[1.2] tracking-[-0.02em] text-background underline decoration-black/30 underline-offset-[5px] transition-colors duration-200 hover:decoration-background tablet:text-[22px] desktop:text-[26px]"
+                            className="text-[22px] font-medium leading-[1.2] tracking-[-0.01em] text-background underline decoration-black/30 underline-offset-[5px] transition-colors duration-200 hover:decoration-background tablet:text-[22px] desktop:text-[26px]"
                           >
                             {etape.structure}
                           </Link>
                         ) : (
-                          <p className="m-0 text-[20px] font-medium leading-[1.2] tracking-[-0.02em] text-background tablet:text-[22px] desktop:text-[26px]">
+                          <p className="m-0 text-[22px] font-medium leading-[1.2] tracking-[-0.01em] text-background tablet:text-[22px] desktop:text-[26px]">
                             {etape.structure}
                           </p>
                         )}
-                        <span className="rounded-[50px] border border-black/20 px-[10px] py-[4px] text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/60">
+                        <span className="rounded-[50px] border border-black/20 px-[10px] py-[4px] micro text-background/60">
                           {etape.nature}
                         </span>
                       </div>
-                      <p className="m-0 text-[15px] font-medium leading-[1.35] tracking-[-0.01em] text-background">
+                      <p className="m-0 text-[16px] font-medium leading-[1.35] tracking-[-0.01em] text-background">
                         {etape.role}
                       </p>
                       {etape.lieu ? (
-                        <p className="m-0 text-[12px] font-medium uppercase leading-[1.3] tracking-[-0.01em] text-background/60">
+                        <p className="m-0 micro text-background/60">
                           {etape.lieu}
                         </p>
                       ) : null}
                       {etape.apport ? (
-                        <p className="m-0 mt-[6px] max-w-[60ch] text-[15px] font-medium leading-[1.45] tracking-[-0.01em] text-background/70">
+                        <p className="m-0 mt-[6px] max-w-[60ch] text-[16px] font-medium leading-[1.45] tracking-[-0.01em] text-background/70">
                           {etape.apport}
                         </p>
                       ) : null}
@@ -444,39 +423,21 @@ export function AboutParcours({
   );
 }
 
-function selectArticles(
-  posts: BlogPost[],
-  featuredSlugs: readonly string[],
-): BlogPost[] {
-  return featuredSlugs
-    .map((slug) => posts.find((post) => post.slug === slug))
-    .filter((post): post is BlogPost => Boolean(post));
-}
-
 export async function AboutPage() {
-  const [site, about, posts] = await Promise.all([
+  const [site, about] = await Promise.all([
     content.getSiteConfig(),
     content.getAbout(),
-    content.getPosts(),
   ]);
-  const articles = selectArticles(posts, about.articles.featuredSlugs);
 
   return (
     <>
       <Header site={site} />
+      <FloatingNav site={site} />
       {/* Cible du lien d'évitement (voir SkipLink.tsx et focus.css). */}
       <main id="main-content" tabIndex={-1}>
         <AboutHero about={about} />
         <AboutStory about={about} />
         {about.parcours ? <AboutParcours parcours={about.parcours} /> : null}
-        {/* Pas de barre d'accent orange ici : mesuré absent sur le live pour
-            cette page (le seul élément orange y est le bouton « START A PROJECT »). */}
-        <ServicesSection
-          services={about.services.items}
-          intro={about.services.intro}
-          eyebrow={about.services.eyebrow}
-          bottomAccent="muted"
-        />
         {/* Témoignage client : DEUX conditions, et il en faut deux. Le drapeau
             `siteFeatures.testimonials` suspend l'affichage ; `about.testimonial`
             dit s'il y a quelque chose à afficher. Le champ était obligatoire et
@@ -485,17 +446,8 @@ export async function AboutPage() {
         {siteFeatures.testimonials && about.testimonial ? (
           <TestimonialsSection testimonials={[about.testimonial]} />
         ) : null}
-        {/* Retrait haut MESURÉ à 30 en mobile sur `/about` (contre 40 sur la
-            home) : la section faisait 2119 sur la source à 390 et 2129 chez
-            nous, écart identique à 600 et 809. */}
-        {/* Teaser blog : suit le drapeau `blog` comme la section « actualités »
-            de la home (voir `src/content/features.ts`). */}
-        {siteFeatures.blog ? (
-          <ArticlesSection posts={articles} compactTop headingTabletPx={64} />
-        ) : null}
       </main>
       <Footer />
-      <FloatingNav site={site} />
     </>
   );
 }

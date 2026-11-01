@@ -18,7 +18,7 @@ export function Lien({ href, children }: { href?: string; children?: ReactNode }
   return (
     <a
       href={href}
-      className="text-background underline decoration-background/30 underline-offset-[3px] transition-colors duration-200 ease-[cubic-bezier(0.44,0,0.56,1)] hover:text-accent-ink hover:decoration-accent-ink motion-reduce:transition-none"
+      className="text-background underline decoration-background/30 underline-offset-[3px] transition-colors duration-200 ease-[var(--courbe-vive)] hover:text-accent-ink hover:decoration-accent-ink motion-reduce:transition-none"
       {...(href?.startsWith("http")
         ? { target: "_blank", rel: "noopener noreferrer" }
         : {})}

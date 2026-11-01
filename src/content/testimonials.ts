@@ -110,7 +110,7 @@ export const methodePromise: Testimonial = {
     // freelance chez / Bouquerel® » se lirait comme une erreur. Le composant
     // rend donc deux lignes, et n'écrit le liant « chez » que si une société
     // existe.
-    role: "Développeur freelance",
+    role: "Développeur à Caen",
     // PORTRAIT REMIS. Il avait été retiré parce que le template y montrait une
     // inconnue, présentée sous le nom d'Eliott. Cadré au rapport de la source
     // (136 / 167 = 0,814), servi en 408 × 501 pour rester net sur écran dense.

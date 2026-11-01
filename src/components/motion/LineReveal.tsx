@@ -3,10 +3,10 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import {
-  EASE_FRAMER,
   REVEAL_VIEWPORT_MARGIN,
   useRevealWillChange,
 } from "@/components/motion/Reveal";
+import { COURBE } from "@/components/motion/tempo";
 
 /**
  * Révélation d'un texte LIGNE PAR LIGNE, en décalé, comme la source.
@@ -59,7 +59,7 @@ export function LineReveal({
   initialY = 40,
   duration = 0.8,
   delay = 0.1,
-  delayStep = 0.1,
+  delayStep = 0.07,
 }: {
   /** Texte d'un seul tenant, découpé par MESURE du rendu. */
   text?: string;
@@ -241,7 +241,7 @@ export function LineReveal({
               shown: {
                 opacity: 1,
                 y: 0,
-                transition: { duration, ease: EASE_FRAMER },
+                transition: { duration, ease: COURBE.sortie },
               },
             }}
           >

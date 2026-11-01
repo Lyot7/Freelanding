@@ -23,6 +23,7 @@
 import { readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import ts from "typescript";
+import { howWeDoItStats, reputationStats } from "../src/content/stats.ts";
 import {
   normalise,
   verifie,
@@ -174,6 +175,24 @@ const cibles = [
 
 let totalCorrections = 0;
 const tousDefauts = [];
+
+/*
+ * LES COMPTEURS. Valeur et suffixe sont des chaînes séparées, et ni « 24h » ni un
+ * « % » seul n'accrochent les règles ci-dessus : c'est ainsi que « 24H » a été
+ * servi. Le rendu concaténé doit porter une fine insécable avant l'unité.
+ */
+for (const stat of [...howWeDoItStats, ...reputationStats]) {
+  const suffixe = stat.suffix ?? "";
+  const rendu = stat.value.endsWith(suffixe) ? stat.value : `${stat.value}${suffixe}`;
+  if (/\d[\s\u00A0]*[h%]$/u.test(rendu) && !/\d\u202F[h%]$/u.test(rendu)) {
+    tousDefauts.push({
+      id: "compteur-sans-fine",
+      quoi: "compteur : espace fine insécable attendue avant l'unité",
+      extrait: rendu,
+      fichier: "src/content/stats.ts",
+    });
+  }
+}
 for (const fichier of cibles) {
   const r = /\.mdx$/.test(fichier) ? traiteMdx(fichier) : traiteTs(fichier);
   totalCorrections += r.corrections;

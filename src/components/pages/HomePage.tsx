@@ -1,19 +1,15 @@
 import { Fragment, type ReactNode } from "react";
 import { SvgSprite } from "@/components/SvgSprite";
 import { FloatingNav, Footer, Header } from "@/components/layout";
-import { AboutSection } from "@/components/sections/AboutSection";
-import { ArticlesSection } from "@/components/sections/ArticlesSection";
+import Link from "next/link";
+import { ConfianceSection } from "@/components/sections/ConfianceSection";
 import { FaqSection } from "@/components/sections/FaqSection";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { LogicielSection } from "@/components/sections/LogicielSection";
 import { LogoBandSection } from "@/components/sections/LogoBandSection";
 import { MoyensSection } from "@/components/sections/MoyensSection";
-import { ServicesSection } from "@/components/sections/ServicesSection";
-import { ShowreelSection } from "@/components/sections/ShowreelSection";
-import { StatsSection } from "@/components/sections/StatsSection";
-import { TestimonialsSection } from "@/components/sections/TestimonialsSection";
-import { WhyUsSection } from "@/components/sections/WhyUsSection";
-import { WorksSection } from "@/components/sections/WorksSection";
+import { PreuvesSection } from "@/components/sections/PreuvesSection";
+import { RencontreSection } from "@/components/sections/RencontreSection";
 import { content } from "@/lib/content";
 
 /**
@@ -24,17 +20,13 @@ import { content } from "@/lib/content";
  * HTML/CSS/JS utilisée pour vérifier chaque traduction.
  */
 export async function HomePage() {
-  const [site, home, allWorks, posts] = await Promise.all([
+  const [site, home, posts] = await Promise.all([
     content.getSiteConfig(),
     content.getHome(),
-    content.getWorks(),
     content.getPosts(),
   ]);
 
-  const works = home.featuredWorkSlugs.map((slug) =>
-    allWorks.find((work) => work.slug === slug),
-  ).filter((work): work is NonNullable<typeof work> => Boolean(work));
-  const featuredPosts = home.articles.featuredSlugs.map((slug) =>
+  const featuredPosts = home.lectures.slugs.map((slug) =>
     posts.find((post) => post.slug === slug),
   ).filter((post): post is NonNullable<typeof post> => Boolean(post));
 
@@ -54,36 +46,30 @@ export async function HomePage() {
         }
       />
     ),
-    about: <AboutSection about={home.about} />,
-    showreel: <ShowreelSection showreel={home.showreel} />,
-    works: <WorksSection works={works} />,
+    logiciel: home.logiciel ? <LogicielSection logiciel={home.logiciel} bottomAccent="muted" /> : null,
     moyens: <MoyensSection moyens={home.moyens} />,
-    whyUs: <WhyUsSection whyUs={home.whyUs} />,
-    services: (
-      <ServicesSection
-        services={home.services.items}
-        intro={home.services.intro}
-        eyebrow={home.services.eyebrow}
-        /* BANDES ACCORDÉES AUX VOISINES depuis le 2026-09-24 : l'accordéon suit
-           désormais `about` (aplat accent) et précède le showreel (clair). La
-           bande du haut prolonge donc l'accent, celle du bas annonce le clair. */
-        topAccent="accent"
-        bottomAccent="muted"
+    preuves: <PreuvesSection preuves={home.preuves} />,
+    confiance: <ConfianceSection confiance={home.confiance} />,
+    rencontre: <RencontreSection rencontre={home.rencontre} />,
+    faq: (
+      <FaqSection
+        faq={home.faq ?? []}
+        topAccent={false}
+        aside={
+          <nav aria-label={home.lectures.titre} className="hidden flex-col gap-[12px] tablet:flex">
+            <p className="micro m-0 text-background/60">{home.lectures.titre}</p>
+            {featuredPosts.map((post) => (
+              <Link key={post.slug} href={`/blog/${post.slug}`} className="cta-lien w-fit text-background">
+                {post.title}
+              </Link>
+            ))}
+            <Link href="/blog" className="cta-lien w-fit text-background">
+              {home.lectures.tous}
+            </Link>
+          </nav>
+        }
       />
     ),
-    /* « Pourquoi moi », sur fond clair, suit la section noire : la bande claire
-       du bas l'annonce. */
-    logiciel: home.logiciel ? (
-      <LogicielSection logiciel={home.logiciel} bottomAccent="muted" />
-    ) : null,
-    numbers: <StatsSection numbers={home.numbers} />,
-    /* Pas de bande en tête de la FAQ sur l'accueil : elle suit « Pourquoi
-       moi », déjà clair, et la bande y recouvrait le bas de sa carte droite. */
-    faq: <FaqSection faq={home.faq ?? []} topAccent={false} />,
-    testimonials: home.testimonials ? (
-      <TestimonialsSection testimonials={home.testimonials.items} />
-    ) : null,
-    articles: <ArticlesSection posts={featuredPosts} />,
   } satisfies Record<string, ReactNode>;
 
   return (
@@ -94,6 +80,7 @@ export async function HomePage() {
           autres routes rendent le header sans appear-id, et le relevé rAF du
           live le confirme au runtime). Voir la prop `appear` de `Header`. */}
       <Header site={site} appear />
+      <FloatingNav site={site} />
       {/* Cible du lien d'évitement (voir SkipLink.tsx et focus.css). */}
       <main id="main-content" tabIndex={-1}>
         {home.sectionOrder.map((section) => (
@@ -103,7 +90,6 @@ export async function HomePage() {
         ))}
       </main>
       <Footer />
-      <FloatingNav site={site} />
     </>
   );
 }

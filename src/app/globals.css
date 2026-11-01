@@ -5,27 +5,32 @@
 @import "./polices.css";
 
 /* ============================================================
-   Design tokens — extraits fidèlement du site d'origine (Framer)
-   Source de vérité unique. Re-brandable : changer ces valeurs.
+   Jetons de la charte. Référence : la carte de visite, voir `DESIGN.md`.
+   Source de vérité unique des couleurs, du rythme et des titres.
    ============================================================ */
 :root {
-  /* Couleurs — tokens système Framer */
+  /* Le tempo du site : mêmes valeurs que `src/components/motion/tempo.ts`. */
+  --courbe-sortie: cubic-bezier(0.16, 1, 0.3, 1);
+  --courbe-vive: cubic-bezier(0.23, 1, 0.32, 1);
+
   --background: #0b0b0b;
   --foreground: #ffffff;
-  /* Accent — le volt de la marque d'Eliott. Le template posait ici l'orange
-     #ff4500 ; il n'a plus de raison d'être sur son site. */
+  /* Le volt, l'accent unique de la marque. */
   --accent: #c8f24a;
   /* Texte posé SUR l'accent. Le volt est clair : le blanc y tombe à 1,29:1,
-     donc illisible. L'encre du système d'identité donne 14,43:1. */
+     donc illisible. L'encre donne 14,43:1. */
   --accent-ink: #10140a;
-  /* Volt — l'accent unique de la marque d'Eliott, repris de son système
-     d'identité (`landing/public/_logos/DESIGN-SYSTEM.md`, palette « Signal »).
-     Première version posée à #d2ff37, la valeur lue dans la pastille de crédit
-     du pied de page du template : c'était la couleur de quelqu'un d'autre.
-     Règle d'or du système : le volt est un SIGNAL, jamais un aplat large. Il
-     ponctue (logo, sélection de texte, accents ponctuels). */
-  --volt: #c8f24a;
-  --muted: #e9e9e9;
+  /* Alias le temps de la migration : tout est désormais porté par `--accent`. */
+  --volt: var(--accent);
+  /* Papier : texte encre à 16,25:1. */
+  --muted: #eff0e9;
+  /* Volt lu SUR papier (4,94:1) : le volt pur n'y est jamais lisible. */
+  --volt-texte: #55700c;
+
+  /* Interligne des titres : un « É » en Geist 900 monte à 0,93 em, 0,96 lui laisse de l’air. */
+  --interligne-titre: 0.96;
+  /* Rythme vertical d'une section : voir `.py-section`. */
+  --section-y: 60px;
 
   /* Surfaces (dark alt) */
   --surface-1: #0e0e0e;
@@ -40,13 +45,20 @@
   --background-60: rgba(11, 11, 11, 0.6);
 }
 
+@media (min-width: 810px) {
+  :root {
+    --section-y: 90px;
+  }
+}
+
 @theme inline {
   /* Couleurs */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-accent: var(--accent);
   --color-accent-ink: var(--accent-ink);
-  --color-volt: var(--volt);
+  --color-volt: var(--accent);
+  --color-volt-texte: var(--volt-texte);
   --color-muted: var(--muted);
   --color-surface-1: var(--surface-1);
   --color-surface-2: var(--surface-2);
@@ -54,10 +66,9 @@
   --color-text-secondary: var(--text-secondary);
   --color-foreground-60: var(--foreground-60);
 
-  /* Fonts — stack EXACTE du live (voir polices.css). Le paquet npm `geist` sert
-     la variable font de Vercel, dont les métriques diffèrent des fichiers
-     statiques Google Fonts utilisés par la source : mêmes dessins, largeurs de
-     texte différentes, donc retours à la ligne différents. */
+  /* Fichiers statiques de Geist (voir polices.css) : le paquet npm `geist` sert
+     une variable font aux métriques différentes, donc d'autres retours à la
+     ligne. */
   --font-sans: "Geist", "Geist Placeholder", sans-serif;
   --font-mono: "Geist Mono", monospace;
 
@@ -69,26 +80,22 @@
   --text-lg: 18px;
   --text-xl: 22px;
   --text-2xl: 26px;
-  --text-3xl: 32px;
-  --text-4xl: 44px;
-  --text-5xl: 52px;
-  --text-6xl: 68px;
-  --text-7xl: 92px;
-  --text-8xl: 100px;
+  --text-3xl: 40px;
+  --text-4xl: 58px;
+  --text-5xl: 92px;
 
   /* Line-height */
-  --leading-display: 0.82;
+  --leading-display: var(--interligne-titre);
   --leading-tight: 1.1;
   --leading-normal: 1.2;
   --leading-prose: 1.3;
 
   /* Letter-spacing */
-  --tracking-tightest: -0.07em;
-  --tracking-tighter: -0.05em;
-  --tracking-tight: -0.02em;
+  --tracking-tighter: -0.045em;
   --tracking-normal: -0.01em;
+  --tracking-micro: 0.14em;
 
-  /* Radius (anguleux : 0, pilule 50px, rond) */
+  /* Radius : angles droits, ronds pour les avatars et les flèches. */
   --radius-none: 0px;
   --radius-pill: 50px;
   --radius-full: 100%;
@@ -176,6 +183,253 @@ body {
 html,
 body {
   overflow-x: clip;
+}
+
+/* Une cible atteinte au clavier ne finit jamais sous le dock flottant. */
+html {
+  scroll-padding-bottom: 96px;
+}
+
+/* En couche de base : `[text-wrap:balance]` doit pouvoir la surcharger. */
+@layer base {
+  p {
+    text-wrap: pretty;
+  }
+}
+
+/* ============================================================
+   Titres et micro-libellés : la signature de la carte de visite.
+
+   HORS COUCHE, comme `focus.css` : ces classes sont une décision de marque et
+   l'emportent sur les utilitaires. Une seule échelle de h2 sur tout le site.
+   ============================================================ */
+.titre-marque {
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.045em;
+  line-height: var(--interligne-titre);
+}
+
+.titre-section {
+  font-size: clamp(40px, calc(12vw / var(--zoom-ecran, 1)), 52px);
+}
+
+@media (min-width: 810px) {
+  .titre-section {
+    font-size: clamp(48px, calc(6vw / var(--zoom-ecran, 1)), 92px);
+  }
+}
+
+/* Sans couleur : elle vient de la surface. */
+.micro {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  line-height: 1.4;
+}
+
+.py-section {
+  padding-block: var(--section-y);
+}
+
+/* ============================================================
+   Trois boutons. Un seul volt plein par écran, et le blanc plein n'est jamais
+   un bouton. L'encre remplace le volt sur papier et sur volt : `.bg-background`
+   reprend la main pour une carte noire posée sur une section claire.
+   ============================================================ */
+.cta-primaire {
+  --cta-fond: var(--accent);
+  --cta-texte: var(--accent-ink);
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  padding-inline: 20px;
+  background-color: var(--cta-fond);
+  color: var(--cta-texte);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: transform 160ms ease-out, background-color 200ms ease;
+}
+
+.bg-muted .cta-primaire,
+.bg-accent .cta-primaire,
+.surface-light .cta-primaire {
+  --cta-fond: var(--accent-ink);
+  --cta-texte: var(--foreground);
+}
+
+.bg-background .cta-primaire,
+.surface-dark .cta-primaire {
+  --cta-fond: var(--accent);
+  --cta-texte: var(--accent-ink);
+}
+
+.cta-secondaire {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding-inline: 16px;
+  border: 1px solid color-mix(in srgb, currentColor 30%, transparent);
+  color: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: transform 160ms ease-out, border-color 200ms ease;
+}
+
+/* LE VRAI SOULIGNEMENT. Le trait part par la droite et revient par la gauche, en
+   440 ms ; `::before` étend la zone de clic sans toucher à la mise en page. */
+.cta-lien {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+}
+.cta-lien::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block: -14px;
+}
+.cta-lien::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: -3px;
+  height: 1px;
+  background-color: currentColor;
+}
+@keyframes cta-trait {
+  0% { transform: scaleX(1); transform-origin: right; }
+  45.4% { transform: scaleX(0); transform-origin: right; }
+  45.5% { transform: scaleX(0); transform-origin: left; }
+  100% { transform: scaleX(1); transform-origin: left; }
+}
+
+/* La flèche sortante : la première part en haut à droite, sa copie arrive d'en
+   bas à gauche, dans un carré d'un em. */
+.fleche-sortante {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  width: 1em;
+  height: 1em;
+  overflow: hidden;
+  vertical-align: -0.12em;
+}
+.fleche-sortante > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transition: transform 300ms var(--courbe-sortie);
+}
+.fleche-sortante > svg:last-child {
+  transform: translate(-110%, 110%);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cta-primaire:hover {
+    background-color: color-mix(in oklab, var(--cta-fond) 88%, white);
+  }
+  .cta-secondaire:hover {
+    border-color: currentColor;
+  }
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .cta-lien:hover::after,
+  a:hover .cta-lien::after {
+    animation: cta-trait 440ms var(--courbe-vive);
+  }
+  a:hover .fleche-sortante > svg:first-child {
+    transform: translate(110%, -110%);
+  }
+  a:hover .fleche-sortante > svg:last-child {
+    transform: none;
+  }
+}
+
+.cta-primaire:active,
+.cta-secondaire:active {
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cta-primaire,
+  .cta-secondaire {
+    transition: none;
+  }
+  .cta-primaire:active,
+  .cta-secondaire:active {
+    transform: none;
+  }
+}
+
+/* Cible de 44 px au doigt, sans bouger la mise en page. À ne pas poser sous un
+   parent `overflow-hidden`, qui couperait la zone agrandie. */
+@media (pointer: coarse) {
+  .cible-44 {
+    position: relative;
+  }
+  .cible-44::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(100%, 44px);
+    height: 44px;
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* ============================================================
+   Dock flottant : l'action s'ouvre à gauche du menu une fois la démonstration
+   passée. Largeur en `grid-template-columns`, pour animer vers une largeur de
+   contenu ; le texte arrive 80 ms après.
+   ============================================================ */
+.dock-action {
+  display: grid;
+  grid-template-columns: 0fr;
+  transition: grid-template-columns 280ms var(--courbe-vive);
+}
+.dock-action[data-ouvert="true"] {
+  grid-template-columns: 1fr;
+}
+.dock-action > * {
+  min-width: 0;
+  overflow: hidden;
+}
+.dock-action-texte {
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+.dock-action[data-ouvert="true"] .dock-action-texte {
+  opacity: 1;
+  transition: opacity 200ms ease 80ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  .dock-action,
+  .dock-action-texte {
+    transition: none !important;
+  }
 }
 
 /* ============================================================
@@ -354,12 +608,12 @@ body {
 
    MAIS ce raisonnement ne vaut que sur fond sombre, et la moitié du site ne
    l'est pas : deux sections sont un aplat volt plein (« À propos » et les
-   chiffres), et une bonne vingtaine d'autres surfaces sont en `--muted`
-   (#e9e9e9). Le surlignage y disparaît, pour une raison purement
+   chiffres), et une bonne vingtaine d'autres surfaces sont en `--muted`.
+   Le surlignage y disparaît, pour une raison purement
    photométrique — sa luminance est presque exactement celle du fond :
 
      volt sur `--accent` (#c8f24a) : 1,00:1  → strictement invisible
-     volt sur `--muted`   (#e9e9e9) : 1,06:1  → indiscernable en clarté
+     volt sur `--muted`              : 1,06:1  → indiscernable en clarté
 
    Sur le volt, seule la couleur du texte change et l'utilisateur ne voit plus
    du tout ce qu'il a sélectionné. Sur le gris clair, seule la teinte distingue
@@ -371,7 +625,7 @@ body {
    contraste redevient franc :
 
      encre sur `--accent`  : 14,43:1  → AAA
-     encre sur `--muted`   : 15,56:1  → AAA
+     encre sur `--muted`   : 16,25:1  → AAA
 
    MÉCANIQUE — deux variables plutôt qu'une liste de sélecteurs `::selection`.
    Les propriétés personnalisées HÉRITENT jusqu'au pseudo-élément : il suffit
@@ -387,12 +641,12 @@ body {
    la règle entière si elle était groupée avec.
    ============================================================ */
 ::selection {
-  background-color: var(--selection-bg, var(--volt));
+  background-color: var(--selection-bg, var(--accent));
   color: var(--selection-ink, var(--background));
 }
 
 ::-moz-selection {
-  background-color: var(--selection-bg, var(--volt));
+  background-color: var(--selection-bg, var(--accent));
   color: var(--selection-ink, var(--background));
 }
 
@@ -431,16 +685,14 @@ body {
 .bg-surface-1,
 .bg-surface-2,
 .surface-dark {
-  --selection-bg: var(--volt);
+  --selection-bg: var(--accent);
   --selection-ink: var(--background);
   --mark: var(--accent);
 }
 
 /* ============================================================
-   Meter "SLOTS" — pulse du slot actif (barre orange en cours de remplissage).
-   Le 5e segment est un composant Framer (smart component) dont l'anim runtime
-   n'a pas ete capturee par le miroir statique :8080 ; on la restaure ici.
-   Etat de REPOS (no-JS / reduced-motion) = orange plein visible (robuste).
+   Jauge de créneaux : pulsation du créneau actif.
+   État de repos (sans JavaScript, mouvement réduit) : barre pleine, visible.
    ============================================================ */
 /* Curseur de saisie du raccourci « Demande à ton assistant » (héros de
    l'accueil) : allumé la moitié du temps, sans fondu, comme un vrai curseur. */
@@ -514,7 +766,7 @@ body {
 }
 
 ::view-transition-old(root) {
-  animation: page-exit 0.2s cubic-bezier(0.27, 0, 0.51, 1) 0s both;
+  animation: page-exit 0.2s var(--courbe-vive) 0s both;
 }
 
 @keyframes page-enter {
@@ -529,7 +781,7 @@ body {
 }
 
 ::view-transition-new(root) {
-  animation: page-enter 0.4s cubic-bezier(0.75, 0.17, 0.3, 0.89) 0s both;
+  animation: page-enter 0.4s var(--courbe-sortie) 0s both;
   mask-image: linear-gradient(
     180deg,
     black calc(-100% + 200% * var(--page-wipe)),
@@ -672,7 +924,7 @@ body {
   }
 }
 .consent-entree {
-  animation: consent-entree 0.36s cubic-bezier(0.68, 0, 0, 1);
+  animation: consent-entree 0.36s var(--courbe-sortie);
 }
 html[data-consent-choisi] [data-consent-attente] {
   display: none;
@@ -732,8 +984,7 @@ html[data-consent-choisi] [data-consent-attente] {
 
 /* ============================================================
    Champ « select » du footer
-   Structure RELEVÉE sur le live (`.framer-form-select-wrapper`) : le
-   `<select>` lui-même n'a NI bordure NI chrome natif, tout est porté par le
+   Le `<select>` lui-même n'a NI bordure NI chrome natif, tout est porté par le
    wrapper.
    - `::after` dessine le contour, en `1px 1px 1px 0` : PAS de bord gauche
      (le champ s'ouvre sur l'axe central de la grille du footer).
@@ -828,30 +1079,28 @@ html[data-consent-choisi] [data-consent-attente] {
 }
 
 /* ---------------------------------------------------------------------------
-   Héros de l'accueil (2026-10-15) : une entrée orchestrée, en CSS pour tourner
-   hors du fil principal pendant l'hydratation. Délais portés par `--d`.
-   Courbe ease-out-expo : départ franc, arrivée douce, aucun rebond.
+   Héros de l'accueil : une entrée en CSS, pour tourner hors du fil principal
+   pendant l'hydratation. Le titre monte de ses masques en 600 ms, tout le reste
+   arrive d'un seul fondu de 240 ms à 200 ms, sans translation : le texte n'attend
+   pas, et seul le cadran bouge ensuite.
    --------------------------------------------------------------------------- */
 @keyframes hero-monte {
   from { transform: translateY(108%); }
   to { transform: none; }
 }
 @keyframes hero-fond {
-  from { opacity: 0; transform: translateY(14px); }
-  to { opacity: 1; transform: none; }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
-@keyframes hero-trait {
-  from { transform: scaleX(0); }
-  to { transform: scaleX(1); }
-}
-@keyframes hero-respire {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.35; }
+/* Un battement d'échappement : le carré se retient, puis repart. */
+@keyframes hero-cran {
+  0%, 20%, 100% { transform: scale(1); }
+  4% { transform: scale(0.66); }
+  12% { transform: scale(1.12); }
 }
 
 .hero-fond {
-  animation: hero-fond 760ms cubic-bezier(0.16, 1, 0.3, 1) both;
-  animation-delay: var(--d, 0ms);
+  animation: hero-fond 240ms var(--courbe-sortie) 200ms both;
 }
 
 /* Chaque ligne du titre monte depuis son propre masque. Les retraits haut et
@@ -864,91 +1113,27 @@ html[data-consent-choisi] [data-consent-attente] {
 }
 .hero-ligne > span {
   display: inline-block;
-  animation: hero-monte 980ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: hero-monte 600ms var(--courbe-sortie) both;
   animation-delay: var(--d, 0ms);
 }
-.hero-ligne-amorce {
-  color: var(--foreground-60);
-  transition: color 240ms ease;
-}
 
-/* Filet haut de chaque porte, tracé de gauche à droite ; le dernier ferme la
-   liste par le bas. Le trait volt du survol glisse dessus. */
-.hero-porte::before,
-.hero-porte:last-child::after {
-  content: "";
-  position: absolute;
-  inset-inline: 0;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.14);
-  transform-origin: left;
-  animation: hero-trait 1200ms cubic-bezier(0.16, 1, 0.3, 1) both;
-  animation-delay: var(--d, 0ms);
-}
-.hero-porte::before { top: 0; }
-.hero-porte:last-child::after { bottom: 0; }
-
-.hero-porte-titre {
-  transition: opacity 260ms ease, transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-.hero-porte-fleche {
-  transition:
-    background-color 220ms ease,
-    border-color 220ms ease,
-    color 220ms ease,
-    transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-.hero-porte:focus-visible .hero-porte-fleche {
-  background-color: var(--accent);
-  border-color: var(--accent);
-  color: var(--accent-ink);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .hero-porte:hover .hero-ligne-amorce { color: var(--foreground); }
-  .hero-porte:hover .hero-porte-titre { transform: translateX(10px); }
-  .hero-porte:hover .hero-porte-fleche {
-    background-color: var(--accent);
-    border-color: var(--accent);
-    color: var(--accent-ink);
-    transform: translateX(4px);
-  }
-  /* La porte visée s'allume, l'autre s'efface. */
-  .hero-portes:has(.hero-porte:hover) .hero-porte:not(:hover) .hero-porte-titre {
-    opacity: 0.32;
-  }
-  .hero-cta { transition: transform 160ms ease-out, background-color 200ms ease; }
-  .hero-cta:hover { background-color: color-mix(in oklab, var(--accent) 88%, white); }
-}
-.hero-cta:active { transform: scale(0.97); }
-
-/* Le carré volt du positionnement respire doucement : le seul mouvement
-   continu du héros, avec le mécanisme du fond. */
 .hero-pastille {
-  animation: hero-respire 2.8s ease-in-out 1.4s infinite;
+  animation: hero-cran 1000ms linear infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .hero-fond,
-  .hero-ligne > span,
-  .hero-porte::before,
-  .hero-porte:last-child::after {
-    animation: hero-fond-doux 400ms ease both;
+  .hero-ligne > span {
+    animation: hero-fond 240ms ease both;
     animation-delay: 0ms;
     transform: none;
   }
   .hero-pastille { animation: none; }
-  .hero-porte-titre,
-  .hero-porte-fleche { transition: none; }
-}
-@keyframes hero-fond-doux {
-  from { opacity: 0; }
-  to { opacity: 1; }
 }
 
 /* Bascule message / rendez-vous du pied de page. */
 .footer-onglet-pastille {
-  transition: transform 280ms cubic-bezier(0.23, 1, 0.32, 1);
+  transition: transform 280ms var(--courbe-vive);
 }
 .footer-onglet {
   transition: color 200ms ease;
@@ -957,11 +1142,11 @@ html[data-consent-choisi] [data-consent-attente] {
   transform: scale(0.97);
 }
 .footer-panneau:not([hidden]) {
-  animation: hero-fond 360ms cubic-bezier(0.23, 1, 0.32, 1) both;
+  animation: hero-fond 240ms var(--courbe-sortie) both;
 }
 @media (prefers-reduced-motion: reduce) {
   .footer-onglet-pastille { transition: none; }
-  .footer-panneau:not([hidden]) { animation: hero-fond-doux 200ms ease both; }
+  .footer-panneau:not([hidden]) { animation: hero-fond 200ms ease both; }
 }
 
 /* ---------------------------------------------------------------------------
@@ -969,26 +1154,53 @@ html[data-consent-choisi] [data-consent-attente] {
    onglet à l'autre ; le temps rendu monte jour après jour.
    --------------------------------------------------------------------------- */
 .logiciel-rendu {
-  transform-origin: bottom;
-  transition: transform 700ms cubic-bezier(0.23, 1, 0.32, 1);
+  transition: transform 700ms var(--courbe-vive);
 }
 .logiciel-jour {
-  transition: opacity 300ms ease-out;
+  transition: opacity 160ms ease-out;
 }
 .logiciel-gain {
   transition: background-color 300ms ease, color 300ms ease;
 }
 
 .logiciel-pastille {
-  transition: transform 280ms cubic-bezier(0.23, 1, 0.32, 1);
-}
-.logiciel-cta {
-  transition: transform 160ms ease-out;
-}
-.logiciel-cta:active {
-  transform: scale(0.97);
+  transition: transform 280ms var(--courbe-vive);
 }
 @media (prefers-reduced-motion: reduce) {
   .logiciel-pastille { transition: none; }
   .logiciel-rendu { transition: none; }
+}
+
+/* Le cadran du héros : après le recul, seule la trotteuse continue, cran par cran. */
+.hero-trotteuse {
+  animation: hero-trotteuse 60s steps(60) infinite;
+}
+@keyframes hero-trotteuse {
+  to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-trotteuse { animation: none; }
+}
+
+/* Les trois façons : la ligne au milieu de l'écran reste pleine, les autres s'effacent. */
+.moyen-ligne {
+  transition: opacity 280ms var(--courbe-vive);
+}
+.moyen-titre {
+  transition: transform 420ms var(--courbe-sortie);
+}
+@media (min-width: 1200px) and (prefers-reduced-motion: no-preference) {
+  .moyen-ligne[data-active="false"] { opacity: 0.32; }
+  .moyens-lignes:has(a:hover) .moyen-ligne { opacity: 0.32; }
+  .moyens-lignes:has(a:hover) .moyen-ligne:has(a:hover) { opacity: 1; }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .moyen-ligne a:hover .moyen-titre { transform: translateX(10px); }
+}
+.moyen-ligne a:focus-visible .moyen-titre { transform: translateX(10px); }
+
+/* L'action sur papier ou sur volt : encre pleine, le volt plein ne se lit pas dessus. */
+.cta-primaire.cta-encre {
+  background-color: var(--accent-ink);
+  color: var(--accent);
 }

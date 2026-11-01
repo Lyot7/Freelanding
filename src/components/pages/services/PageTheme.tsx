@@ -42,13 +42,13 @@ function EnTeteBloc({ bloc, ton }: { bloc: BlocTheme; ton: Ton }) {
   const t = TONS[ton];
   return (
     <div className="flex flex-col gap-[16px]">
-      <h2 className="accent-room max-w-[560px] text-balance text-[26px] font-semibold uppercase leading-[0.95] tracking-[-0.04em] tablet:text-[34px]">
+      <h2 className="accent-room max-w-[560px] text-balance text-[26px] titre-marque tablet:text-[34px]">
         {bloc.titre}
       </h2>
       {bloc.paragraphes.map((paragraphe) => (
         <p
           key={paragraphe}
-          className={`max-w-[620px] text-[15px] font-medium leading-[1.45] tracking-[-0.01em] ${t.attenue}`}
+          className={`max-w-[620px] text-[16px] font-medium leading-[1.45] tracking-[-0.01em] ${t.attenue}`}
         >
           {paragraphe}
         </p>
@@ -71,7 +71,7 @@ function LiensBloc({ bloc, ton }: { bloc: BlocTheme; ton: Ton }) {
           <li key={lien.href} className="flex flex-col gap-[2px]">
             <Link
               href={lien.href}
-              className={`w-fit text-[15px] font-semibold leading-[1.3] tracking-[-0.01em] underline underline-offset-[3px] transition-[text-decoration-color,text-underline-offset] duration-200 hover:underline-offset-[4px] ${t.lien}`}
+              className={`w-fit text-[16px] font-semibold leading-[1.3] tracking-[-0.01em] underline underline-offset-[3px] transition-[text-decoration-color,text-underline-offset] duration-200 hover:underline-offset-[4px] ${t.lien}`}
             >
               {lien.libelle}
             </Link>
@@ -140,7 +140,7 @@ function Tableau({ bloc, ton }: { bloc: BlocTableau; ton: Ton }) {
                   <th
                     key={`${ligne[0]}-${premiere}`}
                     scope="row"
-                    className="align-top text-[15px] font-semibold leading-[1.3] tracking-[-0.01em] tablet:w-[24%] tablet:py-[16px] tablet:pr-[20px]"
+                    className="align-top text-[16px] font-semibold leading-[1.3] tracking-[-0.01em] tablet:w-[24%] tablet:py-[16px] tablet:pr-[20px]"
                   >
                     {cellule}
                   </th>
@@ -167,7 +167,7 @@ function Tableau({ bloc, ton }: { bloc: BlocTableau; ton: Ton }) {
               {bloc.total.map((cellule, index) => (
                 <td
                   key={`total-${bloc.colonnes[index]}`}
-                  className={`text-[15px] font-semibold leading-[1.3] tracking-[-0.01em] tablet:py-[16px] tablet:pr-[20px] ${cellule === "" ? "hidden tablet:table-cell" : ""}`}
+                  className={`text-[16px] font-semibold leading-[1.3] tracking-[-0.01em] tablet:py-[16px] tablet:pr-[20px] ${cellule === "" ? "hidden tablet:table-cell" : ""}`}
                 >
                   {cellule}
                 </td>
@@ -200,7 +200,7 @@ function Etapes({ bloc, ton }: { bloc: BlocEtapes; ton: Ton }) {
             <span className={`text-[12px] font-medium leading-[1.2] tracking-[-0.01em] ${t.etiquette}`}>
               {String(index + 1).padStart(2, "0")}
             </span>
-            <h3 className="text-[18px] font-semibold uppercase leading-[1] tracking-[-0.03em]">
+            <h3 className="text-[18px] font-semibold uppercase leading-[1] tracking-[-0.045em]">
               {etape.titre}
             </h3>
             <p className={`text-[14px] font-medium leading-[1.45] tracking-[-0.01em] ${t.attenue}`}>
@@ -234,7 +234,7 @@ function Chiffres({ bloc, ton }: { bloc: BlocChiffres; ton: Ton }) {
             <dt className={`text-[14px] font-medium leading-[1.4] tracking-[-0.01em] ${t.attenue}`}>
               {chiffre.libelle}
             </dt>
-            <dd className="text-[44px] font-semibold leading-[1] tracking-[-0.04em] desktop:text-[64px]">
+            <dd className="text-[44px] font-semibold leading-[1] tracking-[-0.045em] desktop:text-[58px]">
               {chiffre.valeur}
             </dd>
           </div>
@@ -300,6 +300,7 @@ export function PageTheme({
     <>
       <SvgSprite />
       <Header site={site} />
+      <FloatingNav site={site} />
       <main id="main-content" tabIndex={-1}>
         <section className="relative flex min-h-[calc(70svh/var(--zoom-ecran,1))] items-end overflow-hidden bg-background px-[20px] pb-[60px] pt-[140px] text-foreground tablet:px-[24px] tablet:pb-[90px] desktop:px-[30px]">
           {visuel ? (
@@ -314,13 +315,13 @@ export function PageTheme({
               />
               <span
                 aria-hidden
-                className="pointer-events-none absolute inset-0 z-[1] bg-[linear-gradient(to_top,#0b0b0b_8%,rgba(11,11,11,.72)_48%,rgba(11,11,11,.35)_100%)]"
+                className="pointer-events-none absolute inset-0 z-[1] bg-[linear-gradient(to_top,var(--background)_8%,rgba(11,11,11,.72)_48%,rgba(11,11,11,.35)_100%)]"
               />
             </>
           ) : (
             <GradientWaveBackdrop seed={graine(page.chemin)} />
           )}
-          <Grain opacity={0.05} className="z-[1]" />
+          <Grain className="z-[1]" />
           <span className="absolute inset-y-0 left-1/2 z-[1] w-px bg-white/10" />
           <div className="relative z-[2] mx-auto grid w-full max-w-[1440px] gap-[20px] tablet:grid-cols-2 tablet:items-end tablet:gap-x-0 tablet:gap-y-[30px]">
             <Reveal
@@ -331,14 +332,15 @@ export function PageTheme({
               duration={1.2}
               className="accent-room overflow-hidden [--accent-room:26px] tablet:col-start-2 tablet:row-start-2"
             >
-              <h1 className="max-w-[560px] text-[52px] font-semibold uppercase leading-[0.85] tracking-[-0.05em] tablet:text-[66px] desktop:text-[86px]">
+              {/* « AUTOMATISATION » mesure 8,5 em en Geist 900 : le corps se borne à la demi-colonne. */}
+              <h1 className="text-[min(52px,calc((calc(100vw/var(--zoom-ecran,1))-40px)/8.8))] titre-marque tablet:text-[min(86px,calc((calc(50vw/var(--zoom-ecran,1))-48px)/8.8))]">
                 {page.h1}
               </h1>
             </Reveal>
             <p className="max-w-[380px] text-[14px] font-medium leading-[1.35] tracking-[-0.01em] text-white/60 tablet:col-start-1 tablet:row-start-3 tablet:mr-[30px] tablet:justify-self-end tablet:text-right desktop:mr-[40px]">
               {page.resume}
             </p>
-            <p className="text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-white/50 tablet:col-start-2 tablet:row-start-3 tablet:pl-[30px] desktop:pl-[40px]">
+            <p className="micro text-white/50 tablet:col-start-2 tablet:row-start-3 tablet:pl-[30px] desktop:pl-[40px]">
               {servicePageLabels.chapoPrix}
             </p>
           </div>
@@ -360,10 +362,10 @@ export function PageTheme({
           />
           <div className="relative mx-auto flex w-full max-w-[1440px] flex-col">
             <div className="grid gap-[16px] pb-[30px] tablet:grid-cols-2 tablet:items-end tablet:gap-0 tablet:pb-[40px]">
-              <h2 className="accent-room max-w-[460px] text-[26px] font-semibold uppercase leading-[0.95] tracking-[-0.04em] tablet:pr-[30px] tablet:text-[34px] desktop:pr-[40px]">
+              <h2 className="accent-room max-w-[460px] text-[26px] titre-marque tablet:pr-[30px] tablet:text-[34px] desktop:pr-[40px]">
                 {page.titreOffre}
               </h2>
-              <p className="max-w-[440px] text-[15px] font-medium leading-[1.45] tracking-[-0.01em] text-white/80 tablet:pl-[30px] desktop:pl-[40px]">
+              <p className="max-w-[440px] text-[16px] font-medium leading-[1.45] tracking-[-0.01em] text-white/80 tablet:pl-[30px] desktop:pl-[40px]">
                 {page.reassurance ?? servicePageLabels.reassurance}
               </p>
             </div>
@@ -381,7 +383,6 @@ export function PageTheme({
         {page.filAriane ? <FilAriane marches={page.filAriane} /> : null}
       </main>
       <Footer sujetRendezVous={page.rendezVous ?? RDV_PAR_PRESTATION[page.prestation]} />
-      <FloatingNav site={site} />
     </>
   );
 }

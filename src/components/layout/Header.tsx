@@ -44,15 +44,20 @@ function StartProjectCta({
   href,
   label,
   shortLabel,
+  contour = false,
 }: {
   href: string;
   label: string;
   shortLabel?: string;
+  /** Contour et non volt : l'action du héros porte déjà le seul volt plein. */
+  contour?: boolean;
 }) {
   return (
     <Link
       href={href}
-      className="group relative flex h-[30px] flex-none flex-row items-center justify-center overflow-hidden bg-accent px-[10px] no-underline"
+      className={`group relative flex h-[30px] flex-none flex-row items-center justify-center overflow-hidden px-[10px] no-underline transition-colors duration-200 motion-reduce:transition-none ${
+        contour ? "border border-white/25" : "bg-accent"
+      }`}
     >
       {/* Swap vertical MESURÉ sur le live : course de 22 px (14,4 px de texte +
           7,6 px d'écart), ~300 ms, et surtout un vrai FONDU CROISÉ (opacité 1→0
@@ -99,7 +104,9 @@ function StartProjectCta({
       <span className="accent-room relative block translate-y-[0.46px] overflow-hidden">
         <SwapCopies
           travel={22}
-          textClassName="text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-accent-ink"
+          textClassName={`text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] ${
+            contour ? "text-foreground" : "text-accent-ink"
+          }`}
         >
           {/* MESURÉ : « DÉMARRER UN PROJET » porte le bouton à 155 px, contre
               124 pour « START A PROJECT » sur la source. À 320 px de fenêtre,
@@ -165,7 +172,7 @@ export function Header({
   // n'en applique AUCUN sur eux — ils gardent donc la base, sans état de survol.
   const navItemCls =
     navBaseCls +
-    " transition-colors duration-200 ease-[cubic-bezier(0.44,0,0.56,1)] hover:text-accent motion-reduce:transition-none";
+    " transition-colors duration-200 ease-[var(--courbe-vive)] hover:text-accent motion-reduce:transition-none";
 
   // Au-delà de 1500 px, le logo et le menu se calent sur la colonne de 1440
   // du contenu au lieu des bords de la fenêtre (2026-10-16) : sur grand
@@ -177,7 +184,9 @@ export function Header({
     <>
       {/* framer-1t4npk4 : Logo + text (gap 20px) */}
       <div className="relative flex w-min flex-none flex-row items-center justify-start gap-[20px] overflow-visible text-foreground">
-        <Logo brand={brand} />
+        {/* L'en-tête défile avec la page : sur l'accueil, il n'existe à l'écran
+            que posé sur le héros. `appear` vaut donc « héros visible ». */}
+        <Logo brand={brand} volt={appear} />
 
         {/* framer-u1lar3 : séparateur vertical — desktop uniquement (≥1200) */}
         <span
@@ -225,6 +234,7 @@ export function Header({
           href={primaryCta.href}
           label={primaryCta.label}
           shortLabel={primaryCta.shortLabel}
+          contour={appear}
         />
       </div>
     </>

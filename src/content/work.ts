@@ -159,7 +159,7 @@ export const workItems: WorkItem[] = [
        ne se replie pas (`white-space: pre`) : à 390 il reste environ 300px
        après le libellé, soit une quarantaine de caractères. « Projet monté en
        propre » en fait 22. */
-    etiquette: "Marketplace sur mesure · projet en propre",
+    etiquette: "Produit complet, mené seul · projet en propre",
     client: "Projet monté en propre",
     year: "2026",
     role: "Conception, design et développement",
@@ -274,7 +274,7 @@ export const workItems: WorkItem[] = [
      * de contrat et faux de deux ans. C'est cette date qui devait être corrigée,
      * pas le silence sur le contrat.
      */
-    etiquette: "Parcours B2B · Würth France · −92 % d’erreurs",
+    etiquette: "Un résultat mesuré · −92 % d’erreurs",
     client: "Würth France",
     clientKind: "employer",
     year: "2024",
@@ -663,7 +663,13 @@ export const workItems: WorkItem[] = [
 
 export const workContent: WorkContent = {
   hero: {
-    title: "Sélection de projets",
+    title: "Trois projets, en ligne ou mesurés.",
+    // Le produit au travail, à la place d'une photo d'illustration.
+    media: {
+      kind: "video",
+      src: "/work/kpsull/mockup.mp4",
+      poster: "/work/kpsull/mockup-poster.jpg",
+    },
     subtitle:
       "Je construis des outils qui servent. Voilà à quoi ça ressemble en pratique.",
     // Le live rend DEUX paragraphes de polarité opposée : le premier atténué

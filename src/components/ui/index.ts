@@ -34,4 +34,3 @@ export { Highlighted } from "./Highlighted";
 export { SwapText } from "./SwapText";
 
 export { HoverPrefetchLink } from "./HoverPrefetchLink";
-export { AvailabilityMeter } from "./AvailabilityMeter";

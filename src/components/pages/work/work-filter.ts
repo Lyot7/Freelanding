@@ -24,26 +24,14 @@ function normalize(value: string): string {
 export function filterWorks(
   works: readonly WorkItem[],
   activeFilter: WorkCategoryFilter,
-  query: string,
 ): readonly WorkItem[] {
   const normalizedFilter =
     activeFilter === null ? null : normalize(activeFilter);
-  const normalizedQuery = normalize(query);
 
-  return works.filter((work) => {
-    const normalizedCategories = work.categories.map(normalize);
-    const matchesCategory =
+  return works.filter(
+    (work) =>
       normalizedFilter === null ||
       normalizedFilter.length === 0 ||
-      normalizedCategories.includes(normalizedFilter);
-    const searchableText = normalize(
-      [work.title, work.client, ...work.categories]
-        .filter((value): value is string => Boolean(value))
-        .join(" "),
-    );
-    const matchesQuery =
-      normalizedQuery.length === 0 || searchableText.includes(normalizedQuery);
-
-    return matchesCategory && matchesQuery;
-  });
+      work.categories.map(normalize).includes(normalizedFilter),
+  );
 }

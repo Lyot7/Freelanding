@@ -30,6 +30,7 @@ export function WorkDetailPage({
   return (
     <>
       <Header site={site} />
+      <FloatingNav site={site} />
       {/* Cible du lien d'évitement (voir SkipLink.tsx et focus.css). */}
       <main id="main-content" tabIndex={-1}>
         <WorkDetailHero work={work} />
@@ -48,7 +49,6 @@ export function WorkDetailPage({
         {nextWork ? <RelatedWork work={nextWork} /> : null}
       </main>
       <Footer />
-      <FloatingNav site={site} />
     </>
   );
 }

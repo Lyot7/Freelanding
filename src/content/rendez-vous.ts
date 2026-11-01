@@ -155,7 +155,7 @@ export const rendezVousContent: ContenuRendezVous = {
   eyebrow: "Prendre rendez-vous",
   titre: "Réserver un créneau",
   chapeau:
-    "Choisissez un sujet, une durée et une heure, puis répondez à trois questions sur votre projet : vous savez avant l’appel ce que votre budget permet. Le lien de visioconférence part par e-mail dans la foulée.",
+    "Choisissez un sujet, une durée et une heure, puis répondez à trois questions sur votre projet : l’appel part de votre situation. Le lien de visioconférence part par e-mail dans la foulée.",
   noteFuseau: "Heures affichées à l’heure de Paris.",
   garanties: [
     "Gratuit et sans engagement",
@@ -210,7 +210,7 @@ export const rendezVousContent: ContenuRendezVous = {
       nom: "Expliquez-moi ce qui coince dans votre métier",
       duree: "30, 45 ou 60 minutes",
       description:
-        "Une tâche que vous refaites à la main, un tableur qui déborde, des outils qui ne se parlent pas, ou un logiciel entier à construire. On regarde où passe le temps et ce qui existe déjà. Vous repartez avec un ordre de grandeur et une prochaine étape.",
+        "Une tâche que vous refaites à la main, un tableur qui déborde, des outils qui ne se parlent pas, un logiciel entier à construire, ou l’IA à installer dans vos outils. On regarde où passe le temps et ce qui existe déjà. Vous repartez avec un ordre de grandeur et une prochaine étape.",
     },
     {
       id: "decouverte",
@@ -296,6 +296,7 @@ export const rendezVousContent: ContenuRendezVous = {
       options: {
         logiciel: [
           { id: "tache", libelle: "Supprimer une tâche faite à la main" },
+          { id: "ia", libelle: "Installer l’IA dans nos outils" },
           { id: "tableur", libelle: "Sortir du tableur partagé" },
           { id: "relier", libelle: "Relier des outils qui ne se parlent pas" },
           { id: "clients", libelle: "Donner un accès à mes clients" },
@@ -303,6 +304,7 @@ export const rendezVousContent: ContenuRendezVous = {
         ],
         decouverte: [
           { id: "tache", libelle: "Supprimer une tâche faite à la main" },
+          { id: "ia", libelle: "Installer l’IA dans nos outils" },
           { id: "relier", libelle: "Relier des outils qui ne se parlent pas" },
           { id: "conseil", libelle: "Avoir un avis sur un projet" },
           { id: "autre", libelle: "Autre chose" },

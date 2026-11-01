@@ -9,7 +9,8 @@ import { homeContent } from "@/content/home";
 import { siteConfig } from "@/content/site";
 import { uiLabels } from "@/content/ui";
 import { content } from "@/lib/content";
-import { HeroSection, HeroVideo } from "./HeroSection";
+import { HeroSection } from "./HeroSection";
+import { HeroVideo } from "./HeroVideo";
 
 /**
  * `HeroVideo` ne pose la vidéo qu'APRÈS le montage (`useEffect`, jamais au
@@ -133,10 +134,32 @@ describe("HeroSection, comparaison de prix", async () => {
     );
   const BLOC_BAS = "border-t border-white/10 pt-[18px]";
 
+  it("décale les lignes du titre de 70 ms, tout le reste arrive d'un seul fondu", () => {
+    const html = rendre(heroSansVideo);
+    expect(html).toContain("--d:0ms");
+    expect(html).toContain("--d:70ms");
+    expect(html).not.toMatch(/--d:(?!0ms|70ms)/);
+    expect(html).toContain('class="hero-fond');
+  });
+
   it("porte l'ancre #services sur le seul h1, cible des fils d'Ariane", () => {
     const html = rendre(heroSansVideo);
     expect(html).toMatch(/<h1 id="services" data-part="hero-titre"/);
     expect(html.match(/<h1\b/g)).toHaveLength(1);
+  });
+
+  it("le h1 vaut exactement le titre : ni prix, ni lien, ni flèche", () => {
+    const html = rendre(heroSansVideo);
+    const h1 = html.match(/<h1\b[^>]*>(.*?)<\/h1>/s)?.[1] ?? "";
+    expect(h1.replace(/<[^>]+>/g, "")).toBe("Je vous rends des heures.");
+    expect(h1).not.toContain("<a ");
+    expect(h1).not.toContain("<svg");
+  });
+
+  it("dit sous le bouton la durée de l'appel, gratuit et sans engagement", () => {
+    const html = rendre(heroSansVideo);
+    expect(html).toContain(`data-part="hero-note-cta"`);
+    expect(html).toContain(homeContent.hero.ctaNote);
   });
 
   it("nomme le sujet, puis chaque ligne avec son prix, le mien seul en accent", () => {
@@ -147,11 +170,12 @@ describe("HeroSection, comparaison de prix", async () => {
     let curseur = bloc.indexOf(comparaison.sujet);
     for (const ligne of comparaison.lignes) {
       const motif = new RegExp(
-        `${ligne.qui}<span class="[^"]*${ligne.fort ? "text-accent" : "text-foreground"}"[^>]*>${ligne.prix}</span>`,
+        `${ligne.qui}<span class="[^"]*${ligne.fort ? "text-accent" : "text-foreground"}"[^>]*>${ligne.prix.replace(/\s/gu, "\\s")}</span>`,
       );
       expect(bloc).toMatch(motif);
       const position = bloc.indexOf(ligne.prix);
       expect(position).toBeGreaterThan(curseur);
+      expect(bloc).toContain(ligne.detail);
       curseur = position;
     }
     expect(bloc).not.toContain("<dl");
@@ -189,6 +213,49 @@ describe("HeroSection, comparaison de prix", async () => {
 
     const rien = rendre({ ...heroSansVideo, comparison: undefined, proofs: [] });
     expect(rien).not.toContain(BLOC_BAS);
+  });
+});
+
+describe("HeroSection, données optionnelles", async () => {
+  const site = await content.getSiteConfig();
+  const routeur = { push() {}, replace() {}, prefetch() {}, back() {}, forward() {}, refresh() {} };
+  const rendre = (changements) =>
+    renderToStaticMarkup(
+      createElement(
+        AppRouterContext.Provider,
+        { value: routeur },
+        createElement(HeroSection, {
+          hero: { ...homeContent.hero, media: undefined, ...changements },
+          site,
+        }),
+      ),
+    );
+
+  it("fait d'une preuve un lien quand elle mène quelque part", () => {
+    const html = rendre({ proofs: [{ value: "12", label: "projets", href: "/realisations" }] });
+    expect(html).toContain('href="/realisations" data-part="preuve"');
+  });
+
+  it("garde une ligne de comparaison sans détail sur son seul prix", () => {
+    const comparison = {
+      ...homeContent.hero.comparison,
+      lignes: [{ qui: "Agence", prix: "10 000 €" }],
+    };
+    const html = rendre({ comparison });
+    expect(html).toContain("10 000 €");
+    expect(html.slice(html.indexOf("10 000 €")).split("</span>")[1]).not.toContain("text-foreground-60");
+  });
+
+  it("retire le cadran et son lien mobile quand il manque", () => {
+    expect(rendre({})).toContain(homeContent.hero.cadran.exempleCourt);
+    const html = rendre({ cadran: undefined });
+    expect(html).not.toContain("hero-cadran");
+    expect(html).not.toContain(homeContent.hero.cadran.exempleCourt);
+  });
+
+  it("retire la note sous l'action quand elle manque", () => {
+    expect(rendre({})).toContain('data-part="hero-note-cta"');
+    expect(rendre({ ctaNote: undefined })).not.toContain('data-part="hero-note-cta"');
   });
 });
 
