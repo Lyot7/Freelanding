@@ -41,16 +41,16 @@ export function ListeMetiers({
         <li key={entree.chemin} className={`border-t ${filet}`}>
           <Link
             href={entree.chemin}
-            className="group grid items-baseline gap-[6px] py-[18px] no-underline transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] active:translate-y-[1px] tablet:grid-cols-2 tablet:gap-0 tablet:py-[22px]"
+            className="group grid items-baseline gap-[6px] py-[18px] no-underline transition-transform duration-150 ease-[var(--courbe-vive)] active:translate-y-[1px] tablet:grid-cols-2 tablet:gap-0 tablet:py-[22px]"
           >
             <span className="flex items-baseline gap-[12px] text-[26px] font-semibold uppercase leading-[1] tracking-[-0.045em] tablet:pr-[30px] tablet:text-[34px] desktop:text-[44px]">
               <span
                 aria-hidden
-                className="text-[0.7em] opacity-0 transition-opacity duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:opacity-100 group-focus-visible:opacity-100"
+                className="text-[0.7em] opacity-0 transition-opacity duration-200 ease-[var(--courbe-vive)] group-hover:opacity-100 group-focus-visible:opacity-100"
               >
                 →
               </span>
-              <span className="-ml-[calc(0.7em+12px)] transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:translate-x-[calc(0.7em+12px)] group-focus-visible:translate-x-[calc(0.7em+12px)]">
+              <span className="-ml-[calc(0.7em+12px)] transition-transform duration-200 ease-[var(--courbe-vive)] group-hover:translate-x-[calc(0.7em+12px)] group-focus-visible:translate-x-[calc(0.7em+12px)]">
                 {entree.libelle}
               </span>
             </span>

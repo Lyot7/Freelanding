@@ -4,6 +4,7 @@ import { useEffect, useState, type ComponentType, type ReactNode } from "react";
 import { motion } from "motion/react";
 import type { HTMLMotionProps, Transition } from "motion/react";
 import { appearAttributes, type AppearAttributes } from "./appearAnimations";
+import { COURBE, DELAI_MAX, DUREE } from "./tempo";
 
 /**
  * Reveal — primitive d'animation d'apparition, extraite de HeroSection pour être
@@ -55,9 +56,6 @@ import { appearAttributes, type AppearAttributes } from "./appearAnimations";
  *    états `to` custom).
  */
 
-/** Courbe d'easing Framer d'origine (cubic-bezier(0.68, 0, 0, 1)). */
-export const EASE_FRAMER = [0.68, 0, 0, 1] as const;
-
 /** Sous-ensemble des valeurs animables utilisées par les reveals. */
 export type MotionValues = {
   opacity?: number;
@@ -76,12 +74,12 @@ export const REVEAL_FINAL: Required<MotionValues> = {
   rotate: 0,
 };
 
-/** Transition tween Framer (ease cubic 0.68,0,0,1 par défaut). */
+/** Transition tween sur la courbe de sortie du site. */
 export const framerTween = (duration: number, delay = 0): Transition => ({
   type: "tween",
   duration,
   delay,
-  ease: EASE_FRAMER,
+  ease: COURBE.sortie,
 });
 
 /** Transition spring Framer (damping/mass alignés sur le hero d'origine). */
@@ -416,9 +414,9 @@ export type RevealProps = HTMLMotionProps<"div"> & {
   children?: ReactNode;
   /** Délai avant l'entrée, en secondes. */
   delay?: number;
-  /** Durée de l'entrée tween, en secondes (défaut 0.8). Ignoré si `transition`. */
+  /** Durée de l'entrée tween, en secondes (défaut `DUREE.titre`). Ignoré si `transition`. */
   duration?: number;
-  /** Easing du tween (défaut {@link EASE_FRAMER}). Ignoré si `transition`. */
+  /** Easing du tween (défaut `COURBE.sortie`). Ignoré si `transition`. */
   easing?: Transition["ease"];
   /** État MASQUÉ de départ (joué uniquement à l'entrée). */
   initialOpacity?: number;
@@ -441,6 +439,8 @@ export type RevealProps = HTMLMotionProps<"div"> & {
   appearId?: string;
 };
 
+const DEPLACEMENT_TEXTE = 6;
+
 /**
  * Composant d'apparition clé-en-main. Rend l'état masqué (`initial*`) dès le
  * rendu serveur, puis joue l'entrée UNE fois vers `to`.
@@ -454,8 +454,8 @@ export function Reveal({
   className,
   children,
   delay = 0,
-  duration = 0.8,
-  easing = EASE_FRAMER,
+  duration,
+  easing = COURBE.sortie,
   initialOpacity,
   initialX,
   initialY,
@@ -470,15 +470,24 @@ export function Reveal({
 }: RevealProps) {
   const wc = useRevealWillChange(trigger === "appear");
 
+  // LE TEXTE COURANT NE VOYAGE PAS : six pixels au plus, et le temps d'un texte.
+  const texte = as === "p";
+  const deplacement =
+    texte && initialY !== undefined ? Math.min(initialY, DEPLACEMENT_TEXTE) : initialY;
+
   const from: MotionValues = {};
   if (initialOpacity !== undefined) from.opacity = initialOpacity;
   if (initialX !== undefined) from.x = initialX;
-  if (initialY !== undefined) from.y = initialY;
+  if (deplacement !== undefined) from.y = deplacement;
   if (initialScale !== undefined) from.scale = initialScale;
   if (initialRotate !== undefined) from.rotate = initialRotate;
 
-  const entranceTransition: Transition =
-    transition ?? { type: "tween", duration, delay, ease: easing };
+  const entranceTransition: Transition = transition ?? {
+    type: "tween",
+    duration: texte ? DUREE.texte : (duration ?? DUREE.titre),
+    delay: Math.min(delay, DELAI_MAX),
+    ease: easing,
+  };
 
   const MotionTag = MOTION_TAGS[as];
 
@@ -508,7 +517,7 @@ export function Reveal({
             viewport: {
               once: true,
               amount: viewportAmount,
-              margin: viewportMargin(initialY),
+              margin: viewportMargin(deplacement),
             },
             onViewportEnter: wc.onViewportEnter,
           })}

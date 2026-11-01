@@ -9,6 +9,10 @@
    Source de vérité unique des couleurs, du rythme et des titres.
    ============================================================ */
 :root {
+  /* Le tempo du site : mêmes valeurs que `src/components/motion/tempo.ts`. */
+  --courbe-sortie: cubic-bezier(0.16, 1, 0.3, 1);
+  --courbe-vive: cubic-bezier(0.23, 1, 0.32, 1);
+
   --background: #0b0b0b;
   --foreground: #ffffff;
   /* Le volt, l'accent unique de la marque. */
@@ -285,7 +289,10 @@ html {
   transition: transform 160ms ease-out, border-color 200ms ease;
 }
 
+/* LE VRAI SOULIGNEMENT. Le trait part par la droite et revient par la gauche, en
+   440 ms ; `::before` étend la zone de clic sans toucher à la mise en page. */
 .cta-lien {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -293,8 +300,49 @@ html {
   font-weight: 600;
   line-height: 1.2;
   letter-spacing: -0.01em;
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  text-decoration: none;
+}
+.cta-lien::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block: -14px;
+}
+.cta-lien::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: -3px;
+  height: 1px;
+  background-color: currentColor;
+}
+@keyframes cta-trait {
+  0% { transform: scaleX(1); transform-origin: right; }
+  45.4% { transform: scaleX(0); transform-origin: right; }
+  45.5% { transform: scaleX(0); transform-origin: left; }
+  100% { transform: scaleX(1); transform-origin: left; }
+}
+
+/* La flèche sortante : la première part en haut à droite, sa copie arrive d'en
+   bas à gauche, dans un carré d'un em. */
+.fleche-sortante {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  width: 1em;
+  height: 1em;
+  overflow: hidden;
+  vertical-align: -0.12em;
+}
+.fleche-sortante > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transition: transform 300ms var(--courbe-sortie);
+}
+.fleche-sortante > svg:last-child {
+  transform: translate(-110%, 110%);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -303,6 +351,19 @@ html {
   }
   .cta-secondaire:hover {
     border-color: currentColor;
+  }
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .cta-lien:hover::after,
+  a:hover .cta-lien::after {
+    animation: cta-trait 440ms var(--courbe-vive);
+  }
+  a:hover .fleche-sortante > svg:first-child {
+    transform: translate(110%, -110%);
+  }
+  a:hover .fleche-sortante > svg:last-child {
+    transform: none;
   }
 }
 
@@ -347,7 +408,7 @@ html {
 .dock-action {
   display: grid;
   grid-template-columns: 0fr;
-  transition: grid-template-columns 280ms cubic-bezier(0.23, 1, 0.32, 1);
+  transition: grid-template-columns 280ms var(--courbe-vive);
 }
 .dock-action[data-ouvert="true"] {
   grid-template-columns: 1fr;
@@ -705,7 +766,7 @@ html {
 }
 
 ::view-transition-old(root) {
-  animation: page-exit 0.2s cubic-bezier(0.27, 0, 0.51, 1) 0s both;
+  animation: page-exit 0.2s var(--courbe-vive) 0s both;
 }
 
 @keyframes page-enter {
@@ -720,7 +781,7 @@ html {
 }
 
 ::view-transition-new(root) {
-  animation: page-enter 0.4s cubic-bezier(0.75, 0.17, 0.3, 0.89) 0s both;
+  animation: page-enter 0.4s var(--courbe-sortie) 0s both;
   mask-image: linear-gradient(
     180deg,
     black calc(-100% + 200% * var(--page-wipe)),
@@ -863,7 +924,7 @@ html {
   }
 }
 .consent-entree {
-  animation: consent-entree 0.36s cubic-bezier(0.68, 0, 0, 1);
+  animation: consent-entree 0.36s var(--courbe-sortie);
 }
 html[data-consent-choisi] [data-consent-attente] {
   display: none;
@@ -1018,26 +1079,28 @@ html[data-consent-choisi] [data-consent-attente] {
 }
 
 /* ---------------------------------------------------------------------------
-   Héros de l'accueil (2026-10-15) : une entrée orchestrée, en CSS pour tourner
-   hors du fil principal pendant l'hydratation. Délais portés par `--d`.
-   Courbe ease-out-expo : départ franc, arrivée douce, aucun rebond.
+   Héros de l'accueil : une entrée en CSS, pour tourner hors du fil principal
+   pendant l'hydratation. Le titre monte de ses masques en 600 ms, tout le reste
+   arrive d'un seul fondu de 240 ms à 200 ms, sans translation : le texte n'attend
+   pas, et seul le cadran bouge ensuite.
    --------------------------------------------------------------------------- */
 @keyframes hero-monte {
   from { transform: translateY(108%); }
   to { transform: none; }
 }
 @keyframes hero-fond {
-  from { opacity: 0; transform: translateY(14px); }
-  to { opacity: 1; transform: none; }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
-@keyframes hero-respire {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.35; }
+/* Un battement d'échappement : le carré se retient, puis repart. */
+@keyframes hero-cran {
+  0%, 20%, 100% { transform: scale(1); }
+  4% { transform: scale(0.66); }
+  12% { transform: scale(1.12); }
 }
 
 .hero-fond {
-  animation: hero-fond 760ms cubic-bezier(0.16, 1, 0.3, 1) both;
-  animation-delay: var(--d, 0ms);
+  animation: hero-fond 240ms var(--courbe-sortie) 200ms both;
 }
 
 /* Chaque ligne du titre monte depuis son propre masque. Les retraits haut et
@@ -1050,37 +1113,27 @@ html[data-consent-choisi] [data-consent-attente] {
 }
 .hero-ligne > span {
   display: inline-block;
-  animation: hero-monte 980ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: hero-monte 600ms var(--courbe-sortie) both;
   animation-delay: var(--d, 0ms);
 }
-.hero-ligne-amorce {
-  color: var(--foreground-60);
-  transition: color 240ms ease;
-}
 
-/* Le carré volt du positionnement respire doucement : le seul mouvement
-   continu du héros, avec le mécanisme du fond. */
 .hero-pastille {
-  animation: hero-respire 2.8s ease-in-out 1.4s infinite;
+  animation: hero-cran 1000ms linear infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .hero-fond,
   .hero-ligne > span {
-    animation: hero-fond-doux 400ms ease both;
+    animation: hero-fond 240ms ease both;
     animation-delay: 0ms;
     transform: none;
   }
   .hero-pastille { animation: none; }
 }
-@keyframes hero-fond-doux {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
 
 /* Bascule message / rendez-vous du pied de page. */
 .footer-onglet-pastille {
-  transition: transform 280ms cubic-bezier(0.23, 1, 0.32, 1);
+  transition: transform 280ms var(--courbe-vive);
 }
 .footer-onglet {
   transition: color 200ms ease;
@@ -1089,11 +1142,11 @@ html[data-consent-choisi] [data-consent-attente] {
   transform: scale(0.97);
 }
 .footer-panneau:not([hidden]) {
-  animation: hero-fond 360ms cubic-bezier(0.23, 1, 0.32, 1) both;
+  animation: hero-fond 240ms var(--courbe-sortie) both;
 }
 @media (prefers-reduced-motion: reduce) {
   .footer-onglet-pastille { transition: none; }
-  .footer-panneau:not([hidden]) { animation: hero-fond-doux 200ms ease both; }
+  .footer-panneau:not([hidden]) { animation: hero-fond 200ms ease both; }
 }
 
 /* ---------------------------------------------------------------------------
@@ -1101,7 +1154,7 @@ html[data-consent-choisi] [data-consent-attente] {
    onglet à l'autre ; le temps rendu monte jour après jour.
    --------------------------------------------------------------------------- */
 .logiciel-rendu {
-  transition: transform 700ms cubic-bezier(0.23, 1, 0.32, 1);
+  transition: transform 700ms var(--courbe-vive);
 }
 .logiciel-jour {
   transition: opacity 160ms ease-out;
@@ -1111,7 +1164,7 @@ html[data-consent-choisi] [data-consent-attente] {
 }
 
 .logiciel-pastille {
-  transition: transform 280ms cubic-bezier(0.23, 1, 0.32, 1);
+  transition: transform 280ms var(--courbe-vive);
 }
 @media (prefers-reduced-motion: reduce) {
   .logiciel-pastille { transition: none; }
@@ -1131,10 +1184,10 @@ html[data-consent-choisi] [data-consent-attente] {
 
 /* Les trois façons : la ligne au milieu de l'écran reste pleine, les autres s'effacent. */
 .moyen-ligne {
-  transition: opacity 280ms ease-out;
+  transition: opacity 280ms var(--courbe-vive);
 }
 .moyen-titre {
-  transition: transform 420ms var(--courbe-sortie, cubic-bezier(0.16, 1, 0.3, 1));
+  transition: transform 420ms var(--courbe-sortie);
 }
 @media (min-width: 1200px) and (prefers-reduced-motion: no-preference) {
   .moyen-ligne[data-active="false"] { opacity: 0.32; }
@@ -1145,3 +1198,9 @@ html[data-consent-choisi] [data-consent-attente] {
   .moyen-ligne a:hover .moyen-titre { transform: translateX(10px); }
 }
 .moyen-ligne a:focus-visible .moyen-titre { transform: translateX(10px); }
+
+/* L'action sur papier ou sur volt : encre pleine, le volt plein ne se lit pas dessus. */
+.cta-primaire.cta-encre {
+  background-color: var(--accent-ink);
+  color: var(--accent);
+}

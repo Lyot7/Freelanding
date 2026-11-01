@@ -9,7 +9,6 @@ import { WorkCardPin } from "@/components/cards/WorkCardPin";
 import { Header } from "@/components/layout/Header";
 import { RelatedWork } from "@/components/pages/work/RelatedWork";
 import { WorkHero } from "@/components/pages/work/WorkHero";
-import { ArticlesSection } from "@/components/sections/ArticlesSection";
 import { content } from "@/lib/content";
 
 /**
@@ -29,11 +28,10 @@ const rendre = (composant, props) =>
 const SANS_ZOOM = /h-\[100vh\]|h-\[300vh\]|desktop:h-screen|h-\[90svh\]|,17\.2vw,|,7\.2vw,|\(50vw-60px\)/;
 
 describe("Unités de fenêtre divisées par le zoom des grands écrans", async () => {
-  const [site, works, page, posts] = await Promise.all([
+  const [site, works, page] = await Promise.all([
     content.getSiteConfig(),
     content.getWorks(),
     content.getWorkPage(),
-    content.getPosts(),
   ]);
   const [work] = works;
 
@@ -63,16 +61,12 @@ describe("Unités de fenêtre divisées par le zoom des grands écrans", async (
   it("WorkHero : la hauteur du héros et le corps du titre", () => {
     const html = rendre(WorkHero, { hero: page.hero });
     expect(html).toContain("h-[calc(90svh/var(--zoom-ecran,1))]");
-    expect(html).toContain("text-[clamp(44px,calc(17.2vw/var(--zoom-ecran,1)),63px)]");
-    expect(html).toContain("tablet:text-[clamp(60px,calc(9.2vw/var(--zoom-ecran,1)),78px)]");
+    expect(html).toContain("text-[clamp(38px,calc(11.6vw/var(--zoom-ecran,1)),63px)]");
+    expect(html).toContain("tablet:text-[clamp(44px,calc(5.6vw/var(--zoom-ecran,1)),84px)]");
     expect(html).not.toMatch(SANS_ZOOM);
   });
 
-  it("ArticlesSection : le titre suit l'échelle de la charte, divisée par le zoom", () => {
-    const accueil = rendre(ArticlesSection, { posts: posts.slice(0, 2) });
-    expect(accueil).toContain("titre-section");
-    expect(accueil).not.toMatch(SANS_ZOOM);
-
+  it("le titre de section suit l'échelle de la charte, divisée par le zoom", () => {
     const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
     expect(css).toContain("clamp(40px, calc(12vw / var(--zoom-ecran, 1)), 52px)");
     expect(css).toContain("clamp(48px, calc(6vw / var(--zoom-ecran, 1)), 92px)");

@@ -1,4 +1,3 @@
-import { ImageProgressive } from "@/components/ui/ImageProgressive";
 /* Le pied de page est sur les NEUF routes : ses liens préchargeaient toutes les
    routes du site dès qu'on descendait jusqu'à lui. Voir `HoverPrefetchLink`. */
 import { HoverPrefetchLink } from "@/components/ui/HoverPrefetchLink";
@@ -9,21 +8,11 @@ import { SignatureTracee } from "@/components/motion/SignatureTracee";
 import Image from "next/image";
 import { DemanderAssistant } from "@/components/pages/agent/DemanderAssistant";
 import { Grain } from "@/components/effects/Grain";
-import { ParallaxCover } from "@/components/effects/ParallaxCover";
-import { BrandB } from "@/components/brand/BrandB";
 import { SocialGlyph } from "@/components/layout/SocialGlyph";
 import type { Link } from "@/lib/content/types";
 import { uiLabels } from "@/content/ui";
-// Le formulaire est un composant CLIENT ; le pied de page reste serveur.
-import { FooterContactForm } from "./FooterContactForm";
-import { Suspense } from "react";
-import { FooterContact } from "./FooterContact";
-import { FooterContactAvecSujet } from "./FooterContactAvecSujet";
-import { ReservationAvecSujet } from "@/components/rendez-vous/ReservationAvecSujet";
-import { ReservationRendezVous } from "@/components/rendez-vous/ReservationRendezVous";
-import { rendezVousContent } from "@/content/rendez-vous";
+import { BlocContact } from "./BlocContact";
 import type { IdRendezVous } from "@/content/rendez-vous";
-import { resoudreConfiguration } from "@/lib/rendez-vous/config";
 
 /**
  * Footer — reconstruction fidèle (100 %) du footer Framer de la page d'accueil d'origine
@@ -82,23 +71,6 @@ const LABELS = { contact: "Contact", navigation: "Navigation" } as const;
 
 /* ------------------------------- SVG décoratifs ------------------------------ */
 
-/**
- * Marque posée à cheval sur le coin haut-droit de la carte.
- *
- * C'ÉTAIT LE LOGO FRAMER : trois parallélogrammes inclinés, la marque de
- * l'outil qui a produit le template, en blanc et au-dessus du portrait
- * d'Eliott, sur les NEUF routes du site. Le site affichait donc la marque d'un
- * tiers à l'endroit le plus exposé de sa page, juste au-dessus de son nom.
- *
- * Remplacé par son monogramme. Le B et non le logotype complet : la zone est
- * un carré de 58 à 76 px de côté, où « BOUQUEREL » (rapport 10,9) ne tiendrait
- * qu'à 7 px de hauteur de capitale.
- */
-function CardBrandMark() {
-  return <BrandB cadrage="tight" className="block h-full w-full text-foreground" />;
-}
-
-/** Flèche « Built in Framer » (`#svg-1500971939_213`, 9×14, fill BLANC). */
 /*
  * Le grain du footer était une COPIE LOCALE du calque, sans `grain-drift` : les
  * deux calques du footer étaient donc les seuls du site à ne pas dériver du
@@ -150,17 +122,19 @@ function SocialIcon({ social }: { social: Link }) {
 
 export async function Footer({
   sujetRendezVous,
+  sansFormulaire = false,
 }: {
   /**
    * Sujet de rendez-vous de la page (pages de prestation) : présélectionné
    * dans l'onglet rendez-vous, sans lecture de `?sujet=`.
    */
   sujetRendezVous?: IdRendezVous;
+  /** `/contact` porte déjà le formulaire : le pied de page ne garde que sa navigation. */
+  sansFormulaire?: boolean;
 } = {}) {
   const {
     footerNav = [],
     contact,
-    footerForm,
     socials,
     legalLinks,
     copyrightLong,
@@ -169,12 +143,6 @@ export async function Footer({
   } = await content.getSiteConfig();
 
   const lettre = footerCta?.lettre;
-  // Mêmes types de rendez-vous que la section de `/contact` : ceux dont
-  // l'événement Cal.com est configuré. Aucun = pas d'onglet rendez-vous.
-  const { typesDisponibles } = resoudreConfiguration();
-  const typesRendezVous = rendezVousContent.types.filter((type) =>
-    typesDisponibles.includes(type.id),
-  );
   /*
    * TOUS LES RÉSEAUX, ET PLUS LES DEUX PREMIERS. La source Framer en exposait
    * deux (X et Instagram) et la coupe avait été recopiée telle quelle. Elle est
@@ -198,13 +166,6 @@ export async function Footer({
   const inlineLinkCls =
     "text-foreground no-underline transition-colors duration-200 hover:text-accent";
 
-  const formulaireMessage = footerForm ? (
-    <FooterContactForm
-      footerForm={footerForm}
-      emailContact={contact.email}
-      inlineLinkCls={inlineLinkCls}
-    />
-  ) : null;
   // Nav du footer (preset 1r5vzwr 20/18px + lien gdp728 blanc) — LA NAV.
   const navLinkCls =
     "relative h-auto w-auto whitespace-pre text-[18px] font-medium leading-[1.2] tracking-[-0.01em] " +
@@ -220,7 +181,7 @@ export async function Footer({
         porte le seul formulaire du site (message ou rendez-vous). Les liens
         `#rendez-vous` des pages et `lienRendezVous` y mènent, et
         `FooterContact` ouvre alors l'onglet rendez-vous. */}
-    <div id="rendez-vous" aria-hidden />
+    {sansFormulaire ? null : <div id="rendez-vous" aria-hidden />}
     <Reveal
       as="footer"
       className={
@@ -251,6 +212,8 @@ export async function Footer({
 
       {/* framer-1omt5a8 "Container" : contenu (z-3, max 1440) */}
       <div className="relative z-[3] flex w-full max-w-[1440px] flex-col items-start gap-[30px] tablet:gap-[60px]">
+        {sansFormulaire ? null : (
+          <>
         <h2 className="titre-marque m-0 w-full text-[clamp(44px,calc(10.2vw/var(--zoom-ecran,1)),150px)] text-foreground">
           {footerCta?.heading}
         </h2>
@@ -346,61 +309,12 @@ export async function Footer({
             </div>
 
             {/* framer-24skgi : formulaire, branché sur `POST /api/contact`. */}
-            {/* SEUL FORMULAIRE DU SITE depuis le 2026-10-16 (message ou
-                rendez-vous). Les replis des frontières `Suspense` rendent le
-                même bloc sans lecture de `?sujet` : le HTML servi porte
-                toujours les deux formulaires. */}
-            {footerForm && sujetRendezVous ? (
-              <FooterContact
-                modes={footerForm.modes}
-                message={formulaireMessage}
-                rendezVous={
-                  typesRendezVous.length > 0 ? (
-                    <ReservationRendezVous
-                      types={typesRendezVous}
-                      emailContact={contact.email}
-                      typeInitial={
-                        typesRendezVous.some((type) => type.id === sujetRendezVous)
-                          ? sujetRendezVous
-                          : undefined
-                      }
-                    />
-                  ) : undefined
-                }
-              />
-            ) : footerForm ? (
-              <Suspense
-                fallback={
-                  <FooterContact
-                    modes={footerForm.modes}
-                    message={formulaireMessage}
-                    rendezVous={
-                      typesRendezVous.length > 0 ? (
-                        <ReservationRendezVous
-                          types={typesRendezVous}
-                          emailContact={contact.email}
-                        />
-                      ) : undefined
-                    }
-                  />
-                }
-              >
-                <FooterContactAvecSujet
-                  modes={footerForm.modes}
-                  message={formulaireMessage}
-                  rendezVous={
-                    typesRendezVous.length > 0 ? (
-                      <ReservationAvecSujet
-                        types={typesRendezVous}
-                        emailContact={contact.email}
-                      />
-                    ) : undefined
-                  }
-                />
-              </Suspense>
-            ) : null}
+            <BlocContact sujetRendezVous={sujetRendezVous} />
           </div>
         </div>
+
+          </>
+        )}
 
         {/* framer-lj3c70 "2 row" : legal (gauche) + nav/contact/copyright (droite) */}
         {/* Le filet du haut est un PSEUDO-ÉLÉMENT et non un `border-t`.

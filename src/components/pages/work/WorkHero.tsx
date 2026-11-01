@@ -1,43 +1,21 @@
+import Image from "next/image";
 import { Reveal } from "@/components/motion/Reveal";
-import {
-  CreditHeroPhoto,
-  HeroPhoto,
-  VOILE_TEXTE,
-} from "@/components/pages/services/HeroPhoto";
-import { herosPages } from "@/content/heros-pages";
+import { ScrollParallax } from "@/components/motion/ScrollParallax";
+import { HeroVideo } from "@/components/sections/HeroVideo";
 import { Grain } from "@/components/effects/Grain";
 import { Highlighted } from "@/components/ui";
 import type { HeroContent, HeroSubtitleParagraph } from "@/lib/content";
 
 /**
- * Géométrie MESURÉE sur le live (rechargement complet à chaque largeur : Framer
- * bascule ses variantes responsive en JS, un simple redimensionnement ne
- * reflète donc pas la vraie mise en page).
- *
- * | | < 810 | 810 | ≥ 1200 |
- * |---|---|---|---|
- * | section  | 90svh, `0 20 20`    | 90svh, `60 24 30` | 90svh, `60 30 30` |
- * | titre    | 63px, pleine largeur | 78px, moitié droite | 98px, moitié droite |
- * | chapô    | 330px à gauche, aligné à gauche | 330px calé sur l'axe central, aligné à droite | idem |
- * | interligne | 20 | 30 | 30 |
- *
- * Le `padding-bottom` déclaré ici vaut le padding réel du live PLUS la rangée
- * de filtres et son interligne, parce que cette rangée vit chez nous dans
- * {@link WorkExplorer} (positionnée par rapport au haut de cette section) alors
- * que le live la garde dans le hero : 20+115+50 = 185, 30+70+70 = 170,
- * 30+30+80 = 140.
- *
- * S'y ajoutent 7px dès 810 : la rangée du chapô mesure 36px sur le live alors
- * que le chapô n'en fait que 29, sa hauteur étant imposée par la demi-colonne
- * jumelle (vide et invisible). Ces 7px de vide sont sous le texte, donc caler
- * le bas de NOTRE bloc sur le bas de la rangée du live descendait l'encre
- * d'autant. On cale sur le bas de l'encre : 170+7 et 140+7.
+ * LE HÉROS DE `/realisations` MONTRE UN PROJET : la boucle de Kpsull, muette, sous
+ * un voile qui garde le titre lisible. L'affiche reste dessous, à toutes les
+ * largeurs : en mouvement réduit ou en profil léger, la boucle ne se monte pas.
  */
 const SECTION_CLS =
-  "relative flex h-[calc(90svh/var(--zoom-ecran,1))] w-full items-end overflow-hidden bg-background " +
-  "px-[20px] pb-[185px] pt-0 text-foreground " +
-  "tablet:px-[24px] tablet:pb-[177px] tablet:pt-[60px] " +
-  "desktop:px-[30px] desktop:pb-[147px]";
+  "relative flex h-[calc(90svh/var(--zoom-ecran,1))] min-h-[560px] w-full items-end overflow-hidden bg-background " +
+  "px-[20px] pb-[30px] pt-0 text-foreground " +
+  "tablet:px-[24px] tablet:pb-[50px] tablet:pt-[60px] " +
+  "desktop:px-[30px]";
 
 /** Une moitié du rail : idiome Framer `flex: 1 0 0` sur une base de 1px. */
 const HALF = "w-full tablet:w-px tablet:flex-[1_0_0]";
@@ -50,7 +28,7 @@ function SubtitleParagraph({ part }: { part: HeroSubtitleParagraph }) {
   // fragments qui redescendent à 60 %.
   return (
     <p
-      className={`${PARAGRAPH_CLS} ${VOILE_TEXTE} ${part.inverted ? "text-foreground" : "text-foreground-60"}`}
+      className={`${PARAGRAPH_CLS} ${part.inverted ? "text-foreground" : "text-foreground-60"}`}
     >
       <Highlighted
         text={part.text}
@@ -69,7 +47,22 @@ export function WorkHero({ hero }: { hero: HeroContent }) {
 
   return (
     <section className={SECTION_CLS}>
-      <HeroPhoto image={herosPages.realisations} hauteur={{ mobile: "90vh", tablette: "90vh" }} />
+      {hero.media ? (
+        <ScrollParallax
+          factor={0.15}
+          decorative
+          className="pointer-events-none absolute inset-0 z-0 overflow-clip"
+        >
+          {hero.media.poster ? (
+            <Image src={hero.media.poster} alt="" fill preload sizes="100vw" className="object-cover" />
+          ) : null}
+          <HeroVideo src={hero.media.src} />
+        </ScrollParallax>
+      ) : null}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-[1] bg-[linear-gradient(180deg,rgba(11,11,11,0.45)_0%,rgba(11,11,11,0.6)_45%,rgba(11,11,11,0.92)_100%)]"
+      />
       {/* MANQUANT jusqu'ici : `/work` n'avait aucun grain de section, le calque
           global inventé le masquait. RELEVÉ sur le live : hôte 1440 × 810 à
           1440 de fenêtre, z-1, opacité 0,05, motif 256 × 256. */}
@@ -91,9 +84,8 @@ export function WorkHero({ hero }: { hero: HeroContent }) {
               initialY={36}
               duration={0.8}
             >
-              {/* Corps plafonné et non fixe : « PROJETS » demandait 319 px pour
-                  280 disponibles à 320, et 395 pour 381 à 810. */}
-              <h1 className="m-0 text-[clamp(44px,calc(17.2vw/var(--zoom-ecran,1)),63px)] titre-marque tablet:text-[clamp(60px,calc(9.2vw/var(--zoom-ecran,1)),78px)] desktop:text-[98px]">
+              {/* Corps calé sur le mot le plus long de la demi-colonne. */}
+              <h1 className="m-0 text-[clamp(38px,calc(11.6vw/var(--zoom-ecran,1)),63px)] titre-marque tablet:text-[clamp(44px,calc(5.6vw/var(--zoom-ecran,1)),84px)]">
                 {hero.title}
               </h1>
             </Reveal>
@@ -123,7 +115,6 @@ export function WorkHero({ hero }: { hero: HeroContent }) {
           </div>
         ) : null}
       </div>
-      <CreditHeroPhoto credit={herosPages.realisations.credit} />
     </section>
   );
 }

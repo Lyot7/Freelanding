@@ -1311,7 +1311,7 @@ export function ReservationRendezVous({
                 {contenu.formulaire.mention}{" "}
                 <Link
                   href={contenu.formulaire.mentionHref}
-                  className="text-foreground no-underline transition-colors duration-200 ease-[cubic-bezier(0.44,0,0.56,1)] hover:text-accent motion-reduce:transition-none"
+                  className="text-foreground no-underline transition-colors duration-200 ease-[var(--courbe-vive)] hover:text-accent motion-reduce:transition-none"
                 >
                   {contenu.formulaire.mentionLien}
                 </Link>

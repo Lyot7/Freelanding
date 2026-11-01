@@ -20,17 +20,13 @@ import { content } from "@/lib/content";
  * HTML/CSS/JS utilisée pour vérifier chaque traduction.
  */
 export async function HomePage() {
-  const [site, home, allWorks, posts] = await Promise.all([
+  const [site, home, posts] = await Promise.all([
     content.getSiteConfig(),
     content.getHome(),
-    content.getWorks(),
     content.getPosts(),
   ]);
 
-  const works = home.featuredWorkSlugs.map((slug) =>
-    allWorks.find((work) => work.slug === slug),
-  ).filter((work): work is NonNullable<typeof work> => Boolean(work));
-  const featuredPosts = home.articles.featuredSlugs.map((slug) =>
+  const featuredPosts = home.lectures.slugs.map((slug) =>
     posts.find((post) => post.slug === slug),
   ).filter((post): post is NonNullable<typeof post> => Boolean(post));
 

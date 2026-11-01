@@ -343,4 +343,41 @@ describe("validerSoumission — questionnaire de /contact", () => {
     expect(resultat.ok).toBe(true);
     expect(resultat.soumission.budget).toBeUndefined();
   });
+
+  describe("le pied de page en deux lignes", () => {
+    const deuxLignes = (champs) => ({
+      intention: "footer",
+      nom: "Jean Dupont",
+      email: "jean@example.com",
+      debutMs: MAINTENANT - 10_000,
+      ...champs,
+    });
+
+    it("accepte un message sans type, sans budget ni objectif", () => {
+      const resultat = valider(deuxLignes({ typeProjet: "", message: "Je recopie les commandes." }));
+      expect(resultat.ok).toBe(true);
+      expect(resultat.soumission.typeProjet).toBe("");
+      expect(resultat.soumission.budget).toBeUndefined();
+      expect(resultat.soumission.objectif).toBeUndefined();
+    });
+
+    it("garde le budget et l'échéance quand le visiteur les ajoute", () => {
+      const resultat = valider(
+        deuxLignes({ message: "Je recopie les commandes.", budget: "inconnu", echeance: "vite" }),
+      );
+      expect(resultat.soumission.budget).toBe("Je ne sais pas encore");
+      expect(resultat.soumission.echeance).toBe("Dès que possible");
+    });
+
+    it("refuse une demande sans type et sans message : il n'y a rien à lire", () => {
+      const resultat = valider(deuxLignes({ typeProjet: "" }));
+      expect(resultat.ok).toBe(false);
+      expect(resultat.motif.champ).toBe("message");
+    });
+
+    it("garde un type envoyé en liste fermée, et l'exige sur l'intention projet", () => {
+      expect(valider(deuxLignes({ typeProjet: "Refaire ma cuisine" })).motif.champ).toBe("typeProjet");
+      expect(valider(soumissionProjet({ typeProjet: "" })).motif.champ).toBe("typeProjet");
+    });
+  });
 });

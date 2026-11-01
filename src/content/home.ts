@@ -2,12 +2,10 @@ import type { HeroComparaison, HomeContent } from "@/lib/content/types";
 import { slugsMisEnAvant } from "@/content/blog";
 import { faqItems } from "@/content/faq";
 import { services } from "@/content/services";
-import { euros, prestation, repereAgenceLogiciel, SUR_DEVIS } from "@/content/offre";
+import { euros, repereAgenceLogiciel, SUR_DEVIS } from "@/content/offre";
 import { TACHES_BUREAU } from "@/content/page-automatisation";
 import { lienRendezVous } from "@/content/rendez-vous";
-import { howWeDoItStats, reputationStats } from "@/content/stats";
-
-const LOGICIEL = prestation("logiciel");
+import { reputationStats } from "@/content/stats";
 
 /* LE GAIN DE L'ACCUEIL, dérivé des hypothèses de `page-automatisation.ts`. */
 const PART_RELECTURE = 0.2;
@@ -318,163 +316,31 @@ export const homeContent: HomeContent = {
   },
 
   /*
-   * LES RÉALISATIONS, RÉÉCRITES LE 2026-10-31 : « On vous compare avant
-   * d'appeler » parlait au client du site vitrine. Ce sont des produits réels,
-   * jamais présentés comme des logiciels livrés à un client : la section invite
-   * à regarder, elle n'affirme aucune référence.
-   *
-   * LIGNES DE 12 SIGNES AU PLUS, le titre est rendu à 92 px dans une demi-
-   * colonne de 683 px, aligné à droite dès 810.
+   * LE PROFIL TEXTE DES ASSISTANTS (`/llms-full.txt`) ET LE JSON-LD lisent encore
+   * ces blocs : aucune section de l'accueil ne les rend depuis le 2026-11-01. Le
+   * parcours est celui de `/a-propos` (`about.ts`) : aucun employeur n'est
+   * présenté comme client.
    */
-  showreel: {
-    marquee: "Regardez ce que je construis.",
-    marqueeLines: ["Regardez", "ce que je", "construis."],
-    statement:
-      "Avant de me confier votre métier, vous voulez voir du concret. Voici des produits que j’ai développés et mis en service, écran par écran.",
-    // Rendue en noir 60 %, ce fragment passe en noir plein.
-    statementEmphasis: ["mis en service, écran par écran."],
-    vintage: "(Réalisations)",
-    /*
-     * SEUL CONTRÔLE DE LA SECTION depuis le 2026-08-27, et il est enfin
-     * cliquable. Le bouton « Showreel » qui l'accompagnait a été supprimé : il
-     * n'avait aucun gestionnaire et venait du template, où le studio d'origine
-     * avait une bande démo à ouvrir. `playLabel` a disparu avec lui.
-     */
-    cta: { label: "VOIR LES RÉALISATIONS", href: "/realisations" },
-    ctaPrefix: "↓ ",
-    /*
-     * AFFICHE DE LA SECTION, REMPLACÉE LE 2026-09-24 (phase E).
-     *
-     * L'ESCALIER DE BÉTON illustrait l'ancien titre (« où avancer semble
-     * évident »). Sous « Ton client te compare avant d'appeler », il ne disait
-     * plus rien. Eliott : « la photo n'est pas hyper pertinente ».
-     *
-     * CE QUI LA REMPLACE montre la scène du titre : quelqu'un tient son
-     * téléphone devant son ordinateur ouvert, deux écrans côte à côte. Le
-     * téléphone et l'ordinateur sont détourés en lignes volt, comme les sujets
-     * des héros du blog et de la page Caen ; le reste de la photo est
-     * légèrement assombri.
-     *
-     * Photographie Alejandro Escamilla, CC0 (Wikimedia Commons, publiée à
-     * l'origine sur Unsplash). Provenance et traitement dans `docs/ASSETS.md`.
-     *
-     * 1512 × 960, le double de la boîte de mise en page (378 × 240 dès 1200).
-     */
-    poster: {
-      src: "/images/telephone-et-ordinateur.jpg",
-      alt: "Une personne tient son téléphone devant son ordinateur portable ouvert",
-      width: 1512,
-      height: 960,
-    },
-  },
-
   about: {
-    /*
-     * UNE VRAIE SECTION « À PROPOS » depuis le 2026-10-16, demande d'Eliott :
-     * le héros dit ce que je fais, la deuxième section dit qui le fait. Eliott
-     * est seul : c'est son argument face aux agences, et le visiteur doit
-     * savoir à qui il parle avant de lire les offres.
-     *
-     * L'ancien titre, « Je pars de ce que votre site doit rapporter », parlait
-     * de méthode ; l'idée reste, en fin de récit.
-     *
-     * DÉCOUPAGE : deux lignes aux unités de sens. Toutes reçoivent le corps
-     * dicté par la plus large (cf. `TitleFitText`).
-     */
     title: "Moi, c’est Eliott.",
-    titleLines: ["Moi,", "c’est Eliott."],
-    /*
-     * LE PARCOURS EST CELUI DE `/a-propos` (`about.ts`), relevé sur LinkedIn,
-     * le CV et Malt : Médiapilote et Würth France en stage, MeilleursBiens et
-     * MECA SERVICES en alternance. Aucun n'est présenté comme client.
-     */
     body: [
       "Je suis développeur, installé à Caen, et je travaille seul. Du premier appel à la mise en service, vous parlez à celui qui conçoit et qui code votre logiciel.",
       "Avant de me lancer, j’ai développé chez Médiapilote, Würth France, MeilleursBiens, puis MECA SERVICES, où je tenais aussi la boutique en ligne. J’y ai appris à partir de ce qu’un outil doit rapporter, et à regarder comment les gens travaillent avant d’écrire la première ligne de code.",
       /* LE MESSAGE D'ELIOTT, 2026-10-30 : le temps humain revient à ce qui rend
          la personne indispensable, l'IA fait le sale boulot. */
-      "Ma conviction : une machine ne remplace pas la personne qui connaît vos clients, elle la débarrasse de ce qui l’empêche de s’en occuper. Le recopiage et les factures partent au logiciel et à l’IA, et le temps rendu revient à vos clients et à vos décisions. Chaque détail est décidé, testé et documenté avant de vous être remis : rien n’est laissé au hasard.",
+      "Ma conviction : une machine ne remplace pas la personne qui connaît vos clients, elle la débarrasse de ce qui l’empêche de s’en occuper. Le recopiage et les factures partent au logiciel et à l’IA, et le temps rendu revient à vos clients et à vos décisions.",
     ],
-    // Emphase (source Framer) : ces expressions passent en noir plein au
-    // milieu du paragraphe rendu à 70 %.
-    highlights: [
-      "je travaille seul",
-      "vous parlez à celui qui conçoit et qui code votre logiciel",
-      "partir de ce qu’un outil doit rapporter",
-      "vos clients et à vos décisions",
-    ],
-    /*
-     * GRILLE D'INFOS ET COMPTEUR RENDUS le 2026-10-16 : Eliott trouvait la
-     * section vide de repères. Ils disent ce qu'aucune autre section ne dit,
-     * le métier, le lieu et le parcours ; « 1 projet à la fois » reste à la
-     * section chiffres.
-     */
-    launchedLabel: "Développeur à Caen",
-    projectsLabel: "En visio partout",
-    counter: {
-      value: "4",
-      caption: "entreprises où j’ai développé avant de me lancer",
-    },
-    cta: { label: "Mon parcours", href: "/a-propos" },
-    image: {
-      src: "/images/eliott-nature-bloc.jpg",
-      alt: "Portrait d’Eliott Bouquerel, développeur web freelance, au bord d’un lac",
-    },
   },
 
-  featuredWorkSlugs: ["kpsull", "wurth-creation-de-compte", "nslysium"],
+  numbers: { title: "Votre projet n’attend personne." },
 
-  // numbers.ts — 3 chiffres sur fond accent.
-  numbers: {
-    // SANS ÉTIQUETTE depuis le 2026-09-24 (phase C) : le titre suffit, et
-    // « Comment je travaille » redisait l'étiquette de la méthode, qui suit.
-    /*
-     * TITRE ET SOUS-TITRE CHOISIS PAR ELIOTT le 2026-09-24. « Pas de maquettes
-     * à valider. Une adresse en ligne qui avance. » parlait de la méthode ; le
-     * titre dit ce que le client y gagne. La phrase d'Eliott qui suivait (« Je
-     * ne cherche pas le volume… ») est sortie : elle redisait « 1 projet à la
-     * fois » avec d'autres mots.
-     */
-    title: "Votre projet n’attend personne.",
-    // « Votre projet » déborde la colonne à 92 px (1 338 px pour 1 313) :
-    // le possessif prend sa ligne.
-    titleLines: ["Votre", "projet", "n’attend", "personne."],
-    intro:
-      "Je ne mène qu’un chantier à la fois, alors votre message a sa réponse sous 24 h ouvrées.",
-    stats: howWeDoItStats,
-  },
+  whyUs: { stats: reputationStats },
 
-  // number.ts — « Pourquoi moi ? » : une carte chiffrée + appel.
-  whyUs: {
-    eyebrow: "(Pourquoi moi ?)",
-    // TITRE ET SOUS-TITRE CHOISIS PAR ELIOTT le 2026-09-24 (remplacent « Ce
-    // qui est vérifiable. »). La carte porte le chiffre qui le prouve.
-    title: "Personne ne vous tient en otage.",
-    titleLines: ["Personne", "ne vous tient", "en otage."],
-    intro:
-      "Vous avez tous les accès dès la mise en service, et vous changez de prestataire quand vous voulez.",
-    stats: reputationStats,
-    // LE RENDEZ-VOUS EST LE CHEMIN PRINCIPAL du site. « Voir les réalisations »
-    // est parti : la section des réalisations est juste au-dessus.
-    ctas: [{ label: "Réserver un appel", href: lienRendezVous("logiciel") }],
-  },
-
-  // section06.ts — prestations en accordéon.
   services: {
-    // PAS D'ÉTIQUETTE SUR L'ACCUEIL depuis le 2026-09-24 (phase C) : le chapô
-    // et l'accordéon disent d'eux-mêmes ce qu'ils présentent, et le gabarit
-    // étiquette / titre / paragraphe revenait cinq fois de suite.
-    // IDENTIQUE à `aboutContent.services.intro` : les deux pages rendent le même
-    // bloc, et un chapô qui dérive est une page qui ne dit pas la même chose que
-    // l’autre sans que personne le remarque.
     intro:
       "Je pars de votre façon de travailler, et je construis le logiciel qui lui correspond : la contrainte disparaît, le temps revient à votre équipe.",
     items: services,
   },
-
-  // SECTION TÉMOIGNAGES RETIRÉE le 2026-09-24 : son tableau était vide et le
-  // composant ne rendait rien. Elle reviendra avec un vrai client (le type la
-  // rend optionnelle, `HomePage` la compose si elle est présente).
 
   // section11.ts — bande défilante. RETIRÉE le 2026-08-10, RÉTABLIE le
   // 2026-09-01 sous une forme qui ne dit plus la même chose.
@@ -558,31 +424,15 @@ export const homeContent: HomeContent = {
   },
 
 
-  // articles.ts — « Actualités et nouveautés. » : 4 articles mis en avant
-  // (source blog.ts). L'archive home affiche les 4 premiers articles.
-  articles: {
-    eyebrow: "Actualités et nouveautés.",
-    titleLines: ["Actualités et", "nouveautés."],
-    cta: { label: "Voir plus", href: "/blog" },
-    // DÉRIVÉE DU REGISTRE depuis le 2026-08-28, plus écrite à la main.
-    //
-    // Cette liste portait quatre slugs recopiés, et la MÊME liste vivait dans
-    // `about.ts`. Elle se périmait à chaque publication (un article nouveau
-    // n'arrivait jamais sur l'accueil sans qu'on y pense, dans deux fichiers),
-    // et elle pouvait pointer vers des slugs disparus — ce qui s'est produit au
-    // passage au MDX : la sélection ne trouvait plus rien, et la section rendait
-    // un titre, un bouton et RIEN entre les deux, ici comme sur `/about`.
-    //
-    // `slugsMisEnAvant` prend les quatre articles publiés les plus récents. Le
-    // choix éditorial n'est pas perdu pour autant : `sort` étant stable, l'ordre
-    // du registre tranche à date égale (cf. l'en-tête de `blog.ts`).
-    featuredSlugs: slugsMisEnAvant,
-  },
-
   faq: faqItems,
 
   // Habillage du bloc FAQ (les questions viennent de faq.ts).
-  lectures: { titre: "(Pour aller plus loin)", tous: "Tous les guides" },
+  // DÉRIVÉE DU REGISTRE : un article publié arrive ici sans qu'on y pense.
+  lectures: {
+    titre: "(Pour aller plus loin)",
+    tous: "Tous les guides",
+    slugs: slugsMisEnAvant.slice(0, 3),
+  },
 
   faqSection: {
     eyebrow: "(FAQ)",
@@ -591,12 +441,9 @@ export const homeContent: HomeContent = {
   },
 
   /*
-   * ORDRE DES SECTIONS : celui de la page d'origine, décision d'Eliott du
-   * 2026-11-01. Qui je suis, ce que j'ai construit, les chiffres, puis le
-   * logiciel au travail : la section métiers et sa liste sont retirées, l'accueil
-   * parle à chaque métier sans le citer.
-   *
-   * LES DEUX SECTIONS À CARTES NOIRES restent séparées par le logiciel.
+   * ORDRE DES SECTIONS du 2026-11-01 : le temps rendu, le moyen, la preuve, la
+   * confiance, l'homme, puis les dernières questions. Aucune liste de métiers :
+   * l'accueil parle à chacun sans le citer.
    */
   sectionOrder: ["hero", "logiciel", "moyens", "preuves", "confiance", "rencontre", "faq"],
 

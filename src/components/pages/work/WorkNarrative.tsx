@@ -68,7 +68,7 @@ const BODY =
  * `ease-out` qui partirait vite.
  */
 const HOVER_300 =
-  "transition-all duration-300 ease-[cubic-bezier(0.68,0,0,1)] motion-reduce:transition-none";
+  "transition-all duration-300 ease-[var(--courbe-vive)] motion-reduce:transition-none";
 const DOT_SWAP = HOVER_300;
 
 /**

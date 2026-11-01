@@ -18,7 +18,6 @@ const publicDir = fileURLToPath(new URL("../../public", import.meta.url));
 
 const tous = [
   herosPages.blog,
-  herosPages.realisations,
   herosPages.introuvable,
   ...Object.values(herosPages.prestations),
   ...Object.values(herosPages.legal),

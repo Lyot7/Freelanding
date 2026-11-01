@@ -147,7 +147,7 @@ describe("composerNotes — ce qu'Eliott lit dans son agenda", () => {
     expect(lignes).toEqual([
       sansInsecable(`${notes.budget} : ${tranchesBudget()[1].libelle}`),
       sansInsecable(`${notes.forfait} : ${logiciel.nom}`),
-      sansInsecable(`${notes.objectif} : ${optionsObjectif("logiciel")[1].libelle}`),
+      sansInsecable(`${notes.objectif} : ${optionsObjectif("logiciel").find((o) => o.id === "tableur").libelle}`),
       sansInsecable(`${notes.echeance} : ${rendezVousContent.questionnaire.echeance.options[1].libelle}`),
       "",
       "Sortir du tableur partagé.",
@@ -169,6 +169,19 @@ describe("composerNotes — ce qu'Eliott lit dans son agenda", () => {
     expect(texte).toContain(sansInsecable(`${notes.forfait} : ${notes.aucunForfait}`));
   });
 
+  it("propose d'installer l'IA, sans la ranger sous « Autre chose »", () => {
+    for (const type of ["logiciel", "decouverte"]) {
+      expect(optionsObjectif(type).map((o) => o.id)).toContain("ia");
+    }
+    expect(rattacherObjectif("ia")).toBe("ia");
+    expect(composerNotes({ type: "logiciel", budget: BUDGET_INCONNU, objectif: "ia" })).toContain(
+      "Installer l’IA dans nos outils",
+    );
+    expect(rendezVousContent.types.find((t) => t.id === "logiciel").description).toContain(
+      "l’IA à installer dans vos outils",
+    );
+  });
+
   it("n'écrit plus de ligne d'outil, même pour une ancienne réponse", () => {
     const texte = composerNotes({
       type: "decouverte",
@@ -179,7 +192,7 @@ describe("composerNotes — ce qu'Eliott lit dans son agenda", () => {
     expect(texte.split("\n")).toEqual([
       sansInsecable(`${notes.budget} : ${rendezVousContent.questionnaire.budget.inconnu}`),
       sansInsecable(`${notes.forfait} : ${notes.aCaler}`),
-      sansInsecable(`${notes.objectif} : ${optionsObjectif("decouverte")[1].libelle}`),
+      sansInsecable(`${notes.objectif} : ${optionsObjectif("decouverte").find((o) => o.id === "relier").libelle}`),
     ]);
     expect(notes).not.toHaveProperty("outil");
   });

@@ -28,7 +28,7 @@ export function RencontreSection({ rencontre }: { rencontre: RencontreContent })
             ))}
           </div>
           <div className="flex flex-wrap items-center gap-x-[28px] gap-y-[14px]">
-            <Link href={rencontre.cta.href} className="cta-primaire">
+            <Link href={rencontre.cta.href} className="cta-primaire cta-encre">
               {rencontre.cta.label}
             </Link>
             <Link href={rencontre.parcours.href} className="cta-lien text-accent-ink">

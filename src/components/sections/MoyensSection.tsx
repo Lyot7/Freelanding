@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { TitreMasque } from "@/components/motion/TitreMasque";
+import { DELAI_MAX } from "@/components/motion/tempo";
 import { Trait } from "@/components/motion/Trait";
+import { FlecheSortante } from "@/components/ui/FlecheSortante";
 import type { MoyensContent } from "@/lib/content/types";
 
 /**
@@ -13,12 +15,17 @@ import type { MoyensContent } from "@/lib/content/types";
  * de l'écran passe en encre pleine, les autres s'effacent. La troisième est une
  * option, plus petite et étiquetée : son déroulé vit sur `/services/automatisation`.
  */
+/** Les lignes à observer, aucune tant que la liste n'existe pas. */
+export function lignesDe(liste: Element | null): Element[] {
+  return liste ? [...liste.children] : [];
+}
+
 export function MoyensSection({ moyens }: { moyens: MoyensContent }) {
   const [active, setActive] = useState(0);
   const liste = useRef<HTMLUListElement>(null);
 
   useEffect(() => {
-    const lignes = liste.current ? [...liste.current.children] : [];
+    const lignes = lignesDe(liste.current);
     const observateur = new IntersectionObserver(
       (entrees) => {
         for (const entree of entrees) {
@@ -53,7 +60,7 @@ export function MoyensSection({ moyens }: { moyens: MoyensContent }) {
               data-active={active === index}
               className={`moyen-ligne ${ligne.option ? "" : "desktop:min-h-[38vh]"}`}
             >
-              <Trait className="bg-black/[0.14]" delai={index * 0.14} />
+              <Trait className="bg-black/[0.14]" delai={Math.min(index * 0.08, DELAI_MAX)} />
               <Link href={ligne.lien.href} className="group flex flex-col gap-[10px] py-[24px] no-underline tablet:py-[34px]">
                 {ligne.option ? <span className="micro text-background/60">{ligne.option}</span> : null}
                 <span className={`moyen-titre font-black uppercase leading-[1.02] tracking-[-0.045em] ${ligne.option ? "text-[24px] tablet:text-[26px]" : "text-[28px] tablet:text-[32px]"}`}>
@@ -62,7 +69,10 @@ export function MoyensSection({ moyens }: { moyens: MoyensContent }) {
                 <span className="max-w-[52ch] text-[16px] font-medium leading-[1.4] tracking-[-0.01em] text-background/70">
                   {ligne.corps}
                 </span>
-                <span className="cta-lien mt-[6px] w-fit text-background">{ligne.lien.label}</span>
+                <span className="cta-lien mt-[6px] w-fit text-background">
+                  {ligne.lien.label}
+                  <FlecheSortante />
+                </span>
               </Link>
             </li>
           ))}

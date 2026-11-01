@@ -1,6 +1,8 @@
 "use client";
 
-import { useId, useState, useSyncExternalStore, type ReactNode } from "react";
+import { useInView } from "motion/react";
+import { useEffect, useId, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { lireReponseCreneaux } from "@/lib/rendez-vous/creneaux";
 
 /**
  * Bascule du pied de page entre ÉCRIRE et RÉSERVER (2026-10-15).
@@ -58,13 +60,38 @@ function lireAncre(): string {
   return window.location.hash;
 }
 
+/**
+ * LE PROCHAIN CRÉNEAU RÉEL, lu quand le bloc approche de l'écran : ce pied de
+ * page est sur toutes les pages, et chaque lecture coûte un appel à Cal.com. Rien
+ * si l'agenda ne répond pas : la ligne disparaît, elle ne se remplace pas.
+ */
+function useProchainCreneau(actif: boolean): string | undefined {
+  const [prochain, setProchain] = useState<string>();
+  useEffect(() => {
+    if (!actif) return;
+    const controleur = new AbortController();
+    fetch("/api/rendez-vous/creneaux?type=logiciel", { signal: controleur.signal })
+      .then((reponse) => (reponse.ok ? reponse.json() : undefined))
+      .then((charge: unknown) => {
+        setProchain(lireReponseCreneaux(charge)?.jours[0]?.creneaux[0]?.resume);
+      })
+      .catch(() => undefined);
+    return () => controleur.abort();
+  }, [actif]);
+  return prochain;
+}
+
 export function FooterContact({
   modes,
   message,
   rendezVous,
   ongletInitial = "message",
 }: {
-  modes?: { label: string; message: string; rendezVous: string };
+  modes?: {
+    label: string;
+    message: { titre: string; detail: string };
+    rendezVous: { titre: string; prochain: string; promesse: string };
+  };
   message: ReactNode;
   rendezVous?: ReactNode;
   /** « rendezVous » quand l'adresse porte un sujet (`?sujet=`). */
@@ -89,21 +116,28 @@ export function FooterContact({
       ? "rendezVous"
       : "message");
   const base = useId();
+  const bloc = useRef<HTMLDivElement>(null);
+  const proche = useInView(bloc, { once: true, margin: "300px 0px" });
+  const prochain = useProchainCreneau(proche && Boolean(rendezVous));
   if (!rendezVous || !modes) return <>{message}</>;
 
   const onglets = [
-    { id: "message", libelle: modes.message },
-    { id: "rendezVous", libelle: modes.rendezVous },
+    { id: "message", titre: modes.message.titre, detail: modes.message.detail },
+    {
+      id: "rendezVous",
+      titre: modes.rendezVous.titre,
+      detail: prochain ? `${modes.rendezVous.prochain} ${prochain}` : undefined,
+    },
   ] as const;
 
   return (
     // `data-section` : premier palier de l'entonnoir de rendez-vous
     // (`PageAnalytics`), porté par la section des pages avant le 2026-10-16.
-    <div data-section="rendez-vous" className="flex w-full flex-col gap-[24px]">
+    <div ref={bloc} data-section="rendez-vous" className="flex w-full flex-col gap-[24px]">
       <div
         role="tablist"
         aria-label={modes.label}
-        className="relative grid w-full grid-cols-2 border border-white/10 p-[4px] tablet:max-w-[440px]"
+        className="relative grid w-full grid-cols-2 border border-white/10 p-[4px]"
         onKeyDown={(evenement) => {
           if (evenement.key !== "ArrowLeft" && evenement.key !== "ArrowRight") return;
           evenement.preventDefault();
@@ -120,7 +154,7 @@ export function FooterContact({
           className="footer-onglet-pastille absolute inset-y-[4px] left-[4px] w-[calc(50%-4px)] bg-white/10"
           style={{ transform: onglet === "message" ? "translateX(0)" : "translateX(100%)" }}
         />
-        {onglets.map(({ id, libelle }) => {
+        {onglets.map(({ id, titre, detail }) => {
           const actif = onglet === id;
           return (
             <button
@@ -132,11 +166,14 @@ export function FooterContact({
               aria-controls={`${base}-panneau-${id}`}
               tabIndex={actif ? 0 : -1}
               onClick={() => setOnglet(id)}
-              className={`footer-onglet relative z-[1] flex min-h-[44px] items-center justify-center px-[12px] text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] ${
+              className={`footer-onglet relative z-[1] flex min-h-[64px] w-full flex-col items-start justify-center gap-[4px] px-[12px] text-left tracking-[-0.01em] tablet:px-[16px] ${
                 actif ? "text-foreground" : "text-foreground-60 hover:text-foreground"
               }`}
             >
-              {libelle}
+              <span className="text-[14px] font-semibold leading-[1.2]">{titre}</span>
+              {detail ? (
+                <span className="text-[12px] font-medium leading-[1.25] text-foreground-60">{detail}</span>
+              ) : null}
             </button>
           );
         })}
@@ -156,8 +193,11 @@ export function FooterContact({
         id={`${base}-panneau-rendezVous`}
         aria-labelledby={`${base}-onglet-rendezVous`}
         hidden={onglet !== "rendezVous"}
-        className="footer-panneau w-full"
+        className="footer-panneau flex w-full flex-col gap-[16px]"
       >
+        <p className="m-0 text-[14px] font-medium leading-[1.35] tracking-[-0.01em] text-foreground-60">
+          {modes.rendezVous.promesse}
+        </p>
         {rendezVous}
       </div>
     </div>

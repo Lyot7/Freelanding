@@ -4,14 +4,14 @@ import { motion } from "motion/react";
 import Link from "next/link";
 import { useReducedMotionAfterMount } from "@/components/motion/reducedMotion";
 import { Rouleaux } from "@/components/motion/Rouleaux";
-import { COURBE } from "@/components/motion/tempo";
+import { COURBE, DUREE } from "@/components/motion/tempo";
 import { TitreMasque } from "@/components/motion/TitreMasque";
 import type { ConfianceContent } from "@/lib/content/types";
 
 /** « chez moi » se barre, « chez vous » s'écrit, ligne après ligne, une seule fois. */
 function Bascule({ objet, avant, apres, index }: { objet: string; avant: string; apres: string; index: number }) {
   const reduit = useReducedMotionAfterMount();
-  const retard = 0.3 + index * 0.15;
+  const retard = 0.12 + index * 0.06;
   return (
     <li className="flex flex-wrap items-baseline gap-x-[12px] text-[28px] font-black uppercase leading-[1.04] tracking-[-0.045em] tablet:text-[26px] desktop:grid desktop:grid-cols-[1fr_auto_auto] desktop:text-[36px]">
       {objet}
@@ -24,7 +24,7 @@ function Bascule({ objet, avant, apres, index }: { objet: string; avant: string;
             initial={{ scaleX: 0 }}
             whileInView={{ scaleX: 1 }}
             viewport={{ once: true, margin: "-15% 0px" }}
-            transition={{ duration: 0.4, ease: COURBE.vive, delay: retard }}
+            transition={{ duration: DUREE.texte, ease: COURBE.vive, delay: retard }}
           />
         </span>
       )}
@@ -33,7 +33,7 @@ function Bascule({ objet, avant, apres, index }: { objet: string; avant: string;
         initial={{ opacity: reduit ? 1 : 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true, margin: "-15% 0px" }}
-        transition={{ duration: 0.28, delay: reduit ? 0 : retard + 0.32 }}
+        transition={{ duration: DUREE.survol, delay: reduit ? 0 : retard }}
       >
         {apres}
       </motion.span>
@@ -63,7 +63,7 @@ export function ConfianceSection({ confiance }: { confiance: ConfianceContent })
 
         <div className="grid gap-[12px] tablet:grid-cols-12">
           <div className="flex flex-col justify-between gap-[28px] bg-background p-[20px] text-foreground tablet:col-span-7 tablet:row-span-3 tablet:p-[30px]">
-            <ul className="m-0 flex list-none flex-col gap-[10px] p-0">
+            <ul className="m-0 flex list-none flex-col gap-[10px] p-0 desktop:gap-[26px]">
               {confiance.otage.lignes.map((objet, index) => (
                 <Bascule key={objet} objet={objet} avant={confiance.otage.avant} apres={confiance.otage.apres} index={index} />
               ))}

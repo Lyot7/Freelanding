@@ -74,17 +74,10 @@ const SORTIE = { duration: 0.24, ease: "easeIn" } as const;
  */
 
 /**
- * Easing de l'ouverture du panneau — courbe en S, PAS un ease-out.
- *
- * MESURÉ image par image sur le live, deux relevés indépendants : à ~27 % de la
- * course l'opacité du panneau vaut 0,16 puis 0,19, et elle ne franchit 50 %
- * qu'aux environs de 38-40 % du temps. `cubic-bezier(0.2,0.8,0.2,1)`, employé
- * avant, franchit 50 % à ~19 % : le panneau se remplissait presque entièrement
- * dans le premier quart puis rampait, alors que la source démarre lentement.
- * `cubic-bezier(0.68,0,0,1)` est la courbe que Framer utilise déjà sur ce site
- * (entrée du header) et recouvre le relevé.
+ * Easing de l'ouverture du panneau : la courbe vive du tempo du site, comme
+ * tout ce qui répond à un geste.
  */
-const EASE = "cubic-bezier(0.68,0,0,1)";
+const EASE = "var(--courbe-vive)";
 const PANEL_ID = "floating-nav-panel";
 
 /**
@@ -351,7 +344,7 @@ export function FloatingNav({ site }: { site: SiteConfig }) {
                       href={link.href}
                       tabIndex={tab}
                       onClick={closeMenu}
-                      className="whitespace-pre py-[11px] text-[18px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground no-underline transition-colors duration-200 ease-[cubic-bezier(0.44,0,0.56,1)] hover:text-accent motion-reduce:transition-none min-[810px]:text-[22px]"
+                      className="whitespace-pre py-[11px] text-[18px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground no-underline transition-colors duration-200 ease-[var(--courbe-vive)] hover:text-accent motion-reduce:transition-none min-[810px]:text-[22px]"
                     >
                       {link.label}
                     </HoverPrefetchLink>

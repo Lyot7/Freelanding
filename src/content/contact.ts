@@ -7,43 +7,14 @@ import { siteConfig } from "@/content/site";
  * Contenu de la page Contact — structure extraite de contact.html (archive
  * Framer), texte réécrit en français à la première personne du singulier.
  *
- * COORDONNÉES : e-mail, téléphone et adresse ne vivent PAS ici, ils sont lus
- * depuis `siteConfig.contact` (source unique, partagée avec le footer). Les
- * valeurs fictives du template (Londres, +1 555…, hello@le-studio-d-origine) ont
- * été remplacées dans `src/content/site.ts` : l'adresse e-mail réelle est
- * `contact@eliottbouquerel.fr` et le téléphone reste volontairement vide.
+ * COORDONNÉES : e-mail et téléphone ne vivent PAS ici, ils sont lus depuis
+ * `siteConfig.contact` (source unique, partagée avec le footer).
  */
 export const contactContent: ContactContent = {
   hero: {
-    title: "Contact.",
-    subtitle:
-      "Voyons si je suis la bonne personne pour votre projet. Une conversation sur ce dont vous avez besoin, et sur ce que je peux faire.",
-    subtitleParagraphs: [
-      {
-        text: "Voyons si je suis la bonne personne pour votre projet. Une conversation sur ce dont vous avez besoin, et sur ce que je peux faire.",
-        emphasis: ["conversation", "ce que je peux faire."],
-      },
-    ],
+    title: "Montrez-moi ce qui vous bloque.",
+    subtitle: "Si ce projet n’est pas pour moi, je vous le dis.",
   },
-  // Surtitre du bloc coordonnées et photo, écrits en dur jusqu'ici.
-  detailsEyebrow: "Me contacter",
-  cover: {
-    // Le visuel du template montrait trois inconnus. Remplacé par le mécanisme
-    // d'horlogerie du hero, extrait de ma propre boucle : le bandeau raccorde
-    // la page contact au reste du site sans mettre en scène personne.
-    src: "/images/mecanisme-bandeau.jpg",
-    alt: "",
-  },
-  intro: [
-    "Chaque projet commence par une conversation. Dites-moi ce que vous cherchez à régler, et je vous dirai honnêtement si je suis la bonne personne pour le faire.",
-    "Je vous réponds sous 24 h ouvrées, franchement, même si c’est pour vous dire « ce projet n’est pas pour moi ».",
-    // « JE VOUS DONNE UNE DATE DE DÉMARRAGE ESTIMÉE » A ÉTÉ RETIRÉ le
-    // 2026-08-31 : c'est un engagement de planning qu'aucun mot d'Eliott ne
-    // porte, sur la page même où le visiteur écrit. À sa place, ce que le
-    // corpus dit du process : tout ce qui se décide se décide AVANT la
-    // signature, et la signature déclenche le développement.
-    "Avant toute signature, on cale ensemble le périmètre et la direction visuelle : ce que vous voulez obtenir, ce qui vous plaît, les références que vous avez déjà trouvées. Le jour où vous signez, je commence à développer.",
-  ],
   contactCard: {
     // Le template mettait en avant une commerciale fictive (Anna Schneider,
     // « Head of Sales »). Eliott est seul : c'est lui l'interlocuteur.
@@ -73,14 +44,6 @@ export const contactContent: ContactContent = {
     },
     email: siteConfig.contact.email,
     phone: siteConfig.contact.phone,
-    address: siteConfig.contact.address,
-    // La page contact intitule les blocs « Adresse » / « Téléphone », là où le
-    // footer utilise « Où me trouver ». Les deux libellés coexistent.
-    // « Localisation » plutôt qu'« Adresse » : pas de bureau public, la valeur
-    // attendue est une zone d'intervention.
-    addressLabel: "Localisation",
-    phoneLabel: "Téléphone",
-    availability: siteConfig.availability,
   },
   faq: faqItems,
   seo: {

@@ -147,6 +147,10 @@ Piste 2, choisie par Eliott. `emil-design-eng` : le volt monte en `scaleY` depui
 
 `impeccable` : l'accueil se suffit, le sous-titre dit ce qui est fait et la troisième ligne des moyens reste une option, sans étapes. Le déroulé part sur `/services/automatisation`. La page logiciel gagne « Comment se passe une mission », numérotée parce que les étapes se suivent.
 
+## Refonte de l'accueil (2026-11-01)
+
+Dix regards indépendants sur le rendu réel, puis exécution par lots. `impeccable` : plus de filet central ni de coupe à 50 %, une composition propre à chaque section, charte de la carte de visite, une seule face volt. `taste-skill` : le cadran comme point focal tiré du vrai chiffre, rien d'ajouté pour décorer. `emil-design-eng` : trois gestes seulement (masque, trait, cran), `transform` et `opacity`, mouvement réduit respecté. Captures avant et après envoyées à Eliott.
+
 ## Ce qui n'a pas été changé, et pourquoi
 
 - La police Geist et la palette volt sur noir : identité installée du site.

@@ -172,7 +172,7 @@ export function Header({
   // n'en applique AUCUN sur eux — ils gardent donc la base, sans état de survol.
   const navItemCls =
     navBaseCls +
-    " transition-colors duration-200 ease-[cubic-bezier(0.44,0,0.56,1)] hover:text-accent motion-reduce:transition-none";
+    " transition-colors duration-200 ease-[var(--courbe-vive)] hover:text-accent motion-reduce:transition-none";
 
   // Au-delà de 1500 px, le logo et le menu se calent sur la colonne de 1440
   // du contenu au lieu des bords de la fenêtre (2026-10-16) : sur grand

@@ -16,3 +16,6 @@ export const DUREE = {
   titre: 0.8,
   image: 1.1,
 } as const;
+
+/** Une section n'attend jamais plus que ça : au-delà, le texte arrive après le lecteur. */
+export const DELAI_MAX = 0.24;

@@ -1,6 +1,4 @@
 import type { AboutContent } from "@/lib/content/types";
-import { slugsMisEnAvant } from "@/content/blog";
-import { services } from "@/content/services";
 
 // Les quatre chiffres du template ("60+ projects shipped since 2019",
 // "89% business from referrals", "12 industries served", "100% on-time")
@@ -8,7 +6,6 @@ import { services } from "@/content/services";
 // aucun historique à afficher. La grille reste (le composant attend quatre
 // cellules et une valeur numérique par cellule), mais elle porte désormais des
 // ENGAGEMENTS tenables au présent, pas un palmarès.
-// L'ordre suit les vitesses de compteur du composant (10 / 12 / 40 / 10 ms).
 /*
  * CHIFFRES DE CONFIANCE, refaits le 2026-10-16 à la demande d'Eliott : « un
  * projet à la fois » et l'échéancier de paiement ne donnaient aucune raison
@@ -186,29 +183,9 @@ export const aboutContent: AboutContent = {
       },
     ],
   },
-  services: {
-    eyebrow: "Services",
-    // IDENTIQUE à `homeContent.services.intro` (même section, deux pages).
-    intro:
-      "Je pars de votre façon de travailler, et je construis le logiciel qui lui correspond : la contrainte disparaît, le temps revient à votre équipe.",
-    items: services,
-  },
   // `testimonial` ABSENT depuis le 2026-09-01. Il portait « Sophie Andersen »,
   // persona du template supprimé de `testimonials.ts` : le champ est optionnel,
   // et le bloc de la page est de toute façon gardé par `siteFeatures.testimonials`.
-  articles: {
-    eyebrow: "Actualités et nouveautés.",
-    titleLines: ["Actualités et", "nouveautés."],
-    cta: { label: "Voir plus", href: "/blog" },
-    // QUATRE cartes dans le teaser de la source, pas trois : la dernière
-    // manquait, ce qui raccourcissait la section de 403px en mobile.
-    //
-    // DÉRIVÉE DU REGISTRE depuis le 2026-08-28, et surtout PARTAGÉE avec
-    // l'accueil : cette liste était une copie de celle de `home.ts`, et une
-    // copie qui dérive est une section qui n'affiche pas la même chose que
-    // l'accueil sans que personne le remarque. Voir l'en-tête de `blog.ts`.
-    featuredSlugs: slugsMisEnAvant,
-  },
   seo: {
     // Séparateur et marque alignés sur `siteConfig.meta.titleTemplate`
     // (« %s · Eliott Bouquerel ») : ces titres sont posés en `absolute`, le

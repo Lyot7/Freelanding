@@ -11,7 +11,6 @@ import { lienRendezVous, rendezVousContent } from "@/content/rendez-vous";
  * reconnaissables, jamais inventées de façon plausible) :
  * - `contact.phone` : vide tant qu'Eliott n'a pas tranché s'il publie un numéro.
  * - `contact.email` : dépend du domaine retenu.
- * - `availability` : donnée commerciale, pas un texte de template.
  * - `socials` : seul le compte GitHub est vérifié.
  * - `credits.createdByAvatar` : photo héritée du template.
  */
@@ -198,41 +197,6 @@ export const siteConfig: SiteConfig = {
   ],
   copyright: "2026©",
   copyrightLong: "© 2026 Eliott Bouquerel",
-  // LA JAUGE DE CRÉNEAUX EST RETIRÉE depuis le 2026-09-01, et le bandeau reste.
-  //
-  // CE QU'ELLE DISAIT. `slotsLeft: 2, totalSlots: 4` rendait deux barres
-  // pleines, une animée, deux éteintes et « 2/4 » : le site déclarait donc
-  // publiquement deux projets en cours sur quatre places, en tête de l'accueil
-  // et de la page contact. Eliott n'a aucun client. Ces deux chiffres étaient
-  // écrits à la main et rien ne les faisait bouger : la même annonce serait
-  // encore là dans six mois, également fausse, et fausse dans l'autre sens le
-  // jour où il aurait réellement du travail.
-  //
-  // POURQUOI PAS DES CRÉNEAUX DÉRIVÉS DE CAL.COM. L'agenda mesure des RENDEZ
-  // VOUS, pas des projets. Trois prospects qui réservent un appel de découverte
-  // dans la même semaine feraient afficher « 3 créneaux pris » sans qu'un seul
-  // devis soit signé : la même fausse déclaration, automatisée, donc plus
-  // difficile à repérer. S'y ajoute qu'aucun type d'événement n'est configuré
-  // (les variables `CAL_COM_EVENT_*` sont vides, cf. `src/lib/rendez-vous/`),
-  // et qu'un appel réseau par rendu du hero coûterait cher pour une donnée qui
-  // ne dit pas ce qu'on lui ferait dire.
-  //
-  // CE QUI LA REMPLACE est déjà écrit ailleurs sur le site et ne dépend que
-  // d'Eliott : `contact.availability` (« Je réponds à chaque message sous
-  // 24 heures ouvrées ») et la statistique « 24h » de `about.ts`. C'est une
-  // promesse qu'il tient, pas une mesure qu'il ne prend pas.
-  //
-  // POUR LA RALLUMER : rendre `slotsLeft` et `totalSlots` à cet objet. Le type,
-  // le composant et la jauge animée sont intacts, et les deux points de montage
-  // (hero d'accueil, hero contact) la reprendront sans autre changement. Le
-  // libellé peut alors reprendre la marque `{mois}`, substituée au rendu par le
-  // mois réel avec bascule le 20 (voir `@/lib/availability-month`).
-  availability: {
-    label: "RÉPONSE SOUS 24 HEURES OUVRÉES",
-    // Le délai en blanc plein, l'annonce en gris : même partage que le mois
-    // dans l'ancien libellé, c'est le chiffre qui porte l'information.
-    labelHighlights: ["24 HEURES OUVRÉES"],
-  },
   // Titres des deux colonnes du pied de page (habillage, pas de l'éditorial).
   footerColumnLabels: { contact: "Contact", navigation: "Navigation" },
   footerCta: {
@@ -255,41 +219,40 @@ export const siteConfig: SiteConfig = {
   footerForm: {
     modes: {
       label: "Comment me contacter",
-      message: "Écrire un message",
-      rendezVous: "Réserver un appel",
+      message: { titre: "Deux lignes par écrit", detail: "Réponse sous 24 h ouvrées" },
+      rendezVous: {
+        titre: "30 minutes en visio",
+        prochain: "Prochain créneau :",
+        promesse: "Vous repartez avec un ordre de grandeur et une prochaine étape.",
+      },
     },
-    nameLabel: "Nom",
-    namePlaceholder: "Alex Dupont",
+    messageLabel: "La tâche qui vous prend du temps, en deux lignes",
+    messagePlaceholder: "Chaque semaine, je recopie les commandes dans un tableur.",
     emailLabel: "Votre adresse e-mail",
     emailPlaceholder: "exemple@email.com",
-    selectLabel: "Que cherchez-vous ?",
-    messageLabel: "Votre message, si vous voulez",
-    messagePlaceholder: "Deux lignes sur ce qui vous bloque suffisent.",
+    nameLabel: "Nom",
+    namePlaceholder: "Alex Dupont",
+    /* LE FORMULAIRE NE LES DEMANDE PLUS depuis le 2026-11-01 : le serveur les
+       accepte encore, un onglet resté ouvert les envoie. */
     selectOptions: [
       "Un logiciel métier",
       "Je ne sais pas encore",
       "Une autre demande",
     ],
-    questionnaire: {
+    /* Facultatifs, repliés : le site promet deux lignes, pas un questionnaire. */
+    precisions: {
+      ouvrir: "Ajouter un budget ou une échéance",
       budget: {
         label: rendezVousContent.questionnaire.budget.legende,
         placeholder: "Choisissez une tranche",
-      },
-      objectif: {
-        label: rendezVousContent.questionnaire.objectif.legende,
-        placeholder: "Choisissez ce qui compte le plus",
       },
       echeance: {
         label: rendezVousContent.questionnaire.echeance.legende,
         placeholder: "Choisissez une échéance",
       },
     },
-    etapes: {
-      titres: ["Votre projet", "Votre budget", "Vos coordonnées"],
-      continuer: "Continuer",
-      retour: "Retour",
-    },
-    submitLabel: "Envoyer",
+    delaiReponse: "Réponse sous 24 h ouvrées.",
+    submitLabel: "Envoyer à Eliott",
     disclaimer:
       "En envoyant ce formulaire, vous acceptez mes conditions générales et ma politique de confidentialité.",
     // Le texte est rendu en trois morceaux autour de ses deux liens.

@@ -1,7 +1,5 @@
 import { ImageProgressive } from "@/components/ui/ImageProgressive";
 import Link from "next/link";
-import { ArticlesSection } from "@/components/sections/ArticlesSection";
-import { ServicesSection } from "@/components/sections/ServicesSection";
 import { TestimonialsSection } from "@/components/sections/TestimonialsSection";
 import { FloatingNav, Footer, Header } from "@/components/layout";
 import { Grain } from "@/components/effects/Grain";
@@ -10,16 +8,13 @@ import { Highlighted } from "@/components/ui";
 import { siteFeatures } from "@/content/features";
 import { aboutHeroImageAlt } from "@/content/about";
 import { Reveal } from "@/components/motion/Reveal";
+import { DUREE } from "@/components/motion/tempo";
 import { LineReveal } from "@/components/motion/LineReveal";
-import { AnimatedCounter } from "@/components/motion/AnimatedCounter";
+import { Rouleaux } from "@/components/motion/Rouleaux";
 import { Signature } from "@/components/sections/hero/Signature";
 import { ScrollParallax } from "@/components/motion/ScrollParallax";
 import { content } from "@/lib/content";
-import type {
-  AboutContent,
-  BlogPost,
-  Stat,
-} from "@/lib/content/types";
+import type { AboutContent, Stat } from "@/lib/content/types";
 
 /*
  * FOND DU HERO. Il n'a pas de champ dans le modèle de contenu, contrairement à
@@ -33,7 +28,6 @@ import type {
 const HERO_IMAGE = "/images/eliott-nature-paysage.jpg";
 /** Le portrait est le sujet de la page : il se décrit, il n'est pas décoratif. */
 const HERO_IMAGE_ALT = aboutHeroImageAlt;
-const COUNTER_SPEEDS = [10, 12, 40, 10] as const;
 
 function AboutHero({ about }: { about: AboutContent }) {
   // Le sous-titre et ses fragments en emphase viennent de la DONNÉE. Ils
@@ -125,9 +119,8 @@ function AboutHero({ about }: { about: AboutContent }) {
             appearId="about-hero-chapo"
             className="grid w-full grid-cols-1 tablet:grid-cols-2"
             initialOpacity={0.001}
-            initialY={28}
-            duration={0.8}
-            delay={0.24}
+            duration={DUREE.texte}
+            delay={0.12}
           >
             {/* Largeur déjà conforme (310 px). En revanche le texte était en
                 blanc PLEIN : le live le pose à 60 % et n'y met en blanc que les
@@ -142,24 +135,17 @@ function AboutHero({ about }: { about: AboutContent }) {
   );
 }
 
-function StatCell({ stat, speedMs }: { stat: Stat; speedMs: number }) {
+function StatCell({ stat }: { stat: Stat }) {
   return (
     // Chiffre MESURÉ sur la source : 34 / 52 / 54 px, graisse 600, chasse
     // -0,07em et interligne `normal` (71px de haut à 54px, soit ~1,31 — pas 1).
     // La cellule n'a pas de hauteur minimale ; l'écart interne passe de 12 à 15.
     <div className="flex flex-col items-start justify-start gap-[12px] tablet:gap-[15px]">
-      <AnimatedCounter
-        value={stat.value}
-        speedMs={speedMs}
-        // Hauteur RÉSERVÉE au chiffre sous 810. L'explication d'origine était
-        // inversée : re-mesuré à 390, l'hôte du compteur de la SOURCE fait 44 de
-        // haut avec 8 px d'écart au libellé, le nôtre 40 avec 12. Ce n'est donc
-        // pas la source qui borne à 40, c'est notre 40 + 12 qui reproduit son
-        // 44 + 8 — même somme, donc libellé au même endroit et pas de rangée
-        // identique des deux côtés (111 px). Le résultat était juste, le
-        // raisonnement non. À partir de 810 la boîte naturelle vaut 67 puis 70,
-        // exactement comme la source : on la laisse libre.
-        className="flex h-[40px] text-[34px] font-semibold leading-[normal] tracking-[-0.045em] text-background tablet:h-auto tablet:text-[52px] desktop:text-[54px]"
+      <Rouleaux
+        valeur={stat.value}
+        // Hauteur RÉSERVÉE au chiffre sous 810 : 40 + 12 d'écart placent le
+        // libellé au même endroit que la source. Au-dessus, la boîte naturelle.
+        className="h-[40px] text-[34px] font-semibold leading-[normal] tracking-[-0.045em] text-background tablet:h-auto tablet:text-[52px] desktop:text-[54px]"
       />
       <p className="w-[150px] text-[14px] font-medium leading-[1.35] tracking-[-0.01em] text-[rgba(11,11,11,0.6)]">
         {stat.label}
@@ -214,8 +200,6 @@ export function AboutStory({ about }: { about: AboutContent }) {
               // celle des paliers supérieurs (-0,01em) sur la source.
               className="w-full max-w-[900px] pb-[16px] text-[22px] font-medium leading-[1.2] tracking-[-0.01em] tablet:pb-[40px] tablet:leading-[1.1] tablet:text-[26px] tablet:tracking-[-0.01em] desktop:text-[32px]"
               initialOpacity={0}
-              initialY={30}
-              duration={0.75}
             >
               {lead}
             </Reveal>
@@ -311,12 +295,8 @@ export function AboutStory({ about }: { about: AboutContent }) {
           {/* Gouttière de colonne NULLE sur la source, et interligne de rangée
               qui s'ouvre avec la largeur : 30 / 50 / 70. */}
           <div className="grid grid-cols-2 gap-x-0 gap-y-[30px] tablet:gap-y-[50px] tablet:pt-[50px] desktop:gap-y-[70px] desktop:pt-[100px]">
-            {about.stats.map((stat, index) => (
-              <StatCell
-                key={stat.label}
-                stat={stat}
-                speedMs={COUNTER_SPEEDS[index] ?? 10}
-              />
+            {about.stats.map((stat) => (
+              <StatCell key={stat.label} stat={stat} />
             ))}
           </div>
         </div>
@@ -340,9 +320,8 @@ export function AboutParcours({
   parcours: NonNullable<AboutContent["parcours"]>;
 }) {
   return (
-    // FOND CLAIR, dans le prolongement du récit : la section Services qui suit
-    // ouvre sur une encoche claire en haut à gauche, qui raccorde au gris du
-    // bloc précédent. Une section sombre intercalée l'aurait laissée orpheline.
+    // FOND CLAIR, dans le prolongement du récit. La page finit ici : le pied de
+    // page et sa lettre signée prennent le relais.
     <section className="relative flex w-full justify-center bg-muted px-[20px] pb-[50px] pt-[20px] text-background tablet:px-[24px] tablet:pb-[90px] tablet:pt-[40px] desktop:px-[30px] desktop:pb-[120px]">
       <span
         aria-hidden
@@ -444,22 +423,11 @@ export function AboutParcours({
   );
 }
 
-function selectArticles(
-  posts: BlogPost[],
-  featuredSlugs: readonly string[],
-): BlogPost[] {
-  return featuredSlugs
-    .map((slug) => posts.find((post) => post.slug === slug))
-    .filter((post): post is BlogPost => Boolean(post));
-}
-
 export async function AboutPage() {
-  const [site, about, posts] = await Promise.all([
+  const [site, about] = await Promise.all([
     content.getSiteConfig(),
     content.getAbout(),
-    content.getPosts(),
   ]);
-  const articles = selectArticles(posts, about.articles.featuredSlugs);
 
   return (
     <>
@@ -470,14 +438,6 @@ export async function AboutPage() {
         <AboutHero about={about} />
         <AboutStory about={about} />
         {about.parcours ? <AboutParcours parcours={about.parcours} /> : null}
-        {/* Pas de barre d'accent orange ici : mesuré absent sur le live pour
-            cette page (le seul élément orange y est le bouton « START A PROJECT »). */}
-        <ServicesSection
-          services={about.services.items}
-          intro={about.services.intro}
-          eyebrow={about.services.eyebrow}
-          bottomAccent="muted"
-        />
         {/* Témoignage client : DEUX conditions, et il en faut deux. Le drapeau
             `siteFeatures.testimonials` suspend l'affichage ; `about.testimonial`
             dit s'il y a quelque chose à afficher. Le champ était obligatoire et
@@ -485,14 +445,6 @@ export async function AboutPage() {
             seul aurait republié un faux client au premier retour à `true`. */}
         {siteFeatures.testimonials && about.testimonial ? (
           <TestimonialsSection testimonials={[about.testimonial]} />
-        ) : null}
-        {/* Retrait haut MESURÉ à 30 en mobile sur `/about` (contre 40 sur la
-            home) : la section faisait 2119 sur la source à 390 et 2129 chez
-            nous, écart identique à 600 et 809. */}
-        {/* Teaser blog : suit le drapeau `blog` comme la section « actualités »
-            de la home (voir `src/content/features.ts`). */}
-        {siteFeatures.blog ? (
-          <ArticlesSection posts={articles} compactTop />
         ) : null}
       </main>
       <Footer />

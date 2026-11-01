@@ -214,8 +214,12 @@ export function validerSoumission(
     };
   }
 
+  // LE PIED DE PAGE TIENT EN DEUX LIGNES depuis le 2026-11-01 : plus de type de
+  // projet à choisir, et c'est alors le message qui fait la demande. Une valeur
+  // envoyée reste vérifiée en liste fermée, pour un onglet resté ouvert.
   const typeProjet = normaliserLigne(lireChaine(champs, "typeProjet") ?? "");
-  if (!options.typesProjetAutorises.includes(typeProjet)) {
+  const messageSeul = intention === "footer" && typeProjet.length === 0;
+  if (!messageSeul && !options.typesProjetAutorises.includes(typeProjet)) {
     return {
       ok: false,
       motif: { type: "champ_invalide", champ: "typeProjet", raison: "hors_liste" },
@@ -223,9 +227,7 @@ export function validerSoumission(
   }
 
   // Questionnaire : chaque réponse donnée doit venir de la liste du type de
-  // projet choisi. Le navigateur exige budget et objectif ; le serveur les
-  // tolère absents, sinon un onglet ouvert avant leur arrivée ne pourrait plus
-  // écrire.
+  // projet choisi. Toutes sont facultatives.
   const idRendezVous = rendezVousDuTypeProjet(typeProjet);
   const reponses: { budget?: string; objectif?: string; echeance?: string } = {};
   const questions: readonly [keyof typeof reponses, readonly OptionQuestion[]][] = [
@@ -255,10 +257,15 @@ export function validerSoumission(
     reponses[champ] = libelle;
   }
 
-  // Le message est facultatif pour les deux intentions : le pied de page le
-  // propose aussi depuis le 2026-10-15, en champ court.
+  // Le message n'est facultatif que si un type de projet dit déjà la demande.
   const messageBrut = normaliserTexte(lireChaine(champs, "message") ?? "");
   if (messageBrut.length === 0) {
+    if (messageSeul) {
+      return {
+        ok: false,
+        motif: { type: "champ_invalide", champ: "message", raison: "longueur" },
+      };
+    }
     return { ok: true, soumission: { intention, nom, email, typeProjet, ...reponses } };
   }
   if (

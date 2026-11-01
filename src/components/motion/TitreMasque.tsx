@@ -3,7 +3,7 @@
 import { motion, useInView } from "motion/react";
 import { useRef } from "react";
 import { useReducedMotionAfterMount } from "@/components/motion/reducedMotion";
-import { COURBE, DUREE } from "@/components/motion/tempo";
+import { COURBE, DELAI_MAX, DUREE } from "@/components/motion/tempo";
 
 /** Le geste des titres : chaque ligne monte de derrière son masque, une seule fois. */
 export function TitreMasque({
@@ -24,7 +24,7 @@ export function TitreMasque({
             className="block"
             initial={false}
             animate={{ y: vu || reduit ? "0%" : "105%" }}
-            transition={{ duration: reduit ? 0 : DUREE.titre, ease: COURBE.sortie, delay: index * 0.07 }}
+            transition={{ duration: reduit ? 0 : DUREE.titre, ease: COURBE.sortie, delay: Math.min(index * 0.07, DELAI_MAX) }}
           >
             {ligne}
           </motion.span>

@@ -21,25 +21,12 @@ describe("accueil", () => {
     expect(homeContent.logoBand?.logos.length).toBeGreaterThan(0);
   });
 
-  test("l'ordre des sections est celui de la page d'origine, décision du 2026-11-01", () => {
-    expect(ordre).toEqual([
-      "hero",
-      "about",
-      "showreel",
-      "works",
-      "numbers",
-      "logiciel",
-      "moyens",
-      "whyUs",
-      "faq",
-      "articles",
-    ]);
+  test("l'ordre des sections : le temps rendu, le moyen, la preuve, l'homme, décision du 2026-11-01", () => {
+    expect(ordre).toEqual(["hero", "logiciel", "moyens", "preuves", "confiance", "rencontre", "faq"]);
     expect(new Set(ordre).size).toBe(ordre.length);
-    // « works » se rend depuis `featuredWorkSlugs`, les autres depuis leur clef.
-    for (const section of ordre.filter((nom) => nom !== "works")) {
+    for (const section of ordre) {
       expect(homeContent[section], `la section « ${section} » n'a pas de contenu`).toBeDefined();
     }
-    expect(homeContent.featuredWorkSlugs.length).toBeGreaterThan(0);
   });
 
   test("l'accueil ne liste aucun métier : il parle à chacun sans le citer", () => {
@@ -72,18 +59,25 @@ describe("accueil", () => {
     expect(titre).not.toMatch(/\d|stage|alternance/iu);
   });
 
-  test("les deux sections à cartes noires ne se suivent pas", () => {
-    const chiffres = ordre.indexOf("numbers");
-    const pourquoi = ordre.indexOf("whyUs");
-    expect(chiffres).toBeGreaterThan(-1);
-    expect(pourquoi).toBeGreaterThan(-1);
-    expect(Math.abs(chiffres - pourquoi)).toBeGreaterThan(1);
+  test("la seule face volt arrive juste avant les dernières questions", () => {
+    expect(ordre.indexOf("rencontre")).toBe(ordre.indexOf("faq") - 1);
+  });
+
+  test("aucun faux chiffre sur les preuves : seul Würth porte un résultat mesuré", () => {
+    const { projets } = homeContent.preuves;
+    expect(projets.map((p) => p.slug)).toEqual(["wurth-creation-de-compte", "kpsull"]);
+    expect(projets.filter((p) => p.chiffre).map((p) => p.slug)).toEqual(["wurth-creation-de-compte"]);
+    expect(projets[0].resume).toContain("mesuré");
+  });
+
+  test("les preuves ne présentent aucun employeur comme client", () => {
+    const { preuves, confiance, rencontre } = homeContent;
+    expect(JSON.stringify({ preuves, confiance, rencontre })).not.toMatch(/\bclients?\b/iu);
   });
 
   test("les offres ne sont pas redites sous le héros, chacune a sa section", () => {
     expect(ordre).not.toContain("services");
-    expect(ordre.indexOf("showreel")).toBe(ordre.indexOf("about") + 1);
-    expect(ordre).toContain("logiciel");
+    expect(ordre.indexOf("logiciel")).toBe(ordre.indexOf("hero") + 1);
     // La section des moyens suit : l'action mène au rendez-vous, pas à la voisine.
     expect(homeContent.logiciel?.cta.href).toBe(lienRendezVous("logiciel"));
     expect(homeContent.hero.offerLink?.href).toBe("#logiciel");
@@ -94,8 +88,10 @@ describe("accueil", () => {
     expect(moyens.lignes.map((l) => l.lien.href)).toContain("/services/automatisation#referent");
     expect(moyens.lignes).toHaveLength(3);
     expect(moyens.lignes.at(-1).corps).toContain("ponctuelles");
-    const { hero, logiciel, whyUs } = homeContent;
-    expect(JSON.stringify({ hero, logiciel, moyens, whyUs })).not.toContain("/services/logiciel-metier");
+    const { hero, logiciel, preuves, confiance, rencontre } = homeContent;
+    expect(JSON.stringify({ hero, logiciel, moyens, preuves, confiance, rencontre })).not.toContain(
+      "/services/logiciel-metier",
+    );
     expect(JSON.stringify(moyens).toLowerCase()).not.toContain("sitpo");
   });
 
@@ -135,14 +131,14 @@ describe("accueil", () => {
     expect(homeContent.hero.title).toBe("Je vous rends des heures.");
     expect(homeContent.hero.titleLines?.join(" ")).toBe(homeContent.hero.title);
     expect(homeContent.about.title).not.toBe(homeContent.hero.title);
-    expect(homeContent.about.titleLines?.join(" ")).toBe(homeContent.about.title);
+    expect(homeContent.rencontre.titleLines.join(" ")).toBe(homeContent.about.title);
   });
 
   test("« indispensable » n'est dit qu'une fois, dans le héros", () => {
     // Tout ce que l'accueil rend sous le héros.
-    const { hero, about, logiciel, moyens, showreel, whyUs, numbers, faq } = homeContent;
+    const { hero, logiciel, moyens, preuves, confiance, rencontre, faq } = homeContent;
     expect(hero.subtitle).toContain("indispensable");
-    const reste = { about, logiciel, moyens, showreel, whyUs, numbers, faq };
+    const reste = { logiciel, moyens, preuves, confiance, rencontre, faq };
     expect(JSON.stringify(reste)).not.toContain("indispensable");
   });
 
@@ -170,10 +166,11 @@ describe("accueil", () => {
     for (const texte of textes) expect(texte ?? "").not.toMatch(/deux fois moins/iu);
   });
 
-  test("« 1 projet à la fois » n'est dit qu'une fois, par la section chiffres", () => {
-    const about = homeContent.about;
-    const textes = [about.launchedLabel, about.projectsLabel, about.counter?.caption, ...about.body];
-    for (const texte of textes) expect(texte ?? "").not.toMatch(/projet à la fois/u);
+  test("« un chantier à la fois » n'est dit qu'une fois, par la confiance", () => {
+    const { confiance, rencontre } = homeContent;
+    const textes = [...rencontre.paragraphes, rencontre.citation, ...homeContent.about.body];
+    for (const texte of textes) expect(texte).not.toMatch(/(projet|chantier) à la fois/u);
+    expect(confiance.tuiles.map((t) => t.titre)).toContain("chantier à la fois");
   });
 });
 
@@ -183,7 +180,8 @@ describe("un seul libellé pour le rendez-vous", () => {
   test("l'en-tête, le bouton flottant et « Pourquoi moi » disent le même mot", () => {
     expect(siteConfig.primaryCta.label.toLowerCase()).toBe(libelle.toLowerCase());
     expect(siteConfig.floatingCta?.label).toBe(libelle);
-    expect(homeContent.whyUs.ctas?.[0]?.label).toBe(libelle);
+    expect(homeContent.confiance.cta.label).toBe(libelle);
+    expect(homeContent.rencontre.cta.label).toBe(libelle);
   });
 
   test("« Démarrer un projet » ne revient pas comme libellé d'action", () => {

@@ -6,6 +6,7 @@ import { motion, useReducedMotion } from "motion/react";
 import type { FaqItem } from "@/lib/content/types";
 import { homeContent } from "@/content/home";
 import { Reveal } from "@/components/motion/Reveal";
+import { COURBE, DUREE } from "@/components/motion/tempo";
 import { SwapCopies } from "@/components/ui/SwapCopies";
 import { ToggleIcon } from "@/components/ui/ToggleIcon";
 import { toggleFaqItem } from "./faq-state";
@@ -64,7 +65,7 @@ const INK_60 = "rgba(11,11,11,0.6)"; // libellé FAQ
 const INK_70 = "rgba(11,11,11,0.7)"; // question fermée
 
 /* Temps séparés : la hauteur porte le mouvement, le texte arrive après elle. */
-const EASE_FAQ = [0.23, 1, 0.32, 1] as const;
+const EASE_FAQ = COURBE.vive;
 const RULE_12 = "rgba(11,11,11,0.12)"; // filet sous chaque item
 const BAR = "rgba(11,11,11,0.6)"; // barres de l'icône
 
@@ -88,8 +89,9 @@ function FaqRow({
     <Reveal
       className="w-full"
       initialOpacity={0.001}
-      initialY={12}
-      transition={{ type: "tween", duration: 0.6, delay: 0.05 + index * 0.08 }}
+      initialY={6}
+      duration={DUREE.texte}
+      delay={index * 0.04}
     >
       {/* pb-[20px] constant : le delta open/close (14px + réponse + 10px) vit
           dans le conteneur animé → total sous la réponse = 10 + 20 = 30px (open),
@@ -265,7 +267,7 @@ export function FaqSection({
                   className="accent-room descender-room block overflow-hidden text-left"
                   initialOpacity={0.001}
                   initialY={40}
-                  transition={{ type: "tween", duration: 0.7, delay: 0.05 }}
+                  delay={0.05}
                 >
                   {titleLines[0]}
                 </Reveal>
@@ -274,7 +276,7 @@ export function FaqSection({
                   className="accent-room descender-room block overflow-hidden text-left"
                   initialOpacity={0.001}
                   initialY={40}
-                  transition={{ type: "tween", duration: 0.7, delay: 0.12 }}
+                  delay={0.12}
                 >
                   {titleLines[1]}
                 </Reveal>
@@ -347,12 +349,6 @@ export function FaqSection({
           </div>
         </div>
       </div>
-
-      {/* framer-1n2wdq0 : filet vertical central (8% noir) — desktop/tablet uniquement */}
-      <div
-        className="absolute left-[calc(50%-0.5px)] top-0 z-[1] hidden h-full w-px opacity-[0.08] tablet:block"
-        style={{ backgroundColor: INK }}
-      />
     </section>
   );
 }

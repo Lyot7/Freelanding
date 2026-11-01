@@ -46,7 +46,7 @@ import type { ReactNode } from "react";
  * (0.44,0,0.56,1). C'est déjà la courbe de l'entrée du header chez Framer.
  * Elle place 50 % de la course à ~39 % du temps, puis étire une longue queue.
  */
-const EASE = "ease-[cubic-bezier(0.68,0,0,1)]";
+const EASE = "ease-[var(--courbe-vive)]";
 
 /**
  * Un motif par course : le sens, la durée et la présence du fondu sont dictés

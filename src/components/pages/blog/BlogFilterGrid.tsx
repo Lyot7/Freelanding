@@ -112,7 +112,7 @@ function BlogIndexCard({
            (0,235 attendu / 0,245 mesuré à 34 % du temps ; 0,552 / 0,562 à 53 % ;
            0,849 / 0,852 à 72 %), donc la courbe symétrique de Framer, pas la
            courbe de 700 ms très traînante utilisée avant. */
-        className="block object-cover transition-transform duration-[400ms] ease-[cubic-bezier(0.44,0,0.56,1)] group-hover:scale-[1.1] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+        className="block object-cover transition-transform duration-[400ms] ease-[var(--courbe-vive)] group-hover:scale-[1.1] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
       />
       </motion.div>
       </motion.div>

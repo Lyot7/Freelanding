@@ -2,6 +2,7 @@
 
 // Préchargement AU SURVOL : le bandeau est visible dès l'arrivée, un `Link`
 // classique téléchargeait la politique de confidentialité pendant le chargement.
+import { COURBE } from "@/components/motion/tempo";
 import { HoverPrefetchLink as Link } from "@/components/ui/HoverPrefetchLink";
 import {
   useCallback,
@@ -52,7 +53,7 @@ import { consentCopy } from "@/content/consent";
  * rebours, pas de réouverture après un refus.
  */
 
-const EASE = [0.68, 0, 0, 1] as const;
+const EASE = COURBE.vive;
 
 /** Interrupteur accessible — `role="switch"`, pilotable au clavier. */
 function ConsentSwitch({

@@ -36,7 +36,7 @@ const URL_WEB = /https?:\/\/[^\s]*[^\s.,;:!?)»…”’"']/g;
  * le vert #c8f24a : illisible. Le soulignement se fonce et s'épaissit.
  */
 const LIEN_CLS =
-  "text-background underline decoration-background/40 decoration-1 underline-offset-[3px] transition-[text-decoration-color] duration-200 ease-[cubic-bezier(0.44,0,0.56,1)] hover:decoration-background hover:decoration-2 motion-reduce:transition-none";
+  "text-background underline decoration-background/40 decoration-1 underline-offset-[3px] transition-[text-decoration-color] duration-200 ease-[var(--courbe-vive)] hover:decoration-background hover:decoration-2 motion-reduce:transition-none";
 
 function linkifyEmails(text: string, cle = ""): ReactNode[] {
   const parts: ReactNode[] = [];

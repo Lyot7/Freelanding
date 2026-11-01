@@ -97,7 +97,7 @@ function RelatedArticle({ post }: { post: BlogPost }) {
              seul calque et non deux. Loi et chiffres dans
              `@/components/motion/mediaReveal`. */
           reveal
-          className="transition-transform duration-[400ms] ease-[cubic-bezier(0.44,0,0.56,1)] group-hover:scale-[1.1] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+          className="transition-transform duration-[400ms] ease-[var(--courbe-vive)] group-hover:scale-[1.1] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
         >
           {/* `.framer-30jb7g-container` : grain z-3, opacité 0.09 sur le live. */}
           <Grain matiere="photo" className="z-[3]" />

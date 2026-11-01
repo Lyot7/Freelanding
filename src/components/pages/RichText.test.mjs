@@ -92,3 +92,19 @@ describe("RichText : liens", () => {
     expect(classes).not.toContain("hover:text-accent");
   });
 });
+
+describe("RichText : titres", () => {
+  it("rend deux niveaux, le h2 ancré pour le sommaire", () => {
+    const doc = rendre(
+      [
+        { type: "heading", level: 2, text: "Une section" },
+        { type: "heading", level: 3, text: "Une sous-section" },
+        paragraphe("Du texte."),
+      ],
+      { bodySize: 15 },
+    );
+    expect(doc.querySelector("h2").id).not.toBe("");
+    expect(doc.querySelector("h3").textContent).toBe("Une sous-section");
+    expect(doc.querySelector("p").className).toContain("text-[16px]");
+  });
+});
