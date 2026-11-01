@@ -20,7 +20,7 @@
 
 const SPRITE_HTML = `
 <svg width="28" height="28" viewBox="0 0 28 28" fill="none" id="svg-1811528748_216">
-<circle cx="14" cy="14" r="14" fill="var(--background)"/>
+<circle cx="14" cy="14" r="14" fill="#0B0B0B"/>
 <path d="M19 14L11.5 18.3301L11.5 9.66987L19 14Z" fill="white"/>
 </svg>
 `;

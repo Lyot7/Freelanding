@@ -43,9 +43,9 @@ export const howWeDoItStats: Stat[] = [
    * courant. Le libellé dit lequel des deux on lit.
    */
   {
-    value: "24 h",
+    value: "24h",
     label: "Pour répondre à votre message, en heures ouvrées",
-    suffix: " h",
+    suffix: "h",
     format: "integer",
     highlights: ["Pour répondre à votre message"],
   },
@@ -63,7 +63,7 @@ export const howWeDoItStats: Stat[] = [
     value: "92",
     label: "D’erreurs sur un parcours d’inscription refait chez Würth France",
     prefix: "\u2212",
-    suffix: " %",
+    suffix: "%",
     format: "integer",
     highlights: ["D’erreurs"],
   },
@@ -81,7 +81,7 @@ export const reputationStats: Stat[] = [
     value: "100",
     label: "Du code, de l’hébergement et des données à votre nom",
     prefix: "/",
-    suffix: " %",
+    suffix: "%",
     format: "integer",
   },
 ];

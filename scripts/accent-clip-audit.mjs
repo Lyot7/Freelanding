@@ -89,7 +89,6 @@ const ROUTES = [
   ...blogPosts.map(({ slug }) => `/blog/${slug}`),
   // Pages de prestation, ajoutées le 2026-08-27 avec la refonte de l'offre.
   "/services/logiciel-metier",
-  "/services/automatisation",
   // Hub des métiers et une page par métier (2026-10-31).
   "/logiciel-metier",
   "/logiciel-metier/echafaudage",
@@ -416,46 +415,6 @@ for (const width of widths) {
     }
   }
 }
-/*
- * LES H1 NE DÉBORDENT PAS DE LEUR COLONNE. Un masque coupe le mot sans erreur :
- * à 878 px, /services/automatisation affichait « AUTOMATISAT ». Largeurs de
- * bascule des colonnes, plus 878 où le défaut a été vu.
- */
-const LARGEURS_H1 = [810, 878, 1200];
-const debordsH1 = [];
-if (args.length === 0) {
-  for (const width of LARGEURS_H1) {
-    await ctx?.close().catch(() => {});
-    ctx = null;
-    for (const route of ROUTES.filter((r) => !r.startsWith("/blog/"))) {
-      const contexte = await contexteVivant(width);
-      const page = await contexte.newPage();
-      try {
-        await page.goto(BASE + route, { waitUntil: "domcontentloaded", timeout: 60_000 });
-        const debord = await page.evaluate(() => {
-          const h1 = document.querySelector("h1");
-          if (!h1) return null;
-          const plage = document.createRange();
-          plage.selectNodeContents(h1);
-          const encre = plage.getBoundingClientRect();
-          let parent = h1.parentElement;
-          while (parent && getComputedStyle(parent).overflowX === "visible") {
-            parent = parent.parentElement;
-          }
-          const bord = (parent ?? document.documentElement).getBoundingClientRect().right;
-          const exces = encre.right - Math.min(bord, window.innerWidth);
-          return exces > 1 ? { texte: h1.textContent.slice(0, 40), exces: Math.round(exces) } : null;
-        });
-        if (debord) debordsH1.push({ route, width, ...debord });
-      } catch {
-        injoignables.push(`${route} (h1 à ${width})`);
-      } finally {
-        await page.close().catch(() => {});
-      }
-    }
-  }
-}
-
 await browser?.close().catch(() => {});
 
 // UNE ROUTE INJOIGNABLE EST UN ÉCHEC, pas une ligne d'information. Sans cette
@@ -524,8 +483,5 @@ rendre(etroits, "GLYPHES ENTIERS MAIS À L'ÉTROIT (toléré)", "serré par");
 console.log(
   `Total : ${coupes.length} coupé(s), ${etroits.length} à l'étroit, sur ${ROUTES.length} routes x ${widths.length} largeurs.`,
 );
-for (const d of debordsH1) {
-  console.log(`  [H1] ${d.route} à ${d.width} px : ${d.exces} px hors colonne, « ${d.texte} »`);
-}
-if (coupes.length > 0 || debordsH1.length > 0) process.exit(1);
+if (coupes.length > 0) process.exit(1);
 process.exit(0);

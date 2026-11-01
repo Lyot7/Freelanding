@@ -44,7 +44,7 @@ export function FilterPill({
         // Voir en revanche `--focus-shadow-keep` plus bas, indispensable au
         // filet interne de la puce inactive.
         "flex h-[30px] w-min cursor-pointer items-center gap-[10px] whitespace-pre px-[10px] " +
-        "micro min-h-[40px] " +
+        "text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] " +
         "transition-colors duration-200 motion-reduce:transition-none " +
         // AUCUN état de survol : la source n'en a pas. Deux preuves
         // concordantes. Le CSS de l'archive ne contient qu'une règle pour ce

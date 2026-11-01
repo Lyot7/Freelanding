@@ -11,7 +11,7 @@ import type { WorkItem } from "@/lib/content/types";
  * Structure relevée sur le live (computed styles + balayage de scroll), identique
  * à toutes les largeurs :
  *
- *   rangée `.framer-l99f28`        height 100vh                           visible
+ *   rangée `.framer-l99f28`        height 800px / 100vh à partir de 1200  visible
  *     └ hublot `<a>` `.framer-z2o4lz`  height 100% + flex column CENTRÉ  clip
  *         ├ fond `.framer-1cogzvi`     absolute inset-0 (DÉFILE)
  *         └ track `.framer-7nnyja`     height 300vh, flex-none           clip
@@ -48,11 +48,11 @@ export function WorkCardPin({
   work,
   index,
   /**
-   * Hauteur de la rangée, donc longueur de scroll du projet. Une fenêtre pleine
-   * à toutes les largeurs : à 800 px sur un téléphone de 844, la carte suivante
-   * montrait son chiffre sous le projet en cours, qui se l'attribuait.
+   * Hauteur de la rangée, donc longueur de scroll du projet. Défaut = valeur
+   * mesurée sur la home : 800px, et 100vh à partir de 1200 (seuil `desktop`,
+   * PAS `tablet` : relevé à 800px de hublot aussi bien à 390 qu'à 810).
    */
-  rowClassName = "h-[calc(100vh/var(--zoom-ecran,1))]",
+  rowClassName = "h-[800px] desktop:h-[calc(100vh/var(--zoom-ecran,1))]",
   /** Contenu superposé à la carte, dans le repère du sticky (titre de section…). */
   overlay,
   /** Châssis d'ordinateur portable autour de la vignette. Home uniquement. */

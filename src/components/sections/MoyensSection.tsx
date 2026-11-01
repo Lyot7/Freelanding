@@ -1,77 +1,57 @@
-"use client";
-
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
-import { TitreMasque } from "@/components/motion/TitreMasque";
-import { DELAI_MAX } from "@/components/motion/tempo";
-import { Trait } from "@/components/motion/Trait";
-import { FlecheSortante } from "@/components/ui/FlecheSortante";
 import type { MoyensContent } from "@/lib/content/types";
 
 /**
  * LES TROIS MOYENS DE RENDRE DU TEMPS (2026-11-01).
  *
- * Le titre reste fixe pendant que les lignes défilent sous lui : celle du milieu
- * de l'écran passe en encre pleine, les autres s'effacent. La troisième est une
- * option, plus petite et étiquetée : son déroulé vit sur `/services/automatisation`.
+ * La section noire montre le gain, celle-ci dit comment on l'obtient. Des lignes
+ * plutôt que trois cartes : le nom se lit d'abord, le détail à côté, comme une
+ * ordonnance. La troisième est une option, décision d'Eliott : son déroulé vit sur
+ * `/services/automatisation`, pas sur l'accueil.
  */
-/** Les lignes à observer, aucune tant que la liste n'existe pas. */
-export function lignesDe(liste: Element | null): Element[] {
-  return liste ? [...liste.children] : [];
-}
-
 export function MoyensSection({ moyens }: { moyens: MoyensContent }) {
-  const [active, setActive] = useState(0);
-  const liste = useRef<HTMLUListElement>(null);
-
-  useEffect(() => {
-    const lignes = lignesDe(liste.current);
-    const observateur = new IntersectionObserver(
-      (entrees) => {
-        for (const entree of entrees) {
-          if (entree.isIntersecting) setActive(lignes.indexOf(entree.target));
-        }
-      },
-      { rootMargin: "-45% 0px -45% 0px" },
-    );
-    for (const ligne of lignes) observateur.observe(ligne);
-    return () => observateur.disconnect();
-  }, []);
-
   return (
     <section
       id="moyens"
       data-section="moyens"
-      className="relative flex w-full flex-col items-center bg-muted px-[20px] py-[60px] text-background tablet:px-[24px] tablet:py-[120px] desktop:px-[30px]"
+      className="relative flex w-full flex-col items-center bg-muted px-[20px] py-[60px] text-background tablet:px-[24px] tablet:py-[90px] desktop:px-[30px]"
     >
-      <div className="grid w-full max-w-[1440px] gap-[40px] desktop:grid-cols-12 desktop:gap-x-[20px]">
-        <div className="flex flex-col gap-[20px] desktop:sticky desktop:top-[100px] desktop:col-span-5 desktop:self-start">
-          <p className="micro m-0 text-background/60">{moyens.eyebrow}</p>
-          <TitreMasque lignes={moyens.titleLines} className="titre-marque text-[44px] tablet:text-[60px] desktop:text-[72px]" />
-          <p className="m-0 max-w-[40ch] text-[16px] font-medium leading-[1.4] tracking-[-0.01em] text-background/70 tablet:text-[18px]">
+      <div className="flex w-full max-w-[1440px] flex-col gap-[48px] tablet:gap-[70px]">
+        <div className="grid gap-[20px] tablet:grid-cols-2 tablet:items-end">
+          <div className="flex flex-col gap-[20px] tablet:pr-[30px]">
+            <p className="m-0 text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/60">
+              {moyens.eyebrow}
+            </p>
+            <h2 className="m-0 flex flex-col text-[44px] font-semibold uppercase leading-[0.96] tracking-[-0.05em] tablet:text-[60px] desktop:text-[80px]">
+              {moyens.titleLines.map((ligne) => (
+                <span key={ligne} className="accent-room block">
+                  {ligne}
+                </span>
+              ))}
+            </h2>
+          </div>
+          <p className="m-0 max-w-[46ch] text-[17px] font-medium leading-[1.4] tracking-[-0.01em] text-background/70 tablet:pl-[30px] desktop:pl-[40px]">
             {moyens.intro}
           </p>
         </div>
 
-        <ul ref={liste} className="moyens-lignes m-0 list-none p-0 desktop:col-span-6 desktop:col-start-7">
-          {moyens.lignes.map((ligne, index) => (
-            <li
-              key={ligne.titre}
-              data-active={active === index}
-              className={`moyen-ligne ${ligne.option ? "" : "desktop:min-h-[38vh]"}`}
-            >
-              <Trait className="bg-black/[0.14]" delai={Math.min(index * 0.08, DELAI_MAX)} />
-              <Link href={ligne.lien.href} className="group flex flex-col gap-[10px] py-[24px] no-underline tablet:py-[34px]">
-                {ligne.option ? <span className="micro text-background/60">{ligne.option}</span> : null}
-                <span className={`moyen-titre font-black uppercase leading-[1.02] tracking-[-0.045em] ${ligne.option ? "text-[24px] tablet:text-[26px]" : "text-[28px] tablet:text-[32px]"}`}>
+        <ul className="m-0 list-none border-b border-black/[0.12] p-0">
+          {moyens.lignes.map((ligne) => (
+            <li key={ligne.titre} className="border-t border-black/[0.12]">
+              <Link
+                href={ligne.lien.href}
+                className="group grid gap-[8px] py-[22px] no-underline transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] active:translate-y-[1px] tablet:grid-cols-2 tablet:gap-0 tablet:py-[30px]"
+              >
+                <span className="text-[26px] font-semibold uppercase leading-[1] tracking-[-0.04em] tablet:pr-[30px] tablet:text-[32px] desktop:text-[40px]">
                   {ligne.titre}
                 </span>
-                <span className="max-w-[52ch] text-[16px] font-medium leading-[1.4] tracking-[-0.01em] text-background/70">
-                  {ligne.corps}
-                </span>
-                <span className="cta-lien mt-[6px] w-fit text-background">
-                  {ligne.lien.label}
-                  <FlecheSortante />
+                <span className="flex flex-col gap-[8px] tablet:pl-[30px] desktop:pl-[40px]">
+                  <span className="max-w-[52ch] text-[16px] font-medium leading-[1.4] tracking-[-0.01em] text-background/70">
+                    {ligne.corps}
+                  </span>
+                  <span className="text-[14px] font-semibold tracking-[-0.01em] underline underline-offset-[3px]">
+                    {ligne.lien.label}
+                  </span>
                 </span>
               </Link>
             </li>

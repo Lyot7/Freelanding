@@ -11,15 +11,10 @@ type Onglet = "main" | "outil";
  * Chaque jour porte sa corvée, à sa hauteur réelle. Avec moi, il n'en reste
  * qu'un cinquième à relire et le reste monte en volt, jour après jour : le temps
  * rendu se voit dans l'agenda avant de se lire dans le total. La fenêtre s'ouvre
- * sur « À la main » et bascule une seule fois quand la semaine est sous les yeux ;
+ * sur « À la main » et bascule une seule fois quand elle est à moitié visible ;
  * dès que le visiteur touche un onglet, plus rien ne bascule seul.
  *
- * L'OBSERVATEUR VISE LA LISTE DES JOURS, pas toute la fenêtre : sur téléphone, la
- * fenêtre franchissait 50 % alors que les colonnes étaient encore sous le pli, et
- * la bascule se jouait hors écran.
- *
- * Le volt monte en `translateY`, jamais en `scaleY`, qui écrasait son texte. Via
- * `.logiciel-rendu`, coupé en mouvement réduit.
+ * Le volt monte en `transform`, via `.logiciel-rendu`, coupé en mouvement réduit.
  * Les onglets suivent le motif ARIA (flèches gauche et droite, un seul arrêt de
  * tabulation).
  */
@@ -30,7 +25,7 @@ export function LogicielDemo({ demo }: { demo: LogicielDemoContent["demo"] }) {
 
   /* Ref de rappel avec nettoyage (React 19) : appelée une fois le nœud posé,
      jamais avec `null` puisqu'elle rend sa fonction de nettoyage. */
-  const observer = useCallback((cible: HTMLUListElement) => {
+  const observer = useCallback((cible: HTMLDivElement) => {
     let minuteur: ReturnType<typeof setTimeout> | undefined;
     const observateur = new IntersectionObserver(
       ([entree]) => {
@@ -38,9 +33,9 @@ export function LogicielDemo({ demo }: { demo: LogicielDemoContent["demo"] }) {
         observateur.disconnect();
         minuteur = setTimeout(() => {
           if (!touche.current) setOnglet("outil");
-        }, 900);
+        }, 1400);
       },
-      { threshold: 0.6 },
+      { threshold: 0.5 },
     );
     observateur.observe(cible);
     return () => {
@@ -60,6 +55,7 @@ export function LogicielDemo({ demo }: { demo: LogicielDemoContent["demo"] }) {
 
   return (
     <div
+      ref={observer}
       className="relative w-full border border-white/10 bg-surface-1 text-foreground"
     >
       <div className="flex flex-col gap-[14px] border-b border-white/10 px-[16px] py-[14px] tablet:px-[20px] min-[1360px]:flex-row min-[1360px]:items-center min-[1360px]:justify-between">
@@ -93,7 +89,7 @@ export function LogicielDemo({ demo }: { demo: LogicielDemoContent["demo"] }) {
               aria-controls={`${base}-panneau`}
               tabIndex={onglet === cle ? 0 : -1}
               onClick={() => choisir(cle)}
-              className={`relative z-[1] h-[44px] whitespace-nowrap tablet:h-[36px] rounded-[50px] px-[16px] text-[12px] font-semibold uppercase leading-none tracking-[-0.01em] transition-colors duration-200 ${
+              className={`relative z-[1] h-[36px] whitespace-nowrap rounded-[50px] px-[16px] text-[12px] font-semibold uppercase leading-none tracking-[-0.01em] transition-colors duration-200 ${
                 onglet === cle ? "text-accent-ink" : "text-foreground-60 hover:text-foreground"
               }`}
             >
@@ -107,6 +103,7 @@ export function LogicielDemo({ demo }: { demo: LogicielDemoContent["demo"] }) {
         id={`${base}-panneau`}
         role="tabpanel"
         aria-labelledby={`${base}-onglet-${onglet}`}
+        aria-live="polite"
       >
         <div className="grid grid-cols-2 border-b border-white/10">
           <p className="m-0 flex flex-col gap-[6px] border-r border-white/10 px-[16px] py-[18px] tablet:px-[20px]">
@@ -119,7 +116,7 @@ export function LogicielDemo({ demo }: { demo: LogicielDemoContent["demo"] }) {
           </p>
           <p
             className={`logiciel-gain m-0 flex flex-col gap-[6px] px-[16px] py-[18px] tablet:px-[20px] ${
-              avecLogiciel ? "bg-accent text-accent-ink" : "text-foreground/50"
+              avecLogiciel ? "bg-accent text-accent-ink" : "text-foreground/30"
             }`}
           >
             <span className="text-[40px] font-semibold leading-[1] tracking-[-0.04em] tabular-nums desktop:text-[52px]">
@@ -131,7 +128,7 @@ export function LogicielDemo({ demo }: { demo: LogicielDemoContent["demo"] }) {
           </p>
         </div>
 
-        <ul ref={observer} className="m-0 grid list-none grid-cols-5 gap-[4px] p-[12px] tablet:gap-[6px] tablet:px-[20px] tablet:py-[16px]">
+        <ul className="m-0 grid list-none grid-cols-5 gap-[4px] p-[12px] tablet:gap-[6px] tablet:px-[20px] tablet:py-[16px]">
           {demo.jours.map((jour, index) => (
             <li key={jour.jour} className="flex min-w-0 flex-col gap-[6px]">
               <span className="truncate text-[11px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground-60 tablet:text-[12px]">
@@ -163,7 +160,7 @@ export function LogicielDemo({ demo }: { demo: LogicielDemoContent["demo"] }) {
                     aria-hidden={!avecLogiciel}
                     className="logiciel-rendu absolute inset-x-0 bottom-0 flex h-[80%] flex-col gap-[2px] bg-accent p-[4px] text-[10px] tablet:p-[6px] font-medium leading-[1.15] tracking-[-0.01em] text-accent-ink tablet:text-[12px]"
                     style={{
-                      transform: avecLogiciel ? "none" : "translateY(100%)",
+                      transform: `scaleY(${avecLogiciel ? 1 : 0})`,
                       transitionDelay: `${index * 70}ms`,
                     }}
                   >
@@ -184,7 +181,7 @@ export function LogicielDemo({ demo }: { demo: LogicielDemoContent["demo"] }) {
         <div className="flex flex-col gap-[6px] border-t border-white/10 px-[16px] py-[14px] tablet:px-[20px]">
           <p
             className={`m-0 text-[15px] font-medium leading-[1.35] tracking-[-0.01em] transition-opacity duration-300 ${
-              avecLogiciel ? "opacity-100" : "opacity-60"
+              avecLogiciel ? "opacity-100" : "opacity-40"
             }`}
           >
             {demo.gain.detail}

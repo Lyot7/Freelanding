@@ -11,6 +11,7 @@ import { lienRendezVous, rendezVousContent } from "@/content/rendez-vous";
  * reconnaissables, jamais inventées de façon plausible) :
  * - `contact.phone` : vide tant qu'Eliott n'a pas tranché s'il publie un numéro.
  * - `contact.email` : dépend du domaine retenu.
+ * - `availability` : donnée commerciale, pas un texte de template.
  * - `socials` : seul le compte GitHub est vérifié.
  * - `credits.createdByAvatar` : photo héritée du template.
  */
@@ -30,13 +31,14 @@ export const siteConfig: SiteConfig = {
    * toutes les pages. LE FRAGMENT DOIT EXISTER DANS `tagline`, sinon `Header`
    * concatène le texte entier et le fragment introuvable.
    */
-  tagline: "Logiciel sur mesure et IA",
-  taglineEmphasis: ["Logiciel sur mesure"],
+  tagline: "Logiciels métier sur mesure",
+  taglineEmphasis: ["Logiciels métier"],
   nav: [
-    { label: "Comment", href: "/#moyens" },
+    { label: "Accueil", href: "/" },
     { label: "Réalisations", href: "/realisations" },
-    { label: "À propos", href: "/a-propos" },
     { label: "Blog", href: "/blog" },
+    { label: "À propos", href: "/a-propos" },
+    { label: "Contact", href: "/contact" },
   ],
   // Panneau du menu flottant — ordre source, différent de la nav d'en-tête et
   // de la colonne « Navigation » du pied de page (qui, elle, contient « 404 »).
@@ -92,22 +94,22 @@ export const siteConfig: SiteConfig = {
     // Le reste de la France suit, à distance, sans se restreindre à une région :
     // c'est le fond de l'activité, et `areaServed` en fait une zone à part
     // entière dans le JSON-LD.
-    address: "Calvados, Manche, Orne et France à distance",
+    address: "Calvados, Manche, Orne, et France à distance",
     addressLabel: "Zone d’intervention",
-    hours: ["Lun. au ven. : 9 h à 18 h"],
+    hours: ["Lun. au ven. : 9h - 18h"],
     // PAS DE LIENS SEO DANS LE PIED DE PAGE (décision d'Eliott du 2026-10-15) :
     // lister les pages Caen, prix et thématiques sous la zone d'intervention se
     // lisait comme du remplissage pour Google. Elles restent reliées depuis leur
     // pilier (`lienLocalParPrestation`) et entre elles.
     responseTime:
-      "Je réponds à chaque message sous 24 h ouvrées.",
+      "Je réponds à chaque message sous 24 heures ouvrées.",
     responseTimeLabel: "Délai de réponse",
     localTimeLabel: "Heure locale",
     timezone: "Europe/Paris",
     // Interlocuteur mis en avant dans le pied de page : Eliott, qui est seul.
     person: {
       name: "Eliott Bouquerel",
-      role: "Développeur à Caen",
+      role: "Développeur freelance",
       note: "C’est moi qui lis votre message, et moi qui vous réponds.",
       // Portrait réel, lu par les données structurées (`Person.image`).
       avatar: {
@@ -197,16 +199,45 @@ export const siteConfig: SiteConfig = {
   ],
   copyright: "2026©",
   copyrightLong: "© 2026 Eliott Bouquerel",
+  // LA JAUGE DE CRÉNEAUX EST RETIRÉE depuis le 2026-09-01, et le bandeau reste.
+  //
+  // CE QU'ELLE DISAIT. `slotsLeft: 2, totalSlots: 4` rendait deux barres
+  // pleines, une animée, deux éteintes et « 2/4 » : le site déclarait donc
+  // publiquement deux projets en cours sur quatre places, en tête de l'accueil
+  // et de la page contact. Eliott n'a aucun client. Ces deux chiffres étaient
+  // écrits à la main et rien ne les faisait bouger : la même annonce serait
+  // encore là dans six mois, également fausse, et fausse dans l'autre sens le
+  // jour où il aurait réellement du travail.
+  //
+  // POURQUOI PAS DES CRÉNEAUX DÉRIVÉS DE CAL.COM. L'agenda mesure des RENDEZ
+  // VOUS, pas des projets. Trois prospects qui réservent un appel de découverte
+  // dans la même semaine feraient afficher « 3 créneaux pris » sans qu'un seul
+  // devis soit signé : la même fausse déclaration, automatisée, donc plus
+  // difficile à repérer. S'y ajoute qu'aucun type d'événement n'est configuré
+  // (les variables `CAL_COM_EVENT_*` sont vides, cf. `src/lib/rendez-vous/`),
+  // et qu'un appel réseau par rendu du hero coûterait cher pour une donnée qui
+  // ne dit pas ce qu'on lui ferait dire.
+  //
+  // CE QUI LA REMPLACE est déjà écrit ailleurs sur le site et ne dépend que
+  // d'Eliott : `contact.availability` (« Je réponds à chaque message sous
+  // 24 heures ouvrées ») et la statistique « 24h » de `about.ts`. C'est une
+  // promesse qu'il tient, pas une mesure qu'il ne prend pas.
+  //
+  // POUR LA RALLUMER : rendre `slotsLeft` et `totalSlots` à cet objet. Le type,
+  // le composant et la jauge animée sont intacts, et les deux points de montage
+  // (hero d'accueil, hero contact) la reprendront sans autre changement. Le
+  // libellé peut alors reprendre la marque `{mois}`, substituée au rendu par le
+  // mois réel avec bascule le 20 (voir `@/lib/availability-month`).
+  availability: {
+    label: "RÉPONSE SOUS 24 HEURES OUVRÉES",
+    // Le délai en blanc plein, l'annonce en gris : même partage que le mois
+    // dans l'ancien libellé, c'est le chiffre qui porte l'information.
+    labelHighlights: ["24 HEURES OUVRÉES"],
+  },
   // Titres des deux colonnes du pied de page (habillage, pas de l'éditorial).
   footerColumnLabels: { contact: "Contact", navigation: "Navigation" },
   footerCta: {
     heading: "Montrez-moi ce qui vous bloque.",
-    lettre: {
-      portrait: { src: "/images/eliott-nature-vertical.jpg", alt: "Eliott Bouquerel, en extérieur" },
-      texte:
-        "Dites-moi quelle tâche vous prend le plus de temps. Je vous réponds moi-même sous 24 h ouvrées, et si je ne suis pas la bonne personne, je vous le dis.",
-      signataire: "Eliott Bouquerel, développeur à Caen",
-    },
     /*
      * LA PHRASE DISCRÈTE, décision d'Eliott du 2026-10-30 : une seule offre,
      * « en restant ouvert aux propositions ». Pas de bloc d'offre : une autre
@@ -219,40 +250,41 @@ export const siteConfig: SiteConfig = {
   footerForm: {
     modes: {
       label: "Comment me contacter",
-      message: { titre: "Deux lignes par écrit", detail: "Réponse sous 24 h ouvrées" },
-      rendezVous: {
-        titre: "30 minutes en visio",
-        prochain: "Prochain créneau :",
-        promesse: "Vous repartez avec un ordre de grandeur et une prochaine étape.",
-      },
+      message: "Écrire un message",
+      rendezVous: "Réserver un appel",
     },
-    messageLabel: "La tâche qui vous prend du temps, en deux lignes",
-    messagePlaceholder: "Chaque semaine, je recopie les commandes dans un tableur.",
-    emailLabel: "Votre adresse e-mail",
-    emailPlaceholder: "exemple@email.com",
     nameLabel: "Nom",
     namePlaceholder: "Alex Dupont",
-    /* LE FORMULAIRE NE LES DEMANDE PLUS depuis le 2026-11-01 : le serveur les
-       accepte encore, un onglet resté ouvert les envoie. */
+    emailLabel: "Votre adresse e-mail",
+    emailPlaceholder: "exemple@email.com",
+    selectLabel: "Que cherchez-vous ?",
+    messageLabel: "Votre message, si vous voulez",
+    messagePlaceholder: "Deux lignes sur ce qui vous bloque suffisent.",
     selectOptions: [
       "Un logiciel métier",
       "Je ne sais pas encore",
       "Une autre demande",
     ],
-    /* Facultatifs, repliés : le site promet deux lignes, pas un questionnaire. */
-    precisions: {
-      ouvrir: "Ajouter un budget ou une échéance",
+    questionnaire: {
       budget: {
         label: rendezVousContent.questionnaire.budget.legende,
         placeholder: "Choisissez une tranche",
+      },
+      objectif: {
+        label: rendezVousContent.questionnaire.objectif.legende,
+        placeholder: "Choisissez ce qui compte le plus",
       },
       echeance: {
         label: rendezVousContent.questionnaire.echeance.legende,
         placeholder: "Choisissez une échéance",
       },
     },
-    delaiReponse: "Réponse sous 24 h ouvrées.",
-    submitLabel: "Envoyer à Eliott",
+    etapes: {
+      titres: ["Votre projet", "Votre budget", "Vos coordonnées"],
+      continuer: "Continuer",
+      retour: "Retour",
+    },
+    submitLabel: "Envoyer",
     disclaimer:
       "En envoyant ce formulaire, vous acceptez mes conditions générales et ma politique de confidentialité.",
     // Le texte est rendu en trois morceaux autour de ses deux liens.

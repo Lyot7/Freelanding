@@ -31,11 +31,11 @@ const ECART = "mt-[20px] first:mt-0";
 
 /** Corps de texte d'article (15 px), en gris, comme les paragraphes. */
 const CORPS =
-  "text-[16px] font-medium leading-[1.3] tracking-[-0.01em] text-background/60";
+  "text-[15px] font-medium leading-[1.3] tracking-[-0.01em] text-background/60";
 
 /** Légende : plus petite, en capitales, comme les métadonnées de la page. */
 const LEGENDE =
-  "mt-[10px] micro text-background/60";
+  "mt-[10px] text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/60";
 
 /**
  * Image légendée. LE bloc le plus utilisé, et le seul moyen de poser une image
@@ -154,7 +154,7 @@ export function Callout({
 export function Stat({ value, label }: { value: string; label: string }) {
   return (
     <div className={ECART}>
-      <p className="m-0 text-[52px] font-semibold uppercase leading-[0.9] tracking-[-0.045em] text-background tablet:text-[58px]">
+      <p className="m-0 text-[52px] font-semibold uppercase leading-[0.9] tracking-[-0.04em] text-background tablet:text-[68px]">
         {value}
       </p>
       <p className={`mt-[6px] max-w-[420px] ${CORPS}`}>{label}</p>
@@ -203,7 +203,7 @@ export function Steps({ items }: { items: readonly string[] }) {
  * directs, ce qui couvre les deux entrées avec une seule règle.
  */
 const CITATION =
-  "text-[22px] font-medium leading-[1.2] tracking-[-0.01em] text-background tablet:text-[26px]";
+  "text-[22px] font-medium leading-[1.2] tracking-[-0.02em] text-background tablet:text-[26px]";
 
 /**
  * ELLE DÉBORDE DANS LA MARGE, et ce n'est pas une coquetterie.
@@ -233,7 +233,7 @@ export function Quote({
   return (
     <blockquote className="my-[50px] m-0 p-0 desktop:-ml-[35%] desktop:w-[135%]">
       <div
-        className={`${CITATION} [&>p]:m-0 [&>p]:max-w-none [&>p]:text-[22px] [&>p]:leading-[1.2] tablet:[&>p]:text-[26px] [&>p]:tracking-[-0.01em] [&>p]:text-background`}
+        className={`${CITATION} [&>p]:m-0 [&>p]:max-w-none [&>p]:text-[22px] [&>p]:leading-[1.2] tablet:[&>p]:text-[26px] [&>p]:tracking-[-0.02em] [&>p]:text-background`}
       >
         {children}
       </div>

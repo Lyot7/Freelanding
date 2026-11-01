@@ -12,6 +12,7 @@ import type { ImageHero } from "@/lib/content/types";
  */
 export const herosPages: {
   readonly blog: ImageHero;
+  readonly realisations: ImageHero;
   readonly introuvable: ImageHero;
   readonly prestations: Readonly<Record<string, ImageHero | undefined>>;
   readonly legal: Readonly<Record<string, ImageHero | undefined>>;
@@ -37,6 +38,31 @@ export const herosPages: {
     og: {
       src: "/images/og-page-blog-index.jpg",
       alt: "Une machine à écrire mécanique ancienne posée sur un bureau en bois, une feuille engagée dans le chariot",
+      width: 1200,
+      height: 630,
+    },
+  },
+  realisations: {
+    src: "/images/heros/page-realisations.jpg",
+    alt: "Maquette en coupe d’une maison en bois clair, avec son escalier, ses planchers et une chambre à l’étage",
+    width: 2400,
+    height: 1350,
+    cadrage: { x: 30, y: 40 },
+    credit: {
+      prefixe: "Photo :",
+      auteur: {
+        libelle: "14GTR",
+        href: "https://commons.wikimedia.org/wiki/File:Granby_Four_Streets_terraced_house_section_model_01.jpg",
+      },
+      licence: {
+        libelle: "CC0",
+        href: "https://creativecommons.org/publicdomain/zero/1.0/deed.fr",
+      },
+      modification: "retouchée",
+    },
+    og: {
+      src: "/images/og-page-realisations.jpg",
+      alt: "Maquette en coupe d’une maison en bois clair, avec son escalier, ses planchers et une chambre à l’étage",
       width: 1200,
       height: 630,
     },

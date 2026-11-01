@@ -1,12 +1,10 @@
 "use client";
 
-import type { ReactNode } from "react";
 import { useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import type { FaqItem } from "@/lib/content/types";
 import { homeContent } from "@/content/home";
 import { Reveal } from "@/components/motion/Reveal";
-import { COURBE, DUREE } from "@/components/motion/tempo";
 import { SwapCopies } from "@/components/ui/SwapCopies";
 import { ToggleIcon } from "@/components/ui/ToggleIcon";
 import { toggleFaqItem } from "./faq-state";
@@ -43,10 +41,9 @@ import { toggleFaqItem } from "./faq-state";
  *   - Icône : `@/components/ui/ToggleIcon`, source unique du plus/moins des
  *     accordéons. La bascule n'est pas un simple échange de barres : le relevé
  *     image par image de la source est documenté dans ce composant.
- *   - Numéro : toujours en ligne, en encre pleine à l'ouverture. Il passait en
- *     absolu et la question sautait de 25 px à chaque clic.
- *   - Hauteur et texte ont chacun leur temps. Fermée, une réponse est en
- *     `visibility: hidden` : un lecteur d'écran ou la recherche ne la lit pas.
+ *   - Numéro (01…04) : visible en ligne quand FERMÉ ; en OUVERT il passe en absolu
+ *     (left:-18px) et se retrouve masqué par l'overflow — fidèle à la source, où
+ *     l'item ouvert n'affiche pas son numéro et la question glisse à gauche.
  *
  * Reveals ROBUSTES (repos = état final visible) via `@/components/motion/Reveal`.
  * Les timings d'entrée sont volontairement sobres : le câblage fin des animations
@@ -60,12 +57,8 @@ const FONT = "[font-family:var(--font-sans)]";
 
 // Couleurs exactes de la section (light) — l'échelle Tailwind n'expose pas
 // `--background-60`, on écrit donc les valeurs rgba littérales.
-const INK = "var(--background)";
-const INK_60 = "rgba(11,11,11,0.6)"; // libellé FAQ
-const INK_70 = "rgba(11,11,11,0.7)"; // question fermée
-
-/* Temps séparés : la hauteur porte le mouvement, le texte arrive après elle. */
-const EASE_FAQ = COURBE.vive;
+const INK = "#0b0b0b"; // --background
+const INK_60 = "rgba(11,11,11,0.6)"; // question + FAQ label
 const RULE_12 = "rgba(11,11,11,0.12)"; // filet sous chaque item
 const BAR = "rgba(11,11,11,0.6)"; // barres de l'icône
 
@@ -89,9 +82,8 @@ function FaqRow({
     <Reveal
       className="w-full"
       initialOpacity={0.001}
-      initialY={6}
-      duration={DUREE.texte}
-      delay={index * 0.04}
+      initialY={12}
+      transition={{ type: "tween", duration: 0.6, delay: 0.05 + index * 0.08 }}
     >
       {/* pb-[20px] constant : le delta open/close (14px + réponse + 10px) vit
           dans le conteneur animé → total sous la réponse = 10 + 20 = 30px (open),
@@ -104,22 +96,27 @@ function FaqRow({
           aria-expanded={open}
           aria-controls={panelId}
           onClick={onToggle}
-          className="relative flex min-h-[56px] w-full cursor-pointer items-center gap-[10px] overflow-hidden pt-[20px] pb-0 text-left"
+          className="relative flex w-full cursor-pointer items-center gap-[10px] overflow-hidden pt-[20px] pb-0 text-left"
         >
-          {/* framer-6rdjy8 : numéro + question */}
-          <span className="relative flex w-px flex-[1_0_0] items-baseline gap-[10px]">
-            {/* framer-1uwy4qo : numéro, toujours à sa place */}
+          {/* framer-6rdjy8 : numéro + question (overflow clip → masque le n° absolu en open) */}
+          <span className="relative flex w-px flex-[1_0_0] items-center gap-[10px] overflow-hidden">
+            {/* framer-1uwy4qo : numéro — inline (fermé) / absolu left:-18px (ouvert, masqué) */}
             <span
               aria-hidden
-              className="micro relative w-[18px] flex-none whitespace-pre transition-opacity duration-200"
-              style={{ color: INK, opacity: open ? 1 : 0.6 }}
+              className={
+                "whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] " +
+                (open
+                  ? "absolute left-[-18px] top-[46%] -translate-y-1/2"
+                  : "relative")
+              }
+              style={{ color: INK }}
             >
               {number}
             </span>
-            {/* framer-1nopks0 : question, en casse normale */}
+            {/* framer-1nopks0 : question (11px, 60% noir, uppercase) */}
             <span
-              className="w-px flex-[1_0_0] whitespace-pre-wrap break-words text-[16px] font-medium leading-[1.25] tracking-[-0.01em] transition-colors duration-200 tablet:text-[22px]"
-              style={{ color: open ? INK : INK_70 }}
+              className="w-px flex-[1_0_0] whitespace-pre-wrap break-words text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em]"
+              style={{ color: INK_60 }}
             >
               {item.question}
             </span>
@@ -131,21 +128,16 @@ function FaqRow({
             (gap 14px + réponse + 10px) est intégralement dans ce conteneur animé. */}
         <motion.div
           id={panelId}
-          role={open ? "region" : undefined}
-          aria-labelledby={open ? headerId : undefined}
+          role="region"
+          aria-labelledby={headerId}
           initial={false}
-          animate={
-            open
-              ? { height: "auto", visibility: "visible" }
-              : { height: 0, transitionEnd: { visibility: "hidden" } }
-          }
+          animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }}
           transition={
-            shouldReduceMotion ? { duration: 0 } : { duration: 0.32, ease: EASE_FAQ }
+            shouldReduceMotion
+              ? { duration: 0 }
+              : { duration: 0.3, ease: [0.68, 0, 0, 1] }
           }
           className="w-full overflow-hidden"
-          /* Rendu serveur : une réponse fermée ne doit pas exister pour un
-             lecteur d'écran avant l'hydratation. */
-          style={open ? undefined : { height: 0, visibility: "hidden" }}
         >
           {/* NON RÉSOLU (mesuré, pas deviné). Le CSS de la source donne
               `padding: 20px 0 14px` sur l'en-tête et rien sur ce panneau, mais
@@ -157,21 +149,12 @@ function FaqRow({
               PREMIER item. On garde donc l'état le moins faux en attendant. */}
           <div className="relative flex w-full items-start pt-[14px] pb-[10px]">
             {/* framer-1gacui7 : texte de réponse (18px mobile/tablet, 20px desktop) */}
-            <motion.p
-              initial={false}
-              animate={open ? { opacity: 1, y: 0 } : { opacity: 0, y: 6 }}
-              transition={
-                shouldReduceMotion
-                  ? { duration: 0 }
-                  : open
-                    ? { duration: 0.22, delay: 0.08, ease: EASE_FAQ }
-                    : { duration: 0.12, ease: EASE_FAQ }
-              }
-              className="w-px max-w-[58ch] flex-[1_0_0] whitespace-pre-wrap break-words pl-[28px] text-[16px] font-normal leading-[1.45] tablet:text-[18px]"
+            <p
+              className="w-px max-w-[600px] flex-[1_0_0] whitespace-pre-wrap break-words text-[18px] font-medium leading-[1.2] tracking-[-0.01em] desktop:text-[20px]"
               style={{ color: INK }}
             >
               {item.answer}
-            </motion.p>
+            </p>
           </div>
         </motion.div>
 
@@ -202,7 +185,6 @@ export function FaqSection({
   titleLines = homeContent.faqSection?.titleLines ?? [],
   cta = homeContent.faqSection?.cta,
   topAccent = true,
-  aside,
 }: {
   faq: FaqItem[];
   eyebrow?: string;
@@ -215,8 +197,6 @@ export function FaqSection({
    * recouvre le bas de sa voisine.
    */
   topAccent?: boolean;
-  /** Sous le titre : de quoi aller plus loin, sur l'accueil seulement. */
-  aside?: ReactNode;
 }) {
   // Item 01 ouvert par défaut (source : premier item = "Desktop open").
   const [openItems, setOpenItems] = useState<Set<number>>(() => new Set([0]));
@@ -227,7 +207,7 @@ export function FaqSection({
       data-section="faq"
       className={
         FONT +
-        " surface-light relative flex w-full flex-col items-center justify-start gap-[10px] overflow-visible bg-muted " +
+        " relative flex w-full flex-col items-center justify-start gap-[10px] overflow-visible bg-muted " +
         "p-[20px] " +
         "tablet:px-[24px] tablet:pt-[30px] tablet:pb-[80px] " +
         "desktop:px-[30px]"
@@ -239,16 +219,16 @@ export function FaqSection({
       ) : null}
 
       {/* framer-1sm0lew : Container (max 1440, aligné à gauche) */}
-      <div className="relative flex w-full max-w-[1440px] flex-col items-start gap-[10px] tablet:grid tablet:grid-cols-12 tablet:gap-x-[20px]">
+      <div className="relative flex w-full max-w-[1440px] flex-col items-start gap-[10px] tablet:gap-[30px]">
         {/* framer-evxos : rangée titre (pleine largeur) */}
-        <div className="relative flex w-full flex-row items-start overflow-visible tablet:sticky tablet:top-[100px] tablet:col-span-5 tablet:self-start">
+        <div className="relative flex w-full flex-row items-start overflow-visible">
           {/* framer-ro3v3f : colonne titre — 50% à droite desktop/tablet, pleine largeur mobile */}
-          <div className="relative flex w-full flex-col items-start gap-[12px] overflow-visible tablet:gap-[28px]">
+          <div className="relative flex w-px flex-[1_0_0] flex-col items-end justify-end gap-[12px] overflow-visible tablet:w-1/2 tablet:flex-none tablet:gap-[40px]">
             {/* framer-1xefvys : eyebrow FAQ */}
-            <div className="relative flex w-full flex-col items-start overflow-visible">
+            <div className="relative flex w-full flex-col items-start overflow-visible tablet:items-end">
               {/* framer-zvi6rv : eyebrow FAQ (12px, 60% noir, uppercase) */}
               <p
-                className="micro h-auto w-auto whitespace-pre"
+                className="h-auto w-auto whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em]"
                 style={{ color: INK_60 }}
               >
                 {eyebrow}
@@ -257,39 +237,50 @@ export function FaqSection({
             {/* framer-1co65xp : titre h2, frère de l'eyebrow dans la source */}
             <div className="relative h-auto w-full">
               <h2
-                /* `.titre-section` borne déjà le corps à la colonne : « COMMENCER. »
-                   tient de 320 à 1440. Aligné sur son étiquette sous 810. */
-                className="titre-marque relative m-0 flex w-full flex-col justify-center p-0 text-left text-[clamp(40px,calc(12vw/var(--zoom-ecran,1)),52px)] tablet:text-[calc(5.2vw/var(--zoom-ecran,1))]"
+                /* TAILLE PLAFONNÉE PAR LA LARGEUR DE LA COLONNE.
+                   Le titre français déborde là où l'anglais tenait : « COMMENCER. »
+                   mesure 330 px à 52 px de corps, pour une colonne de 280 à
+                   320 px de large. Le `overflow-hidden` du masque d'apparition
+                   le coupait donc, sans erreur ni alerte.
+                   Le débordement n'apparaît qu'APRÈS chaque bascule, quand le
+                   corps saute avant que la colonne ait grandi. Relevé sur 19
+                   largeurs : colonne = 100vw - 40 sous 810, 50vw - 25 entre 810
+                   et 1199, 50vw - 30 au-delà ; et le texte mesure toujours
+                   6,35 x le corps. Le corps tenable vaut donc colonne / 6,35,
+                   arrondi à 6,5 pour la marge.
+                   `min()` garde EXACTEMENT la taille d'origine partout où elle
+                   tient, et ne réduit que dans les bandes où le texte serait
+                   tronqué : 320-369, 810-913 et 1200-1227. */
+                className="relative m-0 flex w-full flex-col justify-center p-0 text-right text-[min(52px,calc(calc(15.38vw/var(--zoom-ecran,1))-6.15px))] font-semibold uppercase leading-[0.82] tracking-[-0.05em] tablet:text-[min(68px,calc(calc(7.69vw/var(--zoom-ecran,1))-3.85px))] desktop:text-[min(92px,calc(calc(7.69vw/var(--zoom-ecran,1))-4.6px))]"
                 style={{ color: INK }}
               >
                 <Reveal
                   as="span"
-                  className="accent-room descender-room block overflow-hidden text-left"
+                  className="block overflow-hidden text-right"
                   initialOpacity={0.001}
                   initialY={40}
-                  delay={0.05}
+                  transition={{ type: "tween", duration: 0.7, delay: 0.05 }}
                 >
                   {titleLines[0]}
                 </Reveal>
                 <Reveal
                   as="span"
-                  className="accent-room descender-room block overflow-hidden text-left"
+                  className="block overflow-hidden text-right"
                   initialOpacity={0.001}
                   initialY={40}
-                  delay={0.12}
+                  transition={{ type: "tween", duration: 0.7, delay: 0.12 }}
                 >
                   {titleLines[1]}
                 </Reveal>
               </h2>
             </div>
-            {aside}
           </div>
         </div>
 
         {/* framer-17aidnj : rangée accordéon (pleine largeur, contenu justifié à droite) */}
-        <div className="relative flex w-full flex-row items-center justify-end overflow-hidden tablet:col-span-7">
+        <div className="relative flex w-full flex-row items-center justify-end overflow-hidden">
           {/* framer-1xmkit9 : colonne accordéon + bouton — 50% à droite desktop/tablet */}
-          <div className="relative flex w-full flex-col items-start gap-[20px] overflow-hidden tablet:gap-[40px]">
+          <div className="relative flex w-px flex-[1_0_0] flex-col items-start gap-[20px] overflow-hidden tablet:w-1/2 tablet:flex-none tablet:gap-[40px]">
             {/* framer-1rofdpl-container > framer-32t3hq : liste accordéon */}
             <div className="relative w-full">
               <div className="relative flex w-full flex-col items-start overflow-hidden">
@@ -314,8 +305,8 @@ export function FaqSection({
                 là où les quatre questions au-dessus ont bien leur fondu. Le
                 reveal posé ici (fondu + 12 px, 600 ms, 400 ms de retard) n'avait
                 pas d'équivalent sur la source. */}
-            <div className="relative w-full tablet:w-auto">
-              {/* framer-1sk0ilg : action secondaire, contour sur papier */}
+            <div className="relative h-[50px] w-full tablet:h-[30px] tablet:w-auto">
+              {/* framer-1sk0ilg : lien (bg noir, texte blanc 12px) */}
               <a
                 // Chemin ABSOLU : en relatif (`./contact`), ce lien résolvait en
                 // `/legal/contact` depuis une page légale, soit un 404. Le live
@@ -323,7 +314,8 @@ export function FaqSection({
                 // absolu est correct partout et insensible à l'endroit où la
                 // section est montée.
                 href={cta?.href ?? "/contact"}
-                className="cta-secondaire group w-full text-background tablet:w-auto"
+                className="surface-dark group relative flex h-full w-full cursor-pointer items-center justify-center gap-[10px] overflow-hidden p-[10px] no-underline tablet:h-[30px] tablet:w-min"
+                style={{ backgroundColor: INK }}
               >
                 {/* framer-12ut4h8 : conteneur (les deux calques de texte = swap au hover).
                     Le swap était ABSENT : les deux calques existaient, mais le
@@ -339,7 +331,7 @@ export function FaqSection({
                 <span className="relative block h-[14.4px] overflow-hidden">
                   <SwapCopies
                     travel={22}
-                    textClassName="whitespace-pre text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em]"
+                    textClassName="whitespace-pre text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-foreground"
                   >
                     {cta?.label}
                   </SwapCopies>
@@ -349,6 +341,12 @@ export function FaqSection({
           </div>
         </div>
       </div>
+
+      {/* framer-1n2wdq0 : filet vertical central (8% noir) — desktop/tablet uniquement */}
+      <div
+        className="absolute left-[calc(50%-0.5px)] top-0 z-[1] hidden h-full w-px opacity-[0.08] tablet:block"
+        style={{ backgroundColor: INK }}
+      />
     </section>
   );
 }

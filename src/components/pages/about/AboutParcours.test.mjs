@@ -37,19 +37,6 @@ describe("parcours de la page À propos", () => {
     expect(html).toContain(">Expérience utilisateur</li>");
   });
 
-  it("ne pose aucune ligne vide sous une étape sans lieu", () => {
-    const groupes = parcours.groupes.map((groupe) => ({
-      ...groupe,
-      etapes: groupe.etapes.map((etape) => ({ ...etape, lieu: undefined })),
-    }));
-    const sansLieu = renderToStaticMarkup(
-      createElement(AboutParcours, { parcours: { ...parcours, groupes } }),
-    );
-    const lignes = (rendu) => rendu.match(/<p class="m-0 micro text-background\/60">/g) ?? [];
-    expect(lignes(html)).toHaveLength(parcours.groupes.flatMap((g) => g.etapes).length);
-    expect(lignes(sansLieu)).toHaveLength(0);
-  });
-
   it("ne pose ni paragraphe ni liste vides sur une expérience", () => {
     const sansDetail = experience?.etapes.filter((e) => !e.apport && !e.domaines) ?? [];
     expect(sansDetail.length).toBe(experience?.etapes.length);

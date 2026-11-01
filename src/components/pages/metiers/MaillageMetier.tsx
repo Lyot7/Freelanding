@@ -24,12 +24,12 @@ export function MaillageMetier({ page }: { page: PageMetierPubliee }) {
     >
       <div className="relative mx-auto flex w-full max-w-[1440px] flex-col gap-[36px]">
         <div className="flex flex-wrap items-baseline justify-between gap-[12px]">
-          <h2 className="accent-room m-0 text-[26px] titre-marque tablet:text-[34px]">
+          <h2 className="accent-room m-0 text-[26px] font-semibold uppercase leading-[0.95] tracking-[-0.04em] tablet:text-[34px]">
             {maillage.voisins}
           </h2>
           <Link
             href={CHEMIN_HUB_METIERS}
-            className="text-[16px] font-semibold tracking-[-0.01em] text-background underline underline-offset-[3px]"
+            className="text-[15px] font-semibold tracking-[-0.01em] text-background underline underline-offset-[3px]"
           >
             {maillage.hub}
           </Link>
@@ -45,7 +45,7 @@ export function MaillageMetier({ page }: { page: PageMetierPubliee }) {
                 <li key={article.slug}>
                   <Link
                     href={`/blog/${article.slug}`}
-                    className="text-[16px] font-semibold leading-[1.3] tracking-[-0.01em] text-background underline underline-offset-[3px]"
+                    className="text-[15px] font-semibold leading-[1.3] tracking-[-0.01em] text-background underline underline-offset-[3px]"
                   >
                     {article.title}
                   </Link>

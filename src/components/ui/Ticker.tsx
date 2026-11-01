@@ -168,7 +168,7 @@ export function Ticker({
          à l'écran, sauf l'accent qui réapparaît. */
       className={
         "[overflow-clip-margin:22px] pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 " +
-        "overflow-clip " +
+        "overflow-clip rounded-[10px] " +
         className
       }
     >
@@ -198,7 +198,7 @@ export function Ticker({
             <p
               className={
                 "m-0 whitespace-pre p-0 text-right text-[100px] font-semibold " +
-                "uppercase leading-[82px] tracking-[-0.045em] text-foreground " +
+                "uppercase leading-[82px] tracking-[-0.04em] text-foreground " +
                 itemClassName
               }
             >

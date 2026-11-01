@@ -134,7 +134,7 @@ function numero(index: number): string {
 }
 
 const CLASSE_LIBELLE =
-  "micro text-foreground-60";
+  "text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60";
 
 const CLASSE_CHAMP =
   "h-[50px] w-full border border-border bg-transparent px-[16px] text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground transition-colors placeholder:text-white/50 focus:border-b-accent tablet:text-[14px]";
@@ -143,10 +143,10 @@ const CLASSE_TEXTE =
   "text-[14px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground-60";
 
 const CLASSE_BOUTON_SECONDAIRE =
-  "flex min-h-[44px] items-center gap-[8px] micro text-foreground-60 transition-colors hover:text-accent motion-reduce:transition-none";
+  "flex min-h-[44px] items-center gap-[8px] text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60 transition-colors hover:text-accent motion-reduce:transition-none";
 
 const CLASSE_BOUTON_PRINCIPAL =
-  "flex h-[50px] w-full items-center justify-center bg-accent px-[24px] text-[14px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-accent-ink transition-opacity disabled:cursor-progress disabled:opacity-60 tablet:w-fit";
+  "flex h-[50px] w-full items-center justify-center bg-accent px-[24px] text-[13px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-accent-ink transition-opacity disabled:cursor-progress disabled:opacity-60 tablet:w-fit";
 
 const TITRES_ETAPES = [
   contenu.etapes.sujet,
@@ -182,7 +182,7 @@ function Progression({
                 faite || courante ? "bg-accent" : "bg-white/15"
               }`}
             />
-            <span className="flex flex-col gap-[4px] pt-[10px] micro">
+            <span className="flex flex-col gap-[4px] pt-[10px] text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em]">
               <span className={faite || courante ? "text-accent" : "text-foreground-60"}>
                 {numero(index)}
               </span>
@@ -230,7 +230,7 @@ function Etape({
       <h3
         ref={refTitre}
         tabIndex={-1}
-        className="m-0 text-[22px] font-medium leading-[1.1] tracking-[-0.01em] text-foreground outline-none tablet:text-[26px]"
+        className="m-0 text-[22px] font-medium leading-[1.1] tracking-[-0.02em] text-foreground outline-none tablet:text-[26px]"
       >
         {titre}
       </h3>
@@ -272,10 +272,10 @@ function ChoixType({
               <span className="text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground">
                 {type.nom}
               </span>
-              <span className="micro text-foreground-60">
+              <span className="text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60">
                 {type.duree}
               </span>
-              <span className="text-[14px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground-60">
+              <span className="text-[13px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground-60">
                 {type.description}
               </span>
             </span>
@@ -351,7 +351,7 @@ function ChoixUnique({
                 onChange={() => onChoisir(option.id)}
                 className="size-[14px] flex-none cursor-pointer appearance-none rounded-full border border-white/40 bg-transparent transition-colors checked:border-accent checked:bg-accent motion-reduce:transition-none"
               />
-              <span className="text-[14px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground">
+              <span className="text-[13px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground">
                 {option.libelle}
               </span>
             </label>
@@ -543,7 +543,7 @@ function Heures({
               // serait rogné par le bord du conteneur.
               data-focus-ring="inset"
               onClick={() => onChoisir(creneau)}
-              className={`h-[44px] border text-[14px] font-medium leading-[1.2] tracking-[-0.01em] transition-colors motion-reduce:transition-none ${
+              className={`h-[44px] border text-[13px] font-medium leading-[1.2] tracking-[-0.01em] transition-colors motion-reduce:transition-none ${
                 actif
                   ? "border-accent bg-accent text-accent-ink"
                   : "border-border text-foreground hover:border-accent hover:text-accent"
@@ -1056,7 +1056,7 @@ export function ReservationRendezVous({
         <p
           ref={refSucces}
           tabIndex={-1}
-          className="text-[22px] font-medium leading-[1.1] tracking-[-0.01em] text-foreground outline-none"
+          className="text-[22px] font-medium leading-[1.1] tracking-[-0.02em] text-foreground outline-none"
         >
           {contenu.succes.titre}
         </p>
@@ -1069,7 +1069,7 @@ export function ReservationRendezVous({
         <button
           type="button"
           onClick={recommencer}
-          className="mt-[4px] flex h-[50px] w-full items-center justify-center border border-border px-[20px] text-[14px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground transition-colors hover:border-accent hover:text-accent motion-reduce:transition-none tablet:w-fit"
+          className="mt-[4px] flex h-[50px] w-full items-center justify-center border border-border px-[20px] text-[13px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground transition-colors hover:border-accent hover:text-accent motion-reduce:transition-none tablet:w-fit"
         >
           {contenu.succes.autre}
         </button>
@@ -1139,7 +1139,7 @@ export function ReservationRendezVous({
                 <button
                   type="button"
                   onClick={() => setTentative((valeur) => valeur + 1)}
-                  className="min-h-[44px] border border-border px-[16px] text-[14px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground transition-colors hover:border-accent hover:text-accent motion-reduce:transition-none"
+                  className="min-h-[44px] border border-border px-[16px] text-[13px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground transition-colors hover:border-accent hover:text-accent motion-reduce:transition-none"
                 >
                   {contenu.actions.reessayer}
                 </button>
@@ -1311,7 +1311,7 @@ export function ReservationRendezVous({
                 {contenu.formulaire.mention}{" "}
                 <Link
                   href={contenu.formulaire.mentionHref}
-                  className="text-foreground no-underline transition-colors duration-200 ease-[var(--courbe-vive)] hover:text-accent motion-reduce:transition-none"
+                  className="text-foreground no-underline transition-colors duration-200 ease-[cubic-bezier(0.44,0,0.56,1)] hover:text-accent motion-reduce:transition-none"
                 >
                   {contenu.formulaire.mentionLien}
                 </Link>

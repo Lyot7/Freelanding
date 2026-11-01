@@ -109,7 +109,7 @@ function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
         >
           <path
             d="M 37.007 0 L 25.016 32.941 L 40.521 32.941 L 40.521 70 L 0 70 L 0 36.647 L 15.712 0 Z M 88.486 0 L 76.494 32.941 L 92 32.941 L 92 70 L 51.479 70 L 51.479 36.647 L 67.191 0 Z"
-            fill="var(--background)"
+            fill="#0b0b0b"
             opacity="0.07"
           />
         </svg>
@@ -117,7 +117,7 @@ function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
         {/* framer-17ap54t : citation + auteur */}
         <div className="flex w-full flex-col items-start gap-[14px] tablet:items-end tablet:gap-[20px]">
           {/* framer-1xqnj9j : citation (32px desktop / 22px mobile) */}
-          <p className="w-full max-w-[560px] text-left text-[22px] font-medium leading-[1.1] tracking-[-0.01em] text-background tablet:text-right tablet:text-[32px]">
+          <p className="w-full max-w-[560px] text-left text-[22px] font-medium leading-[1.1] tracking-[-0.02em] text-background tablet:text-right tablet:text-[32px]">
             {/* La citation monte LIGNE PAR LIGNE, en décalé, comme la source.
                 Le découpage est mesuré sur le rendu du navigateur, jamais écrit
                 en dur : les retours à la ligne dépendent de la largeur. */}
@@ -176,7 +176,7 @@ function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
                 `/about` : hôte carré 570 × 570 à 1440 (381 à 810, 350 à 390),
                 z-1, opacité 0,08, et DÉRIVANT — il était figé en `inset-0`,
                 donc absent de l'inventaire de grain des deux pages. */}
-            <Grain className="z-[1]" />
+            <Grain opacity={0.08} className="z-[1]" />
           </div>
         </div>
       </div>
@@ -253,7 +253,7 @@ export function TestimonialsSection({
               <LineReveal
                 as="h2"
                 lines={[...titleLines]}
-                className="relative m-0 flex w-full max-w-full flex-col justify-center p-0 text-left titre-marque titre-section text-background tablet:text-right "
+                className="relative m-0 flex w-full max-w-full flex-col justify-center p-0 text-left text-[52px] font-semibold uppercase leading-[0.82] tracking-[-0.05em] text-background tablet:text-right tablet:text-[68px] desktop:text-[92px]"
                 lineClassName="w-full overflow-hidden"
               />
             </div>
@@ -262,7 +262,7 @@ export function TestimonialsSection({
           {/* framer-102a0qa : Label (order 0 en mobile, aligné à droite dès 810) */}
           <div className="relative order-0 flex w-full flex-row items-start justify-start overflow-hidden tablet:order-none tablet:w-px tablet:flex-[1_0_0] tablet:justify-end">
             {/* framer-101sjeo : surtitre (preset wwtw0z, uppercase 12px, noir 60%) */}
-            <p className="h-auto w-auto whitespace-pre micro text-[rgba(11,11,11,0.6)]">
+            <p className="h-auto w-auto whitespace-pre text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-[rgba(11,11,11,0.6)]">
               {eyebrow}
             </p>
           </div>
@@ -284,7 +284,7 @@ export function TestimonialsSection({
                   initialOpacity={0.001}
                   duration={0.8}
                   delay={0.15}
-                  className="relative w-px max-w-[240px] flex-[1_0_0] whitespace-pre-wrap break-words text-[14px] font-medium leading-[1.35] tracking-[-0.01em] text-[rgba(11,11,11,0.6)]">
+                  className="relative w-px max-w-[240px] flex-[1_0_0] whitespace-pre-wrap break-words text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-[rgba(11,11,11,0.6)]">
                   {/* Texte = `testimonials.intro`, emphase = `introEmphasis`.
                       Les deux fragments en noir plein étaient des `<span>`
                       écrits en anglais : la traduction de la donnée ne les

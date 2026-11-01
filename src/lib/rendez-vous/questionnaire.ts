@@ -124,10 +124,9 @@ export function rattacherTranche(valeur: string): string {
 }
 
 /**
- * LES OBJECTIFS RETIRÉS LE 2026-10-31 avec le site et le CTO. Un onglet ouvert
- * avant le déploiement les envoie encore : les refuser ferait perdre le
- * rendez-vous ou le message. Ils se rangent sous « Autre chose ». « ia » est
- * revenu le 2026-11-01 : installer l'IA est l'un des trois moyens de l'accueil.
+ * LES OBJECTIFS RETIRÉS LE 2026-10-31 avec le site, l'IA et le CTO. Un onglet
+ * ouvert avant le déploiement les envoie encore : les refuser ferait perdre le
+ * rendez-vous ou le message. Ils se rangent sous « Autre chose ».
  */
 const OBJECTIFS_RETIRES: readonly string[] = [
   "google",
@@ -140,6 +139,7 @@ const OBJECTIFS_RETIRES: readonly string[] = [
   "documents",
   "decisions",
   "devis",
+  "ia",
   "equipe",
 ];
 

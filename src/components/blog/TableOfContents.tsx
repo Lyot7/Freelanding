@@ -83,7 +83,7 @@ export function TableOfContents({
       className="sticky top-[110px] max-w-[320px] pb-[40px]"
     >
       {/* Encre à 60 % et non 40 : 2,64:1 sur le gris clair, sous le seuil AA. */}
-      <p className="micro text-background/60">
+      <p className="text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/60">
         {titre}
       </p>
       <ol className="mt-[14px] list-none p-0">
@@ -94,7 +94,7 @@ export function TableOfContents({
               <a
                 href={`#${id}`}
                 aria-current={courant ? "true" : undefined}
-                className={`flex gap-[10px] text-[14px] font-medium leading-[1.3] tracking-[-0.01em] no-underline transition-colors duration-200 motion-reduce:transition-none ${
+                className={`flex gap-[10px] text-[13px] font-medium leading-[1.3] tracking-[-0.01em] no-underline transition-colors duration-200 motion-reduce:transition-none ${
                   courant
                     ? "text-background"
                     : "text-background/60 hover:text-background/80"

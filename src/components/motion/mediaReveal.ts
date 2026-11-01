@@ -1,5 +1,4 @@
-import type { MotionValues } from "@/components/motion/Reveal";
-import { COURBE, DUREE } from "@/components/motion/tempo";
+import { EASE_FRAMER, type MotionValues } from "@/components/motion/Reveal";
 import type { Transition } from "motion/react";
 
 /**
@@ -42,13 +41,51 @@ import type { Transition } from "motion/react";
  */
 export const MEDIA_REVEAL_FROM: MotionValues = { opacity: 0.001, scale: 1.1 };
 
-/** Durée et courbe de l'entrée : celles du tempo du site, comme tout le reste. */
-export const MEDIA_REVEAL_DURATION = DUREE.image;
+/**
+ * Durée et courbe de l'entrée.
+ *
+ * COURBE : `cubic-bezier(0.68, 0, 0, 1)`, la courbe Framer du site
+ * ({@link EASE_FRAMER}). Vérification de la FORME, indépendamment de la durée :
+ * on relève l'instant auquel la source franchit chaque palier d'opacité et on le
+ * rapporte à l'instant du même palier chez nous. De 0,2 à 0,99, les douze
+ * rapports tiennent entre 0,928 et 0,948 — un rapport CONSTANT, c'est-à-dire une
+ * simple mise à l'échelle du temps : la forme est bien la même des deux côtés,
+ * seule la durée diffère.
+ *
+ * DURÉE : 1,17 s. Elle n'est PAS déduite d'un ajustement des moindres carrés sur
+ * un modèle, mais de l'écart d'OPACITÉ réellement affiché : pour chaque durée
+ * candidate, on compare image par image l'opacité du modèle à celle du relevé de
+ * la source, et on retient celle qui minimise l'écart. C'est le critère qui
+ * correspond à ce qu'un œil voit. Résultat, sur deux emplacements indépendants :
+ *
+ *     écart MOYEN d'opacité, par durée candidate
+ *     durée (ms)                1150     1165     1170     1200     1250
+ *     /blog, carte 688 x 688   0,0058   0,0046   0,0047   0,0086   0,0163
+ *     /about, portrait 110     0,0062   0,0048   0,0045   0,0076   0,0132
+ *     article, visuel 690      0,0063   0,0049   0,0046   0,0074   0,0148
+ *
+ * Les TROIS minimums tombent au même endroit, 1165-1175 ms, et l'écart maximal y
+ * descend à 0,04 (contre 0,15 à 1,25 s, atteint vers 450 ms — soit une image à
+ * 15 % d'opacité de retard au moment le plus raide de la courbe).
+ *
+ * POURQUOI 1,25 s AVAIT ÉTÉ RETENU AILLEURS, ET POURQUOI C'ÉTAIT TROP LENT. La
+ * valeur précédente venait d'un rapport d'AMPLITUDE TOTALE : durée entre le
+ * premier et le dernier échantillon, source contre clone. Cet estimateur est
+ * dominé par les deux queues de la courbe, or `cubic-bezier(0.68, 0, 0, 1)` finit
+ * sa course avec une tangente nulle : les 3 derniers pourcents s'étalent sur plus
+ * de 150 ms et quelques images de plus ou de moins y déplacent l'estimation de
+ * 80 ms. Le critère d'écart d'opacité, lui, pèse chaque instant à sa valeur.
+ *
+ * Une valeur de 0,9 s (celle qui avait été posée sur le visuel d'article) donne
+ * 0,52 à 399 ms là où la source vaut 0,29 : l'image y est à moitié apparue quand
+ * la source commence à peine.
+ */
+export const MEDIA_REVEAL_DURATION = 1.17;
 
 export const MEDIA_REVEAL_TRANSITION: Transition = {
   type: "tween",
   duration: MEDIA_REVEAL_DURATION,
-  ease: COURBE.sortie,
+  ease: EASE_FRAMER,
 };
 
 /*

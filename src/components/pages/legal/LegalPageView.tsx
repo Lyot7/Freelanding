@@ -25,7 +25,6 @@ export function LegalPageView({
     <>
       <SvgSprite />
       <Header site={site} />
-      <FloatingNav site={site} />
       {/* Cible du lien d'évitement (voir SkipLink.tsx et focus.css). */}
       <main id="main-content" tabIndex={-1}>
         {/* Rembourrage BAS remesuré sur les deux documents et aux quatre
@@ -38,7 +37,7 @@ export function LegalPageView({
           {/* RELEVÉ sur `/legal/privacy-policy` : hôte 1440 × 810, z-1,
               opacité 0,05. La page n'a que trois calques : ce héros, le grain
               plein footer et celui de la carte témoignage du footer. */}
-          <Grain className="z-[1]" />
+          <Grain opacity={0.05} className="z-[1]" />
           <span className="absolute inset-y-0 left-1/2 z-[1] w-px bg-white/10" />
           {/* DEUX RANGÉES, PAS DEUX COLONNES SUR LA MÊME LIGNE.
               Relevé sur la source (`/live-proxy`, quatre largeurs, les deux
@@ -74,13 +73,13 @@ export function LegalPageView({
                   largeur disponible, et la boîte occupe sa colonne entière.
                   Repère de la source conservé pour les titres courts, qui
                   gardent leur présence. */}
-              <h1 className="max-w-[680px] text-[clamp(38px,calc(9vw/var(--zoom-ecran,1)),63px)] titre-marque tablet:text-[clamp(44px,calc(6.2vw/var(--zoom-ecran,1)),78px)] desktop:text-[clamp(52px,calc(5.4vw/var(--zoom-ecran,1)),98px)]">
+              <h1 className="max-w-[680px] text-[clamp(38px,calc(9vw/var(--zoom-ecran,1)),63px)] font-semibold uppercase leading-[0.82] tracking-[-0.05em] tablet:text-[clamp(44px,calc(6.2vw/var(--zoom-ecran,1)),78px)] desktop:text-[clamp(52px,calc(5.4vw/var(--zoom-ecran,1)),98px)]">
                 {document.title}
               </h1>
             </Reveal>
             {/* 12px sur 280px de large : MESURÉ sur le live (nous étions à 11px
                 sur 330px, d'où une coupure de lignes différente). */}
-            <p className="max-w-[280px] text-[14px] font-medium leading-[1.35] tracking-[-0.01em] text-white/60 tablet:col-start-1 tablet:row-start-2 tablet:justify-self-end tablet:text-right">
+            <p className="max-w-[280px] text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-white/60 tablet:col-start-1 tablet:row-start-2 tablet:justify-self-end tablet:text-right">
               {document.summary}
             </p>
           </div>
@@ -119,7 +118,7 @@ export function LegalPageView({
             {/* 12 px, interligne 1,2, chasse -0,01em : relevé sur la source
                 aux 5 largeurs. Nous rendions 10 px, interligne 15, sans
                 chasse. */}
-            <p className="micro text-background/60 desktop:text-left">
+            <p className="text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/60 desktop:text-left">
               {uiLabels.dates.lastUpdatedLabel}
               <time dateTime={document.lastUpdated} className="text-background">
                 {formatLongDate(document.lastUpdated)}
@@ -163,6 +162,7 @@ export function LegalPageView({
             de prestation. */}
       </main>
       <Footer />
+      <FloatingNav site={site} />
     </>
   );
 }
