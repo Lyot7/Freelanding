@@ -938,6 +938,3 @@ export const pagesSecteur: readonly PageSecteur[] = [
 /** Résolution par slug. `undefined` plutôt qu'une exception : la route 404. */
 export const pageSecteur = (slug: string): PageSecteur | undefined =>
   pagesSecteur.find((p) => p.slug === slug);
-
-/** Amorce de la liste des pages secteur, sous l’offre de la page pilier. */
-export const avantLiensSecteur = "Par métier :";

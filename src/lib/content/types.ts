@@ -855,6 +855,8 @@ export interface HomeAboutSection {
 
 /** Une tâche de la semaine : sa part de la plus longue, sa durée dans les deux cas. */
 export interface TacheDemo {
+  /** Le remède de cette tâche, affiché avec le gain. */
+  moyen: string;
   libelle: string;
   /** Longueur de la barre, de 0 à 1. */
   part: number;
@@ -872,6 +874,16 @@ export interface CompteurDemo {
  * La section qui montre ce qu'un logiciel métier rend : une semaine de bureau,
  * à la main puis avec le logiciel.
  */
+/** Les trois moyens de rendre du temps, sous la démonstration. */
+export interface MoyensContent {
+  eyebrow: string;
+  titleLines: readonly string[];
+  intro: string;
+  lignes: readonly { titre: string; corps: string; lien: Link }[];
+  titreEtapes: string;
+  etapes: readonly { titre: string; corps: string }[];
+}
+
 export interface LogicielDemoContent {
   eyebrow: string;
   titleLines: readonly string[];
@@ -897,6 +909,8 @@ export interface HomeContent {
   hero: HeroContent;
   /** Démonstration du logiciel métier, en section noire. */
   logiciel?: LogicielDemoContent;
+  /** Les trois moyens de rendre du temps et le déroulé. */
+  moyens: MoyensContent;
   showreel: ShowreelContent;
   about: HomeAboutSection;
   /** Projets mis en avant sur la home, dans l'ordre éditorial. */

@@ -28,6 +28,7 @@ describe("accueil", () => {
       "works",
       "numbers",
       "logiciel",
+      "moyens",
       "whyUs",
       "faq",
       "articles",
@@ -81,7 +82,20 @@ describe("accueil", () => {
     expect(ordre).not.toContain("services");
     expect(ordre.indexOf("showreel")).toBe(ordre.indexOf("about") + 1);
     expect(ordre).toContain("logiciel");
-    expect(homeContent.logiciel?.cta.href).toBe("/services/logiciel-metier");
+    expect(homeContent.logiciel?.cta.href).toBe("#moyens");
+  });
+
+  test("trois moyens rendent le temps, sans aucun nom de prospect", () => {
+    const { moyens } = homeContent;
+    expect(moyens.lignes.map((l) => l.lien.href)).toContain("/services/logiciel-metier");
+    expect(moyens.lignes).toHaveLength(3);
+    expect(moyens.etapes).toHaveLength(4);
+    expect(JSON.stringify(moyens).toLowerCase()).not.toContain("sitpo");
+  });
+
+  test("chaque tâche de la démonstration montre son remède", () => {
+    const remedes = new Set(homeContent.logiciel.demo.taches.map((t) => t.moyen));
+    expect(remedes.size).toBe(2);
   });
 
   test("la démonstration montre un gain dérivé de ses hypothèses, jamais écrit à la main", () => {
@@ -105,7 +119,7 @@ describe("accueil", () => {
   test("le titre du héros est une seule porte, vers l'offre unique", () => {
     const portes = homeContent.hero.doors ?? [];
     expect(portes.map((porte) => porte.href)).toEqual(["/services/logiciel-metier"]);
-    expect(homeContent.hero.title).toBe("Un logiciel qui vous rend des heures.");
+    expect(homeContent.hero.title).toBe("Je vous rends des heures.");
     expect(homeContent.hero.titleLines?.join(" ")).toBe(homeContent.hero.title);
     expect(portes[0]?.price).toContain(prixPlancher(prestation("logiciel")));
     expect(homeContent.about.title).not.toBe(homeContent.hero.title);

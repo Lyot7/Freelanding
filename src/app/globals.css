@@ -974,6 +974,9 @@ html[data-consent-choisi] [data-consent-attente] {
   transition: transform 700ms cubic-bezier(0.23, 1, 0.32, 1), background-color 300ms ease;
 }
 
+.logiciel-moyen {
+  transition: opacity 300ms ease-out;
+}
 .logiciel-gain {
   transition: background-color 300ms ease, color 300ms ease;
 }

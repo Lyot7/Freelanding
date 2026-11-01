@@ -36,7 +36,6 @@ export const siteConfig: SiteConfig = {
   nav: [
     { label: "Accueil", href: "/" },
     { label: "Logiciel métier", href: "/services/logiciel-metier" },
-    { label: "Par métier", href: "/logiciel-metier" },
     { label: "Réalisations", href: "/realisations" },
     { label: "Blog", href: "/blog" },
     { label: "À propos", href: "/a-propos" },
@@ -47,7 +46,6 @@ export const siteConfig: SiteConfig = {
   menuNav: [
     { label: "Accueil", href: "/" },
     { label: "Logiciel métier", href: "/services/logiciel-metier" },
-    { label: "Par métier", href: "/logiciel-metier" },
     { label: "Réalisations", href: "/realisations" },
     { label: "À propos", href: "/a-propos" },
     { label: "Blog", href: "/blog" },
@@ -138,7 +136,6 @@ export const siteConfig: SiteConfig = {
   footerNav: [
     { label: "Accueil", href: "/" },
     { label: "Logiciel métier", href: "/services/logiciel-metier" },
-    { label: "Par métier", href: "/logiciel-metier" },
     { label: "Réalisations", href: "/realisations" },
     { label: "À propos", href: "/a-propos" },
     { label: "Blog", href: "/blog" },
@@ -186,6 +183,8 @@ export const siteConfig: SiteConfig = {
   // liens partagent une seule ligne. Les pages elles-mêmes, le menu flottant et
   // la mention du formulaire gardent les intitulés complets.
   legalLinks: [
+    /* UN SEUL LIEN VERS LE HUB, pour Google : une page sans lien entrant ne s'indexe pas. */
+    { label: "Par métier et par besoin", shortLabel: "Par métier", href: "/logiciel-metier" },
     { label: "Mentions légales", shortLabel: "Mentions légales", href: "/legal/mentions-legales" },
     {
       label: "Politique de confidentialité",

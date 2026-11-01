@@ -520,7 +520,7 @@ export async function Footer({
               « Confidentialité » en fin de défilement. */}
           <div className="relative order-1 flex w-full flex-col items-start justify-end overflow-visible pb-[70px] tablet:order-none tablet:h-full tablet:pb-0">
             {/* framer-mqix49 "Legal Links" (gap 32) */}
-            <div className="relative flex w-min flex-row items-center gap-[32px] overflow-visible">
+            <div className="relative flex w-full flex-wrap tablet:w-min tablet:flex-nowrap flex-row items-center gap-[32px] overflow-visible">
               {/* FORME COURTE ICI, et ici seulement. Les trois liens légaux
                   partagent une ligne : en toutes lettres, « Politique de
                   confidentialité » (168 px) et « Conditions générales » les

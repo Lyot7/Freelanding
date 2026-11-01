@@ -6,6 +6,26 @@ import type { LigneHub } from "@/content/metiers";
  * le nom en grand, ce que la page couvre à côté. Le visiteur se reconnaît au mot
  * de son métier ; des cartes le feraient lire trois fois plus de texte.
  */
+/** LE HUB, EN PLAN : il sert à Google et à qui arrive d'une page, en petit quoi qu'il compte. */
+export function PlanMetiers({ entrees }: { entrees: readonly LigneHub[] }) {
+  return (
+    <ul className="m-0 grid list-none gap-x-[30px] gap-y-[22px] p-0 tablet:grid-cols-2 desktop:grid-cols-3">
+      {entrees.map((entree) => (
+        <li key={entree.chemin}>
+          <Link href={entree.chemin} className="group flex flex-col gap-[4px] no-underline">
+            <span className="text-[16px] font-semibold leading-[1.2] tracking-[-0.02em] underline-offset-[3px] group-hover:underline">
+              {entree.libelle}
+            </span>
+            <span className="text-[13px] font-medium leading-[1.35] tracking-[-0.01em] text-white/60">
+              {entree.accroche}
+            </span>
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export function ListeMetiers({
   entrees,
   ton = "sombre",

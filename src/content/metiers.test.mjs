@@ -254,8 +254,11 @@ describe("le maillage se génère depuis les données", () => {
     expect(pageMetier("plombier")).toBeUndefined();
   });
 
-  test("le menu mène au hub", () => {
-    expect(siteConfig.nav.map((l) => l.href)).toContain(CHEMIN_HUB_METIERS);
+  test("aucun menu ne mène au hub, seul un lien discret du pied de page l'y envoie", () => {
+    for (const menu of [siteConfig.nav, siteConfig.menuNav, siteConfig.footerNav]) {
+      expect(menu.map((l) => l.href)).not.toContain(CHEMIN_HUB_METIERS);
+    }
+    expect(siteConfig.legalLinks.map((l) => l.href)).toContain(CHEMIN_HUB_METIERS);
   });
 
   test("le prix n'est écrit nulle part dans le fichier de données", () => {
