@@ -3,36 +3,23 @@
  *
  * POURQUOI CETTE PAGE. « Prix logiciel sur mesure » et « combien coûte un
  * logiciel sur mesure » sont tenus par des comparateurs et une ferme de
- * contenu ; aucun développeur indépendant n'y publie ses prix (plan du
- * 2026-10-02, lot 3). La page répond en tête, chiffres compris, dans le format
- * que reprennent les moteurs génératifs : réponse directe, plancher, ce qui
- * fait varier le prix, un calcul à hypothèses affichées, une FAQ.
+ * contenu (plan du 2026-10-02, lot 3). La page répond en tête, dans le format
+ * que reprennent les moteurs génératifs : réponse directe, ce qui fait varier le
+ * prix, les repères du marché, un calcul à hypothèses affichées, une FAQ.
  *
- * LES MONTANTS NE S'ÉCRIVENT PAS ICI. Le plancher et le suivi viennent de
- * `offre.ts` ; le calcul face à un abonnement est fait à partir de ses
- * hypothèses, et `page-prix-logiciel.test.mjs` vérifie qu'il tombe juste.
+ * ELLE NE PORTE AUCUN CHIFFRE D'ELIOTT DEPUIS LE 2026-11-01 : ses prix se
+ * donnent uniquement sur devis (voir `offre.ts`). Elle reste en ligne pour la
+ * requête. Le suivi n'y a plus de taux ni de minimum : il entre dans le calcul
+ * comme une ligne du devis.
  *
- * LE SUIVI MENSUEL APPARAÎT ICI, contrairement aux pages de prestation (voir
- * `TAUX_SUIVI`) : une page qui répond « combien ça coûte » et compare à un
- * abonnement sur 3 ans ne peut pas l'omettre sans fausser la comparaison. Il
- * reste hors de l'offre : il est dans le calcul et dans la FAQ.
- *
- * LE REPÈRE D'AGENCE (2026-10-15) vient d'`offre.ts`, avec sa source, son lien
- * et sa date : chiffres de l'agence et plancher toujours côte à côte.
+ * LES MONTANTS NE S'ÉCRIVENT PAS ICI. Le calcul face à un abonnement part de ses
+ * hypothèses, et `page-prix-logiciel.test.mjs` vérifie qu'il tombe juste. Le
+ * repère d'agence vient d'`offre.ts`, avec sa source, son lien et sa date.
  *
  * VOUVOIEMENT depuis le 2026-10-15, décision d'Eliott.
  */
 import type { FaqItem } from "@/lib/content/types";
-import {
-  aPartirDe,
-  euros,
-  plancherSuivi,
-  prestation,
-  prixPlancher,
-  repereAgenceLogiciel,
-  suiviMensuelHT,
-  tauxSuivi,
-} from "./offre";
+import { euros, prestation, repereAgenceLogiciel } from "./offre";
 import { CHEMIN_PAGE_LOGICIEL_CAEN } from "./page-caen";
 import {
   CHEMIN_PRIX_LOGICIEL,
@@ -46,34 +33,15 @@ const AGENCE = repereAgenceLogiciel;
 
 /*
  * HYPOTHÈSES DE LA COMPARAISON : 20 utilisateurs, un abonnement à 40 € HT par
- * utilisateur et par mois, 36 mois.
- *
- * EN FACE, PLUS DE PRIX FERME DEPUIS LE 2026-10-05. La comparaison reposait
- * sur le prix ferme du palier du milieu, supprimé. Elle répond maintenant à la
- * question que le visiteur se pose vraiment, à hypothèses affichées : jusqu'à
- * quel prix de devis le sur mesure, suivi compris, reste moins cher que
- * l'abonnement (`BUDGET_EQUIVALENT`, arrondi à la centaine inférieure). Et au
- * plancher de l'offre, à partir de combien d'utilisateurs il passe devant
- * (`SEUIL_UTILISATEURS`). Aucun des deux ne présente un prix de projet comme
- * acquis.
+ * utilisateur et par mois, 36 mois. Le coût de l'abonnement devient la barre
+ * sous laquelle le devis du visiteur, suivi compris, passe devant : la page donne
+ * la méthode et le lecteur y met son propre devis.
  */
 const SAAS_UTILISATEURS = 20;
 const SAAS_PRIX_UTILISATEUR = 40;
 const DUREE_MOIS = 36;
-const SAAS_COUT = SAAS_UTILISATEURS * SAAS_PRIX_UTILISATEUR * DUREE_MOIS;
-const coutSurMesure = (prixProjet: number): number =>
-  prixProjet + suiviMensuelHT(prixProjet) * DUREE_MOIS;
-const PLANCHER = LOGICIEL.plancher;
-const SUIVI = suiviMensuelHT(PLANCHER);
-const SUR_MESURE_COUT = coutSurMesure(PLANCHER);
-const SEUIL_UTILISATEURS =
-  Math.floor(SUR_MESURE_COUT / (SAAS_PRIX_UTILISATEUR * DUREE_MOIS)) + 1;
-function budgetEquivalent(): number {
-  let budget = Math.floor(SAAS_COUT / 100) * 100;
-  while (budget > 0 && coutSurMesure(budget) > SAAS_COUT) budget -= 100;
-  return budget;
-}
-const BUDGET_EQUIVALENT = budgetEquivalent();
+const SAAS_COUT_UTILISATEUR = SAAS_PRIX_UTILISATEUR * DUREE_MOIS;
+const SAAS_COUT = SAAS_UTILISATEURS * SAAS_COUT_UTILISATEUR;
 
 /** La comparaison, en nombres : le texte est écrit depuis eux. */
 export interface ComparaisonAbonnement {
@@ -81,17 +49,9 @@ export interface ComparaisonAbonnement {
   /** Prix d'un abonnement, en euros HT par utilisateur et par mois. */
   readonly prixParUtilisateur: number;
   readonly mois: number;
+  /** Ce que coûte un utilisateur de plus, sur la durée. */
+  readonly coutParUtilisateur: number;
   readonly coutAbonnement: number;
-  /** Le plancher de l'offre, en euros HT. */
-  readonly prixProjet: number;
-  /** Suivi mensuel d'un projet au plancher, en euros HT. */
-  readonly suiviMensuel: number;
-  /** Projet au plancher et son suivi, sur la durée. */
-  readonly coutSurMesure: number;
-  /** Au plancher, nombre d'utilisateurs à partir duquel le sur mesure coûte moins cher. */
-  readonly seuilUtilisateurs: number;
-  /** Prix de projet le plus haut qui, suivi compris, reste sous le coût de l'abonnement. */
-  readonly budgetEquivalent: number;
 }
 
 export interface PagePrix {
@@ -127,23 +87,24 @@ export const pagePrixLogiciel: PagePrix = {
     // mesure en 2026 : fourchettes réelles » ; la marque, exigée par le test,
     // ne laisse la place qu'à l'année dans 60 caractères.
     titre: "Prix d’un logiciel sur mesure en 2026 · Eliott Bouquerel",
-    description: `Combien coûte un logiciel sur mesure pour votre PME : ${aPartirDe(LOGICIEL, " HT")}, ce qui fait varier le prix du devis, et le calcul face à un abonnement SaaS.`,
+    description:
+      "Combien coûte un logiciel sur mesure pour votre PME : ce qui fait varier le prix du devis, les repères d’agence et le calcul face à un abonnement SaaS.",
   },
   h1: "Prix d’un logiciel sur mesure",
-  /* RÉPONSE CHIFFRÉE EN TÊTE (carte SEO du 2026-10-15) : le plancher, puis le
-     repère d'agence sourcé, à côté. */
-  resume: `Un logiciel sur mesure démarre à ${prixPlancher(LOGICIEL)} HT chez moi. En agence, ${AGENCE.source.nom} relève un premier outil entre ${euros(AGENCE.premierOutilMin)} et ${euros(AGENCE.premierOutilMax)} (${AGENCE.source.releve}). Le prix dépend des modules, des outils à relier et de votre historique, jamais du nombre d’utilisateurs. Il est fixé au devis, et il ne bouge plus.`,
+  /* RÉPONSE DIRECTE EN TÊTE (carte SEO du 2026-10-15) : ce dont dépend le prix,
+     puis le repère d'agence sourcé. */
+  resume: `Le prix d’un logiciel sur mesure dépend des modules, des outils à relier et de votre historique, jamais du nombre d’utilisateurs. Je le fixe au devis, avant de commencer, et il ne bouge plus. En agence, ${AGENCE.source.nom} relève un premier outil entre ${euros(AGENCE.premierOutilMin)} et ${euros(AGENCE.premierOutilMax)} (${AGENCE.source.releve}).`,
   marcheFilAriane: "Prix",
   libelleLien: "prix d’un logiciel sur mesure",
   noteLlms:
-    "prix d’un logiciel sur mesure : le plancher, ce qui fait varier le prix, le suivi mensuel, et une comparaison chiffrée avec un abonnement SaaS sur 3 ans",
+    "prix d’un logiciel sur mesure : ce qui fait varier le prix, les repères d’agence, le suivi mensuel, et une comparaison chiffrée avec un abonnement SaaS sur 3 ans",
   sections: [
     {
       id: "forfaits",
-      titre: "Un plancher, puis la taille de votre problème",
+      titre: "Un prix qui suit la taille de votre problème",
       paragraphes: [
         "Un module correspond à un pan de votre activité : les devis, le planning, la facturation, le stock. Un raccordement relie le logiciel à un outil qui porte déjà vos données, comme votre comptabilité ou votre ERP. Ces 2 unités font l’essentiel du prix.",
-        "Ce qui est compris dès le plancher est détaillé plus bas, ligne par ligne. Les pages par métier montrent à quoi ressemblent ces modules dans un secteur donné.",
+        "Ce que comprend chaque projet est détaillé plus bas, ligne par ligne. Les pages par métier montrent à quoi ressemblent ces modules dans un secteur donné.",
       ],
       liens: {
         titre: "Exemples par métier",
@@ -177,7 +138,7 @@ export const pagePrixLogiciel: PagePrix = {
       paragraphes: [
         "Le prix suit le périmètre : le nombre de modules, le nombre d’outils à relier, et la part de votre métier qui sort des cas courants. Le nombre d’utilisateurs n’y entre pas, et une fois livré, le logiciel ne vous coûte aucune licence.",
         "Au premier appel, ces 4 postes suffisent pour vous donner un ordre de prix. Le devis le fixe ensuite, poste par poste.",
-        `En agence, ${AGENCE.source.nom} relève un premier outil entre ${euros(AGENCE.premierOutilMin)} et ${euros(AGENCE.premierOutilMax)}, et une médiane de ${euros(AGENCE.mediane)} par projet logiciel (${AGENCE.source.releve}). Chez moi, il démarre à ${prixPlancher(LOGICIEL)} HT : je conçois et je code moi-même, et votre budget paie le logiciel plutôt qu’un chef de projet.`,
+        `En agence, ${AGENCE.source.nom} relève un premier outil entre ${euros(AGENCE.premierOutilMin)} et ${euros(AGENCE.premierOutilMax)}, et une médiane de ${euros(AGENCE.mediane)} par projet logiciel (${AGENCE.source.releve}). Je conçois et je code moi-même : votre budget paie le logiciel plutôt qu’un chef de projet.`,
       ],
       liens: {
         titre: "Source",
@@ -222,7 +183,7 @@ export const pagePrixLogiciel: PagePrix = {
       titre: "Sur mesure ou abonnement SaaS : le calcul sur 3 ans",
       paragraphes: [
         `Prenez une équipe de ${SAAS_UTILISATEURS} utilisateurs sur un logiciel en abonnement à ${euros(SAAS_PRIX_UTILISATEUR)} HT par utilisateur et par mois. Sur ${DUREE_MOIS} mois, l’abonnement coûte ${euros(SAAS_COUT)} HT.`,
-        `Un logiciel sur mesure se paie une fois, puis son suivi mensuel, à ${tauxSuivi()} du prix par an. Avec ces hypothèses, tout projet jusqu’à ${euros(BUDGET_EQUIVALENT)} HT, suivi compris, coûte moins cher que l’abonnement sur 3 ans. Au plancher, ${prixPlancher(LOGICIEL)} HT et ${euros(SUIVI)} de suivi par mois, soit ${euros(SUR_MESURE_COUT)} HT sur la durée, le sur mesure passe devant dès ${SEUIL_UTILISATEURS} utilisateurs, et l’écart se creuse chaque année suivante.`,
+        `Un logiciel sur mesure se paie une fois, puis son suivi mensuel, tous deux chiffrés au devis. Le calcul se fait donc avec votre devis : additionnez le projet et ${DUREE_MOIS} mois de suivi. Sous ${euros(SAAS_COUT)} HT, le sur mesure coûte moins cher que l’abonnement sur 3 ans. Chaque utilisateur en plus relève cette barre de ${euros(SAAS_COUT_UTILISATEUR)} HT, et l’écart se creuse chaque année suivante.`,
         "Ces chiffres sont des hypothèses : votre nombre d’utilisateurs, le tarif de votre éditeur et le prix de votre devis changent le résultat. Le calcul laisse de côté l’hébergement du sur mesure, payé à votre hébergeur, et le temps de paramétrage d’un abonnement.",
       ],
       liens: {
@@ -251,8 +212,9 @@ export const pagePrixLogiciel: PagePrix = {
           corps: "3 ans d’usage, sans hausse de tarif de l’éditeur sur la période.",
         },
         {
-          titre: `Hypothèse 4 : un suivi à ${tauxSuivi()} par an`,
-          corps: `Le suivi que je propose vaut ${tauxSuivi()} du prix du projet par an, avec un minimum de ${plancherSuivi()} par mois. Il couvre les mises à jour, les sauvegardes vérifiées et les corrections.`,
+          titre: "Hypothèse 4 : le suivi compte dans le total",
+          corps:
+            "Le suivi couvre les mises à jour, les sauvegardes vérifiées et les corrections. Je le chiffre au devis, avec le projet.",
         },
       ],
     },
@@ -311,12 +273,8 @@ export const pagePrixLogiciel: PagePrix = {
     utilisateurs: SAAS_UTILISATEURS,
     prixParUtilisateur: SAAS_PRIX_UTILISATEUR,
     mois: DUREE_MOIS,
+    coutParUtilisateur: SAAS_COUT_UTILISATEUR,
     coutAbonnement: SAAS_COUT,
-    prixProjet: PLANCHER,
-    suiviMensuel: SUIVI,
-    coutSurMesure: SUR_MESURE_COUT,
-    seuilUtilisateurs: SEUIL_UTILISATEURS,
-    budgetEquivalent: BUDGET_EQUIVALENT,
   },
   titreOffre: "Ce qui est compris, ce qui fait varier le prix",
   faq: {
@@ -330,7 +288,8 @@ export const pagePrixLogiciel: PagePrix = {
       },
       {
         question: "Combien coûte un logiciel sur mesure ?",
-        answer: `Chez moi, ${aPartirDe(LOGICIEL, " HT")}. Au-dessus, le prix suit le nombre de modules, les outils à relier, la reprise de votre historique et les cas particuliers de votre métier. Je le fixe au devis, après un premier échange, et le montant signé ne change plus.`,
+        answer:
+          "Le prix suit le nombre de modules, les outils à relier, la reprise de votre historique et les cas particuliers de votre métier. Je le fixe au devis, après un premier échange, et le montant signé ne change plus.",
       },
       {
         question: "Et si le projet vous prend plus de temps que prévu ?",
@@ -339,7 +298,8 @@ export const pagePrixLogiciel: PagePrix = {
       },
       {
         question: "Combien coûte la maintenance d’un logiciel sur mesure ?",
-        answer: `Le suivi mensuel revient à ${tauxSuivi()} du prix du projet par an, avec un minimum de ${plancherSuivi()} par mois. Il couvre les mises à jour, les sauvegardes vérifiées et les corrections. Il reste facultatif : le logiciel livré fonctionne sans lui. L’hébergement, lui, est à votre nom et se paie directement à l’hébergeur, selon la charge.`,
+        answer:
+          "Le suivi mensuel se chiffre au devis, avec le projet. Il couvre les mises à jour, les sauvegardes vérifiées et les corrections. Il reste facultatif : le logiciel livré fonctionne sans lui. L’hébergement, lui, est à votre nom et se paie directement à l’hébergeur, selon la charge.",
       },
       {
         question: "Le prix dépend-il du nombre d’utilisateurs ?",
@@ -354,11 +314,11 @@ export const pagePrixLogiciel: PagePrix = {
       {
         question: "Pourquoi ne pas prendre un logiciel du marché ?",
         answer:
-          "Si un logiciel du marché couvre votre métier, prenez-le : il vous coûtera moins cher au départ. Le sur mesure se justifie quand vos licences s’additionnent, quand vos règles sortent de ses paramètres, ou quand vos outils ne se parlent pas. Le calcul plus haut vous donne un seuil, à refaire avec vos chiffres.",
+          "Si un logiciel du marché couvre votre métier, prenez-le : il vous coûtera moins cher au départ. Le sur mesure se justifie quand vos licences s’additionnent, quand vos règles sortent de ses paramètres, ou quand vos outils ne se parlent pas. Le calcul plus haut se refait avec vos chiffres.",
       },
     ],
   },
 };
 
 /** Amorce du lien vers cette page, sous l'offre de la page pilier. */
-export const avantLienPrix = "Le détail des prix :";
+export const avantLienPrix = "Ce qui fait varier le prix :";

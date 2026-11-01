@@ -17,7 +17,7 @@
  *   01 le sujet — une carte par sujet ; un clic passe à la suite ;
  *   02 le créneau — durée, calendrier du mois, heures du jour retenu ;
  *   03 le projet — budget, objectif, échéance, et le retour « ce que vous pouvez
- *      espérer à ce budget » calculé sur place depuis la grille de l'offre ;
+ *      espérer à ce budget » calculé sur place ;
  *      (budget, objectif, échéance) ;
  *   04 les coordonnées — nom, adresse, et un message facultatif.
  * La barre de progression rend chaque étape franchie cliquable, et le
@@ -377,49 +377,14 @@ function ChoixUnique({
  * une région qui apparaît déjà remplie. Vide, elle ne prend aucune place.
  */
 function RetourEspere({ retour }: { retour: RetourBudget | undefined }) {
-  const texte = "text-[13px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground-60";
   return (
     <div aria-live="polite">
       {retour ? (
         <div className="mt-[12px] flex flex-col gap-[14px] border border-border p-[16px]">
           <p className={CLASSE_LIBELLE}>{contenu.retour.titre}</p>
-
-          {retour.type === "aPortee"
-            ? retour.lignes.map((ligne) => (
-                <div key={ligne.prestation} className="flex flex-col gap-[6px]">
-                  <p className="flex flex-wrap items-baseline justify-between gap-x-[12px] gap-y-[4px]">
-                    <span className="text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground">
-                      {ligne.prestation}
-                    </span>
-                    <span className="text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-accent">
-                      {ligne.prix}
-                    </span>
-                  </p>
-                  <p className={texte}>{ligne.texte}</p>
-                </div>
-              ))
-            : null}
-
-          {retour.type === "aucun" ? (
-            <p className="text-[14px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground">
-              {retour.texte}
-            </p>
-          ) : null}
-
-          {retour.type === "inconnu" ? (
-            <div className="flex flex-col gap-[6px]">
-              <p className="text-[14px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground">
-                {retour.texte}
-              </p>
-              <ul className="m-0 flex list-none flex-col gap-[4px] p-0">
-                {retour.reperes.map((repere) => (
-                  <li key={repere} className={texte}>
-                    {repere}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
+          <p className="text-[14px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground">
+            {retour.texte}
+          </p>
         </div>
       ) : null}
     </div>
@@ -674,7 +639,7 @@ export function ReservationRendezVous({
   /** Vrai après un « Continuer » refusé : les champs requis vides s'affichent en erreur. */
   const [envoiTente, setEnvoiTente] = useState(false);
   const tranches = useMemo(
-    () => (type ? tranchesBudget(type) : []),
+    () => (type ? tranchesBudget() : []),
     [type],
   );
   const objectifs = useMemo(() => (type ? optionsObjectif(type) : []), [type]);
@@ -682,8 +647,8 @@ export function ReservationRendezVous({
   const objectifChoisi = objectifs.some((o) => o.id === objectif) ? objectif : "";
   const budgetManquant = !budgetChoisi;
   const retour = useMemo(
-    () => (type && budgetChoisi ? retourBudget(type, budgetChoisi) : undefined),
-    [type, budgetChoisi],
+    () => (budgetChoisi ? retourBudget(budgetChoisi) : undefined),
+    [budgetChoisi],
   );
   const erreurBudget =
     (envoiTente && budgetManquant) || champEnErreur === "budget"

@@ -1,11 +1,11 @@
 import { describe, expect, it } from "bun:test";
-import { aPartirDe, euros, prestation } from "../../content/offre.ts";
+import { euros, prestation } from "../../content/offre.ts";
 import { IDS_RENDEZ_VOUS, rendezVousContent } from "../../content/rendez-vous.ts";
 import { siteConfig } from "../../content/site.ts";
 import {
   rattacherObjectif,
+  BORNES_BUDGET,
   BUDGET_INCONNU,
-  bornesBudget,
   composerNotes,
   LEGENDE_OBJECTIF,
   offresDuRendezVous,
@@ -17,15 +17,14 @@ import {
 } from "./questionnaire.ts";
 
 /**
- * LES TRANCHES SUIVENT LES PLANCHERS, elles ne les recopient pas. Ces tests
- * lisent les planchers dans `offre.ts` plutôt que de les écrire : un plancher
- * qui bouge doit déplacer les tranches, pas casser ce fichier. Ce qu'ils
- * figent, c'est la RÈGLE (quelle prestation est à portée de quelle tranche, ce
- * qui s'affiche au-delà), et l'absence de tout nom de forfait.
+ * LES TRANCHES NE CITENT AUCUN PRIX D'ELIOTT, décision du 2026-11-01. Ces tests
+ * figent la RÈGLE (quelle tranche donne quel retour, ce qui part dans les notes),
+ * et l'absence de tout montant et de tout nom de forfait dans les textes.
  */
 
 const logiciel = prestation("logiciel");
-const bornes = (p) => [1, 2, 4].map((m) => p.plancher * m);
+const [A, B, C] = BORNES_BUDGET;
+const tranche = (rang) => tranchesBudget()[rang].id;
 const sansInsecable = (texte) => texte.replace(/[\u00a0\u202f]/gu, " ");
 
 describe("rattacherObjectif", () => {
@@ -50,59 +49,50 @@ describe("le questionnaire est le même pour chaque sujet", () => {
     const { objectif } = rendezVousContent.questionnaire;
     expect(objectif).not.toHaveProperty("legendeParType");
     expect(LEGENDE_OBJECTIF).toBe(objectif.legende);
+    expect(tranchesBudget().length).toBeGreaterThan(2);
     for (const id of IDS_RENDEZ_VOUS) {
-      expect(tranchesBudget(id).length, id).toBeGreaterThan(2);
       expect(optionsObjectif(id).length, id).toBeGreaterThan(2);
     }
   });
 });
 
-describe("bornesBudget et tranchesBudget", () => {
-  it("pose le plancher puis ses multiples, pour chaque sujet", () => {
-    for (const id of IDS_RENDEZ_VOUS) {
-      expect(bornesBudget(id), id).toEqual(bornes(logiciel));
-    }
-    expect(bornesBudget("logiciel")).toEqual([6000, 12000, 24000]);
+describe("tranchesBudget", () => {
+  it("ne laisse deviner aucun prix d'Eliott : ni son ancien plancher, ni ses multiples", () => {
+    for (const borne of BORNES_BUDGET) expect([6000, 12000, 24000]).not.toContain(borne);
+    for (const t of tranchesBudget()) expect(t.libelle).not.toMatch(/\b6\s000/u);
   });
 
   it("ne pose jamais deux bornes voisines à moins de moitié d’écart", () => {
-    for (const id of IDS_RENDEZ_VOUS) {
-      const b = bornesBudget(id);
-      for (let i = 0; i < b.length - 1; i += 1) {
-        expect(b[i + 1] / b[i]).toBeGreaterThanOrEqual(1.5);
-      }
+    for (let i = 0; i < BORNES_BUDGET.length - 1; i += 1) {
+      expect(BORNES_BUDGET[i + 1] / BORNES_BUDGET[i]).toBeGreaterThanOrEqual(1.5);
     }
   });
 
-  it("encadre le plancher : sous le premier, entre chaque, au-dessus du dernier, puis « je ne sais pas »", () => {
-    const [a, b, c] = bornes(logiciel);
-    for (const id of IDS_RENDEZ_VOUS) {
-      expect(tranchesBudget(id).map((t) => t.id)).toEqual([
-        `moins-${a}`,
-        `${a}-${b}`,
-        `${b}-${c}`,
-        `plus-${c}`,
-        BUDGET_INCONNU,
-      ]);
-    }
+  it("encadre les bornes : sous la première, entre chaque, au-dessus de la dernière, puis « je ne sais pas »", () => {
+    expect(tranchesBudget().map((t) => t.id)).toEqual([
+      `moins-${A}`,
+      `${A}-${B}`,
+      `${B}-${C}`,
+      `plus-${C}`,
+      BUDGET_INCONNU,
+    ]);
   });
 
-  it("écrit les libellés avec les montants formatés de l’offre", () => {
+  it("écrit les libellés avec les montants formatés", () => {
     const { budget } = rendezVousContent.questionnaire;
-    const [a, b, c] = bornes(logiciel);
-    expect(tranchesBudget("decouverte").map((t) => t.libelle)).toEqual([
-      budget.moinsDe(euros(a)),
-      budget.entre(euros(a), euros(b)),
-      budget.entre(euros(b), euros(c)),
-      budget.plusDe(euros(c)),
+    expect(tranchesBudget().map((t) => t.libelle)).toEqual([
+      budget.moinsDe(euros(A)),
+      budget.entre(euros(A), euros(B)),
+      budget.entre(euros(B), euros(C)),
+      budget.plusDe(euros(C)),
       budget.inconnu,
     ]);
   });
 
   it("donne des identifiants uniques à chaque sujet", () => {
+    const ids = tranchesBudget().map((t) => t.id);
+    expect(new Set(ids).size).toBe(ids.length);
     for (const id of IDS_RENDEZ_VOUS) {
-      const ids = tranchesBudget(id).map((t) => t.id);
-      expect(new Set(ids).size).toBe(ids.length);
       const objectifs = optionsObjectif(id).map((o) => o.id);
       expect(new Set(objectifs).size).toBe(objectifs.length);
     }
@@ -112,57 +102,32 @@ describe("bornesBudget et tranchesBudget", () => {
 describe("retourBudget — ce que vous pouvez espérer", () => {
   const { retour: R } = rendezVousContent;
 
-  it("dit franchement que rien ne tient sous le plancher", () => {
-    for (const id of IDS_RENDEZ_VOUS) {
-      const retour = retourBudget(id, tranchesBudget(id)[0].id);
-      expect(retour.type).toBe("aucun");
-      expect(retour.texte).toBe(R.aucun(euros(logiciel.plancher)));
-    }
+  it("sous le seuil interne, propose de cadrer ensemble, sans jamais nommer le seuil", () => {
+    expect(retourBudget(tranche(0))).toEqual({ type: "serre", texte: R.serre });
   });
 
-  it("au-dessus du plancher, donne la prestation, son prix de départ et la suite au devis", () => {
-    const retour = retourBudget("logiciel", tranchesBudget("logiciel")[2].id);
-    expect(retour.type).toBe("aPortee");
-    expect(retour.lignes).toEqual([
-      {
-        prestation: logiciel.nom,
-        prix: R.prixPlancher(euros(logiciel.plancher)),
-        texte: R.aPortee,
-      },
-    ]);
+  it("au-dessus du seuil, renvoie à l’appel et au devis", () => {
+    expect(retourBudget(tranche(1))).toEqual({ type: "aPortee", texte: R.aPortee });
+    expect(retourBudget(tranche(2))).toEqual({ type: "aPortee", texte: R.aPortee });
   });
 
   it("sur la tranche ouverte vers le haut, dit que le budget laisse de la place", () => {
-    const retour = retourBudget("logiciel", tranchesBudget("logiciel")[3].id);
-    expect(retour.lignes[0].texte).toBe(R.large);
-    expect(retour.lignes[0].prix).toBe(R.prixPlancher(euros(logiciel.plancher)));
+    expect(retourBudget(tranche(3))).toEqual({ type: "large", texte: R.large });
   });
 
-  it("sur « decouverte », donne la même ligne que sur « logiciel »", () => {
-    const tranche = `${logiciel.plancher}-${logiciel.plancher * 2}`;
-    const retour = retourBudget("decouverte", tranche);
-    expect(retour.lignes.map((l) => l.prestation)).toEqual([logiciel.nom]);
-    expect(retour).toEqual(retourBudget("logiciel", tranche));
+  it("« je ne sais pas » renvoie à l’appel", () => {
+    expect(retourBudget(BUDGET_INCONNU)).toEqual({ type: "inconnu", texte: R.inconnu });
   });
 
-  it("« je ne sais pas » renvoie à l’appel, avec le prix de départ du logiciel", () => {
-    for (const id of IDS_RENDEZ_VOUS) {
-      const inconnu = retourBudget(id, BUDGET_INCONNU);
-      expect(inconnu.type).toBe("inconnu");
-      expect(inconnu.reperes).toEqual([R.repere(logiciel.nom, aPartirDe(logiciel, " HT"))]);
-    }
-  });
-
-  it("ne calcule rien pour une tranche qui n’appartient pas au sujet", () => {
+  it("ne calcule rien pour une tranche inconnue", () => {
     // Une tranche de l'ancien site vitrine, retirée le 2026-10-31.
-    expect(retourBudget("logiciel", "moins-3000")).toBe(undefined);
-    expect(retourBudget("decouverte", "3000-6000")).toBe(undefined);
+    expect(retourBudget("moins-3000")).toBe(undefined);
+    expect(retourBudget("3000-6000")).toBe(undefined);
   });
 
-  it("aucun texte du retour ne nomme un forfait ni un palier", () => {
-    const textes = [R.titre, R.aucun("X"), R.inconnu, R.repere("X", "Y"), R.prixPlancher("X"), R.aPortee, R.large];
-    for (const texte of textes) {
-      expect(/forfait|palier|prix ferme/iu.test(texte), texte).toBe(false);
+  it("aucun texte du retour ne porte un montant, un forfait ni un palier", () => {
+    for (const texte of [R.titre, R.serre, R.inconnu, R.aPortee, R.large]) {
+      expect(/forfait|palier|prix ferme|prix de départ|\d/iu.test(texte), texte).toBe(false);
     }
   });
 });
@@ -171,17 +136,16 @@ describe("composerNotes — ce qu'Eliott lit dans son agenda", () => {
   const { notes } = rendezVousContent;
 
   it("pose une réponse par ligne, ce qui est à portée, puis le message", () => {
-    const [a, b] = bornes(logiciel);
     const texte = composerNotes({
       type: "logiciel",
-      budget: `${a}-${b}`,
+      budget: `${A}-${B}`,
       objectif: "tableur",
       echeance: "trimestre",
       message: "Sortir du tableur partagé.",
     });
     const lignes = texte.split("\n");
     expect(lignes).toEqual([
-      sansInsecable(`${notes.budget} : ${tranchesBudget("logiciel")[1].libelle}`),
+      sansInsecable(`${notes.budget} : ${tranchesBudget()[1].libelle}`),
       sansInsecable(`${notes.forfait} : ${logiciel.nom}`),
       sansInsecable(`${notes.objectif} : ${optionsObjectif("logiciel")[1].libelle}`),
       sansInsecable(`${notes.echeance} : ${rendezVousContent.questionnaire.echeance.options[1].libelle}`),
@@ -196,10 +160,10 @@ describe("composerNotes — ce qu'Eliott lit dans son agenda", () => {
     expect(texte).toContain(sansInsecable(`${notes.forfait} : ${notes.aCaler}`));
   });
 
-  it("dit que rien ne tient sous le plancher", () => {
+  it("signale à Eliott un budget sous le seuil interne", () => {
     const texte = composerNotes({
       type: "logiciel",
-      budget: tranchesBudget("logiciel")[0].id,
+      budget: tranche(0),
       objectif: "autre",
     });
     expect(texte).toContain(sansInsecable(`${notes.forfait} : ${notes.aucunForfait}`));
@@ -223,7 +187,7 @@ describe("composerNotes — ce qu'Eliott lit dans son agenda", () => {
   it("ne laisse aucune espace insécable dans le texte brut", () => {
     const texte = composerNotes({
       type: "decouverte",
-      budget: `plus-${logiciel.plancher * 4}`,
+      budget: `plus-${C}`,
       objectif: "relier",
     });
     expect(texte).not.toMatch(/[\u00a0\u202f]/u);
@@ -246,24 +210,22 @@ describe("rendezVousDuTypeProjet", () => {
   });
 });
 
-describe("rattacherTranche — tranches du logiciel à 6 000 €", () => {
+describe("rattacherTranche — les tranches retirées", () => {
   it("ramène chaque ancienne tranche à la tranche actuelle qui contient sa borne basse", () => {
-    const [a, b, c] = bornes(logiciel);
-    for (const id of IDS_RENDEZ_VOUS) {
-      expect(rattacherTranche(id, "moins-6000")).toBe(`moins-${a}`);
-      expect(rattacherTranche(id, "moins-3000")).toBe(`moins-${a}`);
-      expect(rattacherTranche(id, "moins-3500")).toBe(`moins-${a}`);
-      expect(rattacherTranche(id, "3000-6000")).toBe(`moins-${a}`);
-      expect(rattacherTranche(id, "6000-12000")).toBe(`${a}-${b}`);
-      expect(rattacherTranche(id, "7000-14000")).toBe(`${a}-${b}`);
-      expect(rattacherTranche(id, "12000-24000")).toBe(`${b}-${c}`);
-      expect(rattacherTranche(id, "plus-14000")).toBe(`${b}-${c}`);
-      expect(rattacherTranche(id, "plus-24000")).toBe(`plus-${c}`);
-    }
+    expect(rattacherTranche("moins-6000")).toBe(`moins-${A}`);
+    expect(rattacherTranche("moins-3000")).toBe(`moins-${A}`);
+    expect(rattacherTranche("moins-3500")).toBe(`moins-${A}`);
+    expect(rattacherTranche("3000-6000")).toBe(`moins-${A}`);
+    expect(rattacherTranche("6000-12000")).toBe(`${A}-${B}`);
+    expect(rattacherTranche("7000-14000")).toBe(`${A}-${B}`);
+    expect(rattacherTranche("12000-24000")).toBe(`${B}-${C}`);
+    expect(rattacherTranche("plus-14000")).toBe(`${B}-${C}`);
+    expect(rattacherTranche("plus-24000")).toBe(`${B}-${C}`);
+    expect(rattacherTranche("plus-36000")).toBe(`plus-${C}`);
   });
 
   it("rend telle quelle une valeur qui n'est pas une ancienne tranche", () => {
-    expect(rattacherTranche("logiciel", BUDGET_INCONNU)).toBe(BUDGET_INCONNU);
-    expect(rattacherTranche("logiciel", "toString")).toBe("toString");
+    expect(rattacherTranche(BUDGET_INCONNU)).toBe(BUDGET_INCONNU);
+    expect(rattacherTranche("toString")).toBe("toString");
   });
 });

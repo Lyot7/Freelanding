@@ -377,7 +377,7 @@ export function FooterContactForm({
           name="budget"
           label={questionnaire.budget.label}
           placeholder={questionnaire.budget.placeholder}
-          options={tranchesBudget(idRendezVous)}
+          options={tranchesBudget()}
           requis
           enErreur={envoi.champEnErreur === "budget"}
         />

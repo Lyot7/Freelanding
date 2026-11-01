@@ -26,13 +26,9 @@
  * VOUVOIEMENT depuis le 2026-10-15, décision d'Eliott.
  */
 import {
-  aPartirDe,
   euros,
-  plancherSuivi,
   prestation,
-  prixPlancher,
   repereAgenceLogiciel,
-  tauxSuivi,
 } from "./offre";
 import { CHEMIN_PAGE_LOGICIEL_CAEN, type PageLocale } from "./page-caen";
 import { CHEMIN_PRIX_LOGICIEL, pagesSecteur } from "./pages-secteur";
@@ -44,10 +40,10 @@ export const pageLogicielCaen: PageLocale = {
   chemin: CHEMIN_PAGE_LOGICIEL_CAEN,
   seo: {
     titre: "Logiciel sur mesure à Caen · Eliott Bouquerel",
-    description: `Votre logiciel métier ou votre application web sur mesure, par un développeur basé à Caen, pour les PME de Normandie : ${aPartirDe(LOGICIEL, " HT")}, prix au devis.`,
+    description: `Votre logiciel métier ou votre application web sur mesure, par un développeur basé à Caen, pour les PME de Normandie, prix fixé au devis, avant le début.`,
   },
   h1: "Logiciel sur mesure à Caen",
-  resume: `Je développe des logiciels métier et des applications web sur mesure pour les PME de Caen, du Calvados, de la Manche et de l’Orne. Basé à Caen, je mène chaque projet en visio, du premier appel à la livraison. Compte ${aPartirDe(LOGICIEL, " HT")}, prix fixé au devis.`,
+  resume: `Je développe des logiciels métier et des applications web sur mesure pour les PME de Caen, du Calvados, de la Manche et de l’Orne. Basé à Caen, je mène chaque projet en visio, du premier appel à la livraison. Le prix se fixe au devis.`,
   marcheFilAriane: "Caen",
   zones: {
     villes: ["Caen"],
@@ -259,7 +255,7 @@ export const pageLogicielCaen: PageLocale = {
     items: [
       {
         question: "Combien coûte un logiciel sur mesure à Caen ?",
-        answer: `Le prix démarre à ${prixPlancher(LOGICIEL)} HT, puis il suit le nombre de modules, les outils à relier et la reprise de votre historique. Je le fixe au devis. En agence, un premier outil démarre entre ${euros(repereAgenceLogiciel.premierOutilMin)} et ${euros(repereAgenceLogiciel.premierOutilMax)} selon ${repereAgenceLogiciel.source.nom} (${repereAgenceLogiciel.source.releve}). Je conçois et je code moi-même : votre budget va au logiciel plutôt qu’à un chef de projet. Être à Caen ne change pas le prix : il se calcule de la même façon pour toute la France.`,
+        answer: `Le prix suit le nombre de modules, les outils à relier et la reprise de votre historique. Je le fixe au devis. En agence, un premier outil démarre entre ${euros(repereAgenceLogiciel.premierOutilMin)} et ${euros(repereAgenceLogiciel.premierOutilMax)} selon ${repereAgenceLogiciel.source.nom} (${repereAgenceLogiciel.source.releve}). Je conçois et je code moi-même : votre budget va au logiciel plutôt qu’à un chef de projet. Être à Caen ne change pas le prix : il se calcule de la même façon pour toute la France.`,
       },
       {
         question: "Faut-il se rencontrer pour lancer un logiciel sur mesure ?",
@@ -283,7 +279,7 @@ export const pageLogicielCaen: PageLocale = {
       },
       {
         question: "Que devient mon logiciel si vous n’êtes plus disponible ?",
-        answer: `Il continue de tourner : il est hébergé à votre nom, et son code est dans votre dépôt avec sa documentation, prêt pour un autre développeur. Si vous voulez que je reste sur le projet, le suivi mensuel revient à ${tauxSuivi()} du prix du projet par an, avec un minimum de ${plancherSuivi()} par mois.`,
+        answer: `Il continue de tourner : il est hébergé à votre nom, et son code est dans votre dépôt avec sa documentation, prêt pour un autre développeur. Si vous voulez que je reste sur le projet, le suivi mensuel se chiffre au devis.`,
       },
     ],
   },

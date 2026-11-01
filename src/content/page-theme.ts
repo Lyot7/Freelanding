@@ -20,7 +20,7 @@
  * `pages-theme.test.mjs` refuse un paragraphe repris d'une autre page.
  *
  * LES RÈGLES DU SITE TIENNENT ICI AUSSI : vouvoiement, aucun montant écrit à
- * la main (planchers et repères d'agence viennent d'`offre.ts`), un calcul
+ * la main (les repères d'agence viennent d'`offre.ts`), un calcul
  * dérivé de ses hypothèses affichées, aucun client inventé, aucun présentiel.
  */
 import type { FaqItem } from "@/lib/content/types";

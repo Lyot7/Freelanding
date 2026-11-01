@@ -103,7 +103,7 @@ export interface ContenuRendezVous {
     readonly budget: {
       readonly legende: string;
       readonly erreur: string;
-      /** Les tranches sont CALCULÉES depuis `offre.ts` ; seuls leurs mots sont ici. */
+      /** Les bornes vivent dans `questionnaire.ts` ; seuls leurs mots sont ici. */
       readonly moinsDe: (prix: string) => string;
       readonly entre: (bas: string, haut: string) => string;
       readonly plusDe: (prix: string) => string;
@@ -124,11 +124,10 @@ export interface ContenuRendezVous {
   /** « Ce que vous pouvez espérer à ce budget », affiché dès qu'une tranche est choisie. */
   readonly retour: {
     readonly titre: string;
-    readonly aucun: (prixEntree: string) => string;
+    /** La tranche est sous le seuil interne, jamais nommé. */
+    readonly serre: string;
     readonly inconnu: string;
-    readonly repere: (prestation: string, prix: string) => string;
-    readonly prixPlancher: (prix: string) => string;
-    /** Le plancher tient dans la tranche. */
+    /** La tranche est au-dessus du seuil interne. */
     readonly aPortee: string;
     /** La tranche est ouverte vers le haut. */
     readonly large: string;
@@ -275,9 +274,9 @@ export const rendezVousContent: ContenuRendezVous = {
    * c'est de l'OR, sinon ce qu'ils veulent et leur dire si c'est possible ou non
    * et ce qu'ils peuvent espérer à ce prix ». Trois questions, deux obligatoires.
    *
-   * AUCUN MONTANT ICI. Les tranches de budget sont calculées depuis les planchers de
-   * `offre.ts` par `src/lib/rendez-vous/questionnaire.ts` : un prix qui change
-   * là-bas déplace les tranches sans qu'on touche à ce fichier.
+   * AUCUN MONTANT ICI. Les bornes des tranches vivent dans
+   * `src/lib/rendez-vous/questionnaire.ts`, et aucune ne cite un prix d'Eliott
+   * (décision du 2026-11-01 : ses prix se donnent uniquement sur devis).
    *
    * « AUTRE CHOSE » RENVOIE AU MESSAGE LIBRE, qui existe déjà à l'étape
    * suivante. Pas de champ texte de plus sous l'option.
@@ -322,13 +321,12 @@ export const rendezVousContent: ContenuRendezVous = {
 
   retour: {
     titre: "Ce que vous pouvez espérer à ce budget",
-    aucun: (prixEntree) =>
-      `Mes projets commencent à ${prixEntree} HT, et ce budget n’y suffit pas. Réservez quand même : on regarde ensemble ce qui est faisable, et par quoi commencer.`,
-    inconnu: "On le cale ensemble pendant l’appel. Pour vous situer :",
-    repere: (prestation, prix) => `${prestation}, ${prix}.`,
-    prixPlancher: (prix) => `À partir de ${prix} HT`,
+    serre:
+      "On regarde ensemble ce qui tient dans ce budget, et par quoi commencer. Le prix dépend du projet : je le fixe au devis.",
+    inconnu:
+      "On le cale ensemble pendant l’appel. Le prix dépend du projet : je le fixe au devis, avant de commencer.",
     aPortee:
-      "Votre budget couvre le prix de départ. Ce qu’il permet d’ajouter, je vous le dis pendant l’appel, et le devis le fixe.",
+      "Je vous dis pendant l’appel ce que ce budget permet. Le prix dépend du projet : je le fixe au devis.",
     large:
       "Votre budget laisse de la place à un projet complet. On fixe le périmètre ensemble, au devis.",
   },
@@ -338,7 +336,7 @@ export const rendezVousContent: ContenuRendezVous = {
     forfait: "À portée",
     objectif: "Objectif",
     echeance: "Échéance",
-    aucunForfait: "rien à ce budget",
+    aucunForfait: "budget serré, à cadrer",
     aCaler: "à caler pendant l’appel",
   },
 

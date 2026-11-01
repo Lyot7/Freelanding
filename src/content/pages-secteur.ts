@@ -34,7 +34,7 @@
  * présente comme une preuve directe, avec le seul chiffre de `work.ts`.
  */
 import type { FaqItem } from "@/lib/content/types";
-import { aPartirDe, euros, prestation, prixPlancher } from "./offre";
+import { euros, prestation } from "./offre";
 import type { LienLocal } from "./page-caen";
 
 const LOGICIEL = prestation("logiciel");
@@ -157,10 +157,10 @@ const pageBtp: PageSecteur = {
   chemin: cheminSecteur("btp"),
   seo: {
     titre: "Logiciel de gestion de chantier BTP · Eliott Bouquerel",
-    description: `Logiciel de gestion de chantier sur mesure pour votre PME du BTP : devis, situations, pointage, sous-traitants. Prix : ${aPartirDe(LOGICIEL, " HT")}, au devis.`,
+    description: `Logiciel de gestion de chantier sur mesure pour votre PME du BTP : devis, situations, pointage, sous-traitants. Le prix dépend du projet et se fixe au devis.`,
   },
   h1: "Logiciel de gestion de chantier BTP",
-  resume: `Un logiciel de gestion de chantier sur mesure réunit vos devis, l’avancement, les situations de travaux et les heures de vos équipes dans un seul outil. Il s’adresse aux PME du BTP que le tableur ou un logiciel standard ne suit plus. Comptez ${aPartirDe(LOGICIEL, " HT")}, selon le périmètre.`,
+  resume: `Un logiciel de gestion de chantier sur mesure réunit vos devis, l’avancement, les situations de travaux et les heures de vos équipes dans un seul outil. Il s’adresse aux PME du BTP que le tableur ou un logiciel standard ne suit plus. Le prix se fixe au devis, selon le périmètre.`,
   marcheFilAriane: "BTP",
   libelleLien: "logiciel de gestion de chantier BTP",
   noteLlms:
@@ -242,7 +242,7 @@ const pageBtp: PageSecteur = {
       titre: "La ressaisie, chiffrée sur une année",
       paragraphes: [
         `Prenez une PME avec ${BTP_CONDUCTEURS} conducteurs de travaux. Par personne, ${BTP_HEURES_SEMAINE} heures par semaine partent à recopier des pointages, à tenir un tableur d’avancement et à refaire les situations. Sur ${BTP_SEMAINES} semaines travaillées, le total atteint ${BTP_HEURES_AN} heures par an.`,
-        `À ${euros(BTP_COUT_HORAIRE)} l’heure, salaire chargé et frais compris, ces heures coûtent ${euros(BTP_COUT_AN)} par an. Un logiciel de chantier sur mesure démarre à ${prixPlancher(LOGICIEL)} HT, payé une fois. Ces 4 chiffres sont des hypothèses : remplacez-les par les vôtres avant d’en tirer une conclusion.`,
+        `À ${euros(BTP_COUT_HORAIRE)} l’heure, salaire chargé et frais compris, ces heures coûtent ${euros(BTP_COUT_AN)} par an. Un logiciel de chantier sur mesure se paie une fois, au prix fixé au devis. Ces 4 chiffres sont des hypothèses : remplacez-les par les vôtres avant d’en tirer une conclusion.`,
       ],
       points: [
         {
@@ -298,7 +298,7 @@ const pageBtp: PageSecteur = {
         },
         {
           titre: "Entre les deux",
-          corps: `À partir de ${prixPlancher(LOGICIEL)} HT, j’ajoute à votre logiciel actuel la fonction qui lui manque : un pointage mobile, un export vers la paie, un tableau de marge par chantier.`,
+          corps: `J’ajoute à votre logiciel actuel la fonction qui lui manque : un pointage mobile, un export vers la paie, un tableau de marge par chantier.`,
         },
         {
           titre: "À qui appartient l’outil",
@@ -371,7 +371,7 @@ const pageBtp: PageSecteur = {
     items: [
       {
         question: "Combien coûte un logiciel de gestion de chantier sur mesure ?",
-        answer: `Le prix démarre à ${prixPlancher(LOGICIEL)} HT et suit le nombre de modules : le pointage mobile seul, ou devis, suivi de chantier et situations réunis. Il monte aussi quand plusieurs sociétés doivent rester d’accord. Je le fixe au devis, et il ne bouge plus.`,
+        answer: `Le prix suit le nombre de modules : le pointage mobile seul, ou devis, suivi de chantier et situations réunis. Il monte aussi quand plusieurs sociétés doivent rester d’accord. Je le fixe au devis, et il ne bouge plus.`,
       },
       {
         question:
@@ -436,10 +436,10 @@ const pageLocation: PageSecteur = {
   chemin: cheminSecteur("location-materiel"),
   seo: {
     titre: "Logiciel de gestion location de matériel · Eliott Bouquerel",
-    description: `Logiciel de location de matériel sur mesure : votre parc, vos contrats, disponibilités, états des lieux et facturation. Prix : ${aPartirDe(LOGICIEL, " HT")}, au devis.`,
+    description: `Logiciel de location de matériel sur mesure : votre parc, vos contrats, disponibilités, états des lieux et facturation. Prix fixé au devis, selon le projet.`,
   },
   h1: "Logiciel de gestion de location de matériel",
-  resume: `Un logiciel de gestion de location de matériel sur mesure suit votre parc machine par machine, vous dit ce qui est disponible demain, et édite le contrat, l’état des lieux et la facture à la journée. Il vise les loueurs et les entreprises de BTP ou de TP qui gèrent leur parc sur un tableur ou un planning mural. Comptez ${aPartirDe(LOGICIEL, " HT")}, selon les modules retenus.`,
+  resume: `Un logiciel de gestion de location de matériel sur mesure suit votre parc machine par machine, vous dit ce qui est disponible demain, et édite le contrat, l’état des lieux et la facture à la journée. Il vise les loueurs et les entreprises de BTP ou de TP qui gèrent leur parc sur un tableur ou un planning mural. Le prix se fixe au devis, selon les modules retenus.`,
   marcheFilAriane: "Location de matériel",
   libelleLien: "logiciel de gestion de location de matériel",
   noteLlms:
@@ -516,7 +516,7 @@ const pageLocation: PageSecteur = {
       titre: "Les mouvements du dépôt, chiffrés sur une année",
       paragraphes: [
         `Prenez un dépôt qui enregistre ${LOC_MOUVEMENTS_JOUR} mouvements par jour, départs et retours confondus. Pour chacun, ${LOC_MINUTES} minutes partent à recopier le bon de sortie, à reporter le compteur et à corriger la durée pour la facture. Sur ${LOC_JOURS} jours d’ouverture, le total atteint ${LOC_HEURES_AN} heures par an.`,
-        `À ${euros(LOC_COUT_HORAIRE)} l’heure, salaire chargé et frais compris, ces heures coûtent ${euros(LOC_COUT_AN)} par an. Un logiciel de location sur mesure démarre à ${prixPlancher(LOGICIEL)} HT, payé une fois. Ces 4 chiffres sont des hypothèses : remplacez-les par ceux de votre dépôt.`,
+        `À ${euros(LOC_COUT_HORAIRE)} l’heure, salaire chargé et frais compris, ces heures coûtent ${euros(LOC_COUT_AN)} par an. Un logiciel de location sur mesure se paie une fois, au prix fixé au devis. Ces 4 chiffres sont des hypothèses : remplacez-les par ceux de votre dépôt.`,
       ],
       points: [
         {
@@ -571,7 +571,7 @@ const pageLocation: PageSecteur = {
         },
         {
           titre: "Entre les deux",
-          corps: `À partir de ${prixPlancher(LOGICIEL)} HT, j’ajoute à votre outil actuel la pièce qui lui manque : l’état des lieux photo sur téléphone, ou le relevé de compteurs qui déclenche l’entretien.`,
+          corps: `J’ajoute à votre outil actuel la pièce qui lui manque : l’état des lieux photo sur téléphone, ou le relevé de compteurs qui déclenche l’entretien.`,
         },
       ],
     },
@@ -639,7 +639,7 @@ const pageLocation: PageSecteur = {
     items: [
       {
         question: "Combien coûte un logiciel de gestion de location de matériel ?",
-        answer: `Le prix démarre à ${prixPlancher(LOGICIEL)} HT, par exemple pour l’état des lieux photo. Il monte avec les modules, comme le planning du parc, les contrats et la facturation, et avec plusieurs dépôts ou plusieurs systèmes à accorder entre eux. Je le fixe au devis.`,
+        answer: `Le prix suit les modules : l’état des lieux photo seul, ou le planning du parc, les contrats et la facturation. Il monte avec plusieurs dépôts ou plusieurs systèmes à accorder entre eux. Je le fixe au devis.`,
       },
       {
         question: "Le logiciel gère-t-il les tarifs dégressifs et les prolongations ?",
@@ -687,10 +687,10 @@ const pageNegoce: PageSecteur = {
   chemin: cheminSecteur("negoce-distribution"),
   seo: {
     titre: "Logiciel de gestion de négoce sur mesure · Eliott Bouquerel",
-    description: `Logiciel de négoce sur mesure pour votre distribution : stock, tarifs clients, remises, comptoir, reliquats, achats. Prix : ${aPartirDe(LOGICIEL, " HT")}, au devis.`,
+    description: `Logiciel de négoce sur mesure pour votre distribution : stock, tarifs clients, remises, comptoir, reliquats, achats. Prix fixé au devis, selon votre périmètre.`,
   },
   h1: "Logiciel de gestion de négoce",
-  resume: `Un logiciel de gestion de négoce sur mesure réunit votre stock, vos tarifs clients, vos commandes et vos achats fournisseurs dans un seul outil, comptoir compris. Il s’adresse aux négociants et aux distributeurs techniques dont l’ERP ne suit plus les conditions commerciales, ou qui travaillent encore sur tableur. Son prix démarre à ${prixPlancher(LOGICIEL)} HT.`,
+  resume: `Un logiciel de gestion de négoce sur mesure réunit votre stock, vos tarifs clients, vos commandes et vos achats fournisseurs dans un seul outil, comptoir compris. Il s’adresse aux négociants et aux distributeurs techniques dont l’ERP ne suit plus les conditions commerciales, ou qui travaillent encore sur tableur. Son prix se fixe au devis.`,
   marcheFilAriane: "Négoce et distribution",
   libelleLien: "logiciel de gestion de négoce",
   noteLlms:
@@ -772,7 +772,7 @@ const pageNegoce: PageSecteur = {
       titre: "La recherche de prix, chiffrée sur une année",
       paragraphes: [
         `Prenez une équipe de vente qui saisit ${NEG_LIGNES_JOUR} lignes de devis et de commande par jour. Pour chaque ligne, ${NEG_MINUTES_LIGNE} minutes partent à retrouver la remise du client dans un tableur, à vérifier le stock d’un autre dépôt ou à recalculer un prix net. Sur ${NEG_JOURS} jours ouvrés, le total atteint ${NEG_HEURES_AN} heures par an.`,
-        `À ${euros(NEG_COUT_HORAIRE)} l’heure, salaire chargé et frais compris, ces heures coûtent ${euros(NEG_COUT_AN)} par an. Un logiciel de négoce sur mesure démarre à ${prixPlancher(LOGICIEL)} HT, payé une fois. Ces 4 chiffres sont des hypothèses : mettez les vôtres à leur place avant de conclure.`,
+        `À ${euros(NEG_COUT_HORAIRE)} l’heure, salaire chargé et frais compris, ces heures coûtent ${euros(NEG_COUT_AN)} par an. Un logiciel de négoce sur mesure se paie une fois, au prix fixé au devis. Ces 4 chiffres sont des hypothèses : mettez les vôtres à leur place avant de conclure.`,
       ],
       points: [
         {
@@ -833,7 +833,7 @@ const pageNegoce: PageSecteur = {
         },
         {
           titre: "Entre les deux",
-          corps: `À partir de ${prixPlancher(LOGICIEL)} HT, je relie votre ERP à ce qui lui manque : l’import automatique d’un tarif fournisseur, ou un écran de comptoir plus rapide.`,
+          corps: `Je relie votre ERP à ce qui lui manque : l’import automatique d’un tarif fournisseur, ou un écran de comptoir plus rapide.`,
         },
       ],
     },
@@ -856,7 +856,7 @@ const pageNegoce: PageSecteur = {
           {
             libelle: "Le logiciel métier en détail",
             href: CHEMIN_PILIER,
-            description: "Ce qui est compris dès le plancher, et ce qui fait monter le prix.",
+            description: "Ce que comprend chaque projet, et ce qui fait varier le prix.",
           },
           LIEN_PRIX,
           {
@@ -902,7 +902,7 @@ const pageNegoce: PageSecteur = {
     items: [
       {
         question: "Combien coûte un logiciel de gestion de négoce sur mesure ?",
-        answer: `Le prix démarre à ${prixPlancher(LOGICIEL)} HT, pour une pièce comme l’import des tarifs fournisseurs, et monte avec les modules réunis, par exemple tarifs clients, commandes et stock. Il monte encore quand le logiciel doit rester d’accord avec votre ERP, votre comptabilité et votre site dans les 2 sens. Le devis fixe le montant.`,
+        answer: `Le prix suit le périmètre : une pièce comme l’import des tarifs fournisseurs, ou plusieurs modules réunis, par exemple tarifs clients, commandes et stock. Il monte encore quand le logiciel doit rester d’accord avec votre ERP, votre comptabilité et votre site dans les 2 sens. Le devis fixe le montant.`,
       },
       {
         question: "Faut-il remplacer mon ERP ?",

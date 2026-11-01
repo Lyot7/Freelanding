@@ -35,7 +35,6 @@ export const siteConfig: SiteConfig = {
   taglineEmphasis: ["Logiciels métier"],
   nav: [
     { label: "Accueil", href: "/" },
-    { label: "Logiciel métier", href: "/services/logiciel-metier" },
     { label: "Réalisations", href: "/realisations" },
     { label: "Blog", href: "/blog" },
     { label: "À propos", href: "/a-propos" },
@@ -45,7 +44,6 @@ export const siteConfig: SiteConfig = {
   // de la colonne « Navigation » du pied de page (qui, elle, contient « 404 »).
   menuNav: [
     { label: "Accueil", href: "/" },
-    { label: "Logiciel métier", href: "/services/logiciel-metier" },
     { label: "Réalisations", href: "/realisations" },
     { label: "À propos", href: "/a-propos" },
     { label: "Blog", href: "/blog" },
@@ -135,7 +133,6 @@ export const siteConfig: SiteConfig = {
    */
   footerNav: [
     { label: "Accueil", href: "/" },
-    { label: "Logiciel métier", href: "/services/logiciel-metier" },
     { label: "Réalisations", href: "/realisations" },
     { label: "À propos", href: "/a-propos" },
     { label: "Blog", href: "/blog" },

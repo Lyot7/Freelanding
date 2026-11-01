@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { prestations, prixPlancher } from "@/content/offre";
+import { prestations } from "@/content/offre";
 import { IDS_RENDEZ_VOUS, lienRendezVous } from "@/content/rendez-vous";
 import { workItems } from "@/content/work";
 import { faqItems } from "@/content/faq";
@@ -17,11 +17,11 @@ const markdown = profilEnMarkdown(profil);
 const prompt = construirePrompt(profil);
 
 describe("profil complet de la vue Agent", () => {
-  it("cite le plancher de chaque offre, ce qui est compris et ce qui fait monter le prix, sans durée", () => {
+  it("dit que le prix se fixe au devis, ce qui est compris et ce qui le fait varier, sans durée", () => {
+    expect(markdown).toContain("Prix fixé au devis.");
+    expect(markdown).not.toMatch(/\b6\s000|à partir de \d|prix de départ/iu);
+    expect(consignesDuPrompt()).not.toMatch(/prix de départ/iu);
     for (const prestation of prestations) {
-      expect(markdown).toContain(
-        `À partir de ${prixPlancher(prestation)}\u00A0HT, prix fixé au devis.`,
-      );
       for (const ligne of [...prestation.inclus, ...prestation.faitMonter]) {
         expect(markdown).toContain(ligne);
       }
@@ -150,7 +150,7 @@ const sourcesDepouillees = {
     ],
     faq: [],
   }),
-  // Ordre inversé : le prix plancher ne doit pas dépendre de l'ordre du fichier.
+  // Ordre inversé : le profil ne dépend pas de l'ordre du fichier.
   prestations: [...prestations].reverse(),
 };
 
@@ -209,11 +209,12 @@ describe("profil : contenu facultatif absent", () => {
     expect(ligneAvec).toContain(`Réserver un appel\u00A0: ${absoluteUrl(premierService.rdvHref)}`);
   });
 
-  it("donne le même prix plancher quel que soit l'ordre des prestations", async () => {
+  it("garde les limites sans aucun montant, quel que soit l'ordre des prestations", async () => {
     const inverse = profilEnMarkdown(await construireProfil(sourcesDepouillees));
-    const [plancher] = [...prestations].sort((a, b) => a.plancher - b.plancher);
-    expect(inverse).toContain(`mes prix commencent à ${prixPlancher(plancher)}\u00A0HT`);
-    expect(markdown).toContain(`mes prix commencent à ${prixPlancher(plancher)}\u00A0HT`);
+    for (const texte of [inverse, markdown]) {
+      expect(texte).toContain("quelques centaines d’euros\u00A0: un logiciel du marché");
+      expect(texte).not.toContain("mes prix commencent");
+    }
   });
 
   it("titre au nom de la marque sans rôle, et le téléphone sans horaires", async () => {
@@ -265,8 +266,8 @@ describe("profilEnMarkdown et consignesDuPrompt", () => {
   });
 });
 
-describe("profil : ligne de service sans offre chiffrée", () => {
-  it("garde le prix affiché par la ligne et ne pose ni bloc d’offre ni lien de détail", async () => {
+describe("profil : ligne de service sans offre", () => {
+  it("ne pose ni bloc d’offre ni lien de détail", async () => {
     const ligne = {
       ...premierService,
       title: "Une ligne sans page d’offre",
@@ -282,7 +283,7 @@ describe("profil : ligne de service sans offre chiffrée", () => {
         prestations,
       }),
     );
-    expect(texte).toContain("### Une ligne sans page d’offre (sur devis)");
+    expect(texte).toContain("### Une ligne sans page d’offre");
     expect(texte).not.toContain("Détail\u00A0:");
     expect(texte).not.toContain("prix fixé au devis");
   });

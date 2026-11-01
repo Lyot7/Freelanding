@@ -13,7 +13,7 @@
  * Aucun client ERP n'est cité : Eliott n'en a pas. Würth France est présenté
  * pour ce qu'il est, un parcours de création de compte dans la distribution.
  */
-import { aPartirDe, euros, prestation, prixPlancher, repereAgenceLogiciel } from "./offre";
+import { euros, prestation, repereAgenceLogiciel } from "./offre";
 import { CHEMIN_ERP, type PageTheme } from "./page-theme";
 import { CHEMIN_PRIX_LOGICIEL } from "./pages-secteur";
 
@@ -26,10 +26,10 @@ export const pageErp: PageTheme = {
   chemin: CHEMIN_ERP,
   seo: {
     titre: "ERP sur mesure pour PME · Eliott Bouquerel",
-    description: `ERP sur mesure pour votre PME : devis, commandes, stock, fabrication et factures dans un seul outil, construit module par module, ${aPartirDe(LOGICIEL, " HT")}.`,
+    description: `ERP sur mesure pour votre PME : devis, commandes, stock, fabrication et factures dans un seul outil, construit module par module, au prix fixé au devis.`,
   },
   h1: "ERP sur mesure",
-  resume: `Un ERP sur mesure relie vos devis, vos commandes, votre stock, votre production et vos factures dans un seul outil, avec vos règles. Je le construis module par module, en commençant par celui qui vous coûte le plus d’heures. Le premier module démarre ${aPartirDe(LOGICIEL, " HT")}, prix fixé au devis.`,
+  resume: `Un ERP sur mesure relie vos devis, vos commandes, votre stock, votre production et vos factures dans un seul outil, avec vos règles. Je le construis module par module, en commençant par celui qui vous coûte le plus d’heures. Le prix de chaque module se fixe au devis.`,
   prestation: "logiciel",
   offre: LOGICIEL,
   filAriane: [
@@ -160,7 +160,7 @@ export const pageErp: PageTheme = {
           "Chacun reprend sa partie",
         ],
       ],
-      note: `Pour situer le prix : ${AGENCE.source.nom} relève qu’en agence, un premier outil démarre entre ${euros(AGENCE.premierOutilMin)} et ${euros(AGENCE.premierOutilMax)} (${AGENCE.source.releve}). Chez moi, un premier module démarre à ${prixPlancher(LOGICIEL)} HT.`,
+      note: `Pour situer le prix : ${AGENCE.source.nom} relève qu’en agence, un premier outil démarre entre ${euros(AGENCE.premierOutilMin)} et ${euros(AGENCE.premierOutilMax)} (${AGENCE.source.releve}). Chez moi, chaque module se chiffre au devis.`,
       liens: {
         titre: "Pour trancher",
         items: [
@@ -224,14 +224,14 @@ export const pageErp: PageTheme = {
       ],
     },
   ],
-  titreOffre: "Prix d’un ERP sur mesure : le premier module",
+  titreOffre: "Un ERP sur mesure, prix au devis",
   faq: {
     eyebrow: "FAQ",
     titleLines: ["Votre ERP", "sur mesure."],
     items: [
       {
         question: "Combien coûte un ERP sur mesure ?",
-        answer: `Le premier module démarre à ${prixPlancher(LOGICIEL)} HT. Le total dépend du nombre de modules, des outils à relier et de la reprise de votre historique, et se fixe au devis. Pour comparer, ${AGENCE.source.nom} relève qu’en agence, un premier outil démarre entre ${euros(AGENCE.premierOutilMin)} et ${euros(AGENCE.premierOutilMax)} (${AGENCE.source.releve}).`,
+        answer: `Le total dépend du nombre de modules, des outils à relier et de la reprise de votre historique, et se fixe au devis. Pour comparer, ${AGENCE.source.nom} relève qu’en agence, un premier outil démarre entre ${euros(AGENCE.premierOutilMin)} et ${euros(AGENCE.premierOutilMax)} (${AGENCE.source.releve}).`,
       },
       {
         question: "Faut-il remplacer tous nos logiciels ?",

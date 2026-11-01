@@ -11,7 +11,7 @@
  * que l'outil en fait ; et le calcul de l'argent qui attend entre le bon
  * d'intervention papier et la facture. Hypothèses affichées, montants calculés.
  */
-import { aPartirDe, euros, prestation, prixPlancher } from "./offre";
+import { euros, prestation } from "./offre";
 import { CHEMIN_GMAO, nombre, type PageTheme } from "./page-theme";
 import { CHEMIN_PRIX_LOGICIEL } from "./pages-secteur";
 
@@ -45,10 +45,10 @@ export const pageGmao: PageTheme = {
   chemin: CHEMIN_GMAO,
   seo: {
     titre: "Logiciel GMAO pour PME de maintenance · Eliott Bouquerel",
-    description: `Logiciel GMAO sur mesure pour votre PME : contrats, préventif, dépannages, bons d’intervention signés sur mobile et facturés le soir, ${aPartirDe(LOGICIEL, " HT")}.`,
+    description: `Logiciel GMAO sur mesure pour votre PME : contrats, préventif, dépannages, bons d’intervention signés sur mobile et facturés le soir, prix fixé au devis.`,
   },
   h1: "Logiciel GMAO et SAV pour PME",
-  resume: `Un logiciel de GMAO sur mesure suit votre parc installé, planifie le préventif à partir de vos contrats, envoie les dépannages au bon technicien et fait partir le bon d’intervention signé en facturation le soir même. Comptez ${aPartirDe(LOGICIEL, " HT")}, prix fixé au devis.`,
+  resume: `Un logiciel de GMAO sur mesure suit votre parc installé, planifie le préventif à partir de vos contrats, envoie les dépannages au bon technicien et fait partir le bon d’intervention signé en facturation le soir même. Le prix se fixe au devis.`,
   prestation: "logiciel",
   offre: LOGICIEL,
   filAriane: [
@@ -134,7 +134,7 @@ export const pageGmao: PageTheme = {
       titre: "GMAO du marché ou outil à votre main",
       paragraphes: [
         "Les GMAO du marché sont pensées pour la maintenance d’une usine : vos propres machines, vos propres techniciens. Votre cas est différent : les équipements appartiennent à vos clients, et chaque intervention finit en facture.",
-        `Quand un logiciel standard vous suit à 80 %, gardez-le et faites développer ce qui manque, à partir de ${prixPlancher(LOGICIEL)} HT : l’application du technicien, le lien vers la facturation, le portail où vos clients suivent leurs demandes.`,
+        `Quand un logiciel standard vous suit à 80 %, gardez-le et faites développer ce qui manque : l’application du technicien, le lien vers la facturation, le portail où vos clients suivent leurs demandes.`,
       ],
       liens: {
         titre: "Pour aller plus loin",
@@ -187,7 +187,7 @@ export const pageGmao: PageTheme = {
     items: [
       {
         question: "Combien coûte une GMAO sur mesure ?",
-        answer: `Le projet démarre à ${prixPlancher(LOGICIEL)} HT. Le prix suit le nombre d’écrans (technicien, bureau, clients), les outils à relier et la reprise de votre parc. Il se fixe au devis.`,
+        answer: `Le prix suit le nombre d’écrans (technicien, bureau, clients), les outils à relier et la reprise de votre parc. Je le fixe au devis.`,
       },
       {
         question: "Le technicien peut-il travailler sans réseau ?",

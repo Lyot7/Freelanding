@@ -4,7 +4,6 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 
 import { rendezVousContent } from "@/content/rendez-vous";
-import { prestation } from "@/content/offre";
 import { ReservationRendezVous } from "./ReservationRendezVous";
 
 /**
@@ -18,8 +17,7 @@ import { ReservationRendezVous } from "./ReservationRendezVous";
  */
 
 const C = rendezVousContent;
-const PLANCHER = prestation("logiciel").plancher;
-const TRANCHE = `${PLANCHER}-${PLANCHER * 2}`;
+const TRANCHE = "5000-10000";
 
 const CRENEAUX = {
   fenetre: {
@@ -289,9 +287,9 @@ describe("ReservationRendezVous — les questions suivent le sujet", () => {
 
     expect(texte(conteneur)).toContain(C.questionnaire.budget.legende);
     expect(texte(conteneur)).toContain(C.questionnaire.objectif.legende);
-    // Les tranches viennent du plancher du logiciel, et le retour le nomme.
+    // Le retour renvoie à l'appel et au devis, sans aucun montant.
     await choisir(conteneur, "budget", TRANCHE);
-    expect(texte(conteneur)).toContain(prestation("logiciel").nom);
+    expect(texte(conteneur)).toContain(C.retour.aPortee);
 
     // Budget répondu, besoin manquant : l'erreur et le focus vont au besoin.
     await cliquer(bouton(conteneur, C.actions.continuer));

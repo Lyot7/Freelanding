@@ -166,7 +166,7 @@ describe("toutes les pages thématiques présentent l'offre unique", () => {
 });
 
 describe("la comparaison aux agences se fait à livrable égal", () => {
-  test("ERP : le plancher face au premier outil d'agence, jamais face à leur médiane", () => {
+  test("ERP : le repère du premier outil d'agence, jamais leur médiane", () => {
     const prix = pageErp.faq.items.find((i) => /Combien coûte/u.test(i.question)).answer;
     const note = pageErp.blocs.find((b) => b.type === "tableau" && b.note?.includes(repereAgenceLogiciel.source.nom)).note;
     for (const texte of [prix, note]) {

@@ -2,18 +2,18 @@
  * Questionnaire de la prise de rendez-vous : tranches de budget, retour « ce
  * que vous pouvez espérer à ce budget », et mise en forme des notes Cal.com.
  *
- * POURQUOI CE MODULE. Eliott veut recevoir des demandes déjà en partie
- * chiffrées, et le visiteur doit savoir avant l'appel ce que son budget permet.
- * Les deux lisent les MÊMES planchers, ceux de `src/content/offre.ts` : les
- * tranches de budget en sont dérivées, jamais écrites à la main. Un plancher
- * qui bouge là-bas déplace les tranches, le retour affiché et les notes
- * reçues, sans qu'une ligne change ici.
+ * POURQUOI CE MODULE. Eliott veut recevoir des demandes déjà cadrées, et le
+ * visiteur doit savoir avant l'appel à quoi s'attendre. Depuis le 2026-11-01, le
+ * site ne cite plus aucun prix d'Eliott : les tranches posent la question du
+ * budget du visiteur sans laisser deviner un plancher, et aucun retour ne le
+ * nomme. Le seuil de `BORNES_BUDGET` reste interne : il classe la demande dans
+ * les notes qu'Eliott lit dans son agenda.
  *
  * MODULE PUR, partagé par le navigateur (retour immédiat) et par le serveur
  * (validation en liste fermée, composition des notes). Ni réseau, ni horloge,
  * ni `process.env`.
  */
-import { aPartirDe, euros, prestations } from "@/content/offre";
+import { euros, prestations } from "@/content/offre";
 import type { Offre } from "@/content/offre";
 import { RDV_PAR_PRESTATION, rendezVousContent } from "@/content/rendez-vous";
 import type { IdRendezVous, OptionQuestion } from "@/content/rendez-vous";
@@ -45,28 +45,15 @@ export function offresDuRendezVous(id: IdRendezVous): readonly Offre[] {
 }
 
 /**
- * MULTIPLES DU PLANCHER QUI BORNENT LES TRANCHES, depuis le 2026-10-05. Les
- * bornes tombaient sur les prix des trois forfaits ; les forfaits partis, il
- * reste le plancher de chaque offre. Le doubler puis le quadrupler donne trois
- * tranches au-dessus de lui, assez pour qu'Eliott lise le budget avant
- * l'appel, sans qu'aucune ne se présente comme un prix : le prix se fixe au
- * devis.
+ * BORNES DES TRANCHES, en euros HT, décorrélées de tout prix d'Eliott depuis le
+ * 2026-11-01 : le visiteur situe son budget, et aucune borne ne se lit comme un
+ * tarif. La première sert de seuil interne (`RetourBudget`, notes de l'agenda).
  */
-const MULTIPLES_PLANCHER = [1, 2, 4] as const;
+export const BORNES_BUDGET = [5000, 10000, 25000] as const;
 
-/** Bornes des tranches, en ordre croissant : le plancher, puis ses multiples. */
-export function bornesBudget(id: IdRendezVous): readonly number[] {
-  const haute = plusChere(offresDuRendezVous(id));
-  return MULTIPLES_PLANCHER.map((m) => haute.plancher * m);
-}
-
-function plusChere(liste: readonly Offre[]): Offre {
-  return liste.reduce((a, b) => (a.plancher >= b.plancher ? a : b));
-}
-
-/** Tranches proposées pour un type de rendez-vous, « je ne sais pas » en dernier. */
-export function tranchesBudget(id: IdRendezVous): readonly TrancheBudget[] {
-  const bornes = bornesBudget(id);
+/** Tranches proposées, identiques pour tous les sujets, « je ne sais pas » en dernier. */
+export function tranchesBudget(): readonly TrancheBudget[] {
+  const bornes = BORNES_BUDGET;
   const tranches: TrancheBudget[] = [];
   const premiere = bornes[0];
   const derniere = bornes[bornes.length - 1];
@@ -96,11 +83,10 @@ export function tranchesBudget(id: IdRendezVous): readonly TrancheBudget[] {
 }
 
 /**
- * LES TRANCHES DES FORFAITS À PRIX FERME, publiées jusqu'au 2026-10-05 avec
- * leur borne basse. Un onglet ouvert avant le passage aux planchers les envoie
- * encore, et son ancien bundle ne propose qu'elles : les refuser bloquerait la
- * réservation jusqu'au rechargement. Retirables quand plus aucun onglet de
- * cette époque ne peut être ouvert.
+ * LES TRANCHES RETIRÉES, et leur borne basse. Un onglet ouvert avant un changement
+ * de tranches les envoie encore, et son ancien bundle ne propose qu'elles : les
+ * refuser bloquerait la réservation jusqu'au rechargement. Retirables quand plus
+ * aucun onglet de cette époque ne peut être ouvert.
  */
 const TRANCHES_RETIREES: Readonly<Record<string, number>> = {
   "3000-4800": 3000,
@@ -109,10 +95,6 @@ const TRANCHES_RETIREES: Readonly<Record<string, number>> = {
   "6000-18000": 6000,
   "18000-36000": 18000,
   "plus-36000": 36000,
-  /*
-   * LES TRANCHES DU LOGICIEL À 3 500 € ET CELLES DU SITE, publiées jusqu'au
-   * 2026-10-31. « moins-6000 » et « 6000-12000 » restent servies.
-   */
   "moins-3000": 0,
   "moins-3500": 0,
   "3000-3500": 3000,
@@ -120,16 +102,20 @@ const TRANCHES_RETIREES: Readonly<Record<string, number>> = {
   "3500-7000": 3500,
   "7000-14000": 7000,
   "plus-14000": 14000,
+  /* Les tranches servies jusqu'au 2026-11-01. */
+  "moins-6000": 0,
+  "6000-12000": 6000,
+  "12000-24000": 12000,
+  "plus-24000": 24000,
 };
 
 /**
  * Ramène une tranche retirée à la tranche actuelle qui contient sa borne
  * basse. Toute autre valeur revient telle quelle, à valider par la liste.
  */
-export function rattacherTranche(id: IdRendezVous, valeur: string): string {
+export function rattacherTranche(valeur: string): string {
   if (!Object.hasOwn(TRANCHES_RETIREES, valeur)) return valeur;
-  const tranches = tranchesBudget(id);
-  if (tranches.some((t) => t.id === valeur)) return valeur;
+  const tranches = tranchesBudget();
   const montant = TRANCHES_RETIREES[valeur];
   const tranche = tranches.find(
     (t) => t.id !== BUDGET_INCONNU && (t.bas ?? 0) <= montant && (t.haut === undefined || montant < t.haut),
@@ -173,61 +159,30 @@ export const LEGENDE_OBJECTIF = questions.objectif.legende;
 /** Échéances proposées, identiques pour tous les types. */
 export const OPTIONS_ECHEANCE: readonly OptionQuestion[] = questions.echeance.options;
 
-/** Une ligne du retour : une prestation dont le plancher tient dans le budget. */
-export interface LigneRetour {
-  readonly prestation: string;
-  /** « À partir de 3 000 € HT ». */
-  readonly prix: string;
+/**
+ * Le retour affiché sous la question du budget.
+ *
+ * `serre` : sous le seuil interne, jamais nommé au visiteur. `large` : la tranche
+ * ouverte vers le haut. Aucun texte ne porte de montant : le prix se fixe au devis.
+ */
+export interface RetourBudget {
+  readonly type: "inconnu" | "serre" | "aPortee" | "large";
   readonly texte: string;
 }
 
-export type RetourBudget =
-  | { readonly type: "inconnu"; readonly texte: string; readonly reperes: readonly string[] }
-  | { readonly type: "aucun"; readonly texte: string }
-  | { readonly type: "aPortee"; readonly lignes: readonly LigneRetour[] };
-
 /**
- * Ce que le visiteur peut espérer avec la tranche choisie.
+ * Ce que le visiteur peut attendre avec la tranche choisie.
  *
- * `undefined` pour une tranche inconnue de ce type : le composant n'affiche
- * rien plutôt qu'un retour calculé sur une réponse périmée.
+ * `undefined` pour une tranche inconnue : le composant n'affiche rien plutôt
+ * qu'un retour calculé sur une réponse périmée.
  */
-export function retourBudget(
-  id: IdRendezVous,
-  idTranche: string,
-): RetourBudget | undefined {
-  const tranche = tranchesBudget(id).find((t) => t.id === idTranche);
+export function retourBudget(idTranche: string): RetourBudget | undefined {
+  const tranche = tranchesBudget().find((t) => t.id === idTranche);
   if (!tranche) return undefined;
-  const concernees = offresDuRendezVous(id);
-
-  if (tranche.id === BUDGET_INCONNU) {
-    return {
-      type: "inconnu",
-      texte: retour.inconnu,
-      reperes: concernees.map((p) => retour.repere(p.nom, aPartirDe(p, " HT"))),
-    };
-  }
-
-  /*
-   * « À PORTÉE » = PLANCHER STRICTEMENT SOUS LE HAUT DE LA TRANCHE, comme
-   * avant avec les forfaits. Sur la tranche ouverte vers le haut, le texte dit
-   * que le budget laisse de la place ; sinon, que le plancher est couvert et
-   * que le reste se voit à l'appel.
-   */
-  const { haut } = tranche;
-  const lignes: LigneRetour[] = concernees
-    .filter((p) => haut === undefined || p.plancher < haut)
-    .map((p) => ({
-      prestation: p.nom,
-      prix: retour.prixPlancher(euros(p.plancher)),
-      texte: haut === undefined ? retour.large : retour.aPortee,
-    }));
-
-  if (lignes.length === 0) {
-    const plancher = Math.min(...concernees.map((p) => p.plancher));
-    return { type: "aucun", texte: retour.aucun(euros(plancher)) };
-  }
-  return { type: "aPortee", lignes };
+  if (tranche.id === BUDGET_INCONNU) return { type: "inconnu", texte: retour.inconnu };
+  if (tranche.haut === undefined) return { type: "large", texte: retour.large };
+  if (tranche.haut <= BORNES_BUDGET[0]) return { type: "serre", texte: retour.serre };
+  return { type: "aPortee", texte: retour.aPortee };
 }
 
 /** Réponses validées au questionnaire, telles que le serveur les a acceptées. */
@@ -254,14 +209,12 @@ function libelle(options: readonly OptionQuestion[], id: string): string {
 export function composerNotes(reponses: ReponsesQuestionnaire): string {
   const { notes } = rendezVousContent;
   const lignes: string[] = [];
-  const retourCalcule = retourBudget(reponses.type, reponses.budget);
-  let forfait: string = notes.aCaler;
-  if (retourCalcule?.type === "aucun") forfait = notes.aucunForfait;
-  if (retourCalcule?.type === "aPortee") {
-    forfait = retourCalcule.lignes.map((ligne) => ligne.prestation).join(" · ");
-  }
+  const retourCalcule = retourBudget(reponses.budget);
+  let forfait: string = offresDuRendezVous(reponses.type).map((p) => p.nom).join(" · ");
+  if (!retourCalcule || retourCalcule.type === "inconnu") forfait = notes.aCaler;
+  if (retourCalcule?.type === "serre") forfait = notes.aucunForfait;
   lignes.push(
-    `${notes.budget} : ${libelle(tranchesBudget(reponses.type), reponses.budget)}`,
+    `${notes.budget} : ${libelle(tranchesBudget(), reponses.budget)}`,
     `${notes.forfait} : ${forfait}`,
   );
   lignes.push(

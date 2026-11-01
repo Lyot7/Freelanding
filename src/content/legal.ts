@@ -142,7 +142,7 @@ export const legalDocuments: readonly LegalDocument[] = [
       },
       {
         type: "paragraph",
-        text: "Prix affichés sur ce site : les montants indiqués s’entendent en euros et hors taxes. Aucune taxe ne s’y ajoute, la franchise en base de l’article 293 B du code général des impôts s’appliquant, et aucun frais de livraison n’est dû, la prestation étant immatérielle. Ces montants ne couvrent pas les services tiers souscrits à votre nom (nom de domaine, hébergement, licences), chiffrés à part. Le prix définitif d’une mission figure au devis.",
+        text: "Prix : les montants de mes devis s’entendent en euros et hors taxes. Aucune taxe ne s’y ajoute, la franchise en base de l’article 293 B du code général des impôts s’appliquant, et aucun frais de livraison n’est dû, la prestation étant immatérielle. Ces montants ne couvrent pas les services tiers souscrits à votre nom (nom de domaine, hébergement, licences), chiffrés à part. Le prix définitif d’une mission figure au devis.",
       },
       { type: "heading", level: 2, text: "2. Directeur de la publication" },
       {
@@ -443,7 +443,7 @@ export const legalDocuments: readonly LegalDocument[] = [
       "Comment on travaille ensemble : devis, paiement, délais, droits sur le livrable. Écrites pour être lues.",
     // Barème réécrit en prix de départ le 2026-10-05 ; vie après livraison
     // sans suivi (art. 9) le 2026-10-19, décision d'Eliott.
-    lastUpdated: "2026-10-19",
+    lastUpdated: "2026-11-01",
     body: [
       { type: "heading", level: 2, text: "1. Objet et champ d’application" },
       {
@@ -470,7 +470,7 @@ export const legalDocuments: readonly LegalDocument[] = [
       { type: "heading", level: 2, text: "3. Prix, échéancier et paiement" },
       {
         type: "paragraph",
-        text: "Le prix de départ de chaque prestation est publié sur ce site, hors taxes, et constitue le barème applicable : aucun devis ne lui est inférieur. Chaque projet fait l’objet d’un devis détaillé, établi à partir du périmètre décrit et de la charge de travail estimée. Le prix inscrit au devis signé est un prix ferme. Le détail du calcul et le devis correspondant sont communiqués sur simple demande à tout client professionnel, sur support durable.",
+        text: "Mes prestations sont construites sur mesure et ne relèvent pas d’un barème de prix unitaires : chaque projet fait l’objet d’un devis détaillé, établi à partir du périmètre décrit et de la charge de travail estimée. Le prix inscrit au devis signé est un prix ferme. Le détail du calcul et le devis correspondant sont communiqués sur simple demande à tout client professionnel, sur support durable.",
       },
       {
         type: "paragraph",

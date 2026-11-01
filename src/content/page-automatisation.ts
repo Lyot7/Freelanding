@@ -16,7 +16,7 @@
  * calculé depuis les hypothèses ; et l'outil qu'Eliott utilise lui-même pour
  * son activité, décrit tel qu'il tourne.
  */
-import { aPartirDe, euros, prestation, prixPlancher } from "./offre";
+import { euros, prestation } from "./offre";
 import { CHEMIN_AUTOMATISATION, nombre, type PageTheme } from "./page-theme";
 
 const LOGICIEL = prestation("logiciel");
@@ -88,10 +88,10 @@ export const pageAutomatisation: PageTheme = {
   chemin: CHEMIN_AUTOMATISATION,
   seo: {
     titre: "Automatisation et IA pour PME · Eliott Bouquerel",
-    description: `Automatisation et IA pour votre PME : mails triés, commandes saisies, factures relancées, sur vos outils. Vous reprenez des heures, ${aPartirDe(LOGICIEL, " HT")}.`,
+    description: `Automatisation et IA pour votre PME : mails triés, commandes saisies, factures relancées, sur vos outils. Vous reprenez des heures, prix fixé au devis.`,
   },
   h1: "Automatisation et IA pour PME",
-  resume: `J’installe l’IA dans les outils que vous utilisez déjà, sur les tâches que votre équipe refait chaque semaine : trier les mails, saisir les commandes, relancer les factures. Vous reprenez des heures pour le travail qui demande quelqu’un. Comptez ${aPartirDe(LOGICIEL, " HT")} pour un premier usage.`,
+  resume: `J’installe l’IA dans les outils que vous utilisez déjà, sur les tâches que votre équipe refait chaque semaine : trier les mails, saisir les commandes, relancer les factures. Vous reprenez des heures pour le travail qui demande quelqu’un. Le prix se fixe au devis, selon le premier usage.`,
   prestation: "logiciel",
   offre: LOGICIEL,
   filAriane: [
@@ -150,6 +150,20 @@ export const pageAutomatisation: PageTheme = {
     },
     {
       type: "etapes",
+      id: "referent",
+      titre: "En option : un référent dans la durée",
+      paragraphes: [
+        "Mes missions sont le plus souvent ponctuelles : une tâche, un outil, une date. Certaines entreprises préfèrent un interlocuteur régulier. Je deviens alors leur référent IA ou développement, voire leur recherche et développement.",
+      ],
+      etapes: [
+        { titre: "Vous notez", corps: "Pendant trois ou quatre semaines, votre équipe note ce qui lui fait perdre du temps." },
+        { titre: "Je trie", corps: "Chaque corvée reçoit son remède : un outil d’IA, un logiciel, ou rien du tout." },
+        { titre: "On traite", corps: "On commence par la tâche qui rend le plus d’heures, et vous mesurez le gain." },
+        { titre: "On continue", corps: "Une réunion par mois pour choisir la suivante, à votre rythme." },
+      ],
+    },
+    {
+      type: "etapes",
       id: "methode",
       titre: "De la tâche choisie à l’outil qui tourne",
       paragraphes: [
@@ -199,14 +213,14 @@ export const pageAutomatisation: PageTheme = {
       },
     },
   ],
-  titreOffre: "Prix d’une automatisation IA : le premier usage",
+  titreOffre: "Une automatisation IA, sur devis",
   faq: {
     eyebrow: "FAQ",
     titleLines: ["L’IA dans", "votre PME."],
     items: [
       {
         question: "Combien coûte une automatisation avec l’IA ?",
-        answer: `Un premier usage branché sur un outil que vous utilisez déjà démarre à ${prixPlancher(LOGICIEL)} HT. Le prix monte avec le nombre d’usages, les règles de votre métier à appliquer et le nombre d’outils à relier. L’abonnement au modèle d’IA est à votre nom, payé directement à son éditeur.`,
+        answer: `Le prix suit le nombre d’usages, les règles de votre métier à appliquer et le nombre d’outils à relier. Je le fixe au devis, avant de commencer. L’abonnement au modèle d’IA est à votre nom, payé directement à son éditeur.`,
       },
       {
         question: "Faut-il changer nos logiciels ?",

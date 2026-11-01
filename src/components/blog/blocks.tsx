@@ -1,7 +1,7 @@
 import { ImageProgressive } from "@/components/ui/ImageProgressive";
 import type { ReactNode } from "react";
 import { MarkdownEnLigne } from "@/components/blog/en-ligne";
-import { aPartirDe, prestation, suiviMensuel, type PrestationId } from "@/content/offre";
+import { SUR_DEVIS } from "@/content/offre";
 
 /**
  * PALETTE FERMÉE des blocs d'article.
@@ -243,28 +243,11 @@ export function Quote({
 }
 
 /**
- * PRIX D'UNE PRESTATION, lu dans `offre.ts` au moment du rendu.
- *
- * POURQUOI CE BLOC. Les articles sur le coût d'un site ou d'un logiciel doivent
- * citer les prix, et un article ne peut rien importer. Écrire « 3 000 € »
- * à la main dans le MDX reproduirait la classe d'erreur que `offre.ts` existe
- * pour empêcher : un montant qui diverge de l'offre sans que rien ne le
- * signale. Ici le montant se calcule.
- *
- * Rend le plancher de la prestation, « à partir de 3 000 € HT » ; avec `suivi`,
- * la mensualité du suivi à partir de ce plancher. Les paliers, et la propriété
- * `forfait` qui les désignait, sont partis le 2026-10-05.
- * « HT » est toujours ajouté : un montant d'Eliott n'existe pas hors taxes
- * implicites.
+ * LA BALISE `<Prix />` RENDAIT LE PLANCHER DE L'OFFRE. Depuis le 2026-11-01, plus
+ * aucun prix d'Eliott : aucun article publié ne s'en sert. Elle reste connue de
+ * `mdx-components.tsx` pour un article resté en attente au cockpit, qui échouerait
+ * à la compilation sans elle, et rend « sur devis » quels que soient ses attributs.
  */
-export function Prix({
-  offre,
-  suivi = false,
-}: {
-  offre: PrestationId;
-  suivi?: boolean;
-}) {
-  const p = prestation(offre);
-  if (suivi) return <>{`à partir de ${suiviMensuel(p.plancher)} HT par mois`}</>;
-  return <>{aPartirDe(p, " HT")}</>;
+export function Prix() {
+  return <>{SUR_DEVIS}</>;
 }

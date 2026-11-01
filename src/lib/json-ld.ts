@@ -99,51 +99,6 @@ export function profilePageSchema() {
 }
 
 /**
- * Les deux bornes d'un prix affiché, telles que schema.org les attend.
- *
- * CE QUE ÇA RÉPARE. L'ancienne fourchette rendait « de 3 000 € à 7 200 € ». La version
- * précédente en retirait tout ce qui n'était pas un chiffre, ce qui collait les
- * deux montants l'un derrière l'autre : `minPrice: 30007200`. Le site vitrine
- * était donc balisé à trente millions d'euros, et les trois prestations
- * chiffrées annonçaient chacune un montant absurde aux moteurs — Google, Bing
- * et les assistants lisent ce champ, pas le texte à côté.
- *
- * UNE OU DEUX BORNES, SELON CE QUE LA PAGE AFFICHE. Depuis le 2026-10-05,
- * l'accordéon n'annonce plus qu'un plancher (« à partir de 3 000 € ») : seul
- * `minPrice` est déclaré. Un balisage qui affirme autre chose que la page est
- * une déclaration trompeuse.
- *
- * LE DÉCOUPAGE EST FAIT SUR LES GROUPES DE CHIFFRES, pas sur le mot « à » :
- * `euros()` insère des insécables dans les milliers, et le séparateur lui-même
- * a déjà changé une fois. Ce qui ne change pas, c'est qu'un montant est une
- * suite de chiffres et d'espaces, et qu'il y en a un ou deux.
- *
- * `\s` AVEC LE DRAPEAU `u` COUVRE LES DEUX INSÉCABLES, l'ordinaire (U+00A0)
- * que produit `euros()` comme l'étroite (U+202F) des versions récentes d'ICU.
- * Les écrire en clair dans la classe de caractères rouvrait exactement le piège
- * que le commentaire d'`euros()` décrit : dans un diff comme à l'écran, une
- * insécable ne se distingue pas d'une espace ordinaire.
- */
-function bornesPrix(prix: string | undefined) {
-  if (!prix) return undefined;
-
-  const montants = (prix.match(/\d[\d\s]*/gu) ?? [])
-    .map((m) => Number.parseInt(m.replace(/\s/gu, ""), 10))
-    .filter((n) => Number.isFinite(n) && n > 0);
-
-  if (!montants.length) return undefined;
-
-  return compact({
-    "@type": "PriceSpecification",
-    priceCurrency: "EUR",
-    minPrice: Math.min(...montants),
-    // Absent quand la page n'annonce qu'un seul montant : déclarer un plafond
-    // égal au plancher fermerait une offre que la page laisse ouverte.
-    maxPrice: montants.length > 1 ? Math.max(...montants) : undefined,
-  });
-}
-
-/**
  * L'activité, ses prestations et sa zone. `areaServed` est ce qui fait la
  * différence sur une recherche locale : sans lui, rien ne relie le site à la
  * Normandie autrement que par un mot dans un paragraphe.
@@ -154,11 +109,6 @@ export function businessSchema(site: SiteConfig, home: HomeContent) {
       "@type": "Offer",
       name: service.title,
       description: service.body[0],
-      // Le prix affiché est un point d'entrée (« dès ») : `Offer` le dit
-      // avec `priceSpecification`, pas avec `price`, qui annoncerait un tarif
-      // ferme et deviendrait un prix trompeur.
-      priceCurrency: "EUR",
-      priceSpecification: bornesPrix(service.price),
     }),
   );
 
@@ -186,8 +136,6 @@ export function businessSchema(site: SiteConfig, home: HomeContent) {
     image: LOGO,
     email: site.contact.email ? `mailto:${site.contact.email}` : undefined,
     telephone: telephoneE164(site.contact.phone),
-    // Prix de départ de 3 000 et 3 500 €, devis au-dessus : le haut de l'échelle locale.
-    priceRange: "€€€",
     // VILLE SANS RUE : l'activité se déplace chez le client ou travaille à
     // distance, aucune adresse de local n'est publiée. Google accepte une
     // adresse partielle pour une entreprise en zone de service, et Caen est
@@ -303,15 +251,9 @@ export function workSchema(work: WorkItem) {
  * donc les trois pages se rattachent à l'entité de l'accueil au lieu de
  * décrire une quatrième activité anonyme.
  *
- * LE PRIX VIENT DE `offre.ts`, JAMAIS ÉCRIT ICI. Un montant recopié aurait
- * divergé au premier changement, et SANS être visible à l'écran, donc sans
- * que personne le voie jamais. UNE `Offer` PAR PRESTATION depuis le
- * 2026-10-05 : le plancher, déclaré en `minPrice`, puisque le prix final se
- * fixe au devis.
- *
- * `priceSpecification` PLUTÔT QUE `price` : le montant est un prix HORS TAXES.
- * Le déclarer en `price` nu laisserait entendre un prix toutes taxes comprises,
- * ce qui serait un prix trompeur pour un lecteur qui n'est pas assujetti.
+ * AUCUN MONTANT DANS LE BALISAGE DEPUIS LE 2026-11-01 : le prix se donne sur
+ * devis, et un balisage qui affirme autre chose que la page est une déclaration
+ * trompeuse. L'`Offer` nomme la prestation, sans `price` ni `priceSpecification`.
  */
 export function serviceSchema(
   prestation: Prestation,
@@ -349,13 +291,6 @@ export function serviceSchema(
       "@type": "Offer",
       name: prestation.nom,
       description: prestation.resume,
-      priceCurrency: "EUR",
-      priceSpecification: {
-        "@type": "PriceSpecification",
-        priceCurrency: "EUR",
-        minPrice: prestation.plancher,
-        valueAddedTaxIncluded: false,
-      },
     },
   });
 }

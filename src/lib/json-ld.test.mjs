@@ -18,8 +18,8 @@ import { siteConfig } from "../content/site.ts";
 describe("JSON-LD de l'entité", () => {
   const business = businessSchema(siteConfig, homeContent);
 
-  test("porte une adresse de ville, sans rue, et une gamme de prix", () => {
-    expect(business.priceRange).toBe("€€€");
+  test("porte une adresse de ville, sans rue, et aucune gamme de prix", () => {
+    expect(business).not.toHaveProperty("priceRange");
     expect(business.address).toEqual({
       "@type": "PostalAddress",
       addressLocality: "Caen",
@@ -30,16 +30,15 @@ describe("JSON-LD de l'entité", () => {
     expect(business.address).not.toHaveProperty("streetAddress");
   });
 
-  test("déclare le plancher du logiciel, un prix de projet, sans unité mensuelle", () => {
-    // Le CTO à temps partagé, seule offre mensuelle, a quitté le site le
-    // 2026-10-31 : plus aucune offre ne déclare `unitCode`.
+  test("nomme l'offre du logiciel sans aucun montant", () => {
+    // Décision d'Eliott du 2026-11-01 : le prix se donne sur devis.
     const offres = business.hasOfferCatalog.itemListElement;
     expect(offres).toHaveLength(homeContent.services.items.length);
     expect(offres.map((offre) => offre.name)).toEqual([prestation("logiciel").nom]);
     for (const offre of offres) {
-      expect(offre.priceSpecification["@type"]).toBe("PriceSpecification");
-      expect(offre.priceSpecification.minPrice).toBe(prestation("logiciel").plancher);
-      expect(offre.priceSpecification).not.toHaveProperty("unitCode");
+      expect(offre).not.toHaveProperty("price");
+      expect(offre).not.toHaveProperty("priceCurrency");
+      expect(offre).not.toHaveProperty("priceSpecification");
     }
   });
 

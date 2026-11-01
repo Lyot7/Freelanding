@@ -1,13 +1,13 @@
 import Link from "next/link";
-import { Reveal } from "@/components/motion/Reveal";
 import type { MoyensContent } from "@/lib/content/types";
 
 /**
- * LES TROIS MOYENS DE RENDRE DU TEMPS, ET LE DÉROULÉ (2026-11-01).
+ * LES TROIS MOYENS DE RENDRE DU TEMPS (2026-11-01).
  *
  * La section noire montre le gain, celle-ci dit comment on l'obtient. Des lignes
  * plutôt que trois cartes : le nom se lit d'abord, le détail à côté, comme une
- * ordonnance. Les étapes sont numérotées parce qu'elles se suivent vraiment.
+ * ordonnance. La troisième est une option, décision d'Eliott : son déroulé vit sur
+ * `/services/automatisation`, pas sur l'accueil.
  */
 export function MoyensSection({ moyens }: { moyens: MoyensContent }) {
   return (
@@ -57,34 +57,6 @@ export function MoyensSection({ moyens }: { moyens: MoyensContent }) {
             </li>
           ))}
         </ul>
-
-        <div className="flex flex-col gap-[24px]">
-          <h3 className="m-0 text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-background/60">
-            {moyens.titreEtapes}
-          </h3>
-          <ol className="m-0 grid list-none gap-[24px] p-0 tablet:grid-cols-2 desktop:grid-cols-4">
-            {moyens.etapes.map((etape, index) => (
-              <li key={etape.titre}>
-                <Reveal
-                  initialOpacity={0.001}
-                  initialY={20}
-                  delay={0.08 * index}
-                  className="flex flex-col gap-[10px] border-t-2 border-background pt-[14px]"
-                >
-                  <span className="text-[13px] font-semibold tabular-nums tracking-[-0.01em] text-background/60">
-                    {index + 1}
-                  </span>
-                  <span className="text-[22px] font-semibold uppercase leading-[1] tracking-[-0.03em]">
-                    {etape.titre}
-                  </span>
-                  <span className="max-w-[34ch] text-[15px] font-medium leading-[1.4] tracking-[-0.01em] text-background/70">
-                    {etape.corps}
-                  </span>
-                </Reveal>
-              </li>
-            ))}
-          </ol>
-        </div>
       </div>
     </section>
   );

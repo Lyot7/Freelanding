@@ -1,14 +1,5 @@
-import {
-  euros,
-  plancherSuivi,
-  prestation,
-  prixPlancher,
-  repereAgenceLogiciel,
-  tauxSuivi,
-} from "@/content/offre";
+import { euros, PRIX_AU_DEVIS, repereAgenceLogiciel } from "@/content/offre";
 import type { FaqItem } from "@/lib/content/types";
-
-const LOGICIEL = prestation("logiciel");
 
 /**
  * Source unique de la FAQ. Rendue à l'identique sur la page d'accueil, sur
@@ -83,14 +74,14 @@ const LOGICIEL = prestation("logiciel");
 export const faqItems: FaqItem[] = [
   {
     question: "Combien coûte un projet, et comment c’est facturé ?",
-    /* Le plancher est lu dans `offre.ts`. L'échéancier se dit sans ses
+    /* Aucun prix d'Eliott depuis le 2026-11-01 : il se fixe au devis. L'échéancier se dit sans ses
        pourcentages depuis le 2026-10-26, décision d'Eliott : un paiement en
        trois fois affiché devient la norme attendue, alors qu'Eliott le propose
        lui-même au devis. Les CGV gardent le défaut.
 
        LE REPÈRE D'AGENCE vient lui aussi d'`offre.ts`, avec sa source et sa
-       date, et compare à livrable égal (un premier outil). */
-    answer: `Un logiciel métier démarre à ${prixPlancher(LOGICIEL)} HT. En agence, un premier outil se facture ${euros(repereAgenceLogiciel.premierOutilMin)} à ${euros(repereAgenceLogiciel.premierOutilMax)} selon ${repereAgenceLogiciel.source.nom} (${repereAgenceLogiciel.source.releve}). Je coûte moins cher parce que je conçois et je code moi-même, sans chef de projet ni structure à payer. Au-delà du plancher, le prix dépend du nombre de modules, des outils à relier et de la reprise de vos données. Je fixe le montant au devis, avant de commencer, et il ne bouge plus. Vous le réglez selon un échéancier écrit au devis et étalé jusqu’à la livraison : vous ne payez jamais tout d’avance.`,
+       date. */
+    answer: `${PRIX_AU_DEVIS} Il suit le nombre de modules, les outils à relier et la reprise de vos données. En agence, un premier outil se facture ${euros(repereAgenceLogiciel.premierOutilMin)} à ${euros(repereAgenceLogiciel.premierOutilMax)} selon ${repereAgenceLogiciel.source.nom} (${repereAgenceLogiciel.source.releve}). Je conçois et je code moi-même, sans chef de projet ni structure à payer. Vous réglez le montant selon un échéancier écrit au devis et étalé jusqu’à la livraison : vous ne payez jamais tout d’avance.`,
   },
   {
     question: "Combien de temps ça prend ?",
@@ -109,7 +100,7 @@ export const faqItems: FaqItem[] = [
   },
   {
     question: "Que se passe-t-il après la mise en service ?",
-    /* Le taux et le plancher de la maintenance sont lus dans `offre.ts`. */
-    answer: `Je ne disparais pas. Je propose une maintenance mensuelle qui revient à ${tauxSuivi()} du prix du logiciel par an, avec un minimum de ${plancherSuivi()} HT par mois. Elle couvre ce qui existe : mises à jour, sauvegardes vérifiées, corrections. Une fonction nouvelle fait l’objet d’un devis, parce qu’elle n’était pas au cadrage. Ce montant ne bouge que si votre logiciel reçoit beaucoup plus de trafic ou si votre hébergeur augmente ses prix. Il faut alors une machine plus puissante, payée sur votre facture d’hébergement, qui est à votre nom, et un suivi plus large. Je vous préviens avant, avec le nouveau montant et la date, et rien ne change tant que vous n’avez pas dit oui.`,
+    /* La maintenance se chiffre au devis, comme le projet. */
+    answer: `Je ne disparais pas. Je propose une maintenance mensuelle, chiffrée au devis avec le projet. Elle couvre ce qui existe : mises à jour, sauvegardes vérifiées, corrections. Une fonction nouvelle fait l’objet d’un devis, parce qu’elle n’était pas au cadrage. Ce montant ne bouge que si votre logiciel reçoit beaucoup plus de trafic ou si votre hébergeur augmente ses prix. Il faut alors une machine plus puissante, payée sur votre facture d’hébergement, qui est à votre nom, et un suivi plus large. Je vous préviens avant, avec le nouveau montant et la date, et rien ne change tant que vous n’avez pas dit oui.`,
   },
 ];
