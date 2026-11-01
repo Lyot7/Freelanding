@@ -227,7 +227,7 @@ const nextConfig: NextConfig = {
       { source: "/services/site-vitrine/prix", destination: "/services/logiciel-metier/prix", statusCode: 301 },
       { source: "/services/site-vitrine/artisans", destination: "/logiciel-metier", statusCode: 301 },
       { source: "/creation-site-internet-caen", destination: "/logiciel-sur-mesure-caen", statusCode: 301 },
-      { source: "/services/cto-referent-ia", destination: "/services/logiciel-metier", statusCode: 301 },
+      { source: "/services/cto-referent-ia", destination: "/services/automatisation", statusCode: 301 },
       /* Le transport passe sur le gabarit des pages métier (2026-10-31). */
       {
         source: "/services/logiciel-metier/transport",

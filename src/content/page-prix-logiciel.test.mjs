@@ -1,16 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import {
-  aPartirDe,
-  euros,
-  plancherSuivi,
-  prestation,
-  prixPlancher,
-  repereAgenceLogiciel,
-  suiviMensuelHT,
-  tauxSuivi,
-} from "./offre.ts";
+import { euros, prestation, repereAgenceLogiciel } from "./offre.ts";
 import { pageLogicielCaen } from "./page-logiciel-caen.ts";
 import { pagePrixLogiciel } from "./page-prix-logiciel.ts";
 import { CHEMIN_PRIX_LOGICIEL, pagesSecteur } from "./pages-secteur.ts";
@@ -21,9 +12,9 @@ import { siteConfig } from "./site.ts";
 /**
  * LA PAGE DE PRIX DE LA SOLUTION MÉTIER, et ce que l'œil ne vérifie pas.
  *
- * Une page qui répond « combien ça coûte » ne tient que si ses chiffres sont
- * justes : le plancher et le suivi viennent de `offre.ts`, et la comparaison
- * avec un abonnement est recalculée ici depuis ses hypothèses.
+ * Elle répond « combien ça coûte » sans aucun chiffre d'Eliott depuis le
+ * 2026-11-01 : ce qui fait varier le prix, le repère d'agence d'`offre.ts`, et la
+ * comparaison avec un abonnement, recalculée ici depuis ses hypothèses.
  *
  * En fin de fichier, l'unicité des pages déclinées (les pages secteur, la page
  * locale de Caen, la page de prix) : des pages qui se recopient passent pour du
@@ -115,11 +106,11 @@ describe("la page de prix est cherchable", () => {
   });
 });
 
-describe("les prix de la page sont ceux d'offre.ts", () => {
-  test("la réponse directe donne le plancher et renvoie au devis", () => {
-    expect(page.resume).toContain(prixPlancher(LOGICIEL));
-    expect(page.resume).toMatch(/devis/u);
-    expect(page.seo.description).toContain(aPartirDe(LOGICIEL, " HT"));
+describe("la page ne porte aucun prix d'Eliott", () => {
+  test("la réponse directe renvoie au devis et cite le repère d'agence", () => {
+    expect(page.resume).toMatch(/au devis/u);
+    expect(page.resume).toContain(euros(repereAgenceLogiciel.premierOutilMin));
+    expect(page.seo.description).not.toMatch(/\d\s*\u20AC|à partir de/u);
   });
 
   test("aucun forfait, aucune fourchette, aucun délai chiffré", () => {
@@ -130,11 +121,11 @@ describe("les prix de la page sont ceux d'offre.ts", () => {
     }
   });
 
-  test("le suivi mensuel est celui d'offre.ts", () => {
-    const tout = textes().join("\n");
-    expect(tout).toContain(tauxSuivi());
-    expect(tout).toContain(plancherSuivi());
-    expect(page.comparaison.suiviMensuel).toBe(suiviMensuelHT(LOGICIEL.plancher));
+  test("le suivi se chiffre au devis, sans taux ni minimum", () => {
+    const reponse = page.faq.items.find((i) => /maintenance/u.test(i.question))?.answer;
+    expect(reponse).toMatch(/au devis/u);
+    expect(reponse).not.toMatch(/\d/u);
+    expect(textes().join("\n")).not.toMatch(/\d\s*%/u);
   });
 
   test("aucun montant en euros n'est écrit à la main dans page-prix-logiciel.ts", () => {
@@ -153,35 +144,15 @@ describe("la comparaison avec un abonnement tombe juste", () => {
   const section = page.sections.find((s) => s.id === "comparaison");
   const corps = section?.paragraphes.join(" ") ?? "";
 
-  test("les coûts sont le produit de leurs hypothèses, au plancher", () => {
-    // Plus de prix ferme de projet depuis le 2026-10-05 : la comparaison part
-    // du plancher, hypothèse affichée comme telle.
-    expect(c.prixProjet).toBe(LOGICIEL.plancher);
-    expect(c.coutAbonnement).toBe(c.utilisateurs * c.prixParUtilisateur * c.mois);
-    expect(c.coutSurMesure).toBe(c.prixProjet + c.suiviMensuel * c.mois);
-  });
-
-  test("le seuil est le premier nombre d'utilisateurs où l'abonnement coûte plus", () => {
-    const abonnement = (n) => n * c.prixParUtilisateur * c.mois;
-    expect(abonnement(c.seuilUtilisateurs)).toBeGreaterThan(c.coutSurMesure);
-    expect(abonnement(c.seuilUtilisateurs - 1)).toBeLessThanOrEqual(c.coutSurMesure);
-  });
-
-  test("le budget équivalent est le plus haut prix de projet, à la centaine, qui reste sous l'abonnement", () => {
-    const cout = (prix) => prix + suiviMensuelHT(prix) * c.mois;
-    expect(c.budgetEquivalent % 100).toBe(0);
-    expect(cout(c.budgetEquivalent)).toBeLessThanOrEqual(c.coutAbonnement);
-    expect(cout(c.budgetEquivalent + 100)).toBeGreaterThan(c.coutAbonnement);
-    expect(c.budgetEquivalent).toBeGreaterThan(c.prixProjet);
+  test("les coûts sont le produit de leurs hypothèses", () => {
+    expect(c.coutParUtilisateur).toBe(c.prixParUtilisateur * c.mois);
+    expect(c.coutAbonnement).toBe(c.utilisateurs * c.coutParUtilisateur);
   });
 
   test("le texte affiche les chiffres calculés et les dit hypothèses", () => {
-    expect(corps).toContain(euros(c.budgetEquivalent));
     expect(section).toBeDefined();
     expect(corps).toContain(euros(c.coutAbonnement));
-    expect(corps).toContain(euros(c.coutSurMesure));
-    expect(corps).toContain(euros(c.suiviMensuel));
-    expect(corps).toContain(`${c.seuilUtilisateurs} utilisateurs`);
+    expect(corps).toContain(euros(c.coutParUtilisateur));
     expect(corps).toContain("hypothèses");
     expect(section.points.every((p) => p.titre.startsWith("Hypothèse"))).toBe(true);
   });
@@ -208,13 +179,12 @@ describe("la page de prix ne promet que ce qui est vrai", () => {
     }
   });
 
-  test("la comparaison avec les agences est sourcée, liée, et garde le plancher à côté", () => {
+  test("la comparaison avec les agences est sourcée et liée", () => {
     const section = page.sections.find((s) => s.id === "variation");
     const paragraphe = section.paragraphes.find((p) => p.includes(repereAgenceLogiciel.source.nom));
     expect(paragraphe).toBeDefined();
     expect(paragraphe).toContain(euros(repereAgenceLogiciel.mediane));
     expect(paragraphe).toContain(euros(repereAgenceLogiciel.premierOutilMin));
-    expect(paragraphe).toContain(prixPlancher(LOGICIEL));
     expect(paragraphe).toContain(repereAgenceLogiciel.source.releve);
     expect(section.liens.items.map((l) => l.href)).toContain(repereAgenceLogiciel.source.href);
   });

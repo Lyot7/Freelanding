@@ -124,7 +124,7 @@ Leurs questions diffèrent (`questionsDuRendezVous` dans
 
 | Sujet | Budget | Objectif | Question de plus | Échéance |
 | ----- | ------ | -------- | ---------------- | -------- |
-| `ia` | tranches tirées du plancher de L'intégration IA | la tâche à confier à l'IA | l'outil où elle se fait (obligatoire) | facultative |
+| `ia` | tranches de budget de L'intégration IA | la tâche à confier à l'IA | l'outil où elle se fait (obligatoire) | facultative |
 | `cto` | **non posé** : le prix est un forfait mensuel | le besoin le plus pressant | aucune | facultative |
 
 Les notes Cal.com suivent : pas de ligne « Budget HT » ni « À portée » pour le

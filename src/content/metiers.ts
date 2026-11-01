@@ -21,7 +21,7 @@
  * passent, et `metiers.test.mjs` refuse qu'une entrée du fichier soit écartée :
  * dans le circuit, le test rouge empêche la poussée.
  *
- * AUCUN MONTANT DANS LE FICHIER : le prix vient d'`offre.ts`, au rendu.
+ * AUCUN MONTANT DANS LE FICHIER : le prix se fixe au devis.
  */
 import { blogPosts } from "./blog";
 import donnees from "./metiers.json";

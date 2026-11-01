@@ -13,7 +13,7 @@ import {
 } from "@/components/pages/services/HeroPhoto";
 import { herosPages } from "@/content/heros-pages";
 import type { SiteConfig } from "@/lib/content/types";
-import { prixPlancher, type Offre, type Prestation } from "@/content/offre";
+import type { Offre, Prestation } from "@/content/offre";
 import {
   lienLocalParPrestation,
   marchesFilAriane,
@@ -36,10 +36,10 @@ import { RDV_PAR_PRESTATION } from "@/content/rendez-vous";
  * un périmètre coûte plus cher qu'un autre. Il montre une différence, il ne
  * l'explique pas.
  *
- * Ici, l'offre dit ce qui est compris dès son plancher et ce qui fait monter
- * le prix. Le montant final se fixe au devis.
+ * Ici, l'offre dit ce qui est compris et ce qui fait varier le prix. Le montant
+ * se fixe au devis.
  *
- * UN PLANCHER, SANS PALIER NI DURÉE, depuis le 2026-10-05 : voir l'en-tête de
+ * AUCUN MONTANT, NI PALIER, NI DURÉE, depuis le 2026-11-01 : voir l'en-tête de
  * `offre.ts`.
  */
 
@@ -107,11 +107,11 @@ export function FilAriane({ marches }: { marches: readonly MarcheFilAriane[] }) 
  * LA GRAMMAIRE EST CELLE DES ANCIENS FORFAITS, et de l'accordéon des
  * prestations : un filet haut, deux moitiés séparées par le filet médian de la
  * section, gouttière nulle reportée en rembourrage de part et d'autre. À
- * gauche le plancher et ce qu'il comprend ; à droite ce qui fait monter le
- * prix, puis l'action.
+ * gauche le prix et ce que comprend chaque projet ; à droite ce qui fait varier
+ * le prix, puis l'action.
  *
- * LE PLANCHER OUVRE LA MOITIÉ GAUCHE : le visiteur venu pour un prix le trouve
- * en premier, et la liste qui suit dit ce qu'il paie à ce montant.
+ * « SUR DEVIS » OUVRE LA MOITIÉ GAUCHE : le visiteur venu pour un prix trouve
+ * sa réponse en premier, et la liste qui suit dit ce qu'il obtient.
  */
 export function OffreDetail({
   offre,
@@ -131,16 +131,8 @@ export function OffreDetail({
         className="absolute left-0 right-0 top-0 h-px bg-[rgba(255,255,255,0.1)]"
       />
       <div className="flex flex-col gap-[20px] tablet:pr-[30px] desktop:pr-[40px]">
-        <p className="flex flex-col gap-[6px]">
-          <span className="text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-white/60">
-            {servicePageLabels.aPartirDe}
-          </span>
-          <span className="text-[32px] font-semibold leading-[1] tracking-[-0.04em] desktop:text-[44px]">
-            {prixPlancher(offre)}
-            <span className="ml-[8px] align-baseline text-[13px] font-medium uppercase tracking-[-0.01em] text-white/50">
-              {servicePageLabels.horsTaxes}
-            </span>
-          </span>
+        <p className="text-[32px] font-semibold leading-[1] tracking-[-0.04em] desktop:text-[44px]">
+          {servicePageLabels.prixOffre}
         </p>
         <ListeOffre titre={servicePageLabels.inclus} lignes={offre.inclus} />
       </div>
@@ -469,9 +461,7 @@ export function ServicePage({
                 donc sans ce retrait les deux textes se collent au pixel près et
                 se lisent comme une seule phrase cassée en deux. */}
             <p className={`text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-white/50 tablet:col-start-2 tablet:row-start-3 tablet:pl-[30px] desktop:pl-[40px]${heroImage ? ` ${VOILE_TEXTE}` : ""}`}>
-              {servicePageLabels.chapoPrix(
-                `${prixPlancher(prestation)} ${servicePageLabels.horsTaxes}`,
-              )}
+              {servicePageLabels.chapoPrix}
             </p>
           </div>
           {heroImage ? <CreditHeroPhoto credit={heroImage.credit} /> : null}
@@ -507,7 +497,7 @@ export function ServicePage({
               </h2>
               {/* LA RÉASSURANCE SE LIT AU MOMENT DU CHOIX, en vis-à-vis du
                   titre et sur sa ligne d'appui, comme le chapô du héros :
-                  devant un plancher, le lecteur cherche d'abord comment le prix se fixe
+                  devant une offre, le lecteur cherche d'abord comment le prix se fixe
                   et si le montant peut bouger. */}
               <p className="max-w-[440px] text-[15px] font-medium leading-[1.45] tracking-[-0.01em] text-white/80 tablet:pl-[30px] desktop:pl-[40px]">
                 {servicePageLabels.reassurance}
@@ -546,6 +536,39 @@ export function ServicePage({
             l'agenda en sachant ce qu'on va lui demander.
 
             `id="devis"` : l'ancre est gardée, `lienDevis()` y mène toujours. */}
+        {local ? null : (
+          <section
+            data-section="mission"
+            className="relative bg-background px-[20px] py-[60px] text-foreground tablet:px-[24px] tablet:py-[90px] desktop:px-[30px]"
+          >
+            <div className="relative mx-auto flex w-full max-w-[1440px] flex-col gap-[30px]">
+              <div className="grid gap-[16px] tablet:grid-cols-2">
+                <h2 className="accent-room m-0 text-[26px] font-semibold uppercase leading-[0.95] tracking-[-0.04em] tablet:pr-[30px] tablet:text-[34px]">
+                  {servicePageLabels.mission.titre}
+                </h2>
+                <p className="m-0 max-w-[46ch] text-[16px] font-medium leading-[1.45] tracking-[-0.01em] text-foreground-60 tablet:pl-[30px] desktop:pl-[40px]">
+                  {servicePageLabels.mission.intro}
+                </p>
+              </div>
+              <ol className="m-0 grid list-none gap-[24px] p-0 tablet:grid-cols-2 desktop:grid-cols-4">
+                {servicePageLabels.mission.etapes.map((etape, index) => (
+                  <li key={etape.titre} className="flex flex-col gap-[10px] border-t-2 border-accent pt-[14px]">
+                    <span className="text-[13px] font-semibold tabular-nums tracking-[-0.01em] text-foreground-60">
+                      {index + 1}
+                    </span>
+                    <span className="text-[20px] font-semibold uppercase leading-[1] tracking-[-0.03em]">
+                      {etape.titre}
+                    </span>
+                    <span className="max-w-[36ch] text-[15px] font-medium leading-[1.4] tracking-[-0.01em] text-foreground-60">
+                      {etape.corps}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </section>
+        )}
+
         <section
           id="devis"
           data-section="sur-mesure"

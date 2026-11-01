@@ -1,7 +1,7 @@
 import { Fragment, type ReactNode } from "react";
 import type { List, ListItem, PhrasingContent, RootContent, Table } from "mdast";
 import { Callout, Figure, Prix, Quote, Stat, Steps, Video } from "@/components/blog/blocks";
-import { prestations, type PrestationId } from "@/content/offre";
+import { prestations } from "@/content/offre";
 import { adresseSure, decouper, lirePrix, mediaSur, type Bloc } from "@/lib/blog/mdx-sur";
 import { habillage } from "@/mdx-components";
 
@@ -77,7 +77,7 @@ export function rendreEnLigne(n: PhrasingContent): ReactNode {
     }
     case "html": {
       const prix = lirePrix(n.value);
-      return prix && OFFRES.has(prix.offre) ? <Prix offre={prix.offre as PrestationId} suivi={prix.suivi} /> : n.value;
+      return prix && OFFRES.has(prix.offre) ? <Prix /> : n.value;
     }
     case "linkReference":
       return enLigne(n.children);

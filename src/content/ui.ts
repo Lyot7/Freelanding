@@ -123,10 +123,9 @@ export const uiLabels: UiLabels = {
     priceLabel: "Prix :",
     /*
      * AUCUN MONTANT DANS CE LIBELLÉ, jamais, et c'est une contrainte d'Eliott
-     * avant d'être un choix de mise en page. « Rendez-vous à 3 000 € » se lit
-     * comme un prix arrêté pour LE projet, alors que le montant affiché juste
-     * au-dessus est un plancher de périmètre. Sa crainte, mot pour mot :
-     * « y'a écrit ça sur le site alors que j'suis pas au courant ».
+     * avant d'être un choix de mise en page : le prix se fixe au devis. Sa
+     * crainte, mot pour mot : « y'a écrit ça sur le site alors que j'suis pas
+     * au courant ».
      *
      * Le contexte passe donc par le nom accessible, jamais par l'étiquette :
      * cinq boutons qui disent tous la même chose à l'écran, et cinq noms

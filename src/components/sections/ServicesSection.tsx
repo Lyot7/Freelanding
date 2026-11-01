@@ -51,8 +51,8 @@ import { urlImageFond } from "@/lib/image-fond";
  *     chrome du site absent des props → écrits en dur ici (texte réel).
  *   - Les images des lignes (framer-hhouxn) ne sont pas dans services.ts →
  *     mappées par numéro depuis l'archive Framer (fallback si service.image).
- *   - Le prix prop ("from $2,900") est rendu "Price: from" (gris) + montant
- *     ("$2,900", blanc), le montant étant dérivé du prop (retrait du "from ").
+ *   - Le prix est rendu en deux temps : le libellé gris « Prix : », puis
+ *     « sur devis » en blanc (aucun montant depuis le 2026-11-01).
  *   - Icône toggle : barre horizontale (v2a2ti) toujours blanche 60% ; barre
  *     verticale (1u6l8q) blanche 60% fermé (=> "+") / transparente ouvert
  *     (=> "−"), conteneur pivoté 90° ouvert (transform Framer exact).
@@ -109,29 +109,6 @@ const COVER_APPEAR: Variants = {
     transition: { type: "tween", duration: 1.09, ease: EASE_FRAMER },
   },
 };
-
-/**
- * Découpe un prix en préfixe et montant, pour le rendu bicolore de la source :
- * le préfixe rejoint le libellé gris de 14 px, le montant reste en blanc de
- * 16 px.
- *
- * « SUR DEVIS » N'A PAS DE PRÉFIXE, et c'est pour ça que la découpe se fait ici
- * plutôt que dans le libellé. Celui-ci portait « Prix : à partir de » en dur, ce
- * qui rendait « Prix : à partir de sur devis » sur la prestation « Au-delà ».
- * C'était servi en production.
- */
-function priceParts(price: string | undefined, label: string): {
-  label: string;
-  amount: string;
-} {
-  if (!price) return { label, amount: "" };
-  // « from » est la donnée du template, « dès » celle du site traduit, « à
-  // partir de » celle de l'offre depuis le 2026-10-05 : le préfixe rejoint le
-  // libellé gris, le montant reste seul en blanc.
-  const parts = price.match(/^\s*(from|à partir de|dès)\s+(.+)$/i);
-  if (!parts) return { label, amount: price };
-  return { label: `${label} ${parts[1].toLowerCase()}`, amount: parts[2] };
-}
 
 /*
  * L'icône Plus/Minus vit désormais dans `@/components/ui/ToggleIcon`, partagée
@@ -366,15 +343,8 @@ function ServiceRow({
                 que les cinq lignes fermées donnent la carte de l'offre en une
                 lecture ; elles étaient invisibles jusqu'au premier clic.
 
-                LA FOURCHETTE PASSE SUR SA PROPRE LIGNE SOUS 810, et c'est une
-                nécessité de mesure, pas un goût. À 390 la colonne droite fait
-                168 px et « Prix : de 12 000 € à 36 000 € » en demande 215 :
-                sur une seule ligne, `overflow-hidden` rasait la borne haute
-                (débordement relevé de 63 px). En colonne, le libellé coiffe le
-                montant et le montant se coupe entre ses deux bornes, jamais au
-                milieu d'un montant : les insécables de `euros()` s'en chargent.
-                Une fourchette tronquée se lit comme un prix, ce qui est
-                exactement la lecture qu'on veut éviter. */}
+                LE PRIX PASSE SUR SA PROPRE LIGNE SOUS 810 : à 390 la colonne
+                droite fait 168 px, et le libellé coiffe la valeur. */}
             <span
               id={`${panelId}-prix`}
               className={
@@ -383,18 +353,17 @@ function ServiceRow({
               }
             >
               {/* framer-11zvtfv : libellé de prix (« Price: from » dans la
-                  source, preset 2okhk1, 14px, blanc 60%). Il porte le préfixe
-                  du montant quand il y en a un, rien sur « sur devis ». */}
-              {/* SANS MONTANT, PAS DE LIBELLÉ. Rendu inconditionnellement, il
+                  source, preset 2okhk1, 14px, blanc 60%). */}
+              {/* SANS PRIX, PAS DE LIBELLÉ. Rendu inconditionnellement, il
                   affichait « Prix : » suivi de rien, servi en production. */}
               {service.price ? (
                 <>
                   <span className="whitespace-pre text-[14px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground-60">
-                    {priceParts(service.price, uiLabels.services.priceLabel).label}
+                    {uiLabels.services.priceLabel}
                   </span>
-                  {/* framer-1407hte : montant (preset htsnb8, 16px, blanc) */}
+                  {/* framer-1407hte : prix (preset htsnb8, 16px, blanc) */}
                   <span className="text-balance text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground tablet:whitespace-pre">
-                    {priceParts(service.price, uiLabels.services.priceLabel).amount}
+                    {service.price}
                   </span>
                 </>
               ) : null}

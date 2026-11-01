@@ -1,14 +1,7 @@
 import { content, type ContentRepository } from "@/lib/content";
 import type { ContentBlock, Stat } from "@/lib/content/types";
 import { absoluteUrl } from "@/lib/site-url";
-import {
-  aPartirDe,
-  euros,
-  prestations,
-  prixAffiche,
-  type Offre,
-  type Prestation,
-} from "@/content/offre";
+import { prestations, type Offre, type Prestation } from "@/content/offre";
 import { lienRendezVous, rendezVousContent } from "@/content/rendez-vous";
 import { CHEMIN_PROFIL_TEXTE, vueAgentContent } from "@/content/vue-agent";
 
@@ -17,9 +10,9 @@ import { CHEMIN_PROFIL_TEXTE, vueAgentContent } from "@/content/vue-agent";
  * version brute (`/llms-full.txt`) et le prompt que le visiteur copie.
  *
  * ASSEMBLÉ, JAMAIS ÉCRIT. Chaque fait vient du fichier de contenu qui l'affiche
- * déjà sur le site : les offres et leurs planchers de `offre.ts`, les rendez-vous de
- * `rendez-vous.ts`, les projets de `work.ts`, la FAQ de `faq.ts`. Changer un
- * tarif ou ajouter une réalisation met à jour les trois sorties sans qu'on y
+ * déjà sur le site : les offres de `offre.ts`, les rendez-vous de
+ * `rendez-vous.ts`, les projets de `work.ts`, la FAQ de `faq.ts`. Changer une
+ * offre ou ajouter une réalisation met à jour les trois sorties sans qu'on y
  * pense. `vue-agent.ts` ne porte que les intertitres et les liaisons.
  *
  * LES LIENS SONT ABSOLUS. Le texte est fait pour être copié hors du site :
@@ -86,7 +79,7 @@ interface OffreAvecPage {
 
 function blocsOffre(offre: Offre): ContentBlock[] {
   return [
-    p(T.offres.plancher(prixAffiche(offre, "\u00A0HT"))),
+    p(T.offres.prixOffre),
     p(`${T.offres.inclus}${DP}`),
     liste(offre.inclus),
     p(`${T.offres.faitMonter}${DP}`),
@@ -152,17 +145,15 @@ export async function construireProfil(
   blocs.push(h2(T.sections.pourQui), ...T.pourQui.map(p));
 
   /* Offres : l'ordre et les intitulés de l'accordéon de l'accueil, le détail
-     tiré de `offre.ts` : plancher, ce qui est compris, ce qui fait monter le
-     prix. */
+     tiré de `offre.ts` : ce qui est compris, ce qui fait varier le prix. */
   blocs.push(h2(T.sections.offres), p(home.services.intro ?? ""), ...T.offres.prix.map(p));
   const offres: readonly OffreAvecPage[] = [
     ...sources.prestations.map((offre) => ({ offre, page: `/services/${offre.slug}` })),
   ];
   for (const service of home.services.items) {
-    const trouvee = offres.find((candidate) => service.cta?.href === candidate.page);
-    const prix = trouvee ? aPartirDe(trouvee.offre, "\u00A0HT") : service.price;
+    const trouvee = offres.find((candidate) => service.title === candidate.offre.nom);
     blocs.push(
-      h3(prix ? T.offres.aPartirDe(service.title, prix) : service.title),
+      h3(service.title),
       ...service.body.map(p),
       ...(trouvee ? blocsOffre(trouvee.offre) : []),
       ...(trouvee ? [p(`${T.offres.detail}${DP} ${absoluteUrl(trouvee.page)}`)] : []),
@@ -246,11 +237,7 @@ export async function construireProfil(
   );
 
   /* Limites, pour que l'assistant du visiteur puisse trancher honnêtement. */
-  const plancher = Math.min(...sources.prestations.map((prestation) => prestation.plancher));
-  blocs.push(
-    h2(T.sections.limites),
-    liste([T.limites.prixPlancher(euros(plancher)), ...T.limites.items]),
-  );
+  blocs.push(h2(T.sections.limites), liste(T.limites.items));
 
   /* FAQ, réponses complètes. */
   /* La question sur l'intelligence artificielle reste sur le site, pas ici :

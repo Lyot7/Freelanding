@@ -1,7 +1,7 @@
 import { content } from "@/lib/content";
 import { absoluteUrl } from "@/lib/site-url";
 import { blogPosts } from "@/content/blog";
-import { aPartirDe, prestations as offre } from "@/content/offre";
+import { prestations as offre } from "@/content/offre";
 import { CHEMIN_HUB_METIERS, hubMetiers, pagesMetier } from "@/content/metiers";
 import { pageLogicielCaen } from "@/content/page-logiciel-caen";
 import { pagePrixLogiciel } from "@/content/page-prix-logiciel";
@@ -19,8 +19,8 @@ import { CHEMIN_PROFIL_TEXTE, CHEMIN_PROMPT_TEXTE } from "@/content/vue-agent";
  * lisible du JSON-LD, qui vise les moteurs classiques.
  *
  * GÉNÉRÉ, jamais écrit à la main : un fichier statique aurait divergé au
- * premier changement de tarif, et un assistant aurait alors cité des prix qui
- * n'existent plus. Même raison que pour le sitemap.
+ * premier changement d'offre, et un assistant aurait alors cité ce qui n'existe
+ * plus. Même raison que pour le sitemap.
  *
  * À LA RACINE de `src/app`, hors des groupes de routes, comme `robots.ts` :
  * c'est là que le fichier doit être servi.
@@ -68,7 +68,7 @@ export async function GET(): Promise<Response> {
     "",
     ...prestations,
     "",
-    "Chaque prix est un prix de départ, hors taxes. Le prix final dépend du projet et se fixe au devis, avant le début du projet ; une fois signé, il ne varie plus.",
+    "Le prix dépend du projet. Il se fixe au devis, avant le début du projet ; une fois signé, il ne varie plus. Le suivi et la maintenance se chiffrent aussi au devis.",
     "",
     "## Réalisations",
     "",
@@ -78,16 +78,14 @@ export async function GET(): Promise<Response> {
     "",
     ligne("Accueil", "/", "présentation de l’offre"),
     /*
-     * PAGES DE PRESTATION, ajoutées avec le retrait de la grille tarifaire de
-     * la page d'accueil le 2026-08-27. Ce sont elles qui portent désormais le
-     * détail des prix : les omettre ici enverrait un modèle chercher des
-     * montants sur une page qui n'en a plus.
+     * PAGES DE PRESTATION : elles disent ce qui est compris et ce qui fait
+     * varier le prix, que le site ne chiffre pas.
      */
     ...offre.map((p) =>
       ligne(
         p.nom,
         `/services/${p.slug}`,
-        `${aPartirDe(p, " HT")} : ce qui est compris, et ce qui fait varier le prix`,
+        "ce qui est compris, et ce qui fait varier le prix du devis",
       ),
     ),
     ligne(

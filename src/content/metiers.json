@@ -30,7 +30,7 @@
     "image": {
       "alt": "Dessin au trait d’une façade d’échafaudage, une travée surlignée"
     },
-    "titreOffre": "Le prix d’un logiciel d’échafaudage",
+    "titreOffre": "Votre logiciel d’échafaudage, sur devis",
     "blocs": [
       {
         "type": "tableau",
@@ -230,7 +230,7 @@
     "image": {
       "alt": "Dessin au trait de la sculpture d’un pneu vue de face, un pain de gomme surligné"
     },
-    "titreOffre": "Le prix d’un logiciel pour centre de pneus",
+    "titreOffre": "Votre logiciel pour centre de pneus, sur devis",
     "blocs": [
       {
         "type": "section",
@@ -424,7 +424,7 @@
     "image": {
       "alt": "Dessin au trait d’un réseau de points de livraison, une tournée surlignée"
     },
-    "titreOffre": "Le prix d’un logiciel de transport",
+    "titreOffre": "Votre logiciel de transport, sur devis",
     "blocs": [
       {
         "type": "tableau",

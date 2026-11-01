@@ -117,11 +117,11 @@ describe("RouteTheme", () => {
     }
   });
 
-  it("déclare au JSON-LD l'offre affichée, son prix et la zone de la page", async () => {
+  it("déclare au JSON-LD l'offre affichée, sans prix, et la zone de la page", async () => {
     for (const page of pagesTheme) {
       const arbre = await RouteTheme({ id: page.id });
       const json = JSON.stringify(arbre);
-      expect(json).toContain(`"minPrice":${page.offre.plancher}`);
+      expect(json).not.toMatch(/minPrice|priceSpecification|priceCurrency/u);
       expect(json).toContain(page.offre.nom);
       expect(json).toContain("FAQPage");
       expect(json.includes("BreadcrumbList")).toBe(page.filAriane !== undefined);

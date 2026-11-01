@@ -4,7 +4,6 @@ import { join } from "node:path";
 import { blogPosts, blogContent } from "./blog.ts";
 import { contentRoutes } from "./routes.ts";
 import { resoudreSujet } from "../lib/rendez-vous/config.ts";
-import { prestation, prixPlancher } from "./offre.ts";
 
 /**
  * AUDIT DES ARTICLES.
@@ -264,8 +263,7 @@ describe("étude des sites des entreprises normandes", () => {
  * Ils visent une requête précise (« odoo ou logiciel sur mesure », « refonte
  * site internet prix »…) et leur forme est la même : réponse directe en tête,
  * tableau ou calcul à hypothèses affichées, FAQ, et un lien vers la prestation
- * ET vers sa page de prix. Les prix d'Eliott n'y sont jamais écrits à la main :
- * le bloc `<Prix>` les lit dans `offre.ts`.
+ * ET vers sa page de prix. Aucun prix d'Eliott : il se fixe au devis.
  */
 describe("articles de décision et de prix", () => {
   const ARTICLES = {
@@ -324,12 +322,9 @@ describe("articles de décision et de prix", () => {
         }
       });
 
-      test("aucun prix d'Eliott écrit à la main, aucun forfait cité", () => {
-        const montant = prixPlancher(prestation(offre));
-        expect(texte.replace(/ /gu, " ")).not.toContain(montant.replace(/ /gu, " "));
-        // Les paliers et la propriété `forfait` de <Prix> sont partis le
-        // 2026-10-05 : seul le plancher se cite.
-        expect(texte).not.toMatch(/<Prix[^>]*forfait=/u);
+      test("aucun prix d'Eliott, aucun forfait cité", () => {
+        expect(texte).toMatch(/devis/u);
+        expect(texte).not.toContain("<Prix");
         expect(/\bforfaits?\b/iu.test(texte)).toBe(false);
       });
 

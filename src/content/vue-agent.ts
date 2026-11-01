@@ -2,7 +2,7 @@
  * Textes du profil complet (`/llms-full.txt`) et du prompt copié par le
  * bouton « Demandez à votre assistant IA » du héros (`/agent/prompt.txt`).
  *
- * CE FICHIER NE PORTE QUE LA CHARPENTE. Le profil lui-même (offres, prix,
+ * CE FICHIER NE PORTE QUE LA CHARPENTE. Le profil lui-même (offres,
  * réalisations, questions fréquentes, rendez-vous) est assemblé par
  * `src/lib/profil/profil.ts` depuis les fichiers de contenu du site. Écrire
  * ici un prix, un délai ou le nom d'un projet créerait une seconde vérité, et
@@ -43,7 +43,7 @@ export const vueAgentContent = {
     sections: {
       quoi: "Ce que je fais",
       pourQui: "Pour qui",
-      offres: "Mes offres et mes prix",
+      offres: "Mes offres",
       methode: "Ma façon de travailler",
       realisations: "Réalisations",
       parcours: "Parcours",
@@ -61,20 +61,17 @@ export const vueAgentContent = {
 
     offres: {
       /*
-       * UN PLANCHER PAR OFFRE DEPUIS LE 2026-10-05, comme sur le site
-       * (`offre.ts`) : le prix se fixe au devis. Aucun montant ne s'écrit
-       * ici : ils viennent tous de `offre.ts`, par `profil.ts`.
+       * AUCUN MONTANT DEPUIS LE 2026-11-01, comme sur le site (`offre.ts`) :
+       * le prix se fixe au devis.
        */
       prix: [
-        "Chaque offre a un prix de départ. Au-dessus, le prix dépend du projet et se fixe au devis, après un échange\u00A0; une fois signé, il ne bouge plus.",
-        "Tous les montants sont hors taxes.",
+        "Le prix dépend de chaque projet. Je le fixe au devis, après un échange\u00A0; une fois signé, il ne bouge plus.",
+        "Le suivi et la maintenance se chiffrent aussi au devis.",
       ],
       /* Aucune durée à côté d'un prix (règle du vault, `offre-grille-prix.md`). */
-      /* Le prix arrive taxe comprise, et « par mois » derrière une offre mensuelle. */
-      plancher: (prix: string) => `À partir de ${prix}, prix fixé au devis.`,
-      aPartirDe: (titre: string, prix: string) => `${titre} (${prix})`,
-      inclus: "Compris dès le plancher",
-      faitMonter: "Ce qui fait monter le prix",
+      prixOffre: "Prix fixé au devis.",
+      inclus: "Compris dans chaque projet",
+      faitMonter: "Ce qui fait varier le prix",
       horsOffre: "Hors offre",
       detail: "Détail",
       rendezVous: uiLabels.services.rdvLabel,
@@ -93,18 +90,17 @@ export const vueAgentContent = {
       /**
        * Déroulé commercial (vault, `methode-vente-rdv.md`). Sans durée ni
        * montant : la durée affichée des rendez-vous vit dans `rendez-vous.ts`,
-       * les prix dans `offre.ts`, et le profil les cite plus bas.
+       * et le profil la cite plus bas.
        */
       etapes: [
-        "Premier rendez-vous en visio, gratuit, pour comprendre votre situation et ce que vous voulez obtenir. Quand vous le réservez, 3 questions sur votre projet, dont votre budget, me permettent de vous dire tout de suite ce qu’il permet.",
+        "Premier rendez-vous en visio, gratuit, pour comprendre votre situation et ce que vous voulez obtenir. Quand vous le réservez, 3 questions sur votre projet, dont votre budget, me permettent de préparer l’appel.",
         "Le devis ne part jamais seul par e-mail\u00A0: je vous le présente lors d’un second rendez-vous, et on le relit ensemble.",
       ],
     },
 
     limites: {
-      prixPlancher: (prix: string) =>
-        `Vous cherchez un outil à quelques centaines d’euros\u00A0: mes prix commencent à ${prix}\u00A0HT.`,
       items: [
+        "Vous cherchez un outil à quelques centaines d’euros\u00A0: un logiciel du marché vous conviendra mieux.",
         "Votre logiciel repose sur PHP ou Laravel et vous voulez le faire reprendre : je n’y touche pas.",
         "Vous voulez une équipe de plusieurs personnes, avec chef de projet et studio de création : je travaille seul, par choix.",
         "Vous êtes une agence ou une ESN et vous cherchez un développeur en régie ou en marque blanche\u00A0: je ne travaille pas ainsi.",
@@ -144,7 +140,7 @@ export const vueAgentContent = {
     etapes: [
       "Présente-toi en une phrase, puis interroge la personne sur son entreprise et son besoin, une ou deux questions à la fois : son activité et sa taille, ce qu’elle a aujourd’hui, ce qui coince, ce qu’elle veut obtenir, son échéance, et son budget si elle veut bien le dire.",
       "Confronte ses réponses au profil et dis franchement ce qui colle et ce qui ne colle pas. Si une agence, un logiciel du marché ou un autre spécialiste lui conviendrait mieux, dis-le et explique pourquoi. Tu ne vends rien : ton seul objectif est qu’elle prenne la bonne décision.",
-      "Pour les prix et les prestations, appuie-toi uniquement sur le profil. Chaque offre a un prix de départ, et le prix final se fixe au devis. N’annonce jamais un montant au-dessus de ce prix de départ\u00A0: c’est Eliott qui le chiffre après un échange. Le profil ne donne aucun délai\u00A0: la date se fixe au devis. S’il ne dit rien sur un point, dis que tu ne sais pas et propose de poser la question à Eliott. N’invente ni tarif, ni délai, ni référence, ni engagement.",
+      "Pour les prix et les prestations, appuie-toi uniquement sur le profil. Eliott ne publie aucun prix\u00A0: il dépend de chaque projet et se fixe au devis. N’annonce jamais de montant pour Eliott\u00A0: c’est lui qui le chiffre après un échange. Le profil ne donne aucun délai\u00A0: la date se fixe au devis. S’il ne dit rien sur un point, dis que tu ne sais pas et propose de poser la question à Eliott. N’invente ni tarif, ni délai, ni référence, ni engagement.",
       "Si Eliott est le bon profil, demande-lui comment elle préfère le contacter : appel en visio, demande de rappel, formulaire de contact ou e-mail. Donne-lui alors le lien exact tiré de la section « Me contacter », et pour un rendez-vous, le sujet qui correspond à son projet.",
       "S’il ne l’est pas, dis-le simplement et arrête-toi là.",
     ],

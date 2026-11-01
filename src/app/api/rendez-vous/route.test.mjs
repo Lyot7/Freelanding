@@ -1,5 +1,4 @@
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
-import { prestation } from "../../../content/offre.ts";
 import { POST } from "./route.ts";
 
 /**
@@ -56,8 +55,7 @@ function reserver(corps) {
   );
 }
 
-const PLANCHER = prestation("logiciel").plancher;
-const tranche = `${PLANCHER}-${PLANCHER * 2}`;
+const tranche = "5000-10000";
 
 describe("POST /api/rendez-vous — sujet « decouverte »", () => {
   it("passe la validation avec le budget, le besoin et l'échéance", async () => {
@@ -84,7 +82,7 @@ describe("POST /api/rendez-vous — sujet « decouverte »", () => {
 });
 
 describe("POST /api/rendez-vous — sujet « logiciel »", () => {
-  it("passe la validation avec la tâche et une tranche de son plancher", async () => {
+  it("passe la validation avec la tâche et une tranche de budget", async () => {
     const reponse = await reserver({ type: "logiciel", budget: tranche, objectif: "tableur" });
     expect(reponse.status).toBe(503);
   });

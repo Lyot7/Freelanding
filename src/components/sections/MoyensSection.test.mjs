@@ -19,11 +19,10 @@ describe("MoyensSection", () => {
     expect(homeContent.logiciel.cta.href).toBe(`#${MoyensSection({ moyens }).props.id}`);
   });
 
-  it("rend chaque moyen avec son lien, et chaque étape", () => {
+  it("rend chaque moyen avec son lien", () => {
     for (const ligne of moyens.lignes) {
       expect(rendu).toContain(ligne.titre);
       expect(rendu).toContain(ligne.lien.href);
     }
-    for (const etape of moyens.etapes) expect(rendu).toContain(etape.corps);
   });
 });

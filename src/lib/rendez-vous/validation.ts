@@ -243,9 +243,9 @@ export function validerReservation(
   }
 
   const budget = lireChoix(
-    { ...champs, budget: rattacherTranche(type, lireChaine(champs, "budget").trim()) },
+    { ...champs, budget: rattacherTranche(lireChaine(champs, "budget").trim()) },
     "budget",
-    tranchesBudget(type),
+    tranchesBudget(),
   );
   if (!budget.ok) return budget;
   const objectif = lireChoix(

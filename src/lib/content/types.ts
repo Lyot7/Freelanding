@@ -637,12 +637,12 @@ export interface HeroProof {
   source?: { label: string; href: string };
 }
 
-/** Une porte de l'accueil : une offre, une ligne du titre, un prix plancher. */
+/** Une porte de l'accueil : une offre, une ligne du titre, où se fixe son prix. */
 export interface HeroDoor {
   /** Lignes du titre, rendues chacune sur sa ligne dès la tablette. */
   lines: readonly string[];
   href: string;
-  /** Prix d'entrée, déjà formaté (« dès 3 000 € HT »). */
+  /** Le prix, tel qu'il s'affiche (« Sur devis »). */
   price: string;
 }
 
@@ -681,7 +681,7 @@ export interface ServiceItem {
   /** Numéro d'ordre affiché (« 01 »…« 05 »). */
   number: string;
   title: string;
-  /** Prix affiché tel quel (« Dès 5 000 € »), préfixe compris. */
+  /** Prix affiché tel quel (« sur devis »). */
   price?: string;
   /** Corps long (un ou plusieurs paragraphes). */
   body: string[];
@@ -879,8 +879,6 @@ export interface MoyensContent {
   titleLines: readonly string[];
   intro: string;
   lignes: readonly { titre: string; corps: string; lien: Link }[];
-  titreEtapes: string;
-  etapes: readonly { titre: string; corps: string }[];
 }
 
 export interface LogicielDemoContent {
@@ -912,7 +910,7 @@ export interface HomeContent {
   hero: HeroContent;
   /** Démonstration du logiciel métier, en section noire. */
   logiciel?: LogicielDemoContent;
-  /** Les trois moyens de rendre du temps et le déroulé. */
+  /** Les trois moyens de rendre du temps. */
   moyens: MoyensContent;
   showreel: ShowreelContent;
   about: HomeAboutSection;
@@ -1146,8 +1144,7 @@ export interface UiLabels {
      *
      * Il vit ici et non dans chaque entrée de `services.ts` pour que
      * l'uniformité soit structurelle : une ligne ne peut pas dériver toute
-     * seule vers « Rendez-vous à 3 000 € », qui se lirait comme un prix arrêté
-     * pour le projet alors que ce n'est qu'un plancher de périmètre.
+     * seule vers un montant, alors que le prix se fixe au devis.
      */
     rdvLabel: string;
     /** Préfixe du nom accessible, complété par le nom de la prestation. */

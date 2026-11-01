@@ -4,7 +4,6 @@ import {
   PREAVIS_MINIMAL_MS,
   validerReservation,
 } from "./validation.ts";
-import { prestation } from "../../content/offre.ts";
 
 /**
  * UNE RÉSERVATION N'EST PAS UN E-MAIL DE PLUS. Elle pose un événement dans
@@ -24,7 +23,7 @@ function valider(surcharge = {}) {
       debut: new Date(MAINTENANT + 48 * 3600 * 1000).toISOString(),
       nom: "Camille Renard",
       email: "camille@exemple.fr",
-      budget: "6000-12000",
+      budget: "5000-10000",
       objectif: "tableur",
       debutMs: DEBUT_HUMAIN,
       ...surcharge,
@@ -77,7 +76,7 @@ describe("validerReservation — le type", () => {
         debut: new Date(MAINTENANT + 48 * 3600 * 1000).toISOString(),
         nom: "Camille Renard",
         email: "camille@exemple.fr",
-        budget: "6000-12000",
+        budget: "5000-10000",
         objectif: "tableur",
         debutMs: DEBUT_HUMAIN,
       },
@@ -196,7 +195,7 @@ describe("validerReservation — le questionnaire", () => {
   it("garde les trois réponses, échéance comprise", () => {
     const resultat = valider({ echeance: "trimestre" });
     expect(resultat.ok).toBe(true);
-    expect(resultat.reservation.budget).toBe("6000-12000");
+    expect(resultat.reservation.budget).toBe("5000-10000");
     expect(resultat.reservation.objectif).toBe("tableur");
     expect(resultat.reservation.echeance).toBe("trimestre");
   });
@@ -219,12 +218,14 @@ describe("validerReservation — le questionnaire", () => {
     });
   });
 
-  it("rattache une tranche des anciens forfaits et de l'ancien plancher à la tranche actuelle", () => {
-    expect(valider({ budget: "4800-7200" }).reservation.budget).toBe("moins-6000");
-    expect(valider({ budget: "3000-6000" }).reservation.budget).toBe("moins-6000");
-    expect(valider({ budget: "plus-7200" }).reservation.budget).toBe("6000-12000");
-    expect(valider({ budget: "7000-14000" }).reservation.budget).toBe("6000-12000");
-    expect(valider({ budget: "plus-14000" }).reservation.budget).toBe("12000-24000");
+  it("rattache une tranche retirée à la tranche actuelle", () => {
+    expect(valider({ budget: "4800-7200" }).reservation.budget).toBe("moins-5000");
+    expect(valider({ budget: "3000-6000" }).reservation.budget).toBe("moins-5000");
+    expect(valider({ budget: "moins-6000" }).reservation.budget).toBe("moins-5000");
+    expect(valider({ budget: "plus-7200" }).reservation.budget).toBe("5000-10000");
+    expect(valider({ budget: "6000-12000" }).reservation.budget).toBe("5000-10000");
+    expect(valider({ budget: "7000-14000" }).reservation.budget).toBe("5000-10000");
+    expect(valider({ budget: "plus-14000" }).reservation.budget).toBe("10000-25000");
   });
 
   it("accepte « je ne sais pas encore » comme budget", () => {
@@ -256,13 +257,10 @@ describe("validerReservation — le questionnaire", () => {
     expect(valider({ budget: 3000 }).motif.raison).toBe("requis");
   });
 
-  it("lit les tranches du type réellement demandé", () => {
-    // Deux et quatre fois le plancher du logiciel, lu dans `offre.ts` pour
-    // suivre un plancher qui bouge.
-    const plancher = prestation("logiciel").plancher;
+  it("accepte une tranche actuelle sur le sujet « decouverte »", () => {
     const resultat = valider({
       type: "decouverte",
-      budget: `${plancher * 2}-${plancher * 4}`,
+      budget: "10000-25000",
       objectif: "conseil",
     });
     expect(resultat.ok).toBe(true);

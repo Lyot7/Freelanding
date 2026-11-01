@@ -287,14 +287,14 @@ describe("validerSoumission — questionnaire de /contact", () => {
     expect(resultat.motif.champ).toBe("budget");
   });
 
-  it("rattache une tranche du logiciel à 6 000 € à la tranche actuelle", () => {
-    // Un onglet ouvert avant le 2026-10-31 propose encore les tranches du
-    // logiciel calculées sur 3 500 € : son message doit passer.
+  it("rattache une tranche retirée à la tranche actuelle", () => {
+    // Un onglet ouvert avant un changement de tranches les propose encore :
+    // son message doit passer.
     const resultat = valider(
       soumissionProjet({ typeProjet: TYPES[0], budget: "7000-14000", objectif: "tableur" }),
     );
     expect(resultat.ok).toBe(true);
-    const attendue = tranchesBudget("logiciel").find(
+    const attendue = tranchesBudget().find(
       (t) => t.bas !== undefined && t.bas <= 7000 && (t.haut === undefined || 7000 < t.haut),
     );
     expect(resultat.soumission.budget).toBe(attendue.libelle);

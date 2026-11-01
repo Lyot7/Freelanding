@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { euros, prestation, prixPlancher } from "./offre.ts";
+import { euros, prestation } from "./offre.ts";
 import { cheminSecteur, pagesSecteur } from "./pages-secteur.ts";
 import { contentRoutes } from "./routes.ts";
 import { pagesHub } from "./metiers.ts";
@@ -141,15 +141,15 @@ describe("les pages secteur ne promettent que ce qui est vrai", () => {
     }
   });
 
-  test("la réponse directe en tête donne le plancher lu dans offre.ts", () => {
+  test("la réponse directe en tête renvoie au devis", () => {
     for (const page of pagesSecteur) {
-      expect(page.resume).toContain(prixPlancher(LOGICIEL));
+      expect(page.resume).toMatch(/au devis/u);
     }
   });
 
-  test("aucun forfait ni fourchette : le plancher, puis le devis", () => {
-    // Paliers supprimés le 2026-10-05. Chaque page cite le plancher dans sa
-    // FAQ et renvoie au devis, sans nom de forfait ni borne haute.
+  test("aucun forfait ni fourchette : le devis seul", () => {
+    // Paliers supprimés le 2026-10-05, plancher le 2026-11-01. Chaque page
+    // renvoie au devis, sans nom de forfait ni borne.
     for (const page of pagesSecteur) {
       const tout = textes(page).join("\n");
       expect(tout).toMatch(/devis/u);

@@ -143,6 +143,10 @@ Quatre pistes maquettées et capturées avant le code. `emil-design-eng` : la va
 
 Piste 2, choisie par Eliott. `emil-design-eng` : le volt monte en `scaleY` depuis le bas, décalé de 70 ms par jour, coupé en mouvement réduit. `impeccable` : un agenda plutôt qu'un graphique, le gain se voit en cases avant de se lire en chiffres.
 
+## Prix sur devis et option référent (2026-11-01)
+
+`impeccable` : l'accueil se suffit, le sous-titre dit ce qui est fait et la troisième ligne des moyens reste une option, sans étapes. Le déroulé part sur `/services/automatisation`. La page logiciel gagne « Comment se passe une mission », numérotée parce que les étapes se suivent.
+
 ## Ce qui n'a pas été changé, et pourquoi
 
 - La police Geist et la palette volt sur noir : identité installée du site.

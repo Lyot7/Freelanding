@@ -15,7 +15,7 @@
  * (`page-automatisation.ts`) chiffre des tâches de bureau ; celle-ci part des
  * métiers du territoire, sans reprendre un seul de ses paragraphes.
  */
-import { aPartirDe, prestation, prixPlancher } from "./offre";
+import { prestation } from "./offre";
 import { CHEMIN_PAGE_LOGICIEL_CAEN } from "./page-caen";
 import { CHEMIN_AUTOMATISATION, CHEMIN_IA_CAEN, type PageTheme } from "./page-theme";
 
@@ -26,10 +26,10 @@ export const pageIaCaen: PageTheme = {
   chemin: CHEMIN_IA_CAEN,
   seo: {
     titre: "Automatisation et IA à Caen · Eliott Bouquerel",
-    description: `Automatisation et IA pour les PME de Caen et de Normandie : je choisis la tâche, je code l’outil et je le branche sur vos logiciels, ${aPartirDe(LOGICIEL, " HT")}.`,
+    description: `Automatisation et IA pour les PME de Caen et de Normandie : je choisis la tâche, je code l’outil et je le branche sur vos logiciels, prix fixé au devis.`,
   },
   h1: "Automatisation et IA à Caen",
-  resume: `Basé à Caen, j’installe l’IA dans les outils des PME du Calvados, de la Manche et de l’Orne. Je choisis la tâche avec vous, je code l’automatisation et je la branche moi-même sur vos logiciels. Rendez-vous en visio, ${aPartirDe(LOGICIEL, " HT")} pour un premier usage.`,
+  resume: `Basé à Caen, j’installe l’IA dans les outils des PME du Calvados, de la Manche et de l’Orne. Je choisis la tâche avec vous, je code l’automatisation et je la branche moi-même sur vos logiciels. Rendez-vous en visio, prix fixé au devis.`,
   prestation: "logiciel",
   offre: LOGICIEL,
   zones: {
@@ -130,14 +130,14 @@ export const pageIaCaen: PageTheme = {
       ],
     },
   ],
-  titreOffre: "Prix d’une automatisation IA à Caen",
+  titreOffre: "Une automatisation IA à Caen, sur devis",
   faq: {
     eyebrow: "FAQ",
     titleLines: ["L’IA à Caen", "et en Normandie."],
     items: [
       {
         question: "Combien coûte une automatisation IA pour une PME caennaise ?",
-        answer: `Un premier usage démarre à ${prixPlancher(LOGICIEL)} HT, branché sur un outil que vous utilisez déjà. Le prix suit le nombre d’usages et d’outils à relier, et se fixe au devis. Être à Caen ne change pas le calcul.`,
+        answer: `Le prix suit le nombre d’usages et d’outils à relier, et se fixe au devis. Être à Caen ne change pas le calcul.`,
       },
       {
         question: "Vous déplacez-vous dans nos locaux ?",

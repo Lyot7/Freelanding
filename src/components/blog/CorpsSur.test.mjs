@@ -51,9 +51,10 @@ describe("CorpsSur : un texte qui n'a pas été relu reste du texte", () => {
     expect(sortie).toContain("logo");
   });
 
-  it("rend le prix d'une offre connue, et laisse une offre inconnue en clair", () => {
-    expect(rendu('Comptez <Prix offre="logiciel" />.')).toContain("€");
-    expect(rendu('Comptez <Prix offre="logiciel" suivi />.')).toContain("par mois");
+  it("rend « sur devis » pour une offre connue, et laisse une offre inconnue en clair", () => {
+    expect(rendu('Comptez <Prix offre="logiciel" />.')).toContain("sur devis");
+    expect(rendu('Comptez <Prix offre="logiciel" suivi />.')).toContain("sur devis");
+    expect(rendu('Comptez <Prix offre="logiciel" />.')).not.toContain("€");
     expect(rendu('Comptez <Prix offre="inconnue" />.')).toContain("&lt;Prix offre=&quot;inconnue&quot; /&gt;");
   });
 

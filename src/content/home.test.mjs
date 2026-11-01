@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { duree, homeContent } from "./home.ts";
 import { siteConfig } from "./site.ts";
 import { uiLabels } from "./ui.ts";
-import { euros, prestation, prixPlancher, repereAgenceLogiciel } from "./offre.ts";
+import { euros, repereAgenceLogiciel, SUR_DEVIS } from "./offre.ts";
 
 /**
  * L'ACCUEIL, ce que la relecture d'écran ne garde pas.
@@ -58,10 +58,9 @@ describe("accueil", () => {
     // Du premier outil à la médiane d'un projet, décision d'Eliott du 2026-11-01.
     expect(agence?.prix).toContain(euros(repereAgenceLogiciel.premierOutilMin).replace(/\s€$/u, ""));
     expect(agence?.prix).toContain(euros(repereAgenceLogiciel.mediane));
-    expect(moi?.prix).toContain(prixPlancher(prestation("logiciel")));
+    expect(moi?.prix).toBe(SUR_DEVIS);
     expect(moi?.fort).toBe(true);
     expect(comparaison?.source.href).toBe(repereAgenceLogiciel.source.href);
-    expect(prestation("logiciel").plancher).toBeLessThan(repereAgenceLogiciel.premierOutilMin);
   });
 
   test("la bande des logos ne porte aucun intitulé qui en ferait des clients", () => {
@@ -85,9 +84,11 @@ describe("accueil", () => {
 
   test("trois moyens rendent le temps, sans aucun nom de prospect", () => {
     const { moyens } = homeContent;
-    expect(moyens.lignes.map((l) => l.lien.href)).toContain("/services/logiciel-metier");
+    expect(moyens.lignes.map((l) => l.lien.href)).toContain("/services/automatisation#referent");
     expect(moyens.lignes).toHaveLength(3);
-    expect(moyens.etapes).toHaveLength(4);
+    expect(moyens.lignes.at(-1).corps).toContain("ponctuelles");
+    const { hero, logiciel, whyUs } = homeContent;
+    expect(JSON.stringify({ hero, logiciel, moyens, whyUs })).not.toContain("/services/logiciel-metier");
     expect(JSON.stringify(moyens).toLowerCase()).not.toContain("sitpo");
   });
 
@@ -120,12 +121,12 @@ describe("accueil", () => {
     expect(duree(65)).toBe("1\u00A0h\u00A005");
   });
 
-  test("le titre du héros est une seule porte, vers l'offre unique", () => {
+  test("le titre du héros est une seule porte, vers les trois moyens", () => {
     const portes = homeContent.hero.doors ?? [];
-    expect(portes.map((porte) => porte.href)).toEqual(["/services/logiciel-metier"]);
+    expect(portes.map((porte) => porte.href)).toEqual(["#moyens"]);
     expect(homeContent.hero.title).toBe("Je vous rends des heures.");
     expect(homeContent.hero.titleLines?.join(" ")).toBe(homeContent.hero.title);
-    expect(portes[0]?.price).toContain(prixPlancher(prestation("logiciel")));
+    expect(portes[0]?.price).toBe("Sur devis");
     expect(homeContent.about.title).not.toBe(homeContent.hero.title);
     expect(homeContent.about.titleLines?.join(" ")).toBe(homeContent.about.title);
   });

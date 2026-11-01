@@ -7,7 +7,7 @@
  * est qu'une chaîne dans un composant échappe au correcteur typographique
  * français, la seconde est qu'on ne relit pas une offre en ouvrant du JSX.
  *
- * CE QUI NE FIGURE PAS ICI : les prix et les périmètres. Ils vivent dans
+ * CE QUI NE FIGURE PAS ICI : les périmètres. Ils vivent dans
  * `offre.ts`, seule source des montants.
  */
 import type { Prestation, PrestationId } from "./offre";
@@ -107,30 +107,52 @@ export const servicePageLabels = {
     separateur: "›",
   },
 
-  /** Chapô du prix, en tête de page : le plancher, et où le prix se fixe. */
-  chapoPrix: (plancher: string) => `À partir de ${plancher}, prix fixé au devis`,
-
-  /** Suffixe des montants. Toujours séparé du chiffre : jamais « 5 000 €HT ». */
-  horsTaxes: "HT",
+  /** Chapô du prix, en tête de page : où le prix se fixe. */
+  chapoPrix: "Prix sur devis",
 
   /** Titre de la section de l'offre. */
   titreOffre: "Ce qui est compris, ce qui fait varier le prix",
 
-  /** Amorce de la liste de ce que comprend le plancher. */
-  inclus: "Compris dès le plancher",
+  /** Amorce de la liste de ce que comprend chaque projet. */
+  inclus: "Compris dans chaque projet",
 
-  /** Amorce de la liste de ce qui fait monter le prix. */
-  faitMonter: "Ce qui fait monter le prix",
+  /** Amorce de la liste de ce qui fait varier le prix. */
+  faitMonter: "Ce qui fait varier le prix",
 
   /** En vis-à-vis du titre de l'offre : comment on paie, et que le prix tient. */
   reassurance:
-    "Le prix est fixé au devis et ne bouge plus. Vous le réglez selon un échéancier étalé jusqu’à la livraison, écrit au devis. Le code et l’hébergement sont à votre nom.",
+    "Le prix dépend du projet : je le fixe au devis, avant de commencer, et il ne bouge plus. Vous le réglez selon un échéancier étalé jusqu’à la livraison, écrit au devis. Le code et l’hébergement sont à votre nom.",
 
   /** Bouton de l'offre, vers l'ancre `#rendez-vous` de la page. */
   cta: RESERVER_UN_APPEL,
 
-  /** Amorce du plancher. */
-  aPartirDe: "À partir de",
+  /** Le prix de l'offre, en tête de sa moitié gauche. */
+  prixOffre: "Sur devis",
+
+  /** Comment se passe une mission : la page pilier sert à ça, l'accueil n'en parle pas. */
+  mission: {
+    titre: "Comment se passe une mission",
+    intro:
+      "La plupart de mes missions sont ponctuelles : une tâche à faire disparaître, un outil, une date de mise en service.",
+    etapes: [
+      {
+        titre: "Vous décrivez la tâche",
+        corps: "Un appel, vos exemples de documents, et ce que vous voulez obtenir. Je vous dis si un logiciel du marché suffit.",
+      },
+      {
+        titre: "Je vous remets un devis",
+        corps: "Le périmètre, le prix et la date, écrits avant que vous signiez. Le prix ne bouge plus ensuite.",
+      },
+      {
+        titre: "Je construis, vous suivez",
+        corps: "Vous voyez le logiciel avancer sur une adresse en ligne, et vous le corrigez avec vos cas réels.",
+      },
+      {
+        titre: "Je le mets en service",
+        corps: "Vos données reprises, votre équipe prise en main. Le code et l’hébergement sont à votre nom.",
+      },
+    ],
+  },
 
   /**
    * LE BLOC « SUR DEVIS » : ce qui sort de l'offre (`horsOffre` de la

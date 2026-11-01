@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { euros, prestation, prixPlancher, repereAgenceLogiciel } from "./offre.ts";
+import { euros, prestation, repereAgenceLogiciel } from "./offre.ts";
 import { CHEMIN_PAGE_LOGICIEL_CAEN } from "./page-caen.ts";
 import { lienVersPageLogicielCaen, pageLogicielCaen } from "./page-logiciel-caen.ts";
 import { pagesSecteur } from "./pages-secteur.ts";
@@ -142,17 +142,17 @@ describe("la page du logiciel à Caen ne promet que ce qui est vrai", () => {
     }
   });
 
-  test("le repère d'agence garde le plancher à côté, avec sa source et sa date", () => {
+  test("le repère d'agence se cite avec sa source et sa date, et mon prix au devis", () => {
     const reponse = page.faq.items.find((i) => /Combien coûte/u.test(i.question))?.answer;
-    expect(reponse).toContain(prixPlancher(LOGICIEL));
+    expect(reponse).toMatch(/devis/u);
     expect(reponse).toContain(euros(repereAgenceLogiciel.premierOutilMin));
     expect(reponse).toContain(repereAgenceLogiciel.source.nom);
     expect(reponse).toContain(repereAgenceLogiciel.source.releve);
   });
 
-  test("la réponse directe et la FAQ donnent le plancher lu dans offre.ts, sans forfait", () => {
-    expect(page.resume).toContain(prixPlancher(LOGICIEL));
-    expect(page.faq.items[0].answer).toContain(prixPlancher(LOGICIEL));
+  test("la réponse directe et la FAQ renvoient au devis, sans forfait", () => {
+    expect(page.resume).toMatch(/devis/u);
+    expect(page.faq.items[0].answer).toMatch(/devis/u);
     for (const texte of textes()) {
       expect(/\bforfaits?\b|\bpaliers?\b/iu.test(texte), texte).toBe(false);
       expect(/de \d[\d\u00A0\u202F ]*\u20AC à \d/u.test(texte), texte).toBe(false);

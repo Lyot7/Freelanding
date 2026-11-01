@@ -2,7 +2,7 @@ import type { HeroComparaison, HomeContent } from "@/lib/content/types";
 import { slugsMisEnAvant } from "@/content/blog";
 import { faqItems } from "@/content/faq";
 import { services } from "@/content/services";
-import { euros, prestation, prixPlancher, repereAgenceLogiciel } from "@/content/offre";
+import { euros, prestation, repereAgenceLogiciel, SUR_DEVIS } from "@/content/offre";
 import { TACHES_BUREAU } from "@/content/page-automatisation";
 import { lienRendezVous } from "@/content/rendez-vous";
 import { howWeDoItStats, reputationStats } from "@/content/stats";
@@ -25,7 +25,6 @@ export function duree(minutes: number): string {
   if (reliquat === 0) return `${heures}\u00A0h`;
   return `${heures}\u00A0h\u00A0${String(reliquat).padStart(2, "0")}`;
 }
-const ENTREE_LOGICIEL = prixPlancher(LOGICIEL);
 
 const minutesDe = (...indices: readonly number[]): number =>
   indices.reduce((total, i) => total + TACHES_BUREAU[i].minutes, 0);
@@ -70,8 +69,8 @@ const POSITIONNEMENT = "Une fraction de ce qu’une agence facture.";
 const PORTES = [
   {
     lines: ["Je vous rends", "des heures."],
-    href: `/services/${LOGICIEL.slug}`,
-    price: `dès ${ENTREE_LOGICIEL} HT`,
+    href: "#moyens",
+    price: "Sur devis",
   },
 ] as const;
 
@@ -79,11 +78,11 @@ const TITRE_ACCUEIL = PORTES.map((porte) => porte.lines.join(" ")).join(" ");
 
 /** Le message d'Eliott, sous le titre. */
 const CE_QUI_DISPARAIT =
-  "La tâche qui vous bloque disparaît. L’IA fait le sale boulot, le recopiage et les factures, et votre équipe revient à ce qui la rend indispensable.";
+  "Je construis votre logiciel sur mesure et j’installe l’IA dans vos outils. La tâche qui vous bloque disparaît, et votre équipe revient à ce qui la rend indispensable.";
 
 /*
- * LE PRIX D'UNE AGENCE ET LE MIEN, POUR LE MÊME LIVRABLE, décision d'Eliott du
- * 2026-10-16 : un premier outil, des deux côtés. Chiffres et source :
+ * CE QU'UNE AGENCE FACTURE, ET LE MIEN SUR DEVIS (décision d'Eliott du
+ * 2026-11-01 : aucun montant de sa part). Chiffres et source :
  * `repereAgenceLogiciel`.
  */
 function comparaisonAgence(): HeroComparaison {
@@ -95,7 +94,7 @@ function comparaisonAgence(): HeroComparaison {
         qui: "En agence",
         prix: `${euros(agence.premierOutilMin).replace(/\s€$/u, "")} à ${euros(agence.mediane)}`,
       },
-      { qui: "Avec moi", prix: `dès ${ENTREE_LOGICIEL}`, fort: true },
+      { qui: "Avec moi", prix: SUR_DEVIS, fort: true },
     ],
     source: {
       label: `${agence.source.nom}, ${agence.source.releve}`,
@@ -120,12 +119,12 @@ export const homeContent: HomeContent = {
     titleLines: PORTES.map((porte) => porte.lines.join(" ")),
     doors: PORTES,
     /* Test des visiteurs du 2026-10-31 : une porte pour qui n'est pas prêt à appeler. */
-    offerLink: { label: "Voir l’offre et le prix", href: `/services/${LOGICIEL.slug}` },
+    offerLink: { label: "Voir comment", href: "#moyens" },
     subtitle: CE_QUI_DISPARAIT,
     subtitleParagraphs: [{ text: CE_QUI_DISPARAIT }],
     /*
      * UNE SEULE PREUVE DANS LE PREMIER ÉCRAN depuis le 2026-10-16 : le prix
-     * d'une agence et le mien, pour le même livrable. Le −92 % de Würth est
+     * d'une agence, à côté du mien sur devis. Le −92 % de Würth est
      * sorti du héros, décision d'Eliott ; il reste dans la section chiffres.
      */
     comparison: comparaisonAgence(),
@@ -211,22 +210,16 @@ export const homeContent: HomeContent = {
       },
       {
         titre: "Construire le logiciel qui manque",
-        corps: `Votre façon de travailler n’entre dans aucun outil du marché : je le construis, et il vous appartient. Dès ${ENTREE_LOGICIEL} HT.`,
-        lien: { label: "Voir l’offre et le prix", href: `/services/${LOGICIEL.slug}` },
+        corps:
+          "Votre façon de travailler n’entre dans aucun outil du marché : je le construis, et il vous appartient. Le prix se fixe au devis.",
+        lien: { label: "En parler", href: lienRendezVous("logiciel") },
       },
       {
-        titre: "Vous accompagner dans la durée",
+        titre: "Si besoin, devenir votre référent",
         corps:
-          "Une réunion par mois pour choisir la prochaine tâche à faire disparaître, et savoir où l’IA n’a rien à faire.",
-        lien: { label: "En parler", href: lienRendezVous("decouverte") },
+          "Mes missions sont le plus souvent ponctuelles. Certaines entreprises préfèrent un interlocuteur régulier : je deviens alors leur référent IA ou développement, voire leur recherche et développement.",
+        lien: { label: "Voir cette option", href: "/services/automatisation#referent" },
       },
-    ],
-    titreEtapes: "Comment ça se passe",
-    etapes: [
-      { titre: "Vous notez", corps: "Pendant trois ou quatre semaines, votre équipe note ce qui lui fait perdre du temps." },
-      { titre: "Je trie", corps: "Chaque corvée reçoit son remède : un outil d’IA, un logiciel, ou rien du tout." },
-      { titre: "On traite", corps: "On commence par la tâche qui rend le plus d’heures, et vous mesurez le gain." },
-      { titre: "On continue", corps: "Chaque mois, on choisit la suivante, à votre rythme." },
     ],
   },
 

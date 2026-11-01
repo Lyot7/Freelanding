@@ -229,19 +229,19 @@ export function validerSoumission(
   const idRendezVous = rendezVousDuTypeProjet(typeProjet);
   const reponses: { budget?: string; objectif?: string; echeance?: string } = {};
   const questions: readonly [keyof typeof reponses, readonly OptionQuestion[]][] = [
-    ["budget", tranchesBudget(idRendezVous)],
+    ["budget", tranchesBudget()],
     ["objectif", optionsObjectif(idRendezVous)],
     ["echeance", OPTIONS_ECHEANCE],
   ];
   for (const [champ, options] of questions) {
     const brut = normaliserLigne(lireChaine(champs, champ) ?? "");
     if (brut.length === 0) continue;
-    // Une tranche publiée avant un changement de plancher, envoyée par un
+    // Une tranche publiée avant un changement de bornes, envoyée par un
     // onglet resté ouvert, se rattache à la tranche actuelle, comme à la
     // prise de rendez-vous : la refuser ferait perdre le message.
     const id =
       champ === "budget"
-        ? rattacherTranche(idRendezVous, brut)
+        ? rattacherTranche(brut)
         : champ === "objectif"
           ? rattacherObjectif(brut)
           : brut;

@@ -14,7 +14,6 @@ import {
   TONS,
   type Ton,
 } from "@/components/pages/services/ServicePage";
-import { prixAffiche } from "@/content/offre";
 import type {
   BlocChiffres,
   BlocEtapes,
@@ -98,6 +97,7 @@ function Enveloppe({
 }) {
   return (
     <section
+      id={id}
       data-section={`theme-${id}`}
       className={`relative px-[20px] py-[60px] tablet:px-[24px] tablet:py-[90px] desktop:px-[30px] ${TONS[ton].section}`}
     >
@@ -339,9 +339,7 @@ export function PageTheme({
               {page.resume}
             </p>
             <p className="text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-white/50 tablet:col-start-2 tablet:row-start-3 tablet:pl-[30px] desktop:pl-[40px]">
-              {servicePageLabels.chapoPrix(
-                prixAffiche(page.offre, ` ${servicePageLabels.horsTaxes}`),
-              )}
+              {servicePageLabels.chapoPrix}
             </p>
           </div>
         </section>

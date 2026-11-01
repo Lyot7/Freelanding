@@ -3,21 +3,18 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
-  aPartirDe,
   euros,
   prestation,
   prestations,
-  prixPlancher,
-  plancherSuivi,
+  PRIX_AU_DEVIS,
   repereAgenceLogiciel,
-  suiviMensuel,
-  suiviMensuelHT,
-  tauxSuivi,
+  SUR_DEVIS,
 } from "./offre.ts";
 import { services } from "./services.ts";
 import { lienDevis } from "./tarifs.ts";
 import { contentRoutes as routesTarifs } from "./routes.ts";
 import { faqItems } from "./faq.ts";
+import { homeContent } from "./home.ts";
 import { uiLabels } from "./ui.ts";
 import { contentRoutes } from "./routes.ts";
 import {
@@ -31,17 +28,11 @@ import {
 const OFFRES = [...prestations];
 
 /**
- * L'OFFRE N'ANNONCE QU'UN PRIX PAR PRESTATION, SON PLANCHER, ET CE PRIX NE
- * S'ÉCRIT QU'À UN ENDROIT.
+ * AUCUN PRIX D'ELIOTT SUR LE SITE, décision du 2026-11-01 : « les prix c'est
+ * uniquement sur devis ». Ces tests figeaient un plancher « à partir de » écrit
+ * à un seul endroit ; ils gardent maintenant son absence.
  *
- * CE QUI EST ARRIVÉ SANS CE TEST. L'accordéon des services annonçait « à partir
- * de 5 000 € » pour l'outil métier pendant que la grille comparative affichait
- * « 5 000 à 15 000 € » pour la même prestation, à deux écrans d'intervalle. Rien
- * ne le signalait : deux fichiers, deux chaînes de caractères, aucun lien.
- *
- * Depuis le 2026-10-05, décision d'Eliott : un plancher « à partir de » par
- * offre, tout le reste sur devis. Les paliers à prix ferme du 2026-09-23 sont
- * supprimés.
+ * Les paliers à prix ferme du 2026-09-23 sont supprimés depuis le 2026-10-05.
  */
 
 /** Les noms des neuf paliers supprimés le 2026-10-05. */
@@ -58,7 +49,7 @@ const PALIERS_SUPPRIMES = [
   "L’Automatisation",
 ];
 
-describe("un plancher par offre, écrit une seule fois", () => {
+describe("l'offre ne porte aucun montant", () => {
   test("une seule prestation, le logiciel métier, au slug unique", () => {
     // Décision d'Eliott du 2026-10-30, appliquée le 2026-10-31 : une seule
     // offre. Le site vitrine, l'intégration IA et le CTO n'existent plus.
@@ -68,12 +59,9 @@ describe("un plancher par offre, écrit une seule fois", () => {
     expect(new Set(slugs).size).toBe(slugs.length);
   });
 
-  test("le plancher arrêté par Eliott", () => {
-    // Montant de décision, pas de calcul : le figer ici fait échouer toute
-    // modification involontaire, et oblige une modification voulue à passer
-    // par ce test. Le plancher revient à 6 000 € le 2026-10-31, celui de la
-    // grille et des mails (le site affichait 3 500 € depuis le 2026-10-16).
-    expect(prestation("logiciel").plancher).toBe(6000);
+  test("aucune offre ne porte de plancher", () => {
+    // Décision d'Eliott du 2026-11-01 : le prix se fixe au devis.
+    for (const offre of OFFRES) expect("plancher" in offre, offre.nom).toBe(false);
   });
 
   test("les anciennes offres ne sont plus exportées", () => {
@@ -82,7 +70,7 @@ describe("un plancher par offre, écrit une seule fois", () => {
     const source = readFileSync(fileURLToPath(new URL("./offre.ts", import.meta.url)), "utf8")
       .replace(/\/\*[\s\S]*?\*\//g, " ")
       .replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
-    for (const nom of ["integrationIA", "ctoReferentIA", "CTO_QUATRE_JOURS", "repereAgenceSite", "PERIODES"]) {
+    for (const nom of ["integrationIA", "ctoReferentIA", "CTO_QUATRE_JOURS", "repereAgenceSite", "PERIODES", "prixPlancher", "prixAffiche", "aPartirDe", "plancherSuivi", "tauxSuivi", "TAUX_SUIVI", "PLANCHER_SUIVI", "suiviMensuel"]) {
       expect(source, `« ${nom} » est revenu dans offre.ts`).not.toContain(nom);
     }
     expect(() => prestation("vitrine")).toThrow();
@@ -91,46 +79,27 @@ describe("un plancher par offre, écrit une seule fois", () => {
   test("le projet est payé une fois : aucune offre n'est mensuelle", () => {
     for (const offre of OFFRES) {
       expect(offre.periode, `« ${offre.nom} » est un projet, payé une fois`).toBeUndefined();
-      expect(aPartirDe(offre)).not.toMatch(/par mois/u);
     }
   });
 
-  test("le suivi suit la règle du logiciel : 18 % par an, 125 € au minimum, aux 5 € supérieurs", () => {
-    expect(tauxSuivi()).toBe("18\u202F%");
-    expect(plancherSuivi()).toBe(euros(125));
-    // 6 000 € x 18 % / 12 = 90 € : le plancher de 125 € mord.
-    expect(suiviMensuelHT(6000)).toBe(125);
-    // 12 000 € x 18 % / 12 = 180 €, déjà un multiple de 5.
-    expect(suiviMensuelHT(12000)).toBe(180);
-    // 13 000 € x 18 % / 12 = 195 € ; 13 500 € donne 202,5 € arrondi à 203 puis à 205 €.
-    expect(suiviMensuelHT(13000)).toBe(195);
-    expect(suiviMensuelHT(13500)).toBe(205);
-  });
-
-  test("le logiciel reste moins cher qu'un premier outil en agence, à livrable égal", () => {
-    // Le plancher couvre un premier outil : il se compare au premier outil
-    // d'une agence (8 000 à 10 000 €), jamais à leur médiane.
-    expect(prestation("logiciel").plancher).toBeLessThan(repereAgenceLogiciel.premierOutilMin);
+  test("les repères d'agence restent ordonnés, source comprise", () => {
     expect(repereAgenceLogiciel.premierOutilMin).toBeLessThan(repereAgenceLogiciel.premierOutilMax);
     expect(repereAgenceLogiciel.premierOutilMax).toBeLessThan(repereAgenceLogiciel.mediane);
+    expect(repereAgenceLogiciel.source.nom).toBe("La Fabrique du Net");
   });
 
   test("plus aucun palier : ni forfaits, ni prix ferme par forfait, ni délai", () => {
     for (const offre of OFFRES) {
-      expect(Number.isInteger(offre.plancher) && offre.plancher > 0).toBe(true);
       for (const champ of ["packs", "delai", "prix", "surMesure"]) {
         expect(champ in offre, `« ${offre.nom} » porte encore « ${champ} »`).toBe(false);
       }
     }
   });
 
-  test("le prix affiché est le plancher, formaté, précédé de « à partir de »", () => {
-    for (const offre of prestations) {
-      expect(prixPlancher(offre)).toBe(euros(offre.plancher));
-      expect(aPartirDe(offre)).toBe(`à partir de ${euros(offre.plancher)}`);
-    }
-    // La taxe se place derrière le montant.
-    expect(aPartirDe(prestation("logiciel"), " HT")).toMatch(/\u20AC HT$/u);
+  test("la phrase du prix ne porte aucun chiffre", () => {
+    expect(SUR_DEVIS).toBe("sur devis");
+    expect(PRIX_AU_DEVIS).toMatch(/devis/u);
+    expect(PRIX_AU_DEVIS).not.toMatch(/\d/u);
   });
 
   test("chaque offre dit ce qui est compris et ce qui fait monter le prix", () => {
@@ -168,8 +137,7 @@ describe("un plancher par offre, écrit une seule fois", () => {
  */
 /**
  * PLUS AUCUN TAUX JOURNALIER SUR LE SITE, même pour le critiquer (décision
- * d'Eliott du 2026-10-15). Le site parle de prix « à partir de » et de devis :
- * un TJM, même cité en repoussoir, ramène le lecteur à un prix au temps passé.
+ * d'Eliott du 2026-10-15). Le site parle de devis : un TJM, même cité en repoussoir, ramène le lecteur à un prix au temps passé.
  * Le test lit les sources de `src/content`, commentaires retirés.
  */
 describe("aucun taux journalier dans src/content", () => {
@@ -219,14 +187,12 @@ describe("l'offre et la FAQ vouvoient", () => {
 
   test("la réponse prix de la FAQ cite le repère d'agence, sa source et sa date", () => {
     const reponse = faqItems.find((f) => /Combien coûte un projet/u.test(f.question))?.answer;
-    // À livrable égal : le premier outil d'une agence contre mon plancher,
-    // jamais mon plancher contre leur médiane.
+    // À livrable égal : le premier outil d'une agence, jamais sa médiane.
     expect(reponse).toContain(euros(repereAgenceLogiciel.premierOutilMin));
     expect(reponse).toContain(euros(repereAgenceLogiciel.premierOutilMax));
     expect(reponse).not.toContain("médiane");
     expect(reponse).toContain(repereAgenceLogiciel.source.nom);
     expect(reponse).toContain(repereAgenceLogiciel.source.releve);
-    expect(prestation("logiciel").plancher).toBeLessThan(repereAgenceLogiciel.premierOutilMin);
   });
 });
 
@@ -254,20 +220,16 @@ describe("aucun nom de palier ne reste dans src/", () => {
   });
 });
 
-describe("le site annonce le même prix que le module", () => {
-  test("l'accordéon reprend le plancher calculé, jamais une copie", () => {
-    // L'EN-TÊTE A PORTÉ UNE FOURCHETTE du 2026-09-02 au 2026-10-05. Il revient
-    // au plancher avec la suppression des paliers. Ce qui ne change pas : le
-    // montant reste CALCULÉ, jamais recopié.
+describe("le site dit « sur devis » partout où il parle de prix", () => {
+  test("l'accordéon annonce « sur devis », sans montant", () => {
     for (const p of OFFRES) {
       const presta = services.find((s) => s.title === p.nom);
       expect(presta, `prestation « ${p.nom} » absente de services.ts`).toBeDefined();
-      expect(presta.price).toBe(aPartirDe(p));
-      expect(presta.price).toContain(prixPlancher(p));
+      expect(presta.price).toBe(SUR_DEVIS);
     }
   });
 
-  test("chaque prestation a une page dédiée, déclarée au manifeste", () => {
+  test("chaque prestation a une page SEO déclarée au manifeste, et À propos n’y mène pas", () => {
     // Une page dédiée absente du manifeste ne serait annoncée à aucun moteur.
     // C'est exactement l'erreur qui avait laissé huit URL mortes et zéro article
     // réel dans le sitemap, découverte le 2026-08-27.
@@ -275,8 +237,7 @@ describe("le site annonce le même prix que le module", () => {
     for (const p of prestations) {
       const attendu = `/services/${p.slug}`;
       expect(chemins, `${attendu} manque au manifeste`).toContain(attendu);
-      const presta = services.find((s) => s.title === p.nom);
-      expect(presta.cta?.href).toBe(attendu);
+      expect(services.find((s) => s.title === p.nom).cta?.href).not.toBe(attendu);
     }
   });
 
@@ -328,44 +289,19 @@ describe("le site annonce le même prix que le module", () => {
     expect([...IDS_RENDEZ_VOUS]).toEqual(["logiciel", "decouverte"]);
   });
 
-  test("le préfixe du prix n'est écrit qu'à un seul endroit", () => {
-    // CE QUI EST ARRIVÉ. Le libellé de l'accordéon portait « Prix : à partir
-    // de » en dur ET la donnée portait son propre préfixe, que le composant
-    // retirait au rendu. Deux préfixes pour un montant : changer l'un des deux
-    // donnait « Prix : à partir de dès 3 000 € », ou « Prix : à partir de sur
-    // devis » sur la prestation qui n'a pas de montant. Les deux ont été servis.
+  test("aucun préfixe de prix ne revient dans le libellé ni dans la donnée", () => {
     expect(uiLabels.services.priceLabel).not.toMatch(/(à partir de|dès|from)\s*$/i);
     for (const s of services) {
-      // Toute ligne de l'accordéon est une prestation chiffrée depuis le
-      // 2026-09-24 : une entrée sans montant n'a plus de raison d'exister.
-      expect(s.price, `« ${s.title} » n'annonce aucun prix`).toBeDefined();
-      // FORME « à partir de X », celle que produit `aPartirDe()`, et une
-      // seule fois : `priceParts()` découpe ce préfixe vers le libellé gris.
-      expect(s.price, `« ${s.title} » doit annoncer son plancher`).toMatch(
-        /^à partir de \d/u,
-      );
-      expect(s.price, `« ${s.title} » ne doit pas doubler le préfixe`).not.toMatch(
-        /à partir de .*(à partir de|dès)/iu,
-      );
-      // Plus de fourchette : une borne haute publiée se lit comme un prix.
-      expect(s.price).not.toMatch(/^de .+ à .+$/u);
+      // Sans montant depuis le 2026-11-01 : le libellé « Prix : » précède
+      // « sur devis », et aucun préfixe de prix ne doit revenir.
+      expect(s.price, `« ${s.title} » doit dire « sur devis »`).toBe(SUR_DEVIS);
+      expect(s.price).not.toMatch(/\d|à partir de|dès/iu);
     }
   });
 
-  test("la FAQ cite les mêmes montants que le module", () => {
-    // La réponse « combien coûte un projet » est le seul endroit où les prix
-    // sont écrits en toutes lettres dans une phrase. Elle dérive donc, sans
-    // rien pour l'en empêcher, sauf ceci.
-    const reponsePrix = faqItems
-      .map((item) => item.answer)
-      .find((a) => /combien|coûte|démarre/i.test(a) && /\d\s?\d{3}/.test(a));
-    expect(reponsePrix).toBeDefined();
-    for (const p of prestations) {
-      expect(
-        reponsePrix,
-        `le montant d'entrée de « ${p.nom} » manque dans la réponse prix de la FAQ`,
-      ).toContain(prixPlancher(p));
-    }
+  test("la réponse prix de la FAQ dit que le prix se fixe au devis", () => {
+    const reponse = faqItems.find((f) => /Combien coûte un projet/u.test(f.question))?.answer;
+    expect(reponse).toContain(PRIX_AU_DEVIS);
   });
 
   test("aucun montant en euros n'est écrit à la main dans la FAQ", () => {
@@ -394,40 +330,17 @@ describe("le site annonce le même prix que le module", () => {
     expect(
       trouves,
       `un montant en euros est écrit à la main dans faq.ts : ${trouves.join(", ")}. ` +
-        "Passer par `prixPlancher(...)`, `plancherSuivi()` ou `suiviMensuel(...)`.",
+        "Aucun prix d'Eliott ne se publie, et un repère de marché vient d'`offre.ts`.",
     ).toEqual([]);
   });
 
-  test("le suivi mensuel est annoncé comme une règle, pas comme un montant figé", () => {
-    // CE QUI ÉTAIT ÉCRIT : « un suivi mensuel à partir de 50 € », hérité d'un
-    // positionnement abandonné. Sur un logiciel à 10 000 €, c'était 0,6 % par an
-    // contre 15 à 20 % relevés sur le marché français. Un prix de suivi écrit en
-    // euros se fige ; exprimé en part du projet, il suit la grille tout seul.
+  test("le suivi se chiffre au devis, sans taux ni montant", () => {
     const suivi = faqItems
       .map((item) => item.answer)
-      .find((a) => /(?:suivi|maintenance) mensuel/i.test(a));
+      .find((a) => /(?:suivi|maintenance) mensuel/iu.test(a));
     expect(suivi, "la réponse sur le suivi a disparu de la FAQ").toBeDefined();
-    expect(suivi, "le taux de suivi de la FAQ a divergé du module").toContain(
-      tauxSuivi(),
-    );
-    expect(suivi, "le plancher du suivi a divergé du module").toContain(
-      plancherSuivi(),
-    );
-    /* L'EXEMPLE CHIFFRÉ EST PARTI LE 2026-10-05 avec le prix ferme du palier
-       qui lui servait de projet de référence. Ce qui reste gardé : aucun
-       autre montant que le plancher du suivi n'apparaît dans la réponse, sans
-       quoi un montant de projet reviendrait par la petite porte. */
-    const montants = suivi.match(/\d[\d\u00A0\u202F ]*\u20AC/gu) ?? [];
-    expect(montants.map((m) => m.replace(/[\s]/gu, " "))).toEqual([
-      plancherSuivi().replace(/[\s]/gu, " "),
-    ]);
-    // Le plancher mord sur le bas de l'offre : aucun projet ne doit pouvoir
-    // sortir un suivi inférieur, ce qui arriverait si le pourcentage était
-    // appliqué seul.
-    for (const offre of prestations) {
-      expect(suiviMensuel(offre.plancher)).toBe(plancherSuivi());
-    }
-    expect(suiviMensuel(1)).toBe(plancherSuivi());
+    expect(suivi).toMatch(/devis/u);
+    expect(suivi).not.toMatch(/\d\s*(?:%|\u20AC)/u);
   });
 
   test("la hausse possible du suivi est annoncée, et elle est bornée", () => {
@@ -574,7 +487,67 @@ describe("l'accordéon porte l'offre unique", () => {
     }
   });
 
-  test("le prix de l'accordéon est un plancher en euros, sans période", () => {
-    expect(services[0].price).toBe(`à partir de ${euros(6000)}`);
+  test("le prix de l'accordéon se lit « sur devis », sans période", () => {
+    expect(services[0].price).toBe(SUR_DEVIS);
+  });
+});
+
+/**
+ * LA GARDE DE LA DÉCISION DU 2026-11-01. Elle parcourt tout `src/content`, ts,
+ * json et mdx, commentaires des ts retirés, et refuse phrase par phrase le retour
+ * d'un prix d'Eliott : son ancien plancher et ses formes, le minimum et le taux
+ * du suivi. Une phrase qui cite un repère d'agence reste permise : La Fabrique
+ * du Net relève aussi une médiane de 6 000 € pour un site de PME.
+ *
+ * `legal.ts` en sort : les CGV ne se réécrivent pas ici.
+ */
+describe("aucun prix d'Eliott dans src/content", () => {
+  const racine = fileURLToPath(new URL("./", import.meta.url));
+  const fichiers = readdirSync(racine, { recursive: true })
+    .map(String)
+    .filter((f) => /\.(ts|json|mdx)$/u.test(f) && f !== "legal.ts");
+
+  const PLANCHER = /(?<!\d)(?<!\d[\s\u00A0\u202F])6[\s\u00A0\u202F]?000(?:[\s\u00A0\u202F]?(?:€|euros))?(?!\d)/u;
+  const SUIVI = /(?<![\d])125[\s\u00A0\u202F]?€|(?<![\d,])18[\s\u00A0\u202F]?%\s+du prix/u;
+  const FORME = /(?:à partir de|dès|démarre à|commencent? à)[\s\u00A0\u202F]+\d[\d\s\u00A0\u202F]*(?:€|euros)|prix (?:plancher|de départ)/iu;
+  const REPERE = /Fabrique du Net|\bagences?\b/iu;
+
+  const phrasesDe = (f) => {
+    const brut = readFileSync(join(racine, f), "utf8");
+    const texte = f.endsWith(".ts")
+      ? brut.replace(/\/\*[\s\S]*?\*\//g, " ").replace(/(^|[^:])\/\/[^\n]*/g, "$1 ")
+      : brut;
+    return texte.split(/(?<=[.!?])\s+|\n/u);
+  };
+
+  test("les fichiers de contenu sont bien lus, articles et métiers compris", () => {
+    expect(fichiers.some((f) => f.endsWith(".mdx"))).toBe(true);
+    expect(fichiers).toContain("metiers.json");
+    expect(fichiers).toContain("offre.ts");
+  });
+
+  test("ni plancher, ni « à partir de », ni suivi chiffré", () => {
+    const fautifs = [];
+    for (const f of fichiers) {
+      for (const phrase of phrasesDe(f)) {
+        const chiffre = (PLANCHER.test(phrase) && !REPERE.test(phrase)) || SUIVI.test(phrase);
+        if (chiffre || FORME.test(phrase)) fautifs.push(`${f} : ${phrase.trim().slice(0, 120)}`);
+      }
+    }
+    expect(fautifs).toEqual([]);
+  });
+
+  test("les garde-fous attrapent bien les formes qu'ils visent", () => {
+    expect(PLANCHER.test("Un logiciel coûte 6\u00A0000\u00A0€ HT.")).toBe(true);
+    expect(PLANCHER.test("le budget va de 16 000 €")).toBe(false);
+    expect(SUIVI.test("avec un minimum de 125\u00A0€ par mois")).toBe(true);
+    expect(SUIVI.test("18\u202F% du prix du projet")).toBe(true);
+    expect(FORME.test("dès 6\u00A0000\u00A0€ HT")).toBe(true);
+    expect(FORME.test("à partir de 3 500 €")).toBe(true);
+  });
+
+  test("le texte rendu ne les porte pas non plus", () => {
+    const rendu = JSON.stringify([faqItems, services, homeContent]);
+    expect(rendu).not.toMatch(/\b6[\s\u00A0\u202F]000[\s\u00A0\u202F]€|125[\s\u00A0\u202F]€/u);
   });
 });

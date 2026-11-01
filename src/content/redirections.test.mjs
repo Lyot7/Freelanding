@@ -16,7 +16,7 @@ const RETIREES = [
   ["/services/site-vitrine/prix", "/services/logiciel-metier/prix"],
   ["/services/site-vitrine/artisans", "/logiciel-metier"],
   ["/creation-site-internet-caen", "/logiciel-sur-mesure-caen"],
-  ["/services/cto-referent-ia", "/services/logiciel-metier"],
+  ["/services/cto-referent-ia", "/services/automatisation"],
   ["/services/logiciel-metier/transport", "/logiciel-metier/transport-routier"],
 ];
 
