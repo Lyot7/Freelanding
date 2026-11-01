@@ -131,6 +131,10 @@ décrivait encore la reconstruction du gabarit Framer d'origine.
 
 Aucune forme neuve : la liste reprend `ListeMetiers`, et son titre celui de « Votre métier n'est pas dans la liste ? ». Un hub long se lit d'un mot à l'autre (`impeccable`, couper plutôt que décorer). Captures : `docs/captures/2026-11-01b`.
 
+## Trois moyens sur l'accueil (2026-11-01)
+
+`impeccable` : des lignes plutôt que trois cartes (grilles identiques bannies), des étapes numérotées parce qu'elles se suivent. `emil-design-eng` : le remède de chaque tâche apparaît en fondu de 300 ms avec le gain, aucune bascule de mise en page. `taste-skill` : le hub passe en plan compact, sa taille ne dépend plus du nombre de pages. Captures : `docs/captures/2026-11-01c`.
+
 ## Ce qui n'a pas été changé, et pourquoi
 
 - La police Geist et la palette volt sur noir : identité installée du site.

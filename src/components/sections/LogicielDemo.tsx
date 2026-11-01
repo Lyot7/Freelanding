@@ -6,11 +6,11 @@ import type { LogicielDemoContent } from "@/lib/content/types";
 type Onglet = "main" | "outil";
 
 /**
- * UNE SEMAINE DE BUREAU, À LA MAIN PUIS AVEC LE LOGICIEL.
+ * UNE SEMAINE DE BUREAU, À LA MAIN PUIS AVEC MOI.
  *
  * Le gain se voit : chaque barre porte la durée d'une tâche et se rétracte à ce
- * qui reste à relire, le total baisse et les heures rendues apparaissent en
- * volt. La fenêtre s'ouvre sur « À la main » et bascule une seule fois quand
+ * qui reste à relire, le total baisse, les heures rendues apparaissent en volt
+ * et chaque tâche montre son remède : un outil d'IA ou un logiciel. La fenêtre s'ouvre sur « À la main » et bascule une seule fois quand
  * elle est à moitié visible ; dès que le visiteur touche un onglet, plus rien ne
  * bascule seul.
  *
@@ -132,7 +132,17 @@ export function LogicielDemo({ demo }: { demo: LogicielDemoContent["demo"] }) {
           {demo.taches.map((tache, index) => (
             <li key={tache.libelle} className="flex flex-col gap-[5px]">
               <span className="flex items-baseline justify-between gap-[12px] text-[14px] font-medium leading-[1.25] tracking-[-0.01em]">
-                {tache.libelle}
+                <span className="flex flex-wrap items-baseline gap-x-[8px]">
+                  {tache.libelle}
+                  <span
+                    aria-hidden={!avecLogiciel}
+                    className={`logiciel-moyen text-[11px] font-semibold uppercase leading-none tracking-[0.02em] text-accent ${
+                      avecLogiciel ? "opacity-100" : "opacity-0"
+                    }`}
+                  >
+                    {tache.moyen}
+                  </span>
+                </span>
                 <span
                   className={`whitespace-nowrap tabular-nums ${
                     avecLogiciel ? "text-accent" : "text-foreground-60"

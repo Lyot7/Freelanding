@@ -5,7 +5,7 @@ import { pagesHub, pagesMetier, versPageTheme, visuelMetier } from "@/content/me
 import { siteConfig } from "@/content/site";
 import { MESSAGES_METIER } from "@/lib/blog/apercu";
 import { ApercuMetier } from "./ApercuMetier";
-import { ListeMetiers } from "./ListeMetiers";
+import { ListeMetiers, PlanMetiers } from "./ListeMetiers";
 import { MaillageMetier } from "./MaillageMetier";
 
 /** Tout le texte d'un arbre JSX, la liste des métiers déroulée. */
@@ -28,6 +28,16 @@ function liens(noeud) {
 }
 
 const page = pagesMetier[0];
+
+describe("PlanMetiers", () => {
+  it("rend chaque page en petit, avec sa phrase et son lien", () => {
+    const rendu = PlanMetiers({ entrees: pagesHub });
+    for (const entree of pagesHub) {
+      expect(texte(rendu)).toContain(entree.accroche);
+      expect(liens(rendu)).toContain(entree.chemin);
+    }
+  });
+});
 
 describe("ListeMetiers", () => {
   it("rend chaque métier avec sa phrase et son lien, sur fond sombre", () => {

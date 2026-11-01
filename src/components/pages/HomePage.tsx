@@ -7,6 +7,7 @@ import { FaqSection } from "@/components/sections/FaqSection";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { LogicielSection } from "@/components/sections/LogicielSection";
 import { LogoBandSection } from "@/components/sections/LogoBandSection";
+import { MoyensSection } from "@/components/sections/MoyensSection";
 import { ServicesSection } from "@/components/sections/ServicesSection";
 import { ShowreelSection } from "@/components/sections/ShowreelSection";
 import { StatsSection } from "@/components/sections/StatsSection";
@@ -56,6 +57,7 @@ export async function HomePage() {
     about: <AboutSection about={home.about} />,
     showreel: <ShowreelSection showreel={home.showreel} />,
     works: <WorksSection works={works} />,
+    moyens: <MoyensSection moyens={home.moyens} />,
     whyUs: <WhyUsSection whyUs={home.whyUs} />,
     services: (
       <ServicesSection

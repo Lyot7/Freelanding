@@ -13,8 +13,6 @@
 import type { Prestation, PrestationId } from "./offre";
 import { lienVersPageLogicielCaen } from "./page-logiciel-caen";
 import { avantLienPrix, pagePrixLogiciel } from "./page-prix-logiciel";
-import { pagesFonction, pagesHub, type LigneHub } from "./metiers";
-import { avantLiensSecteur } from "./pages-secteur";
 import { pageTheme } from "./pages-theme";
 
 /** Lien vers une page thématique, sous l’offre de son pilier. */
@@ -201,8 +199,9 @@ export function marchesFilAriane(
 
 /**
  * LIENS VERS LES DÉCLINAISONS D'UNE PRESTATION, posés sous ses périmètres : le
- * logiciel métier mène à ses pages par métier, à sa page de prix et à sa page
- * de Caen. Une ligne sobre par famille, une amorce et des liens : la page
+ * logiciel métier mène à ses besoins, à sa page de prix et à sa page de Caen.
+ * Les pages par métier n'y sont plus depuis le 2026-11-01, décision d'Eliott : une
+ * liste sans fin dit au visiteur qu'on vise tout le monde. Une ligne sobre par famille, une amorce et des liens : la page
  * pilier ne devient pas un sommaire.
  */
 export interface LiensDeclinaisons {
@@ -210,23 +209,16 @@ export interface LiensDeclinaisons {
   readonly liens: readonly { readonly libelle: string; readonly href: string }[];
 }
 
-const versLien = (p: LigneHub) => ({ libelle: p.libelle, href: p.chemin });
-
 export const lienLocalParPrestation: Partial<
   Record<PrestationId, readonly LiensDeclinaisons[]>
 > = {
   logiciel: [
-    {
-      avant: avantLiensSecteur,
-      liens: pagesHub.map(versLien),
-    },
     {
       avant: "Par besoin :",
       liens: [
         lienTheme("erp-sur-mesure"),
         lienTheme("maintenance-sav"),
         lienTheme("automatisation"),
-        ...pagesFonction.map(versLien),
       ],
     },
     {

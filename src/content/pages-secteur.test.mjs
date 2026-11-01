@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { euros, prestation, prixPlancher } from "./offre.ts";
 import { cheminSecteur, pagesSecteur } from "./pages-secteur.ts";
 import { contentRoutes } from "./routes.ts";
-import { lienLocalParPrestation } from "./service-pages.ts";
+import { pagesHub } from "./metiers.ts";
 import { siteConfig } from "./site.ts";
 
 /**
@@ -75,8 +75,7 @@ describe("chaque page secteur est cherchable", () => {
       });
 
       test("la page pilier la lie", () => {
-        const liens = (lienLocalParPrestation.logiciel ?? []).flatMap((l) => l.liens);
-        expect(liens.map((l) => l.href)).toContain(page.chemin);
+        expect(pagesHub.map((p) => p.chemin)).toContain(page.chemin);
       });
 
       test("ses liens internes visent des pages servies ou le rendez-vous", () => {

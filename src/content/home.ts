@@ -27,6 +27,7 @@ export function duree(minutes: number): string {
   return `${heures}\u00A0h\u00A0${String(reliquat).padStart(2, "0")}`;
 }
 const ENTREE_LOGICIEL = prixPlancher(LOGICIEL);
+const MOYENS_TACHE = { ia: "Outil d’IA", logiciel: "Logiciel" } as const;
 
 /*
  * UNE SEULE OFFRE DEPUIS LE 2026-10-31, décision d'Eliott du 2026-10-30. Ce qui
@@ -37,12 +38,15 @@ const ENTREE_LOGICIEL = prixPlancher(LOGICIEL);
  * comparaison le rendait exact (`offre.ts`). Le logiciel se compare à livrable
  * égal, chiffre d'agence écrit à côté du mien.
  */
-const POSITIONNEMENT = "Logiciel métier sur mesure, et il vous appartient.";
+const POSITIONNEMENT = "Logiciel sur mesure, IA et accompagnement.";
 
-/* LE H1 DE L'ACCUEIL, mots d'Eliott du 2026-10-15. */
+/*
+ * LE H1 DE L'ACCUEIL. Depuis le 2026-11-01, décision d'Eliott : le temps gagné
+ * d'abord, pour tous les métiers, et le moyen ensuite (logiciel, IA, accompagnement).
+ */
 const PORTES = [
   {
-    lines: ["Un logiciel qui vous", "rend des heures."],
+    lines: ["Je vous rends", "des heures."],
     href: `/services/${LOGICIEL.slug}`,
     price: `dès ${ENTREE_LOGICIEL} HT`,
   },
@@ -136,22 +140,20 @@ export const homeContent: HomeContent = {
    * affichées de `/services/automatisation`, le total en est dérivé.
    */
   logiciel: {
-    eyebrow: LOGICIEL.nom,
+    eyebrow: "Le temps gagné",
     // Lignes de douze signes au plus : le titre est rendu à 92 px dans une
     // demi-colonne, comme celui du showreel.
     titleLines: ["Vos heures", "valent mieux", "qu’un", "tableur."],
     statement:
-      "Trier, recopier, relancer, rapprocher : une semaine de bureau part là-dedans. Je construis le logiciel qui le fait à votre place. L’IA fait le sale boulot, il vous reste à relire, et le temps revient à ce qui vous rend indispensable.",
+      "Trier, recopier, relancer, rapprocher : une semaine de bureau part là-dedans, quel que soit votre métier. Chaque tâche a son remède, un outil d’IA ou un logiciel. L’IA fait le sale boulot, il vous reste à relire, et le temps revient à ce qui vous rend indispensable.",
     statementEmphasis: ["le temps revient à ce qui vous rend indispensable."],
-    cta: {
-      label: "Voir l’offre et le prix",
-      href: `/services/${LOGICIEL.slug}`,
-    },
+    cta: { label: "Voir comment", href: "#moyens" },
     demo: {
       titre: "Une semaine de bureau, en exemple",
-      onglets: { main: "À la main", outil: "Avec le logiciel" },
+      onglets: { main: "À la main", outil: "Avec moi" },
       taches: TACHES_BUREAU.map((tache) => ({
         libelle: tache.tache,
+        moyen: MOYENS_TACHE[tache.moyen],
         part: tache.minutes / MINUTES_MAX,
         main: duree(tache.minutes),
         outil: duree(reste(tache.minutes)),
@@ -168,6 +170,44 @@ export const homeContent: HomeContent = {
       },
       note: `Exemple pour un bureau d’une dizaine de personnes, sur ${SEMAINES_AN} semaines. Il reste un cinquième du temps pour relire. Vos chiffres se mesurent pendant l’appel.`,
     },
+  },
+
+  /*
+   * LES TROIS MOYENS, décision d'Eliott du 2026-11-01 : ce qu'il ferait pour une
+   * entreprise qui veut gagner du temps, sans aucun nom ni donnée d'un prospect.
+   * Le prix n'est écrit que pour le logiciel : l'accompagnement se chiffre au devis.
+   */
+  moyens: {
+    eyebrow: "Trois façons de vous rendre ces heures",
+    titleLines: ["Le bon remède", "pour chaque", "corvée."],
+    intro:
+      "Une corvée ne se règle pas toujours avec un logiciel. Je regarde où part votre temps, puis je prends le moyen le plus simple.",
+    lignes: [
+      {
+        titre: "Installer l’IA dans vos outils",
+        corps:
+          "Mails, comptes rendus, devis simples : vos équipes s’en servent sur leurs vraies tâches, sans rien remplacer.",
+        lien: { label: "Voir l’automatisation", href: "/services/automatisation" },
+      },
+      {
+        titre: "Construire le logiciel qui manque",
+        corps: `Votre façon de travailler n’entre dans aucun outil du marché : je le construis, et il vous appartient. Dès ${ENTREE_LOGICIEL} HT.`,
+        lien: { label: "Voir l’offre et le prix", href: `/services/${LOGICIEL.slug}` },
+      },
+      {
+        titre: "Vous accompagner dans la durée",
+        corps:
+          "Une réunion par mois pour choisir la prochaine tâche à faire disparaître, et savoir où l’IA n’a rien à faire.",
+        lien: { label: "En parler", href: lienRendezVous("decouverte") },
+      },
+    ],
+    titreEtapes: "Comment ça se passe",
+    etapes: [
+      { titre: "Vous notez", corps: "Pendant trois ou quatre semaines, votre équipe note ce qui lui fait perdre du temps." },
+      { titre: "Je trie", corps: "Chaque corvée reçoit son remède : un outil d’IA, un logiciel, ou rien du tout." },
+      { titre: "On traite", corps: "On commence par la tâche qui rend le plus d’heures, et vous mesurez le gain." },
+      { titre: "On continue", corps: "Chaque mois, on choisit la suivante, à votre rythme." },
+    ],
   },
 
   /*
@@ -454,6 +494,7 @@ export const homeContent: HomeContent = {
     "works",
     "numbers",
     "logiciel",
+    "moyens",
     "whyUs",
     "faq",
     "articles",
