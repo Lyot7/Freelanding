@@ -36,7 +36,7 @@ describe("LogicielSection", () => {
     expect(html).toContain(`href="${logiciel.cta.href}"`);
     expect(html).toContain(logiciel.cta.label);
     // Le fragment mis en avant est rendu dans sa propre classe de couleur.
-    expect(html).toMatch(/class="text-foreground"[^>]*>le temps revient à ce qui vous rend indispensable\./);
+    expect(html).toMatch(/class="text-foreground"[^>]*>vous validez, et le temps revient à ce qui vous rend indispensable\./);
     expect(html).toContain('role="tablist"');
     expect(html).toContain(logiciel.demo.titre);
   });

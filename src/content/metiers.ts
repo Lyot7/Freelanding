@@ -345,9 +345,7 @@ export function versPageTheme(page: PageMetierPubliee): Omit<PageTheme, "id"> {
     libelleLien: page.libelle,
     filAriane: [
       { libelle: hubMetiers.filAccueil, href: "/" },
-      estFonction(page)
-        ? { libelle: hubMetiers.besoins.titre, href: `${CHEMIN_HUB_METIERS}#${ANCRE_BESOINS}` }
-        : { libelle: hubMetiers.filHub, href: CHEMIN_HUB_METIERS },
+      { libelle: hubMetiers.filHub, href: CHEMIN_HUB_METIERS },
       { libelle: page.libelle },
     ],
   };
@@ -359,21 +357,18 @@ export const visuelMetier = (slug: string) => ({
   partage: `/images/og-metier-${slug}.jpg`,
 });
 
-export const ANCRE_BESOINS = "besoins";
-
 /** Le hub, et les libellés du maillage. Aucun texte dans les composants. */
 export const hubMetiers = {
   seo: {
-    titre: "Logiciel métier, secteur par secteur · Eliott Bouquerel",
+    titre: "Logiciel métier, besoin par besoin · Eliott Bouquerel",
     description:
-      "Chaque métier a ses corvées : une location en jours réels, une fiche à retaper, un client à rappeler la veille. Voyez ce qui disparaît dans le vôtre.",
+      "Stock, interventions, production, relances : partez de la tâche qui vous prend le plus de temps, et voyez ce qui disparaît.",
   },
-  h1: "Un logiciel pour votre métier",
+  h1: "Partez de ce qui vous prend du temps",
   resume:
-    "Chaque métier a ses corvées : une location qui se compte en jours réels, une fiche qui se retape au bureau, un destinataire à rappeler la veille. Choisissez le vôtre, et voyez ce qui disparaît.",
+    "Stock, interventions, production, relances : choisissez la tâche qui vous coûte le plus d’heures, et voyez ce qu’elle deviendrait.",
   filAccueil: "Accueil",
-  filHub: "Par métier",
-  titreListe: "Les métiers",
+  filHub: "Par besoin",
   besoins: {
     titre: "Par besoin",
     pages: [
@@ -422,15 +417,15 @@ export const hubMetiers = {
     ],
   },
   autre: {
-    titre: "Votre métier n’est pas dans la liste ?",
+    titre: "Votre besoin n’est pas dans la liste ?",
     corps:
-      "La page viendra, mais votre logiciel n’a pas à l’attendre. Décrivez-moi la tâche qui vous bloque, je vous dis ce qu’elle deviendrait.",
+      "Décrivez-moi la tâche qui vous bloque, je vous dis ce qu’elle deviendrait.",
     cta: "Réserver un appel",
   },
   maillage: {
     voisins: "Pages voisines",
     articles: "À lire aussi",
-    hub: "Toutes les pages",
+    hub: "Tous les besoins",
   },
 } as const;
 

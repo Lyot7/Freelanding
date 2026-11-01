@@ -855,13 +855,10 @@ export interface HomeAboutSection {
 
 /** Une tâche de la semaine : sa part de la plus longue, sa durée dans les deux cas. */
 export interface TacheDemo {
-  /** Le remède de cette tâche, affiché avec le gain. */
-  moyen: string;
   libelle: string;
   /** Longueur de la barre, de 0 à 1. */
   part: number;
   main: string;
-  outil: string;
 }
 
 /** Un grand chiffre et ce qu'il compte. */
@@ -896,6 +893,13 @@ export interface LogicielDemoContent {
     titre: string;
     onglets: { main: string; outil: string };
     taches: readonly TacheDemo[];
+    /** La même journée avec moi : une tâche réelle, de bout en bout. */
+    parcours: {
+      titre: string;
+      etapes: readonly { titre: string; detail: string; validation?: boolean }[];
+      bouton: string;
+      preuve: string;
+    };
     /** Le total de la semaine, par onglet. */
     compteur: { main: CompteurDemo; outil: CompteurDemo };
     /** Ce qui revient au client, affiché avec le logiciel. */
