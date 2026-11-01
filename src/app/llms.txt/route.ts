@@ -95,7 +95,7 @@ export async function GET(): Promise<Response> {
       pageLogicielCaen.chemin,
       "le logiciel métier sur mesure pour les PME de Caen, du Calvados, de la Manche et de l’Orne",
     ),
-    ligne(hubMetiers.h1, CHEMIN_HUB_METIERS, "toutes les pages par métier"),
+    ligne(hubMetiers.h1, CHEMIN_HUB_METIERS, "les pages par métier et par besoin"),
     /* PAGES PAR MÉTIER, dérivées de `metiers.ts`. */
     ...pagesMetier.map((p) => ligne(p.h1, p.chemin, p.noteLlms)),
     /* PAGES SECTEUR de la solution métier, dérivées de `pages-secteur.ts`. */

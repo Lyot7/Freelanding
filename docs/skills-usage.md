@@ -127,6 +127,10 @@ décrivait encore la reconstruction du gabarit Framer d'origine.
 | Panneau qui apparaît sec | Fondu et 14 px de montée, 360 ms | Le changement d'onglet se lit |
 | Mouvement continu absent ou partout | Un seul : la pastille volt du positionnement respire (2,8 s) | Une vie discrète, pas de fatigue |
 
+## Liste « Par besoin » du hub (2026-11-01)
+
+Aucune forme neuve : la liste reprend `ListeMetiers`, et son titre celui de « Votre métier n'est pas dans la liste ? ». Un hub long se lit d'un mot à l'autre (`impeccable`, couper plutôt que décorer). Captures : `docs/captures/2026-11-01b`.
+
 ## Ce qui n'a pas été changé, et pourquoi
 
 - La police Geist et la palette volt sur noir : identité installée du site.
