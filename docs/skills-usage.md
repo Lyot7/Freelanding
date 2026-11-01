@@ -139,6 +139,10 @@ Aucune forme neuve : la liste reprend `ListeMetiers`, et son titre celui de « V
 
 Quatre pistes maquettées et capturées avant le code. `emil-design-eng` : la validation reste un vrai bouton avec retour à l'appui, et le parcours finit seul pour qui regarde sans toucher. `impeccable` : les heures rendues ne passent en volt qu'une fois la tâche finie, un seul point focal à la fois. `taste-skill` : le hub ne garde que le plan par besoin.
 
+## La semaine rendue (2026-11-01)
+
+Piste 2, choisie par Eliott. `emil-design-eng` : le volt monte en `scaleY` depuis le bas, décalé de 70 ms par jour, coupé en mouvement réduit. `impeccable` : un agenda plutôt qu'un graphique, le gain se voit en cases avant de se lire en chiffres.
+
 ## Ce qui n'a pas été changé, et pourquoi
 
 - La police Geist et la palette volt sur noir : identité installée du site.

@@ -966,16 +966,14 @@ html[data-consent-choisi] [data-consent-attente] {
 
 /* ---------------------------------------------------------------------------
    Démonstration du logiciel (accueil, 2026-10-16). La pastille glisse d'un
-   onglet à l'autre ; les étapes du parcours s'allument l'une après l'autre.
+   onglet à l'autre ; le temps rendu monte jour après jour.
    --------------------------------------------------------------------------- */
-.logiciel-etape {
+.logiciel-rendu {
+  transform-origin: bottom;
+  transition: transform 700ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.logiciel-jour {
   transition: opacity 300ms ease-out;
-}
-.logiciel-valider {
-  transition: transform 160ms ease-out;
-}
-.logiciel-valider:active {
-  transform: scale(0.97);
 }
 .logiciel-gain {
   transition: background-color 300ms ease, color 300ms ease;
@@ -992,4 +990,5 @@ html[data-consent-choisi] [data-consent-attente] {
 }
 @media (prefers-reduced-motion: reduce) {
   .logiciel-pastille { transition: none; }
+  .logiciel-rendu { transition: none; }
 }
