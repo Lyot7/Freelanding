@@ -151,6 +151,14 @@ describe("creerReservation", () => {
     expect(JSON.parse(appels[1].options.body).duree).toBe(45);
   });
 
+  it("renonce sans durée connue plutôt que de réserver une durée au hasard", async () => {
+    const env = { ...ENV, COCKPIT_URL: "https://sans-types.test" };
+    const appels = simuler([{ erreur: "non_configure" }, 503]);
+    const resultat = await creerReservation({ ...RESERVATION, duree: undefined }, env);
+    expect(resultat).toEqual({ ok: false, raison: "indisponible", detail: "durees_inconnues" });
+    expect(appels).toHaveLength(1);
+  });
+
   it("garde le 409 `creneau_pris` pour que la route le traduise", async () => {
     simuler([{ erreur: "creneau_pris" }, 409]);
     expect(await creerReservation(RESERVATION, ENV)).toEqual({
@@ -273,6 +281,27 @@ describe("gestion par jeton", () => {
     });
     expect(appels[0].url).toBe(`https://cockpit.test/api/rdv/gestion/${JETON}/deplacer`);
     expect(JSON.parse(appels[0].options.body)).toEqual({ debut: "2026-11-12T13:00:00.000Z" });
+  });
+
+  it("traite une réponse de déplacement sans jeton comme une panne", async () => {
+    simuler([{ id: "rdv_2", debut: "2026-11-12T13:00:00.000Z" }]);
+    expect(await deplacerRendezVous(JETON, { debutUtc: "2026-11-12T13:00:00.000Z" }, ENV)).toEqual({
+      ok: false,
+      raison: "indisponible",
+      detail: "charge_illisible",
+    });
+  });
+
+  it("refuse un jeton mal formé à l’annulation et au déplacement sans appel", async () => {
+    const appels = simuler([{}]);
+    expect((await annulerRendezVous("x", undefined, ENV)).ok).toBe(false);
+    expect((await deplacerRendezVous("x", { debutUtc: "2026-11-12T13:00:00.000Z" }, ENV)).ok).toBe(false);
+    expect(appels).toHaveLength(0);
+  });
+
+  it("rend le refus du cockpit à l’annulation", async () => {
+    simuler([{ erreur: "introuvable" }, 404]);
+    expect((await annulerRendezVous(JETON, undefined, ENV)).ok).toBe(false);
   });
 
   it("garde le 409 d’un créneau pris au déplacement", async () => {

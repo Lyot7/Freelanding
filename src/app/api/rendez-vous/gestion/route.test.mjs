@@ -89,6 +89,35 @@ describe("POST …/annuler", () => {
     expect(appels).toHaveLength(0);
   });
 
+  it("refuse un corps illisible", async () => {
+    simuler([{}]);
+    const corpsCasse = (chemin) =>
+      new Request(`https://eliottbouquerel.fr/api/rendez-vous/gestion/${chemin}`, {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-forwarded-for": `198.51.100.${(appelant += 1)}` },
+        body: "{",
+      });
+    expect((await annuler(corpsCasse(`${JETON}/annuler`), contexte())).status).toBe(400);
+    expect((await deplacer(corpsCasse(`${JETON}/deplacer`), contexte())).status).toBe(400);
+  });
+
+  it("limite les écritures par adresse", async () => {
+    simuler([{ statut: "ANNULE", deja: true }]);
+    const meme = () =>
+      annuler(
+        new Request(`https://eliottbouquerel.fr/api/rendez-vous/gestion/${JETON}/annuler`, {
+          method: "POST",
+          headers: { "content-type": "application/json", "x-forwarded-for": "198.51.100.250" },
+          body: "{}",
+        }),
+        contexte(),
+      );
+    const statuts = [];
+    for (let i = 0; i < 7; i += 1) statuts.push((await meme()).status);
+    expect(statuts.slice(0, 6).every((s) => s === 200)).toBe(true);
+    expect(statuts[6]).toBe(429);
+  });
+
   it("refuse un motif trop long", async () => {
     simuler([{}]);
     const reponse = await annuler(requete(`${JETON}/annuler`, { corps: { motif: "x".repeat(1001) } }), contexte());
@@ -173,6 +202,18 @@ describe("GET …/creneaux", () => {
     expect(params.get("type")).toBe("decouverte");
     expect(params.get("duree")).toBe("30");
     expect(charge.fenetre.mois).toMatch(/^\d{4}-\d{2}$/);
+  });
+
+  it("répond 404 quand le cockpit ne connaît pas le jeton", async () => {
+    simuler([{ erreur: "introuvable" }, 404]);
+    const reponse = await creneaux(requete(`${JETON}/creneaux`, { methode: "GET" }), contexte());
+    expect(reponse.status).toBe(404);
+  });
+
+  it("répond 502 quand le cockpit refuse les créneaux", async () => {
+    simuler([RDV], [{ erreur: "sans_agenda" }, 503]);
+    const reponse = await creneaux(requete(`${JETON}/creneaux`, { methode: "GET" }), contexte());
+    expect(reponse.status).toBe(502);
   });
 
   it("refuse de proposer des créneaux pour un rendez-vous annulé", async () => {

@@ -55,6 +55,8 @@ describe("validerDeplacement", () => {
     expect(validerDeplacement({ debut: "2026-11-02T10:30:00Z" }, ms)).toEqual({ ok: false, champ: "creneau" });
     expect(validerDeplacement({ debut: "2027-06-01T10:00:00Z" }, ms)).toEqual({ ok: false, champ: "creneau" });
     expect(validerDeplacement({ debut: "demain" }, ms)).toEqual({ ok: false, champ: "creneau" });
+    expect(validerDeplacement(null, ms)).toEqual({ ok: false, champ: "creneau" });
+    expect(validerDeplacement({ debut: 12 }, ms)).toEqual({ ok: false, champ: "creneau" });
     expect(validerDeplacement({ debut: "2026-11-05T14:00:00Z", duree: 9999 }, ms)).toEqual({
       ok: false,
       champ: "duree",
