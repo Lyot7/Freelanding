@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test";
 import {
   creerThrottleClic,
+  DESTINATION_BUSTE,
   DESTINATION_CLIC,
   DESTINATION_OUVERTURE,
   estRobotProbable,
@@ -400,10 +401,20 @@ describe("traiterOuverture : portrait de la signature", () => {
     const { deps, planifies } = banc();
     const reponse = traiterOuverture(requeteLogo("GET"), "dupont-plomberie", deps);
     expect(reponse.status).toBe(302);
-    expect(reponse.headers.get("location")).toBe("https://eliottbouquerel.fr/images/eliott-carte.jpg");
-    expect(DESTINATION_OUVERTURE).toBe("https://eliottbouquerel.fr/images/eliott-carte.jpg");
+    expect(reponse.headers.get("location")).toBe("https://eliottbouquerel.fr/images/eliott-bouquerel-avatar.jpg");
+    expect(DESTINATION_OUVERTURE).toBe("https://eliottbouquerel.fr/images/eliott-bouquerel-avatar.jpg");
     expect(reponse.headers.get("cache-control")).toBe("no-store");
     expect(planifies).toHaveLength(1);
+  });
+
+  it("sert le buste de la carte de visite sur ?forme=buste, et rien d'autre de la requête", async () => {
+    const { deps, planifies } = banc();
+    const buste = traiterOuverture(new Request("http://localhost/o/x?forme=buste"), "dupont-plomberie", deps);
+    expect(buste.headers.get("location")).toBe("https://eliottbouquerel.fr/images/eliott-carte.jpg");
+    expect(DESTINATION_BUSTE).toBe("https://eliottbouquerel.fr/images/eliott-carte.jpg");
+    expect(planifies).toHaveLength(1);
+    const autre = traiterOuverture(new Request("http://localhost/o/x?forme=https://ailleurs.example"), "dupont-plomberie", deps);
+    expect(autre.headers.get("location")).toBe(DESTINATION_OUVERTURE);
   });
 
   it("corps du clic plus nature ouverture, sur la même URL du cockpit", async () => {

@@ -44,8 +44,18 @@ export const DESTINATION_CLIC =
  */
 export const URL_COCKPIT_CLICS = "https://admin.eliottbouquerel.fr/api/clics";
 
-/** Le buste de la carte de signature (depuis le 2026-11-02), recadré de `eliott-portrait-vertical.jpg`. */
-export const DESTINATION_OUVERTURE = "https://eliottbouquerel.fr/images/eliott-carte.jpg";
+/**
+ * La photo de profil d'Eliott, carrée sur fond volt : les mails partis avant la
+ * carte de visite l'affichent dans un cadre carré ou rond.
+ */
+export const DESTINATION_OUVERTURE = "https://eliottbouquerel.fr/images/eliott-bouquerel-avatar.jpg";
+
+/**
+ * Le buste de la carte de visite (depuis le 2026-11-02), recadré de
+ * `eliott-portrait-vertical.jpg`, pour `/o/<id>?forme=buste`. Deux cibles
+ * littérales choisies par un drapeau : rien de la requête n'entre dans l'URL.
+ */
+export const DESTINATION_BUSTE = "https://eliottbouquerel.fr/images/eliott-carte.jpg";
 
 /** Au-delà, le cockpit est jugé injoignable. La redirection, elle, est déjà partie. */
 const DELAI_COCKPIT_MS = 5_000;
@@ -271,5 +281,6 @@ export function traiterOuverture(
   deps: DependancesClic,
 ): Response {
   planifierEnregistrement(requete, "ouverture", id, deps);
-  return redirection(DESTINATION_OUVERTURE);
+  const buste = new URL(requete.url).searchParams.get("forme") === "buste";
+  return redirection(buste ? DESTINATION_BUSTE : DESTINATION_OUVERTURE);
 }
