@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { siteConfig } from "@/content/site";
 import { POST } from "./route.ts";
 
 /** La route se charge et refuse avant tout envoi ce qui n'est pas du JSON de son origine. */
@@ -40,6 +41,46 @@ describe("POST /api/contact — téléphone", () => {
     expect(await reponse.json()).toEqual({
       message: "Ce numéro de téléphone ne semble pas valide.",
       champ: "telephone",
+    });
+  });
+});
+
+describe("POST /api/contact — chaque champ refusé est nommé au client", () => {
+  const valide = {
+    intention: "footer",
+    nom: "Jean Dupont",
+    email: "jean@example.com",
+    typeProjet: siteConfig.footerForm.selectOptions[0],
+    budget: "inconnu",
+    objectif: "tableur",
+    echeance: "vite",
+  };
+  const cas = [
+    ["email", { email: "pas-une-adresse" }],
+    ["nom", { nom: "J" }],
+    ["typeProjet", { typeProjet: "Un type inventé" }],
+    ["budget", { budget: "1-2" }],
+    ["objectif", { objectif: "conseil" }],
+    ["echeance", { echeance: "un jour peut-être" }],
+    ["message", { message: "x".repeat(5000) }],
+  ];
+  cas.forEach(([champ, ecart], index) => {
+    test(`« ${champ} » invalide`, async () => {
+      const reponse = await POST(
+        new Request("http://localhost:3000/api/contact", {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            origin: "http://localhost:3000",
+            "x-forwarded-for": `203.0.113.${10 + index}`,
+          },
+          body: JSON.stringify({ ...valide, ...ecart, debutMs: Date.now() - 10_000 }),
+        }),
+      );
+      expect(reponse.status).toBe(400);
+      const corps = await reponse.json();
+      expect(corps.champ).toBe(champ);
+      expect(corps.message.length).toBeGreaterThan(0);
     });
   });
 });
