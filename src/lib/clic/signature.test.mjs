@@ -400,8 +400,8 @@ describe("traiterOuverture : portrait de la signature", () => {
     const { deps, planifies } = banc();
     const reponse = traiterOuverture(requeteLogo("GET"), "dupont-plomberie", deps);
     expect(reponse.status).toBe(302);
-    expect(reponse.headers.get("location")).toBe("https://eliottbouquerel.fr/images/eliott-signature.jpg");
-    expect(DESTINATION_OUVERTURE).toBe("https://eliottbouquerel.fr/images/eliott-signature.jpg");
+    expect(reponse.headers.get("location")).toBe("https://eliottbouquerel.fr/images/eliott-carte.jpg");
+    expect(DESTINATION_OUVERTURE).toBe("https://eliottbouquerel.fr/images/eliott-carte.jpg");
     expect(reponse.headers.get("cache-control")).toBe("no-store");
     expect(planifies).toHaveLength(1);
   });
