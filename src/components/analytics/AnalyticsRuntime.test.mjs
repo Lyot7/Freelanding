@@ -229,6 +229,24 @@ describe("AnalyticsRuntime et ConsentBanner", () => {
     ).toHaveLength(1);
   });
 
+  it("panneau déplié : la pastille d'un interrupteur glisse par translate", async () => {
+    await monter();
+    await act(async () => {
+      bouton(consentCopy.customise).click();
+    });
+    const interrupteur = document.querySelector('[role="switch"]:not([disabled])');
+    const pastille = () => interrupteur.querySelector("span > span");
+    const avant = interrupteur.getAttribute("aria-checked");
+    await act(async () => {
+      interrupteur.click();
+    });
+    expect(interrupteur.getAttribute("aria-checked")).not.toBe(avant);
+    const coche = interrupteur.getAttribute("aria-checked") === "true";
+    expect(pastille().className).toContain("transition-[translate,background-color]");
+    expect(pastille().className).toContain("left-[3px]");
+    expect(pastille().className.includes("translate-x-[18px]")).toBe(coche);
+  });
+
   it("rouvert après un choix, propose de retirer le consentement", async () => {
     localStorage.setItem(
       "eb-consent",

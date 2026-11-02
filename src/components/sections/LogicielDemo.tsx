@@ -141,7 +141,7 @@ export function LogicielDemo({ demo }: { demo: LogicielDemoContent["demo"] }) {
                 >
                   <span
                     aria-hidden={avecLogiciel}
-                    className={`logiciel-jour absolute inset-0 flex flex-col gap-[2px] p-[4px] text-[10px] tablet:p-[6px] font-medium leading-[1.15] tracking-[-0.01em] tablet:text-[12px] ${
+                    className={`logiciel-jour absolute inset-0 flex flex-col gap-[2px] p-[4px] text-[11px] tablet:p-[6px] font-medium hyphens-auto leading-[1.15] tracking-[-0.01em] tablet:text-[12px] ${
                       avecLogiciel ? "opacity-0" : "opacity-100"
                     }`}
                   >
@@ -150,7 +150,7 @@ export function LogicielDemo({ demo }: { demo: LogicielDemoContent["demo"] }) {
                   </span>
                   <span
                     aria-hidden={!avecLogiciel}
-                    className={`logiciel-jour absolute inset-x-0 top-0 h-[20%] truncate px-[6px] pt-[3px] text-[10px] font-medium leading-none text-foreground-60 ${
+                    className={`logiciel-jour absolute inset-x-0 top-0 h-[20%] truncate px-[6px] pt-[3px] text-[11px] font-medium leading-none text-foreground-60 ${
                       avecLogiciel ? "opacity-100" : "opacity-0"
                     }`}
                   >
@@ -158,7 +158,7 @@ export function LogicielDemo({ demo }: { demo: LogicielDemoContent["demo"] }) {
                   </span>
                   <span
                     aria-hidden={!avecLogiciel}
-                    className="logiciel-rendu absolute inset-x-0 bottom-0 flex h-[80%] flex-col gap-[2px] bg-accent p-[4px] text-[10px] tablet:p-[6px] font-medium leading-[1.15] tracking-[-0.01em] text-accent-ink tablet:text-[12px]"
+                    className="logiciel-rendu absolute inset-x-0 bottom-0 flex h-[80%] flex-col gap-[2px] bg-accent p-[4px] text-[11px] tablet:p-[6px] font-medium hyphens-auto leading-[1.15] tracking-[-0.01em] text-accent-ink tablet:text-[12px]"
                     style={{
                       transform: `scaleY(${avecLogiciel ? 1 : 0})`,
                       transitionDelay: `${index * 70}ms`,
@@ -170,7 +170,7 @@ export function LogicielDemo({ demo }: { demo: LogicielDemoContent["demo"] }) {
                     {jour.tache}
                   </span>
                 </span>
-                <span className="flex-1 bg-white/[0.05] p-[4px] text-[10px] tablet:p-[6px] font-medium leading-[1.15] tracking-[-0.01em] text-foreground-60 tablet:text-[12px]">
+                <span className="flex-1 bg-white/[0.05] p-[4px] text-[11px] tablet:p-[6px] font-medium hyphens-auto leading-[1.15] tracking-[-0.01em] text-foreground-60 tablet:text-[12px]">
                   {demo.votreMetier}
                 </span>
               </span>

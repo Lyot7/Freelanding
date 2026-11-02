@@ -1,3 +1,32 @@
+# Test du skill Hallmark sur l'accueil, 2026-11-02
+
+Demande d'Eliott : installer `nutlope/hallmark` et le tester sur le site. Verbe
+utilisé : `audit` (Hallmark ne retouche un site existant que nommé), puis un
+passage `polish` limité aux défauts francs. Rendu réel enregistré par
+`sloplint --render --before` puis `--kept` (84/84 liens, 13/13 champs, 81/81
+gestionnaires conservés). Captures : `docs/captures/2026-11-02-hallmark/`.
+
+Retenu (défauts mesurés) :
+- Contour des champs du formulaire de contact à 2,1:1 sur le fond, sous le
+  3:1 des composants d'interface (impeccable, `color-and-contrast.md`) :
+  25 % de blanc porté à 40 %, survol à 60 %. Environ 3,8:1.
+- Étiquettes de la démonstration « semaine de bureau » à 10 px : 11 px, et
+  césure française sur mobile, où « Commandes » sortait de sa colonne.
+- Interrupteur du bandeau cookies animé sur `left` : animé en `transform`
+  (emil-design-eng, « Only animate transform and opacity »).
+- Héros d'article en `90vh` : `90svh`, pour ne plus passer sous la barre
+  d'adresse sur téléphone.
+
+Écarté, avec la raison :
+- Règles maison de Hallmark (libellés en capitales espacées, sur-titres,
+  flèche collée au lien, 80 mots par écran, titres en capitales serrés) :
+  elles contredisent la direction voulue de `DESIGN.md`. Les appliquer serait
+  une refonte, pas un audit.
+- Faux positifs du linter : SVG de la marque (déjà `aria-hidden` par
+  décomposition), vidéo du héros (décor, l'image fait le LCP), deux `sticky`
+  (cartes empilées voulues), « mur de photos » (cartes empilées floutées dans
+  la capture pleine page), bandeau défilant (absent de l'accueil).
+
 # Usage des skills design — passage à une seule offre, 2026-10-31
 
 Demande d'Eliott : le site vend à 100 % le logiciel métier ; hub et pages par métier.

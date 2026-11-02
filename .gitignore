@@ -99,3 +99,6 @@ docs/EMAIL-WURTH-AUTORISATION.md
 # graphe de connaissance : regenerable par graphe-projet.sh
 graphify-out/
 .visiteurs/
+
+# Hallmark (audit des outils de design)
+.hallmark/
