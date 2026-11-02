@@ -121,6 +121,7 @@ describe("POST /api/rendez-vous — chaque refus nomme son champ", () => {
     ["budget", { budget: "" }],
     ["echeance", { echeance: "demain" }],
     ["telephone", { telephone: "abc" }],
+    ["projet", { type: "point-d-etape", objectif: "priorites", projet: "" }],
   ])("%s", async (champ, surcharge) => {
     const reponse = await reserver({ ...valide, ...surcharge });
     expect(reponse.status).toBe(400);
