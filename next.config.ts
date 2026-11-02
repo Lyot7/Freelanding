@@ -105,7 +105,7 @@ const nextConfig: NextConfig = {
       /* LIENS DE PREMIER RENDEZ-VOUS envoyés en prospection et aux clients,
          décision d'Eliott du 2026-11-02 : ils mènent au formulaire du pied de
          l'accueil, qui recueille le projet, l'échéance et les coordonnées avant
-         de réserver le créneau Cal.com. Temporaires (307) : la destination peut
+         de réserver le créneau au cockpit. Temporaires (307) : la destination peut
          changer sans qu'un navigateur la garde en cache. */
       { source: "/rdv", destination: "/?sujet=decouverte#rendez-vous", statusCode: 307 },
       { source: "/rdv/logiciel", destination: "/?sujet=logiciel#rendez-vous", statusCode: 307 },
