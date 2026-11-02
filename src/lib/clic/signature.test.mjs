@@ -410,8 +410,8 @@ describe("traiterOuverture : portrait de la signature", () => {
   it("sert le buste de la carte de visite sur ?forme=buste, et rien d'autre de la requête", async () => {
     const { deps, planifies } = banc();
     const buste = traiterOuverture(new Request("http://localhost/o/x?forme=buste"), "dupont-plomberie", deps);
-    expect(buste.headers.get("location")).toBe("https://eliottbouquerel.fr/images/eliott-carte.jpg");
-    expect(DESTINATION_BUSTE).toBe("https://eliottbouquerel.fr/images/eliott-carte.jpg");
+    expect(buste.headers.get("location")).toBe("https://eliottbouquerel.fr/images/eliott-carte.png");
+    expect(DESTINATION_BUSTE).toBe("https://eliottbouquerel.fr/images/eliott-carte.png");
     expect(planifies).toHaveLength(1);
     const autre = traiterOuverture(new Request("http://localhost/o/x?forme=https://ailleurs.example"), "dupont-plomberie", deps);
     expect(autre.headers.get("location")).toBe(DESTINATION_OUVERTURE);
