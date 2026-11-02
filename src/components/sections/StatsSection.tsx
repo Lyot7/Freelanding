@@ -7,7 +7,8 @@ import type {
   Testimonial as TestimonialContent,
 } from "@/lib/content/types";
 import { Highlighted } from "@/components/ui";
-import { AnimatedCounter } from "@/components/motion/AnimatedCounter";
+import { CompteurDefilement } from "@/components/motion/CompteurDefilement";
+import { parseCounterValue } from "@/components/motion/animated-counter";
 import { uiLabels } from "@/content/ui";
 
 /**
@@ -46,7 +47,6 @@ const GRID_LAYOUT = [
   { dot: "right" as const },
   { dot: "left" as const },
 ];
-const COUNTER_SPEEDS = [10, 10, 10] as const;
 
 function Dot({ side }: { side: "left" | "right" }) {
   // framer-1h215vn / ac44d9 / 9u6m7p : cellule de grille (h-full, w-full, self-start)
@@ -66,7 +66,30 @@ function Dot({ side }: { side: "left" | "right" }) {
   );
 }
 
-function Counter({ stat, speedMs }: { stat: Stat; speedMs: number }) {
+/**
+ * Chiffre de la section, compté au rythme du défilement (2026-11-02) au lieu
+ * d'un décompte minuté : l'unité suit le nombre, la valeur complète est lue
+ * par les lecteurs d'écran.
+ */
+function CompteurStat({
+  value,
+  suffix,
+  className,
+}: {
+  value: string;
+  suffix?: string;
+  className: string;
+}) {
+  const { end, precision, suffix: unite } = parseCounterValue(value, suffix);
+  return (
+    <span className={className} data-counter-value={value}>
+      <CompteurDefilement cible={end} decimales={precision} libelle={value} />
+      {unite ? <span aria-hidden>{unite}</span> : null}
+    </span>
+  );
+}
+
+function Counter({ stat }: { stat: Stat }) {
   return (
     // framer-1kb2cqw / 1oh0ifa / obt2nj : compteur + libellé
     <div className="relative flex w-full max-w-[500px] flex-col items-start gap-[12px] self-start tablet:gap-[16px]">
@@ -81,10 +104,9 @@ function Counter({ stat, speedMs }: { stat: Stat; speedMs: number }) {
             {stat.prefix}
           </span>
         ) : null}
-        <AnimatedCounter
+        <CompteurStat
           value={stat.value}
           suffix={stat.suffix}
-          speedMs={speedMs}
           // `uppercase` : le live rend l'unité en capitale (« 3.2S », pas « 3.2s »).
           className="flex items-center gap-0 text-[44px] font-semibold uppercase tracking-[-0.07em] leading-[normal] text-accent-ink tablet:text-[52px] desktop:text-[58px]"
         />
@@ -110,11 +132,9 @@ function Counter({ stat, speedMs }: { stat: Stat; speedMs: number }) {
 function StatGrid({
   stat,
   dot,
-  speedMs,
 }: {
   stat: Stat;
   dot: "left" | "right";
-  speedMs: number;
 }) {
   // framer-zi5ocb / 1k3lmsr / 6t6elu : grille 2 colonnes (point | compteur)
   return (
@@ -122,11 +142,11 @@ function StatGrid({
       {dot === "left" ? (
         <>
           <Dot side="left" />
-          <Counter stat={stat} speedMs={speedMs} />
+          <Counter stat={stat} />
         </>
       ) : (
         <>
-          <Counter stat={stat} speedMs={speedMs} />
+          <Counter stat={stat} />
           <Dot side="right" />
         </>
       )}
@@ -237,7 +257,6 @@ export function StatsSection({ numbers }: { numbers: StatsSectionContent }) {
                 key={stat.label}
                 stat={stat}
                 dot={GRID_LAYOUT[i].dot}
-                speedMs={COUNTER_SPEEDS[i]}
               />
             ))}
           </div>

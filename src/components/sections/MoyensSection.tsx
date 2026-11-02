@@ -37,12 +37,12 @@ export function MoyensSection({ moyens }: { moyens: MoyensContent }) {
 
         <ul className="m-0 list-none border-b border-black/[0.12] p-0">
           {moyens.lignes.map((ligne) => (
-            <li key={ligne.titre} className="border-t border-black/[0.12]">
+            <li key={ligne.titre} className="moyens-ligne relative border-t border-black/[0.12]">
               <Link
                 href={ligne.lien.href}
                 className="group grid gap-[8px] py-[22px] no-underline transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] active:translate-y-[1px] tablet:grid-cols-2 tablet:gap-0 tablet:py-[30px]"
               >
-                <span className="text-[26px] font-semibold uppercase leading-[1] tracking-[-0.04em] tablet:pr-[30px] tablet:text-[32px] desktop:text-[40px]">
+                <span className="moyens-titre text-[26px] font-semibold uppercase leading-[1] tracking-[-0.04em] tablet:pr-[30px] tablet:text-[32px] desktop:text-[40px]">
                   {ligne.titre}
                 </span>
                 <span className="flex flex-col gap-[8px] tablet:pl-[30px] desktop:pl-[40px]">
