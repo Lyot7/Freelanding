@@ -1,7 +1,7 @@
 /**
- * `GET /r/<id>` : lien « Prendre contact » des e-mails de prospection.
+ * `GET /r/<id>` : bouton « Réserver un appel » des e-mails de prospection.
  *
- * Redirige toujours en 302 vers `/contact`. La logique, le contrat avec le
+ * Redirige toujours en 302 vers la prise de rendez-vous de l'accueil. La logique, le contrat avec le
  * cockpit et le plafond anti-inondation vivent dans
  * `src/lib/clic/signature.ts` ; ce fichier ne fait que les brancher.
  */

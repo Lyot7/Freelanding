@@ -1,11 +1,12 @@
 /**
- * Clic sur le lien « Prendre contact » des e-mails de prospection.
+ * Clic sur le bouton « Réserver un appel » des e-mails de prospection (le lien
+ * « Prendre contact » avant le 2026-11-02).
  *
  * Chaque e-mail porte un lien unique `/r/<id>`. La route redirige toujours
- * vers `/contact` et, pour un vrai clic, l'enregistre dans le cockpit
+ * vers la prise de rendez-vous de l'accueil et, pour un vrai clic, l'enregistre dans le cockpit
  * d'Eliott : il sait QUI a cliqué, sans cookie.
  *
- * Le logo de la signature porte le même identifiant, `/o/<id>` : son
+ * Le portrait de la signature porte le même identifiant, `/o/<id>` : son
  * affichage est relayé au cockpit comme une ouverture (décision d'Eliott du
  * 2026-10-15), puis redirigé vers l'image fixe.
  *
@@ -13,7 +14,7 @@
  * identifiants au format `ID_CLIC`. Le cockpit (`admin.eliottbouquerel.fr`)
  * reçoit `POST /api/clics` avec un jeton Bearer et le corps
  * `{ id, cliqueLe, navigateur, robotProbable }`, plus `nature: "ouverture"`
- * pour un affichage du logo. Il répond 201 (créé), 200
+ * pour un affichage du portrait. Il répond 201 (créé), 200
  * (déjà enregistré), 404 (identifiant qui ne correspond à aucun envoi,
  * attendu) ; 400, 401 et 503 signalent un défaut de notre côté ou du sien.
  * L'URL, les en-têtes et les quatre champs ne bougent pas sans lui.
@@ -35,7 +36,7 @@ const ID_CLIC = /^[a-z0-9-]{3,80}$/;
  * répond 200 et porte la balise canonical, `www` redirige en 307 vers lui.
  */
 export const DESTINATION_CLIC =
-  "https://eliottbouquerel.fr/contact?utm_source=email&utm_medium=signature&utm_campaign=prospection";
+  "https://eliottbouquerel.fr/?sujet=decouverte&utm_source=email&utm_medium=signature&utm_campaign=prospection#rendez-vous";
 
 /**
  * Littérale pour la même raison que la destination : le jeton ne doit partir
@@ -43,8 +44,8 @@ export const DESTINATION_CLIC =
  */
 export const URL_COCKPIT_CLICS = "https://admin.eliottbouquerel.fr/api/clics";
 
-/** Le logo de la signature, servi par Next depuis `src/app/apple-icon.png`. */
-export const DESTINATION_OUVERTURE = "https://eliottbouquerel.fr/apple-icon.png";
+/** Le portrait de la signature (depuis le 2026-11-02), servi depuis `public/images`. */
+export const DESTINATION_OUVERTURE = "https://eliottbouquerel.fr/images/eliott-bouquerel-avatar.jpg";
 
 /** Au-delà, le cockpit est jugé injoignable. La redirection, elle, est déjà partie. */
 const DELAI_COCKPIT_MS = 5_000;
@@ -260,7 +261,7 @@ export function traiterClic(
 }
 
 /**
- * Affichage du logo de la signature : toujours redirigé vers l'image fixe,
+ * Affichage du portrait de la signature : toujours redirigé vers l'image fixe,
  * relayé au cockpit comme une ouverture. Mêmes règles que le clic, avec son
  * propre plafond (`deps.throttle` distinct dans la route).
  */
