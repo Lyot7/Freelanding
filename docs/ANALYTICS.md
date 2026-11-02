@@ -139,7 +139,7 @@ imposé par `/services/*` ou `?sujet=`), `rdv_slots_loaded` (`slots_count` à z�
 = agenda vide, ce qui n'est pas une panne ; depuis le 2026-10-01 il compte un
 MOIS et non plus une semaine, et repart à chaque changement de durée,
 `duration_min` à l'appui : les courbes antérieures ne se comparent pas), `rdv_slots_failed`
-(`non_configure` = Cal.com absent ou mal réglé, `reseau` = appel échoué),
+(`non_configure` = `RDV_TOKEN` absent sur le site, `reseau` = appel échoué),
 `rdv_slot_selected` (`days_ahead`, jamais l'horaire, qui identifierait la
 personne une fois croisé avec l'agenda), `rdv_confirmed`, `rdv_failed`.
 
@@ -201,8 +201,8 @@ désintérêt alors qu'elle vient d'une panne.
    n'a pas de sens sur ce palier.
 
    Une chute entre les étapes 2 et 3 se lit à côté de `rdv_slots_failed` AVANT
-   d'être attribuée au désintérêt : une panne Cal.com dessine exactement la même
-   courbe. Le 2026-09-06, les quatre types pointaient sur des identifiants
+   d'être attribuée au désintérêt : une panne du cockpit dessine exactement la même
+   courbe. Le 2026-09-06, du temps de Cal.com, les quatre types pointaient sur des identifiants
    inexistants et aucun créneau ne s'affichait ; rien ne le disait.
 
 Avec quelques dizaines de visites par mois, **les taux ne veulent rien dire**.

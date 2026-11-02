@@ -1,14 +1,12 @@
 "use client";
 
 /**
- * Réservation Cal.com, entièrement dessinée ici — composant CLIENT.
+ * Prise de rendez-vous, entièrement dessinée ici — composant CLIENT.
  *
- * PAS D'IFRAME, ET C'EST LE POINT DE DÉPART. L'embed Cal.com impose sa
- * typographie, ses couleurs, ses rayons de 8 px et une seconde feuille de
- * style ; ce site tient au pixel près à un dessin anguleux, une seule police et
- * un seul accent. Les points de terminaison v2 employés ici répondent sans
- * clef d'API (vérifié, voir `src/lib/rendez-vous/cal-com.ts`), donc rien
- * n'obligeait à l'iframe.
+ * LE MOTEUR EST LE COCKPIT depuis le 2026-11-02 (avant : Cal.com). Ce composant
+ * ne parle qu'aux routes du site (`/api/rendez-vous/*`), qui relaient au
+ * cockpit côté serveur (`src/lib/rendez-vous/cockpit.ts`). `Calendrier` et
+ * `Heures` sont exportés : la page `/rdv/gerer/[jeton]` les réutilise.
  *
  * UN STEPPER, UNE ÉTAPE À L'ÉCRAN (2026-10-01). La version précédente empilait
  * les étapes et grandissait à chaque choix : arrivé aux coordonnées, le bloc
@@ -24,8 +22,8 @@
  * récapitulatif garde sous les yeux ce qui a déjà été choisi.
  *
  * LA DURÉE EST CHOISIE PAR LE VISITEUR, présélectionnée sur la valeur par
- * défaut du type d'événement Cal.com. Les options viennent de Cal.com par la
- * route des créneaux : le site n'en recopie aucune.
+ * défaut du type au cockpit. Les options viennent du cockpit par la route des
+ * créneaux : le site n'en recopie aucune.
  *
  * LE QUESTIONNAIRE VIENT APRÈS LE CRÉNEAU, PAS AVANT (2026-09-23). Trois
  * questions posées avant de voir un agenda sont une barrière à l'entrée ;
@@ -133,19 +131,19 @@ function numero(index: number): string {
   return String(index + 1).padStart(2, "0");
 }
 
-const CLASSE_LIBELLE =
+export const CLASSE_LIBELLE =
   "text-[13px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground/80";
 
-const CLASSE_CHAMP =
+export const CLASSE_CHAMP =
   "h-[52px] w-full border border-white/25 bg-white/[0.04] px-[16px] text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground transition-colors placeholder:text-white/45 hover:border-white/45 focus:border-accent tablet:text-[15px]";
 
-const CLASSE_TEXTE =
+export const CLASSE_TEXTE =
   "text-[14px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground-60";
 
-const CLASSE_BOUTON_SECONDAIRE =
+export const CLASSE_BOUTON_SECONDAIRE =
   "flex min-h-[44px] items-center gap-[8px] text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60 transition-colors hover:text-accent motion-reduce:transition-none";
 
-const CLASSE_BOUTON_PRINCIPAL =
+export const CLASSE_BOUTON_PRINCIPAL =
   "flex h-[52px] w-full items-center justify-center bg-accent px-[28px] text-[13px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-accent-ink transition-[opacity,transform] duration-150 ease-out active:scale-[0.98] disabled:cursor-progress disabled:opacity-60 motion-reduce:transition-none tablet:w-fit";
 
 const TITRES_ETAPES = [
@@ -400,7 +398,7 @@ function RetourEspere({ retour }: { retour: RetourBudget | undefined }) {
  * quand il y a de la place, et un jour sans créneau se lit comme tel au lieu
  * de disparaître de la bande.
  */
-function Calendrier({
+export function Calendrier({
   donnees,
   jourActif,
   chargement,
@@ -505,7 +503,7 @@ function Calendrier({
 }
 
 /** Heures libres du jour retenu, en grille serrée. */
-function Heures({
+export function Heures({
   jour,
   choisi,
   onChoisir,
@@ -582,7 +580,7 @@ export function ReservationRendezVous({
   const [etape, setEtape] = useState(typeInitial ? ETAPE_CRENEAU : ETAPE_SUJET);
   const [type, setType] = useState<IdRendezVous | undefined>(typeInitial);
   const [creneau, setCreneau] = useState<Creneau | undefined>(undefined);
-  /** Durée demandée ; `undefined` = celle par défaut du type chez Cal.com. */
+  /** Durée demandée ; `undefined` = celle par défaut du type au cockpit. */
   const [duree, setDuree] = useState<number | undefined>(undefined);
   const [mois, setMois] = useState("");
   const [jourChoisi, setJourChoisi] = useState("");

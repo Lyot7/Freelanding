@@ -31,3 +31,14 @@ export const LIMITE_RESERVATION: OptionsLimiteur = {
   maxParFenetre: 3,
   maxCles: 5_000,
 };
+
+/**
+ * Gestion d'un rendez-vous (annuler, déplacer) : 6 par quart d'heure et par
+ * adresse. Le jeton de 256 bits rend la devinette vaine ; la limite protège
+ * l'agenda d'un script qui déplacerait en boucle un rendez-vous connu.
+ */
+export const LIMITE_GESTION: OptionsLimiteur = {
+  fenetreMs: 15 * 60 * 1000,
+  maxParFenetre: 6,
+  maxCles: 5_000,
+};

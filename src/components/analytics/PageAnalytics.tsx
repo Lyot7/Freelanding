@@ -3,12 +3,8 @@
 import { Suspense, useEffect } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
-import {
-  ANALYTICS_EVENTS,
-  pageTypeFromPathname,
-  slugFromPathname,
-  viewEventForPageType,
-} from "@/lib/analytics/events";
+import { ANALYTICS_EVENTS, viewEventForPageType } from "@/lib/analytics/events";
+import { proprietesDePage } from "@/lib/analytics/masque";
 import { capture } from "@/lib/analytics/posthog";
 
 /**
@@ -50,14 +46,10 @@ function PageAnalyticsInner({ enabled }: { enabled: boolean }) {
   useEffect(() => {
     if (!enabled) return;
 
-    const pageType = pageTypeFromPathname(pathname);
-    const contentSlug = slugFromPathname(pathname);
-    const url = window.location.href;
-    const base = {
-      page_type: pageType,
-      page_path: pathname,
-      content_slug: contentSlug,
-    };
+    // Le jeton d'un lien de gestion de rendez-vous ne part jamais (`masque.ts`).
+    const { base, url } = proprietesDePage(pathname, window.location.href);
+    const pageType = base.page_type;
+    const contentSlug = base.content_slug;
 
     const enteredAt = Date.now();
     /* Temps ACTIF : l'onglet en arrière-plan ne compte pas. Un onglet oublié

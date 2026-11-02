@@ -1,6 +1,6 @@
 /**
  * Questionnaire de la prise de rendez-vous : tranches de budget, retour « ce
- * que vous pouvez espérer à ce budget », et mise en forme des notes Cal.com.
+ * que vous pouvez espérer à ce budget », et mise en forme des notes du rendez-vous.
  *
  * POURQUOI CE MODULE. Eliott veut recevoir des demandes déjà cadrées, et le
  * visiteur doit savoir avant l'appel à quoi s'attendre. Depuis le 2026-11-01, le
@@ -191,7 +191,7 @@ export interface ReponsesQuestionnaire {
   readonly budget: string;
   readonly objectif: string;
   readonly echeance?: string;
-  /** Facultatif : Cal.com n'en reçoit pas d'autre trace que cette ligne. */
+  /** Facultatif : le cockpit la reçoit aussi à part, mais elle reste en tête des notes. */
   readonly telephone?: string;
   readonly message?: string;
 }
@@ -207,7 +207,7 @@ function libelle(options: readonly OptionQuestion[], id: string): string {
 }
 
 /**
- * Texte déposé dans le champ `notes` de la réservation Cal.com.
+ * Texte déposé dans le champ `notes` de la réservation (cockpit, puis Google Agenda).
  *
  * LISIBLE D'UN COUP D'ŒIL DANS UN AGENDA : une réponse par ligne, ce qui est
  * à portée déjà calculé, puis le message libre après une ligne vide. Les
@@ -217,7 +217,7 @@ function libelle(options: readonly OptionQuestion[], id: string): string {
 export function composerNotes(reponses: ReponsesQuestionnaire): string {
   const { notes } = rendezVousContent;
   const lignes: string[] = [];
-  // En tête : c'est la seule coordonnée que Cal.com ne porte pas déjà.
+  // En tête : c'est la seule coordonnée que l'événement d'agenda ne porte pas déjà.
   if (reponses.telephone) {
     lignes.push(`${LIBELLE_NOTE_TELEPHONE} : ${reponses.telephone}`);
   }

@@ -3,16 +3,15 @@ import { POST } from "./route.ts";
 
 /**
  * LA ROUTE DE RÉSERVATION, VUE DU NAVIGATEUR, pour les deux sujets qui restent
- * depuis le 2026-10-31 : « logiciel » et « decouverte ». Rien ne part chez Cal.com : sans clef Turnstile, une
+ * depuis le 2026-10-31 : « logiciel » et « decouverte ». Rien ne part au cockpit : sans clef Turnstile, une
  * demande valide s'arrête au captcha en 503, APRÈS la validation. Un 503 prouve
  * donc que la demande a passé la validation ; un 400 dit quel champ l'a
  * arrêtée.
  */
 
 const VARIABLES = {
-  CAL_COM_USERNAME: "eliott-bouquerel",
-  CAL_COM_EVENT_LOGICIEL: "7514252",
-  CAL_COM_EVENT_DECOUVERTE: "7514277",
+  RDV_TOKEN: "jeton-de-test",
+  COCKPIT_URL: "https://cockpit.test",
   TURNSTILE_SECRET_KEY: "",
 };
 const avant = {};
@@ -128,6 +127,21 @@ describe("POST /api/rendez-vous — chaque refus nomme son champ", () => {
     const corps = await reponse.json();
     expect(corps.champ).toBe(champ);
     expect(corps.message.length).toBeGreaterThan(0);
+  });
+});
+
+describe("POST /api/rendez-vous — sans RDV_TOKEN", () => {
+  it("répond 503 et renvoie vers l’e-mail, sans rien réserver", async () => {
+    process.env.RDV_TOKEN = "";
+    try {
+      const reponse = await reserver({ type: "logiciel", budget: tranche, objectif: "tache" });
+      expect(reponse.status).toBe(503);
+      expect((await reponse.json()).message).toBe(
+        "La prise de rendez-vous en ligne est momentanément indisponible. Écrivez-moi directement à contact@eliottbouquerel.fr.",
+      );
+    } finally {
+      process.env.RDV_TOKEN = VARIABLES.RDV_TOKEN;
+    }
   });
 });
 

@@ -31,6 +31,7 @@ import {
   POSTHOG_UI_HOST,
 } from "./config";
 import { CONSENT_TTL_DAYS, type ConsentChoices } from "./consent";
+import { masquerJetons } from "./masque";
 
 type Properties = Record<string, unknown>;
 
@@ -68,6 +69,15 @@ export function filtreSansConsentement<T extends { event: string }>(
   if (!event || consentGranted) return event;
   if (oppositionSignalee()) return null;
   return EVENEMENTS_SANS_CONSENTEMENT.has(event.event) ? event : null;
+}
+
+/**
+ * Dernier filtre avant l'envoi : le consentement d'abord, puis le jeton de
+ * gestion d'un rendez-vous masqué partout où une URL le porterait.
+ */
+export function avantEnvoi<T extends { event: string }>(event: T | null): T | null {
+  const retenu = filtreSansConsentement(event);
+  return retenu ? masquerJetons(retenu) : null;
 }
 
 /*
@@ -271,7 +281,7 @@ export async function startAnalytics(
            jetées à la réception. */
         opt_out_capturing_by_default: true,
         cookieless_mode: "on_reject",
-        before_send: filtreSansConsentement,
+        before_send: avantEnvoi,
       });
 
       if (consentGranted) grantConsent(posthog);

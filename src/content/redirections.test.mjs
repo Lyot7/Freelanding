@@ -51,3 +51,17 @@ describe("les liens de premier rendez-vous mènent au formulaire de l'accueil", 
     });
   }
 });
+
+describe("les liens de premier rendez-vous mènent au formulaire de l’accueil", () => {
+  test("/rdv et /rdv/logiciel, en temporaire, sujet déjà choisi", async () => {
+    const { default: config } = await import("../../next.config.ts");
+    const redirections = await config.redirects();
+    const vers = (origine) => redirections.find((r) => r.source === origine);
+    expect(vers("/rdv")).toEqual({ source: "/rdv", destination: "/?sujet=decouverte#rendez-vous", statusCode: 307 });
+    expect(vers("/rdv/logiciel")).toEqual({
+      source: "/rdv/logiciel",
+      destination: "/?sujet=logiciel#rendez-vous",
+      statusCode: 307,
+    });
+  });
+});

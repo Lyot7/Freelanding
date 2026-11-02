@@ -57,12 +57,8 @@ erreur dans les journaux.
 | `CONTACT_FROM_EMAIL` | non | expéditeur affiché | route en 503 |
 | `CONTACT_TO_EMAIL` | non | destinataire des demandes | route en 503 |
 | `RESEND_API_KEY` | non | chemin d'envoi préféré s'il est posé | bascule sur SMTP |
-| `CAL_COM_USERNAME` | non | compte Cal.com | prise de rendez-vous masquée |
-| `CAL_COM_EVENT_SITE` | non | type d'événement « un site » | entrée masquée |
-| `CAL_COM_EVENT_LOGICIEL` | non | type « une solution métier » | entrée masquée |
-| `CAL_COM_EVENT_IA` | non | type « l'intégration IA » | entrée masquée |
-| `CAL_COM_EVENT_CTO` | non | type « CTO et référent IA » | entrée masquée |
-| `CAL_COM_EVENT_DECOUVERTE` | non | type « je ne sais pas encore » | entrée masquée |
+| `RDV_TOKEN` | non (secret) | jeton partagé avec le cockpit, moteur des rendez-vous (`docs/RENDEZ-VOUS.md`) | prise de rendez-vous masquée |
+| `COCKPIT_URL` | non | adresse du cockpit, `https://admin.eliottbouquerel.fr` par défaut | défaut appliqué |
 | `CLIC_TOKEN` | non | jeton du cockpit, enregistre les clics des liens `/r/<id>` des e-mails de prospection | clic non enregistré, journal `[clic] <id> non_configure`, redirection intacte |
 
 **Aucune absence ne provoque d'erreur visible pour le visiteur** : chaque

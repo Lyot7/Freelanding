@@ -72,15 +72,15 @@ export const ANALYTICS_EVENTS = {
   /* --- Prise de rendez-vous ------------------------------------------------
      LE FORMULAIRE DE RDV NE SE MESURE PAS COMME LES AUTRES, et c'est la raison
      d'être de ces six noms. Les écouteurs délégués de `GlobalAnalytics` voient
-     un `submit` et s'arrêtent là : ils ne peuvent pas savoir si Cal.com a
+     un `submit` et s'arrêtent là : ils ne peuvent pas savoir si le cockpit a
      confirmé, si le créneau avait été pris entre l'affichage et le clic, ni si
      la grille des créneaux s'est seulement chargée. Un entonnoir bâti sur
      `form_submitted` comptait donc en conversions des réservations qui
      échouaient.
 
-     `rdv_slots_failed` EST LE PLUS IMPORTANT DES SIX. Quand Cal.com répond 502,
-     comme le 2026-09-06 où les quatre types pointaient sur des identifiants
-     inexistants, le prospect ne voit aucun créneau et repart. Sans cet
+     `rdv_slots_failed` EST LE PLUS IMPORTANT DES SIX. Quand le moteur répond 502
+     (Cal.com le 2026-09-06, quand les quatre types pointaient sur des
+     identifiants inexistants ; le cockpit depuis le 2026-11-02), le prospect ne voit aucun créneau et repart. Sans cet
      événement, l'entonnoir montre une chute à l'étape 2 et rien ne dit qu'elle
      vient d'une panne plutôt que d'un désintérêt. */
   rdvTypeSelected: "rdv_type_selected",
@@ -206,10 +206,10 @@ export const RECOMMENDED_FUNNELS: readonly FunnelDefinition[] = [
     ],
     note:
       "L'entonnoir qui compte : il finit sur une réservation CONFIRMÉE par " +
-      "Cal.com, jamais sur un formulaire envoyé. Filtrer l'étape 1 sur " +
+      "le cockpit, jamais sur un formulaire envoyé. Filtrer l'étape 1 sur " +
       "`section = rendez-vous`. Fenêtre : 1 jour, la prise de rendez-vous se " +
       "joue en une seule visite. Croiser la chute entre les étapes 2 et 3 avec " +
-      "`rdv_slots_failed` avant de conclure à un désintérêt : une panne Cal.com " +
+      "`rdv_slots_failed` avant de conclure à un désintérêt : une panne du cockpit " +
       "produit exactement la même courbe.",
   },
   {

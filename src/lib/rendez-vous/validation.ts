@@ -10,9 +10,9 @@
  * choisi pose, chacune dans sa liste fermée (`questionnaire.ts`).
  *
  * POURQUOI VÉRIFIER L'INSTANT ALORS QUE CAL.COM LE FERA AUSSI. Parce qu'une
- * requête refusée par Cal.com est un aller-retour payé à un tiers pour rien, et
+ * requête refusée par le cockpit est un aller-retour payé à un tiers pour rien, et
  * surtout parce que rien n'oblige le client à renvoyer un créneau que nous lui
- * avons proposé : le champ arrive tel quel du navigateur. Cal.com reste
+ * avons proposé : le champ arrive tel quel du navigateur. Le cockpit reste
  * l'autorité sur la disponibilité réelle, ce module écarte l'absurde.
  *
  * MODULE PUR. Ni réseau, ni `Date.now()`, ni `process.env`.
@@ -44,18 +44,17 @@ export const LONGUEUR_MESSAGE_MAX = 1_500;
 /**
  * Délai minimal entre maintenant et le créneau demandé.
  *
- * Cal.com porte le même garde-fou (`minimumBookingNotice`), réglable par
- * événement. Celui-ci est volontairement PLUS PERMISSIF (une heure) : c'est un
- * filtre à l'absurde, pas la politique d'agenda d'Eliott. La politique reste
- * chez Cal.com, seul endroit où elle peut être changée sans déployer.
+ * Le cockpit porte le vrai préavis (deux heures). Celui-ci est volontairement
+ * PLUS PERMISSIF (une heure) : c'est un filtre à l'absurde, pas la politique
+ * d'agenda d'Eliott, qui reste au cockpit.
  */
 export const PREAVIS_MINIMAL_MS = 60 * 60 * 1000;
 
 export interface ReservationValide {
   readonly type: IdRendezVous;
-  /** Instant de début, normalisé en ISO 8601 UTC (ce qu'attend Cal.com). */
+  /** Instant de début, normalisé en ISO 8601 UTC (ce qu'attend le cockpit). */
   readonly debutUtc: string;
-  /** Minutes demandées ; absente = durée par défaut du type chez Cal.com. */
+  /** Minutes demandées ; absente = durée par défaut du type au cockpit. */
   readonly duree?: number;
   readonly nom: string;
   readonly email: string;
@@ -116,7 +115,7 @@ function surUneLigne(valeur: string): string {
  *
  * Rien de ce que le client envoie ne part tel quel dans les notes : seul un
  * identifiant connu passe, et c'est son LIBELLÉ, écrit par nous, qui sera
- * déposé chez Cal.com.
+ * déposé au cockpit.
  */
 function lireChoix(
   corps: Record<string, unknown>,
@@ -207,7 +206,7 @@ export function validerReservation(
   }
 
   // La durée n'est vérifiée ici qu'en forme : seule la route connaît les
-  // options du type, lues chez Cal.com, et c'est elle qui tranche.
+  // options du type, lues au cockpit, et c'est elle qui tranche.
   const duree = champs.duree;
   if (duree !== undefined && duree !== null && !estDureePlausible(duree)) {
     return {
@@ -273,7 +272,7 @@ export function validerReservation(
     ok: true,
     reservation: {
       type,
-      // Cal.com exige l'instant en UTC. `toISOString` le garantit quel que soit
+      // Le cockpit reçoit l'instant en UTC. `toISOString` le garantit quel que soit
       // le décalage écrit par le client (`+02:00` comme `Z`).
       debutUtc: instant.toISOString(),
       ...(estDureePlausible(duree) ? { duree } : {}),

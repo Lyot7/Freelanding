@@ -214,7 +214,7 @@ export const siteConfig: SiteConfig = {
   // dans la même semaine feraient afficher « 3 créneaux pris » sans qu'un seul
   // devis soit signé : la même fausse déclaration, automatisée, donc plus
   // difficile à repérer. S'y ajoute qu'aucun type d'événement n'est configuré
-  // (les variables `CAL_COM_EVENT_*` sont vides, cf. `src/lib/rendez-vous/`),
+  // (le compte de rendez-vous vit au cockpit, cf. `src/lib/rendez-vous/`),
   // et qu'un appel réseau par rendu du hero coûterait cher pour une donnée qui
   // ne dit pas ce qu'on lui ferait dire.
   //

@@ -148,7 +148,7 @@ describe("startAnalytics, les deux régimes", () => {
     expect(sdk.config.cookieless_mode).toBe("on_reject");
     expect(sdk.config.opt_out_capturing_by_default).toBe(true);
     expect(sdk.config.disable_session_recording).toBe(true);
-    expect(sdk.config.before_send).toBe(mesure.filtreSansConsentement);
+    expect(sdk.config.before_send).toBe(mesure.avantEnvoi);
     expect(mesure.getAnalyticsSnapshot()).toBe(true);
     expect(mesure.getRegimeSnapshot()).toBe("sans-cookie");
     expect(vus.length).toBe(1);

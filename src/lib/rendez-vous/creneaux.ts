@@ -1,5 +1,5 @@
 /**
- * Lecture et mise en forme des créneaux Cal.com.
+ * Lecture et mise en forme des créneaux du moteur de réservation (cockpit).
  *
  * MODULE PUR : aucune requête, aucune horloge globale. L'instant courant est
  * toujours injecté. C'est ce qui rend `creneaux.test.mjs` possible sans réseau
@@ -11,11 +11,13 @@
  * tombe à 9 h chez l'un des deux est une réunion manquée. Le fuseau est donc
  * fixe et ANNONCÉ à l'écran (`rendezVousContent.noteFuseau`).
  *
- * DEUX FORMES DE RÉPONSE sont acceptées par `lireCreneaux`, parce que l'API v2
- * en a servi deux selon la version d'en-tête :
+ * TROIS FORMES DE RÉPONSE sont acceptées par `lireCreneaux` : celle du cockpit
+ * (`GET /api/rdv/creneaux`, depuis le 2026-11-02), et les deux que servait
+ * l'API v2 de Cal.com sous `data`, gardées tant qu'elles ne coûtent rien :
  *
- *   { "2026-09-01": [{ "start": "2026-09-01T15:00:00.000+02:00" }] }
- *   { "2026-09-01": ["2026-09-01T15:00:00.000+02:00"] }
+ *   { "jours": [{ "jour": "2026-09-01", "creneaux": ["2026-09-01T13:00:00.000Z"] }] }
+ *   { "data": { "2026-09-01": [{ "start": "2026-09-01T15:00:00.000+02:00" }] } }
+ *   { "data": { "2026-09-01": ["2026-09-01T15:00:00.000+02:00"] } }
  *
  * Tout ce qui n'entre dans ni l'une ni l'autre est IGNORÉ silencieusement au
  * niveau du créneau, jamais du jour entier : une entrée mal formée ne doit pas
@@ -36,7 +38,7 @@ export const FUSEAU = "Europe/Paris";
 
 /** Un créneau réservable, à son instant de début. */
 export interface Creneau {
-  /** Instant ISO 8601 tel que servi par Cal.com. */
+  /** Instant ISO 8601 tel que servi par le cockpit. */
   readonly debut: string;
   /** Heure affichable, à l'heure de Paris (« 15:00 »). */
   readonly heure: string;
@@ -64,11 +66,11 @@ export interface JourDeCreneaux {
 /**
  * Horizon maximal de réservation, en jours.
  *
- * Il n'a rien d'esthétique : sans borne, un client pourrait faire pagineter la
- * route jusqu'en 2050 et transformer notre serveur en marteau sur l'API
- * publique de Cal.com.
+ * Celui du cockpit (`HORIZON_JOURS` de `src/lib/rdv/types.ts`) : au-delà, il ne
+ * rend aucun créneau, et un mois vide se lirait « agenda plein ». La borne
+ * empêche aussi un client de faire paginer la route jusqu'en 2050.
  */
-export const HORIZON_JOURS = 120;
+export const HORIZON_JOURS = 60;
 
 const MOTIF_JOUR = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -161,7 +163,7 @@ export function dernierJourDuMois(mois: string): string {
  * Le mois demandé vient du client : il est donc traité comme une suggestion.
  * Antérieur au mois courant, il y est ramené ; au-delà de l'horizon, il est
  * ramené au mois de l'horizon. Les deux bords sont ensuite coupés à
- * aujourd'hui et à l'horizon : rien ne remonte tel quel jusqu'à Cal.com.
+ * aujourd'hui et à l'horizon : rien ne remonte tel quel jusqu'au cockpit.
  */
 export function fenetreMois(
   moisDemande: string,
@@ -307,26 +309,40 @@ function lireDebut(entree: unknown): string | undefined {
   return typeof start === "string" ? start : undefined;
 }
 
+/** Paires (jour, créneaux bruts) d'une charge, sous ses trois formes. */
+function entreesParJour(charge: unknown): readonly (readonly [string, unknown])[] {
+  if (typeof charge !== "object" || charge === null) return [];
+  const objet = charge as Record<string, unknown>;
+  if (Array.isArray(objet.jours)) {
+    const entrees: (readonly [string, unknown])[] = [];
+    for (const entree of objet.jours) {
+      if (typeof entree !== "object" || entree === null) continue;
+      const { jour, creneaux } = entree as Record<string, unknown>;
+      if (typeof jour === "string") entrees.push([jour, creneaux]);
+    }
+    return entrees;
+  }
+  const data = objet.data;
+  if (typeof data !== "object" || data === null || Array.isArray(data)) return [];
+  return Object.entries(data as Record<string, unknown>);
+}
+
 /**
- * Convertit la charge utile de `GET /v2/slots` en jours affichables.
+ * Convertit la charge utile du cockpit en jours affichables.
  *
  * @param charge Corps JSON déjà analysé, jamais typé d'office.
  * @param maintenant Instant courant : les créneaux déjà passés sont retirés.
- *   Cal.com les filtre normalement lui-même, mais une fenêtre demandée le matin
+ *   Le cockpit les filtre normalement lui-même, mais une fenêtre demandée le matin
  *   et affichée le soir garderait sinon des heures mortes cliquables.
  */
 export function lireCreneaux(
   charge: unknown,
   maintenant: Date,
 ): readonly JourDeCreneaux[] {
-  if (typeof charge !== "object" || charge === null) return [];
-  const data = (charge as Record<string, unknown>).data;
-  if (typeof data !== "object" || data === null || Array.isArray(data)) return [];
-
   const seuil = maintenant.getTime();
   const jours: JourDeCreneaux[] = [];
 
-  for (const [jour, brut] of Object.entries(data as Record<string, unknown>)) {
+  for (const [jour, brut] of entreesParJour(charge)) {
     if (!estJourValide(jour) || !Array.isArray(brut)) continue;
 
     const libelle = formaterJour(jour);
@@ -364,9 +380,9 @@ export interface FenetreAffichee extends Fenetre {
 
 export interface ReponseCreneaux {
   readonly fenetre: FenetreAffichee;
-  /** Durées proposées par Cal.com ; `null` quand elles n'ont pas pu être lues. */
+  /** Durées proposées par le type ; `null` quand elles n'ont pas pu être lues. */
   readonly durees: Durees | null;
-  /** Durée des créneaux renvoyés ; `null` = durée par défaut de Cal.com. */
+  /** Durée des créneaux renvoyés ; `null` = durée par défaut du type. */
   readonly duree: number | null;
   readonly jours: readonly JourDeCreneaux[];
 }

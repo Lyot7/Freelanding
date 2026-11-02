@@ -1,10 +1,10 @@
 /**
- * Durées de rendez-vous proposées par un type d'événement Cal.com.
+ * Durées de rendez-vous proposées par un type de rendez-vous du cockpit.
  *
- * CAL.COM EST L'AUTORITÉ, LE SITE SUIT (2026-10-01). Un type d'événement peut
- * proposer plusieurs durées (`lengthInMinutesOptions`) et en désigner une par
- * défaut (`lengthInMinutes`). Le site les lit au lieu de les recopier : changer
- * une durée chez Cal.com change le sélecteur sans déployer.
+ * LE COCKPIT EST L'AUTORITÉ, LE SITE SUIT. Un type peut proposer plusieurs
+ * durées et en désigner une par défaut (`GET /api/rdv/types` du cockpit). Le
+ * site les lit au lieu de les recopier : changer une durée au cockpit change
+ * le sélecteur sans déployer le site.
  *
  * MODULE PUR, importé par le composant client comme par les routes : aucune
  * requête, aucune lecture d'environnement.
@@ -39,7 +39,7 @@ export function estDureePlausible(valeur: unknown): valeur is number {
  *     la route des créneaux.
  *
  * `undefined` dès que rien d'exploitable n'en sort : le sélecteur disparaît et
- * Cal.com applique sa durée par défaut, ce qui reste une réservation valable.
+ * le cockpit applique la durée par défaut, ce qui reste une réservation valable.
  */
 export function lireDurees(charge: unknown): Durees | undefined {
   if (typeof charge !== "object" || charge === null) return undefined;
@@ -69,7 +69,7 @@ function normaliser(defaut: number, brutes: readonly unknown[]): Durees {
 }
 
 /**
- * Durée à demander à Cal.com pour une valeur reçue du client.
+ * Durée à demander au cockpit pour une valeur reçue du client.
  *
  * Une valeur absente, illisible ou hors des options retombe sur la durée par
  * défaut : un lien partagé avec `?duree=90` ne doit pas produire une erreur,
