@@ -46,6 +46,32 @@ describe("masquage du jeton de gestion", () => {
     expect(envoye.properties.liste).toEqual(["/rdv/gerer/[jeton]", 3, null]);
   });
 
+  it("masque aussi les clés (carte de chaleur) et les appels d’API de la page", () => {
+    const evenement = {
+      event: "$$heatmap",
+      properties: { $heatmap_data: { [URL_PAGE]: [{ x: 1, y: 2 }] } },
+    };
+    const envoye = masquerJetons(evenement);
+    expect(JSON.stringify(envoye)).not.toContain(JETON);
+    expect(Object.keys(envoye.properties.$heatmap_data)).toEqual([
+      "https://eliottbouquerel.fr/rdv/gerer/[jeton]?utm_source=mail",
+    ]);
+    const reseau = {
+      event: "$snapshot",
+      properties: {
+        $snapshot_data: [
+          { name: `https://eliottbouquerel.fr/api/rendez-vous/gestion/${JETON}/annuler` },
+          { name: `https://x.fr/?retour=%2Frdv%2Fgerer%2F${JETON}` },
+        ],
+      },
+    };
+    const nettoye = masquerJetons(reseau);
+    expect(JSON.stringify(nettoye)).not.toContain(JETON);
+    expect(nettoye.properties.$snapshot_data[0].name).toBe(
+      "https://eliottbouquerel.fr/api/rendez-vous/gestion/[jeton]/annuler",
+    );
+  });
+
   it("rend tel quel un événement sans lien de gestion", () => {
     const evenement = { event: "$pageview", properties: { $pathname: "/contact" } };
     expect(masquerJetons(evenement)).toBe(evenement);
