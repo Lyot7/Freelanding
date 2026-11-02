@@ -60,6 +60,11 @@ function messageRejet(motif: MotifRejetReservation): {
           message: "Cette adresse e-mail ne semble pas valide.",
           champ: "email",
         };
+      case "telephone":
+        return {
+          message: "Ce numéro de téléphone ne semble pas valide.",
+          champ: "telephone",
+        };
       case "message":
         return { message: "Votre message est trop long.", champ: "message" };
       case "creneau":

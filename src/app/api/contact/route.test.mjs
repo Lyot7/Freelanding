@@ -15,3 +15,31 @@ describe("POST /api/contact", () => {
     expect(reponse.status).toBeLessThan(500);
   });
 });
+
+describe("POST /api/contact — téléphone", () => {
+  test("refuse un numéro invalide en nommant le champ", async () => {
+    const reponse = await POST(
+      new Request("http://localhost:3000/api/contact", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          origin: "http://localhost:3000",
+          "x-forwarded-for": "203.0.113.200",
+        },
+        body: JSON.stringify({
+          intention: "footer",
+          nom: "Jean Dupont",
+          email: "jean@example.com",
+          typeProjet: "Une solution métier",
+          telephone: "abc",
+          debutMs: Date.now() - 10_000,
+        }),
+      }),
+    );
+    expect(reponse.status).toBe(400);
+    expect(await reponse.json()).toEqual({
+      message: "Ce numéro de téléphone ne semble pas valide.",
+      champ: "telephone",
+    });
+  });
+});

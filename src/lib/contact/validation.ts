@@ -39,6 +39,8 @@ export interface SoumissionValide {
   readonly nom: string;
   readonly email: string;
   readonly typeProjet: string;
+  /** Facultatif ; absent quand le visiteur n'a rien saisi. Donnée personnelle. */
+  readonly telephone?: string;
   readonly message?: string;
   /**
    * Réponses au questionnaire de `/contact`, en LIBELLÉS (prêts pour l'e-mail).
@@ -99,6 +101,8 @@ export const LIMITES = {
   email: { min: 6, max: 254 },
   message: { min: 10, max: 4_000 },
   typeProjet: { max: 120 },
+  /** Facultatif : chiffres comptés à part, longueur avec séparateurs bornée. */
+  telephone: { chiffresMin: 6, chiffresMax: 20, max: 30 },
 } as const;
 
 /**
@@ -115,6 +119,37 @@ export const MOTIF_EMAIL =
 /** Caractères de contrôle et séparateurs de ligne, interdits partout. */
 const CARACTERES_CONTROLE =
   /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
+
+/**
+ * Forme d'un numéro de téléphone : un `+` initial facultatif, puis chiffres,
+ * espaces, points, tirets et parenthèses. Le nombre de chiffres se vérifie à
+ * part : le motif seul accepterait « ( - ) ».
+ */
+const MOTIF_TELEPHONE = /^\+?[\d\s.()-]+$/;
+
+/** Lecture d'un numéro facultatif : vide = pas de numéro, pas une erreur. */
+export type ResultatTelephone =
+  | { readonly ok: true; readonly valeur?: string }
+  | { readonly ok: false; readonly raison: "longueur" | "format" };
+
+/**
+ * Valide et normalise le téléphone facultatif des deux formulaires.
+ *
+ * Partagée avec la prise de rendez-vous, comme `MOTIF_EMAIL`, pour que les deux
+ * formulaires acceptent exactement les mêmes numéros.
+ */
+export function lireTelephone(brut: unknown): ResultatTelephone {
+  if (typeof brut !== "string") return { ok: true };
+  const valeur = normaliserTexte(brut).replace(/\s+/g, " ");
+  if (valeur.length === 0) return { ok: true };
+  if (valeur.length > LIMITES.telephone.max) return { ok: false, raison: "longueur" };
+  if (!MOTIF_TELEPHONE.test(valeur)) return { ok: false, raison: "format" };
+  const chiffres = valeur.replace(/\D/g, "").length;
+  if (chiffres < LIMITES.telephone.chiffresMin || chiffres > LIMITES.telephone.chiffresMax) {
+    return { ok: false, raison: "longueur" };
+  }
+  return { ok: true, valeur };
+}
 
 function estIntention(valeur: unknown): valeur is Intention {
   return (
@@ -214,6 +249,15 @@ export function validerSoumission(
     };
   }
 
+  const telephone = lireTelephone(champs.telephone);
+  if (!telephone.ok) {
+    return {
+      ok: false,
+      motif: { type: "champ_invalide", champ: "telephone", raison: telephone.raison },
+    };
+  }
+  const coordonnees = telephone.valeur ? { telephone: telephone.valeur } : {};
+
   const typeProjet = normaliserLigne(lireChaine(champs, "typeProjet") ?? "");
   if (!options.typesProjetAutorises.includes(typeProjet)) {
     return {
@@ -259,7 +303,7 @@ export function validerSoumission(
   // propose aussi depuis le 2026-10-15, en champ court.
   const messageBrut = normaliserTexte(lireChaine(champs, "message") ?? "");
   if (messageBrut.length === 0) {
-    return { ok: true, soumission: { intention, nom, email, typeProjet, ...reponses } };
+    return { ok: true, soumission: { intention, nom, email, ...coordonnees, typeProjet, ...reponses } };
   }
   if (
     messageBrut.length < LIMITES.message.min ||
@@ -273,6 +317,14 @@ export function validerSoumission(
 
   return {
     ok: true,
-    soumission: { intention, nom, email, typeProjet, ...reponses, message: messageBrut },
+    soumission: {
+      intention,
+      nom,
+      email,
+      ...coordonnees,
+      typeProjet,
+      ...reponses,
+      message: messageBrut,
+    },
   };
 }

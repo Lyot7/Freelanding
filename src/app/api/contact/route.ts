@@ -78,6 +78,11 @@ function messageRejet(motif: MotifRejet): { message: string; champ?: string } {
         return { message: "Cette adresse e-mail ne semble pas valide.", champ: "email" };
       case "nom":
         return { message: "Merci d’indiquer votre nom.", champ: "nom" };
+      case "telephone":
+        return {
+          message: "Ce numéro de téléphone ne semble pas valide.",
+          champ: "telephone",
+        };
       case "typeProjet":
         return {
           message: "Choisissez un type de projet dans la liste.",

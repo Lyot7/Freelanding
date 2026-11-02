@@ -344,3 +344,66 @@ describe("validerSoumission — questionnaire de /contact", () => {
     expect(resultat.soumission.budget).toBeUndefined();
   });
 });
+
+describe("validerSoumission — téléphone facultatif", () => {
+  it("n'ajoute rien quand le champ est absent", () => {
+    const resultat = valider(soumissionProjet());
+    expect(resultat.ok).toBe(true);
+    expect(resultat.soumission).not.toHaveProperty("telephone");
+  });
+
+  it("n'ajoute rien quand le champ est vide ou blanc", () => {
+    for (const telephone of ["", "   "]) {
+      const resultat = valider(soumissionProjet({ telephone }));
+      expect(resultat.ok).toBe(true);
+      expect(resultat.soumission).not.toHaveProperty("telephone");
+    }
+  });
+
+  it("accepte un numéro français et compacte les espaces", () => {
+    const resultat = valider(soumissionProjet({ telephone: "  06 32  21 37 11 " }));
+    expect(resultat.ok).toBe(true);
+    expect(resultat.soumission.telephone).toBe("06 32 21 37 11");
+  });
+
+  it("accepte un numéro international", () => {
+    const resultat = valider(soumissionProjet({ telephone: "+33 6 32 21 37 11" }));
+    expect(resultat.ok).toBe(true);
+    expect(resultat.soumission.telephone).toBe("+33 6 32 21 37 11");
+  });
+
+  it("accepte points, tirets et parenthèses", () => {
+    expect(valider(soumissionProjet({ telephone: "(0)6.32-21.37.11" })).ok).toBe(true);
+  });
+
+  it("garde le téléphone quand le message est vide", () => {
+    const resultat = valider(soumissionProjet({ message: "", telephone: "0632213711" }));
+    expect(resultat.ok).toBe(true);
+    expect(resultat.soumission.telephone).toBe("0632213711");
+  });
+
+  it("refuse des lettres", () => {
+    const resultat = valider(soumissionProjet({ telephone: "abc" }));
+    expect(resultat.ok).toBe(false);
+    expect(resultat.motif).toEqual({ type: "champ_invalide", champ: "telephone", raison: "format" });
+  });
+
+  it("refuse un + ailleurs qu'en tête", () => {
+    const resultat = valider(soumissionProjet({ telephone: "06 32 +21 37 11" }));
+    expect(resultat.ok).toBe(false);
+    expect(resultat.motif.champ).toBe("telephone");
+  });
+
+  it("refuse un numéro trop court", () => {
+    const resultat = valider(soumissionProjet({ telephone: "06 32" }));
+    expect(resultat.ok).toBe(false);
+    expect(resultat.motif).toEqual({ type: "champ_invalide", champ: "telephone", raison: "longueur" });
+  });
+
+  it("refuse plus de 20 chiffres et plus de 30 caractères", () => {
+    expect(valider(soumissionProjet({ telephone: "1".repeat(21) })).motif.champ).toBe("telephone");
+    expect(
+      valider(soumissionProjet({ telephone: "06 . 32 . 21 . 37 . 11 . 00 . 00" })).motif.champ,
+    ).toBe("telephone");
+  });
+});

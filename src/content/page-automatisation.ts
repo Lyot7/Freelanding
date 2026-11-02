@@ -148,18 +148,21 @@ export const pageAutomatisation: PageTheme = {
         },
       ],
     },
+    /* SANS DÉROULÉ depuis le 2026-11-02, décision d'Eliott : les quatre étapes
+       (noter, trier, traiter, continuer) venaient d'une proposition faite à un
+       client, pas de sa façon générale de travailler. L'option reste, son
+       déroulé se règle au devis. */
     {
-      type: "etapes",
+      type: "section",
       id: "referent",
       titre: "En option : un référent dans la durée",
       paragraphes: [
         "Mes missions sont le plus souvent ponctuelles : une tâche, un outil, une date. Certaines entreprises préfèrent un interlocuteur régulier. Je deviens alors leur référent IA ou développement, voire leur recherche et développement.",
       ],
-      etapes: [
-        { titre: "Vous notez", corps: "Pendant trois ou quatre semaines, votre équipe note ce qui lui fait perdre du temps." },
-        { titre: "Je trie", corps: "Chaque corvée reçoit son remède : un outil d’IA, un logiciel, ou rien du tout." },
-        { titre: "On traite", corps: "On commence par la tâche qui rend le plus d’heures, et vous mesurez le gain." },
-        { titre: "On continue", corps: "Une réunion par mois pour choisir la suivante, à votre rythme." },
+      points: [
+        { titre: "Référent IA", corps: "Je choisis avec vous les tâches à confier à l’IA, et je tiens les outils en place." },
+        { titre: "Développement", corps: "Vos logiciels évoluent avec votre activité, sans repartir de zéro à chaque besoin." },
+        { titre: "Recherche et développement", corps: "Une idée de produit ou de service se teste sur un premier outil avant d’engager plus." },
       ],
     },
     {

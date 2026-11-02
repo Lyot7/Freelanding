@@ -7,6 +7,7 @@ import {
   BORNES_BUDGET,
   BUDGET_INCONNU,
   composerNotes,
+  LIBELLE_NOTE_TELEPHONE,
   LEGENDE_OBJECTIF,
   offresDuRendezVous,
   optionsObjectif,
@@ -182,6 +183,23 @@ describe("composerNotes — ce qu'Eliott lit dans son agenda", () => {
       sansInsecable(`${notes.objectif} : ${optionsObjectif("decouverte")[1].libelle}`),
     ]);
     expect(notes).not.toHaveProperty("outil");
+  });
+
+  it("met le téléphone en tête quand le visiteur l'a donné", () => {
+    const texte = composerNotes({
+      type: "logiciel",
+      budget: BUDGET_INCONNU,
+      objectif: "tableur",
+      telephone: "+33 6 32 21 37 11",
+    });
+    const lignes = texte.split("\n");
+    expect(lignes[0]).toBe(`${LIBELLE_NOTE_TELEPHONE} : +33 6 32 21 37 11`);
+    expect(lignes).toHaveLength(4);
+  });
+
+  it("n'écrit aucune ligne de téléphone sans numéro", () => {
+    const texte = composerNotes({ type: "logiciel", budget: BUDGET_INCONNU, objectif: "tableur" });
+    expect(texte).not.toContain(LIBELLE_NOTE_TELEPHONE);
   });
 
   it("ne laisse aucune espace insécable dans le texte brut", () => {

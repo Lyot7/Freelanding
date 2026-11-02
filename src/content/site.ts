@@ -257,6 +257,8 @@ export const siteConfig: SiteConfig = {
     namePlaceholder: "Alex Dupont",
     emailLabel: "Votre adresse e-mail",
     emailPlaceholder: "exemple@email.com",
+    telephoneLabel: "Téléphone (facultatif)",
+    telephonePlaceholder: "06 12 34 56 78",
     selectLabel: "Que cherchez-vous ?",
     messageLabel: "Votre message, si vous voulez",
     messagePlaceholder: "Deux lignes sur ce qui vous bloque suffisent.",

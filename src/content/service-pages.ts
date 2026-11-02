@@ -129,31 +129,6 @@ export const servicePageLabels = {
   /** Le prix de l'offre, en tête de sa moitié gauche. */
   prixOffre: "Sur devis",
 
-  /** Comment se passe une mission : la page pilier sert à ça, l'accueil n'en parle pas. */
-  mission: {
-    titre: "Comment se passe une mission",
-    intro:
-      "La plupart de mes missions sont ponctuelles : une tâche à faire disparaître, un outil, une date de mise en service.",
-    etapes: [
-      {
-        titre: "Vous décrivez la tâche",
-        corps: "Un appel, vos exemples de documents, et ce que vous voulez obtenir. Je vous dis si un logiciel du marché suffit.",
-      },
-      {
-        titre: "Je vous remets un devis",
-        corps: "Le périmètre, le prix et la date, écrits avant que vous signiez. Le prix ne bouge plus ensuite.",
-      },
-      {
-        titre: "Je construis, vous suivez",
-        corps: "Vous voyez le logiciel avancer sur une adresse en ligne, et vous le corrigez avec vos cas réels.",
-      },
-      {
-        titre: "Je le mets en service",
-        corps: "Vos données reprises, votre équipe prise en main. Le code et l’hébergement sont à votre nom.",
-      },
-    ],
-  },
-
   /**
    * LE BLOC « SUR DEVIS » : ce qui sort de l'offre (`horsOffre` de la
    * prestation), et les trois questions du questionnaire de rendez-vous. Eliott

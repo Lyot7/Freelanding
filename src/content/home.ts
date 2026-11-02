@@ -297,9 +297,6 @@ export const homeContent: HomeContent = {
     body: [
       "Je suis développeur full-stack, installé à Caen, et je travaille seul. Du premier appel à la mise en service, vous parlez à celui qui conçoit et qui code votre logiciel.",
       "Avant de me lancer, j’ai développé chez Médiapilote, Würth France, MeilleursBiens, puis MECA SERVICES, où je tenais aussi la boutique en ligne. J’y ai appris à partir de ce qu’un outil doit rapporter, et à regarder comment les gens travaillent avant d’écrire la première ligne de code.",
-      /* LE MESSAGE D'ELIOTT, 2026-10-30 : le temps humain revient à ce qui rend
-         la personne indispensable, l'IA fait le sale boulot. */
-      "Ma conviction : une machine ne remplace pas la personne qui connaît vos clients, elle la débarrasse de ce qui l’empêche de s’en occuper. Le recopiage et les factures partent au logiciel et à l’IA, et le temps rendu revient à ce qui rend votre équipe indispensable. Chaque détail est décidé, testé et documenté avant de vous être remis : rien n’est laissé au hasard.",
     ],
     // Emphase (source Framer) : ces expressions passent en noir plein au
     // milieu du paragraphe rendu à 70 %.
@@ -307,7 +304,6 @@ export const homeContent: HomeContent = {
       "je travaille seul",
       "vous parlez à celui qui conçoit et qui code votre logiciel",
       "partir de ce qu’un outil doit rapporter",
-      "ce qui rend votre équipe indispensable",
     ],
     /*
      * GRILLE D'INFOS ET COMPTEUR RENDUS le 2026-10-16 : Eliott trouvait la
@@ -353,12 +349,16 @@ export const homeContent: HomeContent = {
   // number.ts — « Pourquoi moi ? » : une carte chiffrée + appel.
   whyUs: {
     eyebrow: "Pourquoi moi ?",
-    // TITRE ET SOUS-TITRE CHOISIS PAR ELIOTT le 2026-09-24 (remplacent « Ce
-    // qui est vérifiable. »). La carte porte le chiffre qui le prouve.
-    title: "Personne ne vous tient en otage.",
-    titleLines: ["Personne", "ne vous tient", "en otage."],
+    /* REFORMULÉ LE 2026-11-02, décision d'Eliott : « Personne ne vous tient en
+       otage » se lisait comme une critique des autres prestataires. La section
+       dit maintenant ce qu'il fait mieux, avec sa conviction, descendue de « Moi,
+       c'est Eliott » où elle allongeait le premier aplat vert. Le titre reprend
+       ses mots (« l'IA fait le sale boulot »). La carte garde la propriété du
+       code et des données, dite sans viser personne. */
+    title: "L’IA fait le sale boulot.",
+    titleLines: ["L’IA fait", "le sale", "boulot."],
     intro:
-      "Vous avez tous les accès dès la mise en service, et vous changez de prestataire quand vous voulez.",
+      "Ma conviction : une machine ne remplace pas la personne qui connaît vos clients, elle la débarrasse de ce qui l’empêche de s’en occuper. Le recopiage et les factures partent au logiciel et à l’IA, et le temps rendu revient à ce qui rend votre équipe indispensable. Chaque détail est décidé, testé et documenté avant de vous être remis : rien n’est laissé au hasard.",
     stats: reputationStats,
     // LE RENDEZ-VOUS EST LE CHEMIN PRINCIPAL du site. « Voir les réalisations »
     // est parti : la section des réalisations est juste au-dessus.
@@ -493,25 +493,23 @@ export const homeContent: HomeContent = {
   },
 
   /*
-   * ORDRE DES SECTIONS, repris le 2026-11-01 pour la vente : ce qu'on y gagne et
-   * comment d'abord, puis qui, les preuves, les garanties, les dernières questions.
-   * Le design reste celui d'origine, seule la place change. Avant : Qui je suis, ce que j'ai construit, les chiffres, puis le
-   * logiciel au travail : la section métiers et sa liste sont retirées, l'accueil
-   * parle à chaque métier sans le citer.
-   *
-   * LES DEUX SECTIONS À CARTES NOIRES restent séparées par le logiciel.
+   * ORDRE DES SECTIONS : ce qu'on y gagne et comment d'abord, puis qui, les
+   * preuves, la conviction, les dernières questions. L'aplat vert des chiffres
+   * suit « Pourquoi moi » depuis le 2026-11-02, décision d'Eliott : remonté sous
+   * « Moi, c'est Eliott », il laissait trois sections claires d'affilée en bas
+   * de page. Le design reste celui d'origine, seule la place change.
    */
   sectionOrder: [
     "hero",
     "logiciel",
     "moyens",
     "about",
-    "numbers",
     "showreel",
     "works",
     "whyUs",
-    "articles",
+    "numbers",
     "faq",
+    "articles",
   ],
 
   seo: {

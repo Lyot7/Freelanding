@@ -38,3 +38,16 @@ describe("les pages retirées redirigent en 301", () => {
     for (const regle of regles) expect(origines.has(regle.destination)).toBe(false);
   });
 });
+
+describe("les liens de premier rendez-vous mènent au formulaire de l'accueil", () => {
+  for (const [origine, sujet] of [
+    ["/rdv", "decouverte"],
+    ["/rdv/logiciel", "logiciel"],
+  ]) {
+    test(`${origine} ouvre l'onglet rendez-vous sur « ${sujet} »`, () => {
+      const regle = regles.find((r) => r.origine === origine);
+      expect(regle?.destination).toBe(`/?sujet=${sujet}#rendez-vous`);
+      expect(regle?.code).toBe("307");
+    });
+  }
+});

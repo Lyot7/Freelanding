@@ -26,12 +26,12 @@ describe("accueil", () => {
       "logiciel",
       "moyens",
       "about",
-      "numbers",
       "showreel",
       "works",
       "whyUs",
-      "articles",
+      "numbers",
       "faq",
+      "articles",
     ]);
     expect(new Set(ordre).size).toBe(ordre.length);
     // « works » se rend depuis `featuredWorkSlugs`, les autres depuis leur clef.
@@ -67,17 +67,17 @@ describe("accueil", () => {
     expect(homeContent.logoBand?.title).toBeUndefined();
   });
 
-  test("les deux sections à cartes noires ne se suivent pas", () => {
+  test("l'aplat vert des chiffres coupe les sections claires du bas de page", () => {
+    // Décision d'Eliott du 2026-11-02 : « Pourquoi moi », la FAQ et les articles
+    // sont clairs ; les chiffres, en aplat vert, s'intercalent.
     const chiffres = ordre.indexOf("numbers");
-    const pourquoi = ordre.indexOf("whyUs");
-    expect(chiffres).toBeGreaterThan(-1);
-    expect(pourquoi).toBeGreaterThan(-1);
-    expect(Math.abs(chiffres - pourquoi)).toBeGreaterThan(1);
+    expect(ordre[chiffres - 1]).toBe("whyUs");
+    expect(ordre[chiffres + 1]).toBe("faq");
   });
 
   test("les offres ne sont pas redites sous le héros, chacune a sa section", () => {
     expect(ordre).not.toContain("services");
-    expect(ordre.indexOf("showreel")).toBe(ordre.indexOf("numbers") + 1);
+    expect(ordre.indexOf("showreel")).toBe(ordre.indexOf("about") + 1);
     expect(ordre).toContain("logiciel");
     expect(homeContent.logiciel?.cta.href).toBe("#moyens");
   });
