@@ -20,7 +20,7 @@
  * 2026-09-23, présélectionne « logiciel » (`resoudreSujet`).
  *
  * UN SUJET INCONNU EST IGNORÉ EN SILENCE. `?sujet=nimportequoi`, ou un sujet
- * réel dont la variable d'environnement Cal.com n'est pas posée, retombent sur
+ * réel quand le cockpit n'est pas configuré, retombent sur
  * l'absence de sélection. Pas de message d'erreur : le visiteur n'a rien
  * demandé de faux, c'est un lien qui a vieilli.
  */

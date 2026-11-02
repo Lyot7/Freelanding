@@ -1,122 +1,62 @@
 import { describe, expect, it } from "bun:test";
 import {
+  CLES_COCKPIT,
   estIdRendezVous,
-  resoudreCible,
+  resoudreAcces,
   resoudreSujet,
   resoudreConfiguration,
-  VARIABLES_EVENEMENT,
+  URL_COCKPIT_PAR_DEFAUT,
 } from "./config.ts";
+import { IDS_RENDEZ_VOUS } from "@/content/rendez-vous";
 
 /**
  * LE CAS QUI COMPTE LE PLUS ICI EST L'ABSENCE. Le dépôt ne contient pas le
- * compte Cal.com d'Eliott : l'état par défaut est « aucune variable », et cet
- * état doit produire une configuration vide, jamais une exception ni une
- * configuration à moitié résolue. C'est lui qui masque proprement la section.
+ * jeton du cockpit : l'état par défaut est « aucune variable », et cet état
+ * doit produire une configuration vide, jamais une exception. C'est lui qui
+ * masque proprement la section.
  */
 
-describe("resoudreCible", () => {
-  it("lit un identifiant numérique sans exiger de nom d’utilisateur", () => {
-    expect(resoudreCible("logiciel", { CAL_COM_EVENT_LOGICIEL: "1234567" })).toEqual({
-      par: "id",
-      eventTypeId: 1234567,
+describe("resoudreAcces", () => {
+  it("rend undefined sans RDV_TOKEN, même avec une adresse", () => {
+    expect(resoudreAcces({})).toBeUndefined();
+    expect(resoudreAcces({ RDV_TOKEN: "   ", COCKPIT_URL: "https://x.fr" })).toBeUndefined();
+  });
+
+  it("prend l’adresse du cockpit par défaut", () => {
+    expect(resoudreAcces({ RDV_TOKEN: " jeton " })).toEqual({
+      url: URL_COCKPIT_PAR_DEFAUT,
+      jeton: "jeton",
     });
   });
 
-  it("garde le nom d’utilisateur à côté d’un identifiant, pour lire les durées", () => {
-    expect(
-      resoudreCible("logiciel", { CAL_COM_EVENT_LOGICIEL: "1234567", CAL_COM_USERNAME: "eliott" }),
-    ).toEqual({ par: "id", eventTypeId: 1234567, username: "eliott" });
+  it("ramène COCKPIT_URL à son origine", () => {
+    expect(resoudreAcces({ RDV_TOKEN: "j", COCKPIT_URL: "https://cockpit.test/" })?.url).toBe(
+      "https://cockpit.test",
+    );
   });
 
-  it("lit un slug, mais seulement accompagné du nom d’utilisateur", () => {
-    const env = { CAL_COM_EVENT_LOGICIEL: "logiciel-30min" };
-    expect(resoudreCible("logiciel", env)).toBeUndefined();
-    expect(
-      resoudreCible("logiciel", { ...env, CAL_COM_USERNAME: "eliott" }),
-    ).toEqual({ par: "slug", eventTypeSlug: "logiciel-30min", username: "eliott" });
-  });
-
-  it("rogne les espaces autour des valeurs collées à la main", () => {
-    expect(
-      resoudreCible("logiciel", {
-        CAL_COM_EVENT_LOGICIEL: "  logiciel-30min  ",
-        CAL_COM_USERNAME: "  eliott  ",
-      }),
-    ).toEqual({ par: "slug", eventTypeSlug: "logiciel-30min", username: "eliott" });
-  });
-
-  it("refuse une variable vide, une variable absente et un zéro", () => {
-    expect(resoudreCible("logiciel", {})).toBeUndefined();
-    expect(resoudreCible("logiciel", { CAL_COM_EVENT_LOGICIEL: "" })).toBeUndefined();
-    expect(resoudreCible("logiciel", { CAL_COM_EVENT_LOGICIEL: "   " })).toBeUndefined();
-    expect(resoudreCible("logiciel", { CAL_COM_EVENT_LOGICIEL: "0" })).toBeUndefined();
-  });
-
-  it("traite une valeur non entièrement numérique comme un slug", () => {
-    // `12abc` n'est PAS un identifiant tronqué : le confondre avec 12 ferait
-    // réserver dans l'agenda de quelqu'un d'autre.
-    expect(
-      resoudreCible("logiciel", {
-        CAL_COM_EVENT_LOGICIEL: "12abc",
-        CAL_COM_USERNAME: "eliott",
-      }),
-    ).toEqual({ par: "slug", eventTypeSlug: "12abc", username: "eliott" });
+  it("refuse le jeton en clair, sauf vers la machine locale", () => {
+    expect(resoudreAcces({ RDV_TOKEN: "j", COCKPIT_URL: "http://cockpit.fr" })).toBeUndefined();
+    expect(resoudreAcces({ RDV_TOKEN: "j", COCKPIT_URL: "http://localhost:3001" })?.url).toBe(
+      "http://localhost:3001",
+    );
+    expect(resoudreAcces({ RDV_TOKEN: "j", COCKPIT_URL: "pas une adresse" })).toBeUndefined();
   });
 });
 
 describe("resoudreConfiguration", () => {
   it("rend une configuration VIDE quand rien n’est posé", () => {
-    const config = resoudreConfiguration({});
-    expect(config.typesDisponibles).toEqual([]);
-    expect(config.cibles).toEqual({});
+    expect(resoudreConfiguration({})).toEqual({ cibles: {}, typesDisponibles: [] });
   });
 
-  it("n’expose que les types réellement configurés", () => {
-    const config = resoudreConfiguration({
-      CAL_COM_USERNAME: "eliott",
-      CAL_COM_EVENT_LOGICIEL: "logiciel-30min",
-    });
-    expect(config.typesDisponibles).toEqual(["logiciel"]);
-    expect(config.cibles.decouverte).toBeUndefined();
-    const seule = resoudreConfiguration({
-      CAL_COM_USERNAME: "eliott",
-      CAL_COM_EVENT_DECOUVERTE: "9876543",
-    });
-    expect(seule.typesDisponibles).toEqual(["decouverte"]);
-    expect(seule.cibles.logiciel).toBeUndefined();
-    const config2 = seule;
-    expect(config2.cibles.decouverte).toEqual({
-      par: "id",
-      eventTypeId: 9876543,
-      username: "eliott",
-    });
+  it("ouvre tous les types du contenu, dans son ordre, avec le jeton", () => {
+    const config = resoudreConfiguration({ RDV_TOKEN: "j" });
+    expect(config.typesDisponibles).toEqual([...IDS_RENDEZ_VOUS]);
+    expect(config.cibles).toEqual({ logiciel: "logiciel", decouverte: "decouverte" });
   });
 
-  it("garde l’ordre du contenu, pas celui des variables", () => {
-    const config = resoudreConfiguration({
-      CAL_COM_EVENT_DECOUVERTE: "4",
-      CAL_COM_EVENT_LOGICIEL: "3",
-    });
-    expect(config.typesDisponibles).toEqual(["logiciel", "decouverte"]);
-  });
-
-  it("couvre les deux types du contenu, sans variable orpheline", () => {
-    expect(Object.keys(VARIABLES_EVENEMENT).sort()).toEqual(["decouverte", "logiciel"]);
-    expect(VARIABLES_EVENEMENT.logiciel).toBe("CAL_COM_EVENT_LOGICIEL");
-    expect(VARIABLES_EVENEMENT.decouverte).toBe("CAL_COM_EVENT_DECOUVERTE");
-  });
-
-  it("ignore les variables des anciens types (site, IA, CTO)", () => {
-    // Les trois événements Cal.com restent posés sur le serveur tant qu'Eliott
-    // ne les retire pas : ils ne doivent rien exposer au sélecteur.
-    const config = resoudreConfiguration({
-      CAL_COM_EVENT_DECOUVERTE: "4",
-      CAL_COM_EVENT_CTO: "7514277",
-      CAL_COM_EVENT_IA: "7514252",
-      CAL_COM_EVENT_SITE: "1",
-    });
-    expect(config.typesDisponibles).toEqual(["decouverte"]);
-    expect(Object.keys(config.cibles)).toEqual(["decouverte"]);
+  it("donne une clé cockpit à chaque type du contenu", () => {
+    for (const id of IDS_RENDEZ_VOUS) expect(typeof CLES_COCKPIT[id]).toBe("string");
   });
 });
 

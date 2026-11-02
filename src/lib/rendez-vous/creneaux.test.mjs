@@ -176,6 +176,22 @@ describe("lireCreneaux", () => {
     },
   };
 
+  it("lit la forme du cockpit, à l’heure de Paris", () => {
+    const jours = lireCreneaux(
+      {
+        jours: [
+          { jour: "2026-09-02", creneaux: ["2026-09-02T14:00:00.000Z", "2026-09-02T13:00:00.000Z"] },
+          { jour: "2026-09-01", creneaux: ["2026-09-01T15:00:00.000Z", 42] },
+          { creneaux: ["2026-09-03T15:00:00.000Z"] },
+        ],
+      },
+      MAINTENANT,
+    );
+    expect(jours.map((j) => j.jour)).toEqual(["2026-09-01", "2026-09-02"]);
+    expect(jours[1].creneaux.map((c) => c.heure)).toEqual(["15:00", "16:00"]);
+    expect(jours[0].creneaux).toHaveLength(1);
+  });
+
   it("groupe par jour, trie les jours ET les heures", () => {
     const jours = lireCreneaux(charge, MAINTENANT);
     expect(jours.map((j) => j.jour)).toEqual(["2026-09-01", "2026-09-02"]);

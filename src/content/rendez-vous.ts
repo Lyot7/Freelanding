@@ -7,14 +7,14 @@
  * libellé, pas même « Réessayer ».
  *
  * CE QUI N'EST PAS ICI, et ne doit pas y venir : la durée RÉELLE de chaque
- * rendez-vous. Elle vit chez Cal.com, qui est l'autorité sur l'agenda. Le champ
+ * rendez-vous. Elle vit au cockpit, qui est l'autorité sur l'agenda. Le champ
  * `duree` ci-dessous n'est qu'un AFFICHAGE : s'il ment, c'est le réglage
- * Cal.com qui fait foi, et `docs/CAL-COM.md` donne la procédure pour que les
+ * cockpit qui fait foi, et `docs/RENDEZ-VOUS.md` donne la procédure pour que les
  * deux coïncident.
  *
  * LE QUESTIONNAIRE, LUI, VIT ICI ET PAS CHEZ CAL.COM (2026-09-23). Ses
  * réponses partent dans le champ natif `notes` de la réservation, mises en
- * forme par `src/lib/rendez-vous/questionnaire.ts`. Aucun champ Cal.com
+ * forme par `src/lib/rendez-vous/questionnaire.ts`. Aucun champ cockpit
  * supplémentaire : un champ personnalisé obligatoire ajouté là-bas casserait
  * la route sans que rien ne change dans le dépôt.
  */
@@ -37,7 +37,7 @@ export type IdRendezVous = (typeof IDS_RENDEZ_VOUS)[number];
 export interface TypeRendezVous {
   readonly id: IdRendezVous;
   readonly nom: string;
-  /** Durée AFFICHÉE. L'autorité reste le type d'événement Cal.com. */
+  /** Durée AFFICHÉE. L'autorité reste le type du cockpit. */
   readonly duree: string;
   readonly description: string;
 }
@@ -81,7 +81,7 @@ export interface ContenuRendezVous {
     readonly libelleDuree: string;
     /** Annonce au lecteur d'écran de ce que montre la colonne des heures. */
     readonly annonce: (jour: string, nombre: number) => string;
-    /** Une durée Cal.com, en minutes, telle qu'affichée sur sa pastille. */
+    /** Une durée du cockpit, en minutes, telle qu'affichée sur sa pastille. */
     readonly duree: (minutes: number) => string;
   };
   /** Titre du récapitulatif affiché au-dessus de chaque étape franchie. */
@@ -135,7 +135,7 @@ export interface ContenuRendezVous {
     readonly large: string;
   };
   /**
-   * Intitulés des lignes déposées dans les notes Cal.com. Lus par Eliott dans
+   * Intitulés des lignes déposées dans les notes du rendez-vous. Lus par Eliott dans
    * son agenda, jamais par le visiteur.
    */
   readonly notes: {
@@ -150,6 +150,48 @@ export interface ContenuRendezVous {
     readonly titre: string;
     readonly texte: string;
     readonly autre: string;
+  };
+  /** Page `/rdv/gerer/[jeton]` : le lien « déplacer ou annuler » des e-mails. */
+  readonly gestion: ContenuGestionRendezVous;
+}
+
+/** Un état de la page de gestion : titre court, puis une phrase. */
+export interface EtatGestion {
+  readonly titre: string;
+  readonly texte: string;
+}
+
+export interface ContenuGestionRendezVous {
+  readonly metaTitre: string;
+  readonly eyebrow: string;
+  readonly titre: string;
+  readonly libelleSujet: string;
+  readonly libelleDate: string;
+  readonly libelleDuree: string;
+  readonly actions: {
+    readonly deplacer: string;
+    readonly annuler: string;
+    readonly confirmerAnnulation: string;
+    readonly confirmerDeplacement: string;
+    readonly retour: string;
+    readonly reserver: string;
+  };
+  readonly lienReserver: string;
+  readonly motif: {
+    readonly libelle: string;
+    readonly aide: string;
+  };
+  readonly choisirCreneau: string;
+  readonly etats: {
+    readonly inconnu: EtatGestion;
+    readonly annule: EtatGestion;
+    readonly deplace: EtatGestion;
+    readonly passe: EtatGestion;
+    readonly indisponible: EtatGestion;
+  };
+  readonly succes: {
+    readonly annule: EtatGestion;
+    readonly deplace: EtatGestion;
   };
 }
 
@@ -181,9 +223,9 @@ export const rendezVousContent: ContenuRendezVous = {
    * s'agit d'un outil ou d'un logiciel complet.
    *
    * ILS NE SONT PAS CE QU'ELIOTT LIT DANS SON AGENDA, et c'est voulu. Le nom de
-   * l'événement dans Google Agenda est réglé chez Cal.com, sobre et scannable
-   * (« SITE · Prénom Nom »), parce qu'un agenda se lit en diagonale entre deux
-   * réunions. Le site invite, l'agenda classe. Voir `docs/CAL-COM.md`.
+   * l'événement dans Google Agenda est posé par le cockpit, sobre et scannable
+   * (« <titre du type> entre Eliott Bouquerel et <nom> »), parce qu'un agenda se lit en diagonale entre deux
+   * réunions. Le site invite, l'agenda classe. Voir `docs/RENDEZ-VOUS.md`.
    *
    * TRENTE MINUTES PARTOUT depuis le 2026-09-02, contre 20 / 20 / 30 / 15.
    * Eliott : « 15 minutes ça peut faire vraiment bâclé en terme de rendez-vous,
@@ -198,13 +240,13 @@ export const rendezVousContent: ContenuRendezVous = {
    * les quatre, ce qui évite au visiteur de croire que son sujet vaut moins de
    * temps que celui d'à côté.
    *
-   * LE VISITEUR CHOISIT SA DURÉE depuis le 2026-10-01. Chaque type d'événement
-   * Cal.com propose plusieurs durées et en désigne une par défaut, présélectionnée
-   * sur le site. Le sélecteur les lit chez Cal.com (`src/lib/rendez-vous/durees.ts`) ;
+   * LE VISITEUR CHOISIT SA DURÉE depuis le 2026-10-01. Chaque type du cockpit
+   * propose plusieurs durées et en désigne une par défaut, présélectionnée
+   * sur le site. Le sélecteur les lit au cockpit (`src/lib/rendez-vous/durees.ts`) ;
    * le champ `duree` ci-dessous ne fait qu'annoncer la fourchette sur la carte.
    *
-   * CETTE DURÉE EST UN AFFICHAGE. L'autorité reste le type d'événement Cal.com :
-   * si les deux divergent, c'est Cal.com qui fait foi et le site qui ment.
+   * CETTE DURÉE EST UN AFFICHAGE. L'autorité reste le type du cockpit :
+   * si les deux divergent, c'est le cockpit qui fait foi et le site qui ment.
    */
   types: [
     {
@@ -261,7 +303,7 @@ export const rendezVousContent: ContenuRendezVous = {
     emailLabel: "Votre e-mail",
     emailPlaceholder: "vous@exemple.fr",
     /* FACULTATIF, décision d'Eliott du 2026-11-02 : pour rappeler plus
-       facilement le visiteur si besoin. Il part dans les notes Cal.com. */
+       facilement le visiteur si besoin. Il part dans les notes du rendez-vous. */
     telephoneLabel: "Votre téléphone (facultatif)",
     telephonePlaceholder: "06 12 34 56 78",
     messageLabel: "Votre situation en deux lignes (facultatif)",
@@ -270,7 +312,7 @@ export const rendezVousContent: ContenuRendezVous = {
     envoyer: "Confirmer le rendez-vous",
     envoiEnCours: "Confirmation en cours…",
     mention:
-      "Votre nom, votre adresse et vos réponses sont transmis à Cal.com, qui héberge mon agenda, dans le seul but de créer ce rendez-vous. Détail dans la",
+      "Votre nom, votre adresse et vos réponses sont enregistrés dans mon outil de gestion et dans mon agenda, dans le seul but de créer ce rendez-vous. Détail dans la",
     mentionLien: "politique de confidentialité",
     mentionHref: "/legal/politique-de-confidentialite",
   },
@@ -352,6 +394,60 @@ export const rendezVousContent: ContenuRendezVous = {
       "Un e-mail de confirmation vient de partir vers votre boîte, avec le lien de visioconférence et de quoi annuler ou déplacer en un clic. Vous n’avez rien d’autre à faire d’ici là.",
     autre: "Prendre un autre rendez-vous",
   },
+  gestion: {
+    metaTitre: "Votre rendez-vous",
+    eyebrow: "Votre rendez-vous",
+    titre: "Déplacer ou annuler",
+    libelleSujet: "Sujet",
+    libelleDate: "Date",
+    libelleDuree: "Durée",
+    actions: {
+      deplacer: "Déplacer",
+      annuler: "Annuler",
+      confirmerAnnulation: "Confirmer l’annulation",
+      confirmerDeplacement: "Confirmer ce créneau",
+      retour: "Retour",
+      reserver: "Réserver un créneau",
+    },
+    lienReserver: "/contact",
+    motif: {
+      libelle: "Motif (facultatif)",
+      aide: "Une ligne suffit, elle m’aide à vous proposer mieux la prochaine fois.",
+    },
+    choisirCreneau: "Choisissez le nouveau créneau",
+    etats: {
+      inconnu: {
+        titre: "Lien introuvable",
+        texte: "Ce lien ne correspond à aucun rendez-vous. Vérifiez qu’il est complet dans l’e-mail, ou écrivez-moi.",
+      },
+      annule: {
+        titre: "Rendez-vous annulé",
+        texte: "Ce rendez-vous est annulé. Vous pouvez en réserver un autre quand vous voulez.",
+      },
+      deplace: {
+        titre: "Rendez-vous déplacé",
+        texte: "Ce rendez-vous a été déplacé. Le lien à jour est dans le dernier e-mail de confirmation.",
+      },
+      passe: {
+        titre: "Rendez-vous passé",
+        texte: "Ce rendez-vous a déjà eu lieu. Pour en prévoir un autre, réservez un nouveau créneau.",
+      },
+      indisponible: {
+        titre: "Momentanément indisponible",
+        texte: "La gestion du rendez-vous ne répond pas. Réessayez dans un moment, ou écrivez-moi.",
+      },
+    },
+    succes: {
+      annule: {
+        titre: "C’est annulé.",
+        texte: "Un e-mail de confirmation part vers votre boîte. Vous pouvez reprendre un créneau quand vous voulez.",
+      },
+      deplace: {
+        titre: "C’est déplacé.",
+        texte: "L’invitation de votre agenda est mise à jour, avec le même lien de visioconférence. Un e-mail de confirmation part vers votre boîte.",
+      },
+    },
+  },
 };
 
 /**
@@ -366,7 +462,7 @@ export const PARAM_SUJET = "sujet";
 
 /**
  * Prestation de l'offre → sujet de rendez-vous : `offre.ts` nomme des
- * prestations vendues, ce fichier nomme des types d'événement Cal.com.
+ * prestations vendues, ce fichier nomme des types de rendez-vous.
  */
 export const RDV_PAR_PRESTATION: Readonly<Record<PrestationId, IdRendezVous>> = {
   logiciel: "logiciel",

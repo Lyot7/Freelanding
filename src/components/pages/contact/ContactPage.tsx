@@ -8,8 +8,8 @@ import { ParallaxBackdrop } from "@/components/motion/ParallaxBackdrop";
 import { AvailabilityMeter, Highlighted } from "@/components/ui";
 import { FaqSection } from "@/components/sections/FaqSection";
 // Le formulaire est un composant CLIENT (soumission, état d'envoi, anti-robot).
-// Prise de rendez-vous Cal.com. Composant SERVEUR : il lit l'environnement et
-// ne rend RIEN tant qu'aucun type d'événement n'est configuré.
+// Prise de rendez-vous (moteur : cockpit). Composant SERVEUR : il lit
+// l'environnement et ne rend RIEN tant que `RDV_TOKEN` n'est pas posé.
 import { content } from "@/lib/content";
 import type { Availability, ContactContent } from "@/lib/content/types";
 

@@ -1,25 +1,18 @@
 /**
  * `GET /api/rendez-vous/creneaux` — créneaux libres d'un type de rendez-vous.
  *
- * POURQUOI CETTE ROUTE EXISTE ALORS QUE CAL.COM RÉPOND SANS CLEF. Le navigateur
- * pourrait techniquement appeler `api.cal.com` en direct. Trois raisons de ne
- * pas le faire :
- *
- *   1. la CONFIGURATION resterait publique. Le nom d'utilisateur et les
- *      identifiants d'événement partiraient dans le paquet JavaScript, donc
- *      dans l'index de n'importe quel moteur ;
- *   2. le DÉBIT ne serait plus limitable. Un visiteur qui pagine trente fois
- *      taperait trente fois sur l'API publique d'un tiers, sous notre nom ;
- *   3. les BORNES ne seraient plus tenues. La fenêtre demandée arrive du client
- *      et doit être ramenée entre aujourd'hui et l'horizon avant d'atteindre
- *      Cal.com — un contrôle qui n'a aucun sens côté navigateur.
+ * POURQUOI CETTE ROUTE. Le moteur est le cockpit, que seul NOTRE serveur peut
+ * appeler (`RDV_TOKEN`). Elle garde aussi le DÉBIT (un visiteur qui pagine
+ * trente fois ne tape pas trente fois sur le cockpit) et les BORNES : la
+ * fenêtre demandée arrive du client et est ramenée entre aujourd'hui et
+ * l'horizon avant d'atteindre le cockpit.
  *
  * ABSENCE DE CONFIGURATION = 503 EXPLICITE, jamais une liste vide. Une liste
  * vide se lit « aucune disponibilité » et ferait croire à un agenda plein.
  */
 import { creerJournal, empreinte, json, origineEtrangere } from "@/lib/api/reponse";
 import { adresseAppelante, creerLimiteur } from "@/lib/contact/rate-limit";
-import { obtenirDurees, recupererCreneaux } from "@/lib/rendez-vous/cal-com";
+import { obtenirDurees, recupererCreneaux } from "@/lib/rendez-vous/cockpit";
 import { estIdRendezVous, resoudreConfiguration } from "@/lib/rendez-vous/config";
 import {
   estDernierMois,
@@ -69,8 +62,8 @@ export async function GET(requete: Request): Promise<Response> {
 
   const maintenant = new Date();
   // Le mois demandé n'est qu'une suggestion : `fenetreMois` le ramène entre
-  // aujourd'hui et l'horizon. La durée, elle, n'est retenue que si Cal.com la
-  // propose. Rien de ce que le client écrit n'atteint Cal.com tel quel.
+  // aujourd'hui et l'horizon. La durée, elle, n'est retenue que si le cockpit
+  // la propose. Rien de ce que le client écrit n'atteint le cockpit tel quel.
   // `debut` (un jour) est l'ancien paramètre, encore envoyé par un onglet
   // ouvert avant le passage au mois : il désigne le mois qui le contient.
   const debutHerite = parametres.get("debut") ?? "";
@@ -90,7 +83,7 @@ export async function GET(requete: Request): Promise<Response> {
       detail: resultat.detail,
       appelant: empreinte(adresse),
     });
-    // 502 et non 500 : la panne est chez le fournisseur, pas chez nous. Le
+    // 502 et non 500 : la panne est au cockpit, pas dans cette route. Le
     // client, lui, ne lit qu'un message et n'a pas à connaître la différence.
     return json({ message: "Créneaux indisponibles." }, 502);
   }

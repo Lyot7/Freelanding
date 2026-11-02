@@ -280,7 +280,7 @@ export async function Footer({
 
   const person = contact.person;
   // Mêmes types de rendez-vous que la section de `/contact` : ceux dont
-  // l'événement Cal.com est configuré. Aucun = pas d'onglet rendez-vous.
+  // le cockpit est configuré (`RDV_TOKEN`). Aucun = pas d'onglet rendez-vous.
   const { typesDisponibles } = resoudreConfiguration();
   const typesRendezVous = rendezVousContent.types.filter((type) =>
     typesDisponibles.includes(type.id),

@@ -3,16 +3,15 @@ import { POST } from "./route.ts";
 
 /**
  * LA ROUTE DE RÉSERVATION, VUE DU NAVIGATEUR, pour les deux sujets qui restent
- * depuis le 2026-10-31 : « logiciel » et « decouverte ». Rien ne part chez Cal.com : sans clef Turnstile, une
+ * depuis le 2026-10-31 : « logiciel » et « decouverte ». Rien ne part au cockpit : sans clef Turnstile, une
  * demande valide s'arrête au captcha en 503, APRÈS la validation. Un 503 prouve
  * donc que la demande a passé la validation ; un 400 dit quel champ l'a
  * arrêtée.
  */
 
 const VARIABLES = {
-  CAL_COM_USERNAME: "eliott-bouquerel",
-  CAL_COM_EVENT_LOGICIEL: "7514252",
-  CAL_COM_EVENT_DECOUVERTE: "7514277",
+  RDV_TOKEN: "jeton-de-test",
+  COCKPIT_URL: "https://cockpit.test",
   TURNSTILE_SECRET_KEY: "",
 };
 const avant = {};

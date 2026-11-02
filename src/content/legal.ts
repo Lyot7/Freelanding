@@ -175,8 +175,7 @@ export const legalDocuments: readonly LegalDocument[] = [
         style: "unordered",
         items: [
           "PostHog, Inc., 2261 Market St. #4008, San Francisco, CA 94114, États-Unis : comptage des visites sans cookie, et, après consentement, mesure d’audience et enregistrement de session, sur son instance européenne.",
-          "Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irlande : messagerie professionnelle, où arrivent et sont archivés les messages qui me sont adressés.",
-          "Cal.com, Inc., 2261 Market Street #4382, San Francisco, CA 94114, États-Unis : prise de rendez-vous en ligne.",
+          "Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irlande : messagerie professionnelle, où arrivent et sont archivés les messages qui me sont adressés, et agenda, où sont inscrits les rendez-vous réservés en ligne.",
           "Plus Five Five, Inc., qui exploite le service Resend, 2261 Market Street #5039, San Francisco, CA 94114, États-Unis : acheminement des e-mails déclenchés par le formulaire.",
           "Cloudflare, Inc., 101 Townsend St, San Francisco, CA 94107, États-Unis : protection anti-robot du formulaire (Turnstile).",
         ],
@@ -254,7 +253,7 @@ export const legalDocuments: readonly LegalDocument[] = [
           "Numéro de téléphone, si vous le laissez",
           "Nom de votre entreprise, si vous le laissez",
           "Le contenu de votre message et des échanges qui suivent",
-          "Quand vous réservez un créneau, vos réponses au questionnaire : budget, objectif, outil utilisé et échéance selon le sujet choisi, transmises à Cal.com avec le rendez-vous",
+          "Quand vous réservez un créneau, vos réponses au questionnaire : budget, objectif, outil utilisé et échéance selon le sujet choisi, inscrites avec le rendez-vous dans mon agenda",
         ],
       },
       { type: "heading", level: 3, text: "2.2 Ce que la visite produit" },
@@ -303,11 +302,10 @@ export const legalDocuments: readonly LegalDocument[] = [
         style: "unordered",
         items: [
           "Hostinger International Ltd (Chypre) : hébergement du site, sur un serveur situé en France.",
-          "Cal.com, Inc. (États-Unis) : prise de rendez-vous en ligne, quand vous réservez un créneau.",
           "PostHog, Inc. (instance européenne) : comptage des visites sans cookie, et, uniquement après votre consentement, mesure d’audience et enregistrement de session. Les données restent hébergées dans l’Union européenne.",
           "Cloudflare, Inc. (États-Unis) : vérification anti-robot du formulaire (Turnstile).",
           "Plus Five Five, Inc., qui exploite Resend (États-Unis) : acheminement des e-mails déclenchés par le formulaire.",
-          "Google Ireland Limited (Irlande) : messagerie professionnelle, où arrivent et sont archivés les messages que vous m’adressez.",
+          "Google Ireland Limited (Irlande) : messagerie professionnelle, où arrivent et sont archivés les messages que vous m’adressez, et agenda, où sont inscrits les rendez-vous que vous réservez.",
           "Indy (France) : devis, factures et signature électronique, une fois la relation engagée.",
         ],
       },
@@ -322,14 +320,13 @@ export const legalDocuments: readonly LegalDocument[] = [
       },
       {
         type: "paragraph",
-        text: "L’hébergement du site, la mesure d’audience et la facturation restent dans l’Union européenne. Quatre prestataires sont établis aux États-Unis, et les données qui leur sont confiées y transitent :",
+        text: "L’hébergement du site, la mesure d’audience et la facturation restent dans l’Union européenne. Trois prestataires sont établis aux États-Unis, et les données qui leur sont confiées y transitent :",
       },
       {
         type: "list",
         style: "unordered",
         items: [
           "Cloudflare, Inc., Google LLC et Plus Five Five, Inc. (Resend) sont certifiés au titre du cadre de protection des données UE-États-Unis (Data Privacy Framework), qui bénéficie de la décision d’adéquation de la Commission européenne du 10 juillet 2023. Google Ireland Limited reste mon interlocuteur en Europe.",
-          "Cal.com, Inc. : clauses contractuelles types de la Commission européenne (décision d’exécution (UE) 2021/914), assorties des mesures techniques prévues par ces clauses.",
         ],
       },
       {

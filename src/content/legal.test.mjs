@@ -57,7 +57,6 @@ const IDENTIFIANTS = {
 const STOCKAGE = [
   "PostHog, Inc., 2261 Market St. #4008, San Francisco, CA 94114",
   "Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irlande",
-  "Cal.com, Inc., 2261 Market Street #4382, San Francisco, CA 94114",
   "Plus Five Five, Inc.",
   "2261 Market Street #5039, San Francisco, CA 94114",
   "Cloudflare, Inc., 101 Townsend St, San Francisco, CA 94107",
@@ -164,6 +163,8 @@ describe("documents légaux", () => {
     }
     // La raison sociale inventée par l'audit, à ne jamais republier.
     expect(texte).not.toContain("Resend, Inc.");
+    // Cal.com ne reçoit plus rien depuis le 2026-11-02 (moteur : le cockpit).
+    expect(texte).not.toContain("Cal.com");
   });
 
   test("les prix affichés sont annoncés hors taxes, art. 19 de la LCEN", () => {

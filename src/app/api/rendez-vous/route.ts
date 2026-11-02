@@ -1,13 +1,12 @@
 /**
- * `POST /api/rendez-vous` — création d'une réservation Cal.com.
+ * `POST /api/rendez-vous` — création d'une réservation au cockpit.
  *
  * MÊME ORDRE DE CONTRÔLES que `/api/contact`, du moins cher au plus cher :
  *   origine → type de contenu → débit → corps → piège/temps/champs → captcha →
  *   écriture. Vérifier le captcha avant le débit ferait payer notre quota
  *   Cloudflare à chaque requête d'un robot.
  *
- * POURQUOI LE CAPTCHA ICI AUSSI, alors que Cal.com a ses propres protections.
- * Une réservation n'est pas un e-mail de plus dans une boîte : elle POSE un
+ * POURQUOI LE CAPTCHA. Une réservation n'est pas un e-mail de plus dans une boîte : elle POSE un
  * événement dans l'agenda d'Eliott, envoie deux messages et bloque un créneau
  * que personne d'autre ne pourra prendre. Un robot qui remplirait quinze
  * créneaux d'affilée ne coûterait pas du bruit, il coûterait une semaine
@@ -22,7 +21,7 @@ import { creerJournal, empreinte, json, origineEtrangere } from "@/lib/api/repon
 import { resoudreVerificateur } from "@/lib/contact/captcha";
 import { EMAIL_CONTACT_PAR_DEFAUT } from "@/lib/contact/mailer";
 import { adresseAppelante, creerLimiteur } from "@/lib/contact/rate-limit";
-import { creerReservation, obtenirDurees } from "@/lib/rendez-vous/cal-com";
+import { creerReservation, obtenirDurees } from "@/lib/rendez-vous/cockpit";
 import { resoudreConfiguration } from "@/lib/rendez-vous/config";
 import { LIMITE_RESERVATION } from "@/lib/rendez-vous/limites";
 import { composerNotes } from "@/lib/rendez-vous/questionnaire";
@@ -129,7 +128,7 @@ export async function POST(requete: Request): Promise<Response> {
 
   const { cibles, typesDisponibles } = resoudreConfiguration();
   if (typesDisponibles.length === 0) {
-    journaliser("non_configure", { variable: "CAL_COM_EVENT_*" });
+    journaliser("non_configure", { variable: "RDV_TOKEN" });
     return json(
       {
         message: `La prise de rendez-vous en ligne est momentanément indisponible. ${REPLI_DIRECT}`,
@@ -197,8 +196,8 @@ export async function POST(requete: Request): Promise<Response> {
     );
   }
 
-  // DURÉE VÉRIFIÉE CONTRE CAL.COM, pas contre ce que le client a cru voir.
-  // Durées illisibles : la durée demandée part quand même, et c'est Cal.com
+  // DURÉE VÉRIFIÉE CONTRE LE COCKPIT, pas contre ce que le client a cru voir.
+  // Durées illisibles : la durée demandée part quand même, et c'est le cockpit
   // qui la refuse s'il ne la propose pas. La retirer en silence réserverait
   // une autre durée que celle affichée au prospect.
   const durees = await obtenirDurees(cible);
@@ -222,7 +221,14 @@ export async function POST(requete: Request): Promise<Response> {
     ...(reservation.duree !== undefined ? { duree: reservation.duree } : {}),
     nom: reservation.nom,
     email: reservation.email,
+    ...(reservation.telephone ? { telephone: reservation.telephone } : {}),
+    // Le téléphone reste AUSSI en tête des notes : c'est elles que l'agenda montre.
     notes: composerNotes(reservation),
+    reponses: {
+      budget: reservation.budget,
+      objectif: reservation.objectif,
+      ...(reservation.echeance ? { echeance: reservation.echeance } : {}),
+    },
   });
 
   if (!creation.ok) {
@@ -233,7 +239,7 @@ export async function POST(requete: Request): Promise<Response> {
       detail: creation.detail,
       contact: empreinte(reservation.email),
     });
-    // 409 chez Cal.com = créneau pris entre l'affichage et la confirmation.
+    // 409 au cockpit = créneau pris entre l'affichage et la confirmation.
     // C'est le seul cas où le prospect peut agir tout seul : on le lui dit.
     if (creation.raison === "refuse" && creation.statut === 409) {
       return json(
