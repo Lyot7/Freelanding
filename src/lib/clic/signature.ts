@@ -51,11 +51,11 @@ export const URL_COCKPIT_CLICS = "https://admin.eliottbouquerel.fr/api/clics";
 export const DESTINATION_OUVERTURE = "https://eliottbouquerel.fr/images/eliott-bouquerel-avatar.jpg";
 
 /**
- * Le buste de la carte de visite (depuis le 2026-11-02), recadré de
- * `eliott-portrait-vertical.jpg`, pour `/o/<id>?forme=buste`. Deux cibles
+ * Le buste de la carte de visite (depuis le 2026-11-02), détouré en PNG transparent depuis
+ * `eliott-nature-bloc.jpg`, pour `/o/<id>?forme=buste`. Deux cibles
  * littérales choisies par un drapeau : rien de la requête n'entre dans l'URL.
  */
-export const DESTINATION_BUSTE = "https://eliottbouquerel.fr/images/eliott-carte.jpg";
+export const DESTINATION_BUSTE = "https://eliottbouquerel.fr/images/eliott-carte.png";
 
 /** Au-delà, le cockpit est jugé injoignable. La redirection, elle, est déjà partie. */
 const DELAI_COCKPIT_MS = 5_000;
