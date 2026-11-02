@@ -202,7 +202,7 @@ function requete(methode, ua = UA_SAFARI) {
 }
 
 const DESTINATION_ATTENDUE =
-  "https://eliottbouquerel.fr/contact?utm_source=email&utm_medium=signature&utm_campaign=prospection";
+  "https://eliottbouquerel.fr/?sujet=decouverte&utm_source=email&utm_medium=signature&utm_campaign=prospection#rendez-vous";
 
 function verifierRedirection(reponse) {
   expect(reponse.status).toBe(302);
@@ -390,18 +390,18 @@ describe("traiterClic : appel au cockpit", () => {
   });
 });
 
-describe("traiterOuverture : logo de la signature", () => {
+describe("traiterOuverture : portrait de la signature", () => {
   function requeteLogo(methode, ua = UA_SAFARI) {
     const headers = ua === null ? {} : { "user-agent": ua };
     return new Request("http://localhost/o/x", { method: methode, headers });
   }
 
-  it("redirige toujours vers le logo fixe, sans cache", async () => {
+  it("redirige toujours vers le portrait fixe, sans cache", async () => {
     const { deps, planifies } = banc();
     const reponse = traiterOuverture(requeteLogo("GET"), "dupont-plomberie", deps);
     expect(reponse.status).toBe(302);
-    expect(reponse.headers.get("location")).toBe("https://eliottbouquerel.fr/apple-icon.png");
-    expect(DESTINATION_OUVERTURE).toBe("https://eliottbouquerel.fr/apple-icon.png");
+    expect(reponse.headers.get("location")).toBe("https://eliottbouquerel.fr/images/eliott-signature.jpg");
+    expect(DESTINATION_OUVERTURE).toBe("https://eliottbouquerel.fr/images/eliott-signature.jpg");
     expect(reponse.headers.get("cache-control")).toBe("no-store");
     expect(planifies).toHaveLength(1);
   });
