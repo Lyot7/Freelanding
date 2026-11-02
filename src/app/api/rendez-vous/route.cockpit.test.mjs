@@ -41,7 +41,7 @@ function simuler(reponseCockpit) {
     if (adresse.includes("challenges.cloudflare.com")) {
       return new Response(JSON.stringify({ success: true }), { status: 200 });
     }
-    if (adresse.endsWith("/api/rdv/types")) return new Response(JSON.stringify(TYPES), { status: 200 });
+    if (adresse.endsWith("/api/rdv/types?prive=1")) return new Response(JSON.stringify(TYPES), { status: 200 });
     envois.push({ url: adresse, options });
     if (reponseCockpit instanceof Error) throw reponseCockpit;
     const [corps, statut] = reponseCockpit;
@@ -89,6 +89,30 @@ describe("POST /api/rendez-vous — jusqu’au cockpit", () => {
     expect(corps.telephone).toBe("06 12 34 56 78");
     expect(corps.notes.split("\n")[0]).toContain("06 12 34 56 78");
     expect(corps.reponses).toEqual({ budget: "5000-10000", objectif: "tableur", echeance: "vite" });
+  });
+
+  it("réserve un point d'étape : le projet part au cockpit, sans budget", async () => {
+    const envois = simuler([{ id: "rdv_2", jetonGestion: "y" }, 201]);
+    const reponse = await reserver({
+      type: "point-d-etape",
+      budget: undefined,
+      objectif: "priorites",
+      projet: "Cockpit",
+      telephone: "",
+    });
+    expect(reponse.status).toBe(200);
+    const corps = JSON.parse(envois[0].options.body);
+    expect(corps.type).toBe("point-d-etape");
+    expect(corps.reponses).toEqual({ projet: "Cockpit", objectif: "priorites" });
+    expect(corps.notes.split("\n")[0]).toBe("Projet : Cockpit");
+  });
+
+  it("refuse un point d'étape sans projet, champ `projet` nommé", async () => {
+    const envois = simuler([{ id: "rdv_3", jetonGestion: "z" }, 201]);
+    const reponse = await reserver({ type: "point-d-etape", objectif: "priorites", projet: "" });
+    expect(reponse.status).toBe(400);
+    expect((await reponse.json()).champ).toBe("projet");
+    expect(envois).toHaveLength(0);
   });
 
   it("traduit le 409 `creneau_pris` en invitation à choisir un autre créneau", async () => {

@@ -156,6 +156,39 @@ export function optionsObjectif(id: IdRendezVous): readonly OptionQuestion[] {
 /** Légende de la question d'objectif. */
 export const LEGENDE_OBJECTIF = questions.objectif.legende;
 
+/** Longueur maximale du nom de projet saisi par un client. */
+export const LONGUEUR_PROJET_MAX = 120;
+
+/**
+ * Les questions qu'un type de rendez-vous pose, en plus de l'objectif.
+ *
+ * LA DÉMONSTRATION ET LE POINT D'ÉTAPE NE PARLENT NI DE BUDGET NI D'ÉCHÉANCE
+ * (2026-11-02) : l'un montre ce qui existe, l'autre suit un projet déjà signé.
+ * Le point d'étape demande en revanche quel projet, en texte libre : un client
+ * peut en avoir plusieurs.
+ */
+export interface QuestionsDuType {
+  readonly budget: boolean;
+  readonly echeance: boolean;
+  readonly projet: boolean;
+  readonly legendeObjectif: string;
+}
+
+const SANS_BUDGET: readonly IdRendezVous[] = ["demonstration", "point-d-etape"];
+const AVEC_PROJET: readonly IdRendezVous[] = ["point-d-etape"];
+
+/** Sans sujet choisi, aucune question : le composant n'a encore rien à poser. */
+export function questionsDuType(id: IdRendezVous | undefined): QuestionsDuType {
+  if (!id) return { budget: false, echeance: false, projet: false, legendeObjectif: LEGENDE_OBJECTIF };
+  const qualifie = !SANS_BUDGET.includes(id);
+  return {
+    budget: qualifie,
+    echeance: qualifie,
+    projet: AVEC_PROJET.includes(id),
+    legendeObjectif: questions.objectif.legendes[id] ?? LEGENDE_OBJECTIF,
+  };
+}
+
 /** Échéances proposées, identiques pour tous les types. */
 export const OPTIONS_ECHEANCE: readonly OptionQuestion[] = questions.echeance.options;
 
@@ -188,7 +221,10 @@ export function retourBudget(idTranche: string): RetourBudget | undefined {
 /** Réponses validées au questionnaire, telles que le serveur les a acceptées. */
 export interface ReponsesQuestionnaire {
   readonly type: IdRendezVous;
-  readonly budget: string;
+  /** Absent pour un type qui ne pose pas la question (`questionsDuType`). */
+  readonly budget?: string;
+  /** Le projet concerné, saisi par un client (point d'étape). */
+  readonly projet?: string;
   readonly objectif: string;
   readonly echeance?: string;
   /** Facultatif : le cockpit la reçoit aussi à part, mais elle reste en tête des notes. */
@@ -221,14 +257,17 @@ export function composerNotes(reponses: ReponsesQuestionnaire): string {
   if (reponses.telephone) {
     lignes.push(`${LIBELLE_NOTE_TELEPHONE} : ${reponses.telephone}`);
   }
-  const retourCalcule = retourBudget(reponses.budget);
-  let forfait: string = offresDuRendezVous(reponses.type).map((p) => p.nom).join(" · ");
-  if (!retourCalcule || retourCalcule.type === "inconnu") forfait = notes.aCaler;
-  if (retourCalcule?.type === "serre") forfait = notes.aucunForfait;
-  lignes.push(
-    `${notes.budget} : ${libelle(tranchesBudget(), reponses.budget)}`,
-    `${notes.forfait} : ${forfait}`,
-  );
+  if (reponses.projet) lignes.push(`${notes.projet} : ${reponses.projet}`);
+  if (reponses.budget) {
+    const retourCalcule = retourBudget(reponses.budget);
+    let forfait: string = offresDuRendezVous(reponses.type).map((p) => p.nom).join(" · ");
+    if (!retourCalcule || retourCalcule.type === "inconnu") forfait = notes.aCaler;
+    if (retourCalcule?.type === "serre") forfait = notes.aucunForfait;
+    lignes.push(
+      `${notes.budget} : ${libelle(tranchesBudget(), reponses.budget)}`,
+      `${notes.forfait} : ${forfait}`,
+    );
+  }
   lignes.push(
     `${notes.objectif} : ${libelle(optionsObjectif(reponses.type), reponses.objectif)}`,
   );

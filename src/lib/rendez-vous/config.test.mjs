@@ -5,9 +5,10 @@ import {
   resoudreAcces,
   resoudreSujet,
   resoudreConfiguration,
+  typesVisibles,
   URL_COCKPIT_PAR_DEFAUT,
 } from "./config.ts";
-import { IDS_RENDEZ_VOUS } from "@/content/rendez-vous";
+import { IDS_RENDEZ_VOUS, rendezVousContent } from "@/content/rendez-vous";
 
 /**
  * LE CAS QUI COMPTE LE PLUS ICI EST L'ABSENCE. Le dépôt ne contient pas le
@@ -52,7 +53,12 @@ describe("resoudreConfiguration", () => {
   it("ouvre tous les types du contenu, dans son ordre, avec le jeton", () => {
     const config = resoudreConfiguration({ RDV_TOKEN: "j" });
     expect(config.typesDisponibles).toEqual([...IDS_RENDEZ_VOUS]);
-    expect(config.cibles).toEqual({ logiciel: "logiciel", decouverte: "decouverte" });
+    expect(config.cibles).toEqual({
+      logiciel: "logiciel",
+      decouverte: "decouverte",
+      demonstration: "demonstration",
+      "point-d-etape": "point-d-etape",
+    });
   });
 
   it("donne une clé cockpit à chaque type du contenu", () => {
@@ -102,5 +108,36 @@ describe("resoudreSujet", () => {
     expect(resoudreSujet(undefined)).toBeUndefined();
     expect(resoudreSujet("toString")).toBeUndefined();
     expect(resoudreSujet("constructor")).toBeUndefined();
+  });
+});
+
+describe("typesVisibles — le point d'étape, réservé aux clients", () => {
+  const types = rendezVousContent.types;
+  const ids = (liste) => liste.map((type) => type.id);
+
+  it("n'apparaît dans aucun choix par défaut", () => {
+    expect(ids(typesVisibles(types))).toEqual(["logiciel", "decouverte", "demonstration"]);
+  });
+
+  it("reste caché quand un autre sujet est demandé", () => {
+    expect(ids(typesVisibles(types, "demonstration"))).toEqual([
+      "logiciel",
+      "decouverte",
+      "demonstration",
+    ]);
+  });
+
+  it("s'ouvre seul quand `?sujet=point-d-etape` le demande", () => {
+    expect(ids(typesVisibles(types, "point-d-etape"))).toEqual(["point-d-etape"]);
+  });
+
+  it("ne s'ouvre pas quand le cockpit ne le propose pas", () => {
+    const publics = types.filter((type) => !type.prive);
+    expect(ids(typesVisibles(publics, "point-d-etape"))).toEqual(ids(publics));
+  });
+
+  it("se résout depuis l'URL comme les autres sujets", () => {
+    expect(resoudreSujet("point-d-etape")).toBe("point-d-etape");
+    expect(resoudreSujet("demonstration")).toBe("demonstration");
   });
 });

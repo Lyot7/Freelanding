@@ -171,13 +171,21 @@ async function choisir(conteneur, groupe, valeur) {
   await cliquer(radio);
 }
 
-/** Écrit dans un champ contrôlé par React, comme le ferait un clavier. */
+/**
+ * Écrit dans un champ contrôlé par React.
+ *
+ * L'ÉVÉNEMENT `input` NE SUFFIT PAS ICI : `react-dom` est importé avant que le
+ * DOM simulé existe, il croit donc le navigateur incapable de cet événement et
+ * l'ignore. Le gestionnaire `onChange` du champ est appelé directement, avec
+ * la valeur écrite dans le DOM.
+ */
 async function saisir(conteneur, nom, valeur) {
   const champ = conteneur.querySelector(`input[name="${nom}"]`);
   const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set;
+  const cle = Object.keys(champ).find((k) => k.startsWith("__reactProps"));
   await act(async () => {
     setter.call(champ, valeur);
-    champ.dispatchEvent(new window.Event("input", { bubbles: true }));
+    champ[cle].onChange({ target: champ });
     await attendre(5);
   });
 }
@@ -220,12 +228,12 @@ describe("ReservationRendezVous — les questions suivent le sujet", () => {
     }
   });
 
-  it("deux sujets seulement, et aucune question d'outil", async () => {
+  it("quatre sujets, et aucune question d'outil", async () => {
     contexte = installerDom();
     simulerServeur([]);
     montage = await monter();
     const { conteneur } = montage;
-    expect(C.types.map((t) => t.id)).toEqual(["logiciel", "decouverte"]);
+    expect(C.types.map((t) => t.id)).toEqual(["logiciel", "decouverte", "demonstration", "point-d-etape"]);
     for (const type of C.types) expect(texte(conteneur)).toContain(type.nom);
     await cliquer(bouton(conteneur, C.types[0].nom));
     await allerAuProjet(conteneur);
@@ -323,6 +331,85 @@ describe("ReservationRendezVous — les questions suivent le sujet", () => {
       objectif: "tache",
     });
     expect(envois[3]).not.toHaveProperty("outil");
+    expect(texte(conteneur)).toContain(C.succes.titre);
+  });
+
+  it("démonstration : ce qu'on veut voir, sans budget ni échéance", async () => {
+    contexte = installerDom();
+    const envois = simulerServeur([{ status: 200, corps: { ok: true } }]);
+    montage = await monter();
+    const { conteneur } = montage;
+    await cliquer(bouton(conteneur, C.types.find((t) => t.id === "demonstration").nom));
+    await allerAuProjet(conteneur);
+
+    expect(texte(conteneur)).toContain(C.questionnaire.objectif.legendes.demonstration);
+    expect(texte(conteneur)).not.toContain(C.questionnaire.budget.legende);
+    expect(texte(conteneur)).not.toContain(C.questionnaire.echeance.legende);
+    expect(conteneur.querySelector('input[name="projet"]')).toBeNull();
+
+    await cliquer(bouton(conteneur, C.actions.continuer));
+    expect(texte(conteneur)).toContain(C.questionnaire.objectif.erreur);
+    expect(document.activeElement?.getAttribute("name")).toMatch(/-objectif$/u);
+
+    await choisir(conteneur, "objectif", "logiciel");
+    await allerAuxCoordonnees(conteneur);
+    await soumettre(conteneur);
+
+    expect(envois).toHaveLength(1);
+    expect(envois[0]).toMatchObject({
+      type: "demonstration",
+      objectif: "logiciel",
+      nom: "Camille Renard",
+      email: "camille@exemple.fr",
+    });
+    expect(envois[0]).not.toHaveProperty("budget");
+    expect(envois[0]).not.toHaveProperty("echeance");
+    expect(envois[0]).not.toHaveProperty("projet");
+  });
+
+  it("point d'étape : le projet concerné puis ce qu'on veut trancher", async () => {
+    contexte = installerDom();
+    const envois = simulerServeur([
+      { status: 400, corps: { message: "Indiquez le projet.", champ: "projet" } },
+      { status: 200, corps: { ok: true } },
+    ]);
+    montage = await monter("point-d-etape");
+    const { conteneur } = montage;
+    await act(async () => attendre(20));
+    await allerAuProjet(conteneur);
+
+    expect(texte(conteneur)).toContain(C.questionnaire.projet.legende);
+    expect(texte(conteneur)).toContain(C.questionnaire.objectif.legendes["point-d-etape"]);
+    expect(texte(conteneur)).not.toContain(C.questionnaire.budget.legende);
+
+    // Rien de répondu : le projet, affiché en premier, est demandé le premier.
+    await cliquer(bouton(conteneur, C.actions.continuer));
+    expect(texte(conteneur)).toContain(C.questionnaire.projet.erreur);
+    expect(document.activeElement?.getAttribute("name")).toBe("projet");
+
+    await saisir(conteneur, "projet", "Cockpit");
+    expect(texte(conteneur)).not.toContain(C.questionnaire.projet.erreur);
+    await cliquer(bouton(conteneur, C.actions.continuer));
+    expect(document.activeElement?.getAttribute("name")).toMatch(/-objectif$/u);
+    await choisir(conteneur, "objectif", "priorites");
+    await allerAuxCoordonnees(conteneur);
+
+    // Le serveur refuse le projet : retour à la question, erreur affichée.
+    await soumettre(conteneur);
+    expect(texte(conteneur)).toContain(C.questionnaire.projet.erreur);
+    await saisir(conteneur, "projet", "Cockpit, module agenda");
+    expect(texte(conteneur)).not.toContain(C.questionnaire.projet.erreur);
+    await allerAuxCoordonnees(conteneur);
+    await soumettre(conteneur);
+
+    expect(envois).toHaveLength(2);
+    expect(envois[1]).toMatchObject({
+      type: "point-d-etape",
+      projet: "Cockpit, module agenda",
+      objectif: "priorites",
+    });
+    expect(envois[1]).not.toHaveProperty("budget");
+    expect(envois[1]).not.toHaveProperty("echeance");
     expect(texte(conteneur)).toContain(C.succes.titre);
   });
 

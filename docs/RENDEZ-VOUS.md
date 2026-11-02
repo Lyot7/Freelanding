@@ -23,11 +23,23 @@ navigateur ──> /api/rendez-vous          ──> cockpit POST /api/rdv
   serveur du site : `src/lib/rendez-vous/cockpit.ts` n'est importé que par des
   routes et des pages serveur.
 - Les types sont désignés par leur clé cockpit (`CLES_COCKPIT` dans
-  `src/lib/rendez-vous/config.ts`) : `logiciel` et `decouverte` aujourd'hui.
-  Le cockpit connaît aussi `site`, `ia`, `cto`, `demonstration` et
-  `point-d-etape` ; le sélecteur du site n'en propose que deux depuis le
-  2026-10-31.
-- Les durées viennent de `GET /api/rdv/types` du cockpit (gardées cinq minutes).
+  `src/lib/rendez-vous/config.ts`) : `logiciel`, `decouverte`,
+  `demonstration` et `point-d-etape` depuis le 2026-11-02 (ces deux derniers
+  quittent Cal.com). Le cockpit connaît aussi `site`, `ia` et `cto`, que le site
+  ne propose plus depuis le 2026-10-31.
+- `point-d-etape` est réservé aux clients : `typesVisibles` ne le montre dans
+  aucun choix de sujet, il ne s'ouvre que par `?sujet=point-d-etape` (lien
+  `/rdv/point-d-etape`), et il est alors le seul sujet proposé. Le cockpit ne
+  le liste qu'avec `?prive=1`, mais accepte ses créneaux et sa réservation
+  comme ceux des autres types.
+- Questionnaire par sujet (`questionsDuType`) : `logiciel` et `decouverte`
+  posent budget, objectif et échéance ; `demonstration` demande seulement ce
+  qu'on veut voir ; `point-d-etape`, le projet concerné (texte libre, requis)
+  et ce qu'on veut trancher. Une réponse à une question non posée est ignorée.
+- Liens directs (307, `next.config.ts`) : `/rdv` (découverte), `/rdv/logiciel`,
+  `/rdv/demonstration`, `/rdv/point-d-etape`.
+- Les durées viennent de `GET /api/rdv/types?prive=1` du cockpit (gardées cinq
+  minutes), pour avoir aussi celles du point d'étape.
   Le cockpit est l'autorité : la durée du contenu (`src/content/rendez-vous.ts`)
   n'est qu'un affichage.
 - Les réponses au questionnaire partent deux fois : en texte dans `notes`

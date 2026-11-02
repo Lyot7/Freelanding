@@ -1,4 +1,4 @@
-import { describe, expect, it } from "bun:test";
+import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 
 import { decouperAutour, Footer } from "./Footer";
 
@@ -33,5 +33,50 @@ describe("decouperAutour", () => {
 
   it("rend tout le texte quand aucun fragment n'est donné", () => {
     expect(decouperAutour("Tout le texte.", "")).toEqual(["Tout le texte."]);
+  });
+});
+
+/** Les listes `types` passées aux blocs de réservation, dans l'ordre de l'arbre. */
+function listesDeTypes(noeud, vus = new WeakSet(), trouves = []) {
+  if (noeud === null || typeof noeud !== "object" || vus.has(noeud)) return trouves;
+  vus.add(noeud);
+  if (Array.isArray(noeud)) {
+    for (const enfant of noeud) listesDeTypes(enfant, vus, trouves);
+    return trouves;
+  }
+  const props = noeud.props;
+  if (!props || typeof props !== "object") return trouves;
+  if (Array.isArray(props.types)) trouves.push(props.types.map((type) => type.id));
+  for (const valeur of Object.values(props)) listesDeTypes(valeur, vus, trouves);
+  return trouves;
+}
+
+describe("Footer — le point d'étape reste réservé aux clients", () => {
+  let jetonAvant;
+  beforeEach(() => {
+    jetonAvant = process.env.RDV_TOKEN;
+    process.env.RDV_TOKEN = "jeton-de-test";
+  });
+  afterEach(() => {
+    if (jetonAvant === undefined) delete process.env.RDV_TOKEN;
+    else process.env.RDV_TOKEN = jetonAvant;
+  });
+
+  it("sans sujet, aucun choix visible ne le propose", async () => {
+    const listes = listesDeTypes(await Footer());
+    expect(listes.length).toBeGreaterThan(0);
+    // Le repli (sans lecture de l'URL) le cache ; `ReservationAvecSujet` reçoit
+    // la liste entière et filtre elle-même selon `?sujet=`.
+    expect(listes[0]).toEqual(["logiciel", "decouverte", "demonstration"]);
+  });
+
+  it("une page qui le demande l'ouvre seul", async () => {
+    const listes = listesDeTypes(await Footer({ sujetRendezVous: "point-d-etape" }));
+    expect(listes[0]).toEqual(["point-d-etape"]);
+  });
+
+  it("une page de prestation ne le montre pas", async () => {
+    const listes = listesDeTypes(await Footer({ sujetRendezVous: "logiciel" }));
+    expect(listes[0]).toEqual(["logiciel", "decouverte", "demonstration"]);
   });
 });

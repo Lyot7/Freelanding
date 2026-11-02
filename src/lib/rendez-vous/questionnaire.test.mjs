@@ -9,8 +9,10 @@ import {
   composerNotes,
   LIBELLE_NOTE_TELEPHONE,
   LEGENDE_OBJECTIF,
+  LONGUEUR_PROJET_MAX,
   offresDuRendezVous,
   optionsObjectif,
+  questionsDuType,
   rattacherTranche,
   rendezVousDuTypeProjet,
   retourBudget,
@@ -245,5 +247,68 @@ describe("rattacherTranche — les tranches retirées", () => {
   it("rend telle quelle une valeur qui n'est pas une ancienne tranche", () => {
     expect(rattacherTranche(BUDGET_INCONNU)).toBe(BUDGET_INCONNU);
     expect(rattacherTranche("toString")).toBe("toString");
+  });
+});
+
+describe("questionsDuType — démonstration et point d'étape sans budget ni échéance", () => {
+  const Q = rendezVousContent.questionnaire;
+
+  it("logiciel et découverte posent budget et échéance, sans projet", () => {
+    for (const id of ["logiciel", "decouverte"]) {
+      expect(questionsDuType(id)).toEqual({
+        budget: true,
+        echeance: true,
+        projet: false,
+        legendeObjectif: LEGENDE_OBJECTIF,
+      });
+    }
+  });
+
+  it("la démonstration demande seulement ce qu'on veut voir", () => {
+    expect(questionsDuType("demonstration")).toEqual({
+      budget: false,
+      echeance: false,
+      projet: false,
+      legendeObjectif: Q.objectif.legendes.demonstration,
+    });
+  });
+
+  it("le point d'étape demande le projet et ce qu'on veut trancher", () => {
+    expect(questionsDuType("point-d-etape")).toEqual({
+      budget: false,
+      echeance: false,
+      projet: true,
+      legendeObjectif: Q.objectif.legendes["point-d-etape"],
+    });
+    expect(LONGUEUR_PROJET_MAX).toBe(120);
+  });
+
+  it("sans sujet, aucune question", () => {
+    expect(questionsDuType(undefined)).toEqual({
+      budget: false,
+      echeance: false,
+      projet: false,
+      legendeObjectif: LEGENDE_OBJECTIF,
+    });
+  });
+
+  it("les notes d'un point d'étape portent le projet, sans ligne de budget", () => {
+    const texte = composerNotes({
+      type: "point-d-etape",
+      projet: "Cockpit",
+      objectif: "priorites",
+      telephone: "06 12 34 56 78",
+    });
+    expect(texte.split("\n")).toEqual([
+      `${LIBELLE_NOTE_TELEPHONE} : 06 12 34 56 78`,
+      `${rendezVousContent.notes.projet} : Cockpit`,
+      `${rendezVousContent.notes.objectif} : Les priorités de la suite`,
+    ]);
+  });
+
+  it("les notes d'une démonstration se limitent à ce qu'on veut voir", () => {
+    expect(composerNotes({ type: "demonstration", objectif: "ia" })).toBe(
+      `${rendezVousContent.notes.objectif} : L’IA au travail sur des documents`,
+    );
   });
 });

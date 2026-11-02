@@ -43,6 +43,8 @@ describe("les liens de premier rendez-vous mènent au formulaire de l'accueil", 
   for (const [origine, sujet] of [
     ["/rdv", "decouverte"],
     ["/rdv/logiciel", "logiciel"],
+    ["/rdv/demonstration", "demonstration"],
+    ["/rdv/point-d-etape", "point-d-etape"],
   ]) {
     test(`${origine} ouvre l'onglet rendez-vous sur « ${sujet} »`, () => {
       const regle = regles.find((r) => r.origine === origine);
@@ -63,5 +65,12 @@ describe("les liens de premier rendez-vous mènent au formulaire de l’accueil"
       destination: "/?sujet=logiciel#rendez-vous",
       statusCode: 307,
     });
+    for (const sujet of ["demonstration", "point-d-etape"]) {
+      expect(vers(`/rdv/${sujet}`)).toEqual({
+        source: `/rdv/${sujet}`,
+        destination: `/?sujet=${sujet}#rendez-vous`,
+        statusCode: 307,
+      });
+    }
   });
 });

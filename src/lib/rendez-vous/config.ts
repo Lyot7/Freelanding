@@ -17,7 +17,7 @@
  * répondent 503 avec un message honnête. C'est l'état par défaut du dépôt.
  */
 import { IDS_RENDEZ_VOUS } from "@/content/rendez-vous";
-import type { IdRendezVous } from "@/content/rendez-vous";
+import type { IdRendezVous, TypeRendezVous } from "@/content/rendez-vous";
 
 /** Adresse du cockpit quand `COCKPIT_URL` n'est pas posée. */
 export const URL_COCKPIT_PAR_DEFAUT = "https://admin.eliottbouquerel.fr";
@@ -31,6 +31,8 @@ export const URL_COCKPIT_PAR_DEFAUT = "https://admin.eliottbouquerel.fr";
 export const CLES_COCKPIT: Readonly<Record<IdRendezVous, string>> = {
   logiciel: "logiciel",
   decouverte: "decouverte",
+  demonstration: "demonstration",
+  "point-d-etape": "point-d-etape",
 };
 
 /** Où et comment joindre le cockpit. Le jeton ne quitte jamais le serveur. */
@@ -118,4 +120,20 @@ export function resoudreSujet(valeur: unknown): IdRendezVous | undefined {
     return undefined;
   }
   return SUJETS_RENOMMES[valeur];
+}
+
+/**
+ * Types proposés au choix, sujet demandé compris.
+ *
+ * UN TYPE PRIVÉ (point d'étape, réservé aux clients) n'est jamais listé : il ne
+ * s'ouvre que lorsque `?sujet=<son id>` le demande, et c'est alors le seul
+ * sujet proposé, pour qu'un client n'en parte pas par erreur vers une offre de
+ * prospect.
+ */
+export function typesVisibles(
+  types: readonly TypeRendezVous[],
+  demande?: IdRendezVous,
+): readonly TypeRendezVous[] {
+  const prive = types.find((type) => type.prive && type.id === demande);
+  return prive ? [prive] : types.filter((type) => !type.prive);
 }
