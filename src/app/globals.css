@@ -763,12 +763,12 @@ html[data-consent-choisi] [data-consent-attente] {
   pointer-events: none;
   border-style: solid;
   border-width: 1px;
-  border-color: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.4);
   transition: border-color 150ms ease;
 }
 
 .footer-select-wrapper:hover::after {
-  border-color: rgba(255, 255, 255, 0.45);
+  border-color: rgba(255, 255, 255, 0.6);
 }
 
 .footer-select-wrapper:focus-within::after {

@@ -84,8 +84,8 @@ function FormField({
         // désormais globale (`src/app/focus.css`), qui pose aussi l'anneau
         // clavier. Le passage du bord bas à l'accent au focus, lui, est bien de
         // la source ; il passe au contour entier.
-        className={`h-[54px] w-full border bg-white/[0.04] px-[16px] text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground transition-colors placeholder:text-white/45 hover:border-white/45 focus:border-accent tablet:h-[52px] tablet:text-[15px] ${
-          enErreur ? "border-accent" : "border-white/25"
+        className={`h-[54px] w-full border bg-white/[0.04] px-[16px] text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground transition-colors placeholder:text-white/45 hover:border-white/60 focus:border-accent tablet:h-[52px] tablet:text-[15px] ${
+          enErreur ? "border-accent" : "border-white/40"
         }`}
       />
     </label>
@@ -444,8 +444,8 @@ export function FooterContactForm({
               maxLength={4000}
               placeholder={footerForm.messagePlaceholder ?? ""}
               aria-invalid={envoi.champEnErreur === "message" || undefined}
-              className={`block min-h-[96px] w-full resize-y border bg-white/[0.04] px-[16px] py-[14px] text-[16px] font-medium leading-[1.35] tracking-[-0.01em] text-foreground transition-colors placeholder:text-white/45 hover:border-white/45 focus:border-accent tablet:text-[15px] ${
-                envoi.champEnErreur === "message" ? "border-accent" : "border-white/25"
+              className={`block min-h-[96px] w-full resize-y border bg-white/[0.04] px-[16px] py-[14px] text-[16px] font-medium leading-[1.35] tracking-[-0.01em] text-foreground transition-colors placeholder:text-white/45 hover:border-white/60 focus:border-accent tablet:text-[15px] ${
+                envoi.champEnErreur === "message" ? "border-accent" : "border-white/40"
               }`}
             />
           </label>

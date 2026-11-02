@@ -90,8 +90,8 @@ function ConsentSwitch({
       >
         <span
           className={
-            "absolute top-[3px] block h-[16px] w-[16px] rounded-full transition-[left,background-color] duration-200 motion-reduce:transition-none " +
-            (checked ? "left-[21px] bg-accent-ink" : "left-[3px] bg-white")
+            "absolute top-[3px] block h-[16px] w-[16px] rounded-full transition-[translate,background-color] duration-200 motion-reduce:transition-none " +
+            "left-[3px] " + (checked ? "translate-x-[18px] bg-accent-ink" : "bg-white")
           }
         />
       </span>
