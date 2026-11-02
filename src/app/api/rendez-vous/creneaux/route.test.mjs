@@ -40,7 +40,7 @@ function simuler(creneaux) {
   globalThis.fetch = async (url, options = {}) => {
     const adresse = String(url);
     appels.push({ url: adresse, options });
-    if (adresse.endsWith("/api/rdv/types")) return new Response(JSON.stringify(TYPES), { status: 200 });
+    if (adresse.endsWith("/api/rdv/types?prive=1")) return new Response(JSON.stringify(TYPES), { status: 200 });
     if (creneaux instanceof Error) throw creneaux;
     const [corps, statut = 200] = creneaux;
     return new Response(JSON.stringify(corps), { status: statut });

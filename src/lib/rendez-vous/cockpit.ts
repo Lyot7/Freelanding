@@ -162,7 +162,9 @@ export async function obtenirDurees(
   const enCache = cacheTypes.get(acces.url);
   if (enCache && enCache.expire > maintenantMs) return enCache.durees.get(cible);
 
-  const resultat = await appeler("/api/rdv/types", { delaiMs: DELAI_LECTURE_MS }, env);
+  // `prive=1` : le point d'étape, réservé aux clients, n'est listé qu'ainsi au
+  // cockpit. Le site le cache lui-même (`typesVisibles`) ; il lui faut ses durées.
+  const resultat = await appeler("/api/rdv/types?prive=1", { delaiMs: DELAI_LECTURE_MS }, env);
   if (!resultat.ok) return undefined;
   const durees = lireTypes(resultat.donnees);
   if (!durees) return undefined;

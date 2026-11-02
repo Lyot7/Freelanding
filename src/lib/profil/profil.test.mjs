@@ -55,10 +55,12 @@ describe("profil complet de la vue Agent", () => {
     }
   });
 
-  it("donne le lien exact de chaque type de rendez-vous, et du formulaire", () => {
-    for (const id of IDS_RENDEZ_VOUS) {
+  it("donne le lien exact de chaque type de rendez-vous public, et du formulaire", () => {
+    for (const id of IDS_RENDEZ_VOUS.filter((id) => id !== "point-d-etape")) {
       expect(markdown).toContain(absoluteUrl(lienRendezVous(id)));
     }
+    // Le point d'étape est réservé aux clients : jamais publié.
+    expect(markdown).not.toContain(absoluteUrl(lienRendezVous("point-d-etape")));
     expect(markdown).toContain(absoluteUrl("/contact"));
   });
 

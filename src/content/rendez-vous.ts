@@ -30,7 +30,12 @@ import type { PrestationId } from "@/content/offre";
  * `resoudreSujet` (`src/lib/rendez-vous/config.ts`), comme « outil » depuis le
  * 2026-09-23.
  */
-export const IDS_RENDEZ_VOUS = ["logiciel", "decouverte"] as const;
+export const IDS_RENDEZ_VOUS = [
+  "logiciel",
+  "decouverte",
+  "demonstration",
+  "point-d-etape",
+] as const;
 
 export type IdRendezVous = (typeof IDS_RENDEZ_VOUS)[number];
 
@@ -40,6 +45,11 @@ export interface TypeRendezVous {
   /** Durée AFFICHÉE. L'autorité reste le type du cockpit. */
   readonly duree: string;
   readonly description: string;
+  /**
+   * Réservé aux clients : jamais proposé dans un choix de sujet, il ne s'ouvre
+   * que par `?sujet=<id>` (`typesVisibles`, `src/lib/rendez-vous/config.ts`).
+   */
+  readonly prive?: true;
 }
 
 /** Une réponse possible à une question du questionnaire. */
@@ -115,12 +125,19 @@ export interface ContenuRendezVous {
       /** Légende commune, reprise par le formulaire de contact. */
       readonly legende: string;
       /** Légende propre à un sujet, quand la commune ne lui va pas. */
+      readonly legendes: Readonly<Partial<Record<IdRendezVous, string>>>;
       readonly erreur: string;
       readonly options: Readonly<Record<IdRendezVous, readonly OptionQuestion[]>>;
     };
     readonly echeance: {
       readonly legende: string;
       readonly options: readonly OptionQuestion[];
+    };
+    /** Le projet concerné, en texte libre : posé aux seuls clients (point d'étape). */
+    readonly projet: {
+      readonly legende: string;
+      readonly placeholder: string;
+      readonly erreur: string;
     };
   };
   /** « Ce que vous pouvez espérer à ce budget », affiché dès qu'une tranche est choisie. */
@@ -143,6 +160,7 @@ export interface ContenuRendezVous {
     readonly forfait: string;
     readonly objectif: string;
     readonly echeance: string;
+    readonly projet: string;
     readonly aucunForfait: string;
     readonly aCaler: string;
   };
@@ -263,6 +281,25 @@ export const rendezVousContent: ContenuRendezVous = {
       description:
         "Autre chose qu’un logiciel, ou le problème sans la solution : on en parle. Si ce n’est pas pour moi, je vous le dis pendant l’appel, ça vous évite de perdre du temps.",
     },
+    /* DEPUIS LE 2026-11-02, la démonstration et le point d'étape quittent
+       Cal.com pour le moteur du cockpit, comme les autres sujets. Ni budget ni
+       échéance : leur questionnaire tient en une ou deux questions
+       (`questionsDuType`, `src/lib/rendez-vous/questionnaire.ts`). */
+    {
+      id: "demonstration",
+      nom: "Voir une démonstration",
+      duree: "45 minutes",
+      description:
+        "Je vous montre en direct un logiciel métier que j’ai construit, sur le cas qui ressemble le plus au vôtre. Vous voyez ce qu’il change au quotidien avant de décider quoi que ce soit.",
+    },
+    {
+      id: "point-d-etape",
+      nom: "Faire le point sur votre projet",
+      duree: "45 minutes",
+      description:
+        "On regarde où en est le projet, ce qui est livré et ce qui reste à trancher. Vous repartez avec les décisions prises et la suite datée.",
+      prive: true,
+    },
   ],
 
   etapes: {
@@ -340,6 +377,10 @@ export const rendezVousContent: ContenuRendezVous = {
     },
     objectif: {
       legende: "Ce que vous voulez obtenir en priorité",
+      legendes: {
+        demonstration: "Ce que vous voulez voir",
+        "point-d-etape": "Ce que vous voulez trancher",
+      },
       erreur: "Choisissez la réponse la plus proche de votre cas.",
       options: {
         logiciel: [
@@ -355,6 +396,18 @@ export const rendezVousContent: ContenuRendezVous = {
           { id: "conseil", libelle: "Avoir un avis sur un projet" },
           { id: "autre", libelle: "Autre chose" },
         ],
+        demonstration: [
+          { id: "logiciel", libelle: "Un logiciel métier en service" },
+          { id: "automatisation", libelle: "Une tâche automatisée de bout en bout" },
+          { id: "ia", libelle: "L’IA au travail sur des documents" },
+          { id: "autre", libelle: "Autre chose" },
+        ],
+        "point-d-etape": [
+          { id: "priorites", libelle: "Les priorités de la suite" },
+          { id: "livraison", libelle: "Un retour sur la dernière livraison" },
+          { id: "evolution", libelle: "Une évolution à ajouter" },
+          { id: "autre", libelle: "Autre chose" },
+        ],
       },
     },
     echeance: {
@@ -364,6 +417,11 @@ export const rendezVousContent: ContenuRendezVous = {
         { id: "trimestre", libelle: "Dans les trois mois" },
         { id: "libre", libelle: "Pas de date précise" },
       ],
+    },
+    projet: {
+      legende: "Le projet concerné",
+      placeholder: "Le nom du projet ou du logiciel",
+      erreur: "Indiquez le projet dont on parle.",
     },
   },
 
@@ -384,6 +442,7 @@ export const rendezVousContent: ContenuRendezVous = {
     forfait: "À portée",
     objectif: "Objectif",
     echeance: "Échéance",
+    projet: "Projet",
     aucunForfait: "budget serré, à cadrer",
     aCaler: "à caler pendant l’appel",
   },

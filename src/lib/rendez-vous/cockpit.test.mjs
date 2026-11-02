@@ -102,7 +102,7 @@ describe("obtenirDurees", () => {
     expect(await obtenirDurees("logiciel", 0, env)).toEqual({ options: [30, 45, 60], defaut: 45 });
     expect(await obtenirDurees("decouverte", 1_000, env)).toEqual({ options: [15, 30, 45], defaut: 30 });
     expect(appels).toHaveLength(1);
-    expect(appels[0].url).toBe("https://cache.test/api/rdv/types");
+    expect(appels[0].url).toBe("https://cache.test/api/rdv/types?prive=1");
     await obtenirDurees("logiciel", 5 * 60 * 1000 + 1, env);
     expect(appels).toHaveLength(2);
   });

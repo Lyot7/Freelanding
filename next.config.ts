@@ -109,6 +109,8 @@ const nextConfig: NextConfig = {
          changer sans qu'un navigateur la garde en cache. */
       { source: "/rdv", destination: "/?sujet=decouverte#rendez-vous", statusCode: 307 },
       { source: "/rdv/logiciel", destination: "/?sujet=logiciel#rendez-vous", statusCode: 307 },
+      { source: "/rdv/demonstration", destination: "/?sujet=demonstration#rendez-vous", statusCode: 307 },
+      { source: "/rdv/point-d-etape", destination: "/?sujet=point-d-etape#rendez-vous", statusCode: 307 },
       { source: "/agent", destination: "/", statusCode: 301 },
       /* Simulateur de prix, retiré le 2026-10-05. */
       { source: "/simulateur-prix", destination: "/#services", statusCode: 301 },

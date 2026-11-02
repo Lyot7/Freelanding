@@ -14,7 +14,7 @@ import {
 
 const MAINTENANT = Date.UTC(2026, 8, 1, 13, 0, 0);
 const DEBUT_HUMAIN = MAINTENANT - 10_000;
-const TYPES = ["logiciel", "decouverte"];
+const TYPES = ["logiciel", "decouverte", "demonstration", "point-d-etape"];
 
 function valider(surcharge = {}) {
   return validerReservation(
@@ -232,9 +232,9 @@ describe("validerReservation — le questionnaire", () => {
     expect(valider({ budget: "inconnu" }).ok).toBe(true);
   });
 
-  it("exige le budget pour chaque sujet, la découverte comprise", () => {
-    // Plus de sujet sans budget depuis le retrait du CTO (2026-10-31).
-    for (const type of TYPES) {
+  it("exige le budget pour chaque sujet de prospect, la découverte comprise", () => {
+    // Démonstration et point d'étape n'ont pas de budget (2026-11-02) : testés à part.
+    for (const type of ["logiciel", "decouverte"]) {
       expect(valider({ type, budget: "" }).motif).toEqual({
         type: "champ_invalide",
         champ: "budget",
@@ -318,5 +318,77 @@ describe("validerReservation — téléphone facultatif", () => {
     const resultat = valider({ telephone: "12345" });
     expect(resultat.ok).toBe(false);
     expect(resultat.motif).toEqual({ type: "champ_invalide", champ: "telephone", raison: "longueur" });
+  });
+});
+
+describe("validerReservation — démonstration et point d'étape", () => {
+  it("la démonstration passe sans budget, et ignore budget et échéance envoyés", () => {
+    const resultat = valider({
+      type: "demonstration",
+      objectif: "logiciel",
+      budget: "n-importe-quoi",
+      echeance: "jamais",
+      projet: "ignoré",
+    });
+    expect(resultat.ok).toBe(true);
+    expect(resultat.reservation).toMatchObject({ type: "demonstration", objectif: "logiciel" });
+    expect(resultat.reservation).not.toHaveProperty("budget");
+    expect(resultat.reservation).not.toHaveProperty("echeance");
+    expect(resultat.reservation).not.toHaveProperty("projet");
+  });
+
+  it("la démonstration exige encore ce qu'on veut voir, dans sa liste", () => {
+    expect(valider({ type: "demonstration", objectif: "tableur" })).toEqual({
+      ok: false,
+      motif: { type: "champ_invalide", champ: "objectif", raison: "hors_liste" },
+    });
+  });
+
+  it("le point d'étape garde le projet, ramené sur une ligne", () => {
+    const resultat = valider({
+      type: "point-d-etape",
+      objectif: "priorites",
+      budget: undefined,
+      projet: "  Cockpit\n module   agenda ",
+    });
+    expect(resultat.ok).toBe(true);
+    expect(resultat.reservation).toMatchObject({
+      type: "point-d-etape",
+      projet: "Cockpit module agenda",
+      objectif: "priorites",
+    });
+    expect(resultat.reservation).not.toHaveProperty("budget");
+  });
+
+  it("le point d'étape refuse un projet vide ou trop long", () => {
+    expect(valider({ type: "point-d-etape", objectif: "priorites", projet: "   " })).toEqual({
+      ok: false,
+      motif: { type: "champ_invalide", champ: "projet", raison: "requis" },
+    });
+    expect(
+      valider({ type: "point-d-etape", objectif: "priorites", projet: "x".repeat(121) }),
+    ).toEqual({
+      ok: false,
+      motif: { type: "champ_invalide", champ: "projet", raison: "longueur" },
+    });
+  });
+
+  it("refuse le point d'étape quand il n'est pas configuré", () => {
+    const resultat = validerReservation(
+      {
+        type: "point-d-etape",
+        debut: new Date(MAINTENANT + 48 * 3600 * 1000).toISOString(),
+        nom: "Camille Renard",
+        email: "camille@exemple.fr",
+        objectif: "priorites",
+        projet: "Cockpit",
+        debutMs: DEBUT_HUMAIN,
+      },
+      { typesAutorises: ["logiciel", "decouverte"], maintenantMs: MAINTENANT },
+    );
+    expect(resultat).toEqual({
+      ok: false,
+      motif: { type: "champ_invalide", champ: "type", raison: "hors_liste" },
+    });
   });
 });

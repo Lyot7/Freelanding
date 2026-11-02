@@ -21,7 +21,7 @@ import { ReservationAvecSujet } from "@/components/rendez-vous/ReservationAvecSu
 import { ReservationRendezVous } from "@/components/rendez-vous/ReservationRendezVous";
 import { rendezVousContent } from "@/content/rendez-vous";
 import type { IdRendezVous } from "@/content/rendez-vous";
-import { resoudreConfiguration } from "@/lib/rendez-vous/config";
+import { resoudreConfiguration, typesVisibles } from "@/lib/rendez-vous/config";
 
 /**
  * Footer — reconstruction fidèle (100 %) du footer Framer de la page d'accueil d'origine
@@ -460,7 +460,7 @@ export async function Footer({
                 rendezVous={
                   typesRendezVous.length > 0 ? (
                     <ReservationRendezVous
-                      types={typesRendezVous}
+                      types={typesVisibles(typesRendezVous, sujetRendezVous)}
                       emailContact={contact.email}
                       typeInitial={
                         typesRendezVous.some((type) => type.id === sujetRendezVous)
@@ -480,7 +480,7 @@ export async function Footer({
                     rendezVous={
                       typesRendezVous.length > 0 ? (
                         <ReservationRendezVous
-                          types={typesRendezVous}
+                          types={typesVisibles(typesRendezVous)}
                           emailContact={contact.email}
                         />
                       ) : undefined

@@ -3,6 +3,7 @@ import type { ContentBlock, Stat } from "@/lib/content/types";
 import { absoluteUrl } from "@/lib/site-url";
 import { prestations, type Offre, type Prestation } from "@/content/offre";
 import { lienRendezVous, rendezVousContent } from "@/content/rendez-vous";
+import { typesVisibles } from "@/lib/rendez-vous/config";
 import { CHEMIN_PROFIL_TEXTE, vueAgentContent } from "@/content/vue-agent";
 
 /**
@@ -256,7 +257,8 @@ export async function construireProfil(
     p(`${T.contact.visio} ${contact.responseTime ?? ""}`.trim()),
     h3(T.contact.rendezVous),
     liste(
-      rendezVousContent.types.map(
+      // Le point d'étape, réservé aux clients, n'est jamais publié.
+      typesVisibles(rendezVousContent.types).map(
         (type) =>
           `${type.nom} (${type.duree})${DP} ${type.description} ${T.contact.rendezVousLien}${DP} ${absoluteUrl(lienRendezVous(type.id))}`,
       ),

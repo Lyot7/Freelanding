@@ -285,8 +285,8 @@ describe("le site dit « sur devis » partout où il parle de prix", () => {
       expect(presta.rdvHref).toBe(lienRendezVous(RDV_PAR_PRESTATION[p.id]));
     }
     expect(RDV_PAR_PRESTATION.logiciel).toBe("logiciel");
-    // Deux sujets seulement : le logiciel, et la découverte pour tout le reste.
-    expect([...IDS_RENDEZ_VOUS]).toEqual(["logiciel", "decouverte"]);
+    // Le logiciel, la découverte pour tout le reste, la démonstration et le point d’étape client.
+    expect([...IDS_RENDEZ_VOUS]).toEqual(["logiciel", "decouverte", "demonstration", "point-d-etape"]);
   });
 
   test("aucun préfixe de prix ne revient dans le libellé ni dans la donnée", () => {

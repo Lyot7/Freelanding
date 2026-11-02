@@ -29,6 +29,8 @@ import { resoudreSujet } from "./config";
 import { HORIZON_JOURS } from "./creneaux";
 import { estDureePlausible } from "./durees";
 import {
+  LONGUEUR_PROJET_MAX,
+  questionsDuType,
   rattacherObjectif,
   OPTIONS_ECHEANCE,
   optionsObjectif,
@@ -62,7 +64,10 @@ export interface ReservationValide {
   readonly telephone?: string;
   /** Absent quand le prospect n'a rien écrit. */
   readonly message?: string;
-  readonly budget: string;
+  /** Absent pour un type qui ne pose pas la question (`questionsDuType`). */
+  readonly budget?: string;
+  /** Le projet concerné, posé aux seuls clients (point d'étape). */
+  readonly projet?: string;
   /** Identifiant d'objectif, pris dans `optionsObjectif(type)`. */
   readonly objectif: string;
   /** Facultative : absente quand le prospect n'a rien coché. */
@@ -70,7 +75,7 @@ export interface ReservationValide {
 }
 
 /** Champs du questionnaire, tels que le serveur les nomme dans un rejet. */
-type ChampQuestionnaire = "budget" | "objectif" | "echeance";
+type ChampQuestionnaire = "budget" | "objectif" | "echeance" | "projet";
 
 export type MotifRejetReservation =
   | { readonly type: "corps_illisible" }
@@ -253,19 +258,41 @@ export function validerReservation(
     };
   }
 
-  const budget = lireChoix(
-    { ...champs, budget: rattacherTranche(lireChaine(champs, "budget").trim()) },
-    "budget",
-    tranchesBudget(),
-  );
-  if (!budget.ok) return budget;
+  // Une question que le type ne pose pas est ignorée, quoi que le client envoie.
+  const posees = questionsDuType(type);
+  let projet = "";
+  if (posees.projet) {
+    projet = surUneLigne(lireChaine(champs, "projet"));
+    if (projet.length === 0 || projet.length > LONGUEUR_PROJET_MAX) {
+      return {
+        ok: false,
+        motif: {
+          type: "champ_invalide",
+          champ: "projet",
+          raison: projet.length === 0 ? "requis" : "longueur",
+        },
+      };
+    }
+  }
+  let budget: string | undefined;
+  if (posees.budget) {
+    const lu = lireChoix(
+      { ...champs, budget: rattacherTranche(lireChaine(champs, "budget").trim()) },
+      "budget",
+      tranchesBudget(),
+    );
+    if (!lu.ok) return lu;
+    budget = lu.valeur;
+  }
   const objectif = lireChoix(
     { ...champs, objectif: rattacherObjectif(lireChaine(champs, "objectif").trim()) },
     "objectif",
     optionsObjectif(type),
   );
   if (!objectif.ok) return objectif;
-  const echeance = lireChoixFacultatif(champs, "echeance", OPTIONS_ECHEANCE);
+  const echeance = posees.echeance
+    ? lireChoixFacultatif(champs, "echeance", OPTIONS_ECHEANCE)
+    : { ok: true as const };
   if (!echeance.ok) return echeance;
 
   return {
@@ -280,7 +307,8 @@ export function validerReservation(
       email,
       ...(telephone.valeur ? { telephone: telephone.valeur } : {}),
       ...(message.length > 0 ? { message } : {}),
-      budget: budget.valeur,
+      ...(budget ? { budget } : {}),
+      ...(projet ? { projet } : {}),
       objectif: objectif.valeur,
       ...(echeance.valeur ? { echeance: echeance.valeur } : {}),
     },

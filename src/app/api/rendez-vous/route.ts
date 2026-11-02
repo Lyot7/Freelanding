@@ -85,6 +85,8 @@ function messageRejet(motif: MotifRejetReservation): {
         return { message: "Choisissez la réponse la plus proche de votre cas.", champ: "objectif" };
       case "echeance":
         return { message: "Cette échéance n’est pas proposée.", champ: "echeance" };
+      case "projet":
+        return { message: "Indiquez le projet dont on parle, en une ligne.", champ: "projet" };
     }
   }
   return {
@@ -225,7 +227,8 @@ export async function POST(requete: Request): Promise<Response> {
     // Le téléphone reste AUSSI en tête des notes : c'est elles que l'agenda montre.
     notes: composerNotes(reservation),
     reponses: {
-      budget: reservation.budget,
+      ...(reservation.budget ? { budget: reservation.budget } : {}),
+      ...(reservation.projet ? { projet: reservation.projet } : {}),
       objectif: reservation.objectif,
       ...(reservation.echeance ? { echeance: reservation.echeance } : {}),
     },

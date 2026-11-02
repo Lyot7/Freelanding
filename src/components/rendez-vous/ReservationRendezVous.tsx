@@ -85,9 +85,10 @@ import type {
   ReponseCreneaux,
 } from "@/lib/rendez-vous/creneaux";
 import {
-  LEGENDE_OBJECTIF,
+  LONGUEUR_PROJET_MAX,
   OPTIONS_ECHEANCE,
   optionsObjectif,
+  questionsDuType,
   retourBudget,
   tranchesBudget,
 } from "@/lib/rendez-vous/questionnaire";
@@ -631,20 +632,28 @@ export function ReservationRendezVous({
   const [budget, setBudget] = useState("");
   const [objectif, setObjectif] = useState("");
   const [echeance, setEcheance] = useState("");
+  const [projet, setProjet] = useState("");
   const [nom, setNom] = useState("");
   const [email, setEmail] = useState("");
   const [telephone, setTelephone] = useState("");
   const [message, setMessage] = useState("");
   /** Vrai après un « Continuer » refusé : les champs requis vides s'affichent en erreur. */
   const [envoiTente, setEnvoiTente] = useState(false);
+  /** Questions que le sujet pose : ni budget ni échéance pour une démonstration. */
+  const posees = useMemo(() => questionsDuType(type), [type]);
   const tranches = useMemo(
-    () => (type ? tranchesBudget() : []),
-    [type],
+    () => (posees.budget ? tranchesBudget() : []),
+    [posees],
   );
   const objectifs = useMemo(() => (type ? optionsObjectif(type) : []), [type]);
   const budgetChoisi = tranches.some((t) => t.id === budget) ? budget : "";
   const objectifChoisi = objectifs.some((o) => o.id === objectif) ? objectif : "";
-  const budgetManquant = !budgetChoisi;
+  const budgetManquant = tranches.length > 0 && !budgetChoisi;
+  const projetManquant = posees.projet && projet.trim().length === 0;
+  const erreurProjet =
+    (envoiTente && projetManquant) || champEnErreur === "projet"
+      ? contenu.questionnaire.projet.erreur
+      : undefined;
   const retour = useMemo(
     () => (budgetChoisi ? retourBudget(budgetChoisi) : undefined),
     [budgetChoisi],
@@ -695,6 +704,7 @@ export function ReservationRendezVous({
   const racine = useRef<HTMLDivElement | null>(null);
   const refTitre = useRef<HTMLHeadingElement | null>(null);
   const refBudget = useRef<HTMLInputElement | null>(null);
+  const refProjet = useRef<HTMLInputElement | null>(null);
   const refObjectif = useRef<HTMLInputElement | null>(null);
   const etapeAffichee = useRef(etape);
   useEffect(() => {
@@ -890,15 +900,17 @@ export function ReservationRendezVous({
   );
 
   const continuerVersCoordonnees = useCallback(() => {
-    if (budgetManquant || !objectifChoisi) {
+    if (projetManquant || budgetManquant || !objectifChoisi) {
       setEnvoiTente(true);
       // Le focus va à la PREMIÈRE question restée sans réponse, dans l'ordre affiché.
-      const premiere = budgetManquant ? refBudget : refObjectif;
+      let premiere = refObjectif;
+      if (budgetManquant) premiere = refBudget;
+      if (projetManquant) premiere = refProjet;
       premiere.current?.focus();
       return;
     }
     setEtape(ETAPE_COORDONNEES);
-  }, [budgetManquant, objectifChoisi]);
+  }, [projetManquant, budgetManquant, objectifChoisi]);
 
   const recommencer = useCallback(() => {
     setType(undefined);
@@ -912,6 +924,7 @@ export function ReservationRendezVous({
     setBudget("");
     setObjectif("");
     setEcheance("");
+    setProjet("");
     setMessage("");
     setEnvoiTente(false);
     setEtape(ETAPE_SUJET);
@@ -966,8 +979,9 @@ export function ReservationRendezVous({
             ...(telephone.trim() ? { telephone } : {}),
             message,
             ...(budgetChoisi ? { budget: budgetChoisi } : {}),
+            ...(posees.projet ? { projet } : {}),
             objectif: objectifChoisi,
-            echeance,
+            ...(posees.echeance ? { echeance } : {}),
             debutMs: refDebut.current,
             [NOM_CHAMP_PIEGE]: typeof piege === "string" ? piege : "",
             ...(jetonCaptcha ? { jetonCaptcha } : {}),
@@ -1017,7 +1031,8 @@ export function ReservationRendezVous({
         } else if (
           champ === "budget" ||
           champ === "objectif" ||
-          champ === "echeance"
+          champ === "echeance" ||
+          champ === "projet"
         ) {
           setEtape(ETAPE_PROJET);
         }
@@ -1041,12 +1056,15 @@ export function ReservationRendezVous({
       dureeRetenue,
       nom,
       email,
+      telephone,
       message,
       protection,
       emailContact,
       budgetChoisi,
       objectifChoisi,
       echeance,
+      projet,
+      posees,
     ],
   );
 
@@ -1207,6 +1225,36 @@ export function ReservationRendezVous({
           {etape === ETAPE_PROJET ? (
             <Etape titre={contenu.etapes.projet} refTitre={refTitre}>
               <div className="flex flex-col gap-[24px]">
+                {posees.projet ? (
+                  <label htmlFor={`${instance}-projet`} className="flex w-full flex-col gap-[10px]">
+                    <span className={CLASSE_LIBELLE}>{contenu.questionnaire.projet.legende}</span>
+                    <input
+                      ref={refProjet}
+                      id={`${instance}-projet`}
+                      name="projet"
+                      type="text"
+                      maxLength={LONGUEUR_PROJET_MAX}
+                      value={projet}
+                      onChange={(evenement) => {
+                        setProjet(evenement.target.value);
+                        setChampEnErreur((champ) => (champ === "projet" ? undefined : champ));
+                      }}
+                      placeholder={contenu.questionnaire.projet.placeholder}
+                      aria-invalid={erreurProjet ? true : undefined}
+                      aria-describedby={erreurProjet ? `${instance}-projet-erreur` : undefined}
+                      className={`${CLASSE_CHAMP} ${erreurProjet ? "border-accent" : ""}`}
+                    />
+                    {erreurProjet ? (
+                      <span
+                        id={`${instance}-projet-erreur`}
+                        className="text-[12px] font-medium leading-[1.3] tracking-[-0.01em] text-accent"
+                      >
+                        {erreurProjet}
+                      </span>
+                    ) : null}
+                  </label>
+                ) : null}
+                {posees.budget ? (
                   <div>
                     <ChoixUnique
                       prefixe={instance}
@@ -1220,24 +1268,27 @@ export function ReservationRendezVous({
                     />
                     <RetourEspere retour={retour} />
                   </div>
+                ) : null}
                 <ChoixUnique
                   prefixe={instance}
                   nom="objectif"
-                  legende={LEGENDE_OBJECTIF}
+                  legende={posees.legendeObjectif}
                   options={objectifs}
                   choisi={objectifChoisi}
                   onChoisir={choisirObjectif}
                   erreur={erreurObjectif}
                   refPremier={refObjectif}
                 />
-                <ChoixUnique
-                  prefixe={instance}
-                  nom="echeance"
-                  legende={contenu.questionnaire.echeance.legende}
-                  options={OPTIONS_ECHEANCE}
-                  choisi={echeance}
-                  onChoisir={setEcheance}
-                />
+                {posees.echeance ? (
+                  <ChoixUnique
+                    prefixe={instance}
+                    nom="echeance"
+                    legende={contenu.questionnaire.echeance.legende}
+                    options={OPTIONS_ECHEANCE}
+                    choisi={echeance}
+                    onChoisir={setEcheance}
+                  />
+                ) : null}
               </div>
               <div className="flex flex-col-reverse gap-[12px] tablet:flex-row tablet:items-center tablet:justify-between">
                 {boutonRetour(ETAPE_CRENEAU)}
