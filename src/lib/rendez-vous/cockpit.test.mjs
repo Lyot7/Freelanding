@@ -314,3 +314,100 @@ describe("gestion par jeton", () => {
     });
   });
 });
+
+describe("réponses inattendues du cockpit", () => {
+  it("garde un code vide quand le refus n’en porte pas", async () => {
+    simuler([{ erreur: 42 }, 500]);
+    expect(await recupererCreneaux("logiciel", "2026-11-02", "2026-11-30", undefined, ENV)).toEqual({
+      ok: false,
+      raison: "refuse",
+      statut: 500,
+      detail: "",
+    });
+  });
+
+  it("nomme « inconnue » une panne qui n’est pas une erreur JavaScript", async () => {
+    globalThis.fetch = async () => {
+      throw "coupure";
+    };
+    expect(await recupererCreneaux("logiciel", "2026-11-02", "2026-11-30", undefined, ENV)).toEqual({
+      ok: false,
+      raison: "indisponible",
+      detail: "inconnue",
+    });
+  });
+
+  it("ne demande pas les durées sans RDV_TOKEN", async () => {
+    const appels = simuler([TYPES]);
+    expect(await obtenirDurees("logiciel", 0, {})).toBeUndefined();
+    expect(appels).toHaveLength(0);
+  });
+
+  it("ignore une liste de types illisible, sans la garder", async () => {
+    const env = { ...ENV, COCKPIT_URL: "https://types-illisibles.test" };
+    for (const charge of [null, { types: "logiciel" }]) {
+      simuler([charge]);
+      expect(await obtenirDurees("logiciel", 0, env)).toBeUndefined();
+    }
+    const appels = simuler([TYPES]);
+    expect(await obtenirDurees("logiciel", 0, env)).toEqual({ options: [30, 45, 60], defaut: 45 });
+    expect(appels).toHaveLength(1);
+  });
+
+  it("écarte les types mal formés et garde les autres", async () => {
+    const env = { ...ENV, COCKPIT_URL: "https://types-mixtes.test" };
+    simuler([
+      {
+        types: [
+          null,
+          { titre: "Sans clé", durees: [30], defaut: 30 },
+          { cle: "decouverte", durees: [15], defaut: "trente" },
+          { cle: "logiciel", durees: [30, 45], defaut: 45 },
+        ],
+      },
+    ]);
+    expect(await obtenirDurees("logiciel", 0, env)).toEqual({ options: [30, 45], defaut: 45 });
+    expect(await obtenirDurees("decouverte", 1, env)).toBeUndefined();
+  });
+
+  it("n’envoie ni notes ni réponses vides", async () => {
+    const appels = simuler([{ id: "rdv_3" }, 201]);
+    const { notes: _notes, telephone: _telephone, ...sansNotes } = RESERVATION;
+    await creerReservation({ ...sansNotes, reponses: {} }, ENV);
+    const corps = JSON.parse(appels[0].options.body);
+    expect(corps).not.toHaveProperty("notes");
+    expect(corps).not.toHaveProperty("reponses");
+    expect(corps).not.toHaveProperty("telephone");
+  });
+
+  it("accepte une réservation sans identifiant lisible", async () => {
+    simuler([null, 201]);
+    expect(await creerReservation(RESERVATION, ENV)).toEqual({ ok: true, donnees: { uid: "" } });
+  });
+
+  it("lit un rendez-vous sans liste de durées comme un rendez-vous à durée unique", async () => {
+    simuler([
+      {
+        type: "decouverte",
+        titre: "Premier échange",
+        duree: 30,
+        debut: "2026-11-10T09:00:00.000Z",
+        fin: "2026-11-10T09:30:00.000Z",
+        statut: "DEPLACE",
+      },
+    ]);
+    const resultat = await lireGestion(JETON, ENV);
+    expect(resultat.ok).toBe(true);
+    expect(resultat.donnees.durees).toEqual({ options: [30], defaut: 30 });
+    expect(resultat.donnees.statut).toBe("DEPLACE");
+  });
+
+  it("traite une charge vide comme une panne", async () => {
+    simuler([null]);
+    expect(await lireGestion(JETON, ENV)).toEqual({
+      ok: false,
+      raison: "indisponible",
+      detail: "charge_illisible",
+    });
+  });
+});

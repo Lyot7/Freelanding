@@ -130,6 +130,21 @@ describe("POST /api/rendez-vous — chaque refus nomme son champ", () => {
   });
 });
 
+describe("POST /api/rendez-vous — sans RDV_TOKEN", () => {
+  it("répond 503 et renvoie vers l’e-mail, sans rien réserver", async () => {
+    process.env.RDV_TOKEN = "";
+    try {
+      const reponse = await reserver({ type: "logiciel", budget: tranche, objectif: "tache" });
+      expect(reponse.status).toBe(503);
+      expect((await reponse.json()).message).toBe(
+        "La prise de rendez-vous en ligne est momentanément indisponible. Écrivez-moi directement à contact@eliottbouquerel.fr.",
+      );
+    } finally {
+      process.env.RDV_TOKEN = VARIABLES.RDV_TOKEN;
+    }
+  });
+});
+
 describe("POST /api/rendez-vous — téléphone facultatif", () => {
   const valide = { type: "logiciel", budget: tranche, objectif: "tache" };
 

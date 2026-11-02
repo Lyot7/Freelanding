@@ -34,7 +34,9 @@ function simuler(...reponses) {
   const appels = [];
   globalThis.fetch = async (url, options = {}) => {
     appels.push({ url: String(url), options });
-    const [corps, statut = 200] = reponses[Math.min(appels.length - 1, reponses.length - 1)];
+    const suivante = reponses[Math.min(appels.length - 1, reponses.length - 1)];
+    if (suivante instanceof Error) throw suivante;
+    const [corps, statut = 200] = suivante;
     return new Response(JSON.stringify(corps), { status: statut });
   };
   return appels;
@@ -130,6 +132,37 @@ describe("POST …/annuler", () => {
     expect(reponse.status).toBe(404);
   });
 
+  it("refuse une écriture sans type de contenu", async () => {
+    const appels = simuler([{}]);
+    const reponse = await annuler(
+      new Request(`https://eliottbouquerel.fr/api/rendez-vous/gestion/${JETON}/annuler`, {
+        method: "POST",
+        headers: { "x-forwarded-for": `198.51.100.${(appelant += 1)}` },
+        body: "{}",
+      }),
+      contexte(),
+    );
+    expect(reponse.status).toBe(415);
+    expect(appels).toHaveLength(0);
+  });
+
+  it("répond 504 et propose l’e-mail quand le cockpit ne répond pas", async () => {
+    simuler(new TypeError("fetch failed"));
+    const reponse = await annuler(requete(`${JETON}/annuler`, { corps: {} }), contexte());
+    expect(reponse.status).toBe(504);
+    expect((await reponse.json()).message).toContain("Écrivez-moi directement à contact@eliottbouquerel.fr.");
+  });
+
+  it("relaie le champ que le refus du cockpit désigne", async () => {
+    simuler([{ erreur: "creneau_pris" }, 409]);
+    const reponse = await annuler(requete(`${JETON}/annuler`, { corps: {} }), contexte());
+    expect(reponse.status).toBe(409);
+    expect(await reponse.json()).toEqual({
+      message: "Ce créneau vient d’être pris. Choisissez-en un autre dans la liste.",
+      champ: "creneau",
+    });
+  });
+
   it("répond 503 sans RDV_TOKEN", async () => {
     const appels = simuler([{}]);
     process.env.RDV_TOKEN = "";
@@ -169,6 +202,43 @@ describe("POST …/deplacer", () => {
     );
     expect(reponse.status).toBe(400);
     expect(appels).toHaveLength(0);
+  });
+
+  it("relaie la durée choisie avec le nouveau créneau", async () => {
+    const nouveau = "e".repeat(43);
+    const debut = dansTroisJours();
+    const appels = simuler([{ debut, fin: debut, jetonGestion: nouveau }]);
+    const reponse = await deplacer(requete(`${JETON}/deplacer`, { corps: { debut, duree: 60 } }), contexte());
+    expect(reponse.status).toBe(200);
+    expect(JSON.parse(appels[0].options.body)).toEqual({ debut, duree: 60 });
+  });
+
+  it("refuse une durée absurde avant d’appeler le cockpit", async () => {
+    const appels = simuler([{}]);
+    const reponse = await deplacer(
+      requete(`${JETON}/deplacer`, { corps: { debut: dansTroisJours(), duree: 1000 } }),
+      contexte(),
+    );
+    expect(reponse.status).toBe(400);
+    expect(await reponse.json()).toEqual({ message: "Cette durée n’est plus proposée.", champ: "duree" });
+    expect(appels).toHaveLength(0);
+  });
+
+  it("répond 404 à un jeton mal formé sans appeler le cockpit", async () => {
+    const appels = simuler([{}]);
+    const reponse = await deplacer(
+      requete("court/deplacer", { corps: { debut: dansTroisJours() } }),
+      contexte("court"),
+    );
+    expect(reponse.status).toBe(404);
+    expect(appels).toHaveLength(0);
+  });
+
+  it("répond 504 quand le cockpit ne répond pas", async () => {
+    simuler(new TypeError("fetch failed"));
+    const reponse = await deplacer(requete(`${JETON}/deplacer`, { corps: { debut: dansTroisJours() } }), contexte());
+    expect(reponse.status).toBe(504);
+    expect(await reponse.json()).not.toHaveProperty("champ");
   });
 
   it("ne relaie pas le 401 du cockpit tel quel", async () => {
@@ -214,6 +284,20 @@ describe("GET …/creneaux", () => {
     simuler([RDV], [{ erreur: "sans_agenda" }, 503]);
     const reponse = await creneaux(requete(`${JETON}/creneaux`, { methode: "GET" }), contexte());
     expect(reponse.status).toBe(502);
+  });
+
+  it("répond 404 à un jeton mal formé sans appeler le cockpit", async () => {
+    const appels = simuler([RDV]);
+    const reponse = await creneaux(requete("court/creneaux", { methode: "GET" }), contexte("court"));
+    expect(reponse.status).toBe(404);
+    expect(appels).toHaveLength(0);
+  });
+
+  it("répond 502 quand le cockpit tombe entre le rendez-vous et ses créneaux", async () => {
+    simuler([RDV], new TypeError("fetch failed"));
+    const reponse = await creneaux(requete(`${JETON}/creneaux`, { methode: "GET" }), contexte());
+    expect(reponse.status).toBe(502);
+    expect(await reponse.json()).toEqual({ message: "Créneaux indisponibles." });
   });
 
   it("refuse de proposer des créneaux pour un rendez-vous annulé", async () => {

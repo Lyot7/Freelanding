@@ -83,6 +83,10 @@ describe("masquage du jeton de gestion", () => {
     expect(masquerJetons(circulaire)).toBe(circulaire);
   });
 
+  it("laisse passer un événement vide sans le toucher", () => {
+    expect(masquerJetons(undefined)).toBeUndefined();
+  });
+
   it("garde le filtre de consentement", () => {
     expect(avantEnvoi(null)).toBeNull();
     expect(avantEnvoi({ event: "$autocapture", properties: { $pathname: CHEMIN } })).toBeNull();
