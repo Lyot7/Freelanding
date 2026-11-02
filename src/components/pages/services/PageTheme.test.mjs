@@ -46,6 +46,15 @@ function liens(noeud) {
   return [...(props?.href ? [props.href] : []), ...liens(props?.children)];
 }
 
+/** Les attributs `id` d'un arbre, composants locaux déroulés. */
+function ancres(noeud) {
+  if (!noeud || typeof noeud !== "object") return [];
+  if (Array.isArray(noeud)) return noeud.flatMap(ancres);
+  const { type, props } = noeud;
+  if (typeof type === "function" && DEROULES.has(type.name)) return ancres(type(props));
+  return [...(props?.id ? [props.id] : []), ...ancres(props?.children)];
+}
+
 describe("PageTheme", async () => {
   const site = await content.getSiteConfig();
 
@@ -88,6 +97,14 @@ describe("PageTheme", async () => {
           if (bloc.type === "section") {
             for (const point of bloc.points) expect(rendu).toContain(point.titre);
           }
+        }
+      });
+
+      it("pose l'ancre de chaque bloc à deux moitiés", () => {
+        // Un lien y mène : `/services/automatisation#referent` (2026-11-02).
+        const ids = ancres(arbre);
+        for (const bloc of page.blocs.filter((b) => b.type === "section")) {
+          expect(ids).toContain(bloc.id);
         }
       });
 

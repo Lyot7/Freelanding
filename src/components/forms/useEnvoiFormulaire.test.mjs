@@ -107,6 +107,7 @@ describe("useEnvoiFormulaire", () => {
         createElement("input", { name: "nom", defaultValue: "Jean Dupont", readOnly: true }),
         createElement("input", { name: "email", defaultValue: "jean@example.com", readOnly: true }),
         createElement("input", { name: "typeProjet", defaultValue: "Site vitrine", readOnly: true }),
+        createElement("input", { name: "telephone", defaultValue: "06 12 34 56 78", readOnly: true }),
         createElement("input", { name: "referenceInterne", defaultValue: "", readOnly: true }),
         createElement("button", { type: "submit" }, "Envoyer"),
       );
@@ -133,6 +134,8 @@ describe("useEnvoiFormulaire", () => {
     expect(requetes).toHaveLength(1);
     expect(requetes[0].nom).toBe("Jean Dupont");
     expect(requetes[0].typeProjet).toBe("Site vitrine");
+    // Le téléphone facultatif part avec le reste (2026-11-02).
+    expect(requetes[0].telephone).toBe("06 12 34 56 78");
     expect(requetes[0].jetonCaptcha).toBe("jeton-de-test");
 
     await act(async () => {

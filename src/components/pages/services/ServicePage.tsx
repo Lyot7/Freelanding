@@ -219,6 +219,7 @@ export const TONS: Record<
 };
 
 export function SectionDeuxMoities({
+  id,
   dataSection,
   titre,
   paragraphes,
@@ -226,6 +227,8 @@ export function SectionDeuxMoities({
   points,
   ton = "clair",
 }: {
+  /** Ancre de la section, quand un lien y mène (`#referent`). */
+  id?: string;
   dataSection: string;
   titre: string;
   paragraphes: readonly string[];
@@ -236,6 +239,7 @@ export function SectionDeuxMoities({
   const t = TONS[ton];
   return (
     <section
+      id={id}
       data-section={dataSection}
       className={`relative px-[20px] py-[60px] tablet:px-[24px] tablet:py-[90px] desktop:px-[30px] ${t.section}`}
     >
