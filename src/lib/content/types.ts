@@ -869,6 +869,8 @@ export interface JourDemo {
 /** Un grand chiffre et ce qu'il compte. */
 export interface CompteurDemo {
   valeur: string;
+  /** La même durée en minutes, pour la faire défiler au scroll. */
+  minutes: number;
   libelle: string;
 }
 

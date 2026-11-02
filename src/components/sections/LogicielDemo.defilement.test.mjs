@@ -50,9 +50,15 @@ async function monter() {
     conteneur.querySelector('[role="tab"][aria-selected="true"]').textContent;
   const rendus = () =>
     [...conteneur.querySelectorAll(".logiciel-rendu")].map((r) => r.style.transform);
-  /** Place la semaine à `haut` px du haut d'un écran de 1000 px, puis défile. */
+  /** Chiffres affichés : heures de saisie, puis heures rendues. */
+  const chiffres = () =>
+    [...conteneur.querySelectorAll('[role="tabpanel"] > div > p > span[aria-hidden]')].map(
+      (span) => span.textContent,
+    );
+  const pastille = () => conteneur.querySelector(".logiciel-pastille").style.transform;
+  /** Place le haut de la fenêtre à `haut` px d'un écran de 1000 px, puis défile. */
   const placer = async (haut) => {
-    conteneur.querySelector("ul").getBoundingClientRect = () => ({ top: haut, height: 300 });
+    conteneur.firstElementChild.getBoundingClientRect = () => ({ top: haut, height: 700 });
     await act(async () => {
       window.dispatchEvent(new window.Event("scroll"));
       await new Promise((resoudre) => window.requestAnimationFrame(resoudre));
@@ -60,44 +66,56 @@ async function monter() {
   };
   const onglet = (cle) => conteneur.querySelector(`[role="tab"][id$="-onglet-${cle}"]`);
   const demonter = () => act(async () => racine.unmount());
-  return { selectionne, rendus, placer, onglet, demonter };
+  return { selectionne, rendus, chiffres, pastille, placer, onglet, demonter };
 }
 
 describe("LogicielDemo piloté par le défilement", () => {
   it("convertit la semaine jour après jour, puis revient si l'on remonte", async () => {
     const vue = await monter();
 
-    // Semaine encore sous l'écran : rien n'est converti.
-    await vue.placer(900);
+    // Fenêtre qui paraît en bas de l'écran : rien n'est converti.
+    await vue.placer(1000);
     expect(vue.selectionne()).toBe(demo.onglets.main);
     expect(vue.rendus().every((t) => t === "scaleY(0)")).toBe(true);
+    expect(vue.chiffres()).toEqual([demo.compteur.main.valeur, demo.gain.avant]);
+    expect(vue.pastille()).toBe("translateX(0%)");
 
-    // À mi-course : lundi bien entamé, vendredi pas encore.
-    await vue.placer(600);
+    // Remontée d'un quart de l'écran : lundi bien entamé, vendredi pas encore,
+    // et les heures bougent déjà, minute par minute.
+    await vue.placer(750);
     const [lundi, , , , vendredi] = vue.rendus();
     expect(lundi).not.toBe("scaleY(0)");
     expect(vendredi).toBe("scaleY(0)");
     expect(vue.selectionne()).toBe(demo.onglets.main);
+    const [saisie, rendues] = vue.chiffres();
+    expect(saisie).not.toBe(demo.compteur.main.valeur);
+    expect(saisie).not.toBe(demo.compteur.outil.valeur);
+    expect(rendues).not.toBe(demo.gain.avant);
+    expect(rendues).not.toBe(demo.gain.valeur);
 
-    // Semaine posée au milieu : tout est converti, la fenêtre passe sur l'outil.
-    await vue.placer(100);
+    // Remontée des deux tiers : tout est converti, la fenêtre passe sur l'outil.
+    await vue.placer(330);
     expect(vue.rendus().every((t) => t === "scaleY(1)")).toBe(true);
     expect(vue.selectionne()).toBe(demo.onglets.outil);
+    expect(vue.chiffres()).toEqual([demo.compteur.outil.valeur, demo.gain.valeur]);
+    expect(vue.pastille()).toBe("translateX(100%)");
 
-    await vue.placer(900);
+    await vue.placer(1000);
     expect(vue.selectionne()).toBe(demo.onglets.main);
     await vue.demonter();
   });
 
   it("rend la main au visiteur dès qu'il touche un onglet", async () => {
     const vue = await monter();
-    await vue.placer(900);
+    await vue.placer(1000);
     await act(async () => {
       vue.onglet("outil").click();
     });
-    await vue.placer(900);
+    await vue.placer(1000);
     expect(vue.selectionne()).toBe(demo.onglets.outil);
     expect(vue.rendus()[0]).toBe("scaleY(1)");
+    expect(vue.chiffres()).toEqual([demo.compteur.outil.valeur, demo.gain.valeur]);
+    expect(vue.pastille()).toBe("translateX(100%)");
     await vue.demonter();
   });
 });

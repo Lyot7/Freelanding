@@ -77,22 +77,23 @@ describe("CompteurDefilement", () => {
   it("monte et redescend avec le défilement", async () => {
     reduit = false;
     const vue = await monter({ cible: 100, libelle: "100" });
-    // Haut à 950 (début) : zéro. Bas à 600 (fin) : la valeur pleine.
-    await vue.placer(950);
+    // Haut au bas de l'écran : zéro. Remonté d'un tiers : la moitié. Remonté
+    // des deux tiers : la valeur pleine, bien avant le haut de l'écran.
+    await vue.placer(1000);
     expect(vue.visible()).toBe("0");
-    await vue.placer(745);
+    await vue.placer(1000 - 1000 / 3);
     expect(vue.visible()).toBe("50");
-    await vue.placer(200);
+    await vue.placer(330);
     expect(vue.visible()).toBe("100");
-    await vue.placer(950);
+    await vue.placer(1000);
     expect(vue.visible()).toBe("0");
     await vue.demonter();
   });
 
   it("garde les décimales demandées", async () => {
     reduit = false;
-    const vue = await monter({ cible: 4.9, decimales: 1, libelle: "4.9" });
-    await vue.placer(745);
+    const vue = await monter({ cible: 4.9, decimales: 1, libelle: "4.9", debut: 0.9, fin: 0.4 });
+    await vue.placer(650);
     expect(vue.visible()).toBe("2.5");
     await vue.demonter();
   });
@@ -100,7 +101,7 @@ describe("CompteurDefilement", () => {
   it("ne compte pas une valeur sous 2", async () => {
     reduit = false;
     const vue = await monter({ cible: 1, libelle: "1" });
-    await vue.placer(950);
+    await vue.placer(1000);
     expect(vue.visible()).toBe("1");
     await vue.demonter();
   });
@@ -108,20 +109,20 @@ describe("CompteurDefilement", () => {
   it("reste à la valeur finale en mouvement réduit, même si la préférence arrive en route", async () => {
     reduit = true;
     const fige = await monter({ cible: 24, libelle: "24" });
-    await fige.placer(950);
+    await fige.placer(1000);
     expect(fige.visible()).toBe("24");
     await fige.demonter();
 
     reduit = false;
     const vue = await monter({ cible: 24, libelle: "24" });
-    await vue.placer(950);
+    await vue.placer(1000);
     expect(vue.visible()).toBe("0");
     reduit = true;
     await act(async () => {
       for (const rappel of ecouteurs) rappel();
     });
     expect(vue.visible()).toBe("24");
-    await vue.placer(950);
+    await vue.placer(1000);
     expect(vue.visible()).toBe("24");
     await vue.demonter();
   });

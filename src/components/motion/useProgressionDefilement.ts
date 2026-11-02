@@ -13,10 +13,12 @@ import { motionValue, type MotionValue } from "motion/react";
  * reculer. Correspondance linéaire, sans courbe : une courbe décrocherait la
  * page du doigt.
  *
- * `debut` et `fin` sont des fractions de la hauteur d'écran : la progression
- * vaut 0 quand le HAUT de l'élément passe à `debut`, 1 quand son BAS passe à
- * `fin`. Avec 0.85 et 0.55, l'animation commence quand l'élément entre par le
- * bas et finit quand il est posé au milieu de l'écran.
+ * `debut` et `fin` sont des fractions de la hauteur d'écran, lues sur le HAUT
+ * de l'élément : la progression vaut 0 quand il passe à `debut`, 1 quand il
+ * passe à `fin`. Par défaut (1 et 1/3, réglage d'Eliott du 2026-11-02),
+ * l'animation part dès que l'élément paraît en bas de l'écran et finit quand
+ * il en a remonté les deux tiers : on la voit en entier, jamais finir tout en
+ * haut.
  *
  * `actif` vaut faux côté serveur, et tant que le visiteur demande moins
  * d'animations : la progression reste alors à 1, l'état final, qui est aussi
@@ -27,8 +29,8 @@ import { motionValue, type MotionValue } from "motion/react";
  */
 export function useProgressionDefilement(
   cible: RefObject<HTMLElement | null>,
-  debut = 0.85,
-  fin = 0.55,
+  debut = 1,
+  fin = 1 / 3,
 ): { progression: MotionValue<number>; actif: boolean } {
   const [progression] = useState(() => motionValue(1));
   const actif = useSyncExternalStore(suivrePreference, mouvementPermis, () => false);
@@ -46,9 +48,8 @@ export function useProgressionDefilement(
       if (!element) return;
       const boite = element.getBoundingClientRect();
       const ecran = window.innerHeight;
-      const depart = ecran * debut;
-      const parcours = depart - (ecran * fin - boite.height);
-      const brute = parcours > 0 ? (depart - boite.top) / parcours : 1;
+      const parcours = ecran * (debut - fin);
+      const brute = parcours > 0 ? (ecran * debut - boite.top) / parcours : 1;
       progression.set(Math.min(1, Math.max(0, brute)));
     };
     const demander = () => {

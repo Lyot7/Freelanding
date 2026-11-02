@@ -1,3 +1,22 @@
+# Rythme des animations au défilement, 2026-11-02 (reprise)
+
+Retour d'Eliott : certaines animations finissaient trop tard, presque en haut
+de l'écran, et la fenêtre « temps gagné » sautait de 0 aux heures rendues.
+
+- Un seul réglage pour tout : départ dès que l'élément paraît en bas de
+  l'écran, arrivée quand il a remonté les deux tiers de l'écran (mesuré sur le
+  haut de l'élément, `useProgressionDefilement`, et `cover 55%` pour les lignes
+  du bon remède en CSS).
+- La fenêtre « temps gagné » suit le même pas que la semaine : la pastille des
+  onglets glisse, les heures de saisie fondent (11 h vers 2 h 12) et les heures
+  rendues montent minute par minute (0 min vers 8 h 48), l'aplat volt et la
+  phrase du bas se remplissent avec elles. Les lecteurs d'écran lisent les
+  valeurs de l'onglet en texte masqué, jamais un chiffre qui défile.
+- emil-design-eng : toujours `transform` et `opacity`, plus la couleur de
+  l'aplat par `color-mix`, sur une seule boîte. impeccable : mouvement réduit
+  inchangé, état final immédiat.
+- Planches avant/après : `docs/captures/2026-11-02-rythme/`.
+
 # Animations au défilement de l'accueil, 2026-11-02
 
 Demande d'Eliott : animer au scroll « le temps gagné » et les sections du

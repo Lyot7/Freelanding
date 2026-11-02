@@ -1009,7 +1009,8 @@ html[data-consent-choisi] [data-consent-attente] {
    « Le bon remède » : les lignes entrent au défilement (2026-11-02)
    Le filet se trace de gauche à droite et le titre glisse en place, chaque
    ligne sur sa propre traversée de l'écran : elles arrivent donc l'une après
-   l'autre. Le texte courant ne bouge pas. Linéaire, puisque c'est le pouce
+   l'autre. Départ dès que la ligne paraît, arrivée quand elle a remonté à peu
+   près les deux tiers de l'écran (`cover 55%` pour une ligne de 100 à 150 px). Le texte courant ne bouge pas. Linéaire, puisque c'est le pouce
    qui avance. État de base = lignes posées : navigateurs sans
    `animation-timeline` et mouvement réduit gardent la liste finie.
    ============================================================ */
@@ -1027,12 +1028,12 @@ html[data-consent-choisi] [data-consent-attente] {
       transform-origin: left;
       animation: moyens-filet linear both;
       animation-timeline: view();
-      animation-range: entry 0% cover 40%;
+      animation-range: entry 0% cover 50%;
     }
     .moyens-titre {
       animation: moyens-titre linear both;
       animation-timeline: view();
-      animation-range: entry 20% cover 45%;
+      animation-range: entry 0% cover 55%;
     }
   }
 }
