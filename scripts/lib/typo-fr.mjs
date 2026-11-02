@@ -250,3 +250,84 @@ export function verifie(texte, ignorer = new Set()) {
   }
   return trouvailles;
 }
+
+/**
+ * Normalise et vérifie la prose d'un article MDX.
+ *
+ * NE SONT NEUTRALISÉS QUE : blocs de code, code en ligne, cibles de liens.
+ *
+ * LES BALISES JSX NE LE SONT PAS (correctif du 2026-08-27). Le motif portait
+ * `<[^>]+>`, où `[^>]` avale aussi les retours à la ligne : une balise
+ * multiligne comme `<Steps items={[ "…" ]} />` était masquée EN ENTIER, prose
+ * comprise, alors que ces propriétés sont du texte rendu à l'écran. Aucune
+ * règle ne touche à la syntaxe JSX elle-même : les noms de balise et
+ * d'attribut ne contiennent ni apostrophe, ni ponctuation haute, ni « € ».
+ *
+ * LA JONCTION APRÈS UNE ZONE NEUTRALISÉE (correctif du 2026-11-02). La prose
+ * est traitée par segments entre les zones. Le segment qui suit
+ * `[libellé](/page)` commençait donc par « : », sans le caractère qui précède
+ * l'espace : la règle `\S[ \t]+:` ne pouvait pas l'atteindre, et le correcteur
+ * laissait une espace ordinaire que le test (qui réduit le lien à son libellé)
+ * refuse. Un article validé échouait ainsi à la publication automatique. Le
+ * segment est désormais jugé AVEC le caractère que le lecteur voit juste avant :
+ * la fin du libellé d'un lien, ou un mot pour du code, comme le fait le test.
+ *
+ * @param {string} source
+ * @param {boolean} fix - juger le texte corrigé (true) ou tel quel (false)
+ * @returns {{sortie: string, corrections: number, defauts: ReturnType<typeof verifie>}}
+ */
+export function normaliseMdx(source, fix) {
+  const zones = [];
+  const masque = /```[\s\S]*?```|`[^`\n]*`|\]\([^)]*\)/g;
+  let m;
+  while ((m = masque.exec(source))) zones.push([m.index, m.index + m[0].length]);
+
+  const segments = [];
+  let curseur = 0;
+  for (const [a, b] of zones) {
+    if (a > curseur) segments.push([curseur, a, true]);
+    segments.push([a, b, false]);
+    curseur = b;
+  }
+  if (curseur < source.length) segments.push([curseur, source.length, true]);
+
+  /** Caractère vu par le lecteur juste avant un segment de prose. */
+  const contexte = (i) => {
+    const zone = segments[i - 1];
+    if (!zone || zone[2]) return "";
+    if (source[zone[0]] === "]") {
+      const avant = source[zone[0] - 1];
+      return avant && avant !== "[" ? avant : "x";
+    }
+    return "e";
+  };
+
+  let sortie = "";
+  let corrections = 0;
+  const defauts = [];
+  segments.forEach(([a, b, prose], i) => {
+    const brut = source.slice(a, b);
+    if (!prose) {
+      sortie += brut;
+      return;
+    }
+    let prefixe = contexte(i);
+    let corrige = normalise(prefixe + brut);
+    // Le préfixe ne sert que de contexte : si une règle l'a modifié, on
+    // retombe sur le segment seul plutôt que de réécrire ce qui précède.
+    if (!corrige.startsWith(prefixe)) {
+      prefixe = "";
+      corrige = normalise(brut);
+    }
+    corrige = corrige.slice(prefixe.length);
+    if (corrige !== brut) corrections += 1;
+    sortie += corrige;
+    const juge = prefixe + (fix ? corrige : brut);
+    // Un défaut contenu tout entier dans le préfixe appartient au segment
+    // précédent, déjà jugé : seul compte ce qui touche ce segment-ci.
+    for (const d of verifie(juge, REGLES_HORS_MDX)) {
+      if (d.index + d.motif.length > prefixe.length) defauts.push(d);
+    }
+  });
+  return { sortie, corrections, defauts };
+}

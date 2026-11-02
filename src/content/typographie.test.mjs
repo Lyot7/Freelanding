@@ -5,7 +5,10 @@ import ts from "typescript";
 import {
   verifie,
   estTechnique,
+  normaliseMdx,
   REGLES_HORS_MDX,
+  INSEC,
+  FINE,
 } from "../../scripts/lib/typo-fr.mjs";
 
 /**
@@ -45,6 +48,13 @@ function fichiers(racine, motif) {
 }
 
 
+/** Prose d'un article MDX telle que le lecteur la voit (voir `chainesDe`). */
+function proseMdx(source) {
+  return source
+    .replace(/```[\s\S]*?```|`[^`\n]*`/g, "code")
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1");
+}
+
 function chainesDe(fichier) {
   const source = readFileSync(fichier, "utf8");
   if (/\.mdx$/.test(fichier)) {
@@ -64,11 +74,7 @@ function chainesDe(fichier) {
     // Le code est remplacé par un MOT, pas par une espace, pour la même raison :
     // `` `Offer`, `` deviendrait « ` ,` », soit une fausse espace devant une
     // virgule. Le mot n'est jugé par aucune règle, il tient seulement la place.
-    return [
-      source
-        .replace(/```[\s\S]*?```|`[^`\n]*`/g, "code")
-        .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1"),
-    ];
+    return [proseMdx(source)];
   }
   const arbre = ts.createSourceFile(fichier, source, ts.ScriptTarget.Latest, true);
   const out = [];
@@ -123,4 +129,39 @@ describe("typographie française du contenu", () => {
       expect(defauts).toHaveLength(0);
     });
   }
+});
+
+/**
+ * Le correcteur MDX et ce test doivent juger la même chose. Le 2026-11-02, un
+ * article validé échouait à la publication automatique : `--fix` laissait une
+ * espace ordinaire devant « : » quand les deux-points suivaient un lien
+ * (`[libellé](/page) : suite`), parce qu'il traitait la prose APRÈS le lien
+ * sans voir le libellé qui la précède. Ce test-ci, qui réduit le lien à son
+ * libellé, refusait le résultat.
+ */
+describe("correcteur MDX : jonction après un lien ou du code", () => {
+  const cas = [
+    ["deux-points après un lien", "Voir [la page](/services/site) : tout y est.", `[la page](/services/site)${INSEC}: tout`],
+    ["point-virgule après un lien", "Voir [la page](/a) ; puis la suite.", `[la page](/a)${FINE}; puis`],
+    ["point d'interrogation collé à un lien", "Avez-vous lu [la page](/a)? Oui.", `[la page](/a)${FINE}? Oui`],
+    ["deux-points après du code", "La commande `bun test` : elle suffit.", `\`bun test\`${INSEC}: elle`],
+  ];
+  for (const [nom, source, attendu] of cas) {
+    test(nom, () => {
+      const { sortie, defauts } = normaliseMdx(source, true);
+      expect(sortie).toContain(attendu);
+      expect(defauts).toHaveLength(0);
+      expect(verifie(proseMdx(sortie), REGLES_HORS_MDX)).toHaveLength(0);
+    });
+  }
+
+  test("le défaut est signalé avant correction", () => {
+    const { defauts } = normaliseMdx("Voir [la page](/a) : la suite.", false);
+    expect(defauts.map((d) => d.id)).toContain("deux-points-espace-secable");
+  });
+
+  test("la cible du lien n'est jamais réécrite", () => {
+    const source = "Voir [la page](/a?b=1 : c) : la suite.";
+    expect(normaliseMdx(source, true).sortie).toContain("(/a?b=1 : c)");
+  });
 });

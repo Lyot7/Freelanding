@@ -27,7 +27,7 @@ import {
   normalise,
   verifie,
   estTechnique,
-  REGLES_HORS_MDX,
+  normaliseMdx,
 } from "./lib/typo-fr.mjs";
 
 const FIX = process.argv.includes("--fix");
@@ -95,63 +95,12 @@ function traiteTs(fichier) {
   return { corrections: edits.length, defauts };
 }
 
-/** MDX : prose entière, blocs de code et adresses préservés. */
+/** MDX : prose entière, blocs de code et adresses préservés (voir `normaliseMdx`). */
 function traiteMdx(fichier) {
   const source = readFileSync(fichier, "utf8");
-  const zones = [];
-  /*
-   * NE SONT NEUTRALISÉS QUE : blocs de code, code en ligne, cibles de liens.
-   *
-   * LES BALISES JSX NE LE SONT PLUS, et c'est le correctif du 2026-08-27. Le
-   * motif portait `<[^>]+>`, où `[^>]` avale aussi les retours à la ligne : une
-   * balise multiligne comme
-   *
-   *     <Steps items={[
-   *       "La fiche d'établissement d'abord : horaires, catégorie…",
-   *     ]} />
-   *
-   * était donc masquée EN ENTIER, prose comprise. Or ces propriétés sont du
-   * texte rendu à l'écran. Résultat : le correcteur les sautait, le
-   * vérificateur aussi, et l'outil annonçait « aucun défaut » pendant que les
-   * quatre articles affichaient des apostrophes droites et des deux-points sans
-   * insécable. Deux fautes de raisonnement pour le prix d'une : masquer plus que
-   * nécessaire, et faire juger le résultat par le même motif qui l'a produit.
-   *
-   * Aucune règle ne touche à la syntaxe JSX elle-même : les noms de balise et
-   * d'attribut ne contiennent ni apostrophe, ni ponctuation haute, ni « € ».
-   */
-  const masque = /```[\s\S]*?```|`[^`\n]*`|\]\([^)]*\)/g;
-  let m;
-  while ((m = masque.exec(source))) zones.push([m.index, m.index + m[0].length]);
-  const protege = (i) => zones.some(([a, b]) => i >= a && i < b);
-
-  let sortie = "";
-  let curseur = 0;
-  const segments = [];
-  for (const [a, b] of zones) {
-    if (a > curseur) segments.push([curseur, a, true]);
-    segments.push([a, b, false]);
-    curseur = b;
-  }
-  if (curseur < source.length) segments.push([curseur, source.length, true]);
-
-  const defauts = [];
-  let corrections = 0;
-  for (const [a, b, prose] of segments) {
-    const brut = source.slice(a, b);
-    if (!prose) {
-      sortie += brut;
-      continue;
-    }
-    const corrige = normalise(brut);
-    if (corrige !== brut) corrections += 1;
-    sortie += corrige;
-    for (const d of verifie(FIX ? corrige : brut, REGLES_HORS_MDX))
-      defauts.push({ ...d, fichier });
-  }
-  void protege;
+  const { sortie, corrections, defauts } = normaliseMdx(source, FIX);
   if (FIX && sortie !== source) writeFileSync(fichier, sortie);
-  return { corrections, defauts };
+  return { corrections, defauts: defauts.map((d) => ({ ...d, fichier })) };
 }
 
 /**
