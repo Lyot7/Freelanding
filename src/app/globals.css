@@ -1004,3 +1004,48 @@ html[data-consent-choisi] [data-consent-attente] {
   .logiciel-pastille { transition: none; }
   .logiciel-rendu { transition: none; }
 }
+
+/* ============================================================
+   « Le bon remède » : les lignes entrent au défilement (2026-11-02)
+   Le filet se trace de gauche à droite et le titre glisse en place, chaque
+   ligne sur sa propre traversée de l'écran : elles arrivent donc l'une après
+   l'autre. Le texte courant ne bouge pas. Linéaire, puisque c'est le pouce
+   qui avance. État de base = lignes posées : navigateurs sans
+   `animation-timeline` et mouvement réduit gardent la liste finie.
+   ============================================================ */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .moyens-ligne {
+      border-top-color: transparent;
+    }
+    .moyens-ligne::before {
+      content: "";
+      position: absolute;
+      inset: -1px 0 auto 0;
+      height: 1px;
+      background: rgba(0, 0, 0, 0.12);
+      transform-origin: left;
+      animation: moyens-filet linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 40%;
+    }
+    .moyens-titre {
+      animation: moyens-titre linear both;
+      animation-timeline: view();
+      animation-range: entry 20% cover 45%;
+    }
+  }
+}
+
+@keyframes moyens-filet {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes moyens-titre {
+  from {
+    opacity: 0.2;
+    transform: translateX(-48px);
+  }
+}

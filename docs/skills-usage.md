@@ -1,3 +1,44 @@
+# Animations au défilement de l'accueil, 2026-11-02
+
+Demande d'Eliott : animer au scroll « le temps gagné » et les sections du
+même genre ; il a retenu « le bon remède », « l'IA fait le sale boulot » et
+« les chiffres ». Travail visuel fait par l'agent principal. Séquences de
+défilement avant (site en ligne) et après (local), 16 images par section, et
+planches avant/après : `docs/captures/2026-11-02-defilement/`.
+
+## emil-design-eng
+
+- Cadre de décision : animation rare (une visite), but « explication » (montrer
+  le temps rendu jour par jour), donc permise et plus longue qu'une interface.
+- « Only animate transform and opacity » : le volt monte en `scaleY`, les
+  lignes glissent en `translateX`, le filet se trace en `scaleX`. Aucune
+  hauteur ni largeur animée.
+- Courbe : aucune. Le défilement mène, la correspondance est linéaire, comme
+  le veut aussi `scroll-choreography.md` de Hallmark.
+
+## impeccable (`animate.md`, registre marque)
+
+- Un moment signature : la semaine qui se convertit. Les trois autres sections
+  reprennent la même famille (le pouce fait avancer), sans nouvel effet.
+- `prefers-reduced-motion` : état final immédiat (compteurs à leur valeur,
+  semaine qui bascule une fois à mi-écran comme avant), et la préférence est
+  suivie si elle change en cours de visite.
+- Rien de bloqué : un clic sur un onglet de la démo rend la main au visiteur.
+
+## taste-skill
+
+- Intensité de mouvement visée 6 : effets liés au scroll, sans détournement du
+  défilement ni section épinglée. Le texte courant ne bouge jamais.
+- Compteurs en chiffres tabulaires, pour que la largeur ne saute pas.
+
+## Hallmark (`scroll-choreography.md`)
+
+- État final par défaut : sans JavaScript, sans `animation-timeline` ou en
+  mouvement réduit, tout est posé. Les lignes du « bon remède » passent par
+  `animation-timeline: view()` sous `@supports`.
+- Écart assumé : Hallmark veut un seul motif de défilement par page. Eliott en
+  a demandé quatre sections ; elles partagent une seule famille.
+
 # Test du skill Hallmark sur l'accueil, 2026-11-02
 
 Demande d'Eliott : installer `nutlope/hallmark` et le tester sur le site. Verbe

@@ -8,7 +8,7 @@ import { LogicielDemo } from "./LogicielDemo";
 
 /**
  * La démonstration du logiciel métier : deux onglets ARIA (« À la main »,
- * « Avec l'outil »), une bascule automatique UNE fois la fenêtre à moitié
+ * « Avec l'outil »), en mouvement réduit une bascule automatique UNE fois la fenêtre à moitié
  * visible, jamais après un geste du visiteur, et le compte des étapes qui
  * restent à faire à la main.
  *
@@ -19,7 +19,11 @@ import { LogicielDemo } from "./LogicielDemo";
 const demo = homeContent.logiciel.demo;
 const DELAI_BASCULE = 1400;
 
-function installerDom() {
+/**
+ * `reduit` : préférence « réduire les animations ». Par défaut vraie, ce qui
+ * garde la bascule unique à mi-écran ; fausse, c'est le défilement qui pilote.
+ */
+function installerDom({ reduit = true } = {}) {
   const dom = new JSDOM("<!doctype html><html><body></body></html>", {
     url: "http://localhost/",
     pretendToBeVisual: true,
@@ -63,6 +67,11 @@ function installerDom() {
     }
     return annuler(id);
   };
+  dom.window.matchMedia = (requete) => ({
+    matches: reduit && requete.includes("reduce"),
+    addEventListener() {},
+    removeEventListener() {},
+  });
   globalThis.window = dom.window;
   globalThis.document = dom.window.document;
   globalThis.IS_REACT_ACT_ENVIRONMENT = true;

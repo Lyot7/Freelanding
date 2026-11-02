@@ -1,18 +1,13 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { animate, useReducedMotion } from "motion/react";
 import { ImageProgressive } from "@/components/ui/ImageProgressive";
 import Link from "next/link";
 import type { HomeContent, Link as LinkData, Stat } from "@/lib/content/types";
 import { BrandB } from "@/components/brand/BrandB";
 import { siteConfig } from "@/content/site";
 import { Icon } from "@/components/ui";
-import {
-  EASE_FRAMER,
-  Reveal,
-} from "@/components/motion/Reveal";
-import { inViewOnce } from "@/components/motion/inViewOnce";
+import { Reveal } from "@/components/motion/Reveal";
+import { CompteurDefilement } from "@/components/motion/CompteurDefilement";
 
 /**
  * WhyUsSection — reconstruction fidèle (CSS Framer → Tailwind responsive) de la
@@ -50,10 +45,6 @@ const FONT = "[font-family:var(--font-sans)]";
 /** Couleur de repli des libellés/nombres « sombres » sur fond clair (token d26d0a6a). */
 const DARK_60 = "text-[rgba(11,11,11,0.6)]";
 
-// useLayoutEffect côté client (avant paint), useEffect en SSR (no-op).
-const useIsoLayoutEffect =
-  typeof window !== "undefined" ? useLayoutEffect : useEffect;
-
 /** Décompose la valeur d'un Stat en cible numérique + nombre de décimales. */
 function parseStat(stat: Stat): { target: number; decimals: number } {
   const suffix = stat.suffix ?? "";
@@ -68,60 +59,6 @@ function parseStat(stat: Stat): { target: number; decimals: number } {
   return { target, decimals };
 }
 
-/**
- * Compteur count-up ROBUSTE. Repos = valeur finale visible ; au reveal (entrée
- * dans le viewport, hors reduced-motion) il descend à 0 puis remonte — la mise à
- * 0 est faite en useLayoutEffect (avant paint) → aucun flash de la valeur finale
- * avant l'animation.
- *
- * CE COMPTEUR RESTE AU REPOS VISIBLE, contrairement aux apparitions de style qui
- * rendent désormais leur état masqué dès le HTML serveur. La raison est qu'il
- * n'y a rien à masquer : un chiffre rendu à zéro puis animé serait FAUX pour un
- * lecteur sans script, là où un `opacity: 0.001` n'est qu'invisible. Et il n'y a
- * pas de rejeu possible : aucune `key` ne bascule ici, la valeur ne descend à
- * zéro qu'au franchissement du seuil, jamais après coup.
- */
-function CountUp({ target, decimals }: { target: number; decimals: number }) {
-  const reduce = useReducedMotion();
-  const [value, setValue] = useState(target);
-  const ref = useRef<HTMLSpanElement>(null);
-  useIsoLayoutEffect(() => {
-    if (reduce) return;
-    const el = ref.current;
-    if (!el) return;
-    // Le décompte doit partir à l'ENTRÉE DANS LE VIEWPORT, pas au montage.
-    // Un simple drapeau « monté côté client » le lançait au chargement : les
-    // chiffres montaient pendant que le visiteur était encore en haut, et se
-    // trouvaient déjà figés à leur valeur finale quand il arrivait devant.
-    // C'est ce qui donnait l'impression qu'ils s'affichent d'un coup.
-    let controls: { stop: () => void } | null = null;
-    // Observateur PARTAGÉ, à la marge commune du site. Un observateur propre à
-    // chaque compteur était instancié ici, avec un retrait de 100 px au bord
-    // bas : la source, elle, déclenche au bord bas même. Encadré sur la home,
-    // fenêtre 1440x900 : les cinq compteurs sont encore à zéro quand leur haut
-    // est à 930 et ont atteint leur valeur (4.9, 89, 60, 3.2, 89) à 870.
-    const stop = inViewOnce(el, () => {
-      setValue(0);
-      controls = animate(0, target, {
-        duration: 1.4,
-        ease: EASE_FRAMER,
-        onUpdate: (v) => setValue(v),
-        onComplete: () => setValue(target),
-      });
-    });
-    return () => {
-      stop();
-      controls?.stop();
-    };
-  }, [reduce, target]);
-  return <span ref={ref}>{value.toFixed(decimals)}</span>;
-}
-
-/**
- * Compteur encadré « / <nombre> <glyphe> » (spans décoratifs `/` + suffixe),
- * reproduit le composant Framer « Number » (flex, gap 0, ls -0.07em, weight 500).
- * `colorClass` = couleur du nombre (blanc sur carte noire / noir sur carte blanche).
- */
 function NumberCounter({
   stat,
   prefix,
@@ -144,7 +81,7 @@ function NumberCounter({
         }
       >
         <span>{prefix}</span>
-        <CountUp target={target} decimals={decimals} />
+        <CompteurDefilement cible={target} decimales={decimals} libelle={target.toFixed(decimals)} />
         <span>{suffix}</span>
       </div>
     </div>
