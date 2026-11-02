@@ -389,7 +389,8 @@ connu.
 | Tests | `src/lib/clic/signature.test.mjs` |
 
 - **Réponse.** Toujours un 302 vers
-  `https://eliottbouquerel.fr/contact?utm_source=email&utm_medium=signature&utm_campaign=prospection`,
+  `https://eliottbouquerel.fr/?sujet=decouverte&utm_source=email&utm_medium=signature&utm_campaign=prospection#rendez-vous`
+  (la prise de rendez-vous de l'accueil, depuis le 2026-11-02 ; `/contact` avant),
   avec `Cache-Control: no-store`, `X-Robots-Tag: noindex, nofollow` et
   `Referrer-Policy: no-referrer`. La destination est une constante littérale :
   rien de la requête ni de l'environnement (`NEXT_PUBLIC_SITE_URL`) n'y entre.

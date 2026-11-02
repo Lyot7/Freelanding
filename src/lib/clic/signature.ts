@@ -44,8 +44,8 @@ export const DESTINATION_CLIC =
  */
 export const URL_COCKPIT_CLICS = "https://admin.eliottbouquerel.fr/api/clics";
 
-/** Le portrait de la signature (depuis le 2026-11-02), servi depuis `public/images`. */
-export const DESTINATION_OUVERTURE = "https://eliottbouquerel.fr/images/eliott-bouquerel-avatar.jpg";
+/** Le portrait de la signature (depuis le 2026-11-02), servi depuis `public/images/eliott-signature.jpg`, recadré de `eliott-nature-carte.jpg`. */
+export const DESTINATION_OUVERTURE = "https://eliottbouquerel.fr/images/eliott-signature.jpg";
 
 /** Au-delà, le cockpit est jugé injoignable. La redirection, elle, est déjà partie. */
 const DELAI_COCKPIT_MS = 5_000;
