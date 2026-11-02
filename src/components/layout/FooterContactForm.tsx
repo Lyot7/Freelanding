@@ -464,10 +464,14 @@ export function FooterContactForm({
               {etapes.retour}
             </button>
           ) : null}
+          {/* `key` distinctes : sans elles, React garde le même `<button>` et
+              le passe en `type="submit"` pendant le clic sur « Continuer »
+              de l'avant-dernière étape. Le navigateur soumettait alors le
+              formulaire et signalait le nom vide à peine affiché. */}
           {etape < DERNIERE_ETAPE ? (
-            <SubmitButton label={etapes.continuer} onClick={continuer} />
+            <SubmitButton key="continuer" label={etapes.continuer} onClick={continuer} />
           ) : (
-            <SubmitButton label={footerForm.submitLabel} enCours={envoi.etat === "envoi"} />
+            <SubmitButton key="envoyer" label={footerForm.submitLabel} enCours={envoi.etat === "envoi"} />
           )}
         </div>
         {etape === DERNIERE_ETAPE ? (
