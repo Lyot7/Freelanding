@@ -390,7 +390,11 @@ export function FooterContactForm({
   function continuer() {
     const conteneur = conteneurEtape(etape);
     const champs = conteneur
-      ? Array.from(conteneur.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>("input, textarea"))
+      ? Array.from(
+          conteneur.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(
+            "select, input, textarea",
+          ),
+        )
       : [];
     const invalide = champs.find((champ) => !champ.checkValidity());
     if (invalide) {

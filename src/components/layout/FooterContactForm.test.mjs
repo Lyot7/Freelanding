@@ -142,14 +142,14 @@ describe("FooterContactForm", () => {
     return [...racine.querySelectorAll(`input[type="radio"][name="${nom}"]`)].map((radio) => radio.value);
   }
 
-  async function monter() {
+  async function monter(props = proprietes) {
     const contexte = installerDom();
     const { createRoot } = await import("react-dom/client");
     const conteneur = document.createElement("div");
     document.body.appendChild(conteneur);
     const racine = createRoot(conteneur);
     await act(async () => {
-      racine.render(createElement(FooterContactForm, proprietes));
+      racine.render(createElement(FooterContactForm, props));
     });
     return {
       conteneur,
@@ -210,5 +210,150 @@ describe("FooterContactForm", () => {
     expect(etatAdresse("claire@atelier", true)).toBe("refuse");
     expect(etatAdresse(" claire.martin@atelier.fr ", true)).toBe("valide");
     expect(siteConfig.footerForm.emailInvalide).toContain("exemple@email.com");
+  });
+
+  /**
+   * Appelle le gestionnaire React d'un élément. Sous la suite complète,
+   * `react-dom/client` est chargé avant le DOM par d'autres tests et
+   * n'écoute plus `focusout` : passer par la prop garde le test juste dans
+   * les deux cas.
+   */
+  async function declencher(element, gestionnaire) {
+    const cle = Object.keys(element).find((nom) => nom.startsWith("__reactProps$"));
+    await act(async () => {
+      element[cle][gestionnaire]({ currentTarget: element });
+    });
+  }
+
+  /** Bouton dont le texte contient `libelle`. */
+  function bouton(racine, libelle) {
+    return [...racine.querySelectorAll("button")].find((b) => b.textContent.includes(libelle));
+  }
+
+  function etapeVisible(racine) {
+    return [...racine.querySelectorAll("[data-etape]")].find((e) => !e.hidden).dataset.etape;
+  }
+
+  it("signale l'adresse refusée sous le champ, puis la retire dès qu'elle est juste", async () => {
+    const { conteneur, demonter } = await monter();
+    try {
+      const email = conteneur.querySelector('input[name="email"]');
+      const aide = () => document.getElementById(email.getAttribute("aria-describedby"));
+      email.value = "claire.martin@";
+      await declencher(email, "onBlur");
+      expect(email.getAttribute("aria-invalid")).toBe("true");
+      expect(aide().textContent).toBe(siteConfig.footerForm.emailInvalide);
+      email.value = "claire.martin@atelier.fr";
+      await declencher(email, "onInput");
+      expect(email.getAttribute("aria-invalid")).toBeNull();
+      expect(email.dataset.etat).toBe("valide");
+      expect(aide().textContent).toBe("");
+    } finally {
+      await demonter();
+    }
+  });
+
+  it("refuse une adresse sans aide écrite quand le contenu n'en donne pas", async () => {
+    const sansTextes = {
+      ...proprietes,
+      footerForm: {
+        ...siteConfig.footerForm,
+        namePlaceholder: undefined,
+        emailPlaceholder: undefined,
+        telephonePlaceholder: undefined,
+        messagePlaceholder: undefined,
+        emailInvalide: undefined,
+      },
+    };
+    const { conteneur, demonter } = await monter(sansTextes);
+    try {
+      const email = conteneur.querySelector('input[name="email"]');
+      expect(email.getAttribute("placeholder")).toBe("");
+      expect(conteneur.querySelector('input[name="telephone"]').getAttribute("placeholder")).toBe("");
+      expect(conteneur.querySelector('textarea[name="message"]').getAttribute("placeholder")).toBe("");
+      email.value = "claire";
+      await declencher(email, "onBlur");
+      expect(email.getAttribute("aria-invalid")).toBe("true");
+      expect(document.getElementById(email.getAttribute("aria-describedby")).textContent).toBe("");
+    } finally {
+      await demonter();
+    }
+  });
+
+  it("se passe du téléphone et du message quand le contenu ne les demande pas", () => {
+    const html = renderToStaticMarkup(
+      createElement(FooterContactForm, {
+        ...proprietes,
+        footerForm: { ...siteConfig.footerForm, telephoneLabel: undefined, messageLabel: undefined },
+      }),
+    );
+    expect(html).toContain('name="nom"');
+    expect(html).not.toContain('name="telephone"');
+    expect(html).not.toContain('name="message"');
+  });
+
+  it("mène d'étape en étape jusqu'à l'envoi des mêmes champs, puis repart au début", async () => {
+    const { conteneur, demonter } = await monter();
+    const envois = [];
+    let repondre;
+    globalThis.fetch = (_url, init) => {
+      envois.push(JSON.parse(init.body));
+      return new Promise((resoudre) => {
+        repondre = () => resoudre({ ok: true, status: 200, json: async () => ({ ok: true }) });
+      });
+    };
+    try {
+      const { etapes, submitLabel, selectOptions } = siteConfig.footerForm;
+      // Sans objectif choisi, l'étape ne se valide pas.
+      await act(async () => bouton(conteneur, etapes.continuer).click());
+      expect(etapeVisible(conteneur)).toBe("0");
+
+      const objectif = conteneur.querySelector('input[name="objectif"]');
+      const budget = conteneur.querySelector('input[name="budget"]');
+      const echeance = conteneur.querySelector('input[name="echeance"]');
+      await act(async () => objectif.click());
+      await act(async () => bouton(conteneur, etapes.continuer).click());
+      expect(etapeVisible(conteneur)).toBe("1");
+      await act(async () => budget.click());
+      await act(async () => echeance.click());
+      await act(async () => bouton(conteneur, etapes.continuer).click());
+      expect(etapeVisible(conteneur)).toBe("2");
+
+      conteneur.querySelector('input[name="nom"]').value = "Claire Martin";
+      conteneur.querySelector('input[name="email"]').value = "claire.martin@atelier.fr";
+      conteneur.querySelector('input[name="telephone"]').value = "06 12 34 56 78";
+      conteneur.querySelector('textarea[name="message"]').value = "Nos devis partent d'un tableur.";
+      await act(async () => {
+        conteneur
+          .querySelector("form")
+          .dispatchEvent(new window.Event("submit", { bubbles: true, cancelable: true }));
+        await new Promise((resoudre) => setTimeout(resoudre, 300));
+      });
+      // Pendant l'envoi, le bouton le dit.
+      expect(bouton(conteneur, "Envoi…")).toBeDefined();
+      expect(bouton(conteneur, submitLabel)).toBeUndefined();
+      expect(envois).toHaveLength(1);
+      expect(envois[0]).toMatchObject({
+        intention: "footer",
+        nom: "Claire Martin",
+        email: "claire.martin@atelier.fr",
+        telephone: "06 12 34 56 78",
+        typeProjet: selectOptions[0],
+        objectif: objectif.value,
+        budget: budget.value,
+        echeance: echeance.value,
+        message: "Nos devis partent d'un tableur.",
+      });
+
+      await act(async () => {
+        repondre();
+        await new Promise((resoudre) => setTimeout(resoudre, 50));
+      });
+      // Envoyé : le formulaire se vide et revient à la première étape.
+      expect(etapeVisible(conteneur)).toBe("0");
+      expect(conteneur.querySelector('input[name="typeProjet"]:checked').value).toBe(selectOptions[0]);
+    } finally {
+      await demonter();
+    }
   });
 });
