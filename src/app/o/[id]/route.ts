@@ -1,7 +1,7 @@
 /**
- * `GET /o/<id>` : logo de la signature des e-mails de prospection.
+ * `GET /o/<id>` : portrait de la signature des e-mails de prospection.
  *
- * Redirige toujours en 302 vers le logo et relaie l'ouverture au cockpit. La
+ * Redirige toujours en 302 vers le portrait et relaie l'ouverture au cockpit. La
  * logique, le contrat avec le cockpit et le plafond anti-inondation vivent
  * dans `src/lib/clic/signature.ts` ; ce fichier ne fait que les brancher.
  */
