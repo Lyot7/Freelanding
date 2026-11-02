@@ -103,7 +103,7 @@ export function FooterContact({
       <div
         role="tablist"
         aria-label={modes.label}
-        className="relative grid w-full grid-cols-2 border border-white/10 p-[4px] tablet:max-w-[440px]"
+        className="relative grid w-full grid-cols-2 border border-white/25 p-[4px] tablet:max-w-[480px]"
         onKeyDown={(evenement) => {
           if (evenement.key !== "ArrowLeft" && evenement.key !== "ArrowRight") return;
           evenement.preventDefault();
@@ -131,8 +131,8 @@ export function FooterContact({
               aria-controls={`${base}-panneau-${id}`}
               tabIndex={actif ? 0 : -1}
               onClick={() => setOnglet(id)}
-              className={`footer-onglet relative z-[1] flex min-h-[44px] items-center justify-center px-[12px] text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] ${
-                actif ? "text-accent-ink" : "text-foreground-60 hover:text-foreground"
+              className={`footer-onglet relative z-[1] flex min-h-[48px] items-center justify-center px-[12px] text-[13px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] ${
+                actif ? "text-accent-ink" : "text-foreground/85 hover:text-foreground"
               }`}
             >
               {libelle}

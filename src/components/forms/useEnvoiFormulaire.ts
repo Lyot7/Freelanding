@@ -155,6 +155,8 @@ export function useEnvoiFormulaire(
       corps.objectif = lire("objectif");
       corps.echeance = lire("echeance");
       corps.message = lire("message");
+      // Facultatif : vide, le serveur l'ignore (`lireTelephone`).
+      corps.telephone = lire("telephone");
 
       try {
         const reponse = await fetch("/api/contact", {

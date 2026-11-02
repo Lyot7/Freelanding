@@ -47,6 +47,8 @@ function FormField({
   placeholder,
   autoComplete,
   enErreur = false,
+  requis = true,
+  inputMode,
 }: {
   label: string;
   type: string;
@@ -56,28 +58,34 @@ function FormField({
   autoComplete?: string;
   /** Surligne le champ que le serveur a désigné comme fautif. */
   enErreur?: boolean;
+  /** Faux pour un champ facultatif (le téléphone). */
+  requis?: boolean;
+  inputMode?: "tel";
 }) {
   return (
     // framer-x05314 / 1cbluft : label (flex col, items-end, gap 10)
-    <label className="relative flex w-full flex-col items-end gap-[10px]">
-      {/* preset 18rrjz2 (11px), color rgba(255,255,255,.6), aligné droite */}
-      <span className="h-auto w-auto whitespace-pre text-right text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground-60">
+    <label className="relative flex w-full flex-col items-start gap-[10px]">
+      {/* Libellé à gauche, au-dessus du champ, à 80 % depuis le 2026-11-02 :
+          à droite et à 60 %, l'œil ne le reliait pas à son champ (Eliott). */}
+      <span className="h-auto w-auto whitespace-pre text-left text-[13px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground/80">
         {label}
       </span>
-      {/* framer-70kwgc : input 50px (54 mobile), border top+right+bottom rgba(255,255,255,.1) */}
+      {/* Contour complet à 25 %, fond à peine levé : le champ se voit comme
+          une zone à remplir sur le fond noir (2026-11-02). */}
       <input
         type={type}
         name={name}
-        required
+        required={requis}
+        inputMode={inputMode}
         placeholder={placeholder}
         autoComplete={autoComplete}
         aria-invalid={enErreur || undefined}
         // `outline-none` retiré : la suppression de l'anneau par défaut est
         // désormais globale (`src/app/focus.css`), qui pose aussi l'anneau
         // clavier. Le passage du bord bas à l'accent au focus, lui, est bien de
-        // la source et reste ici.
-        className={`h-[54px] w-full border-y border-r bg-transparent px-[16px] text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground transition-colors placeholder:text-[rgba(255,255,255,0.3)] focus:border-b-accent tablet:h-[50px] tablet:text-[14px] ${
-          enErreur ? "border-accent" : "border-[rgba(255,255,255,0.1)]"
+        // la source ; il passe au contour entier.
+        className={`h-[54px] w-full border bg-white/[0.04] px-[16px] text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground transition-colors placeholder:text-white/45 hover:border-white/45 focus:border-accent tablet:h-[52px] tablet:text-[15px] ${
+          enErreur ? "border-accent" : "border-white/25"
         }`}
       />
     </label>
@@ -102,14 +110,14 @@ function SubmitButton({
   // `leading-[1.2]` et non `leading-[16px]` : le cadre clippant de la source
   // mesure 15,59 px (13 px × 1,2), le nôtre en mesurait 16.
   const textCls =
-    "text-[13px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-[#0b0b0b]";
+    "text-[13px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-accent-ink";
   return (
-    <div className="h-[50px] w-full tablet:w-auto">
+    <div className="h-[52px] w-full tablet:w-auto">
       <button
         type={onClick ? "button" : "submit"}
         onClick={onClick}
         disabled={enCours}
-        className="group relative flex h-[50px] w-full flex-none flex-row items-center justify-center gap-[15px] overflow-hidden bg-foreground px-[20px] transition-opacity disabled:cursor-progress disabled:opacity-60 tablet:w-min"
+        className="group relative flex h-[52px] w-full flex-none flex-row items-center justify-center gap-[15px] overflow-hidden bg-accent px-[28px] transition-[opacity,transform] duration-150 ease-out active:scale-[0.98] disabled:cursor-progress disabled:opacity-60 motion-reduce:transition-none tablet:w-min"
       >
         <span className="relative block h-[15.6px] overflow-hidden">
           <SwapCopies travel={12} textClassName={textCls}>
@@ -143,8 +151,8 @@ function QuestionField({
   enErreur: boolean;
 }) {
   return (
-    <label className="relative flex w-full flex-col items-end gap-[10px]">
-      <span className="h-auto w-auto whitespace-pre text-right text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground-60">
+    <label className="relative flex w-full flex-col items-start gap-[10px]">
+      <span className="h-auto w-auto whitespace-pre text-left text-[13px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground/80">
         {label}
         {requis ? " *" : ""}
       </span>
@@ -154,7 +162,7 @@ function QuestionField({
           required={requis}
           defaultValue=""
           aria-invalid={enErreur || undefined}
-          className="block h-[54px] w-full appearance-none border-0 bg-transparent p-[16px] text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground tablet:h-[50px] tablet:text-[14px]"
+          className="block h-[54px] w-full appearance-none border-0 bg-transparent p-[16px] text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground tablet:h-[52px] tablet:text-[15px]"
         >
           <option value="" disabled={requis} className="text-[#0b0b0b]">
             {placeholder}
@@ -178,6 +186,7 @@ const ETAPE_DU_CHAMP: Readonly<Record<string, number>> = {
   echeance: 1,
   nom: 2,
   email: 2,
+  telephone: 2,
   message: 2,
 };
 
@@ -335,8 +344,8 @@ export function FooterContactForm({
             (`.footer-select-wrapper`, cf. globals.css) exactement comme
             sur le live : bordure sans côté gauche via `::after`, chevron
             en masque SVG via `::before`. Le `<select>` est donc nu. */}
-        <label className="relative flex w-full flex-col items-end gap-[10px]">
-          <span className="h-auto w-auto whitespace-pre text-right text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground-60">
+        <label className="relative flex w-full flex-col items-start gap-[10px]">
+          <span className="h-auto w-auto whitespace-pre text-left text-[13px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground/80">
             {footerForm.selectLabel}
           </span>
           <div className="footer-select-wrapper w-full">
@@ -347,7 +356,7 @@ export function FooterContactForm({
               onChange={(evenement) => setTypeProjet(evenement.target.value)}
               aria-invalid={envoi.champEnErreur === "typeProjet" || undefined}
               // `outline-none` retiré : voir `src/app/focus.css`.
-              className="block h-[54px] w-full appearance-none border-0 bg-transparent p-[16px] text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground tablet:h-[50px] tablet:text-[14px]"
+              className="block h-[54px] w-full appearance-none border-0 bg-transparent p-[16px] text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground tablet:h-[52px] tablet:text-[15px]"
             >
               {footerForm.selectOptions.map((opt) => (
                 <option key={opt} value={opt} className="text-[#0b0b0b]">
@@ -412,9 +421,21 @@ export function FooterContactForm({
           placeholder={footerForm.emailPlaceholder ?? ""}
           enErreur={envoi.champEnErreur === "email"}
         />
+        {footerForm.telephoneLabel ? (
+          <FormField
+            label={footerForm.telephoneLabel}
+            type="tel"
+            name="telephone"
+            autoComplete="tel"
+            inputMode="tel"
+            requis={false}
+            placeholder={footerForm.telephonePlaceholder ?? ""}
+            enErreur={envoi.champEnErreur === "telephone"}
+          />
+        ) : null}
         {footerForm.messageLabel ? (
-          <label className="relative flex w-full flex-col items-end gap-[10px]">
-            <span className="h-auto w-auto whitespace-pre text-right text-[12px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground-60">
+          <label className="relative flex w-full flex-col items-start gap-[10px]">
+            <span className="h-auto w-auto whitespace-pre text-left text-[13px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground/80">
               {footerForm.messageLabel}
             </span>
             <textarea
@@ -423,8 +444,8 @@ export function FooterContactForm({
               maxLength={4000}
               placeholder={footerForm.messagePlaceholder ?? ""}
               aria-invalid={envoi.champEnErreur === "message" || undefined}
-              className={`block min-h-[96px] w-full resize-y border-y border-r bg-transparent px-[16px] py-[14px] text-[16px] font-medium leading-[1.35] tracking-[-0.01em] text-foreground transition-colors placeholder:text-[rgba(255,255,255,0.3)] focus:border-b-accent tablet:text-[14px] ${
-                envoi.champEnErreur === "message" ? "border-accent" : "border-[rgba(255,255,255,0.1)]"
+              className={`block min-h-[96px] w-full resize-y border bg-white/[0.04] px-[16px] py-[14px] text-[16px] font-medium leading-[1.35] tracking-[-0.01em] text-foreground transition-colors placeholder:text-white/45 hover:border-white/45 focus:border-accent tablet:text-[15px] ${
+                envoi.champEnErreur === "message" ? "border-accent" : "border-white/25"
               }`}
             />
           </label>
@@ -443,10 +464,14 @@ export function FooterContactForm({
               {etapes.retour}
             </button>
           ) : null}
+          {/* `key` distinctes : sans elles, React garde le même `<button>` et
+              le passe en `type="submit"` pendant le clic sur « Continuer »
+              de l'avant-dernière étape. Le navigateur soumettait alors le
+              formulaire et signalait le nom vide à peine affiché. */}
           {etape < DERNIERE_ETAPE ? (
-            <SubmitButton label={etapes.continuer} onClick={continuer} />
+            <SubmitButton key="continuer" label={etapes.continuer} onClick={continuer} />
           ) : (
-            <SubmitButton label={footerForm.submitLabel} enCours={envoi.etat === "envoi"} />
+            <SubmitButton key="envoyer" label={footerForm.submitLabel} enCours={envoi.etat === "envoi"} />
           )}
         </div>
         {etape === DERNIERE_ETAPE ? (

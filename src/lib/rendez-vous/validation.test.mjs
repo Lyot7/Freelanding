@@ -288,3 +288,35 @@ describe("validerReservation — la durée", () => {
     }
   });
 });
+
+describe("validerReservation — téléphone facultatif", () => {
+  it("n'ajoute rien quand le champ est absent ou vide", () => {
+    expect(valider().reservation).not.toHaveProperty("telephone");
+    expect(valider({ telephone: "" }).reservation).not.toHaveProperty("telephone");
+    expect(valider({ telephone: "  " }).reservation).not.toHaveProperty("telephone");
+  });
+
+  it("accepte un numéro français", () => {
+    const resultat = valider({ telephone: " 06 32 21 37 11 " });
+    expect(resultat.ok).toBe(true);
+    expect(resultat.reservation.telephone).toBe("06 32 21 37 11");
+  });
+
+  it("accepte un numéro international", () => {
+    const resultat = valider({ telephone: "+33 6 32 21 37 11" });
+    expect(resultat.ok).toBe(true);
+    expect(resultat.reservation.telephone).toBe("+33 6 32 21 37 11");
+  });
+
+  it("refuse des lettres", () => {
+    const resultat = valider({ telephone: "abc" });
+    expect(resultat.ok).toBe(false);
+    expect(resultat.motif).toEqual({ type: "champ_invalide", champ: "telephone", raison: "format" });
+  });
+
+  it("refuse un numéro trop court", () => {
+    const resultat = valider({ telephone: "12345" });
+    expect(resultat.ok).toBe(false);
+    expect(resultat.motif).toEqual({ type: "champ_invalide", champ: "telephone", raison: "longueur" });
+  });
+});

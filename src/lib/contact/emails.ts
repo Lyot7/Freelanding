@@ -92,6 +92,14 @@ export function composerNotification(
       `<a href="mailto:${echapperHtml(soumission.email)}" style="color:#0b0b0b;">${echapperHtml(soumission.email)}</a>`,
     ),
   );
+  if (soumission.telephone) {
+    morceaux.push(
+      bloc(
+        "Téléphone",
+        `<a href="tel:${echapperHtml(soumission.telephone.replace(/[^\d+]/g, ""))}" style="color:#0b0b0b;">${echapperHtml(soumission.telephone)}</a>`,
+      ),
+    );
+  }
   if (soumission.typeProjet) {
     morceaux.push(bloc("Type de projet", echapperHtml(soumission.typeProjet)));
   }
@@ -107,6 +115,9 @@ export function composerNotification(
   const lignesTexte = [`Reçu depuis le ${origine}`, ""];
   lignesTexte.push(`Nom : ${soumission.nom}`);
   lignesTexte.push(`E-mail : ${soumission.email}`);
+  if (soumission.telephone) {
+    lignesTexte.push(`Téléphone : ${soumission.telephone}`);
+  }
   if (soumission.typeProjet) {
     lignesTexte.push(`Type de projet : ${soumission.typeProjet}`);
   }

@@ -289,6 +289,9 @@ export interface SiteConfig {
     namePlaceholder?: string;
     emailLabel: string;
     emailPlaceholder?: string;
+    /** Téléphone FACULTATIF, pour rappeler le visiteur au besoin (2026-11-02). */
+    telephoneLabel?: string;
+    telephonePlaceholder?: string;
     /** Message court, facultatif. */
     messageLabel?: string;
     messagePlaceholder?: string;

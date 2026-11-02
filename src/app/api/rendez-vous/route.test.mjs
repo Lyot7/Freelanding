@@ -121,11 +121,30 @@ describe("POST /api/rendez-vous — chaque refus nomme son champ", () => {
     ["type", { type: "inconnu" }],
     ["budget", { budget: "" }],
     ["echeance", { echeance: "demain" }],
+    ["telephone", { telephone: "abc" }],
   ])("%s", async (champ, surcharge) => {
     const reponse = await reserver({ ...valide, ...surcharge });
     expect(reponse.status).toBe(400);
     const corps = await reponse.json();
     expect(corps.champ).toBe(champ);
     expect(corps.message.length).toBeGreaterThan(0);
+  });
+});
+
+describe("POST /api/rendez-vous — téléphone facultatif", () => {
+  const valide = { type: "logiciel", budget: tranche, objectif: "tache" };
+
+  it("passe la validation avec un numéro", async () => {
+    const reponse = await reserver({ ...valide, telephone: "+33 6 32 21 37 11" });
+    expect(reponse.status).toBe(503);
+  });
+
+  it("refuse un numéro trop court avec son message", async () => {
+    const reponse = await reserver({ ...valide, telephone: "06 32" });
+    expect(reponse.status).toBe(400);
+    expect(await reponse.json()).toEqual({
+      message: "Ce numéro de téléphone ne semble pas valide.",
+      champ: "telephone",
+    });
   });
 });

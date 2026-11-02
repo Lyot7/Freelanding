@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { composerNotification } from "./emails.ts";
+import { composerAccuseReception, composerNotification } from "./emails.ts";
 
 const base = {
   intention: "projet",
@@ -26,5 +26,29 @@ describe("composerNotification — questionnaire", () => {
     const { texte } = composerNotification(base);
     expect(texte).not.toContain("Budget HT");
     expect(texte).not.toContain("Objectif");
+  });
+});
+
+describe("composerNotification — téléphone", () => {
+  it("donne le numéro à Eliott, sous l'e-mail, avec un lien d'appel", () => {
+    const { texte, html } = composerNotification({ ...base, telephone: "06 32 21 37 11" });
+    expect(texte).toContain("E-mail : jean@example.com\nTéléphone : 06 32 21 37 11");
+    expect(html).toContain('href="tel:0632213711"');
+    expect(html).toContain("06 32 21 37 11");
+  });
+
+  it("n'écrit aucune ligne de téléphone sans numéro", () => {
+    const { texte, html } = composerNotification(base);
+    expect(texte).not.toContain("Téléphone");
+    expect(html).not.toContain("tel:");
+  });
+
+  it("ne met pas le numéro dans l'accusé de réception du visiteur", () => {
+    const { texte, html } = composerAccuseReception(
+      { ...base, telephone: "06 32 21 37 11" },
+      "contact@example.com",
+    );
+    expect(texte).not.toContain("06 32 21 37 11");
+    expect(html).not.toContain("06 32 21 37 11");
   });
 });

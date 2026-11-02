@@ -134,10 +134,10 @@ function numero(index: number): string {
 }
 
 const CLASSE_LIBELLE =
-  "text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60";
+  "text-[13px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground/80";
 
 const CLASSE_CHAMP =
-  "h-[50px] w-full border border-border bg-transparent px-[16px] text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground transition-colors placeholder:text-white/50 focus:border-b-accent tablet:text-[14px]";
+  "h-[52px] w-full border border-white/25 bg-white/[0.04] px-[16px] text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground transition-colors placeholder:text-white/45 hover:border-white/45 focus:border-accent tablet:text-[15px]";
 
 const CLASSE_TEXTE =
   "text-[14px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground-60";
@@ -146,7 +146,7 @@ const CLASSE_BOUTON_SECONDAIRE =
   "flex min-h-[44px] items-center gap-[8px] text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground-60 transition-colors hover:text-accent motion-reduce:transition-none";
 
 const CLASSE_BOUTON_PRINCIPAL =
-  "flex h-[50px] w-full items-center justify-center bg-accent px-[24px] text-[13px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-accent-ink transition-opacity disabled:cursor-progress disabled:opacity-60 tablet:w-fit";
+  "flex h-[52px] w-full items-center justify-center bg-accent px-[28px] text-[13px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-accent-ink transition-[opacity,transform] duration-150 ease-out active:scale-[0.98] disabled:cursor-progress disabled:opacity-60 motion-reduce:transition-none tablet:w-fit";
 
 const TITRES_ETAPES = [
   contenu.etapes.sujet,
@@ -635,6 +635,7 @@ export function ReservationRendezVous({
   const [echeance, setEcheance] = useState("");
   const [nom, setNom] = useState("");
   const [email, setEmail] = useState("");
+  const [telephone, setTelephone] = useState("");
   const [message, setMessage] = useState("");
   /** Vrai après un « Continuer » refusé : les champs requis vides s'affichent en erreur. */
   const [envoiTente, setEnvoiTente] = useState(false);
@@ -964,6 +965,7 @@ export function ReservationRendezVous({
             ...(dureeRetenue !== undefined ? { duree: dureeRetenue } : {}),
             nom,
             email,
+            ...(telephone.trim() ? { telephone } : {}),
             message,
             ...(budgetChoisi ? { budget: budgetChoisi } : {}),
             objectif: objectifChoisi,
@@ -1285,6 +1287,22 @@ export function ReservationRendezVous({
                   />
                 </label>
 
+                <label htmlFor={`${instance}-telephone`} className="flex w-full flex-col gap-[10px]">
+                  <span className={CLASSE_LIBELLE}>{contenu.formulaire.telephoneLabel}</span>
+                  <input
+                    id={`${instance}-telephone`}
+                    name="telephone"
+                    type="tel"
+                    inputMode="tel"
+                    autoComplete="tel"
+                    value={telephone}
+                    onChange={(evenement) => setTelephone(evenement.target.value)}
+                    placeholder={contenu.formulaire.telephonePlaceholder}
+                    aria-invalid={champEnErreur === "telephone" || undefined}
+                    className={`${CLASSE_CHAMP} ${champEnErreur === "telephone" ? "border-accent" : ""}`}
+                  />
+                </label>
+
                 <label htmlFor={`${instance}-message`} className="flex w-full flex-col gap-[10px]">
                   <span className={CLASSE_LIBELLE}>{contenu.formulaire.messageLabel}</span>
                   <textarea
@@ -1295,7 +1313,7 @@ export function ReservationRendezVous({
                     onChange={(evenement) => setMessage(evenement.target.value)}
                     placeholder={contenu.formulaire.messagePlaceholder}
                     aria-invalid={champEnErreur === "message" || undefined}
-                    className="min-h-[90px] w-full resize-y border border-border bg-transparent p-[16px] text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground transition-colors placeholder:text-white/50 focus:border-b-accent tablet:text-[14px]"
+                    className="min-h-[90px] w-full resize-y border border-white/25 bg-white/[0.04] p-[16px] text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground transition-colors placeholder:text-white/45 hover:border-white/45 focus:border-accent tablet:text-[15px]"
                   />
                 </label>
               </div>

@@ -22,6 +22,7 @@ import {
   DELAI_MINIMAL_MS,
   LIMITES,
   MOTIF_EMAIL,
+  lireTelephone,
   normaliserTexte,
 } from "@/lib/contact/validation";
 import { resoudreSujet } from "./config";
@@ -58,6 +59,8 @@ export interface ReservationValide {
   readonly duree?: number;
   readonly nom: string;
   readonly email: string;
+  /** Facultatif ; absent quand le prospect n'a rien saisi. Donnée personnelle. */
+  readonly telephone?: string;
   /** Absent quand le prospect n'a rien écrit. */
   readonly message?: string;
   readonly budget: string;
@@ -83,6 +86,7 @@ export type MotifRejetReservation =
         | "duree"
         | "nom"
         | "email"
+        | "telephone"
         | "message"
         | ChampQuestionnaire;
       readonly raison: string;
@@ -234,6 +238,14 @@ export function validerReservation(
     };
   }
 
+  const telephone = lireTelephone(champs.telephone);
+  if (!telephone.ok) {
+    return {
+      ok: false,
+      motif: { type: "champ_invalide", champ: "telephone", raison: telephone.raison },
+    };
+  }
+
   const message = normaliserTexte(lireChaine(champs, "message"));
   if (message.length > LONGUEUR_MESSAGE_MAX) {
     return {
@@ -267,6 +279,7 @@ export function validerReservation(
       ...(estDureePlausible(duree) ? { duree } : {}),
       nom,
       email,
+      ...(telephone.valeur ? { telephone: telephone.valeur } : {}),
       ...(message.length > 0 ? { message } : {}),
       budget: budget.valeur,
       objectif: objectif.valeur,

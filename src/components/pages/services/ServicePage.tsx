@@ -219,6 +219,7 @@ export const TONS: Record<
 };
 
 export function SectionDeuxMoities({
+  id,
   dataSection,
   titre,
   paragraphes,
@@ -226,6 +227,8 @@ export function SectionDeuxMoities({
   points,
   ton = "clair",
 }: {
+  /** Ancre de la section, quand un lien y mène (`#referent`). */
+  id?: string;
   dataSection: string;
   titre: string;
   paragraphes: readonly string[];
@@ -236,6 +239,7 @@ export function SectionDeuxMoities({
   const t = TONS[ton];
   return (
     <section
+      id={id}
       data-section={dataSection}
       className={`relative px-[20px] py-[60px] tablet:px-[24px] tablet:py-[90px] desktop:px-[30px] ${t.section}`}
     >
@@ -536,39 +540,6 @@ export function ServicePage({
             l'agenda en sachant ce qu'on va lui demander.
 
             `id="devis"` : l'ancre est gardée, `lienDevis()` y mène toujours. */}
-        {local ? null : (
-          <section
-            data-section="mission"
-            className="relative bg-background px-[20px] py-[60px] text-foreground tablet:px-[24px] tablet:py-[90px] desktop:px-[30px]"
-          >
-            <div className="relative mx-auto flex w-full max-w-[1440px] flex-col gap-[30px]">
-              <div className="grid gap-[16px] tablet:grid-cols-2">
-                <h2 className="accent-room m-0 text-[26px] font-semibold uppercase leading-[0.95] tracking-[-0.04em] tablet:pr-[30px] tablet:text-[34px]">
-                  {servicePageLabels.mission.titre}
-                </h2>
-                <p className="m-0 max-w-[46ch] text-[16px] font-medium leading-[1.45] tracking-[-0.01em] text-foreground-60 tablet:pl-[30px] desktop:pl-[40px]">
-                  {servicePageLabels.mission.intro}
-                </p>
-              </div>
-              <ol className="m-0 grid list-none gap-[24px] p-0 tablet:grid-cols-2 desktop:grid-cols-4">
-                {servicePageLabels.mission.etapes.map((etape, index) => (
-                  <li key={etape.titre} className="flex flex-col gap-[10px] border-t-2 border-accent pt-[14px]">
-                    <span className="text-[13px] font-semibold tabular-nums tracking-[-0.01em] text-foreground-60">
-                      {index + 1}
-                    </span>
-                    <span className="text-[20px] font-semibold uppercase leading-[1] tracking-[-0.03em]">
-                      {etape.titre}
-                    </span>
-                    <span className="max-w-[36ch] text-[15px] font-medium leading-[1.4] tracking-[-0.01em] text-foreground-60">
-                      {etape.corps}
-                    </span>
-                  </li>
-                ))}
-              </ol>
-            </div>
-          </section>
-        )}
-
         <section
           id="devis"
           data-section="sur-mesure"

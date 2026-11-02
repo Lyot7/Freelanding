@@ -91,6 +91,8 @@ export interface ContenuRendezVous {
     readonly nomPlaceholder: string;
     readonly emailLabel: string;
     readonly emailPlaceholder: string;
+    readonly telephoneLabel: string;
+    readonly telephonePlaceholder: string;
     readonly messageLabel: string;
     readonly messagePlaceholder: string;
     readonly envoyer: string;
@@ -258,6 +260,10 @@ export const rendezVousContent: ContenuRendezVous = {
     nomPlaceholder: "Prénom et nom",
     emailLabel: "Votre e-mail",
     emailPlaceholder: "vous@exemple.fr",
+    /* FACULTATIF, décision d'Eliott du 2026-11-02 : pour rappeler plus
+       facilement le visiteur si besoin. Il part dans les notes Cal.com. */
+    telephoneLabel: "Votre téléphone (facultatif)",
+    telephonePlaceholder: "06 12 34 56 78",
     messageLabel: "Votre situation en deux lignes (facultatif)",
     messagePlaceholder:
       "Ce que vous avez aujourd’hui, ce qui coince, ce que vous avez déjà essayé.",

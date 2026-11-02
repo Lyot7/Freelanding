@@ -191,8 +191,16 @@ export interface ReponsesQuestionnaire {
   readonly budget: string;
   readonly objectif: string;
   readonly echeance?: string;
+  /** Facultatif : Cal.com n'en reçoit pas d'autre trace que cette ligne. */
+  readonly telephone?: string;
   readonly message?: string;
 }
+
+/**
+ * Intitulé de la ligne du téléphone. Écrit ici et non dans le contenu : la
+ * ligne n'est lue que par Eliott, dans son agenda.
+ */
+export const LIBELLE_NOTE_TELEPHONE = "Téléphone";
 
 function libelle(options: readonly OptionQuestion[], id: string): string {
   return options.find((option) => option.id === id)?.libelle ?? id;
@@ -209,6 +217,10 @@ function libelle(options: readonly OptionQuestion[], id: string): string {
 export function composerNotes(reponses: ReponsesQuestionnaire): string {
   const { notes } = rendezVousContent;
   const lignes: string[] = [];
+  // En tête : c'est la seule coordonnée que Cal.com ne porte pas déjà.
+  if (reponses.telephone) {
+    lignes.push(`${LIBELLE_NOTE_TELEPHONE} : ${reponses.telephone}`);
+  }
   const retourCalcule = retourBudget(reponses.budget);
   let forfait: string = offresDuRendezVous(reponses.type).map((p) => p.nom).join(" · ");
   if (!retourCalcule || retourCalcule.type === "inconnu") forfait = notes.aCaler;

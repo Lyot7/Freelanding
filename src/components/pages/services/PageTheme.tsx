@@ -262,6 +262,7 @@ function Bloc({ bloc, ton }: { bloc: BlocTheme; ton: Ton }) {
     case "section":
       return (
         <SectionDeuxMoities
+          id={bloc.id}
           dataSection={`theme-${bloc.id}`}
           titre={bloc.titre}
           paragraphes={bloc.paragraphes}
