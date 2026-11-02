@@ -730,69 +730,6 @@ html[data-consent-choisi] [data-consent-attente] {
   }
 }
 
-/* ============================================================
-   Champ « select » du footer
-   Structure RELEVÉE sur le live (`.framer-form-select-wrapper`) : le
-   `<select>` lui-même n'a NI bordure NI chrome natif, tout est porté par le
-   wrapper.
-   - `::after` dessine le contour, en `1px 1px 1px 0` : PAS de bord gauche
-     (le champ s'ouvre sur l'axe central de la grille du footer).
-   - `::before` dessine le chevron : un aplat de la couleur d'icône découpé par
-     un masque SVG. En `content-box`, sa boîte fait 10 + 16 + 16 = 42px de large
-     et 16 + 18 + 16 = 50px de haut, soit toute la hauteur du champ ; le masque
-     de 16px posé à 10px du bord gauche aligne donc le chevron exactement sur le
-     bord droit du `<select>`.
-   - Le wrapper réserve ces 16px via `padding-right`, d'où un `<select>` à
-     666,5px pour un champ à 682,5px.
-   ============================================================ */
-.footer-select-wrapper {
-  position: relative;
-  display: block;
-  overflow: hidden;
-  padding-right: 16px;
-  /* Fond à peine levé et contour complet depuis le 2026-11-02 : sur le noir du
-     pied, la liste doit se voir comme un champ à remplir (Eliott). */
-  background-color: rgba(255, 255, 255, 0.04);
-}
-
-.footer-select-wrapper::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  box-sizing: border-box;
-  pointer-events: none;
-  border-style: solid;
-  border-width: 1px;
-  border-color: rgba(255, 255, 255, 0.4);
-  transition: border-color 150ms ease;
-}
-
-.footer-select-wrapper:hover::after {
-  border-color: rgba(255, 255, 255, 0.6);
-}
-
-.footer-select-wrapper:focus-within::after {
-  border-color: var(--color-accent);
-}
-
-.footer-select-wrapper::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  box-sizing: content-box;
-  width: 16px;
-  height: 18px;
-  padding: 16px 16px 16px 10px;
-  pointer-events: none;
-  background-color: #fff;
-  mask-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16'><path d='M 3.5 6 L 8 10.5 L 12.5 6' fill='transparent' stroke-width='1.5' stroke='rgb(153,153,153)' stroke-linecap='round' stroke-linejoin='round'></path></svg>");
-  mask-repeat: no-repeat;
-  mask-position: 10px 50%;
-  mask-size: 16px;
-}
-
 /*
  * Rail du comparateur avant / après (`ComparateurAvantApres`).
  *
@@ -958,21 +895,244 @@ html[data-consent-choisi] [data-consent-attente] {
   to { opacity: 1; }
 }
 
-/* Bascule message / rendez-vous du pied de page. */
-.footer-onglet-pastille {
-  transition: transform 280ms cubic-bezier(0.23, 1, 0.32, 1);
+/* ---------------------------------------------------------------------------
+   Contact du pied de page en néomorphisme (2026-11-02, maquette validée par
+   Eliott). Une seule matière, à peine plus claire que le fond, qui se lève
+   (relief) ou se creuse (creux) sous deux ombres : une claire en haut à
+   gauche, une sombre en bas à droite. Le relief dit « on peut appuyer », le
+   creux dit « on écrit ici » ou « c'est choisi ».
+
+   Hors couche, comme `focus.css` : ces règles battent les utilitaires
+   Tailwind, ce qui laisse la couleur d'état (vérifié, refusé) gagner sur le
+   contour de repos et de survol posé dans le composant.
+   --------------------------------------------------------------------------- */
+.neo {
+  --neo-matiere: #131313;
+  --neo-clair: rgba(255, 255, 255, 0.045);
+  --neo-ombre: rgba(0, 0, 0, 0.7);
+  --neo-relief: -6px -6px 14px var(--neo-clair), 7px 7px 16px var(--neo-ombre);
+  --neo-relief-doux: -3px -3px 8px var(--neo-clair), 4px 4px 10px var(--neo-ombre);
+  --neo-relief-survol: -4px -4px 10px var(--neo-clair), 5px 5px 12px var(--neo-ombre);
+  --neo-creux: inset 4px 4px 9px var(--neo-ombre), inset -3px -3px 8px var(--neo-clair);
+  --neo-sortie: cubic-bezier(0.23, 1, 0.32, 1);
+  /* 7,3:1 et 6,4:1 sur la matière : un contour d'état se lit sans la couleur
+     seule, l'aide en dessous le dit aussi en mots. */
+  --neo-valide: #8fae35;
+  --neo-erreur: #ff6b5a;
+  --neo-erreur-texte: #ff8c7f;
 }
-.footer-onglet {
-  transition: color 200ms ease;
+
+/* La carte. `inline-size` : les tuiles du type de projet se rangent selon la
+   largeur de la carte, pas de la fenêtre (la colonne change d'un palier à
+   l'autre). */
+.neo-carte {
+  container-type: inline-size;
+  padding: 24px 20px;
+  border-radius: 28px;
+  background: var(--neo-matiere);
+  box-shadow: var(--neo-relief);
 }
-.footer-onglet:active {
+@media (min-width: 810px) {
+  .neo-carte { padding: 40px; }
+}
+
+/* Interrupteur message / appel : un creux, une pastille volt qui y glisse. */
+.neo-mode {
+  border-radius: 999px;
+  box-shadow: var(--neo-creux);
+}
+.neo-mode-pastille {
+  border-radius: 999px;
+  background: var(--color-accent);
+  box-shadow: var(--neo-relief-doux);
+  transition: transform 260ms var(--neo-sortie);
+}
+.neo-mode-onglet {
+  font-size: 13px;
+  transition: color 200ms ease, transform 140ms var(--neo-sortie);
+}
+.neo-mode-onglet:active { transform: scale(0.97); }
+/* Sur téléphone, « Réserver un appel » tient sur une ligne. */
+@container (max-width: 340px) {
+  .neo-mode-onglet { font-size: 12px; }
+}
+
+/* Progression : une piste creusée qui se remplit de volt. */
+.neo-piste {
+  display: block;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 99px;
+  box-shadow: var(--neo-creux);
+}
+.neo-piste > span {
+  display: block;
+  height: 100%;
+  background: var(--color-accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 320ms var(--neo-sortie);
+}
+.neo-piste[data-rempli="true"] > span { transform: scaleX(1); }
+
+/* Choix en pastilles : le bouton radio natif, invisible, couvre la pastille. */
+.neo-choix {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.neo-choix--tuiles {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+.neo-choix label {
+  position: relative;
+  cursor: pointer;
+}
+.neo-choix input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.neo-pastille {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 46px;
+  padding: 12px 18px;
+  border: 1px solid transparent;
+  border-radius: 16px;
+  background: var(--neo-matiere);
+  box-shadow: var(--neo-relief-doux);
+  color: var(--color-foreground);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.25;
+  transition:
+    box-shadow 160ms var(--neo-sortie),
+    transform 160ms var(--neo-sortie),
+    border-color 160ms var(--neo-sortie);
+}
+/* Le point : un petit creux cerclé à 40 % de blanc (3,8:1), volt une fois choisi. */
+.neo-pastille::before {
+  content: "";
+  flex: none;
+  width: 12px;
+  height: 12px;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  box-shadow: inset 2px 2px 4px var(--neo-ombre);
+  transition: background-color 160ms var(--neo-sortie), box-shadow 160ms var(--neo-sortie);
+}
+.neo-choix--tuiles .neo-pastille {
+  min-height: 56px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+@container (min-width: 520px) {
+  .neo-choix--tuiles { grid-template-columns: repeat(3, 1fr); }
+  .neo-choix--tuiles .neo-pastille {
+    min-height: 88px;
+    align-items: flex-end;
+  }
+  .neo-choix--tuiles .neo-pastille::before {
+    position: absolute;
+    top: 16px;
+    left: 18px;
+  }
+}
+@media (hover: hover) and (pointer: fine) {
+  .neo-choix label:hover .neo-pastille { box-shadow: var(--neo-relief-survol); }
+}
+.neo-choix label:active .neo-pastille { transform: scale(0.98); }
+.neo-choix input:checked + .neo-pastille {
+  border-color: rgba(200, 242, 74, 0.45);
+  box-shadow: var(--neo-creux);
+}
+.neo-choix input:checked + .neo-pastille::before {
+  border-color: var(--color-accent);
+  background-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(200, 242, 74, 0.18);
+}
+.neo-choix[aria-invalid="true"] .neo-pastille { border-color: var(--neo-erreur); }
+/* Le radio est invisible : l'anneau clavier de `focus.css` passe sur la
+   pastille, sans transition, comme partout ailleurs. */
+.neo-choix input:focus-visible + .neo-pastille {
+  outline: var(--focus-ring-width) solid var(--focus-ring-light);
+  outline-offset: var(--focus-ring-offset);
+  transition: none;
+}
+
+/* Champs en creux. `--focus-shadow-keep` garde le creux sous l'anneau clavier. */
+.neo-champ {
+  border-radius: 16px;
+  background-color: var(--neo-matiere);
+  box-shadow: var(--neo-creux);
+  --focus-shadow-keep: var(--neo-creux);
+  transition: border-color 160ms var(--neo-sortie);
+}
+.neo-champ[data-etat="valide"] { border-color: var(--neo-valide); }
+.neo-champ[aria-invalid="true"] { border-color: var(--neo-erreur); }
+.neo-aide { color: var(--neo-erreur-texte); }
+.neo-duo {
+  display: grid;
+  gap: 20px 16px;
+}
+@container (min-width: 520px) {
+  .neo-duo { grid-template-columns: 1fr 1fr; }
+}
+
+/* Boutons : en relief, ils s'enfoncent au clic. */
+.neo-bouton {
+  border-radius: 999px;
+  transition: transform 140ms var(--neo-sortie), box-shadow 140ms var(--neo-sortie);
+}
+.neo-bouton--principal {
+  background: var(--color-accent);
+  box-shadow: var(--neo-relief-doux);
+  --focus-shadow-keep: var(--neo-relief-doux);
+}
+.neo-bouton--retour {
+  background: var(--neo-matiere);
+  box-shadow: var(--neo-relief-doux);
+  --focus-shadow-keep: var(--neo-relief-doux);
+}
+@media (hover: hover) and (pointer: fine) {
+  .neo-bouton:hover { box-shadow: var(--neo-relief-survol); }
+}
+.neo-bouton--principal:active:not(:disabled) {
   transform: scale(0.97);
+  box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.25);
+}
+.neo-bouton--retour:active {
+  transform: scale(0.97);
+  box-shadow: var(--neo-creux);
+}
+.neo-bouton:focus-visible,
+.neo-mode-onglet:focus-visible { transition: none; }
+
+/* Une étape, un panneau : ils arrivent d'un léger glissé. */
+.neo-etape:not([hidden]) {
+  animation: neo-arrivee 240ms var(--neo-sortie) both;
+}
+@keyframes neo-arrivee {
+  from { opacity: 0; transform: translateY(8px); }
 }
 .footer-panneau:not([hidden]) {
   animation: hero-fond 360ms cubic-bezier(0.23, 1, 0.32, 1) both;
 }
 @media (prefers-reduced-motion: reduce) {
-  .footer-onglet-pastille { transition: none; }
+  .neo-mode-pastille,
+  .neo-piste > span,
+  .neo-pastille,
+  .neo-bouton { transition: none; }
+  .neo-mode-onglet:active,
+  .neo-choix label:active .neo-pastille,
+  .neo-bouton:active:not(:disabled) { transform: none; }
+  .neo-etape:not([hidden]) { animation: hero-fond-doux 200ms ease both; }
   .footer-panneau:not([hidden]) { animation: hero-fond-doux 200ms ease both; }
 }
 

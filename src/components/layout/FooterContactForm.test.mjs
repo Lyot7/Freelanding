@@ -4,12 +4,18 @@ import { act, createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { siteConfig } from "@/content/site";
-import { FooterContactForm } from "./FooterContactForm";
+import {
+  OPTIONS_ECHEANCE,
+  optionsObjectif,
+  rendezVousDuTypeProjet,
+  tranchesBudget,
+} from "@/lib/rendez-vous/questionnaire";
+import { FooterContactForm, etatAdresse } from "./FooterContactForm";
 
 /**
- * Le contour d'un champ doit tenir 3:1 sur le fond du pied de page (WCAG
- * 1.4.11). À 25 % de blanc sur `#0b0b0b`, il plafonnait à 2,1:1 ; 40 % donne
- * environ 3,8:1, et le survol monte d'un cran au-dessus.
+ * Le contour d'un champ doit tenir 3:1 sur la carte du pied de page (WCAG
+ * 1.4.11). À 25 % de blanc, il plafonnait à 2,1:1 ; 40 % donne environ 3,8:1
+ * sur la matière `#131313`, et le survol monte d'un cran au-dessus.
  */
 const proprietes = {
   footerForm: siteConfig.footerForm,
@@ -83,7 +89,7 @@ describe("FooterContactForm", () => {
     );
     const champs = [...html.matchAll(/<(input|textarea)\b[^>]*class="([^"]*)"/g)]
       .map(([, , classes]) => classes)
-      .filter((classes) => classes.includes("bg-white/[0.04]"));
+      .filter((classes) => classes.includes("neo-champ"));
     expect(champs.length).toBeGreaterThan(1);
     for (const classes of champs) {
       expect(classes).toContain("border-white/40");
@@ -96,7 +102,7 @@ describe("FooterContactForm", () => {
     ["email", "input"],
     ["message", "textarea"],
   ]) {
-    it(`passe le contour de « ${champ} » à l'accent quand le serveur le refuse`, async () => {
+    it(`marque « ${champ} » refusé quand le serveur le refuse`, async () => {
       const contexte = installerDom();
       globalThis.fetch = async () => ({
         ok: false,
@@ -114,7 +120,7 @@ describe("FooterContactForm", () => {
           racine.render(createElement(FooterContactForm, proprietes));
         });
         const champRefuse = () => conteneur.querySelector(`${balise}[name="${champ}"]`);
-        expect(champRefuse().className).toContain("border-white/40");
+        expect(champRefuse().getAttribute("aria-invalid")).toBeNull();
         await act(async () => {
           conteneur
             .querySelector("form")
@@ -122,12 +128,87 @@ describe("FooterContactForm", () => {
           // Le sondage du jeton (150 ms) puis la réponse factice.
           await new Promise((resoudre) => setTimeout(resoudre, 400));
         });
-        expect(champRefuse().className).toContain("border-accent");
-        expect(champRefuse().className).not.toContain("border-white/40");
+        // `.neo-champ[aria-invalid="true"]` passe le contour au rouge d'erreur.
+        expect(champRefuse().getAttribute("aria-invalid")).toBe("true");
       } finally {
         await act(async () => racine.unmount());
         contexte.restaurer();
       }
     });
   }
+
+  /** Valeurs des boutons radio d'un groupe, dans l'ordre affiché. */
+  function valeurs(racine, nom) {
+    return [...racine.querySelectorAll(`input[type="radio"][name="${nom}"]`)].map((radio) => radio.value);
+  }
+
+  async function monter() {
+    const contexte = installerDom();
+    const { createRoot } = await import("react-dom/client");
+    const conteneur = document.createElement("div");
+    document.body.appendChild(conteneur);
+    const racine = createRoot(conteneur);
+    await act(async () => {
+      racine.render(createElement(FooterContactForm, proprietes));
+    });
+    return {
+      conteneur,
+      async demonter() {
+        await act(async () => racine.unmount());
+        contexte.restaurer();
+      },
+    };
+  }
+
+  it("envoie les mêmes réponses qu'avec les listes, en pastilles radio", async () => {
+    const { conteneur, demonter } = await monter();
+    try {
+      expect(conteneur.querySelector("select")).toBeNull();
+      const { selectOptions } = siteConfig.footerForm;
+      expect(valeurs(conteneur, "typeProjet")).toEqual(selectOptions);
+      expect(conteneur.querySelector('input[name="typeProjet"]:checked').value).toBe(selectOptions[0]);
+      expect(valeurs(conteneur, "objectif")).toEqual(
+        optionsObjectif(rendezVousDuTypeProjet(selectOptions[0])).map((option) => option.id),
+      );
+      expect(valeurs(conteneur, "budget")).toEqual(tranchesBudget().map((option) => option.id));
+      expect(valeurs(conteneur, "echeance")).toEqual(OPTIONS_ECHEANCE.map((option) => option.id));
+      // Requis comme l'étaient les listes, sauf l'échéance.
+      expect(conteneur.querySelector('input[name="objectif"]').required).toBe(true);
+      expect(conteneur.querySelector('input[name="budget"]').required).toBe(true);
+      expect(conteneur.querySelector('input[name="echeance"]').required).toBe(false);
+    } finally {
+      await demonter();
+    }
+  });
+
+  it("change les objectifs proposés avec le type de projet", async () => {
+    const { conteneur, demonter } = await monter();
+    try {
+      const autre = siteConfig.footerForm.selectOptions.find(
+        (type) => rendezVousDuTypeProjet(type) !== rendezVousDuTypeProjet(siteConfig.footerForm.selectOptions[0]),
+      );
+      expect(autre).toBeDefined();
+      await act(async () => {
+        conteneur.querySelector(`input[name="typeProjet"][value="${autre}"]`).click();
+      });
+      expect(valeurs(conteneur, "objectif")).toEqual(
+        optionsObjectif(rendezVousDuTypeProjet(autre)).map((option) => option.id),
+      );
+    } finally {
+      await demonter();
+    }
+  });
+
+  it("vérifie l'adresse e-mail à la sortie du champ", () => {
+    // Le branchement sur `onBlur` est vérifié au navigateur : sous la suite
+    // complète, `react-dom/client` est chargé avant le DOM par d'autres tests
+    // et n'écoute plus `focusout`.
+    expect(etatAdresse("", true)).toBe("repos");
+    expect(etatAdresse("   ", true)).toBe("repos");
+    expect(etatAdresse("claire.martin@", false)).toBe("refuse");
+    // `type="email"` accepte une adresse sans point dans le domaine.
+    expect(etatAdresse("claire@atelier", true)).toBe("refuse");
+    expect(etatAdresse(" claire.martin@atelier.fr ", true)).toBe("valide");
+    expect(siteConfig.footerForm.emailInvalide).toContain("exemple@email.com");
+  });
 });

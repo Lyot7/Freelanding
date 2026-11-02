@@ -14,8 +14,11 @@
  * `/contact`, avec l'intention `footer`, qui la distingue dans la boîte
  * d'Eliott sans dupliquer une ligne de serveur.
  *
- * Le balisage, les classes et les commentaires de relevé Framer sont repris
- * tels quels depuis `Footer.tsx`.
+ * NÉOMORPHISME depuis le 2026-11-02 (maquette validée par Eliott) : la carte,
+ * les pastilles, les champs et les boutons sont dessinés par les classes
+ * `.neo-*` de `globals.css`. Les choix fermés (type, objectif, budget,
+ * échéance) sont des boutons radio natifs à la place des `<select>` : mêmes
+ * `name`, mêmes valeurs envoyées, et chaque réponse se voit sans ouvrir de liste.
  */
 
 import { SwapCopies } from "@/components/ui/SwapCopies";
@@ -26,7 +29,7 @@ import {
   ReplisSansScript,
 } from "@/components/forms/ProtectionFormulaire";
 import { useEnvoiFormulaire } from "@/components/forms/useEnvoiFormulaire";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import {
   OPTIONS_ECHEANCE,
   optionsObjectif,
@@ -39,7 +42,36 @@ import type { SiteConfig } from "@/lib/content/types";
 /** Le pied de page ne rend ce composant que si la donnée existe. */
 type FooterFormContent = NonNullable<SiteConfig["footerForm"]>;
 
-/** Champ de formulaire (label aligné droite + input à bordure subtile). */
+/** Libellé de champ : à gauche, au-dessus, en capitales 13 px. */
+const LIBELLE_CLS =
+  "text-left text-[13px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground";
+
+/**
+ * Dessin commun des champs en creux. Le contour à 40 % de blanc tient 3,8:1
+ * sur la matière de la carte (`#131313`), au-dessus des 3:1 de WCAG 1.4.11 ;
+ * le survol monte d'un cran. La couleur d'état (vérifié, refusé) est portée
+ * par `.neo-champ` selon `data-etat` et `aria-invalid`.
+ */
+const CHAMP_CLS =
+  "neo-champ w-full border border-white/40 px-[18px] text-[16px] font-medium leading-[1.4] tracking-[-0.01em] text-foreground placeholder:text-white/50 hover:border-white/60 focus:border-accent";
+
+/** Une adresse qu'on peut écrire : quelque chose, une arobase, un domaine à point. */
+const FORME_EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+
+type EtatEmail = "repos" | "valide" | "refuse";
+
+/**
+ * État d'une adresse à la sortie du champ : rien tant qu'elle est vide, vert
+ * quand le navigateur l'accepte ET qu'elle a un domaine à point (le navigateur
+ * laisse passer `nom@domaine`), rouge sinon.
+ */
+export function etatAdresse(valeur: string, accepteeParLeNavigateur: boolean): EtatEmail {
+  const adresse = valeur.trim();
+  if (adresse.length === 0) return "repos";
+  return accepteeParLeNavigateur && FORME_EMAIL.test(adresse) ? "valide" : "refuse";
+}
+
+/** Champ de saisie en creux, libellé au-dessus. */
 function FormField({
   label,
   type,
@@ -49,6 +81,10 @@ function FormField({
   enErreur = false,
   requis = true,
   inputMode,
+  etat,
+  aide,
+  onBlur,
+  onInput,
 }: {
   label: string;
   type: string;
@@ -56,23 +92,26 @@ function FormField({
   name: string;
   placeholder: string;
   autoComplete?: string;
-  /** Surligne le champ que le serveur a désigné comme fautif. */
+  /** Surligne le champ que le serveur, ou la vérification locale, a refusé. */
   enErreur?: boolean;
   /** Faux pour un champ facultatif (le téléphone). */
   requis?: boolean;
   inputMode?: "tel";
+  /** Contour vert quand la saisie a été vérifiée. */
+  etat?: EtatEmail;
+  /** Ligne d'aide sous le champ, réservée même vide pour ne rien décaler. */
+  aide?: string;
+  onBlur?: (champ: HTMLInputElement) => void;
+  onInput?: (champ: HTMLInputElement) => void;
 }) {
+  const id = useId();
   return (
-    // framer-x05314 / 1cbluft : label (flex col, items-end, gap 10)
-    <label className="relative flex w-full flex-col items-start gap-[10px]">
-      {/* Libellé à gauche, au-dessus du champ, à 80 % depuis le 2026-11-02 :
-          à droite et à 60 %, l'œil ne le reliait pas à son champ (Eliott). */}
-      <span className="h-auto w-auto whitespace-pre text-left text-[13px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground/80">
+    <div className="flex w-full flex-col gap-[10px]">
+      <label htmlFor={id} className={LIBELLE_CLS}>
         {label}
-      </span>
-      {/* Contour complet à 25 %, fond à peine levé : le champ se voit comme
-          une zone à remplir sur le fond noir (2026-11-02). */}
+      </label>
       <input
+        id={id}
         type={type}
         name={name}
         required={requis}
@@ -80,19 +119,25 @@ function FormField({
         placeholder={placeholder}
         autoComplete={autoComplete}
         aria-invalid={enErreur || undefined}
-        // `outline-none` retiré : la suppression de l'anneau par défaut est
-        // désormais globale (`src/app/focus.css`), qui pose aussi l'anneau
-        // clavier. Le passage du bord bas à l'accent au focus, lui, est bien de
-        // la source ; il passe au contour entier.
-        className={`h-[54px] w-full border bg-white/[0.04] px-[16px] text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground transition-colors placeholder:text-white/45 hover:border-white/60 focus:border-accent tablet:h-[52px] tablet:text-[15px] ${
-          enErreur ? "border-accent" : "border-white/40"
-        }`}
+        aria-describedby={aide !== undefined ? `${id}-aide` : undefined}
+        data-etat={etat === "valide" ? "valide" : undefined}
+        onBlur={onBlur ? (evenement) => onBlur(evenement.currentTarget) : undefined}
+        onInput={onInput ? (evenement) => onInput(evenement.currentTarget) : undefined}
+        className={`${CHAMP_CLS} h-[54px]`}
       />
-    </label>
+      {aide !== undefined ? (
+        <p id={`${id}-aide`} aria-live="polite" className="neo-aide m-0 min-h-[1lh] text-[13px] leading-[1.3]">
+          {aide}
+        </p>
+      ) : null}
+    </div>
   );
 }
 
-/** Bouton « Send message » (blanc, texte sombre, swap vertical CSS au survol). */
+/**
+ * Bouton principal, volt, en relief : il s'enfonce au clic. Le texte permute
+ * verticalement au survol (`SwapCopies`), comme les autres boutons du site.
+ */
 function SubmitButton({
   label,
   enCours = false,
@@ -103,78 +148,111 @@ function SubmitButton({
   /** Présent = bouton « Continuer » d'une étape, qui n'envoie rien. */
   onClick?: () => void;
 }) {
-  // Course de 12 px VERS LE BAS et non de la hauteur de ligne : mesuré sur le
-  // live, où ce bouton (`.framer-yuvr8`, le même que l'envoi du formulaire de
-  // contact) permute plus court que les CTA « START A PROJECT » (22 px vers le
-  // haut) et dans l'autre sens.
   // `leading-[1.2]` et non `leading-[16px]` : le cadre clippant de la source
   // mesure 15,59 px (13 px × 1,2), le nôtre en mesurait 16.
   const textCls =
     "text-[13px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-accent-ink";
   return (
-    <div className="h-[52px] w-full tablet:w-auto">
-      <button
-        type={onClick ? "button" : "submit"}
-        onClick={onClick}
-        disabled={enCours}
-        className="group relative flex h-[52px] w-full flex-none flex-row items-center justify-center gap-[15px] overflow-hidden bg-accent px-[28px] transition-[opacity,transform] duration-150 ease-out active:scale-[0.98] disabled:cursor-progress disabled:opacity-60 motion-reduce:transition-none tablet:w-min"
-      >
-        <span className="relative block h-[15.6px] overflow-hidden">
-          <SwapCopies travel={12} textClassName={textCls}>
-            {enCours ? "Envoi…" : label}
-          </SwapCopies>
-        </span>
-      </button>
-    </div>
+    <button
+      type={onClick ? "button" : "submit"}
+      onClick={onClick}
+      disabled={enCours}
+      className="neo-bouton neo-bouton--principal group relative flex h-[52px] flex-none items-center justify-center px-[28px] disabled:cursor-progress disabled:opacity-60"
+    >
+      <span className="relative block h-[15.6px] overflow-hidden">
+        <SwapCopies travel={12} textClassName={textCls}>
+          {enCours ? "Envoi…" : label}
+        </SwapCopies>
+      </span>
+    </button>
   );
 }
 
 /**
- * Question à choix (budget, objectif, échéance), au dessin du sélecteur
- * « Que cherchez-vous ? » : contour et chevron portés par
- * `.footer-select-wrapper`. Les valeurs sont les identifiants de
- * `questionnaire.ts`, vérifiés en liste fermée par le serveur.
+ * Question à choix, en pastilles en relief : une pastille choisie s'enfonce,
+ * son point et son contour passent au vert. Ce sont des boutons radio natifs,
+ * cachés sous la pastille : le clavier (flèches), le formulaire et la
+ * validation du navigateur marchent sans une ligne de plus. Les valeurs sont
+ * les identifiants de `questionnaire.ts`, vérifiés en liste fermée par le
+ * serveur.
  */
-function QuestionField({
+function ChoixField({
   name,
-  label,
-  placeholder,
+  legende,
   options,
   requis,
   enErreur,
+  tuiles = false,
+  valeur,
+  onChoisir,
 }: {
   name: string;
-  label: string;
-  placeholder: string;
+  legende: string;
   options: readonly OptionQuestion[];
   requis: boolean;
   enErreur: boolean;
+  /** Grandes tuiles côte à côte (le type de projet), lignes sur téléphone. */
+  tuiles?: boolean;
+  /** Présent = choix contrôlé (le type, qui règle la liste des objectifs). */
+  valeur?: string;
+  onChoisir?: (valeur: string) => void;
 }) {
   return (
-    <label className="relative flex w-full flex-col items-start gap-[10px]">
-      <span className="h-auto w-auto whitespace-pre text-left text-[13px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground/80">
-        {label}
-        {requis ? " *" : ""}
-      </span>
-      <div className="footer-select-wrapper w-full">
-        <select
-          name={name}
-          required={requis}
-          defaultValue=""
-          aria-invalid={enErreur || undefined}
-          className="block h-[54px] w-full appearance-none border-0 bg-transparent p-[16px] text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground tablet:h-[52px] tablet:text-[15px]"
-        >
-          <option value="" disabled={requis} className="text-[#0b0b0b]">
-            {placeholder}
-          </option>
-          {options.map((option) => (
-            <option key={option.id} value={option.id} className="text-[#0b0b0b]">
-              {option.libelle}
-            </option>
-          ))}
-        </select>
+    <fieldset className="m-0 min-w-0 border-0 p-0">
+      <legend className={`${LIBELLE_CLS} mb-[12px] p-0`}>{legende}</legend>
+      <div
+        role="radiogroup"
+        aria-invalid={enErreur || undefined}
+        className={tuiles ? "neo-choix neo-choix--tuiles" : "neo-choix"}
+      >
+        {options.map((option) => (
+          <label key={option.id}>
+            <input
+              type="radio"
+              name={name}
+              value={option.id}
+              required={requis}
+              {...(valeur !== undefined
+                ? {
+                    checked: valeur === option.id,
+                    onChange: () => onChoisir?.(option.id),
+                  }
+                : {})}
+            />
+            <span className="neo-pastille">{option.libelle}</span>
+          </label>
+        ))}
       </div>
-    </label>
+    </fieldset>
+  );
+}
+
+/** Zone de message libre, en creux comme les autres champs. */
+function FieldTexte({
+  label,
+  placeholder,
+  enErreur,
+}: {
+  label: string;
+  placeholder: string;
+  enErreur: boolean;
+}) {
+  const id = useId();
+  return (
+    <div className="flex w-full flex-col gap-[10px]">
+      <label htmlFor={id} className={LIBELLE_CLS}>
+        {label}
+      </label>
+      <textarea
+        id={id}
+        name="message"
+        rows={3}
+        maxLength={4000}
+        placeholder={placeholder}
+        aria-invalid={enErreur || undefined}
+        className={`${CHAMP_CLS} block min-h-[110px] resize-y py-[15px]`}
+      />
+    </div>
   );
 }
 
@@ -193,9 +271,9 @@ const ETAPE_DU_CHAMP: Readonly<Record<string, number>> = {
 const DERNIERE_ETAPE = 2;
 
 /**
- * Barre de progression, même dessin que la prise de rendez-vous voisine : un
- * segment, un numéro et un titre par étape. Une étape franchie ramène à elle ;
- * une étape à venir ne s'atteint qu'en validant la courante.
+ * Barre de progression : une piste creusée par étape, qui se remplit de volt
+ * quand on l'atteint, un numéro et un titre dessous. Une étape franchie ramène
+ * à elle ; une étape à venir ne s'atteint qu'en validant la courante.
  */
 function Progression({
   titres,
@@ -207,25 +285,20 @@ function Progression({
   onAller: (index: number) => void;
 }) {
   return (
-    <ol className="m-0 grid w-full list-none grid-cols-3 gap-[6px] p-0">
+    <ol className="m-0 grid w-full list-none grid-cols-3 gap-[10px] p-0">
       {titres.map((titre, index) => {
         const faite = index < etape;
         const courante = index === etape;
         const corps = (
           <>
-            <span
-              aria-hidden
-              className={`block h-[2px] w-full transition-colors motion-reduce:transition-none ${
-                faite || courante ? "bg-accent" : "bg-white/15"
-              }`}
-            />
-            <span className="flex flex-col gap-[4px] pt-[10px] text-[12px] font-medium uppercase leading-[1.2] tracking-[-0.01em]">
-              <span className={faite || courante ? "text-accent" : "text-foreground-60"}>
+            <span aria-hidden className="neo-piste" data-rempli={faite || courante}>
+              <span />
+            </span>
+            <span className="flex flex-col gap-[8px] pt-[10px] text-[12px] font-medium leading-[1.25]">
+              <span className={`text-[13px] font-semibold ${faite || courante ? "text-foreground" : "text-foreground-60"}`}>
                 {String(index + 1).padStart(2, "0")}
               </span>
-              <span className={courante ? "text-foreground" : "text-foreground-60"}>
-                {titre}
-              </span>
+              <span className={courante ? "text-foreground" : "text-foreground-60"}>{titre}</span>
             </span>
           </>
         );
@@ -263,6 +336,8 @@ export function FooterContactForm({
   const envoi = useEnvoiFormulaire("footer", emailContact);
   const { questionnaire, etapes } = footerForm;
   const premierType = footerForm.selectOptions[0];
+  // Le type de projet est envoyé en clair : sa valeur est son libellé.
+  const optionsType = footerForm.selectOptions.map((libelle) => ({ id: libelle, libelle }));
 
   /*
    * TROIS ÉTAPES, UNE SEULE AFFICHÉE, depuis le 2026-10-16. Ce formulaire est
@@ -275,22 +350,31 @@ export function FooterContactForm({
   // Le type choisi règle les listes, comme le sujet du rendez-vous.
   const [typeProjet, setTypeProjet] = useState(premierType);
   const idRendezVous = rendezVousDuTypeProjet(typeProjet);
+  // L'adresse est vérifiée à la sortie du champ, pas à chaque frappe.
+  const [etatEmail, setEtatEmail] = useState<EtatEmail>("repos");
   const refFormulaire = useRef<HTMLFormElement>(null);
-  const refPremierRendu = useRef(true);
+  // Dernière étape focalisée : comparer l'étape plutôt qu'un drapeau de premier
+  // rendu, que le double effet du mode strict de React consommait (le premier
+  // choix prenait le focus dès l'affichage en développement).
+  const refEtapeVue = useRef(etape);
 
   function conteneurEtape(index: number): HTMLElement | null | undefined {
     return refFormulaire.current?.querySelector<HTMLElement>(`[data-etape="${index}"]`);
   }
 
+  function verifierEmail(champ: HTMLInputElement) {
+    setEtatEmail(etatAdresse(champ.value, champ.checkValidity()));
+  }
+
   // Le focus suit l'étape, sauf au premier affichage de la page.
   useEffect(() => {
-    if (refPremierRendu.current) {
-      refPremierRendu.current = false;
-      return;
-    }
-    conteneurEtape(etape)
-      ?.querySelector<HTMLElement>("select, input, textarea")
-      ?.focus({ preventScroll: true });
+    if (refEtapeVue.current === etape) return;
+    refEtapeVue.current = etape;
+    const conteneur = conteneurEtape(etape);
+    (
+      conteneur?.querySelector<HTMLElement>("input:checked") ??
+      conteneur?.querySelector<HTMLElement>("input, textarea")
+    )?.focus({ preventScroll: true });
   }, [etape]);
 
   // Un champ refusé par le serveur ramène à son étape (ajusté au rendu, sans
@@ -306,11 +390,7 @@ export function FooterContactForm({
   function continuer() {
     const conteneur = conteneurEtape(etape);
     const champs = conteneur
-      ? Array.from(
-          conteneur.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(
-            "select, input, textarea",
-          ),
-        )
+      ? Array.from(conteneur.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>("input, textarea"))
       : [];
     const invalide = champs.find((champ) => !champ.checkValidity());
     if (invalide) {
@@ -323,7 +403,7 @@ export function FooterContactForm({
   return (
     <form
       ref={refFormulaire}
-      className="relative flex w-full flex-col items-start gap-[14px] overflow-hidden tablet:gap-[16px]"
+      className="relative flex w-full flex-col items-start gap-[26px]"
       /* Voir `ReplisSansScript` : en POST, jamais en GET, pour qu'une
          soumission sans script ne remonte pas les données dans l'URL. */
       method="post"
@@ -331,6 +411,7 @@ export function FooterContactForm({
       onSubmit={envoi.gererSoumission}
       onReset={() => {
         setTypeProjet(premierType);
+        setEtatEmail("repos");
         setEtape(0);
       }}
       onFocusCapture={envoi.protection.activer}
@@ -338,41 +419,23 @@ export function FooterContactForm({
       <Progression titres={etapes.titres} etape={etape} onAller={setEtape} />
 
       {/* 01 — le projet : ce qui est cherché, et pour obtenir quoi. */}
-      <div data-etape={0} hidden={etape !== 0} className="flex w-full flex-col gap-[14px] tablet:gap-[16px]">
-        {/* framer-4tlyn3 : select « What are you looking for? »
-            Contour et chevron sont portés par le wrapper
-            (`.footer-select-wrapper`, cf. globals.css) exactement comme
-            sur le live : bordure sans côté gauche via `::after`, chevron
-            en masque SVG via `::before`. Le `<select>` est donc nu. */}
-        <label className="relative flex w-full flex-col items-start gap-[10px]">
-          <span className="h-auto w-auto whitespace-pre text-left text-[13px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground/80">
-            {footerForm.selectLabel}
-          </span>
-          <div className="footer-select-wrapper w-full">
-            <select
-              name="typeProjet"
-              required
-              value={typeProjet}
-              onChange={(evenement) => setTypeProjet(evenement.target.value)}
-              aria-invalid={envoi.champEnErreur === "typeProjet" || undefined}
-              // `outline-none` retiré : voir `src/app/focus.css`.
-              className="block h-[54px] w-full appearance-none border-0 bg-transparent p-[16px] text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground tablet:h-[52px] tablet:text-[15px]"
-            >
-              {footerForm.selectOptions.map((opt) => (
-                <option key={opt} value={opt} className="text-[#0b0b0b]">
-                  {opt}
-                </option>
-              ))}
-            </select>
-          </div>
-        </label>
+      <div data-etape={0} hidden={etape !== 0} className="neo-etape flex w-full flex-col gap-[26px]">
+        <ChoixField
+          name="typeProjet"
+          legende={footerForm.selectLabel}
+          options={optionsType}
+          requis
+          tuiles
+          enErreur={envoi.champEnErreur === "typeProjet"}
+          valeur={typeProjet}
+          onChoisir={setTypeProjet}
+        />
         {/* `key` sur le type : changer de type remet la réponse à zéro,
             puisque la liste change. */}
-        <QuestionField
+        <ChoixField
           key={`objectif-${idRendezVous}`}
           name="objectif"
-          label={questionnaire.objectif.label}
-          placeholder={questionnaire.objectif.placeholder}
+          legende={questionnaire.objectif.label}
           options={optionsObjectif(idRendezVous)}
           requis
           enErreur={envoi.champEnErreur === "objectif"}
@@ -380,20 +443,17 @@ export function FooterContactForm({
       </div>
 
       {/* 02 — le budget et l'échéance. */}
-      <div data-etape={1} hidden={etape !== 1} className="flex w-full flex-col gap-[14px] tablet:gap-[16px]">
-        <QuestionField
-          key={`budget-${idRendezVous}`}
+      <div data-etape={1} hidden={etape !== 1} className="neo-etape flex w-full flex-col gap-[26px]">
+        <ChoixField
           name="budget"
-          label={questionnaire.budget.label}
-          placeholder={questionnaire.budget.placeholder}
+          legende={questionnaire.budget.label}
           options={tranchesBudget()}
           requis
           enErreur={envoi.champEnErreur === "budget"}
         />
-        <QuestionField
+        <ChoixField
           name="echeance"
-          label={questionnaire.echeance.label}
-          placeholder={questionnaire.echeance.placeholder}
+          legende={questionnaire.echeance.label}
           options={OPTIONS_ECHEANCE}
           requis={false}
           enErreur={envoi.champEnErreur === "echeance"}
@@ -401,15 +461,29 @@ export function FooterContactForm({
       </div>
 
       {/* 03 — les coordonnées, un message si l'on veut, puis l'envoi. */}
-      <div data-etape={2} hidden={etape !== 2} className="flex w-full flex-col gap-[14px] tablet:gap-[16px]">
-        <FormField
-          label={footerForm.nameLabel}
-          type="text"
-          name="nom"
-          autoComplete="name"
-          placeholder={footerForm.namePlaceholder ?? ""}
-          enErreur={envoi.champEnErreur === "nom"}
-        />
+      <div data-etape={2} hidden={etape !== 2} className="neo-etape flex w-full flex-col gap-[20px]">
+        <div className="neo-duo">
+          <FormField
+            label={footerForm.nameLabel}
+            type="text"
+            name="nom"
+            autoComplete="name"
+            placeholder={footerForm.namePlaceholder ?? ""}
+            enErreur={envoi.champEnErreur === "nom"}
+          />
+          {footerForm.telephoneLabel ? (
+            <FormField
+              label={footerForm.telephoneLabel}
+              type="tel"
+              name="telephone"
+              autoComplete="tel"
+              inputMode="tel"
+              requis={false}
+              placeholder={footerForm.telephonePlaceholder ?? ""}
+              enErreur={envoi.champEnErreur === "telephone"}
+            />
+          ) : null}
+        </div>
         <FormField
           label={footerForm.emailLabel}
           /* `type="email"` et non `text` : le clavier des téléphones
@@ -419,51 +493,37 @@ export function FooterContactForm({
           name="email"
           autoComplete="email"
           placeholder={footerForm.emailPlaceholder ?? ""}
-          enErreur={envoi.champEnErreur === "email"}
+          enErreur={envoi.champEnErreur === "email" || etatEmail === "refuse"}
+          etat={etatEmail}
+          aide={etatEmail === "refuse" ? (footerForm.emailInvalide ?? "") : ""}
+          onBlur={verifierEmail}
+          // Une adresse refusée se revérifie à la frappe : le rouge part dès
+          // qu'elle est juste, sans attendre de quitter le champ.
+          onInput={etatEmail === "refuse" ? verifierEmail : undefined}
         />
-        {footerForm.telephoneLabel ? (
-          <FormField
-            label={footerForm.telephoneLabel}
-            type="tel"
-            name="telephone"
-            autoComplete="tel"
-            inputMode="tel"
-            requis={false}
-            placeholder={footerForm.telephonePlaceholder ?? ""}
-            enErreur={envoi.champEnErreur === "telephone"}
-          />
-        ) : null}
         {footerForm.messageLabel ? (
-          <label className="relative flex w-full flex-col items-start gap-[10px]">
-            <span className="h-auto w-auto whitespace-pre text-left text-[13px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground/80">
-              {footerForm.messageLabel}
-            </span>
-            <textarea
-              name="message"
-              rows={3}
-              maxLength={4000}
-              placeholder={footerForm.messagePlaceholder ?? ""}
-              aria-invalid={envoi.champEnErreur === "message" || undefined}
-              className={`block min-h-[96px] w-full resize-y border bg-white/[0.04] px-[16px] py-[14px] text-[16px] font-medium leading-[1.35] tracking-[-0.01em] text-foreground transition-colors placeholder:text-white/45 hover:border-white/60 focus:border-accent tablet:text-[15px] ${
-                envoi.champEnErreur === "message" ? "border-accent" : "border-white/40"
-              }`}
-            />
-          </label>
+          <FieldTexte
+            label={footerForm.messageLabel}
+            placeholder={footerForm.messagePlaceholder ?? ""}
+            enErreur={envoi.champEnErreur === "message"}
+          />
         ) : null}
       </div>
 
-      {/* framer-vx7pd3 : boutons + disclaimer (la mention n'accompagne que l'envoi) */}
-      <div className="relative flex w-full flex-col items-start gap-[16px] overflow-visible tablet:flex-row tablet:items-center tablet:gap-[20px] tablet:pt-[26px]">
-        <div className="flex w-full flex-col gap-[10px] tablet:w-auto tablet:flex-row">
+      {/* Retour à gauche, la suite à droite ; la mention n'accompagne que l'envoi. */}
+      <div className="flex w-full flex-col gap-[20px]">
+        <div className="flex w-full items-center justify-between gap-[16px]">
           {etape > 0 ? (
             <button
               type="button"
               onClick={() => setEtape((courante) => Math.max(courante - 1, 0))}
-              className="flex h-[50px] w-full items-center justify-center border border-white/10 px-[20px] text-[13px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground transition-colors hover:border-white/35 motion-reduce:transition-none tablet:w-auto"
+              className="neo-bouton neo-bouton--retour flex h-[52px] items-center justify-center px-[26px] text-[13px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-foreground"
             >
               {etapes.retour}
             </button>
-          ) : null}
+          ) : (
+            <span aria-hidden />
+          )}
           {/* `key` distinctes : sans elles, React garde le même `<button>` et
               le passe en `type="submit"` pendant le clic sur « Continuer »
               de l'avant-dernière étape. Le navigateur soumettait alors le
@@ -475,8 +535,7 @@ export function FooterContactForm({
           )}
         </div>
         {etape === DERNIERE_ETAPE ? (
-          /* framer-pqglgl : disclaimer (preset 1epsd85 12px, blanc 60 %, max 189) */
-          <p className="h-auto w-full max-w-[189px] flex-1 whitespace-pre-wrap break-words text-[12px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground-60 tablet:w-px">
+          <p className="m-0 w-full text-[12px] font-medium leading-[1.45] tracking-[-0.01em] text-foreground-60">
             {/* Les trois morceaux de phrase encadrant les deux liens
                 viennent de la donnée (`disclaimerPrefix` / `Joiner` /
                 `Suffix`). */}

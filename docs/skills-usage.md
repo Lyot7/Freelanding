@@ -1,3 +1,37 @@
+# Formulaire de contact en néomorphisme, 2026-11-02
+
+Maquette validée par Eliott (HTML autonome et sept captures), portée dans le
+vrai pied de page : `FooterContact.tsx` (carte et interrupteur),
+`FooterContactForm.tsx` (étapes, pastilles, champs, boutons), classes `.neo-*`
+de `globals.css`. Envoi inchangé : mêmes `name`, mêmes valeurs, même
+`useEnvoiFormulaire`, même protection.
+
+Captures dans `docs/captures/formulaire-neomorphisme/` : `avant-*` (formulaire
+à listes) et `apres-*` (néomorphisme), à 1440 et 390, une par étape (projet,
+choix au clavier, budget, coordonnées avec adresse refusée, onglet appel).
+
+| Règle appliquée | Constat sur le rendu | Ce qui a changé |
+| --- | --- | --- |
+| impeccable · polish (aligner sur le système) | DESIGN.md pose des angles droits ; la maquette validée arrondit (28 / 16 px, pilules) | La maquette gagne, décision d'Eliott ; les arrondis restent cantonnés aux classes `.neo-*` du pied de page |
+| impeccable · polish (contraste des états) | Le filet `#5f5f5f` de la maquette tient 2,9:1 sur `#131313`, sous les 3:1 | Contour à 40 % de blanc (3,8:1, décision de la PR 57 gardée), survol à 60 % ; point des pastilles à 40 % aussi |
+| impeccable · polish (focus) | Le radio caché portait l'anneau, invisible | L'anneau double de `focus.css` passe sur la pastille, sans transition ; `--focus-shadow-keep` garde relief et creux sous l'anneau |
+| impeccable · adapt | Les tuiles du type de projet suivaient la fenêtre ; la colonne du pied change d'un palier à l'autre | Requêtes de conteneur sur la carte : trois tuiles hautes au-delà de 520 px de carte, des lignes en dessous ; « Réserver un appel » à 12 px sous 340 px, une seule ligne à 390 |
+| emil · press feedback | Les boutons et pastilles ne répondaient pas à l'appui | `scale(0.97)` et ombre rentrée au clic (140 ms), pastille `scale(0.98)` |
+| emil · une forme qui glisse | Interrupteur | Une pastille volt déplacée en `transform` 260 ms `cubic-bezier(0.23, 1, 0.32, 1)` dans un creux |
+| emil · survol | Survol déclenché au toucher sur téléphone | Relief de survol sous `@media (hover: hover) and (pointer: fine)` |
+| emil · mouvement réduit | Glissés et pistes animées | Transitions de mouvement et `scale` coupées, étapes en simple fondu |
+| taste · formulaires (libellé au-dessus, erreur dessous) | L'adresse fausse n'était signalée qu'à l'envoi | Vérifiée à la sortie du champ : contour rouge et aide en mots sous le champ, contour vert quand elle est juste, le rouge part à la frappe dès qu'elle est corrigée |
+| taste · retour tactile | Étapes qui apparaissaient d'un coup | Arrivée en fondu glissé de 8 px, 240 ms |
+
+## Ce qui n'a pas été repris de la maquette
+
+- L'en-tête « Contact / Montrez-moi ce qui bloque » de la carte : le pied de
+  page porte déjà son grand titre juste au-dessus.
+- L'écran « C'est reçu » : l'état d'envoi reste `MessageEtat`, branché sur
+  `useEnvoiFormulaire`, que la demande interdisait de toucher.
+- Le panneau « Réserver un appel » garde son dessin : il vit dans
+  `src/components/rendez-vous/`, travaillé sur une autre branche.
+
 # Rythme des animations au défilement, 2026-11-02 (reprise)
 
 Retour d'Eliott : certaines animations finissaient trop tard, presque en haut
