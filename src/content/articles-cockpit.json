@@ -1,5 +1,22 @@
 [
   {
+    "slug": "logiciel-gestion-de-commande",
+    "title": "Logiciel de gestion de commande : coût et choix en PME",
+    "date": "2026-11-02",
+    "category": "Outils métier",
+    "description": "Logiciel de gestion de commande : ce qu’il doit faire jusqu’à la facture, ce que coûtent les offres du marché et quand un outil sur mesure vous rend du temps.",
+    "readingTime": "9 min de lecture",
+    "tags": [
+      "logiciel gestion de commande",
+      "logiciel de gestion des commandes",
+      "logiciel gestion des commandes",
+      "logiciel de gestion de commande",
+      "logiciel gestion des commandes clients"
+    ],
+    "alt": "Cinq voies ferrées grises qui se rejoignent par des aiguillages en une seule voie verte, sur laquelle part un wagon",
+    "validationId": "ee19714b-6fd4-47be-b0a8-59acb21cb425"
+  },
+  {
     "slug": "automatisation-factures-fournisseurs",
     "title": "Automatisation des factures fournisseurs : méthode et coût",
     "date": "2026-10-30",
