@@ -89,7 +89,8 @@ export function FooterContact({
       ? "rendezVous"
       : "message");
   const base = useId();
-  if (!rendezVous || !modes) return <>{message}</>;
+  // La carte en relief porte le formulaire seul quand il n'y a pas d'onglets.
+  if (!rendezVous || !modes) return <div className="neo neo-carte w-full">{message}</div>;
 
   const onglets = [
     { id: "message", libelle: modes.message },
@@ -99,11 +100,11 @@ export function FooterContact({
   return (
     // `data-section` : premier palier de l'entonnoir de rendez-vous
     // (`PageAnalytics`), porté par la section des pages avant le 2026-10-16.
-    <div data-section="rendez-vous" className="flex w-full flex-col gap-[24px]">
+    <div data-section="rendez-vous" className="neo neo-carte flex w-full flex-col gap-[28px]">
       <div
         role="tablist"
         aria-label={modes.label}
-        className="relative grid w-full grid-cols-2 border border-white/25 p-[4px] tablet:max-w-[480px]"
+        className="neo-mode relative grid w-full grid-cols-2 p-[5px]"
         onKeyDown={(evenement) => {
           if (evenement.key !== "ArrowLeft" && evenement.key !== "ArrowRight") return;
           evenement.preventDefault();
@@ -112,11 +113,12 @@ export function FooterContact({
           document.getElementById(`${base}-onglet-${suivant}`)?.focus();
         }}
       >
-        {/* Pastille volt qui glisse sous l'onglet actif : une seule boîte
-            déplacée en `transform`, jamais deux fonds qui s'échangent. */}
+        {/* Pastille volt en relief qui glisse dans le creux, sous l'onglet
+            actif : une seule boîte déplacée en `transform`, jamais deux fonds
+            qui s'échangent. */}
         <span
           aria-hidden
-          className="footer-onglet-pastille absolute inset-y-[4px] left-[4px] w-[calc(50%-4px)] bg-accent"
+          className="neo-mode-pastille absolute inset-y-[5px] left-[5px] w-[calc(50%-5px)]"
           style={{ transform: onglet === "message" ? "translateX(0)" : "translateX(100%)" }}
         />
         {onglets.map(({ id, libelle }) => {
@@ -131,8 +133,8 @@ export function FooterContact({
               aria-controls={`${base}-panneau-${id}`}
               tabIndex={actif ? 0 : -1}
               onClick={() => setOnglet(id)}
-              className={`footer-onglet relative z-[1] flex min-h-[48px] items-center justify-center px-[12px] text-[13px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] ${
-                actif ? "text-accent-ink" : "text-foreground/85 hover:text-foreground"
+              className={`neo-mode-onglet relative z-[1] flex min-h-[44px] items-center justify-center whitespace-nowrap rounded-full px-[6px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] ${
+                actif ? "text-accent-ink" : "text-foreground/70 hover:text-foreground"
               }`}
             >
               {libelle}
