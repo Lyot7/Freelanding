@@ -1,3 +1,4 @@
+import { duree } from "@/lib/duree";
 import type { HeroComparaison, HomeContent } from "@/lib/content/types";
 import { slugsMisEnAvant } from "@/content/blog";
 import { faqItems } from "@/content/faq";
@@ -17,14 +18,8 @@ const MINUTES_SEMAINE = TACHES_BUREAU.reduce((total, t) => total + t.minutes, 0)
 const MINUTES_RENDUES = MINUTES_SEMAINE - reste(MINUTES_SEMAINE);
 const HEURES_RENDUES_AN = Math.round((MINUTES_RENDUES * SEMAINES_AN) / 60);
 
-/** « 2 h 30 », « 36 min », « 11 h » : la durée telle qu'elle s'écrit. */
-export function duree(minutes: number): string {
-  const heures = Math.floor(minutes / 60);
-  const reliquat = minutes % 60;
-  if (heures === 0) return `${reliquat}\u00A0min`;
-  if (reliquat === 0) return `${heures}\u00A0h`;
-  return `${heures}\u00A0h\u00A0${String(reliquat).padStart(2, "0")}`;
-}
+// Déplacée dans `src/lib/duree.ts` : la démo l'emploie côté client.
+export { duree } from "@/lib/duree";
 
 const minutesDe = (...indices: readonly number[]): number =>
   indices.reduce((total, i) => total + TACHES_BUREAU[i].minutes, 0);
@@ -178,11 +173,16 @@ export const homeContent: HomeContent = {
       votreMetier: "Votre métier",
       preuve: "Je fais tourner ça chaque jour sur ma propre boîte mail.",
       compteur: {
-        main: { valeur: duree(MINUTES_SEMAINE), libelle: "de saisie par semaine" },
-        outil: { valeur: duree(reste(MINUTES_SEMAINE)), libelle: "de relecture par semaine" },
+        main: { valeur: duree(MINUTES_SEMAINE), minutes: MINUTES_SEMAINE, libelle: "de saisie par semaine" },
+        outil: {
+          valeur: duree(reste(MINUTES_SEMAINE)),
+          minutes: reste(MINUTES_SEMAINE),
+          libelle: "de relecture par semaine",
+        },
       },
       gain: {
         valeur: duree(MINUTES_RENDUES),
+        minutes: MINUTES_RENDUES,
         avant: duree(0),
         libelle: "rendues chaque semaine",
         detail: `Soit ${HEURES_RENDUES_AN} heures par an pour vos clients, vos décisions et le travail qui demande un humain.`,

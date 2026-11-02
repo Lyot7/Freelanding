@@ -18,8 +18,8 @@ export function CompteurDefilement({
   decimales = 0,
   libelle,
   className,
-  debut = 0.95,
-  fin = 0.6,
+  debut,
+  fin,
 }: {
   cible: number;
   decimales?: number;

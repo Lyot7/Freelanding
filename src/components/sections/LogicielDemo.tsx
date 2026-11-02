@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import type { MotionValue } from "motion/react";
 import { tranche, useProgressionDefilement } from "@/components/motion/useProgressionDefilement";
+import { duree } from "@/lib/duree";
 import type { LogicielDemoContent } from "@/lib/content/types";
 
 type Onglet = "main" | "outil";
@@ -28,9 +29,12 @@ export function LogicielDemo({ demo }: { demo: LogicielDemoContent["demo"] }) {
   const [onglet, setOnglet] = useState<Onglet>("main");
   const touche = useRef(false);
   const [libre, setLibre] = useState(false);
+  // Côté où se trouve la pastille pendant qu'elle glisse : l'onglet qu'elle
+  // couvre prend l'encre sombre, l'autre reste lisible sur le fond.
+  const [pastilleOutil, setPastilleOutil] = useState(false);
   const base = useId();
-  const semaine = useRef<HTMLUListElement>(null);
-  const { progression, actif } = useProgressionDefilement(semaine, 0.85, 0.5);
+  const fenetre = useRef<HTMLDivElement | null>(null);
+  const { progression, actif } = useProgressionDefilement(fenetre);
   const pilote = actif && !libre;
   const pilotage = useRef(pilote);
   useEffect(() => {
@@ -39,14 +43,60 @@ export function LogicielDemo({ demo }: { demo: LogicielDemoContent["demo"] }) {
 
   useEffect(() => {
     if (!pilote) return;
-    const suivre = (p: number) => setOnglet(p >= 1 ? "outil" : "main");
+    const suivre = (p: number) => {
+      setOnglet(p >= 1 ? "outil" : "main");
+      setPastilleOutil(p >= 0.5);
+    };
     suivre(progression.get());
     return progression.on("change", suivre);
   }, [pilote, progression]);
 
+  /* Tout le reste de la fenêtre suit le défilement au même pas que la
+     semaine (2026-11-02) : la pastille glisse, les heures de saisie fondent et
+     les heures rendues montent minute par minute, l'aplat volt se remplit.
+     Écrit dans le DOM sans repasser par React ; les valeurs lues par les
+     lecteurs d'écran restent celles de l'onglet, en texte masqué. */
+  const pastille = useRef<HTMLSpanElement>(null);
+  const saisie = useRef<HTMLSpanElement>(null);
+  const panneauGain = useRef<HTMLParagraphElement>(null);
+  const rendues = useRef<HTMLSpanElement>(null);
+  const detail = useRef<HTMLParagraphElement>(null);
+  const { main: avant, outil: apres } = demo.compteur;
+  const gainMinutes = demo.gain.minutes;
+  useLayoutEffect(() => {
+    const glisse = pastille.current;
+    const texteSaisie = saisie.current?.firstChild;
+    const panneau = panneauGain.current;
+    const texteRendues = rendues.current?.firstChild;
+    const note = detail.current;
+    if (!pilote || !glisse || !texteSaisie || !panneau || !texteRendues || !note) return;
+    glisse.style.transition = "none";
+    panneau.style.transition = "none";
+    note.style.transition = "none";
+    const poser = (p: number) => {
+      glisse.style.transform = `translateX(${p * 100}%)`;
+      texteSaisie.nodeValue = duree(Math.round(avant.minutes + (apres.minutes - avant.minutes) * p));
+      texteRendues.nodeValue = duree(Math.round(gainMinutes * p));
+      const part = `${Math.round(p * 100)}%`;
+      panneau.style.backgroundColor = `color-mix(in oklab, var(--color-accent) ${part}, transparent)`;
+      panneau.style.color = `color-mix(in oklab, var(--color-accent-ink) ${part}, rgb(255 255 255 / 0.3))`;
+      note.style.opacity = String(0.4 + 0.6 * p);
+    };
+    poser(progression.get());
+    const arreter = progression.on("change", poser);
+    return () => {
+      arreter();
+      for (const element of [glisse, panneau, note]) element.style.transition = "";
+      panneau.style.backgroundColor = "";
+      panneau.style.color = "";
+      note.style.opacity = "";
+    };
+  }, [apres.minutes, avant.minutes, gainMinutes, pilote, progression]);
+
   /* Ref de rappel avec nettoyage (React 19) : appelée une fois le nœud posé,
      jamais avec `null` puisqu'elle rend sa fonction de nettoyage. */
   const observer = useCallback((cible: HTMLDivElement) => {
+    fenetre.current = cible;
     let minuteur: ReturnType<typeof setTimeout> | undefined;
     const observateur = new IntersectionObserver(
       ([entree]) => {
@@ -60,6 +110,7 @@ export function LogicielDemo({ demo }: { demo: LogicielDemoContent["demo"] }) {
     );
     observateur.observe(cible);
     return () => {
+      fenetre.current = null;
       observateur.disconnect();
       if (minuteur) clearTimeout(minuteur);
     };
@@ -98,8 +149,9 @@ export function LogicielDemo({ demo }: { demo: LogicielDemoContent["demo"] }) {
         >
           <span
             aria-hidden
+            ref={pastille}
             className="logiciel-pastille absolute inset-y-[4px] left-[4px] w-[calc(50%-4px)] rounded-[50px] bg-accent"
-            style={{ transform: avecLogiciel ? "translateX(100%)" : "none" }}
+            style={pilote ? undefined : { transform: avecLogiciel ? "translateX(100%)" : "none" }}
           />
           {ordre.map((cle) => (
             <button
@@ -112,7 +164,9 @@ export function LogicielDemo({ demo }: { demo: LogicielDemoContent["demo"] }) {
               tabIndex={onglet === cle ? 0 : -1}
               onClick={() => choisir(cle)}
               className={`relative z-[1] h-[36px] whitespace-nowrap rounded-[50px] px-[16px] text-[12px] font-semibold uppercase leading-none tracking-[-0.01em] transition-colors duration-200 ${
-                onglet === cle ? "text-accent-ink" : "text-foreground-60 hover:text-foreground"
+                (pilote ? (cle === "outil") === pastilleOutil : onglet === cle)
+                  ? "text-accent-ink"
+                  : "text-foreground-60 hover:text-foreground"
               }`}
             >
               {demo.onglets[cle]}
@@ -129,20 +183,35 @@ export function LogicielDemo({ demo }: { demo: LogicielDemoContent["demo"] }) {
       >
         <div className="grid grid-cols-2 border-b border-white/10">
           <p className="m-0 flex flex-col gap-[6px] border-r border-white/10 px-[16px] py-[18px] tablet:px-[20px]">
-            <span className="text-[40px] font-semibold leading-[1] tracking-[-0.04em] tabular-nums desktop:text-[52px]">
-              {compteur.valeur}
+            <span className="sr-only">{compteur.valeur}</span>
+            {/* `key` : un nœud neuf quand le défilement prend ou rend la main,
+                pour que React ne garde jamais un texte écrit par l'animation. */}
+            <span
+              key={pilote ? "pilote" : "onglet"}
+              ref={saisie}
+              aria-hidden
+              className="text-[40px] font-semibold leading-[1] tracking-[-0.04em] tabular-nums desktop:text-[52px]"
+            >
+              {pilote ? avant.valeur : compteur.valeur}
             </span>
             <span className="text-[13px] font-medium leading-[1.25] tracking-[-0.01em] text-foreground-60">
               {compteur.libelle}
             </span>
           </p>
           <p
+            ref={panneauGain}
             className={`logiciel-gain m-0 flex flex-col gap-[6px] px-[16px] py-[18px] tablet:px-[20px] ${
               avecLogiciel ? "bg-accent text-accent-ink" : "text-foreground/30"
             }`}
           >
-            <span className="text-[40px] font-semibold leading-[1] tracking-[-0.04em] tabular-nums desktop:text-[52px]">
-              {avecLogiciel ? demo.gain.valeur : demo.gain.avant}
+            <span className="sr-only">{avecLogiciel ? demo.gain.valeur : demo.gain.avant}</span>
+            <span
+              key={pilote ? "pilote" : "onglet"}
+              ref={rendues}
+              aria-hidden
+              className="text-[40px] font-semibold leading-[1] tracking-[-0.04em] tabular-nums desktop:text-[52px]"
+            >
+              {pilote || !avecLogiciel ? demo.gain.avant : demo.gain.valeur}
             </span>
             <span className="text-[13px] font-medium leading-[1.25] tracking-[-0.01em]">
               {demo.gain.libelle}
@@ -150,7 +219,7 @@ export function LogicielDemo({ demo }: { demo: LogicielDemoContent["demo"] }) {
           </p>
         </div>
 
-        <ul ref={semaine} className="m-0 grid list-none grid-cols-5 gap-[4px] p-[12px] tablet:gap-[6px] tablet:px-[20px] tablet:py-[16px]">
+        <ul className="m-0 grid list-none grid-cols-5 gap-[4px] p-[12px] tablet:gap-[6px] tablet:px-[20px] tablet:py-[16px]">
           {demo.jours.map((jour, index) => (
             <Jour
               key={jour.jour}
@@ -168,6 +237,7 @@ export function LogicielDemo({ demo }: { demo: LogicielDemoContent["demo"] }) {
 
         <div className="flex flex-col gap-[6px] border-t border-white/10 px-[16px] py-[14px] tablet:px-[20px]">
           <p
+            ref={detail}
             className={`m-0 text-[15px] font-medium leading-[1.35] tracking-[-0.01em] transition-opacity duration-300 ${
               avecLogiciel ? "opacity-100" : "opacity-40"
             }`}
