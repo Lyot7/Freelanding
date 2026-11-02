@@ -137,8 +137,8 @@ describe("POST …/annuler", () => {
     const reponse = await annuler(
       new Request(`https://eliottbouquerel.fr/api/rendez-vous/gestion/${JETON}/annuler`, {
         method: "POST",
+        // Sans corps : aucun type de contenu, pas même celui qu'ajoute un corps texte.
         headers: { "x-forwarded-for": `198.51.100.${(appelant += 1)}` },
-        body: "{}",
       }),
       contexte(),
     );

@@ -17,7 +17,7 @@
 import { resoudreAcces } from "./config";
 import type { Environnement } from "./config";
 import { ajouterJours, FUSEAU } from "./creneaux";
-import { estDureePlausible, lireDurees } from "./durees";
+import { lireDurees } from "./durees";
 import type { Durees } from "./durees";
 
 /**
@@ -268,25 +268,25 @@ function estInstant(valeur: unknown): valeur is string {
 export function lireRendezVousGere(charge: unknown): RendezVousGere | undefined {
   if (typeof charge !== "object" || charge === null) return undefined;
   const o = charge as Record<string, unknown>;
+  // `lireDurees` ne rend rien quand la durée du rendez-vous n'est pas plausible.
+  const durees = lireDurees({
+    options: Array.isArray(o.durees) ? o.durees : [],
+    defaut: o.duree,
+  });
   if (
     typeof o.type !== "string" ||
     typeof o.titre !== "string" ||
-    !estDureePlausible(o.duree) ||
+    !durees ||
     !estInstant(o.debut) ||
     !estInstant(o.fin) ||
     !estStatut(o.statut)
   ) {
     return undefined;
   }
-  const durees = lireDurees({
-    options: Array.isArray(o.durees) ? o.durees : [],
-    defaut: o.duree,
-  });
-  if (!durees) return undefined;
   return {
     type: o.type,
     titre: o.titre,
-    duree: o.duree,
+    duree: durees.defaut,
     durees,
     debut: new Date(o.debut).toISOString(),
     fin: new Date(o.fin).toISOString(),

@@ -372,8 +372,7 @@ describe("réponses inattendues du cockpit", () => {
 
   it("n’envoie ni notes ni réponses vides", async () => {
     const appels = simuler([{ id: "rdv_3" }, 201]);
-    const { notes: _notes, telephone: _telephone, ...sansNotes } = RESERVATION;
-    await creerReservation({ ...sansNotes, reponses: {} }, ENV);
+    await creerReservation({ ...RESERVATION, telephone: undefined, notes: undefined, reponses: {} }, ENV);
     const corps = JSON.parse(appels[0].options.body);
     expect(corps).not.toHaveProperty("notes");
     expect(corps).not.toHaveProperty("reponses");
@@ -402,12 +401,22 @@ describe("réponses inattendues du cockpit", () => {
     expect(resultat.donnees.statut).toBe("DEPLACE");
   });
 
-  it("traite une charge vide comme une panne", async () => {
-    simuler([null]);
-    expect(await lireGestion(JETON, ENV)).toEqual({
-      ok: false,
-      raison: "indisponible",
-      detail: "charge_illisible",
-    });
+  it("traite une charge vide ou une durée absurde comme une panne", async () => {
+    const rdv = {
+      type: "logiciel",
+      titre: "Logiciel",
+      durees: [30, 45],
+      debut: "2026-11-10T09:00:00.000Z",
+      fin: "2026-11-10T09:45:00.000Z",
+      statut: "CONFIRME",
+    };
+    for (const charge of [null, { ...rdv, duree: 0 }, { ...rdv, duree: "45" }]) {
+      simuler([charge]);
+      expect(await lireGestion(JETON, ENV)).toEqual({
+        ok: false,
+        raison: "indisponible",
+        detail: "charge_illisible",
+      });
+    }
   });
 });

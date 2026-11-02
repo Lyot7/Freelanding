@@ -71,7 +71,7 @@ export function GestionRendezVous({ jeton }: { jeton: string }) {
   const [etatEnvoi, setEtatEnvoi] = useState<EtatEnvoi>("repos");
   const [messageEnvoi, setMessageEnvoi] = useState("");
   const [creneau, setCreneau] = useState<Creneau | undefined>(undefined);
-  const [resumeDeplace, setResumeDeplace] = useState("");
+  const [resumeDeplace, setResumeDeplace] = useState<string | undefined>(undefined);
   const [mois, setMois] = useState("");
   const [jourChoisi, setJourChoisi] = useState("");
   const [tentative, setTentative] = useState(0);
@@ -123,7 +123,7 @@ export function GestionRendezVous({ jeton }: { jeton: string }) {
       const reponse =
         mode === "annuler"
           ? await envoyer(`${base}/annuler`, motif.trim() ? { motif: motif.trim() } : {})
-          : await envoyer(`${base}/deplacer`, { debut: creneau?.debut ?? "" });
+          : await envoyer(`${base}/deplacer`, { debut: creneau?.debut });
       const charge: unknown = await reponse.json().catch(() => undefined);
       if (!reponse.ok) {
         setEtatEnvoi("erreur");
@@ -140,7 +140,7 @@ export function GestionRendezVous({ jeton }: { jeton: string }) {
         changerMode("annule");
         return;
       }
-      setResumeDeplace(creneau?.resume ?? "");
+      setResumeDeplace(creneau?.resume);
       changerMode("deplace");
       const nouveau = lireJeton(charge);
       if (nouveau) router.replace(`/rdv/gerer/${nouveau}`);
