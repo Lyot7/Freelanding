@@ -32,6 +32,27 @@ describe("visuel d'un article du cockpit", () => {
     expect(refusVisuel(svg("").replace("0 0 2400 1350", "0 0 1200 630"))).toContain("viewBox");
   });
 
+  test("rend en 1600 × 900 les figures que le corps appelle, et elles seules", async () => {
+    const { rendreFigures } = await import("../../scripts/visuel-article.mjs");
+    const racine = mkdtempSync(join(tmpdir(), "figures-"));
+    const figure = { svg: svg("").replace("0 0 2400 1350", "0 0 1600 900"), alt: "Un trait en diagonale" };
+    const corps = '<Figure src="/images/blog/corps/essai-2.jpg" alt="Un trait" />';
+    const chemins = await rendreFigures("essai", [figure, figure], corps, racine);
+    expect(chemins).toEqual([join(racine, "public/images/blog/corps/essai-2.jpg").replace(/\\/g, "/")]);
+    const { width, height, format } = await sharp(chemins[0]).metadata();
+    expect([width, height, format]).toEqual([1600, 900, "jpeg"]);
+    expect(await rendreFigures("essai", undefined, corps, racine)).toEqual([]);
+  });
+
+  test("refuse une figure hors cadre ou dangereuse", async () => {
+    const { rendreFigures } = await import("../../scripts/visuel-article.mjs");
+    const racine = mkdtempSync(join(tmpdir(), "figures-"));
+    const corps = "![Un trait](/images/blog/corps/essai-1.jpg)";
+    await expect(rendreFigures("essai", [{ svg: svg(""), alt: "x" }], corps, racine)).rejects.toThrow("viewBox");
+    const script = svg("<script>alert(1)</script>").replace("0 0 2400 1350", "0 0 1600 900");
+    await expect(rendreFigures("essai", [{ svg: script, alt: "x" }], corps, racine)).rejects.toThrow("Figure 1");
+  });
+
   test("rend héros, vignette et partage aux tailles du site", async () => {
     const { rendreVisuel } = await import("../../scripts/visuel-article.mjs");
     const racine = mkdtempSync(join(tmpdir(), "visuel-"));

@@ -7,6 +7,7 @@ import {
   chargerApercu,
   demandeApercu,
   estPageApercu,
+  imagesDApercu,
   pageDApercu,
 } from "@/lib/blog/apercu";
 import { sommaireDuTexte } from "@/lib/blog/sommaire";
@@ -61,7 +62,7 @@ export default async function ApercuArticle({
       site={site}
       sommaire={sommaireDuTexte(article.corps)}
     >
-      <CorpsSur source={article.corps} />
+      <CorpsSur source={article.corps} images={imagesDApercu(article)} />
     </BlogArticlePage>
   );
 }

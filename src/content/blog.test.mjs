@@ -20,7 +20,9 @@ import { resoudreSujet } from "../lib/rendez-vous/config.ts";
  *  - une image de couverture qui pointe sur un fichier inexistant ;
  *  - un reste du template (`framerusercontent`) dans un visuel d'article ;
  *  - un `#` de titre 1 dans un corps, qui ferait un second h1 sur la page ;
- *  - une image markdown sans texte de remplacement.
+ *  - une image markdown sans texte de remplacement ;
+ *  - une image du corps (`<Figure>` ou markdown) qui manque dans `public/`, une
+ *    `<Figure>` sans texte de remplacement, plus de trois figures du corps.
  */
 
 const DOSSIER = join(import.meta.dirname, "articles");
@@ -122,6 +124,40 @@ describe("corps des articles", () => {
     for (const [fichier, texte] of corps) {
       for (const [, alt] of texte.matchAll(/!\[([^\]]*)\]\(/g)) {
         expect([fichier, alt.trim().length > 0]).toEqual([fichier, true]);
+      }
+    }
+  });
+
+  /** Les chemins d'image du corps : `<Figure src="…">` et `![alt](…)`. */
+  const images = (texte) => [
+    ...[...texte.matchAll(/<Figure\b[^>]*?\ssrc=["']([^"']+)["']/g)].map((m) => m[1]),
+    ...[...texte.matchAll(/!\[[^\]]*\]\(([^)\s]+)/g)].map((m) => m[1]),
+  ];
+
+  test("chaque image du corps existe dans public/", () => {
+    for (const [fichier, texte] of corps) {
+      for (const src of images(texte)) {
+        expect([fichier, src, src.startsWith("/") && existsSync(join(PUBLIC, src))]).toEqual([fichier, src, true]);
+      }
+    }
+  });
+
+  test("chaque <Figure> porte un texte de remplacement", () => {
+    for (const [fichier, texte] of corps) {
+      for (const [balise] of texte.matchAll(/<Figure\b[^>]*>/g)) {
+        const alt = /\salt=["']([^"']*)["']/.exec(balise)?.[1] ?? "";
+        expect([fichier, balise, alt.trim().length > 0]).toEqual([fichier, balise, true]);
+      }
+    }
+  });
+
+  test("trois figures du corps au plus, chacune suit le slug de son article", () => {
+    for (const [fichier, texte] of corps) {
+      const slug = fichier.replace(/\.mdx$/, "");
+      const figures = new Set(images(texte).filter((src) => src.startsWith("/images/blog/corps/")));
+      expect([fichier, figures.size <= 3]).toEqual([fichier, true]);
+      for (const src of figures) {
+        expect([fichier, src]).toEqual([fichier, expect.stringMatching(new RegExp(`^/images/blog/corps/${slug}-[1-3]\\.jpg$`))]);
       }
     }
   });

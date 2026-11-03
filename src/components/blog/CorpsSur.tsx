@@ -43,6 +43,16 @@ const {
 
 const OFFRES = new Set<string>(prestations.map((p) => p.id));
 
+declare module "mdast" {
+  interface ImageData {
+    /**
+     * L'image qu'une figure du corps montre dans l'aperçu, posée par `avecImages` :
+     * jamais lue dans le texte, que l'analyseur ne traduit pas en `data`.
+     */
+    figure?: string;
+  }
+}
+
 /**
  * Le texte d'une phrase. Rendu en place et non par un composant intermédiaire :
  * `AncreH2` lit le texte de ses enfants pour calculer l'ancre du titre, et un
@@ -72,7 +82,7 @@ export function rendreEnLigne(n: PhrasingContent): ReactNode {
       return href ? <A href={href}>{enLigne(n.children)}</A> : enLigne(n.children);
     }
     case "image": {
-      const src = mediaSur(n.url);
+      const src = n.data?.figure ?? mediaSur(n.url);
       return src ? <Img src={src} alt={n.alt ?? ""} /> : (n.alt ?? "");
     }
     case "html": {
@@ -205,7 +215,36 @@ function Blocs({ blocs }: Readonly<{ blocs: Bloc[] }>) {
   return blocs.map((bloc, i) => <BlocArticle key={`${bloc.type}-${i}`} bloc={bloc} />);
 }
 
-/** Le corps d'un article en attente, sans compilation ni évaluation. */
-export function CorpsSur({ source }: Readonly<{ source: string }>) {
-  return <Blocs blocs={decouper(source)} />;
+/** Marque chaque image markdown dont le chemin a son image d'aperçu. */
+function marquer(n: RootContent, images: Readonly<Record<string, string>>): void {
+  if (n.type === "image" && Object.hasOwn(images, n.url)) n.data = { ...n.data, figure: images[n.url] };
+  if ("children" in n) for (const enfant of n.children) marquer(enfant, images);
+}
+
+/** Les figures du corps, qui n'existent pas encore en JPG, remplacées par leur image d'aperçu. */
+function avecImages(blocs: Bloc[], images: Readonly<Record<string, string>>): Bloc[] {
+  return blocs.map((bloc) => {
+    switch (bloc.type) {
+      case "markdown":
+        for (const n of bloc.racine.children) marquer(n, images);
+        return bloc;
+      case "Figure":
+        return Object.hasOwn(images, bloc.src) ? { ...bloc, src: images[bloc.src] } : bloc;
+      case "Callout":
+      case "Quote":
+        return { ...bloc, enfants: avecImages(bloc.enfants, images) };
+      default:
+        return bloc;
+    }
+  });
+}
+
+/**
+ * Le corps d'un article en attente, sans compilation ni évaluation. `images`
+ * associe un chemin appelé par le texte à l'image que l'aperçu montre à sa place
+ * (les figures du corps, `imagesDApercu`).
+ */
+export function CorpsSur({ source, images }: Readonly<{ source: string; images?: Readonly<Record<string, string>> }>) {
+  const blocs = decouper(source);
+  return <Blocs blocs={images ? avecImages(blocs, images) : blocs} />;
 }

@@ -11,16 +11,20 @@
  * ci-dessous redit l'essentiel : sharp ne doit rien charger d'extérieur, même
  * si le cockpit laissait un jour passer un SVG qu'il n'aurait pas dû.
  */
+import { mkdirSync } from "node:fs";
+import { dirname } from "node:path";
 import sharp from "sharp";
 
 const FOND = "#0b0b0b";
 const VIEWBOX = 'viewBox="0 0 2400 1350"';
+/** Le cadre d'une figure du corps : celui de `<Figure>` sur le site, 16:9. */
+const VIEWBOX_FIGURE = 'viewBox="0 0 1600 900"';
 
 /** Ce qui empêche de rendre le SVG ; `null` s'il peut partir. */
-export function refusVisuel(svg) {
+export function refusVisuel(svg, viewBox = VIEWBOX) {
   const s = String(svg ?? "").trim();
   if (!/^<svg[\s>]/i.test(s) || !/<\/svg>$/i.test(s)) return "pas un élément <svg>";
-  if (!s.slice(0, s.indexOf(">") + 1).includes(VIEWBOX)) return `${VIEWBOX} attendu`;
+  if (!s.slice(0, s.indexOf(">") + 1).includes(viewBox)) return `${viewBox} attendu`;
   if (/<\s*(script|style|text|image|foreignObject|iframe|object|embed)\b/i.test(s)) return "élément interdit";
   if (/\son[a-z]+\s*=|javascript:|data:|<!(ENTITY|DOCTYPE)/i.test(s)) return "contenu exécutable ou embarqué";
   for (const m of s.matchAll(/\b(?:href|xlink:href)\s*=\s*["']([^"']*)["']/gi)) {
@@ -78,6 +82,30 @@ export function rendreVisuelMetier(slug, svg, racine = ".") {
     partage: `${racine}/public/images/og-metier-${slug}.jpg`,
   };
   return rendre(svg, (nom) => fichiers[nom]);
+}
+
+/**
+ * Écrit les figures du corps, `public/images/blog/corps/<slug>-<n>.jpg` en
+ * 1600 × 900, celles que le texte appelle : une figure qu'Eliott a retirée en
+ * corrigeant l'article ne laisse pas de fichier orphelin. Rend les chemins écrits.
+ */
+export async function rendreFigures(slug, figures, corps, racine = ".") {
+  const chemins = [];
+  for (const [i, figure] of (figures ?? []).entries()) {
+    const publie = `/images/blog/corps/${slug}-${i + 1}.jpg`;
+    if (!corps.includes(publie)) continue;
+    const refus = refusVisuel(figure.svg, VIEWBOX_FIGURE);
+    if (refus) throw new Error(`Figure ${i + 1} refusée : ${refus}`);
+    const chemin = `${racine}/public${publie}`;
+    mkdirSync(dirname(chemin), { recursive: true });
+    await sharp(Buffer.from(figure.svg.trim()))
+      .resize(1600, 900, { fit: "cover" })
+      .flatten({ background: FOND })
+      .jpeg({ quality: 82, progressive: true, mozjpeg: true })
+      .toFile(chemin);
+    chemins.push(chemin);
+  }
+  return chemins;
 }
 
 /** `bun scripts/visuel-article.mjs <fichier.svg> [dossier]` : rend un SVG hors circuit, pour le régler. */
