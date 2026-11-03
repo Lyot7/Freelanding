@@ -156,6 +156,10 @@ describe("CorpsSur : les figures du corps dans l'aperçu", () => {
 
   it("ne touche ni aux autres chemins, ni à une adresse data: écrite dans le texte", () => {
     expect(rendu(`![Autre](${AUTRE})`, { [CHEMIN]: URI })).toContain("essai-2.jpg");
+    expect(rendu(`<Figure src="${AUTRE}" alt="Autre" />`, { [CHEMIN]: URI })).toContain("essai-2.jpg");
+    const melange = rendu(`<Quote author="Eliott">\n\n![Le circuit](${CHEMIN})\n\n</Quote>\n\n<Stat value="3" label="relances" />`, { [CHEMIN]: URI });
+    expect(melange).toContain("data:image/svg+xml");
+    expect(melange).toContain("relances");
     expect(rendu(`![Piège](${URI})`, { [CHEMIN]: URI })).not.toContain("data:image");
     expect(rendu(`![Le circuit](${CHEMIN})`)).toContain("essai-1.jpg");
   });
