@@ -63,12 +63,14 @@ function lirePages(): PageMetier[] {
 
 const existe = (slug: string) => existsSync(join(ARTICLES, `${slug}.mdx`));
 
-/** Le corps, l'entrée du registre et les trois JPG du visuel. */
+/** Le corps, l'entrée du registre, les trois JPG du visuel et ceux des figures du corps. */
 async function ecrire(a: ArticleAPublier, date: string): Promise<void> {
   if (!a.article.visuel) throw new Error(`${a.article.slug} : pas de visuel`);
   // sharp n'est chargé que pour écrire : les autres modes tournent sans lui.
-  const { rendreVisuel } = await import("./visuel-article.mjs");
+  const { rendreFigures, rendreVisuel } = await import("./visuel-article.mjs");
   await rendreVisuel(a.article.slug, a.article.visuel.svg, RACINE);
+  // Un échec remet le dossier à son état : `annuler` nettoie aussi `public/images/blog/corps`.
+  await rendreFigures(a.article.slug, a.article.figures ?? [], a.corps, RACINE);
   writeFileSync(join(ARTICLES, `${a.article.slug}.mdx`), `${a.corps.trim()}\n`);
   // Un texte retouché dans le cockpit perd ses insécables, et le test de typographie
   // bloquait l'article à chaque essai. La réparation mécanique passe avant les contrôles ;

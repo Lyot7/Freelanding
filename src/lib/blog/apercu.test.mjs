@@ -8,6 +8,7 @@ import {
   chargerApercu,
   demandeApercu,
   estPageApercu,
+  imagesDApercu,
   lireReponse,
   pageDApercu,
   uriSvg,
@@ -181,5 +182,25 @@ describe("la page par métier en aperçu", () => {
       },
     };
     expect(pageDApercu(apercu(), "2026-10-15", panne).illisible).toBe("texte brut");
+  });
+});
+
+describe("figures du corps dans l'aperçu", () => {
+  const figure = { svg: "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 900'/>", alt: "Trois étapes reliées, la dernière en vert" };
+
+  it("associe chaque chemin appelé par le texte au SVG de sa figure", () => {
+    const lu = lireReponse(ID, { ...reponse, article: { ...article, figures: [figure, { ...figure, alt: "Avant, après" }] } });
+    expect(lu?.article.figures?.length).toBe(2);
+    expect(imagesDApercu(lu)).toEqual({
+      "/images/blog/corps/un-article-1.jpg": uriSvg(figure.svg),
+      "/images/blog/corps/un-article-2.jpg": uriSvg(figure.svg),
+    });
+  });
+
+  it("une figure illisible les écarte toutes, plutôt que de décaler les suivantes", () => {
+    const lu = lireReponse(ID, { ...reponse, article: { ...article, figures: [{ svg: "" }, figure] } });
+    expect(lu?.article.figures).toBeUndefined();
+    expect(imagesDApercu(lu)).toEqual({});
+    expect(imagesDApercu(lireReponse(ID, reponse))).toEqual({});
   });
 });

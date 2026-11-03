@@ -140,3 +140,23 @@ describe("CorpsSur : nœuds sans attribut facultatif", () => {
     expect(html(createElement(BlocMarkdown, { n: { type: "definition", identifier: "x", url: "/" } }))).toBe("");
   });
 });
+
+describe("CorpsSur : les figures du corps dans l'aperçu", () => {
+  const CHEMIN = "/images/blog/corps/essai-1.jpg";
+  const AUTRE = "/images/blog/corps/essai-2.jpg";
+  const URI = "data:image/svg+xml;base64,PHN2Zy8+";
+  const rendu = (source, images) => html(createElement(CorpsSur, { source, images }));
+
+  it("montre le SVG à la place du JPG pas encore publié, bloc ou markdown, même imbriqué", () => {
+    const source = `<Figure src="${CHEMIN}" alt="Le circuit" caption="Le circuit" />\n\n![Le circuit](${CHEMIN})\n\n<Callout title="À retenir">\n\n![Le circuit](${CHEMIN})\n\n</Callout>`;
+    const sortie = rendu(source, { [CHEMIN]: URI });
+    expect(sortie.match(/src="data:image\/svg\+xml/g)?.length).toBe(3);
+    expect(sortie).not.toContain("essai-1.jpg");
+  });
+
+  it("ne touche ni aux autres chemins, ni à une adresse data: écrite dans le texte", () => {
+    expect(rendu(`![Autre](${AUTRE})`, { [CHEMIN]: URI })).toContain("essai-2.jpg");
+    expect(rendu(`![Piège](${URI})`, { [CHEMIN]: URI })).not.toContain("data:image");
+    expect(rendu(`![Le circuit](${CHEMIN})`)).toContain("essai-1.jpg");
+  });
+});

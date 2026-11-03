@@ -1,6 +1,7 @@
 import type { BlogPost } from "@/lib/content/types";
 import {
   articlesDuCockpit,
+  cheminFigure,
   entreeDuCockpit,
   type ArticleDuCockpit,
   type PageMetierDuCockpit,
@@ -88,7 +89,15 @@ function lireArticle(a: unknown): ArticleDuCockpit | null {
     motsCles: Array.isArray(a.motsCles) ? a.motsCles.filter(estRequete) : undefined,
     pageServie: { url: a.pageServie.url },
     visuel: lireVisuel(a.visuel),
+    figures: lireFigures(a.figures),
   };
+}
+
+/** Toutes les figures, ou aucune : une figure illisible décalerait la numérotation des suivantes. */
+function lireFigures(v: unknown): { svg: string; alt: string }[] | undefined {
+  if (!Array.isArray(v) || v.length === 0) return undefined;
+  const figures = v.map(lireVisuel);
+  return figures.every((f) => f !== undefined) ? figures : undefined;
 }
 
 /** La réponse du cockpit, lue champ par champ ; null si elle n'a pas la forme attendue. */
@@ -120,6 +129,15 @@ export async function chargerApercu(
 
 /** Un SVG en adresse d'image : affiché comme une image, il n'exécute rien. */
 export const uriSvg = (svg: string): string => `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`;
+
+/**
+ * Les figures du corps, par le chemin que le texte appelle : avant la publication
+ * leurs JPG n'existent pas, l'aperçu montre leur SVG à la place.
+ */
+export function imagesDApercu(a: ArticleApercu): Record<string, string> {
+  const figures = a.article.figures ?? [];
+  return Object.fromEntries(figures.map((f, i) => [cheminFigure(a.article.slug, i + 1), uriSvg(f.svg)]));
+}
 
 /** Sans visuel, l'aperçu garde la place du héros, en aplat sombre. */
 const SANS_VISUEL = '<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1350"><rect width="2400" height="1350" fill="#0b0b0b"/></svg>';

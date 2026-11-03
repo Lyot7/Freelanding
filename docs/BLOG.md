@@ -51,7 +51,10 @@ hébergé par GitHub, gratuit pour un dépôt public. Il lance
    dans `src/content/articles-cockpit.json`, et son visuel (le SVG que le
    rédacteur a conçu et qu'Eliott a vu dans l'aperçu) rendu en trois JPG par
    `scripts/visuel-article.mjs` : héros 2400 × 1350, vignette 1200 × 1114,
-   partage 1200 × 630. Un article sans visuel attend son visuel ;
+   partage 1200 × 630. Un article sans visuel attend son visuel. Ses deux ou
+   trois figures du corps (`article.figures`, SVG 1600 × 900) deviennent
+   `public/images/blog/corps/<slug>-<n>.jpg`, le chemin que le texte appelle
+   dans un `<Figure>` ; l'aperçu du cockpit montre leur SVG à la place ;
 4. passe les contrôles du site, du moins cher au plus cher :
    `bun run typecheck`, `bun run lint`, `bun run test`, `bun run build` ;
 5. pousse un commit sur `main`. Coolify déploie seul à chaque poussée ;

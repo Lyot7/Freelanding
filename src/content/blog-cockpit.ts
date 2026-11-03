@@ -96,7 +96,15 @@ export interface ArticleDuCockpit {
   pageServie: { url: string };
   /** Le SVG conçu pour l'article par le rédacteur, contrôlé par le cockpit. */
   visuel?: { svg: string; alt: string };
+  /** Deux ou trois schémas du corps, SVG 1600 × 900, appelés par `cheminFigure(slug, n)`. */
+  figures?: { svg: string; alt: string }[];
 }
+
+/**
+ * Le chemin publié de la figure `n` (à partir de 1) du corps : le texte l'appelle
+ * dans un `<Figure>`, la publication y écrit le JPG, l'aperçu y montre le SVG.
+ */
+export const cheminFigure = (slug: string, n: number): string => `/images/blog/corps/${slug}-${n}.jpg`;
 
 /**
  * Ce que le cockpit dit d'une page par métier : même validation qu'un article,
