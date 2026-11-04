@@ -1,5 +1,22 @@
 [
   {
+    "slug": "logiciel-gestion-des-achats",
+    "title": "Logiciel de gestion des achats : savoir qui dépense quoi",
+    "date": "2026-11-04",
+    "category": "Outils métier",
+    "description": "De la demande au paiement, chaque achat validé, commandé, reçu puis rapproché de sa facture : ce que doit faire un logiciel de gestion des achats en PME.",
+    "readingTime": "9 min de lecture",
+    "tags": [
+      "logiciel gestion des achats",
+      "logiciel gestion achat",
+      "logiciel achat",
+      "logiciel achats",
+      "logiciel de gestion des achats"
+    ],
+    "alt": "Coupe d’une serrure à goupilles : la clé soulève six goupilles de hauteurs différentes jusqu’à une même ligne verte où le barillet peut tourner",
+    "validationId": "ae90a729-e5fb-47d8-9be6-e727b3200bac"
+  },
+  {
     "slug": "logiciel-relance-client",
     "title": "Logiciel de relance client : être payé sans courir après",
     "date": "2026-11-03",
