@@ -278,6 +278,46 @@ describe("traiterClic : appel au cockpit", () => {
     expect(init.signal).toBeInstanceOf(AbortSignal);
   });
 
+  async function corpsEnvoye(headers) {
+    const { deps, planifies, appels } = banc();
+    const req = new Request("http://localhost/r/x", {
+      method: "GET",
+      headers: { "user-agent": UA_SAFARI, ...headers },
+    });
+    traiterClic(req, "dupont-plomberie", deps);
+    await executer(planifies);
+    return JSON.parse(appels[0].init.body);
+  }
+
+  it("ip : premier élément de x-forwarded-for", async () => {
+    const corps = await corpsEnvoye({ "x-forwarded-for": "203.0.113.9, 10.0.0.2" });
+    expect(corps.ip).toBe("203.0.113.9");
+    expect("eliott" in corps).toBe(false);
+  });
+
+  it("sans x-forwarded-for ni cookie : ni ip ni eliott", async () => {
+    const corps = await corpsEnvoye({});
+    expect("ip" in corps).toBe(false);
+    expect("eliott" in corps).toBe(false);
+  });
+
+  it("x-forwarded-for vide : pas d'ip", async () => {
+    const corps = await corpsEnvoye({ "x-forwarded-for": " , 10.0.0.2" });
+    expect("ip" in corps).toBe(false);
+  });
+
+  it("cookie suivi-eliott=1 : eliott vaut true", async () => {
+    const corps = await corpsEnvoye({ cookie: "a=b; suivi-eliott=1; c=d" });
+    expect(corps.eliott).toBe(true);
+  });
+
+  it("autre valeur ou autre cookie : eliott omis", async () => {
+    for (const cookie of ["suivi-eliott=0", "xsuivi-eliott=1", "a=b"]) {
+      const corps = await corpsEnvoye({ cookie });
+      expect("eliott" in corps).toBe(false);
+    }
+  });
+
   it("l'URL est une constante littérale sur le cockpit", () => {
     expect(URL_COCKPIT_CLICS).toBe(URL_COCKPIT);
   });

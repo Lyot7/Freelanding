@@ -14,7 +14,8 @@
  * identifiants au format `ID_CLIC`. Le cockpit (`admin.eliottbouquerel.fr`)
  * reçoit `POST /api/clics` avec un jeton Bearer et le corps
  * `{ id, cliqueLe, navigateur, robotProbable }`, plus `nature: "ouverture"`
- * pour un affichage du portrait. Il répond 201 (créé), 200
+ * pour un affichage du portrait, et deux champs facultatifs : `ip` (visiteur)
+ * et `eliott: true` (cookie `suivi-eliott=1`), qui lui font ignorer le clic. Il répond 201 (créé), 200
  * (déjà enregistré), 404 (identifiant qui ne correspond à aucun envoi,
  * attendu) ; 400, 401 et 503 signalent un défaut de notre côté ou du sien.
  * L'URL, les en-têtes et les quatre champs ne bougent pas sans lui.
@@ -23,7 +24,7 @@
  * serveur Next : `route.ts` ne fait que brancher `after()`, `fetch` et
  * `CLIC_TOKEN`.
  */
-import { creerLimiteur } from "../contact/rate-limit";
+import { adresseAppelante, creerLimiteur } from "../contact/rate-limit";
 
 const ID_CLIC = /^[a-z0-9-]{3,80}$/;
 
@@ -111,6 +112,10 @@ interface ClicARapporter {
   readonly maintenantMs: number;
   readonly userAgent: string | null;
   readonly robot: boolean;
+  /** Premier élément de `x-forwarded-for`, absent si l'en-tête est vide. */
+  readonly ip?: string;
+  /** Cookie `suivi-eliott=1` : c'est Eliott qui clique ou affiche. */
+  readonly eliott: boolean;
 }
 
 export interface ThrottleClic {
@@ -229,6 +234,8 @@ async function enregistrer(clic: ClicARapporter, deps: DependancesClic): Promise
         navigateur: nettoyerNavigateur(clic.userAgent),
         robotProbable: clic.robot,
         ...(clic.nature === "ouverture" ? { nature: "ouverture" } : {}),
+        ...(clic.ip ? { ip: clic.ip } : {}),
+        ...(clic.eliott ? { eliott: true } : {}),
       }),
       signal: AbortSignal.timeout(DELAI_COCKPIT_MS),
     });
@@ -238,6 +245,18 @@ async function enregistrer(clic: ClicARapporter, deps: DependancesClic): Promise
   } catch (erreur) {
     journaliser(clic.nature, clic.id, estTimeout(erreur) ? "timeout" : "reseau", false);
   }
+}
+
+/** Le cookie posé sur eliottbouquerel.fr par le suivi des démos. */
+function porteCookieEliott(requete: Request): boolean {
+  const cookies = requete.headers.get("cookie") ?? "";
+  return cookies.split(";").some((c) => c.trim() === "suivi-eliott=1");
+}
+
+function ipDuVisiteur(requete: Request): string | undefined {
+  if (!requete.headers.get("x-forwarded-for")) return undefined;
+  const ip = adresseAppelante(requete.headers);
+  return ip === "sans-adresse" ? undefined : ip;
 }
 
 function planifierEnregistrement(
@@ -251,7 +270,15 @@ function planifierEnregistrement(
   const userAgent = requete.headers.get("user-agent");
   const robot = nature === "ouverture" ? ouvertureRobotProbable(userAgent) : estRobotProbable(userAgent);
   if (deps.throttle.autoriser(id, maintenantMs, robot)) {
-    const clic: ClicARapporter = { nature, id, maintenantMs, userAgent, robot };
+    const clic: ClicARapporter = {
+      nature,
+      id,
+      maintenantMs,
+      userAgent,
+      robot,
+      ip: ipDuVisiteur(requete),
+      eliott: porteCookieEliott(requete),
+    };
     deps.planifier(() => enregistrer(clic, deps));
   }
 }
