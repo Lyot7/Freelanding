@@ -1,0 +1,89 @@
+Un logiciel pour promoteur immobilier tient la vie de chaque lot, de la réservation à la remise des clés : le dépôt de garantie, la signature chez le notaire, les appels de fonds à chaque stade du chantier, les travaux modificatifs demandés par l’acquéreur, puis la livraison et ses réserves. Sur le marché, les logiciels dédiés couvrent surtout la prospection foncière, le suivi commercial et la diffusion des annonces ; les offres affichées vont de 69 à 89 € par mois pour un outil de vente, et la plupart des éditeurs donnent leur prix sur demande (comparatif Appvizer publié le 11 juillet 2024). Quand vos programmes vivent dans un bilan sous tableur et que vos appels de fonds partent à la main, un outil conçu autour de votre façon de travailler et branché sur ce bilan se paie une fois et vous appartient.
+
+Je conçois et je développe seul ce type d’outil, du cadrage à la mise en production. Pendant [un appel en visio](/contact?sujet=logiciel#rendez-vous), montrez-moi la grille de lots d’un programme en cours et le fichier où vous suivez vos appels de fonds : je vous dis ce qui peut se calculer et partir seul.
+
+## Où passe le temps entre la réservation et la livraison ?
+
+Chez un promoteur qui sort deux à cinq programmes par an, le temps ne part pas dans le foncier ni dans la commercialisation, que les outils du marché couvrent déjà. Il part dans le suivi de chaque lot après la réservation, parce que chaque lot avance à son rythme :
+
+- **la réservation** : contrat signé, dépôt de garantie encaissé, pièces de l’acquéreur à réunir, prêt à obtenir dans le délai prévu ;
+- **l’acte de vente** : projet transmis au notaire, date de signature, notice descriptive et plans annexés ;
+- **les appels de fonds** : un courrier par acquéreur à chaque stade du chantier, avec l’attestation de l’architecte, puis le suivi du paiement ou du déblocage par la banque ;
+- **les travaux modificatifs** : une cuisine déplacée, une prise ajoutée, chiffrées, acceptées, facturées et transmises à l’entreprise ;
+- **la livraison** : rendez-vous, procès-verbal, réserves à lever dans les délais.
+
+Sur un programme de vingt-quatre lots, cela fait vingt-quatre dossiers qui passent chacun par une quinzaine d’étapes, avec des dates qui dépendent du chantier. Dans un tableur, il faut quelqu’un qui sait où en est chaque ligne. Quand cette personne part en congés, les appels de fonds attendent.
+
+<Figure src="/images/blog/corps/logiciel-promoteur-immobilier-1.jpg" alt="Quatre cercles reliés par un fil, de la réservation à la livraison, avec entre le deuxième et le troisième un chantier qui monte et trois enveloppes vertes suspendues" caption="Après la réservation, chaque lot suit le chantier : les trois appels de fonds sont les étapes où l’argent attend un courrier." />
+
+## Le calcul que votre outil doit faire seul : l’échéancier de la VEFA
+
+En vente en l’état futur d’achèvement d’un logement, l’article R. 261-14 du Code de la construction et de l’habitation plafonne ce que vous pouvez appeler : 35 % du prix au total à l’achèvement des fondations, 70 % à la mise hors d’eau, 95 % à l’achèvement de l’immeuble, le solde à la remise des clés. Le contrat de réservation, lui, limite le dépôt de garantie à 5 % du prix si la vente doit être signée dans l’année, et à 2 % si elle doit l’être dans les deux ans (article R. 261-28 du même code).
+
+Pour un appartement vendu 280 000 €, cela donne :
+
+| Stade du chantier | Plafond cumulé | Montant cumulé maximal | À appeler à ce stade |
+|---|---|---|---|
+| Réservation (vente dans l’année) | 5 % en dépôt | 14 000 € | 14 000 € |
+| Achèvement des fondations | 35 % | 98 000 € | 84 000 € |
+| Mise hors d’eau | 70 % | 196 000 € | 98 000 € |
+| Achèvement de l’immeuble | 95 % | 266 000 € | 70 000 € |
+| Remise des clés | 100 % | 280 000 € | 14 000 € |
+
+Votre échéancier contractuel peut découper plus finement, par exemple un appel au plancher bas du rez-de-chaussée, à condition de rester sous ces plafonds à chaque stade. C’est là que le tableur trompe : un avenant qui modifie le prix, des travaux modificatifs ajoutés au total, un dépôt de garantie imputé ou non sur le premier appel, et le pourcentage cumulé glisse sans que personne le voie. Un appel qui dépasse le plafond, la banque de l’acquéreur le refuse, et l’argent arrive avec plusieurs semaines de retard.
+
+Un logiciel conçu pour vous refait ce calcul lot par lot, à chaque modification, et n’émet un appel que si le stade est attesté et le plafond respecté. Sur vingt-quatre lots et quatre appels chacun, ce sont près d’une centaine de courriers par programme qui se préparent sans calcul à la main.
+
+<Figure src="/images/blog/corps/logiciel-promoteur-immobilier-2.jpg" alt="Un escalier gris de cinq marches qui montent par paliers, et une ligne verte d’appels de fonds cumulés qui suit chaque marche juste en dessous, sans jamais la dépasser" caption="Les appels cumulés suivent les plafonds de la loi : 35, 70 puis 95 % du prix, jamais au-dessus du stade atteint." />
+
+## Une relance d’acquéreur qui part au bon stade, relue avant de partir
+
+L’autre poste qui mange le temps, c’est la relance : la pièce manquante pour le prêt, l’appel de fonds resté sans paiement, le choix des finitions attendu avant une date de chantier. Elle part en retard parce que personne ne voit qu’elle est due.
+
+Pour ma propre activité, j’ai construit un cockpit qui fonctionne ainsi : chaque message que l’IA prépare attend dans une file, je le lis, je le corrige si besoin, je le valide, et rien ne part sans ce geste. Le même principe s’applique à vos acquéreurs. L’outil voit qu’un appel de fonds n’est pas payé quinze jours après son envoi, l’IA rédige la relance avec le bon montant, le bon stade et le bon interlocuteur à la banque, et votre assistante la valide en un clic. Elle relit au lieu d’écrire, et aucune relance ne part à un acquéreur qui a déjà payé, puisque l’outil lit le paiement avant de proposer quoi que ce soit.
+
+L’IA sait aussi lire les pièces qu’on vous envoie : une offre de prêt, une attestation d’achèvement de stade, un devis de travaux modificatifs. Elle en sort les dates et les montants, et vous ne vérifiez que ce qui ne colle pas. C’est le travail de l’offre [automatisation et IA](/services/automatisation), branchée sur votre logiciel.
+
+## Logiciel d’éditeur ou outil sur mesure : lequel choisir ?
+
+Les logiciels du marché pour promoteurs sont bien faits pour ce qu’ils visent. Le choix dépend de ce qui vous coûte du temps :
+
+| Votre situation | Logiciel d’éditeur | Outil sur mesure |
+|---|---|---|
+| Vous cherchez surtout du foncier et des acquéreurs | Fait pour vous : prospection, suivi des contacts, annonces | Peu d’intérêt |
+| Votre bilan promoteur vit dans un tableur que vous ne voulez pas quitter | À ressaisir, ou à importer selon l’éditeur | Le bilan reste la source, l’outil le lit et se met à jour |
+| Vos appels de fonds partent à la main | Selon les offres, souvent sur demande | Calculés lot par lot, plafonds contrôlés |
+| Vous travaillez avec les mêmes notaires et les mêmes banques | Échanges par courriel | Documents et relances au format de chacun |
+| Vous payez | Un abonnement, tant que vous restez client | Une fois, l’outil vous appartient |
+
+Une voie mixte marche souvent : garder un logiciel commercial pour la commercialisation et faire développer la partie qui va de la réservation à la livraison, celle où se trouvent l’argent et les délais.
+
+## Combien coûte chaque option ?
+
+Pour un outil du marché, comptez un abonnement mensuel, de 69 à 89 € pour un outil de vente selon les options, et un prix sur demande pour la plupart des plateformes qui couvrent toute l’opération (comparatif Appvizer publié le 11 juillet 2024). La mise en place et la reprise de vos programmes en cours se chiffrent à part.
+
+Un logiciel conçu pour vous se paie une fois. Pour comparer, une agence facture couramment de 8 000 à 10 000 € HT un premier outil sur mesure (La Fabrique du Net, ordres de grandeur relevés le 15 octobre 2026). Je fais le même travail, du cadrage à la mise en production, à un prix fixé au devis : vous parlez directement à la personne qui conçoit et qui code. Le prix dépend du nombre d’étapes par lot, des documents à produire et des outils à relier. Le code source est livré dans votre dépôt, avec sa documentation. Le détail de l’offre est sur la page [Logiciel métier sur mesure](/services/logiciel-metier).
+
+## Par où commencer sur un programme déjà lancé ?
+
+<Steps items={[
+  "Prenez un programme en cours et sortez la liste de ses lots avec leur prix, leur acquéreur et le dernier appel de fonds envoyé.",
+  "Notez, pour chaque stade, qui atteste l’achèvement et sous quelle forme il vous parvient.",
+  "Comptez sur un mois le temps passé à préparer les appels et à relancer les acquéreurs.",
+  "Listez les cas qui vous ont déjà coûté un retard : avenant au prix, travaux modificatifs, banque qui refuse un déblocage.",
+  "Commencez par les appels de fonds de ce seul programme, en gardant votre tableur en parallèle le premier mois."
+]} />
+
+Si votre suivi vit aujourd’hui dans plusieurs tableurs, l’article sur [le remplacement d’Excel par un logiciel](/blog/remplacer-excel-par-un-logiciel) détaille la migration pas à pas, et celui sur [le CRM sur mesure](/blog/crm-sur-mesure) traite le suivi des acquéreurs avant la réservation.
+
+## Questions fréquentes
+
+**Un logiciel sur mesure peut-il reprendre mon bilan promoteur ?** Oui. Il lit le fichier tel que vous le tenez, ou reprend ses chiffres une fois, et chaque vente ou avenant met à jour le chiffre d’affaires réalisé du programme.
+
+**Les acquéreurs peuvent-ils suivre leur dossier ?** Oui, avec un espace acquéreur : stade du chantier, appels de fonds reçus et payés, documents à télécharger, choix des finitions à rendre avant une date.
+
+**L’outil fonctionne-t-il pour des locaux professionnels ?** Oui. Les plafonds de l’article R. 261-14 ne s’imposent qu’aux logements ; pour un local, l’outil suit l’échéancier écrit dans votre contrat.
+
+**Combien de temps faut-il pour le mettre en service ?** Sur un premier périmètre limité aux appels de fonds et aux relances, comptez quelques semaines, cadrage compris, avec un programme réel comme banc d’essai.
+
+Si vos appels de fonds partent encore d’un tableur, [prenez un créneau](/contact?sujet=logiciel#rendez-vous) et apportez la grille de lots d’un programme en cours.
