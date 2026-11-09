@@ -354,8 +354,9 @@ async function offreDuCockpit(id: string, deps: DependancesClic): Promise<"logic
 /**
  * Le clic de la route : la destination suit l'offre du mail (formulaire
  * logiciel pour un mail logiciel, découverte pour tout le reste), les liens
- * déjà envoyés compris. Seuls les vrais clics (GET, identifiant valide)
- * interrogent le cockpit ; le reste, et toute panne, rend la découverte.
+ * déjà envoyés compris. Un GET et un HEAD d'identifiant valide donnent la même
+ * destination (seul le GET enregistre un clic) ; un identifiant invalide, et
+ * toute panne du cockpit, rendent la découverte.
  */
 export async function traiterClicSuivi(
   requete: Request,
@@ -363,7 +364,7 @@ export async function traiterClicSuivi(
   deps: DependancesClic,
 ): Promise<Response> {
   const offre =
-    requete.method === "GET" && idClicValide(id) ? await offreDuCockpit(id, deps) : "decouverte";
+    idClicValide(id) ? await offreDuCockpit(id, deps) : "decouverte";
   return traiterClic(
     requete,
     id,
