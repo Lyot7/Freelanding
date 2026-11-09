@@ -40,10 +40,29 @@ export const DESTINATION_CLIC =
   "https://eliottbouquerel.fr/?sujet=decouverte&utm_source=email&utm_medium=signature&utm_campaign=prospection#rendez-vous";
 
 /**
+ * Même destination pour un mail qui porte l'offre logiciel (boîte logiciel, ou
+ * lien `/rdv/logiciel` dans son corps) : le formulaire « logiciel ». Littérale
+ * aussi : la requête ne la choisit jamais, seule la réponse du cockpit
+ * (`logiciel` ou `decouverte`) départage les deux destinations.
+ */
+export const DESTINATION_CLIC_LOGICIEL =
+  "https://eliottbouquerel.fr/?sujet=logiciel&utm_source=email&utm_medium=signature&utm_campaign=prospection#rendez-vous";
+
+/**
  * Littérale pour la même raison que la destination : le jeton ne doit partir
  * que vers le cockpit, quel que soit l'environnement.
  */
 export const URL_COCKPIT_CLICS = "https://admin.eliottbouquerel.fr/api/clics";
+
+/** L'offre d'un lien suivi : `GET` avec le même jeton porteur que le relais des clics. */
+export const urlCockpitOffre = (id: string): string => `${URL_COCKPIT_CLICS}/${id}/offre`;
+
+/**
+ * Au-delà, la redirection part sans attendre l'offre : un cockpit lent ne doit
+ * jamais retarder le prospect, qui tombe alors sur la découverte.
+ */
+const DELAI_OFFRE_MS = 1_500;
+const MEMOIRE_OFFRES_MAX = 2_000;
 
 /**
  * La photo de profil d'Eliott, carrée sur fond volt : les mails partis avant la
@@ -181,6 +200,12 @@ export interface DependancesClic {
   readonly envoyer: EnvoyerRequete;
   readonly throttle: ThrottleClic;
   readonly maintenantMs: () => number;
+  /**
+   * Offres déjà lues, par identifiant : un scanner de messagerie ouvre le lien
+   * avant le destinataire, la seconde ouverture ne rappelle pas le cockpit.
+   * Absente : chaque clic interroge le cockpit.
+   */
+  readonly memoireOffres?: Map<string, "logiciel" | "decouverte">;
 }
 
 function redirection(destination: string = DESTINATION_CLIC): Response {
@@ -292,9 +317,59 @@ export function traiterClic(
   requete: Request,
   id: string,
   deps: DependancesClic,
+  destination: string = DESTINATION_CLIC,
 ): Response {
   planifierEnregistrement(requete, "clic", id, deps);
-  return redirection();
+  return redirection(destination);
+}
+
+/** Ne lève jamais : toute issue qui n'est pas « logiciel » rend la découverte. */
+async function offreDuCockpit(id: string, deps: DependancesClic): Promise<"logiciel" | "decouverte"> {
+  const memoire = deps.memoireOffres?.get(id);
+  if (memoire) return memoire;
+  const jeton = deps.jeton()?.trim();
+  if (!jeton) return "decouverte";
+  try {
+    const reponse = await deps.envoyer(urlCockpitOffre(id), {
+      method: "GET",
+      headers: { authorization: `Bearer ${jeton}` },
+      signal: AbortSignal.timeout(DELAI_OFFRE_MS),
+    });
+    if (reponse.status !== 200) return "decouverte";
+    const corps: unknown = await reponse.json();
+    const offre =
+      typeof corps === "object" && corps !== null && "offre" in corps && corps.offre === "logiciel"
+        ? "logiciel"
+        : "decouverte";
+    if (deps.memoireOffres) {
+      if (deps.memoireOffres.size >= MEMOIRE_OFFRES_MAX) deps.memoireOffres.clear();
+      deps.memoireOffres.set(id, offre);
+    }
+    return offre;
+  } catch {
+    return "decouverte";
+  }
+}
+
+/**
+ * Le clic de la route : la destination suit l'offre du mail (formulaire
+ * logiciel pour un mail logiciel, découverte pour tout le reste), les liens
+ * déjà envoyés compris. Seuls les vrais clics (GET, identifiant valide)
+ * interrogent le cockpit ; le reste, et toute panne, rend la découverte.
+ */
+export async function traiterClicSuivi(
+  requete: Request,
+  id: string,
+  deps: DependancesClic,
+): Promise<Response> {
+  const offre =
+    requete.method === "GET" && idClicValide(id) ? await offreDuCockpit(id, deps) : "decouverte";
+  return traiterClic(
+    requete,
+    id,
+    deps,
+    offre === "logiciel" ? DESTINATION_CLIC_LOGICIEL : DESTINATION_CLIC,
+  );
 }
 
 /**

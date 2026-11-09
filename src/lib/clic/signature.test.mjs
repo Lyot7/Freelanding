@@ -3,14 +3,17 @@ import {
   creerThrottleClic,
   DESTINATION_BUSTE,
   DESTINATION_CLIC,
+  DESTINATION_CLIC_LOGICIEL,
   DESTINATION_OUVERTURE,
   estRobotProbable,
   idClicValide,
   nettoyerNavigateur,
   ouvertureRobotProbable,
   traiterClic,
+  traiterClicSuivi,
   traiterOuverture,
   URL_COCKPIT_CLICS,
+  urlCockpitOffre,
 } from "./signature.ts";
 
 /**
@@ -497,5 +500,95 @@ describe("traiterOuverture : portrait de la signature", () => {
     traiterClic(requete("GET"), "abc", deps);
     await executer(planifies);
     expect(JSON.parse(appels[0].init.body)).not.toHaveProperty("nature");
+  });
+});
+
+describe("traiterClicSuivi : l'offre du mail choisit le formulaire", () => {
+  const offre = (corps) => async () => Response.json(corps);
+  const DESTINATION_LOGICIEL =
+    "https://eliottbouquerel.fr/?sujet=logiciel&utm_source=email&utm_medium=signature&utm_campaign=prospection#rendez-vous";
+
+  it("destinations littérales, sur l'hôte canonique", () => {
+    expect(DESTINATION_CLIC_LOGICIEL).toBe(DESTINATION_LOGICIEL);
+    expect(urlCockpitOffre("abc")).toBe("https://admin.eliottbouquerel.fr/api/clics/abc/offre");
+  });
+
+  it("offre logiciel : 302 vers le formulaire logiciel, jeton porteur, clic toujours enregistré", async () => {
+    const { deps, planifies, appels } = banc({ repondre: offre({ offre: "logiciel" }) });
+    const reponse = await traiterClicSuivi(requete("GET"), "starsnett-96c9bc", deps);
+    expect(reponse.status).toBe(302);
+    expect(reponse.headers.get("location")).toBe(DESTINATION_LOGICIEL);
+    expect(reponse.headers.get("cache-control")).toBe("no-store");
+    expect(appels).toHaveLength(1);
+    expect(appels[0].url).toBe("https://admin.eliottbouquerel.fr/api/clics/starsnett-96c9bc/offre");
+    expect(appels[0].init.method).toBe("GET");
+    expect(appels[0].init.headers.authorization).toBe("Bearer jeton-de-test");
+    expect(planifies).toHaveLength(1);
+  });
+
+  it("offre découverte : 302 vers la découverte", async () => {
+    const { deps } = banc({ repondre: offre({ offre: "decouverte" }) });
+    const reponse = await traiterClicSuivi(requete("GET"), "abc", deps);
+    expect(reponse.headers.get("location")).toBe(DESTINATION_ATTENDUE);
+  });
+
+  it("cockpit en panne, identifiant inconnu, réponse illisible ou autre offre : la découverte", async () => {
+    const cas = [
+      async () => new Response(null, { status: 404 }),
+      async () => new Response(null, { status: 503 }),
+      async () => new Response("pas du json", { status: 200 }),
+      offre(null),
+      offre({ offre: "ia" }),
+      async () => {
+        throw new Error("réseau");
+      },
+      async () => {
+        throw new DOMException("délai", "TimeoutError");
+      },
+    ];
+    for (const repondre of cas) {
+      const { deps } = banc({ repondre });
+      const reponse = await traiterClicSuivi(requete("GET"), "abc", deps);
+      expect(reponse.status).toBe(302);
+      expect(reponse.headers.get("location")).toBe(DESTINATION_ATTENDUE);
+    }
+  });
+
+  it("HEAD, identifiant invalide ou jeton absent : la découverte, sans interroger le cockpit", async () => {
+    for (const [methode, id, options] of [
+      ["HEAD", "abc", {}],
+      ["GET", "AB CD", {}],
+      ["GET", "abc", { jeton: undefined }],
+      ["GET", "abc", { jeton: "  " }],
+    ]) {
+      const { deps, appels } = banc({ ...options, repondre: offre({ offre: "logiciel" }) });
+      const reponse = await traiterClicSuivi(requete(methode), id, deps);
+      expect(reponse.headers.get("location")).toBe(DESTINATION_ATTENDUE);
+      expect(appels).toHaveLength(0);
+    }
+  });
+
+  it("mémoire des offres : le second clic ne rappelle pas le cockpit, la mémoire se vide à 2 000 entrées", async () => {
+    const { deps, appels } = banc({ repondre: offre({ offre: "logiciel" }) });
+    const memoireOffres = new Map();
+    const avecMemoire = { ...deps, memoireOffres };
+    await traiterClicSuivi(requete("GET"), "abc", avecMemoire);
+    const second = await traiterClicSuivi(requete("GET"), "abc", avecMemoire);
+    expect(second.headers.get("location")).toBe(DESTINATION_LOGICIEL);
+    expect(appels).toHaveLength(1);
+
+    for (let i = 0; i < 2_000; i++) memoireOffres.set(`plein-${i}`, "decouverte");
+    await traiterClicSuivi(requete("GET"), "nouveau", avecMemoire);
+    expect(memoireOffres.size).toBe(1);
+    expect(memoireOffres.get("nouveau")).toBe("logiciel");
+  });
+
+  it("une panne n'entre pas dans la mémoire : le clic suivant réessaie", async () => {
+    const { deps, appels } = banc({ repondre: async () => new Response(null, { status: 503 }) });
+    const memoireOffres = new Map();
+    await traiterClicSuivi(requete("GET"), "abc", { ...deps, memoireOffres });
+    await traiterClicSuivi(requete("GET"), "abc", { ...deps, memoireOffres });
+    expect(appels).toHaveLength(2);
+    expect(memoireOffres.size).toBe(0);
   });
 });

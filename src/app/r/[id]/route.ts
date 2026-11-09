@@ -1,12 +1,13 @@
 /**
  * `GET /r/<id>` : bouton « Réserver un appel » des e-mails de prospection.
  *
- * Redirige toujours en 302 vers la prise de rendez-vous de l'accueil. La logique, le contrat avec le
+ * Redirige toujours en 302 vers la prise de rendez-vous de l'accueil (formulaire logiciel pour
+ * un mail qui porte l'offre logiciel, découverte sinon). La logique, le contrat avec le
  * cockpit et le plafond anti-inondation vivent dans
  * `src/lib/clic/signature.ts` ; ce fichier ne fait que les brancher.
  */
 import { after } from "next/server";
-import { creerThrottleClic, traiterClic } from "@/lib/clic/signature";
+import { creerThrottleClic, traiterClicSuivi } from "@/lib/clic/signature";
 import type { DependancesClic } from "@/lib/clic/signature";
 
 /** Node et non Edge : le plafond en mémoire n'a de sens que sur un processus qui dure. */
@@ -19,6 +20,7 @@ const dependances: DependancesClic = {
   jeton: () => process.env.CLIC_TOKEN,
   envoyer: (url, init) => fetch(url, init),
   throttle: creerThrottleClic(),
+  memoireOffres: new Map(),
   maintenantMs: () => Date.now(),
 };
 
@@ -27,7 +29,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ): Promise<Response> {
   const { id } = await params;
-  return traiterClic(requete, id, dependances);
+  return traiterClicSuivi(requete, id, dependances);
 }
 
 /** Même réponse, jamais d'enregistrement : `traiterClic` n'enregistre que les GET. */
