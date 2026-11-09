@@ -335,10 +335,7 @@ async function offreDuCockpit(id: string, deps: DependancesClic): Promise<"logic
       headers: { authorization: `Bearer ${jeton}` },
       signal: AbortSignal.timeout(DELAI_OFFRE_MS),
     });
-    if (reponse.status !== 200) {
-      await reponse.body?.cancel().catch(() => undefined);
-      return "decouverte";
-    }
+    if (reponse.status !== 200) return "decouverte";
     const corps: unknown = await reponse.json();
     const offre =
       typeof corps === "object" && corps !== null && "offre" in corps && corps.offre === "logiciel"
