@@ -554,9 +554,16 @@ describe("traiterClicSuivi : l'offre du mail choisit le formulaire", () => {
     }
   });
 
-  it("HEAD, identifiant invalide ou jeton absent : la découverte, sans interroger le cockpit", async () => {
+  it("HEAD : même destination que le GET, sans enregistrer de clic", async () => {
+    const { deps, planifies, appels } = banc({ repondre: offre({ offre: "logiciel" }) });
+    const reponse = await traiterClicSuivi(requete("HEAD"), "abc", deps);
+    expect(reponse.headers.get("location")).toBe(DESTINATION_LOGICIEL);
+    expect(appels).toHaveLength(1);
+    expect(planifies).toHaveLength(0);
+  });
+
+  it("identifiant invalide ou jeton absent : la découverte, sans interroger le cockpit", async () => {
     for (const [methode, id, options] of [
-      ["HEAD", "abc", {}],
       ["GET", "AB CD", {}],
       ["GET", "abc", { jeton: undefined }],
       ["GET", "abc", { jeton: "  " }],
