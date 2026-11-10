@@ -29,7 +29,15 @@ import { resoudreSujet } from "./config";
 import { HORIZON_JOURS } from "./creneaux";
 import { estDureePlausible } from "./durees";
 import {
+  LONGUEUR_ACTIVITE_MAX,
+  LONGUEUR_COINCE_MAX,
+  LONGUEUR_COINCE_MIN,
+  LONGUEUR_ENTREPRISE_MAX,
   LONGUEUR_PROJET_MAX,
+  OPTIONS_COUT,
+  OPTIONS_DECISION,
+  OPTIONS_ESSAYE,
+  OPTIONS_TAILLE,
   questionsDuType,
   rattacherObjectif,
   OPTIONS_ECHEANCE,
@@ -71,11 +79,28 @@ export interface ReservationValide {
   /** Identifiant d'objectif, pris dans `optionsObjectif(type)`. */
   readonly objectif: string;
   /** Facultative : absente quand le prospect n'a rien coché. */
-  readonly echeance?: string;
+  readonly echeance?: string;  readonly entreprise?: string;
+  readonly activite?: string;
+  readonly taille?: string;
+  readonly decision?: string;
+  readonly coince?: string;
+  readonly cout?: string;
+  readonly essaye?: string;
 }
 
 /** Champs du questionnaire, tels que le serveur les nomme dans un rejet. */
-type ChampQuestionnaire = "budget" | "objectif" | "echeance" | "projet";
+type ChampQuestionnaire =
+  | "budget"
+  | "objectif"
+  | "echeance"
+  | "projet"
+  | "entreprise"
+  | "activite"
+  | "taille"
+  | "decision"
+  | "coince"
+  | "cout"
+  | "essaye";
 
 export type MotifRejetReservation =
   | { readonly type: "corps_illisible" }
@@ -295,6 +320,25 @@ export function validerReservation(
     : { ok: true as const };
   if (!echeance.ok) return echeance;
 
+  /*
+   * LE CADRAGE (2026-11-10), exigé en entier. UN ONGLET OUVERT AVANT son arrivée
+   * n'envoie aucune de ses réponses, et son visiteur ne voit pas ces questions :
+   * on garde son rendez-vous plutôt que de le bloquer jusqu'au rechargement.
+   */
+  const cadrage = posees.cadrage && Object.hasOwn(champs, "coince");
+  let reponsesCadrage: Partial<ReservationValide> = {};
+  if (cadrage) {
+    const lu = lireCadrage(champs);
+    if (!lu.ok) return lu;
+    if (!telephone.valeur) {
+      return { ok: false, motif: { type: "champ_invalide", champ: "telephone", raison: "requis" } };
+    }
+    if (!echeance.valeur) {
+      return { ok: false, motif: { type: "champ_invalide", champ: "echeance", raison: "requis" } };
+    }
+    reponsesCadrage = lu.valeur;
+  }
+
   return {
     ok: true,
     reservation: {
@@ -311,6 +355,67 @@ export function validerReservation(
       ...(projet ? { projet } : {}),
       objectif: objectif.valeur,
       ...(echeance.valeur ? { echeance: echeance.valeur } : {}),
+      ...reponsesCadrage,
+    },
+  };
+}
+
+type ReponsesCadrage = Pick<
+  ReservationValide,
+  "entreprise" | "activite" | "taille" | "decision" | "coince" | "cout" | "essaye"
+>;
+
+/** Texte libre du cadrage, borné ; `requis` quand il est vide. */
+function lireTexteCadrage(
+  champs: Record<string, unknown>,
+  champ: "entreprise" | "activite" | "coince",
+  min: number,
+  max: number,
+):
+  | { readonly ok: true; readonly valeur: string }
+  | { readonly ok: false; readonly motif: MotifRejetReservation } {
+  const brut = lireChaine(champs, champ);
+  // « Ce qui coince » garde ses retours à la ligne ; les deux autres tiennent sur une.
+  const valeur = champ === "coince" ? normaliserTexte(brut) : surUneLigne(brut);
+  if (valeur.length === 0) {
+    return { ok: false, motif: { type: "champ_invalide", champ, raison: "requis" } };
+  }
+  if (valeur.length < min || valeur.length > max) {
+    return { ok: false, motif: { type: "champ_invalide", champ, raison: "longueur" } };
+  }
+  return { ok: true, valeur };
+}
+
+/** Les sept réponses du cadrage, dans l'ordre où le visiteur les voit. */
+function lireCadrage(
+  champs: Record<string, unknown>,
+):
+  | { readonly ok: true; readonly valeur: ReponsesCadrage }
+  | { readonly ok: false; readonly motif: MotifRejetReservation } {
+  const entreprise = lireTexteCadrage(champs, "entreprise", 1, LONGUEUR_ENTREPRISE_MAX);
+  if (!entreprise.ok) return entreprise;
+  const activite = lireTexteCadrage(champs, "activite", 2, LONGUEUR_ACTIVITE_MAX);
+  if (!activite.ok) return activite;
+  const taille = lireChoix(champs, "taille", OPTIONS_TAILLE);
+  if (!taille.ok) return taille;
+  const decision = lireChoix(champs, "decision", OPTIONS_DECISION);
+  if (!decision.ok) return decision;
+  const coince = lireTexteCadrage(champs, "coince", LONGUEUR_COINCE_MIN, LONGUEUR_COINCE_MAX);
+  if (!coince.ok) return coince;
+  const cout = lireChoix(champs, "cout", OPTIONS_COUT);
+  if (!cout.ok) return cout;
+  const essaye = lireChoix(champs, "essaye", OPTIONS_ESSAYE);
+  if (!essaye.ok) return essaye;
+  return {
+    ok: true,
+    valeur: {
+      entreprise: entreprise.valeur,
+      activite: activite.valeur,
+      taille: taille.valeur,
+      decision: decision.valeur,
+      coince: coince.valeur,
+      cout: cout.valeur,
+      essaye: essaye.valeur,
     },
   };
 }

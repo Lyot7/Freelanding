@@ -71,14 +71,14 @@ export const ANALYTICS_EVENTS = {
 
   /* --- Prise de rendez-vous ------------------------------------------------
      LE FORMULAIRE DE RDV NE SE MESURE PAS COMME LES AUTRES, et c'est la raison
-     d'être de ces six noms. Les écouteurs délégués de `GlobalAnalytics` voient
+     d'être de ces noms. Les écouteurs délégués de `GlobalAnalytics` voient
      un `submit` et s'arrêtent là : ils ne peuvent pas savoir si le cockpit a
      confirmé, si le créneau avait été pris entre l'affichage et le clic, ni si
      la grille des créneaux s'est seulement chargée. Un entonnoir bâti sur
      `form_submitted` comptait donc en conversions des réservations qui
      échouaient.
 
-     `rdv_slots_failed` EST LE PLUS IMPORTANT DES SIX. Quand le moteur répond 502
+     `rdv_slots_failed` EST LE PLUS IMPORTANT DE TOUS. Quand le moteur répond 502
      (Cal.com le 2026-09-06, quand les quatre types pointaient sur des
      identifiants inexistants ; le cockpit depuis le 2026-11-02), le prospect ne voit aucun créneau et repart. Sans cet
      événement, l'entonnoir montre une chute à l'étape 2 et rien ne dit qu'elle
@@ -87,6 +87,8 @@ export const ANALYTICS_EVENTS = {
   rdvSlotsLoaded: "rdv_slots_loaded",
   rdvSlotsFailed: "rdv_slots_failed",
   rdvSlotSelected: "rdv_slot_selected",
+  /** Cadrage rempli, coordonnées comprises : le visiteur passe au créneau (2026-11-10). */
+  rdvQuestionnaireCompleted: "rdv_questionnaire_completed",
   rdvConfirmed: "rdv_confirmed",
   rdvFailed: "rdv_failed",
 
@@ -195,11 +197,12 @@ export const RECOMMENDED_FUNNELS: readonly FunnelDefinition[] = [
   },
   {
     id: "rendez-vous",
-    label: "Section RDV vue → sujet → créneaux → créneau → envoi → confirmé",
+    label: "Section RDV vue → sujet → créneaux → questionnaire → créneau → envoi → confirmé",
     steps: [
       ANALYTICS_EVENTS.sectionViewed,
       ANALYTICS_EVENTS.rdvTypeSelected,
       ANALYTICS_EVENTS.rdvSlotsLoaded,
+      ANALYTICS_EVENTS.rdvQuestionnaireCompleted,
       ANALYTICS_EVENTS.rdvSlotSelected,
       ANALYTICS_EVENTS.formSubmitted,
       ANALYTICS_EVENTS.rdvConfirmed,

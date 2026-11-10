@@ -392,3 +392,68 @@ describe("validerReservation — démonstration et point d'étape", () => {
     });
   });
 });
+
+describe("validerReservation — le cadrage, posé avant le créneau", () => {
+  const CADRAGE = {
+    telephone: "06 12 34 56 78",
+    echeance: "trimestre",
+    entreprise: "Transports Martin",
+    activite: "Transport frigorifique",
+    taille: "6-20",
+    decision: "plusieurs",
+    coince: "On ressaisit chaque commande dans trois fichiers.",
+    cout: "2-5h",
+    essaye: "tableur",
+  };
+
+  it("garde les sept réponses du cadrage", () => {
+    const resultat = valider(CADRAGE);
+    expect(resultat.ok).toBe(true);
+    expect(resultat.reservation).toMatchObject({
+      entreprise: "Transports Martin",
+      activite: "Transport frigorifique",
+      taille: "6-20",
+      decision: "plusieurs",
+      coince: "On ressaisit chaque commande dans trois fichiers.",
+      cout: "2-5h",
+      essaye: "tableur",
+      telephone: "06 12 34 56 78",
+      echeance: "trimestre",
+    });
+  });
+
+  it("exige chaque réponse, téléphone et échéance compris, en nommant le champ", () => {
+    for (const champ of ["entreprise", "activite", "taille", "decision", "cout", "essaye", "telephone", "echeance"]) {
+      const resultat = valider({ ...CADRAGE, [champ]: "" });
+      expect(resultat.ok, champ).toBe(false);
+      expect(resultat.motif.champ).toBe(champ);
+    }
+  });
+
+  it("refuse un « ce qui coince » d'un mot, et une réponse hors liste", () => {
+    expect(valider({ ...CADRAGE, coince: "tout" }).motif).toEqual({
+      type: "champ_invalide",
+      champ: "coince",
+      raison: "longueur",
+    });
+    expect(valider({ ...CADRAGE, taille: "1000" }).motif.raison).toBe("hors_liste");
+  });
+
+  it("laisse passer un onglet ouvert avant le cadrage, qui n'en envoie rien", () => {
+    const resultat = valider({});
+    expect(resultat.ok).toBe(true);
+    expect(resultat.reservation.entreprise).toBeUndefined();
+  });
+
+  it("ne pose pas le cadrage à un point d'étape, quoi que le client envoie", () => {
+    const resultat = valider({
+      type: "point-d-etape",
+      budget: undefined,
+      objectif: "priorites",
+      projet: "Cockpit",
+      coince: "x",
+    });
+    expect(resultat.ok).toBe(true);
+    expect(resultat.reservation.coince).toBeUndefined();
+  });
+});

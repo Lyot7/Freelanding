@@ -59,6 +59,20 @@ export interface OptionQuestion {
   readonly libelle: string;
 }
 
+/** Question à réponse libre, sur une ligne. */
+export interface QuestionTexte {
+  readonly legende: string;
+  readonly placeholder: string;
+  readonly erreur: string;
+}
+
+/** Question à choix unique, options dans l'ordre d'affichage. */
+export interface QuestionChoix {
+  readonly legende: string;
+  readonly erreur: string;
+  readonly options: readonly OptionQuestion[];
+}
+
 export interface ContenuRendezVous {
   readonly eyebrow: string;
   readonly titre: string;
@@ -72,7 +86,12 @@ export interface ContenuRendezVous {
     readonly creneau: string;
     readonly projet: string;
     readonly coordonnees: string;
+    /** Questionnaire de cadrage (logiciel, découverte), en deux temps. */
+    readonly entreprise: string;
+    readonly besoin: string;
   };
+  /** Sous le titre de la première étape du cadrage. */
+  readonly introCadrage: string;
   readonly actions: {
     readonly reessayer: string;
     readonly moisPrecedent: string;
@@ -102,11 +121,18 @@ export interface ContenuRendezVous {
     readonly emailLabel: string;
     readonly emailPlaceholder: string;
     readonly telephoneLabel: string;
+    readonly telephoneFacultatif: string;
+    readonly telephoneAide: string;
+    readonly telephoneErreur: string;
     readonly telephonePlaceholder: string;
     readonly messageLabel: string;
     readonly messagePlaceholder: string;
     readonly envoyer: string;
     readonly envoiEnCours: string;
+    /** Étape du créneau quand elle vient en dernier : ce qu'il reste à faire. */
+    readonly choisirHeure: string;
+    /** Lu au lecteur d'écran quand une heure est choisie : le bouton est plus bas. */
+    readonly confirmerCiDessous: string;
     readonly mention: string;
     readonly mentionLien: string;
     readonly mentionHref: string;
@@ -131,8 +157,20 @@ export interface ContenuRendezVous {
     };
     readonly echeance: {
       readonly legende: string;
+      readonly erreur: string;
       readonly options: readonly OptionQuestion[];
     };
+    readonly entreprise: QuestionTexte;
+    readonly activite: QuestionTexte;
+    readonly coince: {
+      readonly legende: string;
+      readonly erreur: string;
+      readonly placeholders: Readonly<Partial<Record<IdRendezVous, string>>>;
+    };
+    readonly taille: QuestionChoix;
+    readonly decision: QuestionChoix;
+    readonly cout: QuestionChoix;
+    readonly essaye: QuestionChoix;
     /** Le projet concerné, en texte libre : posé aux seuls clients (point d'étape). */
     readonly projet: {
       readonly legende: string;
@@ -156,6 +194,13 @@ export interface ContenuRendezVous {
    * son agenda, jamais par le visiteur.
    */
   readonly notes: {
+    readonly entreprise: string;
+    readonly activite: string;
+    readonly taille: string;
+    readonly decision: string;
+    readonly coince: string;
+    readonly cout: string;
+    readonly essaye: string;
     readonly budget: string;
     readonly forfait: string;
     readonly objectif: string;
@@ -167,6 +212,8 @@ export interface ContenuRendezVous {
   readonly succes: {
     readonly titre: string;
     readonly texte: string;
+    /** Après un cadrage : le mail demande de confirmer d'un mot. */
+    readonly texteCadrage: string;
     readonly autre: string;
   };
   /** Page `/rdv/gerer/[jeton]` : le lien « déplacer ou annuler » des e-mails. */
@@ -217,7 +264,7 @@ export const rendezVousContent: ContenuRendezVous = {
   eyebrow: "Prendre rendez-vous",
   titre: "Réserver un créneau",
   chapeau:
-    "Choisissez un sujet, une durée et une heure, puis répondez à trois questions sur votre projet : vous savez avant l’appel ce que votre budget permet. Le lien de visioconférence part par e-mail dans la foulée.",
+    "Choisissez un sujet, répondez à quelques questions sur votre entreprise et votre besoin, puis prenez votre créneau. Je prépare l’appel avec vos réponses, et le lien de visio part par e-mail dans la foulée.",
   noteFuseau: "Heures affichées à l’heure de Paris.",
   garanties: [
     "Gratuit et sans engagement",
@@ -307,7 +354,12 @@ export const rendezVousContent: ContenuRendezVous = {
     creneau: "Le créneau",
     projet: "Votre projet",
     coordonnees: "Vos coordonnées",
+    entreprise: "Votre entreprise",
+    besoin: "Votre besoin",
   },
+
+  introCadrage:
+    "Dix questions courtes, deux à trois minutes, puis votre créneau. Je prépare l’appel avec vos réponses, elles ne servent qu’à ça.",
 
   actions: {
     reessayer: "Réessayer",
@@ -341,13 +393,18 @@ export const rendezVousContent: ContenuRendezVous = {
     emailPlaceholder: "vous@exemple.fr",
     /* FACULTATIF, décision d'Eliott du 2026-11-02 : pour rappeler plus
        facilement le visiteur si besoin. Il part dans les notes du rendez-vous. */
-    telephoneLabel: "Votre téléphone (facultatif)",
+    telephoneLabel: "Votre téléphone",
+    telephoneFacultatif: "Votre téléphone (facultatif)",
+    telephoneAide: "Je vous appelle si la visio ne démarre pas.",
+    telephoneErreur: "Indiquez un numéro où vous joindre le jour du rendez-vous.",
     telephonePlaceholder: "06 12 34 56 78",
-    messageLabel: "Votre situation en deux lignes (facultatif)",
+    messageLabel: "Autre chose à me dire (facultatif)",
     messagePlaceholder:
-      "Ce que vous avez aujourd’hui, ce qui coince, ce que vous avez déjà essayé.",
+      "Un lien à regarder avant l’appel, une contrainte, une question.",
     envoyer: "Confirmer le rendez-vous",
     envoiEnCours: "Confirmation en cours…",
+    choisirHeure: "Choisissez un jour puis une heure pour confirmer.",
+    confirmerCiDessous: "Heure retenue. Confirmez avec le bouton plus bas.",
     mention:
       "Votre nom, votre adresse et vos réponses sont enregistrés dans mon outil de gestion et dans mon agenda, dans le seul but de créer ce rendez-vous. Détail dans la",
     mentionLien: "politique de confidentialité",
@@ -411,11 +468,73 @@ export const rendezVousContent: ContenuRendezVous = {
       },
     },
     echeance: {
-      legende: "Votre échéance (facultatif)",
+      legende: "Votre échéance",
+      erreur: "Choisissez une échéance.",
       options: [
         { id: "vite", libelle: "Dès que possible" },
         { id: "trimestre", libelle: "Dans les trois mois" },
         { id: "libre", libelle: "Pas de date précise" },
+      ],
+    },
+    entreprise: {
+      legende: "Le nom de votre entreprise",
+      placeholder: "Transports Martin",
+      erreur: "Indiquez le nom de votre entreprise.",
+    },
+    activite: {
+      legende: "Ce que fait votre entreprise",
+      placeholder: "Transport frigorifique, 12 camions",
+      erreur: "Dites en quelques mots ce que fait votre entreprise.",
+    },
+    coince: {
+      legende: "Ce qui coince aujourd’hui",
+      erreur: "Décrivez en une ou deux phrases ce qui coince.",
+      placeholders: {
+        logiciel:
+          "On ressaisit chaque commande dans trois fichiers, et des erreurs passent jusqu’à la facture.",
+        decouverte:
+          "Les devis partent trois jours après la demande, et on perd des clients.",
+      },
+    },
+    taille: {
+      legende: "Combien de personnes dans l’entreprise ?",
+      erreur: "Choisissez la taille la plus proche.",
+      options: [
+        { id: "seul", libelle: "Juste moi" },
+        { id: "2-5", libelle: "2 à 5" },
+        { id: "6-20", libelle: "6 à 20" },
+        { id: "21-50", libelle: "21 à 50" },
+        { id: "plus-50", libelle: "Plus de 50" },
+      ],
+    },
+    decision: {
+      legende: "Qui décidera du projet ?",
+      erreur: "Choisissez la réponse la plus proche.",
+      options: [
+        { id: "seul", libelle: "Je décide seul" },
+        { id: "plusieurs", libelle: "Nous décidons à plusieurs" },
+        { id: "autre", libelle: "Quelqu’un d’autre décide" },
+      ],
+    },
+    cout: {
+      legende: "Ce que ça vous coûte aujourd’hui",
+      erreur: "Choisissez la réponse la plus proche.",
+      options: [
+        { id: "moins-2h", libelle: "Moins de 2 h par semaine" },
+        { id: "2-5h", libelle: "2 à 5 h par semaine" },
+        { id: "plus-5h", libelle: "Plus de 5 h par semaine" },
+        { id: "ventes", libelle: "Des ventes ou des clients perdus" },
+        { id: "inconnu", libelle: "Je ne sais pas le chiffrer" },
+      ],
+    },
+    essaye: {
+      legende: "Ce que vous avez déjà essayé",
+      erreur: "Choisissez la réponse la plus proche.",
+      options: [
+        { id: "rien", libelle: "Rien pour l’instant" },
+        { id: "tableur", libelle: "Un tableur ou un outil fait maison" },
+        { id: "logiciel", libelle: "Un logiciel du marché" },
+        { id: "prestataire", libelle: "Un prestataire ou une agence" },
       ],
     },
     projet: {
@@ -438,6 +557,13 @@ export const rendezVousContent: ContenuRendezVous = {
   },
 
   notes: {
+    entreprise: "Entreprise",
+    activite: "Activité",
+    taille: "Taille",
+    decision: "Décision",
+    coince: "Ce qui coince",
+    cout: "Coût actuel",
+    essaye: "Déjà essayé",
     budget: "Budget HT",
     forfait: "À portée",
     objectif: "Objectif",
@@ -451,6 +577,8 @@ export const rendezVousContent: ContenuRendezVous = {
     titre: "C’est réservé.",
     texte:
       "Un e-mail de confirmation vient de partir vers votre boîte, avec le lien de visioconférence et de quoi annuler ou déplacer en un clic. Vous n’avez rien d’autre à faire d’ici là.",
+    texteCadrage:
+      "Un e-mail de confirmation vient de partir vers votre boîte, avec le lien de visio et de quoi déplacer ou annuler. Répondez-y d’un mot pour me confirmer votre présence.",
     autre: "Prendre un autre rendez-vous",
   },
   gestion: {

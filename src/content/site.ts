@@ -278,7 +278,8 @@ export const siteConfig: SiteConfig = {
         placeholder: "Choisissez ce qui compte le plus",
       },
       echeance: {
-        label: rendezVousContent.questionnaire.echeance.legende,
+        // Facultative ici, exigée au cadrage du rendez-vous : légende propre.
+        label: "Votre échéance (facultatif)",
         placeholder: "Choisissez une échéance",
       },
     },

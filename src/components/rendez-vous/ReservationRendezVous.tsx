@@ -9,26 +9,22 @@
  * `Heures` sont exportés : la page `/rdv/gerer/[jeton]` les réutilise.
  *
  * UN STEPPER, UNE ÉTAPE À L'ÉCRAN (2026-10-01). La version précédente empilait
- * les étapes et grandissait à chaque choix : arrivé aux coordonnées, le bloc
- * dépassait deux écrans. Eliott : « assez indigeste et qui s'agrandit, faire
- * plutôt une sorte de stepper ». Quatre temps, un seul affiché :
- *   01 le sujet — une carte par sujet ; un clic passe à la suite ;
- *   02 le créneau — durée, calendrier du mois, heures du jour retenu ;
- *   03 le projet — budget, objectif, échéance, et le retour « ce que vous pouvez
- *      espérer à ce budget » calculé sur place ;
- *      (budget, objectif, échéance) ;
- *   04 les coordonnées — nom, adresse, et un message facultatif.
- * La barre de progression rend chaque étape franchie cliquable, et le
+ * les étapes et grandissait à chaque choix. Eliott : « assez indigeste et qui
+ * s'agrandit, faire plutôt une sorte de stepper ». Un seul temps affiché, la
+ * barre de progression rend chaque étape franchie cliquable, et le
  * récapitulatif garde sous les yeux ce qui a déjà été choisi.
+ *
+ * LE QUESTIONNAIRE VIENT AVANT LE CRÉNEAU depuis le 2026-11-10, pour les
+ * prospects (logiciel, découverte) : sujet → entreprise → besoin →
+ * coordonnées (téléphone obligatoire) → créneau. Des rendez-vous pris sans
+ * contexte finissaient en absence ; celui qui a expliqué son cas avant de voir
+ * l'agenda vient, et Eliott arrive préparé. Les clients en cours
+ * (démonstration, point d'étape) gardent le parcours court : sujet → créneau →
+ * une ou deux questions → coordonnées (`ordreDe`).
  *
  * LA DURÉE EST CHOISIE PAR LE VISITEUR, présélectionnée sur la valeur par
  * défaut du type au cockpit. Les options viennent du cockpit par la route des
  * créneaux : le site n'en recopie aucune.
- *
- * LE QUESTIONNAIRE VIENT APRÈS LE CRÉNEAU, PAS AVANT (2026-09-23). Trois
- * questions posées avant de voir un agenda sont une barrière à l'entrée ;
- * posées une fois l'heure retenue, elles se remplissent parce que le visiteur
- * a déjà choisi de venir.
  *
  * AUCUNE ANIMATION D'APPARITION ICI, contrairement au reste du site. `Reveal`
  * rend l'état MASQUÉ dès le serveur et compte sur une animation pour le lever :
@@ -85,8 +81,16 @@ import type {
   ReponseCreneaux,
 } from "@/lib/rendez-vous/creneaux";
 import {
+  LONGUEUR_ACTIVITE_MAX,
+  LONGUEUR_COINCE_MAX,
+  LONGUEUR_COINCE_MIN,
+  LONGUEUR_ENTREPRISE_MAX,
   LONGUEUR_PROJET_MAX,
+  OPTIONS_COUT,
+  OPTIONS_DECISION,
   OPTIONS_ECHEANCE,
+  OPTIONS_ESSAYE,
+  OPTIONS_TAILLE,
   optionsObjectif,
   questionsDuType,
   retourBudget,
@@ -98,12 +102,6 @@ const contenu = rendezVousContent;
 
 /** Ce qui empêche d'afficher des créneaux, du plus bénin au plus définitif. */
 type EtatCreneaux = "aucune" | "reseau" | "indisponible";
-
-/** Index des quatre étapes, dans l'ordre de la barre de progression. */
-const ETAPE_SUJET = 0;
-const ETAPE_CRENEAU = 1;
-const ETAPE_PROJET = 2;
-const ETAPE_COORDONNEES = 3;
 
 /**
  * Dernier résultat reçu, avec la QUESTION à laquelle il répond.
@@ -136,7 +134,7 @@ export const CLASSE_LIBELLE =
   "text-[13px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground/80";
 
 export const CLASSE_CHAMP =
-  "h-[52px] w-full border border-white/25 bg-white/[0.04] px-[16px] text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground transition-colors placeholder:text-white/45 hover:border-white/45 focus:border-accent tablet:text-[15px]";
+  "h-[52px] w-full border border-white/45 bg-white/[0.04] px-[16px] text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground transition-colors placeholder:text-white/45 hover:border-white/60 focus:border-accent tablet:text-[15px]";
 
 export const CLASSE_TEXTE =
   "text-[14px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground-60";
@@ -147,32 +145,102 @@ export const CLASSE_BOUTON_SECONDAIRE =
 export const CLASSE_BOUTON_PRINCIPAL =
   "flex h-[52px] w-full items-center justify-center bg-accent px-[28px] text-[13px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-accent-ink transition-[opacity,transform] duration-150 ease-out active:scale-[0.98] disabled:cursor-progress disabled:opacity-60 motion-reduce:transition-none tablet:w-fit";
 
-const TITRES_ETAPES = [
-  contenu.etapes.sujet,
-  contenu.etapes.creneau,
-  contenu.etapes.projet,
-  contenu.etapes.coordonnees,
-] as const;
+/**
+ * Les étapes du parcours, dans l'ordre que suit le sujet choisi.
+ *
+ * DEUX ORDRES (2026-11-10). Un prospect (logiciel, découverte) répond au cadrage
+ * et donne ses coordonnées AVANT de voir l'agenda : Eliott arrive préparé, et
+ * celui qui a pris trois minutes pour expliquer son cas vient au rendez-vous.
+ * Un client déjà en cours (démonstration, point d'étape) garde le parcours
+ * court : le créneau d'abord, une question, ses coordonnées.
+ */
+export type IdEtape = "sujet" | "entreprise" | "besoin" | "cadre" | "coordonnees" | "creneau" | "projet";
+
+const ORDRE_CADRAGE: readonly IdEtape[] = ["sujet", "entreprise", "besoin", "cadre", "coordonnees", "creneau"];
+const ORDRE_COURT: readonly IdEtape[] = ["sujet", "creneau", "projet", "coordonnees"];
+
+/** Ordre du sujet ; sans sujet, celui du cadrage, que suivent les sujets proposés d'emblée. */
+function ordreDe(type: IdRendezVous | undefined): readonly IdEtape[] {
+  return !type || questionsDuType(type).cadrage ? ORDRE_CADRAGE : ORDRE_COURT;
+}
+
+/** Étape qui suit `etape` dans l'ordre du sujet ; la dernière reste la dernière. */
+function suivante(type: IdRendezVous | undefined, etape: IdEtape): IdEtape {
+  const ordre = ordreDe(type);
+  return ordre[Math.min(ordre.indexOf(etape) + 1, ordre.length - 1)];
+}
+
+const TITRES_ETAPES: Readonly<Record<IdEtape, string>> = {
+  sujet: contenu.etapes.sujet,
+  entreprise: contenu.etapes.entreprise,
+  besoin: contenu.etapes.besoin,
+  cadre: contenu.etapes.projet,
+  coordonnees: contenu.etapes.coordonnees,
+  creneau: contenu.etapes.creneau,
+  projet: contenu.etapes.projet,
+};
 
 /**
- * Barre de progression : quatre segments, numéro et titre sous chacun.
+ * Étape où renvoie un refus du serveur qui nomme son champ : le visiteur
+ * retrouve la question fautive au lieu d'un message loin d'elle.
+ */
+export function etapeDuChamp(champ: string | undefined, cadrage: boolean): IdEtape | undefined {
+  switch (champ) {
+    case "creneau":
+    case "duree":
+      return "creneau";
+    case "entreprise":
+    case "activite":
+    case "taille":
+      return "entreprise";
+    case "coince":
+    case "cout":
+    case "essaye":
+      return "besoin";
+    case "objectif":
+      return cadrage ? "besoin" : "projet";
+    case "decision":
+    case "budget":
+    case "echeance":
+      return cadrage ? "cadre" : "projet";
+    case "projet":
+      return "projet";
+    case "nom":
+    case "email":
+    case "telephone":
+    case "message":
+      return "coordonnees";
+    default:
+      return undefined;
+  }
+}
+
+/**
+ * Barre de progression : un segment par étape, numéro et titre sous chacun.
  *
  * Une étape FRANCHIE est un bouton qui y ramène ; l'étape courante et celles à
  * venir ne sont pas cliquables, parce qu'on n'atteint pas le créneau sans
- * sujet, ni les coordonnées sans questionnaire.
+ * avoir répondu, ni les coordonnées sans sujet.
  */
 function Progression({
+  ordre,
   etape,
   onAller,
 }: {
-  etape: number;
-  onAller: (index: number) => void;
+  ordre: readonly IdEtape[];
+  etape: IdEtape;
+  onAller: (etape: IdEtape) => void;
 }) {
+  const courant = ordre.indexOf(etape);
   return (
-    <ol className="m-0 grid list-none grid-cols-4 gap-[6px] p-0">
-      {TITRES_ETAPES.map((titre, index) => {
-        const faite = index < etape;
-        const courante = index === etape;
+    <ol
+      className="m-0 grid list-none gap-[6px] p-0"
+      style={{ gridTemplateColumns: `repeat(${ordre.length}, minmax(0, 1fr))` }}
+    >
+      {ordre.map((id, index) => {
+        const faite = index < courant;
+        const courante = index === courant;
+        const titre = TITRES_ETAPES[id];
         const corps = (
           <>
             <span
@@ -185,18 +253,22 @@ function Progression({
               <span className={faite || courante ? "text-accent" : "text-foreground-60"}>
                 {numero(index)}
               </span>
-              <span className={courante ? "text-foreground" : "text-foreground-60"}>
+              {/* Sur un téléphone, cinq titres ne tiennent pas côte à côte : les
+                  numéros suffisent, le titre de l'étape est juste dessous. */}
+              <span
+                className={`sr-only tablet:not-sr-only ${courante ? "text-foreground" : "text-foreground-60"}`}
+              >
                 {titre}
               </span>
             </span>
           </>
         );
         return (
-          <li key={titre} aria-current={courante ? "step" : undefined}>
+          <li key={id} aria-current={courante ? "step" : undefined}>
             {faite ? (
               <button
                 type="button"
-                onClick={() => onAller(index)}
+                onClick={() => onAller(id)}
                 className="block w-full text-left transition-opacity hover:opacity-70 motion-reduce:transition-none"
               >
                 {corps}
@@ -208,6 +280,113 @@ function Progression({
         );
       })}
     </ol>
+  );
+}
+
+/** Vrai quand le visiteur a demandé moins de mouvement ; faux là où la requête n'existe pas. */
+function mouvementReduit(): boolean {
+  return (
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
+
+/**
+ * Une réponse libre : libellé, champ (une ligne ou plusieurs), erreur dessous.
+ *
+ * L'erreur est reliée au champ par `aria-describedby`, comme celle d'un groupe
+ * de `ChoixUnique` : le lecteur d'écran la lit en arrivant sur le champ.
+ */
+function ChampTexte({
+  id,
+  nom,
+  legende,
+  valeur,
+  onChanger,
+  placeholder,
+  erreur,
+  aide,
+  refChamp,
+  multiligne = false,
+  maxLength,
+  type = "text",
+  autoComplete,
+  inputMode,
+  requis = false,
+  invalide = false,
+}: {
+  id: string;
+  nom: string;
+  legende: string;
+  valeur: string;
+  onChanger: (valeur: string) => void;
+  placeholder?: string;
+  erreur?: string;
+  aide?: string;
+  refChamp?: RefObject<HTMLInputElement | HTMLTextAreaElement | null>;
+  multiligne?: boolean;
+  maxLength?: number;
+  type?: "text" | "email" | "tel";
+  autoComplete?: string;
+  inputMode?: "text" | "email" | "tel";
+  requis?: boolean;
+  /** Bordure d'erreur sans texte : le message du serveur s'affiche sous le formulaire. */
+  invalide?: boolean;
+}) {
+  const idErreur = `${id}-erreur`;
+  const idAide = `${id}-aide`;
+  const decrit = [aide ? idAide : undefined, erreur ? idErreur : undefined]
+    .filter(Boolean)
+    .join(" ");
+  const commun = {
+    id,
+    name: nom,
+    value: valeur,
+    maxLength,
+    placeholder,
+    required: requis || undefined,
+    "aria-invalid": erreur || invalide ? true : undefined,
+    "aria-describedby": decrit || undefined,
+  } as const;
+  return (
+    // Le libellé ne porte que la légende : l'aide et l'erreur passent par
+    // `aria-describedby`, sans être lues deux fois.
+    <div className="flex w-full flex-col gap-[10px]">
+      <label htmlFor={id} className={CLASSE_LIBELLE}>
+        {legende}
+      </label>
+      {multiligne ? (
+        <textarea
+          {...commun}
+          ref={refChamp as RefObject<HTMLTextAreaElement | null> | undefined}
+          onChange={(evenement) => onChanger(evenement.target.value)}
+          className={`min-h-[110px] w-full resize-y border border-white/45 bg-white/[0.04] p-[16px] text-[16px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground transition-colors placeholder:text-white/45 hover:border-white/60 focus:border-accent tablet:text-[15px] ${erreur || invalide ? "border-accent" : ""}`}
+        />
+      ) : (
+        <input
+          {...commun}
+          ref={refChamp as RefObject<HTMLInputElement | null> | undefined}
+          type={type}
+          autoComplete={autoComplete}
+          inputMode={inputMode}
+          onChange={(evenement) => onChanger(evenement.target.value)}
+          className={`${CLASSE_CHAMP} ${erreur || invalide ? "border-accent" : ""}`}
+        />
+      )}
+      {aide ? (
+        <span id={idAide} className="-mt-[2px] mb-[8px] text-[12px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground-60">
+          {aide}
+        </span>
+      ) : null}
+      {erreur ? (
+        <span
+          id={idErreur}
+          className="text-[12px] font-medium leading-[1.3] tracking-[-0.01em] text-accent"
+        >
+          {erreur}
+        </span>
+      ) : null}
+    </div>
   );
 }
 
@@ -570,15 +749,17 @@ export function ReservationRendezVous({
    * Sujet déjà choisi à l'arrivée, lu dans `?sujet` par l'appelant.
    *
    * VALEUR INITIALE, PAS VALEUR CONTRÔLÉE : le prospect reste libre d'en
-   * changer. Présent, il ouvre directement l'étape du créneau : le visiteur
-   * vient de choisir son sujet en cliquant le lien, inutile de le lui redemander.
+   * changer. Présent, il ouvre directement l'étape qui suit le sujet : le
+   * visiteur vient de le choisir en cliquant le lien, inutile de le redemander.
    */
   typeInitial?: IdRendezVous;
 }) {
   // Préfixe des identifiants et des groupes de boutons radio : la page de
   // contact et le pied de page peuvent monter deux réservations à la fois.
   const instance = `rdv${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
-  const [etape, setEtape] = useState(typeInitial ? ETAPE_CRENEAU : ETAPE_SUJET);
+  const [etape, setEtape] = useState<IdEtape>(
+    typeInitial ? suivante(typeInitial, "sujet") : "sujet",
+  );
   const [type, setType] = useState<IdRendezVous | undefined>(typeInitial);
   const [creneau, setCreneau] = useState<Creneau | undefined>(undefined);
   /** Durée demandée ; `undefined` = celle par défaut du type au cockpit. */
@@ -600,6 +781,9 @@ export function ReservationRendezVous({
    * résultat reçu ne répond pas à la question posée. Le tenir en état
    * obligerait à un `setChargement(true)` en tête d'effet, donc à une cascade
    * de rendus dont `react-hooks/set-state-in-effect` ne veut pas.
+   *
+   * LES CRÉNEAUX SE CHARGENT DÈS LE SUJET CHOISI, même quand le créneau vient
+   * en dernier : ils sont prêts quand le visiteur y arrive.
    */
   const cle = type ? `${type}|${mois}|${duree ?? ""}|${tentative}` : "";
   const chargement = type !== undefined && resultat.cle !== cle;
@@ -633,14 +817,27 @@ export function ReservationRendezVous({
   const [objectif, setObjectif] = useState("");
   const [echeance, setEcheance] = useState("");
   const [projet, setProjet] = useState("");
+  const [entreprise, setEntreprise] = useState("");
+  const [activite, setActivite] = useState("");
+  const [taille, setTaille] = useState("");
+  const [decision, setDecision] = useState("");
+  const [coince, setCoince] = useState("");
+  const [cout, setCout] = useState("");
+  const [essaye, setEssaye] = useState("");
   const [nom, setNom] = useState("");
   const [email, setEmail] = useState("");
   const [telephone, setTelephone] = useState("");
   const [message, setMessage] = useState("");
-  /** Vrai après un « Continuer » refusé : les champs requis vides s'affichent en erreur. */
-  const [envoiTente, setEnvoiTente] = useState(false);
+  /**
+   * Étapes dont le « Continuer » a été refusé : leurs réponses manquantes
+   * s'affichent en erreur. Par étape, pour qu'une étape encore jamais vue
+   * n'arrive pas couverte d'erreurs.
+   */
+  const [tentees, setTentees] = useState<readonly IdEtape[]>([]);
   /** Questions que le sujet pose : ni budget ni échéance pour une démonstration. */
   const posees = useMemo(() => questionsDuType(type), [type]);
+  const ordre = ordreDe(type);
+  const derniere = ordre[ordre.length - 1];
   const tranches = useMemo(
     () => (posees.budget ? tranchesBudget() : []),
     [posees],
@@ -648,33 +845,55 @@ export function ReservationRendezVous({
   const objectifs = useMemo(() => (type ? optionsObjectif(type) : []), [type]);
   const budgetChoisi = tranches.some((t) => t.id === budget) ? budget : "";
   const objectifChoisi = objectifs.some((o) => o.id === objectif) ? objectif : "";
-  const budgetManquant = tranches.length > 0 && !budgetChoisi;
-  const projetManquant = posees.projet && projet.trim().length === 0;
-  const erreurProjet =
-    (envoiTente && projetManquant) || champEnErreur === "projet"
-      ? contenu.questionnaire.projet.erreur
-      : undefined;
   const retour = useMemo(
     () => (budgetChoisi ? retourBudget(budgetChoisi) : undefined),
     [budgetChoisi],
   );
-  const erreurBudget =
-    (envoiTente && budgetManquant) || champEnErreur === "budget"
-      ? contenu.questionnaire.budget.erreur
-      : undefined;
-  const erreurObjectif =
-    (envoiTente && !objectifChoisi) || champEnErreur === "objectif"
-      ? contenu.questionnaire.objectif.erreur
-      : undefined;
 
-  const choisirBudget = useCallback((id: string) => {
-    setBudget(id);
-    setChampEnErreur((champ) => (champ === "budget" ? undefined : champ));
-  }, []);
-  const choisirObjectif = useCallback((id: string) => {
-    setObjectif(id);
-    setChampEnErreur((champ) => (champ === "objectif" ? undefined : champ));
-  }, []);
+  /** Réponses absentes, question par question, pour le sujet courant. */
+  const manquants = {
+    entreprise: posees.cadrage && entreprise.trim().length === 0,
+    activite: posees.cadrage && activite.trim().length < 2,
+    taille: posees.cadrage && !taille,
+    decision: posees.cadrage && !decision,
+    coince: posees.cadrage && coince.trim().length < LONGUEUR_COINCE_MIN,
+    cout: posees.cadrage && !cout,
+    essaye: posees.cadrage && !essaye,
+    echeance: posees.cadrage && posees.echeance && !echeance,
+    budget: tranches.length > 0 && !budgetChoisi,
+    objectif: !objectifChoisi,
+    projet: posees.projet && projet.trim().length === 0,
+  } as const;
+  type Question = keyof typeof manquants;
+
+  /** Le message d'erreur d'une question : après un « Continuer » refusé, ou un refus du serveur. */
+  const erreurDe = (question: Question, ou: IdEtape, texte: string): string | undefined =>
+    (tentees.includes(ou) && manquants[question]) || champEnErreur === question ? texte : undefined;
+  const etapeObjectif: IdEtape = posees.cadrage ? "besoin" : "projet";
+  const etapeBudget: IdEtape = posees.cadrage ? "cadre" : "projet";
+  const q = contenu.questionnaire;
+  const erreurs = {
+    entreprise: erreurDe("entreprise", "entreprise", q.entreprise.erreur),
+    activite: erreurDe("activite", "entreprise", q.activite.erreur),
+    taille: erreurDe("taille", "entreprise", q.taille.erreur),
+    decision: erreurDe("decision", "cadre", q.decision.erreur),
+    coince: erreurDe("coince", "besoin", q.coince.erreur),
+    cout: erreurDe("cout", "besoin", q.cout.erreur),
+    essaye: erreurDe("essaye", "besoin", q.essaye.erreur),
+    echeance: erreurDe("echeance", "cadre", q.echeance.erreur),
+    budget: erreurDe("budget", etapeBudget, q.budget.erreur),
+    objectif: erreurDe("objectif", etapeObjectif, q.objectif.erreur),
+    projet: erreurDe("projet", "projet", q.projet.erreur),
+  };
+
+  /** Une réponse donnée efface l'erreur que le serveur avait posée sur elle. */
+  const repondre = useCallback(
+    (question: string, poser: (valeur: string) => void) => (valeur: string) => {
+      poser(valeur);
+      setChampEnErreur((champ) => (champ === question ? undefined : champ));
+    },
+    [],
+  );
 
   /**
    * Horodatage d'affichage, posé APRÈS le montage.
@@ -703,9 +922,19 @@ export function ReservationRendezVous({
    */
   const racine = useRef<HTMLDivElement | null>(null);
   const refTitre = useRef<HTMLHeadingElement | null>(null);
+  /** Premier champ de chaque question, pour y poser le focus quand elle manque. */
+  const refEntreprise = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
+  const refActivite = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
+  const refTaille = useRef<HTMLInputElement | null>(null);
+  const refDecision = useRef<HTMLInputElement | null>(null);
+  const refCoince = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
+  const refCout = useRef<HTMLInputElement | null>(null);
+  const refEssaye = useRef<HTMLInputElement | null>(null);
+  const refEcheance = useRef<HTMLInputElement | null>(null);
   const refBudget = useRef<HTMLInputElement | null>(null);
-  const refProjet = useRef<HTMLInputElement | null>(null);
   const refObjectif = useRef<HTMLInputElement | null>(null);
+  const refProjet = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
+  const refConfirmer = useRef<HTMLDivElement | null>(null);
   const etapeAffichee = useRef(etape);
   useEffect(() => {
     if (etapeAffichee.current === etape) return;
@@ -849,11 +1078,11 @@ export function ReservationRendezVous({
         setDuree(undefined);
         setMois("");
         setJourChoisi("");
-        setEnvoiTente(false);
+        setTentees([]);
       }
       setEtatEnvoi("repos");
       setMessageEnvoi("");
-      setEtape(ETAPE_CRENEAU);
+      setEtape(suivante(id, "sujet"));
     },
     [type],
   );
@@ -870,6 +1099,9 @@ export function ReservationRendezVous({
    * `days_ahead` dit si le prospect prend le premier créneau venu ou repousse.
    * L'HEURE PRÉCISE N'EST PAS ENVOYÉE : elle identifierait la réservation, donc
    * la personne, dès qu'on la croise avec l'agenda.
+   *
+   * QUAND LE CRÉNEAU EST LA DERNIÈRE ÉTAPE, on reste sur place et le bouton de
+   * confirmation vient en vue : sur un téléphone, il est sous la grille des heures.
    */
   const choisirCreneau = useCallback(
     (choix: Creneau) => {
@@ -885,7 +1117,14 @@ export function ReservationRendezVous({
         duration_min: dureeRetenue,
       });
       setCreneau(choix);
-      setEtape(ETAPE_PROJET);
+      const ordreDuType = ordreDe(type);
+      if (ordreDuType[ordreDuType.length - 1] !== "creneau") {
+        setEtape(suivante(type, "creneau"));
+        return;
+      }
+      // Le bloc existe déjà (il invite à choisir une heure) : il passe en haut
+      // de l'écran, et la confirmation qui s'y affiche reste en vue.
+      refConfirmer.current?.scrollIntoView({ block: "start", behavior: mouvementReduit() ? "auto" : "smooth" });
     },
     [type, dureeRetenue],
   );
@@ -899,18 +1138,48 @@ export function ReservationRendezVous({
     [donnees],
   );
 
-  const continuerVersCoordonnees = useCallback(() => {
-    if (projetManquant || budgetManquant || !objectifChoisi) {
-      setEnvoiTente(true);
-      // Le focus va à la PREMIÈRE question restée sans réponse, dans l'ordre affiché.
-      let premiere = refObjectif;
-      if (budgetManquant) premiere = refBudget;
-      if (projetManquant) premiere = refProjet;
-      premiere.current?.focus();
+  /** Questions de chaque étape, dans l'ordre affiché : le focus va à la première sans réponse. */
+  const QUESTIONS_ETAPE: Readonly<Partial<Record<IdEtape, readonly Question[]>>> = {
+    entreprise: ["entreprise", "activite", "taille"],
+    besoin: ["objectif", "coince", "cout", "essaye"],
+    cadre: ["decision", "echeance", "budget"],
+    projet: ["projet", "objectif"],
+  };
+
+  /**
+   * « Continuer » : refusé tant qu'une question de l'étape reste sans réponse,
+   * avec le focus sur la première. Les coordonnées passent par la validation
+   * du navigateur, comme avant (champs `required`, `type="email"`).
+   */
+  const continuer = () => {
+    const questions = QUESTIONS_ETAPE[etape] ?? [];
+    const premiere = questions.find((question) => manquants[question]);
+    if (premiere) {
+      setTentees((deja) => (deja.includes(etape) ? deja : [...deja, etape]));
+      const champs = {
+        entreprise: refEntreprise,
+        activite: refActivite,
+        taille: refTaille,
+        decision: refDecision,
+        coince: refCoince,
+        cout: refCout,
+        essaye: refEssaye,
+        echeance: refEcheance,
+        budget: refBudget,
+        objectif: refObjectif,
+        projet: refProjet,
+      };
+      champs[premiere].current?.focus();
       return;
     }
-    setEtape(ETAPE_COORDONNEES);
-  }, [projetManquant, budgetManquant, objectifChoisi]);
+    // Les coordonnées ne sont jamais la dernière étape du cadrage : leur
+    // « Continuer » est un `submit`, que le navigateur ne laisse passer qu'une
+    // fois nom, adresse et téléphone valides (`required`, `type="email"`).
+    if (etape === "coordonnees") {
+      capture(ANALYTICS_EVENTS.rdvQuestionnaireCompleted, { rdv_type: type, budget: budgetChoisi });
+    }
+    setEtape(suivante(type, etape));
+  };
 
   const recommencer = useCallback(() => {
     setType(undefined);
@@ -925,9 +1194,12 @@ export function ReservationRendezVous({
     setObjectif("");
     setEcheance("");
     setProjet("");
+    setCoince("");
+    setCout("");
+    setEssaye("");
     setMessage("");
-    setEnvoiTente(false);
-    setEtape(ETAPE_SUJET);
+    setTentees([]);
+    setEtape("sujet");
     refDebut.current = Date.now();
   }, []);
 
@@ -936,10 +1208,14 @@ export function ReservationRendezVous({
     [types, type],
   );
 
-  const gererSoumission = useCallback(
-    async (evenement: FormEvent<HTMLFormElement>) => {
+  const gererSoumission = async (evenement: FormEvent<HTMLFormElement>) => {
       // Interdit la soumission native, donc toute donnée en chaîne de requête.
       evenement.preventDefault();
+      // Entrée dans un champ d'une étape intermédiaire : on passe à la suite.
+      if (etape !== derniere) {
+        continuer();
+        return;
+      }
       if (etatEnvoi === "envoi" || !type || !creneau) return;
 
       const donneesFormulaire = new FormData(evenement.currentTarget);
@@ -982,6 +1258,9 @@ export function ReservationRendezVous({
             ...(posees.projet ? { projet } : {}),
             objectif: objectifChoisi,
             ...(posees.echeance ? { echeance } : {}),
+            ...(posees.cadrage
+              ? { entreprise, activite, taille, decision, coince, cout, essaye }
+              : {}),
             debutMs: refDebut.current,
             [NOM_CHAMP_PIEGE]: typeof piege === "string" ? piege : "",
             ...(jetonCaptcha ? { jetonCaptcha } : {}),
@@ -997,7 +1276,7 @@ export function ReservationRendezVous({
           // La tranche, jamais un montant.
           capture(ANALYTICS_EVENTS.rdvConfirmed, {
             rdv_type: type,
-            // Vide pour le CTO, qui n'a pas de tranche : la propriété est omise.
+            // Vide pour les sujets sans tranche : la propriété est omise.
             ...(budgetChoisi ? { budget: budgetChoisi } : {}),
             duration_min: dureeRetenue,
           });
@@ -1023,19 +1302,13 @@ export function ReservationRendezVous({
         });
         // Créneau pris ou durée retirée entre l'affichage et la confirmation :
         // retour au calendrier, rechargé, plutôt qu'un bouton qui échouera à
-        // l'identique. Une réponse du questionnaire refusée renvoie à sa question.
+        // l'identique. Une réponse refusée renvoie à l'étape de sa question.
         if (champ === "creneau" || champ === "duree") {
           setCreneau(undefined);
           setTentative((valeur) => valeur + 1);
-          setEtape(ETAPE_CRENEAU);
-        } else if (
-          champ === "budget" ||
-          champ === "objectif" ||
-          champ === "echeance" ||
-          champ === "projet"
-        ) {
-          setEtape(ETAPE_PROJET);
         }
+        const retourVers = etapeDuChamp(champ, posees.cadrage);
+        if (retourVers) setEtape(retourVers);
         // Le jeton est à usage unique : sans réinitialisation, la deuxième
         // tentative échouerait en boucle sur un jeton déjà consommé.
         protection.reinitialiser();
@@ -1048,25 +1321,7 @@ export function ReservationRendezVous({
           reason: "reseau",
         });
       }
-    },
-    [
-      etatEnvoi,
-      type,
-      creneau,
-      dureeRetenue,
-      nom,
-      email,
-      telephone,
-      message,
-      protection,
-      emailContact,
-      budgetChoisi,
-      objectifChoisi,
-      echeance,
-      projet,
-      posees,
-    ],
-  );
+  };
 
   if (etatEnvoi === "succes") {
     return (
@@ -1083,7 +1338,9 @@ export function ReservationRendezVous({
             {creneau.resume}
           </p>
         ) : null}
-        <p className={CLASSE_TEXTE}>{contenu.succes.texte}</p>
+        <p className={CLASSE_TEXTE}>
+          {posees.cadrage ? contenu.succes.texteCadrage : contenu.succes.texte}
+        </p>
         <button
           type="button"
           onClick={recommencer}
@@ -1098,300 +1355,416 @@ export function ReservationRendezVous({
   const enCours = etatEnvoi === "envoi";
   const recapitulatif = [
     typeChoisi?.nom,
-    dureeRetenue !== undefined ? contenu.creneaux.duree(dureeRetenue) : undefined,
-    etape > ETAPE_CRENEAU ? creneau?.resume : undefined,
+    dureeRetenue !== undefined && (etape === "creneau" || creneau)
+      ? contenu.creneaux.duree(dureeRetenue)
+      : undefined,
+    creneau && etape !== "creneau" ? creneau.resume : undefined,
   ].filter((morceau): morceau is string => Boolean(morceau));
 
-  const boutonRetour = (vers: number) => (
-    <button type="button" onClick={() => setEtape(vers)} className={CLASSE_BOUTON_SECONDAIRE}>
+  const precedente = ordre[Math.max(ordre.indexOf(etape) - 1, 0)];
+  const boutonRetour = (
+    <button type="button" onClick={() => setEtape(precedente)} className={CLASSE_BOUTON_SECONDAIRE}>
       <Icon name="arrow" size={14} className="rotate-180" />
       {contenu.actions.retour}
     </button>
   );
 
+  /** Pied d'une étape : retour, et « Continuer » ou la confirmation sur la dernière. */
+  const pied = (
+    <div className="flex flex-col-reverse gap-[12px] tablet:flex-row tablet:items-center tablet:justify-between">
+      {boutonRetour}
+      {etape === derniere ? (
+        <button type="submit" disabled={enCours} className={CLASSE_BOUTON_PRINCIPAL}>
+          {enCours ? contenu.formulaire.envoiEnCours : contenu.formulaire.envoyer}
+        </button>
+      ) : (
+        // `submit` : Entrée dans un champ avance aussi, `gererSoumission` aiguille.
+        <button type="submit" className={CLASSE_BOUTON_PRINCIPAL}>
+          {contenu.actions.continuer}
+        </button>
+      )}
+    </div>
+  );
+
+  const mention = (
+    <p className="text-[12px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground-60">
+      {contenu.formulaire.mention}{" "}
+      <Link
+        href={contenu.formulaire.mentionHref}
+        className="text-foreground no-underline transition-colors duration-200 ease-[cubic-bezier(0.44,0,0.56,1)] hover:text-accent motion-reduce:transition-none"
+      >
+        {contenu.formulaire.mentionLien}
+      </Link>
+      .
+    </p>
+  );
+
+  const champObjectif = (
+    <ChoixUnique
+      prefixe={instance}
+      nom="objectif"
+      legende={posees.legendeObjectif}
+      options={objectifs}
+      choisi={objectifChoisi}
+      onChoisir={repondre("objectif", setObjectif)}
+      erreur={erreurs.objectif}
+      refPremier={refObjectif}
+    />
+  );
+
+  const champBudget = posees.budget ? (
+    <div>
+      <ChoixUnique
+        prefixe={instance}
+        nom="budget"
+        legende={q.budget.legende}
+        options={tranches}
+        choisi={budgetChoisi}
+        onChoisir={repondre("budget", setBudget)}
+        erreur={erreurs.budget}
+        refPremier={refBudget}
+      />
+      <RetourEspere retour={retour} />
+    </div>
+  ) : null;
+
   return (
     // `scroll-mt` : le haut du bloc ne doit pas finir sous l'en-tête fixe quand
     // le changement d'étape le ramène en vue.
     <div ref={racine} className="flex scroll-mt-[100px] flex-col gap-[28px]">
-      <Progression etape={etape} onAller={setEtape} />
+      <Progression ordre={ordre} etape={etape} onAller={setEtape} />
 
-      {etape > ETAPE_SUJET && recapitulatif.length > 0 ? (
-        <div className="flex flex-col gap-[6px] border border-border bg-white/[0.03] px-[16px] py-[12px]">
-          <p className={CLASSE_LIBELLE}>{contenu.recapitulatif}</p>
-          <p className="m-0 text-[14px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground">
-            {recapitulatif.join(" · ")}
-          </p>
-        </div>
+      {/* UNE LIGNE, pas un bloc : sur un téléphone, le premier champ de
+          chaque écran doit rester au-dessus de la ligne de flottaison. */}
+      {etape !== "sujet" && recapitulatif.length > 0 ? (
+        <p className="m-0 border-y border-border py-[10px] text-[14px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground">
+          <span className={`${CLASSE_LIBELLE} mr-[8px]`}>{contenu.recapitulatif}</span>
+          {recapitulatif.join(" · ")}
+        </p>
       ) : null}
 
-      {etape === ETAPE_SUJET ? (
-        <Etape titre={contenu.etapes.sujet} refTitre={refTitre}>
-          <ChoixType types={types} choisi={type} onChoisir={choisirType} />
-        </Etape>
-      ) : null}
+      <form
+        /* SANS CE NOM, la mesure appelle ce formulaire « form » et les
+           formulaires de contact du site se confondent dans un même seau. */
+        data-analytics-form="rendez-vous"
+        className="relative flex flex-col gap-[20px]"
+        /* `method="post"` et `action` : sans script, le navigateur soumet
+           lui-même, en POST et dans un CORPS. Aucune donnée personnelle ne
+           peut partir dans une chaîne de requête. */
+        method="post"
+        action="/api/rendez-vous"
+        onSubmit={gererSoumission}
+        /* Première interaction = chargement du script Turnstile. */
+        onFocusCapture={protection.activer}
+      >
+        {etape === "sujet" ? (
+          <Etape titre={contenu.etapes.sujet} refTitre={refTitre}>
+            <ChoixType types={types} choisi={type} onChoisir={choisirType} />
+          </Etape>
+        ) : null}
 
-      {etape === ETAPE_CRENEAU && typeChoisi ? (
-        <Etape titre={contenu.etapes.creneau} refTitre={refTitre}>
-          <div className="flex flex-col gap-[24px]">
-            {durees && durees.options.length > 1 ? (
+        {etape === "entreprise" && typeChoisi ? (
+          <Etape titre={contenu.etapes.entreprise} refTitre={refTitre}>
+            <p className={CLASSE_TEXTE}>{contenu.introCadrage}</p>
+            <div className="flex flex-col gap-[24px]">
+              <div className="grid grid-cols-1 gap-[14px] tablet:grid-cols-2">
+                <ChampTexte
+                  id={`${instance}-entreprise`}
+                  nom="entreprise"
+                  legende={q.entreprise.legende}
+                  valeur={entreprise}
+                  onChanger={repondre("entreprise", setEntreprise)}
+                  placeholder={q.entreprise.placeholder}
+                  erreur={erreurs.entreprise}
+                  refChamp={refEntreprise}
+                  maxLength={LONGUEUR_ENTREPRISE_MAX}
+                  autoComplete="organization"
+                />
+                <ChampTexte
+                  id={`${instance}-activite`}
+                  nom="activite"
+                  legende={q.activite.legende}
+                  valeur={activite}
+                  onChanger={repondre("activite", setActivite)}
+                  placeholder={q.activite.placeholder}
+                  erreur={erreurs.activite}
+                  refChamp={refActivite}
+                  maxLength={LONGUEUR_ACTIVITE_MAX}
+                />
+              </div>
               <ChoixUnique
                 prefixe={instance}
-                nom="duree"
-                legende={contenu.creneaux.libelleDuree}
-                options={durees.options.map((minutes) => ({
-                  id: String(minutes),
-                  libelle: contenu.creneaux.duree(minutes),
-                }))}
-                choisi={dureeRetenue !== undefined ? String(dureeRetenue) : ""}
-                onChoisir={choisirDuree}
+                nom="taille"
+                legende={q.taille.legende}
+                options={OPTIONS_TAILLE}
+                choisi={taille}
+                onChoisir={repondre("taille", setTaille)}
+                erreur={erreurs.taille}
+                refPremier={refTaille}
               />
-            ) : null}
+            </div>
+            {pied}
+          </Etape>
+        ) : null}
 
-            {etatCreneaux === "indisponible" ? (
-              <p className={CLASSE_TEXTE}>{contenu.creneaux.indisponible}</p>
-            ) : null}
+        {etape === "besoin" && typeChoisi ? (
+          <Etape titre={contenu.etapes.besoin} refTitre={refTitre}>
+            <div className="flex flex-col gap-[24px]">
+              {champObjectif}
+              <ChampTexte
+                id={`${instance}-coince`}
+                nom="coince"
+                legende={q.coince.legende}
+                valeur={coince}
+                onChanger={repondre("coince", setCoince)}
+                placeholder={q.coince.placeholders[typeChoisi.id]}
+                erreur={erreurs.coince}
+                refChamp={refCoince}
+                multiligne
+                maxLength={LONGUEUR_COINCE_MAX}
+              />
+              <ChoixUnique
+                prefixe={instance}
+                nom="cout"
+                legende={q.cout.legende}
+                options={OPTIONS_COUT}
+                choisi={cout}
+                onChoisir={repondre("cout", setCout)}
+                erreur={erreurs.cout}
+                refPremier={refCout}
+              />
+              <ChoixUnique
+                prefixe={instance}
+                nom="essaye"
+                legende={q.essaye.legende}
+                options={OPTIONS_ESSAYE}
+                choisi={essaye}
+                onChoisir={repondre("essaye", setEssaye)}
+                erreur={erreurs.essaye}
+                refPremier={refEssaye}
+              />
+            </div>
+            {pied}
+          </Etape>
+        ) : null}
 
-            {etatCreneaux === "reseau" ? (
-              <div className="flex flex-col items-start gap-[12px]">
-                <p className={CLASSE_TEXTE}>{contenu.creneaux.erreur}</p>
-                <button
-                  type="button"
-                  onClick={() => setTentative((valeur) => valeur + 1)}
-                  className="min-h-[44px] border border-border px-[16px] text-[13px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground transition-colors hover:border-accent hover:text-accent motion-reduce:transition-none"
-                >
-                  {contenu.actions.reessayer}
-                </button>
-              </div>
-            ) : null}
+        {etape === "cadre" && typeChoisi ? (
+          <Etape titre={contenu.etapes.projet} refTitre={refTitre}>
+            <div className="flex flex-col gap-[24px]">
+              <ChoixUnique
+                prefixe={instance}
+                nom="decision"
+                legende={q.decision.legende}
+                options={OPTIONS_DECISION}
+                choisi={decision}
+                onChoisir={repondre("decision", setDecision)}
+                erreur={erreurs.decision}
+                refPremier={refDecision}
+              />
+              <ChoixUnique
+                prefixe={instance}
+                nom="echeance"
+                legende={q.echeance.legende}
+                options={OPTIONS_ECHEANCE}
+                choisi={echeance}
+                onChoisir={repondre("echeance", setEcheance)}
+                erreur={erreurs.echeance}
+                refPremier={refEcheance}
+              />
+              {champBudget}
+            </div>
+            {pied}
+          </Etape>
+        ) : null}
 
-            {chargement && !donnees ? (
-              <div className="flex min-h-[320px] items-center gap-[10px]">
-                <Spinner size="sm" label={contenu.creneaux.chargement} />
-                <span aria-hidden className={CLASSE_LIBELLE}>
-                  {contenu.creneaux.chargement}
-                </span>
-              </div>
-            ) : null}
-
-            {/* Calendrier et heures restent POSÉS pendant un rechargement (mois
-                ou durée), simplement estompés : les faire disparaître
-                déplacerait la grille sous le curseur du prospect. */}
-            {donnees ? (
-              <div className="grid grid-cols-1 gap-[28px] desktop:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)]">
-                <Calendrier
-                  donnees={donnees}
-                  jourActif={jourActif}
-                  chargement={chargement}
-                  onChoisirJour={setJourChoisi}
-                  onDecaler={decalerMois}
+        {etape === "projet" && typeChoisi ? (
+          <Etape titre={contenu.etapes.projet} refTitre={refTitre}>
+            <div className="flex flex-col gap-[24px]">
+              {posees.projet ? (
+                <ChampTexte
+                  id={`${instance}-projet`}
+                  nom="projet"
+                  legende={q.projet.legende}
+                  valeur={projet}
+                  onChanger={repondre("projet", setProjet)}
+                  placeholder={q.projet.placeholder}
+                  erreur={erreurs.projet}
+                  refChamp={refProjet}
+                  maxLength={LONGUEUR_PROJET_MAX}
                 />
-                {jourActif ? (
-                  <div
-                    className={`transition-opacity motion-reduce:transition-none desktop:min-h-[300px] ${
-                      chargement ? "pointer-events-none opacity-40" : ""
-                    }`}
-                  >
-                    <Heures jour={jourActif} choisi={creneau} onChoisir={choisirCreneau} />
-                  </div>
-                ) : (
-                  <p className={`${CLASSE_TEXTE} desktop:pt-[50px]`}>
-                    {contenu.creneaux.vide}
-                  </p>
-                )}
-              </div>
-            ) : null}
+              ) : null}
+              {champObjectif}
+            </div>
+            {pied}
+          </Etape>
+        ) : null}
 
-            <p className={CLASSE_LIBELLE}>{contenu.noteFuseau}</p>
-          </div>
-          <div>{boutonRetour(ETAPE_SUJET)}</div>
-        </Etape>
-      ) : null}
+        {etape === "coordonnees" && typeChoisi ? (
+          <Etape titre={contenu.etapes.coordonnees} refTitre={refTitre}>
+            <div className="flex flex-col gap-[14px]">
+              <ChampTexte
+                id={`${instance}-nom`}
+                nom="nom"
+                legende={contenu.formulaire.nomLabel}
+                valeur={nom}
+                onChanger={setNom}
+                placeholder={contenu.formulaire.nomPlaceholder}
+                invalide={champEnErreur === "nom"}
+                autoComplete="name"
+                requis
+              />
+              <ChampTexte
+                id={`${instance}-email`}
+                nom="email"
+                type="email"
+                legende={contenu.formulaire.emailLabel}
+                valeur={email}
+                onChanger={setEmail}
+                placeholder={contenu.formulaire.emailPlaceholder}
+                invalide={champEnErreur === "email"}
+                autoComplete="email"
+                inputMode="email"
+                requis
+              />
+              <ChampTexte
+                id={`${instance}-telephone`}
+                nom="telephone"
+                type="tel"
+                legende={
+                  posees.cadrage
+                    ? contenu.formulaire.telephoneLabel
+                    : contenu.formulaire.telephoneFacultatif
+                }
+                aide={posees.cadrage ? contenu.formulaire.telephoneAide : undefined}
+                valeur={telephone}
+                onChanger={setTelephone}
+                placeholder={contenu.formulaire.telephonePlaceholder}
+                invalide={champEnErreur === "telephone"}
+                autoComplete="tel"
+                inputMode="tel"
+                requis={posees.cadrage}
+              />
+              <ChampTexte
+                id={`${instance}-message`}
+                nom="message"
+                legende={contenu.formulaire.messageLabel}
+                valeur={message}
+                onChanger={setMessage}
+                placeholder={contenu.formulaire.messagePlaceholder}
+                multiligne
+                maxLength={1500}
+              />
+            </div>
+            {pied}
+            {etape === derniere ? mention : null}
+          </Etape>
+        ) : null}
 
-      {etape >= ETAPE_PROJET && typeChoisi && creneau ? (
-        <form
-          /* SANS CE NOM, la mesure appelle ce formulaire « form » et les
-             formulaires de contact du site se confondent dans un même seau. */
-          data-analytics-form="rendez-vous"
-          className="relative flex flex-col gap-[20px]"
-          /* `method="post"` et `action` : sans script, le navigateur soumet
-             lui-même, en POST et dans un CORPS. Aucune donnée personnelle ne
-             peut partir dans une chaîne de requête. */
-          method="post"
-          action="/api/rendez-vous"
-          onSubmit={gererSoumission}
-          /* Première interaction = chargement du script Turnstile. */
-          onFocusCapture={protection.activer}
-        >
-          {etape === ETAPE_PROJET ? (
-            <Etape titre={contenu.etapes.projet} refTitre={refTitre}>
-              <div className="flex flex-col gap-[24px]">
-                {posees.projet ? (
-                  <label htmlFor={`${instance}-projet`} className="flex w-full flex-col gap-[10px]">
-                    <span className={CLASSE_LIBELLE}>{contenu.questionnaire.projet.legende}</span>
-                    <input
-                      ref={refProjet}
-                      id={`${instance}-projet`}
-                      name="projet"
-                      type="text"
-                      maxLength={LONGUEUR_PROJET_MAX}
-                      value={projet}
-                      onChange={(evenement) => {
-                        setProjet(evenement.target.value);
-                        setChampEnErreur((champ) => (champ === "projet" ? undefined : champ));
-                      }}
-                      placeholder={contenu.questionnaire.projet.placeholder}
-                      aria-invalid={erreurProjet ? true : undefined}
-                      aria-describedby={erreurProjet ? `${instance}-projet-erreur` : undefined}
-                      className={`${CLASSE_CHAMP} ${erreurProjet ? "border-accent" : ""}`}
-                    />
-                    {erreurProjet ? (
-                      <span
-                        id={`${instance}-projet-erreur`}
-                        className="text-[12px] font-medium leading-[1.3] tracking-[-0.01em] text-accent"
-                      >
-                        {erreurProjet}
-                      </span>
-                    ) : null}
-                  </label>
-                ) : null}
-                {posees.budget ? (
-                  <div>
-                    <ChoixUnique
-                      prefixe={instance}
-                      nom="budget"
-                      legende={contenu.questionnaire.budget.legende}
-                      options={tranches}
-                      choisi={budgetChoisi}
-                      onChoisir={choisirBudget}
-                      erreur={erreurBudget}
-                      refPremier={refBudget}
-                    />
-                    <RetourEspere retour={retour} />
-                  </div>
-                ) : null}
+        {etape === "creneau" && typeChoisi ? (
+          <Etape titre={contenu.etapes.creneau} refTitre={refTitre}>
+            <div className="flex flex-col gap-[24px]">
+              {durees && durees.options.length > 1 ? (
                 <ChoixUnique
                   prefixe={instance}
-                  nom="objectif"
-                  legende={posees.legendeObjectif}
-                  options={objectifs}
-                  choisi={objectifChoisi}
-                  onChoisir={choisirObjectif}
-                  erreur={erreurObjectif}
-                  refPremier={refObjectif}
+                  nom="duree"
+                  legende={contenu.creneaux.libelleDuree}
+                  options={durees.options.map((minutes) => ({
+                    id: String(minutes),
+                    libelle: contenu.creneaux.duree(minutes),
+                  }))}
+                  choisi={String(dureeRetenue)}
+                  onChoisir={choisirDuree}
                 />
-                {posees.echeance ? (
-                  <ChoixUnique
-                    prefixe={instance}
-                    nom="echeance"
-                    legende={contenu.questionnaire.echeance.legende}
-                    options={OPTIONS_ECHEANCE}
-                    choisi={echeance}
-                    onChoisir={setEcheance}
+              ) : null}
+
+              {etatCreneaux === "indisponible" ? (
+                <p className={CLASSE_TEXTE}>{contenu.creneaux.indisponible}</p>
+              ) : null}
+
+              {etatCreneaux === "reseau" ? (
+                <div className="flex flex-col items-start gap-[12px]">
+                  <p className={CLASSE_TEXTE}>{contenu.creneaux.erreur}</p>
+                  <button
+                    type="button"
+                    onClick={() => setTentative((valeur) => valeur + 1)}
+                    className="min-h-[44px] border border-border px-[16px] text-[13px] font-medium uppercase leading-[1.2] tracking-[-0.01em] text-foreground transition-colors hover:border-accent hover:text-accent motion-reduce:transition-none"
+                  >
+                    {contenu.actions.reessayer}
+                  </button>
+                </div>
+              ) : null}
+
+              {chargement && !donnees ? (
+                <div className="flex min-h-[320px] items-center gap-[10px]">
+                  <Spinner size="sm" label={contenu.creneaux.chargement} />
+                  <span aria-hidden className={CLASSE_LIBELLE}>
+                    {contenu.creneaux.chargement}
+                  </span>
+                </div>
+              ) : null}
+
+              {/* Calendrier et heures restent POSÉS pendant un rechargement (mois
+                  ou durée), simplement estompés : les faire disparaître
+                  déplacerait la grille sous le curseur du prospect. */}
+              {donnees ? (
+                <div className="grid grid-cols-1 gap-[28px] desktop:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)]">
+                  <Calendrier
+                    donnees={donnees}
+                    jourActif={jourActif}
+                    chargement={chargement}
+                    onChoisirJour={setJourChoisi}
+                    onDecaler={decalerMois}
                   />
-                ) : null}
+                  {jourActif ? (
+                    <div
+                      className={`transition-opacity motion-reduce:transition-none desktop:min-h-[300px] ${
+                        chargement ? "pointer-events-none opacity-40" : ""
+                      }`}
+                    >
+                      <Heures jour={jourActif} choisi={creneau} onChoisir={choisirCreneau} />
+                    </div>
+                  ) : (
+                    <p className={`${CLASSE_TEXTE} desktop:pt-[50px]`}>
+                      {contenu.creneaux.vide}
+                    </p>
+                  )}
+                </div>
+              ) : null}
+
+              <p className={CLASSE_LIBELLE}>{contenu.noteFuseau}</p>
+            </div>
+
+            {derniere === "creneau" ? (
+              <div ref={refConfirmer} className="flex scroll-mt-[100px] flex-col gap-[16px]">
+                {/* La région existe avant son contenu : le choix d'une heure s'annonce. */}
+                <div aria-live="polite">
+                  {creneau ? (
+                    <div className="flex flex-col gap-[6px] border border-accent bg-accent/[0.07] px-[16px] py-[12px]">
+                      <p className={CLASSE_LIBELLE}>{contenu.recapitulatif}</p>
+                      <span className="sr-only">{contenu.formulaire.confirmerCiDessous}</span>
+                      <p className="m-0 text-[16px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground">
+                        {dureeRetenue !== undefined
+                          ? `${creneau.resume} · ${contenu.creneaux.duree(dureeRetenue)}`
+                          : creneau.resume}
+                      </p>
+                    </div>
+                  ) : (
+                    <p className={CLASSE_TEXTE}>{contenu.formulaire.choisirHeure}</p>
+                  )}
+                </div>
+                {creneau ? pied : <div>{boutonRetour}</div>}
+                {creneau ? mention : null}
               </div>
-              <div className="flex flex-col-reverse gap-[12px] tablet:flex-row tablet:items-center tablet:justify-between">
-                {boutonRetour(ETAPE_CRENEAU)}
-                <button
-                  type="button"
-                  onClick={continuerVersCoordonnees}
-                  className={CLASSE_BOUTON_PRINCIPAL}
-                >
-                  {contenu.actions.continuer}
-                </button>
-              </div>
-            </Etape>
-          ) : (
-            <Etape titre={contenu.etapes.coordonnees} refTitre={refTitre}>
-              <div className="flex flex-col gap-[14px]">
-                <label htmlFor={`${instance}-nom`} className="flex w-full flex-col gap-[10px]">
-                  <span className={CLASSE_LIBELLE}>{contenu.formulaire.nomLabel}</span>
-                  <input
-                    id={`${instance}-nom`}
-                    name="nom"
-                    type="text"
-                    required
-                    autoComplete="name"
-                    value={nom}
-                    onChange={(evenement) => setNom(evenement.target.value)}
-                    placeholder={contenu.formulaire.nomPlaceholder}
-                    aria-invalid={champEnErreur === "nom" || undefined}
-                    className={`${CLASSE_CHAMP} ${champEnErreur === "nom" ? "border-accent" : ""}`}
-                  />
-                </label>
+            ) : (
+              <div>{boutonRetour}</div>
+            )}
+          </Etape>
+        ) : null}
 
-                <label htmlFor={`${instance}-email`} className="flex w-full flex-col gap-[10px]">
-                  <span className={CLASSE_LIBELLE}>{contenu.formulaire.emailLabel}</span>
-                  <input
-                    id={`${instance}-email`}
-                    name="email"
-                    type="email"
-                    required
-                    autoComplete="email"
-                    value={email}
-                    onChange={(evenement) => setEmail(evenement.target.value)}
-                    placeholder={contenu.formulaire.emailPlaceholder}
-                    aria-invalid={champEnErreur === "email" || undefined}
-                    className={`${CLASSE_CHAMP} ${champEnErreur === "email" ? "border-accent" : ""}`}
-                  />
-                </label>
-
-                <label htmlFor={`${instance}-telephone`} className="flex w-full flex-col gap-[10px]">
-                  <span className={CLASSE_LIBELLE}>{contenu.formulaire.telephoneLabel}</span>
-                  <input
-                    id={`${instance}-telephone`}
-                    name="telephone"
-                    type="tel"
-                    inputMode="tel"
-                    autoComplete="tel"
-                    value={telephone}
-                    onChange={(evenement) => setTelephone(evenement.target.value)}
-                    placeholder={contenu.formulaire.telephonePlaceholder}
-                    aria-invalid={champEnErreur === "telephone" || undefined}
-                    className={`${CLASSE_CHAMP} ${champEnErreur === "telephone" ? "border-accent" : ""}`}
-                  />
-                </label>
-
-                <label htmlFor={`${instance}-message`} className="flex w-full flex-col gap-[10px]">
-                  <span className={CLASSE_LIBELLE}>{contenu.formulaire.messageLabel}</span>
-                  <textarea
-                    id={`${instance}-message`}
-                    name="message"
-                    maxLength={1500}
-                    value={message}
-                    onChange={(evenement) => setMessage(evenement.target.value)}
-                    placeholder={contenu.formulaire.messagePlaceholder}
-                    aria-invalid={champEnErreur === "message" || undefined}
-                    className="min-h-[90px] w-full resize-y border border-white/25 bg-white/[0.04] p-[16px] text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground transition-colors placeholder:text-white/45 hover:border-white/45 focus:border-accent tablet:text-[15px]"
-                  />
-                </label>
-              </div>
-
-              <div className="flex flex-col-reverse gap-[12px] tablet:flex-row tablet:items-center tablet:justify-between">
-                {boutonRetour(ETAPE_PROJET)}
-                <button type="submit" disabled={enCours} className={CLASSE_BOUTON_PRINCIPAL}>
-                  {enCours ? contenu.formulaire.envoiEnCours : contenu.formulaire.envoyer}
-                </button>
-              </div>
-
-              <p className="text-[12px] font-medium leading-[1.3] tracking-[-0.01em] text-foreground-60">
-                {contenu.formulaire.mention}{" "}
-                <Link
-                  href={contenu.formulaire.mentionHref}
-                  className="text-foreground no-underline transition-colors duration-200 ease-[cubic-bezier(0.44,0,0.56,1)] hover:text-accent motion-reduce:transition-none"
-                >
-                  {contenu.formulaire.mentionLien}
-                </Link>
-                .
-              </p>
-            </Etape>
-          )}
-
-          {/* Toujours montés, quelle que soit l'étape du formulaire : le widget
-              Turnstile ne survit pas à un démontage entre 03 et 04. */}
-          <ChampsProtection refConteneur={protection.refConteneur} />
-        </form>
-      ) : null}
+        {/* Toujours montés, quelle que soit l'étape : le widget Turnstile ne
+            survit pas à un démontage entre deux étapes. */}
+        <ChampsProtection refConteneur={protection.refConteneur} />
+      </form>
 
       {/* HORS DES ÉTAPES, toujours monté : un refus du serveur peut renvoyer
           au calendrier ou au questionnaire, et le message doit s'y lire et
@@ -1402,7 +1775,7 @@ export function ReservationRendezVous({
           montée en permanence : une région qui apparaît déjà remplie n'est
           pas annoncée. */}
       <p aria-live="polite" className="sr-only">
-        {etape !== ETAPE_CRENEAU
+        {etape !== "creneau"
           ? ""
           : chargement
             ? contenu.creneaux.chargement

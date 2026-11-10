@@ -182,9 +182,11 @@ export interface DemandeReservation {
   readonly nom: string;
   readonly email: string;
   readonly telephone?: string;
+  /** Nom saisi au cadrage : il nomme la fiche société créée au cockpit. */
+  readonly entreprise?: string;
   /** Texte composé par `composerNotes` : téléphone en tête, réponses, message. */
   readonly notes?: string;
-  /** Réponses brutes du questionnaire (identifiants), pour le cockpit. */
+  /** Réponses du questionnaire en clair (`reponsesLisibles`), pour le cockpit. */
   readonly reponses?: Readonly<Record<string, string>>;
 }
 
@@ -217,6 +219,7 @@ export async function creerReservation(
     fuseau: FUSEAU,
   };
   if (demande.telephone) corps.telephone = demande.telephone;
+  if (demande.entreprise) corps.entreprise = demande.entreprise;
   if (demande.notes) corps.notes = demande.notes;
   if (demande.reponses && Object.keys(demande.reponses).length > 0) {
     corps.reponses = demande.reponses;

@@ -1,3 +1,23 @@
+# Questionnaire de cadrage avant le créneau, 2026-11-10
+
+Prise de rendez-vous des prospects (`/rdv`, `/rdv/logiciel`) : sujet →
+entreprise → besoin → projet → coordonnées (téléphone obligatoire) → créneau.
+Captures mobiles dans `docs/captures/rdv-questionnaire/` (`0-avant` : créneau
+d'emblée ; les autres : nouveau parcours).
+
+- **impeccable** (critique, charge cognitive) : détecteur déterministe propre
+  sur le composant. La checklist de charge cognitive a fait échouer « une étape,
+  six questions » : le cadrage est découpé en trois écrans de trois à quatre
+  questions. Libellés de taille raccourcis (« 2 à 5 ») pour tenir sur une ligne.
+  Progression : numéros seuls sous 810 px, titres lus au lecteur d'écran.
+- **design-council** (craft + anti-slop, perception, accessibilité, lentilles
+  aveugles) : L1/L2 PASS ; L3 21/30, retenu : récapitulatif sur une ligne,
+  intro qui compte les questions et dit à quoi servent les réponses ; écarté
+  (décision d'Eliott : le questionnaire filtre) : budget, coût et décideur
+  facultatifs. L5 : bordure des champs passée à 3,9:1 (bloquant), libellé sans
+  aide ni erreur imbriquées, « Continuer » en `submit` pour la touche Entrée,
+  annonce du bouton de confirmation au lecteur d'écran.
+
 # Formulaire de contact en néomorphisme, 2026-11-02
 
 Maquette validée par Eliott (HTML autonome et sept captures), portée dans le
