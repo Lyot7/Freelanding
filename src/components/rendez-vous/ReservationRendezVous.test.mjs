@@ -4,7 +4,7 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 
 import { rendezVousContent } from "@/content/rendez-vous";
-import { ReservationRendezVous } from "./ReservationRendezVous";
+import { etapeDuChamp, ReservationRendezVous } from "./ReservationRendezVous";
 
 /**
  * LE STEPPER, PARCOURU COMME UN VISITEUR, pour les deux sujets qui restent
@@ -485,5 +485,135 @@ describe("ReservationRendezVous — les questions suivent le sujet", () => {
     expect(texte(conteneur)).toContain(C.questionnaire.decision.erreur);
     expect(texte(conteneur)).toContain(C.questionnaire.budget.erreur);
     expect(document.activeElement?.getAttribute("name")).toMatch(/-decision$/u);
+  });
+});
+
+describe("etapeDuChamp — un refus du serveur renvoie à l'écran de sa question", () => {
+  it.each([
+    ["creneau", true, "creneau"],
+    ["duree", false, "creneau"],
+    ["entreprise", true, "entreprise"],
+    ["activite", true, "entreprise"],
+    ["taille", true, "entreprise"],
+    ["coince", true, "besoin"],
+    ["cout", true, "besoin"],
+    ["essaye", true, "besoin"],
+    ["objectif", true, "besoin"],
+    ["objectif", false, "projet"],
+    ["decision", true, "cadre"],
+    ["budget", true, "cadre"],
+    ["echeance", true, "cadre"],
+    ["budget", false, "projet"],
+    ["projet", false, "projet"],
+    ["nom", true, "coordonnees"],
+    ["email", true, "coordonnees"],
+    ["telephone", true, "coordonnees"],
+    ["message", false, "coordonnees"],
+  ])("%s (cadrage : %s) → %s", (champ, cadrage, attendue) => {
+    expect(etapeDuChamp(champ, cadrage)).toBe(attendue);
+  });
+
+  it("un refus sans champ, ou d'un champ inconnu, laisse le visiteur où il est", () => {
+    expect(etapeDuChamp(undefined, true)).toBeUndefined();
+    expect(etapeDuChamp("jetonCaptcha", true)).toBeUndefined();
+  });
+});
+
+describe("ReservationRendezVous — navigation et états du créneau", () => {
+  let contexte;
+  let montage;
+
+  afterEach(async () => {
+    if (montage) {
+      await act(async () => montage.racine.unmount());
+      montage = undefined;
+    }
+    if (contexte) {
+      await attendre(20);
+      contexte.restaurer();
+      contexte = undefined;
+    }
+  });
+
+  /** GET des créneaux servis dans l'ordre donné : `"reseau"` = panne, sinon `{ status, corps }`. */
+  function simulerCreneaux(reponsesGet, reponsesPost = []) {
+    const envois = [];
+    globalThis.fetch = async (url, options) => {
+      if (String(url).startsWith("/api/rendez-vous/creneaux")) {
+        const suivante = reponsesGet.length > 1 ? reponsesGet.shift() : reponsesGet[0];
+        if (suivante === "reseau") throw new Error("reseau");
+        return { ok: suivante.status === 200, status: suivante.status, json: async () => suivante.corps };
+      }
+      envois.push(JSON.parse(options.body));
+      const { status, corps } = reponsesPost.shift();
+      return { ok: status === 200, status, json: async () => corps };
+    };
+    return envois;
+  }
+
+  it("la barre et « Retour » ramènent aux étapes franchies, réponses gardées", async () => {
+    contexte = installerDom();
+    simulerServeur([]);
+    montage = await monter("logiciel");
+    const { conteneur } = montage;
+    await act(async () => attendre(20));
+    await saisir(conteneur, "entreprise", "Transports Martin");
+    await saisir(conteneur, "activite", "Transport frigorifique");
+    await choisir(conteneur, "taille", "seul");
+    await continuer(conteneur);
+    expect(titre(conteneur)).toBe(C.etapes.besoin);
+
+    await cliquer(bouton(conteneur, C.actions.retour));
+    expect(titre(conteneur)).toBe(C.etapes.entreprise);
+    expect(conteneur.querySelector('input[name="entreprise"]').value).toBe("Transports Martin");
+
+    await continuer(conteneur);
+    // Étape 01 franchie : un bouton qui ramène au choix du sujet.
+    await cliquer(bouton(conteneur, C.etapes.sujet));
+    expect(titre(conteneur)).toBe(C.etapes.sujet);
+  });
+
+  it("agenda non configuré, panne puis « Réessayer », mois vide, sans durées", async () => {
+    contexte = installerDom();
+    const sansDurees = { ...CRENEAUX, durees: undefined, duree: undefined };
+    delete sansDurees.durees;
+    delete sansDurees.duree;
+    simulerCreneaux([{ status: 503, corps: {} }]);
+    montage = await monter("demonstration");
+    let { conteneur } = montage;
+    await act(async () => attendre(30));
+    expect(texte(conteneur)).toContain(C.creneaux.indisponible);
+    await act(async () => montage.racine.unmount());
+
+    simulerCreneaux(["reseau", { status: 200, corps: { ...CRENEAUX, jours: [] } }]);
+    montage = await monter("demonstration");
+    conteneur = montage.conteneur;
+    await act(async () => attendre(30));
+    expect(texte(conteneur)).toContain(C.creneaux.erreur);
+    await cliquer(bouton(conteneur, C.actions.reessayer), 40);
+    expect(texte(conteneur)).toContain(C.creneaux.vide);
+    await act(async () => montage.racine.unmount());
+
+    // Sans durées au cockpit : la confirmation montre le créneau seul.
+    const envois = simulerCreneaux([{ status: 200, corps: sansDurees }], [{ status: 502, corps: { message: "Le rendez-vous n’a pas pu être enregistré." } }]);
+    montage = await monter("logiciel");
+    conteneur = montage.conteneur;
+    await act(async () => attendre(20));
+    await repondreAuCadrage(conteneur);
+    await donnerCoordonnees(conteneur);
+    // Moins de mouvement demandé : la confirmation vient en vue sans glisser.
+    const defilements = [];
+    window.matchMedia = () => ({ matches: true, addEventListener() {}, removeEventListener() {} });
+    window.HTMLElement.prototype.scrollIntoView = (options) => defilements.push(options);
+    await cliquer(bouton(conteneur, "15:00"));
+    expect(defilements).toEqual([{ block: "start", behavior: "auto" }]);
+    expect(texte(conteneur)).toContain("mardi 3 novembre à 15:00");
+    expect(texte(conteneur)).not.toMatch(/15:00\s·/u);
+
+    // Refus sans champ nommé : le visiteur reste sur le créneau, le message s'affiche.
+    await soumettre(conteneur);
+    expect(envois).toHaveLength(1);
+    expect(titre(conteneur)).toBe(C.etapes.creneau);
+    expect(texte(conteneur)).toContain("Le rendez-vous n’a pas pu être enregistré.");
   });
 });

@@ -1,4 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
+import { rendezVousContent } from "@/content/rendez-vous";
 import { POST } from "./route.ts";
 
 /**
@@ -106,6 +107,19 @@ describe("POST /api/rendez-vous — sujet « logiciel »", () => {
   });
 });
 
+/** Un cadrage complet, tel que l'envoie le parcours prospect depuis le 2026-11-10. */
+const cadrage = {
+  telephone: "06 12 34 56 78",
+  echeance: "trimestre",
+  entreprise: "Transports Martin",
+  activite: "Transport frigorifique",
+  taille: "6-20",
+  decision: "plusieurs",
+  coince: "On ressaisit chaque commande dans trois fichiers.",
+  cout: "2-5h",
+  essaye: "tableur",
+};
+
 describe("POST /api/rendez-vous — chaque refus nomme son champ", () => {
   const valide = { type: "logiciel", budget: tranche, objectif: "tache" };
   const loin = new Date(Date.now() + 400 * 24 * 3600 * 1000).toISOString();
@@ -122,6 +136,12 @@ describe("POST /api/rendez-vous — chaque refus nomme son champ", () => {
     ["echeance", { echeance: "demain" }],
     ["telephone", { telephone: "abc" }],
     ["projet", { type: "point-d-etape", objectif: "priorites", projet: "" }],
+    ...["entreprise", "activite", "taille", "decision", "coince", "cout", "essaye"].map((champ) => [
+      champ,
+      { ...cadrage, [champ]: "" },
+    ]),
+    ["telephone", { ...cadrage, telephone: "" }],
+    ["echeance", { ...cadrage, echeance: "" }],
   ])("%s", async (champ, surcharge) => {
     const reponse = await reserver({ ...valide, ...surcharge });
     expect(reponse.status).toBe(400);
@@ -161,5 +181,17 @@ describe("POST /api/rendez-vous — téléphone facultatif", () => {
       message: "Ce numéro de téléphone ne semble pas valide.",
       champ: "telephone",
     });
+  });
+});
+
+describe("POST /api/rendez-vous — messages du cadrage", () => {
+  it("un téléphone ou une échéance manquants demandent la réponse, sans parler de format", async () => {
+    const valide = { type: "logiciel", budget: tranche, objectif: "tache" };
+    const sansTelephone = await (await reserver({ ...valide, ...cadrage, telephone: "" })).json();
+    expect(sansTelephone.message).toBe(rendezVousContent.formulaire.telephoneErreur);
+    const sansEcheance = await (await reserver({ ...valide, ...cadrage, echeance: "" })).json();
+    expect(sansEcheance.message).toBe(rendezVousContent.questionnaire.echeance.erreur);
+    const coince = await (await reserver({ ...valide, ...cadrage, coince: "" })).json();
+    expect(coince.message).toBe(rendezVousContent.questionnaire.coince.erreur);
   });
 });

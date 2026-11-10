@@ -154,7 +154,7 @@ export const CLASSE_BOUTON_PRINCIPAL =
  * Un client déjà en cours (démonstration, point d'étape) garde le parcours
  * court : le créneau d'abord, une question, ses coordonnées.
  */
-type IdEtape = "sujet" | "entreprise" | "besoin" | "cadre" | "coordonnees" | "creneau" | "projet";
+export type IdEtape = "sujet" | "entreprise" | "besoin" | "cadre" | "coordonnees" | "creneau" | "projet";
 
 const ORDRE_CADRAGE: readonly IdEtape[] = ["sujet", "entreprise", "besoin", "cadre", "coordonnees", "creneau"];
 const ORDRE_COURT: readonly IdEtape[] = ["sujet", "creneau", "projet", "coordonnees"];
@@ -184,7 +184,7 @@ const TITRES_ETAPES: Readonly<Record<IdEtape, string>> = {
  * Étape où renvoie un refus du serveur qui nomme son champ : le visiteur
  * retrouve la question fautive au lieu d'un message loin d'elle.
  */
-function etapeDuChamp(champ: string | undefined, cadrage: boolean): IdEtape | undefined {
+export function etapeDuChamp(champ: string | undefined, cadrage: boolean): IdEtape | undefined {
   switch (champ) {
     case "creneau":
     case "duree":
@@ -934,9 +934,6 @@ export function ReservationRendezVous({
   const refBudget = useRef<HTMLInputElement | null>(null);
   const refObjectif = useRef<HTMLInputElement | null>(null);
   const refProjet = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
-  const refNom = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
-  const refEmail = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
-  const refTelephone = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
   const refConfirmer = useRef<HTMLDivElement | null>(null);
   const etapeAffichee = useRef(etape);
   useEffect(() => {
@@ -1125,11 +1122,9 @@ export function ReservationRendezVous({
         setEtape(suivante(type, "creneau"));
         return;
       }
-      setTimeout(() => {
-        const noeud = refConfirmer.current;
-        if (!noeud || typeof noeud.scrollIntoView !== "function") return;
-        noeud.scrollIntoView({ block: "nearest", behavior: mouvementReduit() ? "auto" : "smooth" });
-      }, 0);
+      // Le bloc existe déjà (il invite à choisir une heure) : il passe en haut
+      // de l'écran, et la confirmation qui s'y affiche reste en vue.
+      refConfirmer.current?.scrollIntoView({ block: "start", behavior: mouvementReduit() ? "auto" : "smooth" });
     },
     [type, dureeRetenue],
   );
@@ -1177,16 +1172,11 @@ export function ReservationRendezVous({
       champs[premiere].current?.focus();
       return;
     }
+    // Les coordonnées ne sont jamais la dernière étape du cadrage : leur
+    // « Continuer » est un `submit`, que le navigateur ne laisse passer qu'une
+    // fois nom, adresse et téléphone valides (`required`, `type="email"`).
     if (etape === "coordonnees") {
-      for (const champ of [refNom, refEmail, refTelephone]) {
-        if (champ.current && !champ.current.reportValidity()) return;
-      }
-      if (posees.cadrage) {
-        capture(ANALYTICS_EVENTS.rdvQuestionnaireCompleted, {
-          rdv_type: type,
-          ...(budgetChoisi ? { budget: budgetChoisi } : {}),
-        });
-      }
+      capture(ANALYTICS_EVENTS.rdvQuestionnaireCompleted, { rdv_type: type, budget: budgetChoisi });
     }
     setEtape(suivante(type, etape));
   };
@@ -1527,7 +1517,7 @@ export function ReservationRendezVous({
                 legende={q.coince.legende}
                 valeur={coince}
                 onChanger={repondre("coince", setCoince)}
-                placeholder={type ? q.coince.placeholders[type] : undefined}
+                placeholder={q.coince.placeholders[typeChoisi.id]}
                 erreur={erreurs.coince}
                 refChamp={refCoince}
                 multiligne
@@ -1603,18 +1593,7 @@ export function ReservationRendezVous({
                   maxLength={LONGUEUR_PROJET_MAX}
                 />
               ) : null}
-              {champBudget}
               {champObjectif}
-              {posees.echeance ? (
-                <ChoixUnique
-                  prefixe={instance}
-                  nom="echeance"
-                  legende={q.echeance.legende}
-                  options={OPTIONS_ECHEANCE}
-                  choisi={echeance}
-                  onChoisir={setEcheance}
-                />
-              ) : null}
             </div>
             {pied}
           </Etape>
@@ -1631,7 +1610,6 @@ export function ReservationRendezVous({
                 onChanger={setNom}
                 placeholder={contenu.formulaire.nomPlaceholder}
                 invalide={champEnErreur === "nom"}
-                refChamp={refNom}
                 autoComplete="name"
                 requis
               />
@@ -1644,7 +1622,6 @@ export function ReservationRendezVous({
                 onChanger={setEmail}
                 placeholder={contenu.formulaire.emailPlaceholder}
                 invalide={champEnErreur === "email"}
-                refChamp={refEmail}
                 autoComplete="email"
                 inputMode="email"
                 requis
@@ -1663,7 +1640,6 @@ export function ReservationRendezVous({
                 onChanger={setTelephone}
                 placeholder={contenu.formulaire.telephonePlaceholder}
                 invalide={champEnErreur === "telephone"}
-                refChamp={refTelephone}
                 autoComplete="tel"
                 inputMode="tel"
                 requis={posees.cadrage}
@@ -1696,7 +1672,7 @@ export function ReservationRendezVous({
                     id: String(minutes),
                     libelle: contenu.creneaux.duree(minutes),
                   }))}
-                  choisi={dureeRetenue !== undefined ? String(dureeRetenue) : ""}
+                  choisi={String(dureeRetenue)}
                   onChoisir={choisirDuree}
                 />
               ) : null}
@@ -1759,7 +1735,7 @@ export function ReservationRendezVous({
             </div>
 
             {derniere === "creneau" ? (
-              <div ref={refConfirmer} className="flex scroll-mb-[24px] flex-col gap-[16px]">
+              <div ref={refConfirmer} className="flex scroll-mt-[100px] flex-col gap-[16px]">
                 {/* La région existe avant son contenu : le choix d'une heure s'annonce. */}
                 <div aria-live="polite">
                   {creneau ? (
