@@ -17,6 +17,7 @@ import {
   rendezVousDuTypeProjet,
   retourBudget,
   tranchesBudget,
+  reponsesLisibles,
 } from "./questionnaire.ts";
 
 /**
@@ -256,6 +257,7 @@ describe("questionsDuType — démonstration et point d'étape sans budget ni é
   it("logiciel et découverte posent budget et échéance, sans projet", () => {
     for (const id of ["logiciel", "decouverte"]) {
       expect(questionsDuType(id)).toEqual({
+        cadrage: true,
         budget: true,
         echeance: true,
         projet: false,
@@ -266,6 +268,7 @@ describe("questionsDuType — démonstration et point d'étape sans budget ni é
 
   it("la démonstration demande seulement ce qu'on veut voir", () => {
     expect(questionsDuType("demonstration")).toEqual({
+      cadrage: false,
       budget: false,
       echeance: false,
       projet: false,
@@ -275,6 +278,7 @@ describe("questionsDuType — démonstration et point d'étape sans budget ni é
 
   it("le point d'étape demande le projet et ce qu'on veut trancher", () => {
     expect(questionsDuType("point-d-etape")).toEqual({
+      cadrage: false,
       budget: false,
       echeance: false,
       projet: true,
@@ -285,6 +289,7 @@ describe("questionsDuType — démonstration et point d'étape sans budget ni é
 
   it("sans sujet, aucune question", () => {
     expect(questionsDuType(undefined)).toEqual({
+      cadrage: false,
       budget: false,
       echeance: false,
       projet: false,
@@ -310,5 +315,51 @@ describe("questionsDuType — démonstration et point d'étape sans budget ni é
     expect(composerNotes({ type: "demonstration", objectif: "ia" })).toBe(
       `${rendezVousContent.notes.objectif} : L’IA au travail sur des documents`,
     );
+  });
+});
+
+describe("le cadrage — ce qu'Eliott lit avant l'appel", () => {
+  const cadrage = {
+    type: "logiciel",
+    budget: "5000-10000",
+    objectif: "tableur",
+    echeance: "trimestre",
+    telephone: "06 12 34 56 78",
+    entreprise: "Transports Martin",
+    activite: "Transport frigorifique",
+    taille: "6-20",
+    decision: "seul",
+    coince: "On ressaisit tout,\npuis on corrige.",
+    cout: "plus-5h",
+    essaye: "logiciel",
+  };
+
+  it("range le cadrage sous le téléphone, une réponse par ligne, en clair", () => {
+    const lignes = composerNotes(cadrage).split("\n");
+    expect(lignes.slice(0, 8)).toEqual([
+      "Téléphone : 06 12 34 56 78",
+      "Entreprise : Transports Martin",
+      "Activité : Transport frigorifique",
+      "Taille : 6 à 20",
+      "Ce qui coince : On ressaisit tout, puis on corrige.",
+      "Coût actuel : Plus de 5 h par semaine",
+      "Déjà essayé : Un logiciel du marché",
+      "Décision : Je décide seul",
+    ]);
+  });
+
+  it("donne au cockpit des libellés et non des identifiants", () => {
+    expect(reponsesLisibles(cadrage)).toMatchObject({
+      taille: "6 à 20",
+      cout: "Plus de 5 h par semaine",
+      objectif: "Sortir du tableur partagé",
+      echeance: "Dans les trois mois",
+      budget: "De 5 000 € à 10 000 €",
+    });
+    // Sans cadrage (point d'étape) : aucune clé vide.
+    expect(reponsesLisibles({ type: "point-d-etape", objectif: "priorites", projet: "Cockpit" })).toEqual({
+      projet: "Cockpit",
+      objectif: "Les priorités de la suite",
+    });
   });
 });

@@ -192,7 +192,14 @@ désintérêt alors qu'elle vient d'une panne.
    `$pageview` → `contact_email_clicked`
 7. **Prise de rendez-vous** — fenêtre 1 jour
    `section_viewed` (filtrer `section = rendez-vous`) → `rdv_type_selected` →
-   `rdv_slots_loaded` → `rdv_slot_selected` → `form_submitted` → `rdv_confirmed`
+   `rdv_slots_loaded` → `rdv_questionnaire_completed` → `rdv_slot_selected` →
+   `form_submitted` → `rdv_confirmed`
+
+   Depuis le 2026-11-10, les prospects (logiciel, découverte) remplissent le
+   cadrage et leurs coordonnées AVANT le créneau : `rdv_questionnaire_completed`
+   marque ce passage. La chute entre `rdv_slots_loaded` et lui mesure ce que
+   coûte le questionnaire ; les sujets des clients (démonstration, point
+   d'étape) ne l'émettent pas.
 
    Depuis le 2026-10-16, `section = rendez-vous` est le double formulaire du
    pied de page (seul formulaire du site, présent sur toutes les pages) : le

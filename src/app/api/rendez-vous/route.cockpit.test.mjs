@@ -88,7 +88,43 @@ describe("POST /api/rendez-vous — jusqu’au cockpit", () => {
     expect(corps.duree).toBe(45);
     expect(corps.telephone).toBe("06 12 34 56 78");
     expect(corps.notes.split("\n")[0]).toContain("06 12 34 56 78");
-    expect(corps.reponses).toEqual({ budget: "5000-10000", objectif: "tableur", echeance: "vite" });
+    expect(corps.reponses).toEqual({
+      budget: "De 5 000 € à 10 000 €",
+      objectif: "Sortir du tableur partagé",
+      echeance: "Dès que possible",
+    });
+  });
+
+  it("envoie le cadrage en clair : entreprise, notes lisibles et réponses reprises par le mail", async () => {
+    const envois = simuler([{ id: "rdv_3", jetonGestion: "z" }, 201]);
+    const reponse = await reserver({
+      echeance: "trimestre",
+      entreprise: "Transports Martin",
+      activite: "Transport frigorifique",
+      taille: "6-20",
+      decision: "plusieurs",
+      coince: "On ressaisit chaque commande dans trois fichiers.",
+      cout: "2-5h",
+      essaye: "tableur",
+    });
+    expect(reponse.status).toBe(200);
+    const corps = JSON.parse(envois[0].options.body);
+    expect(corps.entreprise).toBe("Transports Martin");
+    expect(corps.reponses).toMatchObject({
+      entreprise: "Transports Martin",
+      activite: "Transport frigorifique",
+      taille: "6 à 20",
+      decision: "Nous décidons à plusieurs",
+      coince: "On ressaisit chaque commande dans trois fichiers.",
+      cout: "2 à 5 h par semaine",
+      essaye: "Un tableur ou un outil fait maison",
+      objectif: "Sortir du tableur partagé",
+    });
+    const lignes = corps.notes.split("\n");
+    expect(lignes[0]).toContain("06 12 34 56 78");
+    expect(lignes).toContain("Entreprise : Transports Martin");
+    expect(lignes).toContain("Ce qui coince : On ressaisit chaque commande dans trois fichiers.");
+    expect(lignes).toContain("Décision : Nous décidons à plusieurs");
   });
 
   it("réserve un point d'étape : le projet part au cockpit, sans budget", async () => {
@@ -103,7 +139,7 @@ describe("POST /api/rendez-vous — jusqu’au cockpit", () => {
     expect(reponse.status).toBe(200);
     const corps = JSON.parse(envois[0].options.body);
     expect(corps.type).toBe("point-d-etape");
-    expect(corps.reponses).toEqual({ projet: "Cockpit", objectif: "priorites" });
+    expect(corps.reponses).toEqual({ projet: "Cockpit", objectif: "Les priorités de la suite" });
     expect(corps.notes.split("\n")[0]).toBe("Projet : Cockpit");
   });
 

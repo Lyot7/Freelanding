@@ -16,6 +16,7 @@
  * PAS DE `GET` ICI, et il ne faut jamais en ajouter : la lecture des créneaux a
  * sa propre route (`./creneaux`). Next renvoie 405 sur toute autre méthode.
  */
+import { rendezVousContent } from "@/content/rendez-vous";
 import { siteConfig } from "@/content/site";
 import { creerJournal, empreinte, json, origineEtrangere } from "@/lib/api/reponse";
 import { resoudreVerificateur } from "@/lib/contact/captcha";
@@ -24,7 +25,7 @@ import { adresseAppelante, creerLimiteur } from "@/lib/contact/rate-limit";
 import { creerReservation, obtenirDurees } from "@/lib/rendez-vous/cockpit";
 import { resoudreConfiguration } from "@/lib/rendez-vous/config";
 import { LIMITE_RESERVATION } from "@/lib/rendez-vous/limites";
-import { composerNotes } from "@/lib/rendez-vous/questionnaire";
+import { composerNotes, reponsesLisibles } from "@/lib/rendez-vous/questionnaire";
 import { validerReservation } from "@/lib/rendez-vous/validation";
 import type { MotifRejetReservation } from "@/lib/rendez-vous/validation";
 
@@ -61,7 +62,10 @@ function messageRejet(motif: MotifRejetReservation): {
         };
       case "telephone":
         return {
-          message: "Ce numéro de téléphone ne semble pas valide.",
+          message:
+            motif.raison === "requis"
+              ? rendezVousContent.formulaire.telephoneErreur
+              : "Ce numéro de téléphone ne semble pas valide.",
           champ: "telephone",
         };
       case "message":
@@ -84,7 +88,21 @@ function messageRejet(motif: MotifRejetReservation): {
       case "objectif":
         return { message: "Choisissez la réponse la plus proche de votre cas.", champ: "objectif" };
       case "echeance":
-        return { message: "Cette échéance n’est pas proposée.", champ: "echeance" };
+        return {
+          message:
+            motif.raison === "requis"
+              ? rendezVousContent.questionnaire.echeance.erreur
+              : "Cette échéance n’est pas proposée.",
+          champ: "echeance",
+        };
+      case "entreprise":
+      case "activite":
+      case "coince":
+      case "taille":
+      case "decision":
+      case "cout":
+      case "essaye":
+        return { message: rendezVousContent.questionnaire[motif.champ].erreur, champ: motif.champ };
       case "projet":
         return { message: "Indiquez le projet dont on parle, en une ligne.", champ: "projet" };
     }
@@ -226,12 +244,9 @@ export async function POST(requete: Request): Promise<Response> {
     ...(reservation.telephone ? { telephone: reservation.telephone } : {}),
     // Le téléphone reste AUSSI en tête des notes : c'est elles que l'agenda montre.
     notes: composerNotes(reservation),
-    reponses: {
-      ...(reservation.budget ? { budget: reservation.budget } : {}),
-      ...(reservation.projet ? { projet: reservation.projet } : {}),
-      objectif: reservation.objectif,
-      ...(reservation.echeance ? { echeance: reservation.echeance } : {}),
-    },
+    // Le nom de l'entreprise nomme la fiche société que le cockpit crée.
+    ...(reservation.entreprise ? { entreprise: reservation.entreprise } : {}),
+    reponses: reponsesLisibles(reservation),
   });
 
   if (!creation.ok) {

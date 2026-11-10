@@ -168,6 +168,13 @@ export const LONGUEUR_PROJET_MAX = 120;
  * peut en avoir plusieurs.
  */
 export interface QuestionsDuType {
+  /**
+   * LE CADRAGE (2026-11-10) : entreprise, activité, taille, ce qui coince, ce
+   * que ça coûte, ce qui a été essayé, qui décide. Posé AVANT le créneau, avec
+   * un téléphone obligatoire : Eliott arrive préparé, et le visiteur s'est
+   * engagé avant de réserver. Les sujets des clients en cours n'y passent pas.
+   */
+  readonly cadrage: boolean;
   readonly budget: boolean;
   readonly echeance: boolean;
   readonly projet: boolean;
@@ -179,9 +186,12 @@ const AVEC_PROJET: readonly IdRendezVous[] = ["point-d-etape"];
 
 /** Sans sujet choisi, aucune question : le composant n'a encore rien à poser. */
 export function questionsDuType(id: IdRendezVous | undefined): QuestionsDuType {
-  if (!id) return { budget: false, echeance: false, projet: false, legendeObjectif: LEGENDE_OBJECTIF };
+  if (!id) {
+    return { cadrage: false, budget: false, echeance: false, projet: false, legendeObjectif: LEGENDE_OBJECTIF };
+  }
   const qualifie = !SANS_BUDGET.includes(id);
   return {
+    cadrage: qualifie,
     budget: qualifie,
     echeance: qualifie,
     projet: AVEC_PROJET.includes(id),
@@ -191,6 +201,19 @@ export function questionsDuType(id: IdRendezVous | undefined): QuestionsDuType {
 
 /** Échéances proposées, identiques pour tous les types. */
 export const OPTIONS_ECHEANCE: readonly OptionQuestion[] = questions.echeance.options;
+
+/** Les questions à choix du cadrage, dans l'ordre où le visiteur les voit. */
+export const OPTIONS_TAILLE: readonly OptionQuestion[] = questions.taille.options;
+export const OPTIONS_DECISION: readonly OptionQuestion[] = questions.decision.options;
+export const OPTIONS_COUT: readonly OptionQuestion[] = questions.cout.options;
+export const OPTIONS_ESSAYE: readonly OptionQuestion[] = questions.essaye.options;
+
+/** Bornes des réponses libres du cadrage, communes au navigateur et au serveur. */
+export const LONGUEUR_ENTREPRISE_MAX = 120;
+export const LONGUEUR_ACTIVITE_MAX = 160;
+/** « Ce qui coince » : une vraie phrase, pas un mot lâché pour passer. */
+export const LONGUEUR_COINCE_MIN = 15;
+export const LONGUEUR_COINCE_MAX = 1_000;
 
 /**
  * Le retour affiché sous la question du budget.
@@ -227,6 +250,14 @@ export interface ReponsesQuestionnaire {
   readonly projet?: string;
   readonly objectif: string;
   readonly echeance?: string;
+  /** Le cadrage, présent pour les sujets qui le posent (`questionsDuType().cadrage`). */
+  readonly entreprise?: string;
+  readonly activite?: string;
+  readonly taille?: string;
+  readonly decision?: string;
+  readonly coince?: string;
+  readonly cout?: string;
+  readonly essaye?: string;
   /** Facultatif : le cockpit la reçoit aussi à part, mais elle reste en tête des notes. */
   readonly telephone?: string;
   readonly message?: string;
@@ -240,6 +271,40 @@ export const LIBELLE_NOTE_TELEPHONE = "Téléphone";
 
 function libelle(options: readonly OptionQuestion[], id: string): string {
   return options.find((option) => option.id === id)?.libelle ?? id;
+}
+
+type CleCadrage = "entreprise" | "activite" | "taille" | "decision" | "coince" | "cout" | "essaye";
+
+/** Ordre de lecture dans l'agenda : qui est en face, puis ce qui coince et ce que ça coûte. */
+const ORDRE_CADRAGE: readonly CleCadrage[] = ["entreprise", "activite", "taille", "coince", "cout", "essaye", "decision"];
+
+/** Réponses du cadrage en clair, dans l'ordre de lecture des notes ; les absentes sont omises. */
+function lignesCadrage(reponses: ReponsesQuestionnaire): Partial<Record<CleCadrage, string>> {
+  const lignes: Partial<Record<CleCadrage, string>> = {};
+  if (reponses.entreprise) lignes.entreprise = reponses.entreprise;
+  if (reponses.activite) lignes.activite = reponses.activite;
+  if (reponses.taille) lignes.taille = libelle(OPTIONS_TAILLE, reponses.taille);
+  if (reponses.coince) lignes.coince = reponses.coince.replace(/\s+/gu, " ");
+  if (reponses.cout) lignes.cout = libelle(OPTIONS_COUT, reponses.cout);
+  if (reponses.essaye) lignes.essaye = libelle(OPTIONS_ESSAYE, reponses.essaye);
+  if (reponses.decision) lignes.decision = libelle(OPTIONS_DECISION, reponses.decision);
+  return lignes;
+}
+
+/**
+ * Réponses en clair pour le cockpit (`reponses` de la réservation).
+ *
+ * DES LIBELLÉS ET NON DES IDENTIFIANTS : le cockpit les stocke et en reprend deux
+ * dans le mail de confirmation (`coince`, `objectif`, `src/lib/rdv/textes.ts` du
+ * cockpit). Les clés sont ce contrat : ne pas les renommer d'un seul côté.
+ */
+export function reponsesLisibles(reponses: ReponsesQuestionnaire): Record<string, string> {
+  const lisibles: Record<string, string> = { ...lignesCadrage(reponses) };
+  if (reponses.projet) lisibles.projet = reponses.projet;
+  lisibles.objectif = libelle(optionsObjectif(reponses.type), reponses.objectif);
+  if (reponses.budget) lisibles.budget = libelle(tranchesBudget(), reponses.budget).replace(/\u00a0|\u202f/gu, " ");
+  if (reponses.echeance) lisibles.echeance = libelle(OPTIONS_ECHEANCE, reponses.echeance);
+  return lisibles;
 }
 
 /**
@@ -258,6 +323,11 @@ export function composerNotes(reponses: ReponsesQuestionnaire): string {
     lignes.push(`${LIBELLE_NOTE_TELEPHONE} : ${reponses.telephone}`);
   }
   if (reponses.projet) lignes.push(`${notes.projet} : ${reponses.projet}`);
+  const cadrage = lignesCadrage(reponses);
+  for (const cle of ORDRE_CADRAGE) {
+    const valeur = cadrage[cle];
+    if (valeur) lignes.push(`${notes[cle]} : ${valeur}`);
+  }
   if (reponses.budget) {
     const retourCalcule = retourBudget(reponses.budget);
     let forfait: string = offresDuRendezVous(reponses.type).map((p) => p.nom).join(" · ");
