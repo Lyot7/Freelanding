@@ -121,7 +121,6 @@ export interface ContenuRendezVous {
     readonly emailLabel: string;
     readonly emailPlaceholder: string;
     readonly telephoneLabel: string;
-    readonly telephoneFacultatif: string;
     readonly telephoneAide: string;
     readonly telephoneErreur: string;
     readonly telephonePlaceholder: string;
@@ -394,7 +393,6 @@ export const rendezVousContent: ContenuRendezVous = {
     /* FACULTATIF, décision d'Eliott du 2026-11-02 : pour rappeler plus
        facilement le visiteur si besoin. Il part dans les notes du rendez-vous. */
     telephoneLabel: "Votre téléphone",
-    telephoneFacultatif: "Votre téléphone (facultatif)",
     telephoneAide: "Je vous appelle si la visio ne démarre pas.",
     telephoneErreur: "Indiquez un numéro où vous joindre le jour du rendez-vous.",
     telephonePlaceholder: "06 12 34 56 78",

@@ -241,7 +241,7 @@ export async function POST(requete: Request): Promise<Response> {
     ...(reservation.duree !== undefined ? { duree: reservation.duree } : {}),
     nom: reservation.nom,
     email: reservation.email,
-    ...(reservation.telephone ? { telephone: reservation.telephone } : {}),
+    telephone: reservation.telephone,
     // Le téléphone reste AUSSI en tête des notes : c'est elles que l'agenda montre.
     notes: composerNotes(reservation),
     // Le nom de l'entreprise nomme la fiche société que le cockpit crée.
