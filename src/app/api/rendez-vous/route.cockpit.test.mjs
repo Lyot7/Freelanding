@@ -134,13 +134,13 @@ describe("POST /api/rendez-vous — jusqu’au cockpit", () => {
       budget: undefined,
       objectif: "priorites",
       projet: "Cockpit",
-      telephone: "",
     });
     expect(reponse.status).toBe(200);
     const corps = JSON.parse(envois[0].options.body);
     expect(corps.type).toBe("point-d-etape");
     expect(corps.reponses).toEqual({ projet: "Cockpit", objectif: "Les priorités de la suite" });
-    expect(corps.notes.split("\n")[0]).toBe("Projet : Cockpit");
+    expect(corps.notes.split("\n")[0]).toBe("Téléphone : 06 12 34 56 78");
+    expect(corps.notes.split("\n")[1]).toBe("Projet : Cockpit");
   });
 
   it("refuse un point d'étape sans projet, champ `projet` nommé", async () => {
@@ -153,7 +153,7 @@ describe("POST /api/rendez-vous — jusqu’au cockpit", () => {
 
   it("traduit le 409 `creneau_pris` en invitation à choisir un autre créneau", async () => {
     simuler([{ erreur: "creneau_pris" }, 409]);
-    const reponse = await reserver({ telephone: "", echeance: undefined });
+    const reponse = await reserver({ echeance: undefined });
     expect(reponse.status).toBe(409);
     expect((await reponse.json()).champ).toBe("creneau");
   });

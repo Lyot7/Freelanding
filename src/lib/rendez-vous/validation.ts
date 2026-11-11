@@ -69,7 +69,7 @@ export interface ReservationValide {
   readonly nom: string;
   readonly email: string;
   /** Facultatif ; absent quand le prospect n'a rien saisi. Donnée personnelle. */
-  readonly telephone?: string;
+  readonly telephone: string;
   /** Absent quand le prospect n'a rien écrit. */
   readonly message?: string;
   /** Absent pour un type qui ne pose pas la question (`questionsDuType`). */
@@ -274,6 +274,10 @@ export function validerReservation(
       motif: { type: "champ_invalide", champ: "telephone", raison: telephone.raison },
     };
   }
+  // Obligatoire pour tout rendez-vous : sans numéro, rien ne rattrape un absent.
+  if (!telephone.valeur) {
+    return { ok: false, motif: { type: "champ_invalide", champ: "telephone", raison: "requis" } };
+  }
 
   const message = normaliserTexte(lireChaine(champs, "message"));
   if (message.length > LONGUEUR_MESSAGE_MAX) {
@@ -330,9 +334,6 @@ export function validerReservation(
   if (cadrage) {
     const lu = lireCadrage(champs);
     if (!lu.ok) return lu;
-    if (!telephone.valeur) {
-      return { ok: false, motif: { type: "champ_invalide", champ: "telephone", raison: "requis" } };
-    }
     if (!echeance.valeur) {
       return { ok: false, motif: { type: "champ_invalide", champ: "echeance", raison: "requis" } };
     }
@@ -349,7 +350,7 @@ export function validerReservation(
       ...(estDureePlausible(duree) ? { duree } : {}),
       nom,
       email,
-      ...(telephone.valeur ? { telephone: telephone.valeur } : {}),
+      telephone: telephone.valeur,
       ...(message.length > 0 ? { message } : {}),
       ...(budget ? { budget } : {}),
       ...(projet ? { projet } : {}),

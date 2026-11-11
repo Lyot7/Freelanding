@@ -213,6 +213,7 @@ async function allerAuxCoordonnees(conteneur) {
   expect(conteneur.querySelector('input[name="nom"]')).not.toBeNull();
   await saisir(conteneur, "nom", "Camille Renard");
   await saisir(conteneur, "email", "camille@exemple.fr");
+  await saisir(conteneur, "telephone", "06 32 21 37 11");
 }
 
 const continuer = (conteneur) => cliquer(bouton(conteneur, C.actions.continuer));
@@ -417,6 +418,30 @@ describe("ReservationRendezVous — les questions suivent le sujet", () => {
     expect(envois[0]).not.toHaveProperty("budget");
     expect(envois[0]).not.toHaveProperty("echeance");
     expect(envois[0]).not.toHaveProperty("projet");
+  });
+
+  it("démonstration : sans téléphone ou avec un faux, l'envoi est bloqué et le champ nommé", async () => {
+    contexte = installerDom();
+    const envois = simulerServeur([]);
+    montage = await monter();
+    const { conteneur } = montage;
+    await cliquer(bouton(conteneur, C.types.find((t) => t.id === "demonstration").nom));
+    await allerAuProjet(conteneur);
+    await choisir(conteneur, "objectif", "logiciel");
+    await allerAuxCoordonnees(conteneur);
+
+    await saisir(conteneur, "telephone", "");
+    await soumettre(conteneur);
+    expect(envois).toHaveLength(0);
+    expect(texte(conteneur)).toContain(C.formulaire.telephoneErreur);
+    expect(conteneur.querySelector('input[name="telephone"]').getAttribute("aria-invalid")).toBe(
+      "true",
+    );
+
+    await saisir(conteneur, "telephone", "abc");
+    await soumettre(conteneur);
+    expect(envois).toHaveLength(0);
+    expect(texte(conteneur)).toContain("Ce numéro de téléphone ne semble pas valide.");
   });
 
   it("point d'étape : le projet concerné puis ce qu'on veut trancher", async () => {

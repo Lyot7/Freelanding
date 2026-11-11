@@ -62,6 +62,7 @@ import { Icon, Spinner } from "@/components/ui";
 import { rendezVousContent } from "@/content/rendez-vous";
 import { ANALYTICS_EVENTS } from "@/lib/analytics/events";
 import { capture } from "@/lib/analytics/posthog";
+import { lireTelephone } from "@/lib/contact/validation";
 import type {
   IdRendezVous,
   OptionQuestion,
@@ -1218,6 +1219,19 @@ export function ReservationRendezVous({
       }
       if (etatEnvoi === "envoi" || !type || !creneau) return;
 
+      // Même lecture que le serveur : numéro requis, format plausible.
+      const lecture = lireTelephone(telephone);
+      if (!lecture.ok || !lecture.valeur) {
+        setEtatEnvoi("erreur");
+        setMessageEnvoi(
+          lecture.ok
+            ? contenu.formulaire.telephoneErreur
+            : "Ce numéro de téléphone ne semble pas valide.",
+        );
+        setChampEnErreur("telephone");
+        return;
+      }
+
       const donneesFormulaire = new FormData(evenement.currentTarget);
       const piege = donneesFormulaire.get(NOM_CHAMP_PIEGE);
 
@@ -1252,7 +1266,7 @@ export function ReservationRendezVous({
             ...(dureeRetenue !== undefined ? { duree: dureeRetenue } : {}),
             nom,
             email,
-            ...(telephone.trim() ? { telephone } : {}),
+            telephone,
             message,
             ...(budgetChoisi ? { budget: budgetChoisi } : {}),
             ...(posees.projet ? { projet } : {}),
@@ -1630,19 +1644,15 @@ export function ReservationRendezVous({
                 id={`${instance}-telephone`}
                 nom="telephone"
                 type="tel"
-                legende={
-                  posees.cadrage
-                    ? contenu.formulaire.telephoneLabel
-                    : contenu.formulaire.telephoneFacultatif
-                }
-                aide={posees.cadrage ? contenu.formulaire.telephoneAide : undefined}
+                legende={contenu.formulaire.telephoneLabel}
+                aide={contenu.formulaire.telephoneAide}
                 valeur={telephone}
                 onChanger={setTelephone}
                 placeholder={contenu.formulaire.telephonePlaceholder}
                 invalide={champEnErreur === "telephone"}
                 autoComplete="tel"
                 inputMode="tel"
-                requis={posees.cadrage}
+                requis
               />
               <ChampTexte
                 id={`${instance}-message`}
