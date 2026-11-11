@@ -61,7 +61,10 @@ function messageRejet(motif: MotifRejetReservation): {
         };
       case "telephone":
         return {
-          message: "Ce numéro de téléphone ne semble pas valide.",
+          message:
+            motif.raison === "requis"
+              ? "Indiquez votre numéro de téléphone."
+              : "Ce numéro de téléphone ne semble pas valide.",
           champ: "telephone",
         };
       case "message":
@@ -223,7 +226,7 @@ export async function POST(requete: Request): Promise<Response> {
     ...(reservation.duree !== undefined ? { duree: reservation.duree } : {}),
     nom: reservation.nom,
     email: reservation.email,
-    ...(reservation.telephone ? { telephone: reservation.telephone } : {}),
+    telephone: reservation.telephone,
     // Le téléphone reste AUSSI en tête des notes : c'est elles que l'agenda montre.
     notes: composerNotes(reservation),
     reponses: {

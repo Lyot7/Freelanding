@@ -66,6 +66,7 @@ import { Icon, Spinner } from "@/components/ui";
 import { rendezVousContent } from "@/content/rendez-vous";
 import { ANALYTICS_EVENTS } from "@/lib/analytics/events";
 import { capture } from "@/lib/analytics/posthog";
+import { lireTelephone } from "@/lib/contact/validation";
 import type {
   IdRendezVous,
   OptionQuestion,
@@ -942,6 +943,19 @@ export function ReservationRendezVous({
       evenement.preventDefault();
       if (etatEnvoi === "envoi" || !type || !creneau) return;
 
+      // Même lecture que le serveur : numéro requis, format plausible.
+      const lecture = lireTelephone(telephone);
+      if (!lecture.ok || !lecture.valeur) {
+        setEtatEnvoi("erreur");
+        setMessageEnvoi(
+          lecture.ok && !lecture.valeur
+            ? "Indiquez votre numéro de téléphone."
+            : "Ce numéro de téléphone ne semble pas valide.",
+        );
+        setChampEnErreur("telephone");
+        return;
+      }
+
       const donneesFormulaire = new FormData(evenement.currentTarget);
       const piege = donneesFormulaire.get(NOM_CHAMP_PIEGE);
 
@@ -976,7 +990,7 @@ export function ReservationRendezVous({
             ...(dureeRetenue !== undefined ? { duree: dureeRetenue } : {}),
             nom,
             email,
-            ...(telephone.trim() ? { telephone } : {}),
+            telephone,
             message,
             ...(budgetChoisi ? { budget: budgetChoisi } : {}),
             ...(posees.projet ? { projet } : {}),
@@ -1344,6 +1358,7 @@ export function ReservationRendezVous({
                     type="tel"
                     inputMode="tel"
                     autoComplete="tel"
+                    required
                     value={telephone}
                     onChange={(evenement) => setTelephone(evenement.target.value)}
                     placeholder={contenu.formulaire.telephonePlaceholder}

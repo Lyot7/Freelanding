@@ -47,6 +47,7 @@ function reserver(corps) {
         debut: new Date(maintenant + 3 * 24 * 3600 * 1000).toISOString(),
         nom: "Camille Renard",
         email: "camille@exemple.fr",
+        telephone: "06 32 21 37 11",
         debutMs: maintenant - 10_000,
         ...corps,
       }),
@@ -121,6 +122,7 @@ describe("POST /api/rendez-vous — chaque refus nomme son champ", () => {
     ["budget", { budget: "" }],
     ["echeance", { echeance: "demain" }],
     ["telephone", { telephone: "abc" }],
+    ["telephone", { telephone: "" }],
     ["projet", { type: "point-d-etape", objectif: "priorites", projet: "" }],
   ])("%s", async (champ, surcharge) => {
     const reponse = await reserver({ ...valide, ...surcharge });

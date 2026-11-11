@@ -341,7 +341,7 @@ export const rendezVousContent: ContenuRendezVous = {
     emailPlaceholder: "vous@exemple.fr",
     /* FACULTATIF, décision d'Eliott du 2026-11-02 : pour rappeler plus
        facilement le visiteur si besoin. Il part dans les notes du rendez-vous. */
-    telephoneLabel: "Votre téléphone (facultatif)",
+    telephoneLabel: "Votre téléphone",
     telephonePlaceholder: "06 12 34 56 78",
     messageLabel: "Votre situation en deux lignes (facultatif)",
     messagePlaceholder:

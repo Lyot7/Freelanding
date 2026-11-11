@@ -23,6 +23,7 @@ function valider(surcharge = {}) {
       debut: new Date(MAINTENANT + 48 * 3600 * 1000).toISOString(),
       nom: "Camille Renard",
       email: "camille@exemple.fr",
+      telephone: "06 32 21 37 11",
       budget: "5000-10000",
       objectif: "tableur",
       debutMs: DEBUT_HUMAIN,
@@ -76,6 +77,7 @@ describe("validerReservation — le type", () => {
         debut: new Date(MAINTENANT + 48 * 3600 * 1000).toISOString(),
         nom: "Camille Renard",
         email: "camille@exemple.fr",
+      telephone: "06 32 21 37 11",
         budget: "5000-10000",
         objectif: "tableur",
         debutMs: DEBUT_HUMAIN,
@@ -289,11 +291,13 @@ describe("validerReservation — la durée", () => {
   });
 });
 
-describe("validerReservation — téléphone facultatif", () => {
-  it("n'ajoute rien quand le champ est absent ou vide", () => {
-    expect(valider().reservation).not.toHaveProperty("telephone");
-    expect(valider({ telephone: "" }).reservation).not.toHaveProperty("telephone");
-    expect(valider({ telephone: "  " }).reservation).not.toHaveProperty("telephone");
+describe("validerReservation — téléphone obligatoire", () => {
+  it("refuse un numéro absent, vide ou fait d'espaces", () => {
+    for (const surcharge of [{ telephone: undefined }, { telephone: "" }, { telephone: "  " }]) {
+      const resultat = valider(surcharge);
+      expect(resultat.ok).toBe(false);
+      expect(resultat.motif).toEqual({ type: "champ_invalide", champ: "telephone", raison: "requis" });
+    }
   });
 
   it("accepte un numéro français", () => {
@@ -380,6 +384,7 @@ describe("validerReservation — démonstration et point d'étape", () => {
         debut: new Date(MAINTENANT + 48 * 3600 * 1000).toISOString(),
         nom: "Camille Renard",
         email: "camille@exemple.fr",
+      telephone: "06 32 21 37 11",
         objectif: "priorites",
         projet: "Cockpit",
         debutMs: DEBUT_HUMAIN,
