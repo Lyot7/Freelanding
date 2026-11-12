@@ -127,7 +127,7 @@ function Montant({
   }
   const ligne = "flex items-baseline gap-[0.22em]";
   const chiffre =
-    "text-[clamp(44px,13vw,64px)] font-black leading-[0.9] tracking-[-0.05em] tabular-nums";
+    "text-[44px] font-black tablet:text-[52px] leading-[0.9] tracking-[-0.05em] tabular-nums";
   const mot =
     "w-[1.7em] flex-none text-[14px] font-semibold tracking-[-0.01em] opacity-75";
   return (
@@ -318,12 +318,10 @@ function Choix<T extends string>({
 function Resultat({
   estimation,
   prenom,
-  source,
   onRecommencer,
 }: {
   estimation: Estimation;
   prenom: string;
-  source: "ia" | "boutons";
   onRecommencer: () => void;
 }) {
   const [duree, setDuree] = useState<0 | 1>(0);
@@ -351,7 +349,7 @@ function Resultat({
             : `${CLASSE_PRINCIPAL.replace("bg-accent", "border border-accent bg-transparent").replace("text-accent-ink", "text-accent")} no-underline`
         }
       >
-        {r.rendezVous}
+        {plein ? r.rendezVous : r.rendezVousBas}
         <span aria-hidden>→</span>
       </Link>
       <p className="m-0 text-[14px] font-medium text-foreground/70">
@@ -378,12 +376,7 @@ function Resultat({
               className="mt-[6px] size-[7px] flex-none bg-accent"
             />
             <span>
-              {r.avertissement}{" "}
-              {estimation.grandProjet
-                ? r.grandProjet
-                : source === "boutons"
-                  ? r.sourceBoutons
-                  : null}
+              {r.avertissement} {estimation.grandProjet ? r.grandProjet : null}
             </span>
           </p>
         </div>
@@ -499,7 +492,7 @@ function Resultat({
           </div>
           <div className="mt-auto flex flex-col gap-[4px] border-t border-accent-ink/25 pt-[20px]">
             <p className={sousLibelle}>
-              {r.abonnement.apres(abonnement.duree)}
+              {r.abonnement.apres(abonnement.duree, estimation.type !== "site")}
             </p>
             <p className="m-0">
               <Montant
@@ -734,6 +727,7 @@ export function OutilEstimation() {
                   setDescriptionValidee(true);
                 } else {
                   setDescriptionTropCourte(true);
+                  document.getElementById(idDescription)?.focus();
                 }
               }}
             >
@@ -762,7 +756,9 @@ export function OutilEstimation() {
                   className={`m-0 whitespace-nowrap text-[12px] font-medium tabular-nums ${tropCourte ? "text-accent" : "text-foreground/65"}`}
                 >
                   {longueur < 20
-                    ? t.description.minimum
+                    ? tropCourte
+                      ? t.description.manque(20 - longueur)
+                      : t.description.minimum
                     : t.description.compteur(
                         description.length,
                         LONGUEUR_DESCRIPTION_MAX,
@@ -859,7 +855,7 @@ export function OutilEstimation() {
               <p
                 id={idErreur}
                 role="alert"
-                className="m-0 text-[14px] font-medium text-accent empty:hidden"
+                className="m-0 text-[14px] font-medium text-accent"
               >
                 {etat.erreur ?? ""}
               </p>
@@ -913,7 +909,6 @@ export function OutilEstimation() {
           <Resultat
             estimation={etat.estimation}
             prenom={contact.prenom.trim()}
-            source={etat.source}
             onRecommencer={recommencer}
           />
         </Apparition>,

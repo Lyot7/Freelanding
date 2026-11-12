@@ -104,6 +104,7 @@ export const estimationContent = {
     compteur: (n: number, max: number) => `${n.toLocaleString("fr-FR")} / ${max.toLocaleString("fr-FR")}`,
     valider: "Continuer",
     minimum: "20 caractères au moins",
+    manque: (n: number) => `Encore ${n} caractère${n > 1 ? "s" : ""} au moins.`,
   },
   contact: {
     question: "Dernière étape : à qui j’envoie le détail de l’estimation ?",
@@ -127,7 +128,7 @@ export const estimationContent = {
   },
   resultat: {
     intro: (prenom: string) => `Voici votre estimation, ${prenom}.`,
-    avertissement: "Estimation indicative. Le prix ferme se donne au devis, après un rendez-vous.",
+    avertissement: "Estimation indicative. Le prix ferme se donne au devis.",
     achat: {
       titre: "Achat direct",
       sousTitre: "Vous payez le projet, il est à vous.",
@@ -141,7 +142,10 @@ export const estimationContent = {
       choixDuree: "Durée d’engagement",
       miseEnRoute: "À la commande, mise en route",
       mensualite: (mois: number) => `Puis chaque mois, pendant ${mois} mois`,
-      apres: (mois: number) => `Après ${mois} mois, le projet est à vous : il ne reste que le suivi`,
+      apres: (mois: number, evolutions: boolean) =>
+        evolutions
+          ? `Après ${mois} mois, le projet est à vous : suivi, hébergement et évolutions chaque mois`
+          : `Après ${mois} mois, le site est à vous : il ne reste que le suivi`,
       parMois: "HT par mois",
     },
     ht: "HT",
@@ -150,9 +154,9 @@ export const estimationContent = {
     des: "dès",
     aPartirDe: "À partir de",
     grandProjet: "Pour un projet de cette taille, le haut de la fourchette se fixe en rendez-vous.",
-    sourceBoutons: "Un rendez-vous de 30 minutes resserre la fourchette.",
-    rendezVous: "En parler en rendez-vous",
-    rendezVousNote: "30 minutes en visio.",
+        rendezVous: "Resserrer ma fourchette",
+    rendezVousBas: "En parler en rendez-vous",
+    rendezVousNote: "30 minutes en visio, gratuit et sans engagement.",
     recommencer: "Refaire une estimation",
   },
   erreurs: {
