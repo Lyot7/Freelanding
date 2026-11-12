@@ -148,7 +148,8 @@ export function lireComposants(texte: string): Composants | undefined {
   } catch {
     return undefined;
   }
-  if (typeof brut !== "object" || brut === null) return undefined;
+  // Le texte analysé va d'une accolade ouvrante à une fermante : un JSON valide
+  // de cette forme est toujours un objet non nul (sinon `JSON.parse` a levé).
   const o = brut as Record<string, unknown>;
   const pages = nombre(o, "pages");
   const modules = nombre(o, "modules");

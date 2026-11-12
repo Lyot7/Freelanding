@@ -613,11 +613,13 @@ export function OutilEstimation() {
     window.scrollTo({ top: 0, behavior: reduit ? "auto" : "smooth" });
   }, [protection, reduit]);
 
-  async function envoyer(evenement: FormEvent<HTMLFormElement>) {
+  async function envoyer(
+    evenement: FormEvent<HTMLFormElement>,
+    completes: Reponses,
+  ) {
     evenement.preventDefault();
     if (etat.etape !== "saisie" || etat.envoi) return;
-    const { type, equipe, outils, urgence } = reponses;
-    if (!type || !equipe || !outils || !urgence) return;
+    const { type, equipe, outils, urgence } = completes;
     setEtat({ etape: "saisie", envoi: true });
     const piege = new FormData(evenement.currentTarget).get(CHAMP_PIEGE);
     const jetonCaptcha = await protection.obtenirJeton();
@@ -708,7 +710,14 @@ export function OutilEstimation() {
     );
   }
 
-  const choixFaits = ORDRE_CHOIX.every((cle) => reponses[cle] !== undefined);
+  // Les quatre choix faits, typés comme tels : le formulaire de contact n'existe
+  // qu'avec eux, et l'envoi les reçoit sans avoir à revérifier.
+  const { type, equipe, outils, urgence } = reponses;
+  const completes: Reponses | undefined =
+    type && equipe && outils && urgence
+      ? { type, equipe, outils, urgence }
+      : undefined;
+  const choixFaits = completes !== undefined;
 
   if (choixFaits) {
     const longueur = description.trim().length;
@@ -793,14 +802,14 @@ export function OutilEstimation() {
     }
   }
 
-  if (choixFaits && descriptionValidee) {
+  if (completes && descriptionValidee) {
     if (etat.etape === "saisie") {
       fils.push(
         <Apparition key="q-contact" etape="contact">
           <Question texte={t.contact.question} actif>
             <form
               ref={refFormulaire}
-              onSubmit={envoyer}
+              onSubmit={(e) => envoyer(e, completes)}
               onFocusCapture={protection.activer}
               className="relative flex flex-col gap-[20px]"
             >
