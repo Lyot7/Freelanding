@@ -83,28 +83,6 @@ function messageRejet(motif: MotifRejetReservation): {
         };
       case "type":
         return { message: "Ce type de rendez-vous n’est pas proposé.", champ: "type" };
-      case "budget":
-        return { message: "Choisissez une tranche de budget.", champ: "budget" };
-      case "objectif":
-        return { message: "Choisissez la réponse la plus proche de votre cas.", champ: "objectif" };
-      case "echeance":
-        return {
-          message:
-            motif.raison === "requis"
-              ? rendezVousContent.questionnaire.echeance.erreur
-              : "Cette échéance n’est pas proposée.",
-          champ: "echeance",
-        };
-      case "entreprise":
-      case "activite":
-      case "coince":
-      case "taille":
-      case "decision":
-      case "cout":
-      case "essaye":
-        return { message: rendezVousContent.questionnaire[motif.champ].erreur, champ: motif.champ };
-      case "projet":
-        return { message: "Indiquez le projet dont on parle, en une ligne.", champ: "projet" };
     }
   }
   return {
@@ -241,11 +219,9 @@ export async function POST(requete: Request): Promise<Response> {
     ...(reservation.duree !== undefined ? { duree: reservation.duree } : {}),
     nom: reservation.nom,
     email: reservation.email,
-    telephone: reservation.telephone,
+    ...(reservation.telephone ? { telephone: reservation.telephone } : {}),
     // Le téléphone reste AUSSI en tête des notes : c'est elles que l'agenda montre.
     notes: composerNotes(reservation),
-    // Le nom de l'entreprise nomme la fiche société que le cockpit crée.
-    ...(reservation.entreprise ? { entreprise: reservation.entreprise } : {}),
     reponses: reponsesLisibles(reservation),
   });
 

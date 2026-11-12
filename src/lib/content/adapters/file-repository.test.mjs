@@ -27,6 +27,7 @@ import { createFileContentRepository } from "./file-repository";
 const PAGES_FIXES = [
   "/",
   "/contact",
+  "/rdv",
   "/a-propos",
   "/blog",
   "/realisations",

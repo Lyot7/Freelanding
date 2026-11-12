@@ -84,14 +84,16 @@ describe("la page de prix est cherchable", () => {
         expect(href).toBe(repereAgenceLogiciel.source.href);
         continue;
       }
-      if (href.startsWith("#")) {
-        expect(href).toBe("#rendez-vous");
+      if (href.startsWith("/rdv")) {
+        // Le premier rendez-vous : `/rdv`, sujet logiciel déjà choisi.
+        expect(href).toBe("/rdv?sujet=logiciel");
+        expect(chemins).toContain("/rdv");
         continue;
       }
       expect(chemins, `${href} n'est pas au sitemap`).toContain(href);
     }
     for (const secteur of pagesSecteur) expect(hrefs).toContain(secteur.chemin);
-    expect(hrefs).toContain("#rendez-vous");
+    expect(hrefs).toContain("/rdv?sujet=logiciel");
   });
 
   test("la FAQ compte 5 à 7 questions", () => {

@@ -29,20 +29,23 @@ import { useSearchParams } from "next/navigation";
 import { ReservationRendezVous } from "@/components/rendez-vous/ReservationRendezVous";
 import { PARAM_SUJET } from "@/content/rendez-vous";
 import type { TypeRendezVous } from "@/content/rendez-vous";
-import { resoudreSujet, typesVisibles } from "@/lib/rendez-vous/config";
+import { resoudreSujet, typesClient, typesVisibles } from "@/lib/rendez-vous/config";
 
 export function ReservationAvecSujet({
   types,
   emailContact,
+  client = false,
 }: {
   types: readonly TypeRendezVous[];
   emailContact: string;
+  /** Page `/rdv/client` : les sujets de clients au lieu de ceux du premier rendez-vous. */
+  client?: boolean;
 }) {
   const demande = resoudreSujet(useSearchParams().get(PARAM_SUJET));
   // Deux filtres, pas un : le sujet doit être connu du contenu ET réellement
   // configuré. `types` est déjà réduit aux seconds par le composant serveur.
   // Un sujet réservé aux clients ne se montre que s'il est demandé.
-  const proposes = typesVisibles(types, demande);
+  const proposes = client ? typesClient(types) : typesVisibles(types, demande);
   const typeInitial =
     demande && proposes.some((type) => type.id === demande) ? demande : undefined;
 

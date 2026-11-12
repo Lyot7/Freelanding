@@ -16,7 +16,7 @@
  * `typesDisponibles` est vide, la section ne se rend pas et les routes
  * répondent 503 avec un message honnête. C'est l'état par défaut du dépôt.
  */
-import { IDS_RENDEZ_VOUS } from "@/content/rendez-vous";
+import { IDS_CLIENT, IDS_RENDEZ_VOUS } from "@/content/rendez-vous";
 import type { IdRendezVous, TypeRendezVous } from "@/content/rendez-vous";
 
 /** Adresse du cockpit quand `COCKPIT_URL` n'est pas posée. */
@@ -30,7 +30,11 @@ export const URL_COCKPIT_PAR_DEFAUT = "https://admin.eliottbouquerel.fr";
  */
 export const CLES_COCKPIT: Readonly<Record<IdRendezVous, string>> = {
   logiciel: "logiciel",
+  site: "site",
+  ia: "ia",
   decouverte: "decouverte",
+  "point-rapide": "point-rapide",
+  proposition: "proposition",
   demonstration: "demonstration",
   "point-d-etape": "point-d-etape",
 };
@@ -95,17 +99,17 @@ export function estIdRendezVous(valeur: unknown): valeur is IdRendezVous {
 }
 
 /**
- * Anciens sujets encore présents dans des liens publiés, et leur successeur.
+ * Anciens noms de sujet, et le sujet qui les remplace.
  *
- * « outil » a été fusionné dans « logiciel » le 2026-09-23. Un lien
- * `?sujet=outil` envoyé par e-mail ou indexé avant cette date doit encore
- * présélectionner quelque chose : le visiteur n'a rien demandé de faux.
+ * « outil » a été fusionné dans « logiciel » le 2026-09-23, « cto » n'est plus
+ * proposé depuis le 2026-10-31 : un lien publié avant ces dates doit encore
+ * présélectionner quelque chose. « autre » est le nom du bouton « Autre »,
+ * « decouverte » son identifiant côté cockpit.
  */
 const SUJETS_RENOMMES: Readonly<Record<string, IdRendezVous>> = {
   outil: "logiciel",
-  ia: "logiciel",
-  site: "decouverte",
   cto: "decouverte",
+  autre: "decouverte",
 };
 
 /**
@@ -120,6 +124,16 @@ export function resoudreSujet(valeur: unknown): IdRendezVous | undefined {
     return undefined;
   }
   return SUJETS_RENOMMES[valeur];
+}
+
+/** Vrai pour un rendez-vous de client (`/rdv/client`) : formulaire réduit. */
+export function estTypeClient(id: IdRendezVous | undefined): boolean {
+  return id !== undefined && (IDS_CLIENT as readonly string[]).includes(id);
+}
+
+/** Les sujets de la page `/rdv/client`, dans l'ordre du contenu. */
+export function typesClient(types: readonly TypeRendezVous[]): readonly TypeRendezVous[] {
+  return types.filter((type) => estTypeClient(type.id));
 }
 
 /**

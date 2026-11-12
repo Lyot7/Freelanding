@@ -123,7 +123,7 @@ export const servicePageLabels = {
   reassurance:
     "Le prix dépend du projet : je le fixe au devis, avant de commencer, et il ne bouge plus. Vous le réglez selon un échéancier étalé jusqu’à la livraison, écrit au devis. Le code et l’hébergement sont à votre nom.",
 
-  /** Bouton de l'offre, vers l'ancre `#rendez-vous` de la page. */
+  /** Bouton de l'offre, vers `/rdv`. */
   cta: RESERVER_UN_APPEL,
 
   /** Le prix de l'offre, en tête de sa moitié gauche. */
@@ -131,21 +131,21 @@ export const servicePageLabels = {
 
   /**
    * LE BLOC « SUR DEVIS » : ce qui sort de l'offre (`horsOffre` de la
-   * prestation), et les trois questions du questionnaire de rendez-vous. Eliott
-   * veut des demandes déjà cadrées, budget compris : le lecteur apprend ici que
-   * le budget se pose d'entrée, et pourquoi il l'aide, lui, à cadrer.
+   * prestation), et les trois repères qu'on cadre pendant l'appel. Depuis le
+   * 2026-11-12 la réservation ne pose plus de questions : une ligne libre
+   * suffit, et le budget, l'objectif et l'échéance se voient en visio.
    */
   surMesureBloc: {
     titre: "Hors offre, sur devis",
     cta: RESERVER_UN_APPEL,
     titreQuestions: "Pas sûr de ce qu’il vous faut ?",
     introQuestions:
-      "3 questions, posées quand vous réservez votre appel. Je vous dis tout de suite ce que votre budget permet, et ce qu’il ne permet pas.",
+      "Rien à préparer avant : une ligne sur votre projet suffit pour réserver. Pendant l’appel, trois repères me permettent de cadrer.",
     questions: [
       {
         titre: "Votre budget",
         corps:
-          "Le repère le plus utile des trois. À budget connu, je vous dis ce qu’il permet de construire, et ce qui attendra.",
+          "À budget connu, je vous dis ce qu’il permet de construire, et ce qui attendra.",
       },
       {
         titre: "Votre objectif",

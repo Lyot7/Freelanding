@@ -272,8 +272,7 @@ describe("le site dit « sur devis » partout où il parle de prix", () => {
     for (const s of services) {
       expect(s.rdvHref, `« ${s.title} » n'a pas de point d'arrivée`).toBeDefined();
       const url = new URL(s.rdvHref, "https://exemple.fr");
-      expect(url.pathname).toBe("/contact");
-      expect(url.hash).toBe("#rendez-vous");
+      expect(url.pathname).toBe("/rdv");
       const sujet = url.searchParams.get(PARAM_SUJET);
       expect(IDS_RENDEZ_VOUS, `sujet inconnu sur « ${s.title} » : ${sujet}`).toContain(
         sujet,
@@ -285,8 +284,8 @@ describe("le site dit « sur devis » partout où il parle de prix", () => {
       expect(presta.rdvHref).toBe(lienRendezVous(RDV_PAR_PRESTATION[p.id]));
     }
     expect(RDV_PAR_PRESTATION.logiciel).toBe("logiciel");
-    // Le logiciel, la découverte pour tout le reste, la démonstration et le point d’étape client.
-    expect([...IDS_RENDEZ_VOUS]).toEqual(["logiciel", "decouverte", "demonstration", "point-d-etape"]);
+    // Logiciel, site, IA, autre (« decouverte »), puis les rendez-vous de clients.
+    expect([...IDS_RENDEZ_VOUS]).toEqual(["logiciel", "site", "ia", "decouverte", "point-rapide", "demonstration", "proposition", "point-d-etape"]);
   });
 
   test("aucun préfixe de prix ne revient dans le libellé ni dans la donnée", () => {

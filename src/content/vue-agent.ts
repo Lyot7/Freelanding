@@ -93,7 +93,7 @@ export const vueAgentContent = {
        * et le profil la cite plus bas.
        */
       etapes: [
-        "Premier rendez-vous en visio, gratuit, pour comprendre votre situation et ce que vous voulez obtenir. Quand vous le réservez, 3 questions sur votre projet, dont votre budget, me permettent de préparer l’appel.",
+        "Premier rendez-vous en visio, gratuit, pour comprendre votre situation et ce que vous voulez obtenir. Quand vous le réservez, une ligne sur votre projet me suffit pour préparer l’appel.",
         "Le devis ne part jamais seul par e-mail\u00A0: je vous le présente lors d’un second rendez-vous, et on le relit ensemble.",
       ],
     },

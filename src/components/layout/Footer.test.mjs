@@ -26,6 +26,14 @@ describe("Footer", () => {
   });
 });
 
+describe("Footer sans formulaire (`/rdv`, `/rdv/client`)", () => {
+  it("ne monte aucun bloc de réservation ni formulaire de contact", async () => {
+    const element = await Footer({ sansFormulaire: true });
+    expect(listesDeTypes(element)).toEqual([]);
+    expect(trouveIconeSociale(element)).toBe(true);
+  });
+});
+
 describe("decouperAutour", () => {
   it("garde ce qui suit le fragment mis en avant", () => {
     expect(decouperAutour("Avant. Fort. Après.", "Fort.")).toEqual(["Avant. ", " Après."]);
@@ -67,7 +75,7 @@ describe("Footer — le point d'étape reste réservé aux clients", () => {
     expect(listes.length).toBeGreaterThan(0);
     // Le repli (sans lecture de l'URL) le cache ; `ReservationAvecSujet` reçoit
     // la liste entière et filtre elle-même selon `?sujet=`.
-    expect(listes[0]).toEqual(["logiciel", "decouverte", "demonstration"]);
+    expect(listes[0]).toEqual(["logiciel", "site", "ia", "decouverte"]);
   });
 
   it("une page qui le demande l'ouvre seul", async () => {
@@ -77,6 +85,6 @@ describe("Footer — le point d'étape reste réservé aux clients", () => {
 
   it("une page de prestation ne le montre pas", async () => {
     const listes = listesDeTypes(await Footer({ sujetRendezVous: "logiciel" }));
-    expect(listes[0]).toEqual(["logiciel", "decouverte", "demonstration"]);
+    expect(listes[0]).toEqual(["logiciel", "site", "ia", "decouverte"]);
   });
 });

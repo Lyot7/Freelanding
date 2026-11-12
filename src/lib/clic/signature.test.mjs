@@ -206,7 +206,7 @@ function requete(methode, ua = UA_SAFARI) {
 }
 
 const DESTINATION_ATTENDUE =
-  "https://eliottbouquerel.fr/?sujet=decouverte&utm_source=email&utm_medium=signature&utm_campaign=prospection#rendez-vous";
+  "https://eliottbouquerel.fr/rdv?sujet=autre&utm_source=email&utm_medium=signature&utm_campaign=prospection";
 
 function verifierRedirection(reponse) {
   expect(reponse.status).toBe(302);
@@ -506,7 +506,7 @@ describe("traiterOuverture : portrait de la signature", () => {
 describe("traiterClicSuivi : l'offre du mail choisit le formulaire", () => {
   const offre = (corps) => async () => Response.json(corps);
   const DESTINATION_LOGICIEL =
-    "https://eliottbouquerel.fr/?sujet=logiciel&utm_source=email&utm_medium=signature&utm_campaign=prospection#rendez-vous";
+    "https://eliottbouquerel.fr/rdv?sujet=logiciel&utm_source=email&utm_medium=signature&utm_campaign=prospection";
 
   it("destinations littérales, sur l'hôte canonique", () => {
     expect(DESTINATION_CLIC_LOGICIEL).toBe(DESTINATION_LOGICIEL);

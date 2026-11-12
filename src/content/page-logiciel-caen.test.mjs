@@ -89,8 +89,10 @@ describe("la page du logiciel à Caen est cherchable", () => {
   test("ses liens internes visent des pages servies ou le rendez-vous", () => {
     const chemins = contentRoutes.map((r) => r.pathname);
     for (const href of hrefs()) {
-      if (href.startsWith("#")) {
-        expect(href).toBe("#rendez-vous");
+      if (href.startsWith("/rdv")) {
+        // Le premier rendez-vous : `/rdv`, sujet logiciel déjà choisi.
+        expect(href).toBe("/rdv?sujet=logiciel");
+        expect(chemins).toContain("/rdv");
         continue;
       }
       expect(chemins, `${href} n'est pas au sitemap`).toContain(href);
@@ -102,7 +104,7 @@ describe("la page du logiciel à Caen est cherchable", () => {
     for (const secteur of pagesSecteur) expect(liens).toContain(secteur.chemin);
     expect(liens).toContain(`/services/${LOGICIEL.slug}`);
     expect(liens).toContain(`/services/${LOGICIEL.slug}/prix`);
-    expect(liens).toContain("#rendez-vous");
+    expect(liens).toContain("/rdv?sujet=logiciel");
   });
 
   test("la FAQ compte 5 à 7 questions", () => {

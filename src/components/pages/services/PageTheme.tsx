@@ -24,6 +24,7 @@ import type {
 import { RDV_PAR_PRESTATION } from "@/content/rendez-vous";
 import { servicePageLabels } from "@/content/service-pages";
 import type { SiteConfig } from "@/lib/content/types";
+import { lienRendezVous } from "@/content/rendez-vous";
 
 /**
  * PAGE THÉMATIQUE : ERP, GMAO, automatisation, IA à Caen, et depuis le
@@ -368,7 +369,7 @@ export function PageTheme({
                 {page.reassurance ?? servicePageLabels.reassurance}
               </p>
             </div>
-            <OffreDetail offre={page.offre} href="#rendez-vous" />
+            <OffreDetail offre={page.offre} href={lienRendezVous("logiciel")} />
           </div>
         </section>
 
