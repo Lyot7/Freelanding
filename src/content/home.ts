@@ -55,15 +55,16 @@ const JOURS_BUREAU = SEMAINE.map(({ jour, tache, taches }) => {
  * comparaison le rendait exact (`offre.ts`). Le héros dit « une fraction » et
  * chiffre ce qu'une agence facture à côté du mien, source écrite.
  */
-const POSITIONNEMENT = "Logiciels sur mesure et IA pour les PME, à Caen et à distance.";
+const POSITIONNEMENT = "Développeur à Caen, je fais gagner du temps aux PME.";
 
 /*
- * LE H1 DE L'ACCUEIL. Depuis le 2026-11-01, décision d'Eliott : le temps gagné
- * d'abord, pour tous les métiers, et le moyen ensuite (logiciel, IA, accompagnement).
+ * LE H1 DE L'ACCUEIL. Depuis le 2026-11-12 (test des 5 secondes d'un reel) : le
+ * titre dit ce qui est vendu et ce qu'il fait à la place du client ; le
+ * sur-titre dit pour qui. « Moins de papier » ne disait pas ce qui était vendu.
  */
 const PORTES = [
   {
-    lines: ["Votre métier mérite", "moins de papier."],
+    lines: ["Un logiciel sur mesure", "et l’IA font vos saisies."],
     href: "#logiciel",
     price: "Voir ce que vous y gagnez",
   },
@@ -73,7 +74,7 @@ const TITRE_ACCUEIL = PORTES.map((porte) => porte.lines.join(" ")).join(" ");
 
 /** Le message d'Eliott, sous le titre. */
 const CE_QUI_DISPARAIT =
-  "Commandes à recopier, mails à trier, factures à relancer : je construis le logiciel ou j’installe l’IA qui s’en charge, pour une fraction de ce qu’une agence facture.";
+  "Commandes à recopier, mails à trier, factures à relancer : je construis le logiciel ou j’installe l’IA qui s’en charge. Votre équipe reprend ses heures, pour une fraction de ce qu’une agence facture.";
 
 /*
  * CE QU'UNE AGENCE FACTURE, ET LE MIEN SUR DEVIS (décision d'Eliott du
