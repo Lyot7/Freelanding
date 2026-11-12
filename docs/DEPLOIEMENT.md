@@ -58,6 +58,9 @@ erreur dans les journaux.
 | `CONTACT_TO_EMAIL` | non | destinataire des demandes | route en 503 |
 | `RESEND_API_KEY` | non | chemin d'envoi préféré s'il est posé | bascule sur SMTP |
 | `RDV_TOKEN` | non (secret) | jeton partagé avec le cockpit, moteur des rendez-vous (`docs/RENDEZ-VOUS.md`) | prise de rendez-vous masquée |
+| `CLOUDFLARE_ACCOUNT_ID` | non | compte Cloudflare de l'IA d'extraction de `/estimation` (Workers AI, offre gratuite) | estimation calculée depuis les boutons seuls, fourchette plus large |
+| `CLOUDFLARE_AI_TOKEN` | non (secret) | jeton Workers AI, droit « Workers AI : lecture » seul | idem |
+| `CLOUDFLARE_AI_MODEL` | non | modèle Workers AI, défaut `@cf/mistralai/mistral-small-3.1-24b-instruct` | modèle par défaut |
 | `COCKPIT_URL` | non | adresse du cockpit, `https://admin.eliottbouquerel.fr` par défaut | défaut appliqué |
 | `CLIC_TOKEN` | non | jeton du cockpit, enregistre les clics des liens `/r/<id>` des e-mails de prospection | clic non enregistré, journal `[clic] <id> non_configure`, redirection intacte |
 

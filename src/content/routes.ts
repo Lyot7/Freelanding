@@ -30,6 +30,8 @@ export const contentRoutes: readonly ContentRoute[] = [
   { pathname: "/a-propos", kind: "page" },
   { pathname: "/blog", kind: "page", lastModified: derniereDateArticle },
   { pathname: "/realisations", kind: "page" },
+  /* L'OUTIL DE CHIFFRAGE (2026-11-12), voir `estimation.ts`. */
+  { pathname: "/estimation", kind: "page" },
   /*
    * PAGES DE PRESTATION, ajoutées le 2026-08-27 avec le retrait de la grille
    * tarifaire de la page d'accueil. Elles sont DÉRIVÉES de `offre.ts`, comme les
