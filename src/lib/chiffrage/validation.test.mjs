@@ -58,3 +58,59 @@ describe("validerDemande", () => {
     expect(validerDemande(r, MAINTENANT)).toEqual({ ok: false, champ: "type" });
   });
 });
+
+describe("validerDemande, champs un à un", () => {
+  const tel = (valeur) => corps({ contact: { ...corps().contact, telephone: valeur } });
+
+  it("refuse un corps sans réponses ou sans description texte", () => {
+    expect(validerDemande(corps({ reponses: null }), MAINTENANT)).toEqual({ ok: false });
+    expect(validerDemande(corps({ reponses: [] }), MAINTENANT)).toEqual({ ok: false });
+    expect(validerDemande(corps({ description: 12 }), MAINTENANT)).toEqual({ ok: false, champ: "description" });
+    expect(validerDemande(corps({ debutMs: "hier" }), MAINTENANT)).toEqual({ ok: false });
+    expect(validerDemande(corps({ debutMs: Number.NaN }), MAINTENANT)).toEqual({ ok: false });
+    expect(validerDemande(corps({ debutMs: MAINTENANT - 13 * 3_600_000 }), MAINTENANT)).toEqual({ ok: false });
+  });
+
+  it("nomme chaque réponse hors liste", () => {
+    for (const champ of ["equipe", "outils", "urgence"]) {
+      const r = corps();
+      r.reponses = { ...r.reponses, [champ]: "nimporte" };
+      expect(validerDemande(r, MAINTENANT)).toEqual({ ok: false, champ });
+    }
+  });
+
+  it("nomme chaque coordonnée absente, vide ou trop longue", () => {
+    expect(validerDemande(corps({ contact: "Lucie" }), MAINTENANT)).toEqual({ ok: false, champ: "prenom" });
+    for (const [champ, max] of [
+      ["prenom", 60],
+      ["nom", 80],
+      ["societe", 120],
+    ]) {
+      const vide = corps({ contact: { ...corps().contact, [champ]: "   " } });
+      expect(validerDemande(vide, MAINTENANT)).toEqual({ ok: false, champ });
+      const absent = corps({ contact: { ...corps().contact, [champ]: undefined } });
+      expect(validerDemande(absent, MAINTENANT)).toEqual({ ok: false, champ });
+      const long = corps({ contact: { ...corps().contact, [champ]: "a".repeat(max + 1) } });
+      expect(validerDemande(long, MAINTENANT)).toEqual({ ok: false, champ });
+    }
+    const mailVide = corps({ contact: { ...corps().contact, email: 4 } });
+    expect(validerDemande(mailVide, MAINTENANT)).toEqual({ ok: false, champ: "email" });
+  });
+
+  it("refuse un téléphone illisible ou mal formé", () => {
+    expect(validerDemande(tel("abc"), MAINTENANT)).toEqual({ ok: false, champ: "telephone" });
+    expect(validerDemande(tel("06"), MAINTENANT)).toEqual({ ok: false, champ: "telephone" });
+    expect(validerDemande(tel(null), MAINTENANT)).toEqual({ ok: false, champ: "telephone" });
+  });
+
+  it("garde un jeton captcha absent comme indéfini", () => {
+    const r = validerDemande(corps({ jetonCaptcha: 42 }), MAINTENANT);
+    expect(r.ok).toBe(true);
+    expect(r.demande.jetonCaptcha).toBeUndefined();
+  });
+
+  it("ne tient pas compte d'un piège qui n'est pas du texte", () => {
+    expect(validerDemande(corps({ referenceInterne: 0 }), MAINTENANT).ok).toBe(true);
+    expect(validerDemande(corps({ referenceInterne: "   " }), MAINTENANT).ok).toBe(true);
+  });
+});

@@ -117,3 +117,149 @@ describe("POST /api/estimation", () => {
     expect((await POST(meme())).status).toBe(429);
   });
 });
+
+describe("POST /api/estimation, chemins d'erreur et de secours", () => {
+  let journal;
+  let consoleOrigine;
+  let reponseTurnstile;
+  let reponseIA;
+  let reponseResend;
+  let appelsResend;
+
+  beforeEach(() => {
+    journal = [];
+    consoleOrigine = console.error;
+    console.error = (...args) => journal.push(args.join(" "));
+    reponseTurnstile = { success: true };
+    reponseIA = undefined;
+    reponseResend = undefined;
+    appelsResend = [];
+    const base = globalThis.fetch;
+    globalThis.fetch = async (url, init) => {
+      const adresse = String(url);
+      if (adresse.includes("turnstile")) return Response.json(reponseTurnstile);
+      if (adresse.includes("api.cloudflare.com")) {
+        if (reponseIA instanceof Error) throw reponseIA;
+        return reponseIA ?? Response.json({ result: { response: "pas du json" } });
+      }
+      if (adresse.startsWith("https://api.resend.com")) {
+        appelsResend.push(JSON.parse(init.body));
+        return reponseResend ?? Response.json({ id: "mail-1" });
+      }
+      return base(url, init);
+    };
+  });
+
+  afterEach(() => {
+    console.error = consoleOrigine;
+  });
+
+  const corpsValide = () => ({ ...VALIDE, debutMs: Date.now() - 30_000 });
+  const journalContient = (texte) => journal.some((l) => l.includes(texte));
+
+  test("refuse une origine étrangère", async () => {
+    const r = await POST(
+      new Request("http://localhost:3000/api/estimation", {
+        method: "POST",
+        headers: { "content-type": "application/json", origin: "https://ailleurs.example" },
+        body: JSON.stringify(corpsValide()),
+      }),
+    );
+    expect(r.status).toBe(403);
+  });
+
+  test("refuse une requête sans type de contenu", async () => {
+    const r = await POST(new Request("http://localhost:3000/api/estimation", { method: "POST" }));
+    expect(r.status).toBe(415);
+  });
+
+  test("répond 400 à un corps qui n'est pas du JSON", async () => {
+    ip += 1;
+    const r = await POST(
+      new Request("http://localhost:3000/api/estimation", {
+        method: "POST",
+        headers: { "content-type": "application/json", origin: "http://localhost:3000", "x-forwarded-for": `203.0.113.${ip}` },
+        body: "{pas du json",
+      }),
+    );
+    expect(r.status).toBe(400);
+    expect((await r.json()).champ).toBeUndefined();
+  });
+
+  test("rejette un robot en silence, sans nommer de champ", async () => {
+    const r = await POST(requete({ ...corpsValide(), referenceInterne: "robot" }));
+    expect(r.status).toBe(400);
+    const charge = await r.json();
+    expect(charge.champ).toBeUndefined();
+    expect(journalContient("rejet_validation")).toBe(true);
+  });
+
+  test("captcha refusé : 403 ; captcha non configuré : 503", async () => {
+    reponseTurnstile = { success: false, "error-codes": ["invalid-input-response"] };
+    expect((await POST(requete(corpsValide()))).status).toBe(403);
+    expect(journalContient("captcha_refuse")).toBe(true);
+    delete process.env.TURNSTILE_SECRET_KEY;
+    expect((await POST(requete(corpsValide()))).status).toBe(503);
+  });
+
+  test("avec l'IA configurée : les composants viennent du modèle", async () => {
+    process.env.CLOUDFLARE_ACCOUNT_ID = "0123456789abcdef0123456789abcdef";
+    process.env.CLOUDFLARE_AI_TOKEN = "jeton-ia";
+    reponseIA = Response.json({
+      result: {
+        response:
+          '{"pages":0,"modules":3,"connexions":1,"utilisateurs":12,"usagesIA":0,"boutique":false,"espacePrive":false,"multilingue":false,"flou":"faible"}',
+      },
+    });
+    const r = await POST(requete(corpsValide()));
+    expect(r.status).toBe(200);
+    expect((await r.json()).source).toBe("ia");
+    expect(appelsCockpit[0].corps.sourceComposants).toBe("ia");
+  });
+
+  test("IA en panne ou illisible : repli sur les boutons, journalisé", async () => {
+    process.env.CLOUDFLARE_ACCOUNT_ID = "0123456789abcdef0123456789abcdef";
+    process.env.CLOUDFLARE_AI_TOKEN = "jeton-ia";
+    reponseIA = new TypeError("réseau");
+    const panne = await POST(requete(corpsValide()));
+    expect((await panne.json()).source).toBe("boutons");
+    expect(journalContient("extraction_repli")).toBe(true);
+    expect(journalContient("TypeError")).toBe(true);
+    journal.length = 0;
+    reponseIA = undefined;
+    const illisible = await POST(requete(corpsValide()));
+    expect((await illisible.json()).source).toBe("boutons");
+    expect(journalContient("illisible")).toBe(true);
+  });
+
+  test("cockpit en panne : l'estimation part par mail à Eliott", async () => {
+    statutCockpit = 503;
+    process.env.RESEND_API_KEY = "cle-resend-de-test";
+    const r = await POST(requete(corpsValide()));
+    expect(r.status).toBe(200);
+    expect(appelsResend.length).toBe(1);
+    expect(appelsResend[0].subject).toContain("Menuiserie des Coteaux");
+    expect(appelsResend[0].reply_to).toBe("lucie@coteaux.fr");
+    expect(appelsResend[0].text).toContain("statut_503");
+    expect(journalContient("cockpit_echoue")).toBe(true);
+    expect(journalContient("contact_perdu")).toBe(false);
+  });
+
+  test("cockpit en panne et mail refusé : le contact perdu est journalisé", async () => {
+    statutCockpit = 503;
+    process.env.RESEND_API_KEY = "cle-resend-de-test";
+    reponseResend = Response.json({ message: "domaine non vérifié" }, { status: 403 });
+    const r = await POST(requete(corpsValide()));
+    expect(r.status).toBe(200);
+    expect(journalContient("contact_perdu")).toBe(true);
+    expect(journalContient("refuse")).toBe(true);
+  });
+
+  test("cockpit en panne et aucun expéditeur : le contact perdu est journalisé", async () => {
+    statutCockpit = 503;
+    const r = await POST(requete(corpsValide()));
+    expect(r.status).toBe(200);
+    expect(journalContient("contact_perdu")).toBe(true);
+    expect(journalContient("expediteur_non_configure")).toBe(true);
+  });
+});

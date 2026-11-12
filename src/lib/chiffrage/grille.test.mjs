@@ -182,3 +182,44 @@ describe("entrées", () => {
     expect(c.multilingue).toBe(true);
   });
 });
+
+describe("composants supposés sans IA", () => {
+  const base = (type, outils, equipe = "6-20") => composantsParDefaut({ type, equipe, outils, urgence: "libre" });
+
+  it("compte les connexions d'après les outils actuels", () => {
+    expect(base("logiciel", "plusieurs").connexions).toBe(2);
+    expect(base("logiciel", "logiciel").connexions).toBe(1);
+    expect(base("logiciel", "papier").connexions).toBe(0);
+    expect(base("logiciel", "rien").connexions).toBe(0);
+    expect(base("site", "plusieurs").connexions).toBe(0);
+  });
+
+  it("compte les modules d'après l'équipe, et l'IA d'après le type", () => {
+    expect(base("logiciel", "rien", "50+").modules).toBe(5);
+    expect(base("autre", "rien", "1-5").modules).toBe(2);
+    expect(base("site", "rien").modules).toBe(0);
+    expect(base("ia", "rien").usagesIA).toBe(1);
+    expect(base("logiciel", "rien").usagesIA).toBe(0);
+  });
+});
+
+describe("indices lus dans la description", () => {
+  const neutre = composantsParDefaut(reponses("site"));
+
+  it("repère la boutique, l'espace privé, les langues et l'IA", () => {
+    const c = indicesTexte("Une boutique avec espace client, en anglais, et un chatgpt pour répondre.", neutre);
+    expect(c.boutique).toBe(true);
+    expect(c.espacePrive).toBe(true);
+    expect(c.multilingue).toBe(true);
+    expect(c.usagesIA).toBe(1);
+  });
+
+  it("n'ajoute rien quand rien n'est nommé, et ne retire jamais", () => {
+    const c = indicesTexte("Une vitrine simple.", neutre);
+    expect(c.boutique).toBe(false);
+    expect(c.usagesIA).toBe(0);
+    const garde = indicesTexte("Une vitrine simple.", { ...neutre, boutique: true, espacePrive: true, multilingue: true, usagesIA: 2 });
+    expect(garde.boutique && garde.espacePrive && garde.multilingue).toBe(true);
+    expect(garde.usagesIA).toBe(2);
+  });
+});

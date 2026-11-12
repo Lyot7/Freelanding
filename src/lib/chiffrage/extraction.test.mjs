@@ -106,3 +106,92 @@ describe("extraire", () => {
     expect(r.ok).toBe(false);
   });
 });
+
+describe("lecture de la réponse du modèle", () => {
+  it("refuse des accolades qui ne contiennent pas du JSON", () => {
+    expect(lireComposants("x {1} y")).toBeUndefined();
+  });
+
+  it("prend un objet déjà décodé rendu par le modèle", async () => {
+    const objet = JSON.parse(JSON_OK);
+    const r = await extraire(REPONSES, "x", {
+      env: ENV,
+      compteur: creerCompteur(),
+      fetch: faux({ result: { response: objet } }).f,
+    });
+    expect(r.ok).toBe(true);
+    expect(r.composants.modules).toBe(3);
+  });
+
+  it("repli illisible quand la forme de la réponse n'est pas celle de Workers AI", async () => {
+    for (const charge of [null, "texte", { result: null }, { result: "x" }, { result: {} }, { result: { response: 12 } }]) {
+      const r = await extraire(REPONSES, "x", {
+        env: ENV,
+        compteur: creerCompteur(),
+        fetch: async () => new Response(JSON.stringify(charge)),
+      });
+      expect(r).toEqual({ ok: false, raison: "illisible" });
+    }
+  });
+
+  it("repli illisible quand la réponse n'est pas du JSON", async () => {
+    const r = await extraire(REPONSES, "x", {
+      env: ENV,
+      compteur: creerCompteur(),
+      fetch: async () => new Response("<html>"),
+    });
+    expect(r).toEqual({ ok: false, raison: "illisible" });
+  });
+
+  it("repli indisponible sur une exception, avec son nom ou « inconnue »", async () => {
+    const nommee = await extraire(REPONSES, "x", {
+      env: ENV,
+      compteur: creerCompteur(),
+      fetch: async () => {
+        throw new TypeError("réseau");
+      },
+    });
+    expect(nommee).toEqual({ ok: false, raison: "indisponible", detail: "TypeError" });
+    const autre = await extraire(REPONSES, "x", {
+      env: ENV,
+      compteur: creerCompteur(),
+      fetch: async () => {
+        throw "chaîne";
+      },
+    });
+    expect(autre).toEqual({ ok: false, raison: "indisponible", detail: "inconnue" });
+  });
+
+  it("choisit le modèle de l'environnement, sinon celui par défaut", async () => {
+    const { f, appels } = faux({ result: { response: JSON_OK } });
+    await extraire(REPONSES, "x", { env: { ...ENV, CLOUDFLARE_AI_MODEL: " @cf/autre/modele " }, compteur: creerCompteur(), fetch: f });
+    expect(appels[0].url).toContain("/ai/run/@cf/autre/modele");
+  });
+
+  it("lit l'environnement du processus et le fetch global par défaut", async () => {
+    const envAvant = { ...process.env };
+    const fetchAvant = globalThis.fetch;
+    process.env.CLOUDFLARE_ACCOUNT_ID = ENV.CLOUDFLARE_ACCOUNT_ID;
+    process.env.CLOUDFLARE_AI_TOKEN = "jeton";
+    const appels = [];
+    globalThis.fetch = async (url) => {
+      appels.push(String(url));
+      return new Response(JSON.stringify({ result: { response: JSON_OK } }));
+    };
+    try {
+      const r = await extraire(REPONSES, "x", { compteur: creerCompteur() });
+      expect(r.ok).toBe(true);
+      expect(appels.length).toBe(1);
+    } finally {
+      globalThis.fetch = fetchAvant;
+      process.env = envAvant;
+    }
+  });
+
+  it("le compteur sans date compte le jour courant", () => {
+    const c = creerCompteur(3);
+    expect(c.utilises()).toBe(0);
+    c.reserver();
+    expect(c.utilises()).toBe(1);
+  });
+});

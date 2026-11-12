@@ -540,7 +540,7 @@ const CONTACT_VIDE: Coordonnees = {
   telephone: "",
 };
 
-function libelleChoix(cle: CleChoix, valeur: string): string {
+export function libelleChoix(cle: CleChoix, valeur: string): string {
   const q = t.questions[cle] as QuestionChoix<string>;
   return q.options.find((o) => o.valeur === valeur)?.libelle ?? valeur;
 }
