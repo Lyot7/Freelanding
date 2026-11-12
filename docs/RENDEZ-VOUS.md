@@ -23,37 +23,37 @@ navigateur ──> /api/rendez-vous          ──> cockpit POST /api/rdv
   serveur du site : `src/lib/rendez-vous/cockpit.ts` n'est importé que par des
   routes et des pages serveur.
 - Les types sont désignés par leur clé cockpit (`CLES_COCKPIT` dans
-  `src/lib/rendez-vous/config.ts`) : `logiciel`, `decouverte`,
-  `demonstration` et `point-d-etape` depuis le 2026-11-02 (ces deux derniers
-  quittent Cal.com). Le cockpit connaît aussi `site`, `ia` et `cto`, que le site
-  ne propose plus depuis le 2026-10-31.
-- `point-d-etape` est réservé aux clients : `typesVisibles` ne le montre dans
-  aucun choix de sujet, il ne s'ouvre que par `?sujet=point-d-etape` (lien
-  `/rdv/point-d-etape`), et il est alors le seul sujet proposé. Le cockpit ne
-  le liste qu'avec `?prive=1`, mais accepte ses créneaux et sa réservation
-  comme ceux des autres types.
-- Questionnaire par sujet (`questionsDuType`). Depuis le 2026-11-10,
-  `logiciel` et `decouverte` passent par le CADRAGE AVANT LE CRÉNEAU : sujet →
-  entreprise (nom, activité, taille) → besoin (priorité, ce qui coince, ce que
-  ça coûte, déjà essayé) → projet (qui décide, échéance, budget) → coordonnées
-  (téléphone obligatoire) → créneau. Tout est exigé, au navigateur comme au
-  serveur ; un onglet ouvert avant cette date, qui n'envoie aucune réponse de
-  cadrage, réserve encore. `demonstration` et `point-d-etape` gardent l'ordre
-  court (créneau, une ou deux questions, coordonnées, téléphone facultatif).
-  Une réponse à une question non posée est ignorée.
-- Liens directs (307, `next.config.ts`) : `/rdv` (découverte), `/rdv/logiciel`,
-  `/rdv/demonstration`, `/rdv/point-d-etape`.
-- Les durées viennent de `GET /api/rdv/types?prive=1` du cockpit (gardées cinq
-  minutes), pour avoir aussi celles du point d'étape.
-  Le cockpit est l'autorité : la durée du contenu (`src/content/rendez-vous.ts`)
-  n'est qu'un affichage.
-- Les réponses au questionnaire partent deux fois : en texte dans `notes`
-  (composé par `composerNotes`, téléphone en première ligne, c'est ce qu'Eliott
-  lit dans son agenda et dans l'historique de la fiche société), et en clair
-  dans `reponses` (`reponsesLisibles`, libellés et non identifiants). Le
-  cockpit reprend `coince` et `objectif` dans le mail de confirmation, qui
-  demande au visiteur de confirmer d'un mot. Le nom saisi part aussi en
-  `entreprise` : il nomme la fiche société créée.
+  `src/lib/rendez-vous/config.ts`), identique à l'identifiant du site :
+  `logiciel`, `site`, `ia`, `decouverte` (bouton « Autre ») pour le PREMIER
+  rendez-vous, puis `point-rapide`, `demonstration`, `proposition` et
+  `point-d-etape` pour les CLIENTS en cours (`IDS_CLIENT`). Le sujet choisi part
+  comme type : le titre de l'agenda, la fiche et le mail de confirmation le
+  suivent au cockpit, sans autre champ.
+- **UN SEUL LIEN DE PREMIER RENDEZ-VOUS depuis le 2026-11-12 : `/rdv`**, page
+  dédiée (`src/app/(site)/rdv/page.tsx`). Le visiteur choisit son sujet par un
+  bouton (Logiciel, Site, IA, Autre), `?sujet=logiciel|site|ia|autre`
+  présélectionne le bouton (liens des pages, de l'outil de chiffrage `/estimation`,
+  des mails). Un seul écran : sujet, créneau, nom, e-mail, téléphone (obligatoire),
+  une ligne libre facultative. La durée est celle du type au cockpit. Le cadrage
+  en dix questions de 2026-11-10 est retiré : il découragait la prise de
+  rendez-vous. Les anciens noms `outil`, `cto` et `autre` sont traduits par
+  `resoudreSujet`.
+- **UN SEUL LIEN POUR LES CLIENTS : `/rdv/client`** (non indexé,
+  `src/app/(site)/rdv/client/page.tsx`). Quatre boutons : Point rapide,
+  Démonstration, Proposition, Point d'étape ; `?sujet=point-rapide|demonstration|
+  proposition|point-d-etape` présélectionne. Seuls le nom et l'e-mail sont
+  exigés, le téléphone et la ligne libre sont facultatifs (`estTypeClient`).
+  `/rdv/demonstration` et `/rdv/point-d-etape` y renvoient (307). Ces quatre
+  types sont `prive` : ils ne figurent jamais dans le choix de `/rdv`.
+- Liens (`next.config.ts`) : `/rdv/logiciel` → `/rdv?sujet=logiciel` en 301 (il
+  est dans des centaines de mails de prospection et dans les liens suivis du
+  cockpit), les mails sortants du cockpit n'ont donc rien à changer.
+  Destinations des clics suivis : `src/lib/clic/signature.ts`.
+- La ligne libre part deux fois : en notes (`composerNotes`, téléphone en première
+  ligne quand il existe, c'est ce qu'Eliott lit dans son agenda et dans
+  l'historique de la fiche société), et en clair dans `reponses.coince`
+  (`reponsesLisibles`), que le cockpit reprend dans le mail de confirmation en
+  demandant de confirmer d'un mot. Sans ligne libre, ni notes ni réponses.
 - Horizon : 60 jours (`HORIZON_JOURS`, le même qu'au cockpit). Préavis réel :
   deux heures, tenu par le cockpit ; le site ne filtre qu'à une heure.
 

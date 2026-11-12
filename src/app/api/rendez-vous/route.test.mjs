@@ -3,8 +3,8 @@ import { rendezVousContent } from "@/content/rendez-vous";
 import { POST } from "./route.ts";
 
 /**
- * LA ROUTE DE RÉSERVATION, VUE DU NAVIGATEUR, pour les deux sujets qui restent
- * depuis le 2026-10-31 : « logiciel » et « decouverte ». Rien ne part au cockpit : sans clef Turnstile, une
+ * LA ROUTE DE RÉSERVATION, VUE DU NAVIGATEUR, pour chaque sujet proposé
+ * (logiciel, site, ia, decouverte, demonstration, point-d-etape). Rien ne part au cockpit : sans clef Turnstile, une
  * demande valide s'arrête au captcha en 503, APRÈS la validation. Un 503 prouve
  * donc que la demande a passé la validation ; un 400 dit quel champ l'a
  * arrêtée.
@@ -56,73 +56,54 @@ function reserver(corps) {
   );
 }
 
-const tranche = "5000-10000";
+describe("POST /api/rendez-vous : les sujets", () => {
+  it.each(["logiciel", "site", "ia", "decouverte", "point-rapide", "demonstration", "proposition", "point-d-etape"])(
+    "« %s » passe la validation sans autre champ que les coordonnées",
+    async (type) => {
+      const reponse = await reserver({ type });
+      expect(reponse.status).toBe(503);
+    },
+  );
 
-describe("POST /api/rendez-vous — sujet « decouverte »", () => {
-  it("passe la validation avec le budget, le besoin et l'échéance", async () => {
-    const reponse = await reserver({
-      type: "decouverte",
-      budget: tranche,
-      objectif: "conseil",
-      echeance: "vite",
-    });
+  it.each(["point-rapide", "demonstration", "proposition", "point-d-etape"])(
+    "un client réserve « %s » sans téléphone",
+    async (type) => {
+      const reponse = await reserver({ type, telephone: "" });
+      expect(reponse.status).toBe(503);
+    },
+  );
+
+  it("garde la ligne libre facultative", async () => {
+    const reponse = await reserver({ type: "site", message: "Refaire notre site vitrine." });
     expect(reponse.status).toBe(503);
   });
 
-  it("exige le budget : plus aucun sujet n'en est dispensé", async () => {
-    const reponse = await reserver({ type: "decouverte", objectif: "conseil" });
-    expect(reponse.status).toBe(400);
-    expect((await reponse.json()).champ).toBe("budget");
-  });
-
-  it("refuse un besoin hors de sa liste, en nommant le champ", async () => {
-    const reponse = await reserver({ type: "decouverte", budget: tranche, objectif: "tableur" });
-    expect(reponse.status).toBe(400);
-    expect((await reponse.json()).champ).toBe("objectif");
-  });
-});
-
-describe("POST /api/rendez-vous — sujet « logiciel »", () => {
-  it("passe la validation avec la tâche et une tranche de budget", async () => {
-    const reponse = await reserver({ type: "logiciel", budget: tranche, objectif: "tableur" });
+  it.each(["outil", "cto", "autre"])("traduit l'ancien sujet « %s » d'un onglet resté ouvert", async (type) => {
+    const reponse = await reserver({ type });
     expect(reponse.status).toBe(503);
   });
 
-  it("ne demande plus d'outil, et ignore un outil envoyé par un ancien onglet", async () => {
+  it("ignore sans erreur les champs de l'ancien questionnaire", async () => {
     const reponse = await reserver({
       type: "logiciel",
-      budget: tranche,
-      objectif: "tache",
+      budget: "n-importe-quoi",
+      objectif: "inconnu",
+      echeance: "demain",
+      entreprise: "Transports Martin",
+      activite: "Transport frigorifique",
+      taille: "1000",
+      decision: "personne",
+      coince: "x",
+      cout: "beaucoup",
+      essaye: "rien",
       outil: "crm",
     });
     expect(reponse.status).toBe(503);
   });
-
-  it("refuse une tâche hors de sa liste avec le message commun", async () => {
-    const reponse = await reserver({ type: "logiciel", budget: tranche, objectif: "conseil" });
-    expect(reponse.status).toBe(400);
-    expect(await reponse.json()).toEqual({
-      message: "Choisissez la réponse la plus proche de votre cas.",
-      champ: "objectif",
-    });
-  });
 });
 
-/** Un cadrage complet, tel que l'envoie le parcours prospect depuis le 2026-11-10. */
-const cadrage = {
-  telephone: "06 12 34 56 78",
-  echeance: "trimestre",
-  entreprise: "Transports Martin",
-  activite: "Transport frigorifique",
-  taille: "6-20",
-  decision: "plusieurs",
-  coince: "On ressaisit chaque commande dans trois fichiers.",
-  cout: "2-5h",
-  essaye: "tableur",
-};
-
-describe("POST /api/rendez-vous — chaque refus nomme son champ", () => {
-  const valide = { type: "logiciel", budget: tranche, objectif: "tache" };
+describe("POST /api/rendez-vous : chaque refus nomme son champ", () => {
+  const valide = { type: "logiciel" };
   const loin = new Date(Date.now() + 400 * 24 * 3600 * 1000).toISOString();
 
   it.each([
@@ -133,17 +114,10 @@ describe("POST /api/rendez-vous — chaque refus nomme son champ", () => {
     ["creneau", { debut: loin }],
     ["duree", { duree: 0.5 }],
     ["type", { type: "inconnu" }],
-    ["budget", { budget: "" }],
-    ["echeance", { echeance: "demain" }],
     ["telephone", { telephone: "abc" }],
     ["telephone", { telephone: "" }],
-    ["projet", { type: "point-d-etape", objectif: "priorites", projet: "" }],
-    ...["entreprise", "activite", "taille", "decision", "coince", "cout", "essaye"].map((champ) => [
-      champ,
-      { ...cadrage, [champ]: "" },
-    ]),
-    ["telephone", { ...cadrage, telephone: "" }],
-    ["echeance", { ...cadrage, echeance: "" }],
+    ["telephone", { type: "site", telephone: "" }],
+    ["telephone", { type: "point-d-etape", telephone: "abc" }],
   ])("%s", async (champ, surcharge) => {
     const reponse = await reserver({ ...valide, ...surcharge });
     expect(reponse.status).toBe(400);
@@ -153,11 +127,11 @@ describe("POST /api/rendez-vous — chaque refus nomme son champ", () => {
   });
 });
 
-describe("POST /api/rendez-vous — sans RDV_TOKEN", () => {
+describe("POST /api/rendez-vous : sans RDV_TOKEN", () => {
   it("répond 503 et renvoie vers l’e-mail, sans rien réserver", async () => {
     process.env.RDV_TOKEN = "";
     try {
-      const reponse = await reserver({ type: "logiciel", budget: tranche, objectif: "tache" });
+      const reponse = await reserver({ type: "logiciel" });
       expect(reponse.status).toBe(503);
       expect((await reponse.json()).message).toBe(
         "La prise de rendez-vous en ligne est momentanément indisponible. Écrivez-moi directement à contact@eliottbouquerel.fr.",
@@ -168,8 +142,8 @@ describe("POST /api/rendez-vous — sans RDV_TOKEN", () => {
   });
 });
 
-describe("POST /api/rendez-vous — téléphone facultatif", () => {
-  const valide = { type: "logiciel", budget: tranche, objectif: "tache" };
+describe("POST /api/rendez-vous : téléphone obligatoire", () => {
+  const valide = { type: "logiciel" };
 
   it("passe la validation avec un numéro", async () => {
     const reponse = await reserver({ ...valide, telephone: "+33 6 32 21 37 11" });
@@ -184,16 +158,13 @@ describe("POST /api/rendez-vous — téléphone facultatif", () => {
       champ: "telephone",
     });
   });
-});
 
-describe("POST /api/rendez-vous — messages du cadrage", () => {
-  it("un téléphone ou une échéance manquants demandent la réponse, sans parler de format", async () => {
-    const valide = { type: "logiciel", budget: tranche, objectif: "tache" };
-    const sansTelephone = await (await reserver({ ...valide, ...cadrage, telephone: "" })).json();
-    expect(sansTelephone.message).toBe(rendezVousContent.formulaire.telephoneErreur);
-    const sansEcheance = await (await reserver({ ...valide, ...cadrage, echeance: "" })).json();
-    expect(sansEcheance.message).toBe(rendezVousContent.questionnaire.echeance.erreur);
-    const coince = await (await reserver({ ...valide, ...cadrage, coince: "" })).json();
-    expect(coince.message).toBe(rendezVousContent.questionnaire.coince.erreur);
+  it("un numéro manquant demande la réponse, sans parler de format", async () => {
+    const reponse = await reserver({ ...valide, telephone: "" });
+    expect(reponse.status).toBe(400);
+    expect(await reponse.json()).toEqual({
+      message: rendezVousContent.formulaire.telephoneErreur,
+      champ: "telephone",
+    });
   });
 });

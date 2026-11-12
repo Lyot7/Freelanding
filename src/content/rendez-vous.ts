@@ -22,22 +22,41 @@
 import type { PrestationId } from "@/content/offre";
 
 /**
- * Les deux entrées du sélecteur, et l'ordre dans lequel elles s'affichent.
+ * Les entrées du sélecteur, et l'ordre dans lequel elles s'affichent.
  *
- * DEPUIS LE 2026-10-31, une seule offre : « logiciel », et « decouverte » pour
- * tout le reste (décision d'Eliott : rester ouvert aux propositions). « site »,
- * « ia » et « cto » ont quitté le sélecteur ; un ancien lien est traduit par
- * `resoudreSujet` (`src/lib/rendez-vous/config.ts`), comme « outil » depuis le
- * 2026-09-23.
+ * UN SEUL LIEN DE PREMIER RENDEZ-VOUS DEPUIS LE 2026-11-12 (`/rdv`) : le visiteur
+ * choisit son sujet par un bouton, « logiciel », « site », « ia » ou « autre »
+ * (« decouverte » côté cockpit). Le sujet suit le rendez-vous au cockpit : titre
+ * de l'agenda, fiche, e-mail de confirmation. « cto » et « outil » restent
+ * traduits par `resoudreSujet` (`src/lib/rendez-vous/config.ts`).
  */
 export const IDS_RENDEZ_VOUS = [
   "logiciel",
+  "site",
+  "ia",
   "decouverte",
+  "point-rapide",
   "demonstration",
+  "proposition",
   "point-d-etape",
 ] as const;
 
 export type IdRendezVous = (typeof IDS_RENDEZ_VOUS)[number];
+
+/**
+ * Les rendez-vous de CLIENTS (`/rdv/client`) : jamais dans le choix de sujet du
+ * premier rendez-vous, et un formulaire réduit à ce qu'il faut pour poser
+ * l'événement (nom, e-mail), le téléphone et la ligne libre étant facultatifs.
+ */
+export const IDS_CLIENT = [
+  "point-rapide",
+  "demonstration",
+  "proposition",
+  "point-d-etape",
+] as const satisfies readonly IdRendezVous[];
+
+/** Les sujets pour lesquels le formulaire de contact pose la question de l'objectif. */
+export type IdObjectif = "logiciel" | "decouverte";
 
 export interface TypeRendezVous {
   readonly id: IdRendezVous;
@@ -46,8 +65,8 @@ export interface TypeRendezVous {
   readonly duree: string;
   readonly description: string;
   /**
-   * Réservé aux clients : jamais proposé dans un choix de sujet, il ne s'ouvre
-   * que par `?sujet=<id>` (`typesVisibles`, `src/lib/rendez-vous/config.ts`).
+   * Hors du choix de sujet (démonstration, point d'étape : clients en cours) :
+   * jamais proposé parmi les boutons, il ne s'ouvre que par `?sujet=<id>` (`typesVisibles`, `src/lib/rendez-vous/config.ts`).
    */
   readonly prive?: true;
 }
@@ -59,20 +78,6 @@ export interface OptionQuestion {
   readonly libelle: string;
 }
 
-/** Question à réponse libre, sur une ligne. */
-export interface QuestionTexte {
-  readonly legende: string;
-  readonly placeholder: string;
-  readonly erreur: string;
-}
-
-/** Question à choix unique, options dans l'ordre d'affichage. */
-export interface QuestionChoix {
-  readonly legende: string;
-  readonly erreur: string;
-  readonly options: readonly OptionQuestion[];
-}
-
 export interface ContenuRendezVous {
   readonly eyebrow: string;
   readonly titre: string;
@@ -81,23 +86,24 @@ export interface ContenuRendezVous {
   /** Faits courts posés sous le chapeau : ce que le visiteur engage en réservant. */
   readonly garanties: readonly string[];
   readonly types: readonly TypeRendezVous[];
-  readonly etapes: {
+  /** Page `/rdv/client` : rendez-vous de clients, formulaire réduit. */
+  readonly client: {
+    readonly eyebrow: string;
+    readonly titre: string;
+    readonly chapeau: string;
+    readonly metaTitre: string;
+    readonly metaDescription: string;
+  };
+  /** Légendes des trois blocs du formulaire. */
+  readonly blocs: {
     readonly sujet: string;
     readonly creneau: string;
-    readonly projet: string;
     readonly coordonnees: string;
-    /** Questionnaire de cadrage (logiciel, découverte), en deux temps. */
-    readonly entreprise: string;
-    readonly besoin: string;
   };
-  /** Sous le titre de la première étape du cadrage. */
-  readonly introCadrage: string;
   readonly actions: {
     readonly reessayer: string;
     readonly moisPrecedent: string;
     readonly moisSuivant: string;
-    readonly continuer: string;
-    readonly retour: string;
   };
   readonly creneaux: {
     readonly chargement: string;
@@ -107,10 +113,9 @@ export interface ContenuRendezVous {
     /** Titre de la colonne des heures, suivi du jour choisi. */
     readonly libelleGrille: string;
     readonly libelleCalendrier: string;
-    readonly libelleDuree: string;
     /** Annonce au lecteur d'écran de ce que montre la colonne des heures. */
     readonly annonce: (jour: string, nombre: number) => string;
-    /** Une durée du cockpit, en minutes, telle qu'affichée sur sa pastille. */
+    /** Une durée du cockpit, en minutes (page de gestion). */
     readonly duree: (minutes: number) => string;
   };
   /** Titre du récapitulatif affiché au-dessus de chaque étape franchie. */
@@ -126,9 +131,15 @@ export interface ContenuRendezVous {
     readonly telephonePlaceholder: string;
     readonly messageLabel: string;
     readonly messagePlaceholder: string;
+    /** Rendez-vous de client : le téléphone et la ligne libre sont facultatifs. */
+    readonly telephoneLabelClient: string;
+    readonly messageLabelClient: string;
+    readonly messagePlaceholderClient: string;
     readonly envoyer: string;
     readonly envoiEnCours: string;
-    /** Étape du créneau quand elle vient en dernier : ce qu'il reste à faire. */
+    /** Sous les boutons de sujet, tant qu'aucun n'est choisi : pourquoi le calendrier manque. */
+    readonly choisirSujet: string;
+    /** Sous le calendrier, tant qu'aucune heure n'est retenue. */
     readonly choisirHeure: string;
     /** Lu au lecteur d'écran quand une heure est choisie : le bouton est plus bas. */
     readonly confirmerCiDessous: string;
@@ -149,70 +160,18 @@ export interface ContenuRendezVous {
     readonly objectif: {
       /** Légende commune, reprise par le formulaire de contact. */
       readonly legende: string;
-      /** Légende propre à un sujet, quand la commune ne lui va pas. */
-      readonly legendes: Readonly<Partial<Record<IdRendezVous, string>>>;
       readonly erreur: string;
-      readonly options: Readonly<Record<IdRendezVous, readonly OptionQuestion[]>>;
+      readonly options: Readonly<Record<IdObjectif, readonly OptionQuestion[]>>;
     };
     readonly echeance: {
       readonly legende: string;
       readonly erreur: string;
       readonly options: readonly OptionQuestion[];
     };
-    readonly entreprise: QuestionTexte;
-    readonly activite: QuestionTexte;
-    readonly coince: {
-      readonly legende: string;
-      readonly erreur: string;
-      readonly placeholders: Readonly<Partial<Record<IdRendezVous, string>>>;
-    };
-    readonly taille: QuestionChoix;
-    readonly decision: QuestionChoix;
-    readonly cout: QuestionChoix;
-    readonly essaye: QuestionChoix;
-    /** Le projet concerné, en texte libre : posé aux seuls clients (point d'étape). */
-    readonly projet: {
-      readonly legende: string;
-      readonly placeholder: string;
-      readonly erreur: string;
-    };
-  };
-  /** « Ce que vous pouvez espérer à ce budget », affiché dès qu'une tranche est choisie. */
-  readonly retour: {
-    readonly titre: string;
-    /** La tranche est sous le seuil interne, jamais nommé. */
-    readonly serre: string;
-    readonly inconnu: string;
-    /** La tranche est au-dessus du seuil interne. */
-    readonly aPortee: string;
-    /** La tranche est ouverte vers le haut. */
-    readonly large: string;
-  };
-  /**
-   * Intitulés des lignes déposées dans les notes du rendez-vous. Lus par Eliott dans
-   * son agenda, jamais par le visiteur.
-   */
-  readonly notes: {
-    readonly entreprise: string;
-    readonly activite: string;
-    readonly taille: string;
-    readonly decision: string;
-    readonly coince: string;
-    readonly cout: string;
-    readonly essaye: string;
-    readonly budget: string;
-    readonly forfait: string;
-    readonly objectif: string;
-    readonly echeance: string;
-    readonly projet: string;
-    readonly aucunForfait: string;
-    readonly aCaler: string;
   };
   readonly succes: {
     readonly titre: string;
     readonly texte: string;
-    /** Après un cadrage : le mail demande de confirmer d'un mot. */
-    readonly texteCadrage: string;
     readonly autre: string;
   };
   /** Page `/rdv/gerer/[jeton]` : le lien « déplacer ou annuler » des e-mails. */
@@ -263,7 +222,7 @@ export const rendezVousContent: ContenuRendezVous = {
   eyebrow: "Prendre rendez-vous",
   titre: "Réserver un créneau",
   chapeau:
-    "Choisissez un sujet, répondez à quelques questions sur votre entreprise et votre besoin, puis prenez votre créneau. Je prépare l’appel avec vos réponses, et le lien de visio part par e-mail dans la foulée.",
+    "Un sujet, un créneau, vos coordonnées. Le lien de visio part par e-mail dans la foulée.",
   noteFuseau: "Heures affichées à l’heure de Paris.",
   garanties: [
     "Gratuit et sans engagement",
@@ -315,32 +274,62 @@ export const rendezVousContent: ContenuRendezVous = {
   types: [
     {
       id: "logiciel",
-      nom: "Expliquez-moi ce qui coince dans votre métier",
+      nom: "Logiciel",
       duree: "30, 45 ou 60 minutes",
       description:
-        "Une tâche que vous refaites à la main, un tableur qui déborde, des outils qui ne se parlent pas, ou un logiciel entier à construire. On regarde où passe le temps et ce qui existe déjà. Vous repartez avec un ordre de grandeur et une prochaine étape.",
+        "Une tâche refaite à la main, un tableur qui déborde, des outils qui ne se parlent pas, ou un logiciel entier à construire.",
+    },
+    {
+      id: "site",
+      nom: "Site",
+      duree: "15, 30 ou 45 minutes",
+      description:
+        "Un site à créer ou à refaire : ce qu’il doit faire pour vos clients, et ce qui existe déjà.",
+    },
+    {
+      id: "ia",
+      nom: "IA",
+      duree: "30, 45 ou 60 minutes",
+      description:
+        "Une tâche répétitive que l’IA peut prendre en charge : on regarde laquelle, et ce que cela vous rendrait.",
     },
     {
       id: "decouverte",
-      nom: "Une autre demande",
+      nom: "Autre",
       duree: "15, 30 ou 45 minutes",
       description:
-        "Autre chose qu’un logiciel, ou le problème sans la solution : on en parle. Si ce n’est pas pour moi, je vous le dis pendant l’appel, ça vous évite de perdre du temps.",
+        "Autre chose, ou le problème sans la solution : on en parle. Si ce n’est pas pour moi, je vous le dis pendant l’appel.",
     },
-    /* DEPUIS LE 2026-11-02, la démonstration et le point d'étape quittent
-       Cal.com pour le moteur du cockpit, comme les autres sujets. Ni budget ni
-       échéance : leur questionnaire tient en une ou deux questions
-       (`questionsDuType`, `src/lib/rendez-vous/questionnaire.ts`). */
+    /* RENDEZ-VOUS DE CLIENTS, depuis le 2026-11-12 : un seul lien, `/rdv/client`,
+       qui propose ces quatre sujets avec un formulaire réduit (nom, e-mail).
+       Ils ne figurent jamais dans le choix du premier rendez-vous. */
+    {
+      id: "point-rapide",
+      nom: "Point rapide",
+      duree: "15 ou 30 minutes",
+      description:
+        "Une question, un retour, un ajustement : un court échange pour avancer sans attendre le prochain point d’étape.",
+      prive: true,
+    },
     {
       id: "demonstration",
-      nom: "Voir une démonstration",
+      nom: "Démonstration",
       duree: "45 minutes",
       description:
         "Je vous montre en direct un logiciel métier que j’ai construit, sur le cas qui ressemble le plus au vôtre. Vous voyez ce qu’il change au quotidien avant de décider quoi que ce soit.",
+      prive: true,
+    },
+    {
+      id: "proposition",
+      nom: "Proposition",
+      duree: "30, 45 ou 60 minutes",
+      description:
+        "Je vous présente la proposition et le devis, et on les relit ensemble : périmètre, prix, délais, ce qui peut changer.",
+      prive: true,
     },
     {
       id: "point-d-etape",
-      nom: "Faire le point sur votre projet",
+      nom: "Point d’étape",
       duree: "45 minutes",
       description:
         "On regarde où en est le projet, ce qui est livré et ce qui reste à trancher. Vous repartez avec les décisions prises et la suite datée.",
@@ -348,24 +337,25 @@ export const rendezVousContent: ContenuRendezVous = {
     },
   ],
 
-  etapes: {
-    sujet: "Le sujet",
-    creneau: "Le créneau",
-    projet: "Votre projet",
-    coordonnees: "Vos coordonnées",
-    entreprise: "Votre entreprise",
-    besoin: "Votre besoin",
+  client: {
+    eyebrow: "Déjà client",
+    titre: "Prendre un rendez-vous",
+    chapeau:
+      "Un point rapide, une démonstration, la présentation d’une proposition ou un point d’étape : choisissez un créneau, il ne manque que votre nom et votre e-mail.",
+    metaTitre: "Rendez-vous client · Eliott Bouquerel",
+    metaDescription: "Réservez un point rapide, une démonstration, une proposition ou un point d’étape avec Eliott Bouquerel.",
   },
 
-  introCadrage:
-    "Dix questions courtes, deux à trois minutes, puis votre créneau. Je prépare l’appel avec vos réponses, elles ne servent qu’à ça.",
+  blocs: {
+    sujet: "Votre sujet",
+    creneau: "Votre créneau",
+    coordonnees: "Vos coordonnées",
+  },
 
   actions: {
     reessayer: "Réessayer",
     moisPrecedent: "Mois précédent",
     moisSuivant: "Mois suivant",
-    continuer: "Continuer",
-    retour: "Retour",
   },
 
   creneaux: {
@@ -377,7 +367,6 @@ export const rendezVousContent: ContenuRendezVous = {
       "La prise de rendez-vous en ligne est momentanément indisponible. Le formulaire de contact reste le chemin le plus direct.",
     libelleGrille: "Heures libres",
     libelleCalendrier: "Jour du rendez-vous",
-    libelleDuree: "Durée de l’appel",
     annonce: (jour, nombre) =>
       `${nombre} ${nombre > 1 ? "créneaux libres" : "créneau libre"} le ${jour}.`,
     duree: (minutes) => `${minutes} min`,
@@ -390,21 +379,22 @@ export const rendezVousContent: ContenuRendezVous = {
     nomPlaceholder: "Prénom et nom",
     emailLabel: "Votre e-mail",
     emailPlaceholder: "vous@exemple.fr",
-    /* FACULTATIF, décision d'Eliott du 2026-11-02 : pour rappeler plus
-       facilement le visiteur si besoin. Il part dans les notes du rendez-vous. */
     telephoneLabel: "Votre téléphone",
-    telephoneAide: "Je vous appelle si la visio ne démarre pas.",
+    telephoneAide: "Pour vous joindre si la visio ne démarre pas.",
     telephoneErreur: "Indiquez un numéro où vous joindre le jour du rendez-vous.",
     telephonePlaceholder: "06 12 34 56 78",
-    messageLabel: "Autre chose à me dire (facultatif)",
-    messagePlaceholder:
-      "Un lien à regarder avant l’appel, une contrainte, une question.",
+    messageLabel: "Votre projet en une ligne (facultatif)",
+    messagePlaceholder: "Ce que vous voulez améliorer ou construire.",
+    telephoneLabelClient: "Votre téléphone (facultatif)",
+    messageLabelClient: "De quoi parler (facultatif)",
+    messagePlaceholderClient: "Un point précis, une question, un document à regarder.",
     envoyer: "Confirmer le rendez-vous",
     envoiEnCours: "Confirmation en cours…",
+    choisirSujet: "Choisissez un sujet pour voir les créneaux libres.",
     choisirHeure: "Choisissez un jour puis une heure pour confirmer.",
     confirmerCiDessous: "Heure retenue. Confirmez avec le bouton plus bas.",
     mention:
-      "Votre nom, votre adresse et vos réponses sont enregistrés dans mon outil de gestion et dans mon agenda, dans le seul but de créer ce rendez-vous. Détail dans la",
+      "Votre nom, votre adresse et votre numéro sont enregistrés dans mon outil de gestion et dans mon agenda, dans le seul but de créer ce rendez-vous. Détail dans la",
     mentionLien: "politique de confidentialité",
     mentionHref: "/legal/politique-de-confidentialite",
   },
@@ -432,10 +422,6 @@ export const rendezVousContent: ContenuRendezVous = {
     },
     objectif: {
       legende: "Ce que vous voulez obtenir en priorité",
-      legendes: {
-        demonstration: "Ce que vous voulez voir",
-        "point-d-etape": "Ce que vous voulez trancher",
-      },
       erreur: "Choisissez la réponse la plus proche de votre cas.",
       options: {
         logiciel: [
@@ -451,18 +437,6 @@ export const rendezVousContent: ContenuRendezVous = {
           { id: "conseil", libelle: "Avoir un avis sur un projet" },
           { id: "autre", libelle: "Autre chose" },
         ],
-        demonstration: [
-          { id: "logiciel", libelle: "Un logiciel métier en service" },
-          { id: "automatisation", libelle: "Une tâche automatisée de bout en bout" },
-          { id: "ia", libelle: "L’IA au travail sur des documents" },
-          { id: "autre", libelle: "Autre chose" },
-        ],
-        "point-d-etape": [
-          { id: "priorites", libelle: "Les priorités de la suite" },
-          { id: "livraison", libelle: "Un retour sur la dernière livraison" },
-          { id: "evolution", libelle: "Une évolution à ajouter" },
-          { id: "autre", libelle: "Autre chose" },
-        ],
       },
     },
     echeance: {
@@ -474,109 +448,12 @@ export const rendezVousContent: ContenuRendezVous = {
         { id: "libre", libelle: "Pas de date précise" },
       ],
     },
-    entreprise: {
-      legende: "Le nom de votre entreprise",
-      placeholder: "Transports Martin",
-      erreur: "Indiquez le nom de votre entreprise.",
-    },
-    activite: {
-      legende: "Ce que fait votre entreprise",
-      placeholder: "Transport frigorifique, 12 camions",
-      erreur: "Dites en quelques mots ce que fait votre entreprise.",
-    },
-    coince: {
-      legende: "Ce qui coince aujourd’hui",
-      erreur: "Décrivez en une ou deux phrases ce qui coince.",
-      placeholders: {
-        logiciel:
-          "On ressaisit chaque commande dans trois fichiers, et des erreurs passent jusqu’à la facture.",
-        decouverte:
-          "Les devis partent trois jours après la demande, et on perd des clients.",
-      },
-    },
-    taille: {
-      legende: "Combien de personnes dans l’entreprise ?",
-      erreur: "Choisissez la taille la plus proche.",
-      options: [
-        { id: "seul", libelle: "Juste moi" },
-        { id: "2-5", libelle: "2 à 5" },
-        { id: "6-20", libelle: "6 à 20" },
-        { id: "21-50", libelle: "21 à 50" },
-        { id: "plus-50", libelle: "Plus de 50" },
-      ],
-    },
-    decision: {
-      legende: "Qui décidera du projet ?",
-      erreur: "Choisissez la réponse la plus proche.",
-      options: [
-        { id: "seul", libelle: "Je décide seul" },
-        { id: "plusieurs", libelle: "Nous décidons à plusieurs" },
-        { id: "autre", libelle: "Quelqu’un d’autre décide" },
-      ],
-    },
-    cout: {
-      legende: "Ce que ça vous coûte aujourd’hui",
-      erreur: "Choisissez la réponse la plus proche.",
-      options: [
-        { id: "moins-2h", libelle: "Moins de 2 h par semaine" },
-        { id: "2-5h", libelle: "2 à 5 h par semaine" },
-        { id: "plus-5h", libelle: "Plus de 5 h par semaine" },
-        { id: "ventes", libelle: "Des ventes ou des clients perdus" },
-        { id: "inconnu", libelle: "Je ne sais pas le chiffrer" },
-      ],
-    },
-    essaye: {
-      legende: "Ce que vous avez déjà essayé",
-      erreur: "Choisissez la réponse la plus proche.",
-      options: [
-        { id: "rien", libelle: "Rien pour l’instant" },
-        { id: "tableur", libelle: "Un tableur ou un outil fait maison" },
-        { id: "logiciel", libelle: "Un logiciel du marché" },
-        { id: "prestataire", libelle: "Un prestataire ou une agence" },
-      ],
-    },
-    projet: {
-      legende: "Le projet concerné",
-      placeholder: "Le nom du projet ou du logiciel",
-      erreur: "Indiquez le projet dont on parle.",
-    },
-  },
-
-  retour: {
-    titre: "Ce que vous pouvez espérer à ce budget",
-    serre:
-      "On regarde ensemble ce qui tient dans ce budget, et par quoi commencer. Le prix dépend du projet : je le fixe au devis.",
-    inconnu:
-      "On le cale ensemble pendant l’appel. Le prix dépend du projet : je le fixe au devis, avant de commencer.",
-    aPortee:
-      "Je vous dis pendant l’appel ce que ce budget permet. Le prix dépend du projet : je le fixe au devis.",
-    large:
-      "Votre budget laisse de la place à un projet complet. On fixe le périmètre ensemble, au devis.",
-  },
-
-  notes: {
-    entreprise: "Entreprise",
-    activite: "Activité",
-    taille: "Taille",
-    decision: "Décision",
-    coince: "Ce qui coince",
-    cout: "Coût actuel",
-    essaye: "Déjà essayé",
-    budget: "Budget HT",
-    forfait: "À portée",
-    objectif: "Objectif",
-    echeance: "Échéance",
-    projet: "Projet",
-    aucunForfait: "budget serré, à cadrer",
-    aCaler: "à caler pendant l’appel",
   },
 
   succes: {
     titre: "C’est réservé.",
     texte:
-      "Un e-mail de confirmation vient de partir vers votre boîte, avec le lien de visioconférence et de quoi annuler ou déplacer en un clic. Vous n’avez rien d’autre à faire d’ici là.",
-    texteCadrage:
-      "Un e-mail de confirmation vient de partir vers votre boîte, avec le lien de visio et de quoi déplacer ou annuler. Répondez-y d’un mot pour me confirmer votre présence.",
+      "Un e-mail de confirmation vient de partir vers votre boîte, avec le lien de visio et de quoi déplacer ou annuler en un clic. Vous pouvez y répondre pour m’envoyer ce qui m’aidera à préparer l’appel : un lien, un document, deux lignes sur votre situation.",
     autre: "Prendre un autre rendez-vous",
   },
   gestion: {
@@ -594,7 +471,7 @@ export const rendezVousContent: ContenuRendezVous = {
       retour: "Retour",
       reserver: "Réserver un créneau",
     },
-    lienReserver: "/contact",
+    lienReserver: "/rdv",
     motif: {
       libelle: "Motif (facultatif)",
       aide: "Une ligne suffit, elle m’aide à vous proposer mieux la prochaine fois.",
@@ -636,14 +513,13 @@ export const rendezVousContent: ContenuRendezVous = {
 };
 
 /**
- * Nom du paramètre d'URL qui PRÉSÉLECTIONNE le sujet sur `/contact`.
- *
- * Il existe parce que la prise de rendez-vous était injoignable : elle vit tout
- * en bas de `/contact`, derrière un formulaire de contact complet qui est son
- * concurrent direct, et AUCUN lien du site n'y menait. Les boutons de
- * l'accordéon des prestations pointent maintenant dessus, sujet déjà choisi.
+ * Nom du paramètre d'URL qui PRÉSÉLECTIONNE le sujet sur `/rdv` (et dans le
+ * formulaire du pied de page) : `?sujet=logiciel|site|ia|autre`.
  */
 export const PARAM_SUJET = "sujet";
+
+/** Page du premier rendez-vous, la seule : tout lien de réservation y mène. */
+export const CHEMIN_RDV = "/rdv";
 
 /**
  * Prestation de l'offre → sujet de rendez-vous : `offre.ts` nomme des
@@ -662,4 +538,4 @@ export const RDV_PAR_PRESTATION: Readonly<Record<PrestationId, IdRendezVous>> = 
  * une présélection qui ne se fait pas.
  */
 export const lienRendezVous = (id: IdRendezVous): string =>
-  `/contact?${PARAM_SUJET}=${id}#rendez-vous`;
+  `${CHEMIN_RDV}?${PARAM_SUJET}=${id === "decouverte" ? "autre" : id}`;

@@ -38,10 +38,11 @@ import { siteConfig } from "@/content/site";
  * Cinq manquements étaient constitués, chacun corrigé dans ce fichier :
  *   - CGV, art. L. 441-1 I C. com. : ni barème de prix, ni méthode de calcul,
  *     ni mention d'escompte. Amende administrative jusqu'à 75 000 €. Depuis le
- *     2026-10-05, le barème est le prix de départ de chaque prestation,
- *     publié sur les pages de prestation (`offre.ts`) ; chaque projet se
- *     chiffre au devis, à la charge estimée, détail communicable sur demande
- *     (III du même article). Le prix ferme est celui du devis signé.
+ *     2026-11-12, plus aucun prix ni barème n'est publié : tout est sur devis.
+ *     La clause dit que les prestations sur mesure ne relèvent pas d'un barème
+ *     de prix unitaires, que chaque projet se chiffre au devis, à la charge
+ *     estimée, détail communicable sur demande (III du même article). Le prix
+ *     ferme est celui du devis signé.
  *   - Mentions légales, art. 1-1 I 5° LCEN, créé par la loi SREN : les tiers
  *     qui stockent des données traitées dans le cadre de l'édition du service
  *     doivent être nommés et adressés. Seul l'hébergeur l'était. Les cinq
@@ -438,7 +439,7 @@ export const legalDocuments: readonly LegalDocument[] = [
     title: "Conditions générales de vente",
     summary:
       "Comment on travaille ensemble : devis, paiement, délais, droits sur le livrable. Écrites pour être lues.",
-    // Barème réécrit en prix de départ le 2026-10-05 ; vie après livraison
+    // Prix de départ retiré le 2026-11-12 (tout sur devis) ; vie après livraison
     // sans suivi (art. 9) le 2026-10-19, décision d'Eliott.
     lastUpdated: "2026-11-01",
     body: [

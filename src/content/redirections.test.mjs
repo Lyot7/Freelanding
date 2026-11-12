@@ -39,36 +39,42 @@ describe("les pages retirées redirigent en 301", () => {
   });
 });
 
-describe("les liens de premier rendez-vous mènent au formulaire de l'accueil", () => {
-  for (const [origine, sujet] of [
-    ["/rdv", "decouverte"],
-    ["/rdv/logiciel", "logiciel"],
-    ["/rdv/demonstration", "demonstration"],
-    ["/rdv/point-d-etape", "point-d-etape"],
-  ]) {
-    test(`${origine} ouvre l'onglet rendez-vous sur « ${sujet} »`, () => {
-      const regle = regles.find((r) => r.origine === origine);
-      expect(regle?.destination).toBe(`/?sujet=${sujet}#rendez-vous`);
+describe("un seul lien de premier rendez-vous : /rdv", () => {
+  test("/rdv/logiciel renvoie définitivement (301) vers /rdv?sujet=logiciel", () => {
+    const regle = regles.find((r) => r.origine === "/rdv/logiciel");
+    expect(regle?.destination).toBe("/rdv?sujet=logiciel");
+    expect(regle?.code).toBe("301");
+  });
+
+  test("/rdv est une page, jamais une redirection", () => {
+    expect(regles.some((r) => r.origine === "/rdv")).toBe(false);
+    expect(contentRoutes.some((r) => r.pathname === "/rdv")).toBe(true);
+  });
+
+  test("la démonstration et le point d'étape gardent leur lien et ouvrent /rdv/client (307)", () => {
+    for (const sujet of ["demonstration", "point-d-etape"]) {
+      const regle = regles.find((r) => r.origine === `/rdv/${sujet}`);
+      expect(regle?.destination).toBe(`/rdv/client?sujet=${sujet}`);
       expect(regle?.code).toBe("307");
-    });
-  }
+    }
+  });
 });
 
-describe("les liens de premier rendez-vous mènent au formulaire de l’accueil", () => {
-  test("/rdv et /rdv/logiciel, en temporaire, sujet déjà choisi", async () => {
+describe("les redirections de next.config.ts", () => {
+  test("/rdv/logiciel garde son sujet, en permanent", async () => {
     const { default: config } = await import("../../next.config.ts");
     const redirections = await config.redirects();
     const vers = (origine) => redirections.find((r) => r.source === origine);
-    expect(vers("/rdv")).toEqual({ source: "/rdv", destination: "/?sujet=decouverte#rendez-vous", statusCode: 307 });
     expect(vers("/rdv/logiciel")).toEqual({
       source: "/rdv/logiciel",
-      destination: "/?sujet=logiciel#rendez-vous",
-      statusCode: 307,
+      destination: "/rdv?sujet=logiciel",
+      statusCode: 301,
     });
+    expect(vers("/rdv")).toBeUndefined();
     for (const sujet of ["demonstration", "point-d-etape"]) {
       expect(vers(`/rdv/${sujet}`)).toEqual({
         source: `/rdv/${sujet}`,
-        destination: `/?sujet=${sujet}#rendez-vous`,
+        destination: `/rdv/client?sujet=${sujet}`,
         statusCode: 307,
       });
     }

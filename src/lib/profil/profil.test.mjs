@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { prestations } from "@/content/offre";
-import { IDS_RENDEZ_VOUS, lienRendezVous } from "@/content/rendez-vous";
+import { IDS_CLIENT, IDS_RENDEZ_VOUS, lienRendezVous } from "@/content/rendez-vous";
 import { workItems } from "@/content/work";
 import { faqItems } from "@/content/faq";
 import { absoluteUrl } from "@/lib/site-url";
@@ -56,7 +56,7 @@ describe("profil complet de la vue Agent", () => {
   });
 
   it("donne le lien exact de chaque type de rendez-vous public, et du formulaire", () => {
-    for (const id of IDS_RENDEZ_VOUS.filter((id) => id !== "point-d-etape")) {
+    for (const id of IDS_RENDEZ_VOUS.filter((id) => !IDS_CLIENT.includes(id))) {
       expect(markdown).toContain(absoluteUrl(lienRendezVous(id)));
     }
     // Le point d'étape est réservé aux clients : jamais publié.

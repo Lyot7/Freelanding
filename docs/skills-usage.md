@@ -1,3 +1,24 @@
+# Un seul lien de rendez-vous, formulaire en un écran, 2026-11-12
+
+Pages `/rdv` (premier rendez-vous) et `/rdv/client` (clients en cours), même
+composant `ReservationRendezVous`. Captures mobiles dans
+`docs/captures/rdv-unique/` : `avant-*` (production avant), `apres-*`.
+
+- **impeccable** (critique, charge cognitive; détecteur déterministe sur le
+  composant et les deux pages : 0 défaut). Constats sur les captures, tous
+  corrigés : (1) le message d'erreur d'un refus (sujet ou heure oubliés, numéro
+  faux) tombait sous la mention légale, loin du bouton touché : il est placé
+  au-dessus du bouton, et un sujet oublié ramène le visiteur sur les boutons de
+  sujet ; (2) le chapeau répétait la liste des garanties : réduit à une phrase ;
+  (3) le pied de page gardait son grand titre d'appel sans formulaire dessous :
+  masqué sur `/rdv` et `/rdv/client` (`Footer sansFormulaire`) ; (4) le
+  formulaire passe de six écrans et dix questions à un écran, quatre champs
+  (sujet par boutons de 52 px, créneau, nom, e-mail, téléphone, une ligne libre
+  facultative) : réponses de cadrage retirées, pas masquées. Le critique a été
+  mené en une seule passe par l'agent principal (pas de sous-agent isolé).
+  Non fait : design-council complet (5 lentilles), la page reprend les composants
+  existants du site sans nouveau motif visuel.
+
 # Questionnaire de cadrage avant le créneau, 2026-11-10
 
 Prise de rendez-vous des prospects (`/rdv`, `/rdv/logiciel`) : sujet →

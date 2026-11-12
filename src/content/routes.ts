@@ -27,6 +27,7 @@ const derniereDateArticle: string | undefined = blogPosts
 export const contentRoutes: readonly ContentRoute[] = [
   { pathname: "/", kind: "page" },
   { pathname: "/contact", kind: "page" },
+  { pathname: "/rdv", kind: "page" },
   { pathname: "/a-propos", kind: "page" },
   { pathname: "/blog", kind: "page", lastModified: derniereDateArticle },
   { pathname: "/realisations", kind: "page" },

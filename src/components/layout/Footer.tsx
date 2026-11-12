@@ -259,18 +259,24 @@ function SocialIcon({ social }: { social: Link }) {
 
 export async function Footer({
   sujetRendezVous,
+  sansFormulaire = false,
 }: {
   /**
    * Sujet de rendez-vous de la page (pages de prestation) : présélectionné
    * dans l'onglet rendez-vous, sans lecture de `?sujet=`.
    */
   sujetRendezVous?: IdRendezVous;
+  /**
+   * Pied de page sans le formulaire (message ou rendez-vous) : la page `/rdv`
+   * porte déjà le formulaire de rendez-vous, deux exemplaires se concurrencent.
+   */
+  sansFormulaire?: boolean;
 } = {}) {
   const {
     brand,
     footerNav = [],
     contact,
-    footerForm,
+    footerForm: footerFormSite,
     socials,
     legalLinks,
     copyrightLong,
@@ -278,6 +284,7 @@ export async function Footer({
     footerColumnLabels,
   } = await content.getSiteConfig();
 
+  const footerForm = sansFormulaire ? undefined : footerFormSite;
   const person = contact.person;
   // Mêmes types de rendez-vous que la section de `/contact` : ceux dont
   // le cockpit est configuré (`RDV_TOKEN`). Aucun = pas d'onglet rendez-vous.
@@ -422,7 +429,9 @@ export async function Footer({
             <Logo brand={brand} className="w-min" />
           </div>
 
+          {/* SANS FORMULAIRE (`/rdv`) : le titre d'appel n'aurait rien sous lui. */}
           {/* framer-1offil1 "Column" : CTA + formulaire (order 0 mobile) */}
+          {sansFormulaire ? null : (
           <div className="accent-clip-titre relative order-0 flex w-full flex-col items-start gap-[10px] overflow-clip tablet:order-none tablet:gap-[40px]">
             {/* framer-1s1ifxt : titre + sous-texte */}
             <div className="accent-room relative flex w-full flex-col items-start gap-[16px] overflow-clip [--accent-room:22px] tablet:gap-[30px]">
@@ -503,6 +512,7 @@ export async function Footer({
               </Suspense>
             ) : null}
           </div>
+          )}
         </div>
 
         {/* framer-lj3c70 "2 row" : legal (gauche) + nav/contact/copyright (droite) */}

@@ -37,7 +37,7 @@ const ID_CLIC = /^[a-z0-9-]{3,80}$/;
  * répond 200 et porte la balise canonical, `www` redirige en 307 vers lui.
  */
 export const DESTINATION_CLIC =
-  "https://eliottbouquerel.fr/?sujet=decouverte&utm_source=email&utm_medium=signature&utm_campaign=prospection#rendez-vous";
+  "https://eliottbouquerel.fr/rdv?sujet=autre&utm_source=email&utm_medium=signature&utm_campaign=prospection";
 
 /**
  * Même destination pour un mail qui porte l'offre logiciel (boîte logiciel, ou
@@ -46,7 +46,7 @@ export const DESTINATION_CLIC =
  * (`logiciel` ou `decouverte`) départage les deux destinations.
  */
 export const DESTINATION_CLIC_LOGICIEL =
-  "https://eliottbouquerel.fr/?sujet=logiciel&utm_source=email&utm_medium=signature&utm_campaign=prospection#rendez-vous";
+  "https://eliottbouquerel.fr/rdv?sujet=logiciel&utm_source=email&utm_medium=signature&utm_campaign=prospection";
 
 /**
  * Littérale pour la même raison que la destination : le jeton ne doit partir

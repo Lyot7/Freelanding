@@ -193,14 +193,14 @@ describe("corps des articles", () => {
    * formulaire et un agenda sans rien présélectionner. Un sujet inconnu est
    * ignoré en silence par la page, d'où la vérification contre la liste.
    */
-  test("chaque article mène vers une prestation et vers le contact", () => {
+  test("chaque article mène vers une prestation et vers le rendez-vous", () => {
     for (const [fichier, texte] of corps) {
       expect([fichier, /\]\(\/services\/[a-z-]+(?:\/prix)?\)/.test(texte)]).toEqual([
         fichier,
         true,
       ]);
       const sujets = [
-        ...texte.matchAll(/\]\(\/contact\?sujet=([a-z]+)#rendez-vous\)/g),
+        ...texte.matchAll(/\]\(\/rdv\?sujet=([a-z]+)\)/g),
       ].map((m) => m[1]);
       expect([fichier, sujets.length > 0]).toEqual([fichier, true]);
       for (const sujet of sujets) {

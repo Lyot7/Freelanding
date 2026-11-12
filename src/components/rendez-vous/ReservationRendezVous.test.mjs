@@ -4,20 +4,21 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 
 import { rendezVousContent } from "@/content/rendez-vous";
-import { etapeDuChamp, ReservationRendezVous } from "./ReservationRendezVous";
+import { ReservationRendezVous } from "./ReservationRendezVous";
 
 /**
- * LE STEPPER, PARCOURU COMME UN VISITEUR, pour les deux sujets qui restent
- * depuis le 2026-10-31 : « logiciel » et « decouverte ». Les deux posent le
- * budget, le besoin et l'échéance, sans question d'outil, et ce que le
- * navigateur envoie suit ces questions.
+ * LE FORMULAIRE D'UN SEUL ÉCRAN, PARCOURU COMME UN VISITEUR (2026-11-12) : un
+ * sujet (Logiciel, Site, IA, Autre), un créneau, nom, e-mail, téléphone et une
+ * ligne libre. Ni cadrage, ni budget : ce que le navigateur envoie se limite à
+ * ces champs.
  *
  * Rien ne sort du processus : `fetch` est remplacé, la clef Turnstile est posée
  * par `scripts/test-turnstile-env.mjs` et le widget est factice.
  */
 
 const C = rendezVousContent;
-const TRANCHE = "5000-10000";
+/** Ce que `ReservationAvecSujet` donne au bloc : jamais un sujet réservé aux clients. */
+const PROSPECTS = C.types.filter((t) => !t.prive);
 
 const CRENEAUX = {
   fenetre: {
@@ -132,13 +133,16 @@ function simulerServeur(reponsesPost) {
 const attendre = (ms) => new Promise((resoudre) => setTimeout(resoudre, ms));
 
 async function monter(typeInitial) {
+  const proposes = typeInitial && C.types.find((t) => t.id === typeInitial)?.prive
+    ? C.types.filter((t) => t.id === typeInitial)
+    : PROSPECTS;
   const conteneur = document.createElement("div");
   document.body.appendChild(conteneur);
   const racine = createRoot(conteneur);
   await act(async () => {
     racine.render(
       createElement(ReservationRendezVous, {
-        types: C.types,
+        types: proposes,
         emailContact: "contact@exemple.fr",
         ...(typeInitial ? { typeInitial } : {}),
       }),
@@ -203,53 +207,19 @@ async function soumettre(conteneur) {
   });
 }
 
-async function allerAuProjet(conteneur) {
-  await cliquer(bouton(conteneur, "15:00"));
-  expect(texte(conteneur)).toContain(C.etapes.projet);
-}
-
-async function allerAuxCoordonnees(conteneur) {
-  await cliquer(bouton(conteneur, C.actions.continuer));
-  expect(conteneur.querySelector('input[name="nom"]')).not.toBeNull();
-  await saisir(conteneur, "nom", "Camille Renard");
-  await saisir(conteneur, "email", "camille@exemple.fr");
-  await saisir(conteneur, "telephone", "06 32 21 37 11");
-}
-
-const continuer = (conteneur) => cliquer(bouton(conteneur, C.actions.continuer));
 const titre = (conteneur) => conteneur.querySelector("h3")?.textContent;
 
-/** Les trois écrans du cadrage, remplis, jusqu'aux coordonnées. */
-async function repondreAuCadrage(conteneur) {
-  expect(titre(conteneur)).toBe(C.etapes.entreprise);
-  await saisir(conteneur, "entreprise", "Transports Martin");
-  await saisir(conteneur, "activite", "Transport frigorifique");
-  await choisir(conteneur, "taille", "6-20");
-  await continuer(conteneur);
-  expect(titre(conteneur)).toBe(C.etapes.besoin);
-  await choisir(conteneur, "objectif", "tache");
-  await saisir(conteneur, "coince", "On ressaisit chaque commande dans trois fichiers.");
-  await choisir(conteneur, "cout", "2-5h");
-  await choisir(conteneur, "essaye", "tableur");
-  await continuer(conteneur);
-  expect(titre(conteneur)).toBe(C.etapes.projet);
-  await choisir(conteneur, "decision", "plusieurs");
-  await choisir(conteneur, "echeance", "trimestre");
-  await choisir(conteneur, "budget", TRANCHE);
-  await continuer(conteneur);
-  expect(titre(conteneur)).toBe(C.etapes.coordonnees);
-}
-
-/** Coordonnées complètes, téléphone compris, puis passage au créneau. */
-async function donnerCoordonnees(conteneur) {
+/** Nom, e-mail et téléphone d'un visiteur. */
+async function donnerCoordonnees(conteneur, telephone = "06 12 34 56 78") {
   await saisir(conteneur, "nom", "Camille Renard");
   await saisir(conteneur, "email", "camille@exemple.fr");
-  await saisir(conteneur, "telephone", "06 12 34 56 78");
-  await continuer(conteneur);
-  expect(titre(conteneur)).toBe(C.etapes.creneau);
+  await saisir(conteneur, "telephone", telephone);
 }
 
-describe("ReservationRendezVous — les questions suivent le sujet", () => {
+const sujets = (conteneur) =>
+  [...conteneur.querySelectorAll('input[type=radio][name$="-sujet"]')].map((r) => r.value);
+
+describe("ReservationRendezVous — un seul écran", () => {
   let contexte;
   let montage;
 
@@ -265,178 +235,108 @@ describe("ReservationRendezVous — les questions suivent le sujet", () => {
     }
   });
 
-  it("quatre sujets, et aucune question d'outil", async () => {
+  it("quatre boutons de sujet, rien de réservé aux clients, aucune question de cadrage", async () => {
     contexte = installerDom();
     simulerServeur([]);
     montage = await monter();
     const { conteneur } = montage;
-    expect(C.types.map((t) => t.id)).toEqual(["logiciel", "decouverte", "demonstration", "point-d-etape"]);
-    for (const type of C.types) expect(texte(conteneur)).toContain(type.nom);
-    await cliquer(bouton(conteneur, C.types[0].nom));
-    // Le cadrage d'abord : aucun créneau avant les réponses.
-    expect(titre(conteneur)).toBe(C.etapes.entreprise);
-    expect(texte(conteneur)).toContain(C.introCadrage);
+    expect(PROSPECTS.map((t) => t.nom)).toEqual(["Logiciel", "Site", "IA", "Autre"]);
+    expect(sujets(conteneur)).toEqual(["logiciel", "site", "ia", "decouverte"]);
+    for (const type of PROSPECTS) expect(texte(conteneur)).toContain(type.nom);
+    expect(texte(conteneur)).not.toContain("Démonstration");
+    // Aucun sujet choisi : pas de calendrier, une invitation à choisir.
+    expect(texte(conteneur)).toContain(C.formulaire.choisirSujet);
     expect(conteneur.querySelector('[aria-label="' + C.creneaux.libelleCalendrier + '"]')).toBeNull();
-    expect(conteneur.querySelector('input[type=radio][name$="-outil"]')).toBeNull();
-    expect(C.questionnaire).not.toHaveProperty("outil");
+    // Le formulaire tient en cinq champs : nom, e-mail, téléphone, ligne libre, et le piège.
+    const champs = [...conteneur.querySelectorAll("input:not([type=radio]):not([type=hidden]), textarea")];
+    expect(champs.map((c) => c.getAttribute("name")).filter((n) => n && n !== "referenceInterne")).toEqual([
+      "nom",
+      "email",
+      "telephone",
+      "message",
+    ]);
+    expect(texte(conteneur)).not.toContain("budget");
   });
 
-  it("découverte : le cadrage, les coordonnées, puis le créneau, et un envoi qui porte tout", async () => {
+  it("un sujet présélectionné charge les créneaux, et un envoi porte exactement le formulaire", async () => {
     contexte = installerDom();
     const envois = simulerServeur([{ status: 200, corps: { ok: true } }]);
-    montage = await monter();
+    montage = await monter("site");
     const { conteneur } = montage;
+    await act(async () => attendre(20));
 
-    // Le sujet se choisit dans la liste : rien n'est présélectionné.
-    await cliquer(bouton(conteneur, C.types.find((t) => t.id === "decouverte").nom));
+    expect(conteneur.querySelector('input[type=radio][value="site"]').checked).toBe(true);
+    expect(texte(conteneur)).not.toContain(C.formulaire.choisirSujet);
+    expect(conteneur.querySelector('[aria-label="' + C.creneaux.libelleCalendrier + '"]')).not.toBeNull();
 
-    // Sans réponse, l'erreur porte sur l'entreprise, et le focus y va.
-    await continuer(conteneur);
-    expect(texte(conteneur)).toContain(C.questionnaire.entreprise.erreur);
-    expect(texte(conteneur)).toContain(C.questionnaire.taille.erreur);
-    expect(document.activeElement?.getAttribute("name")).toBe("entreprise");
-    expect(titre(conteneur)).toBe(C.etapes.entreprise);
-
-    await repondreAuCadrage(conteneur);
-
-    // Le téléphone est exigé : sans lui, on reste sur les coordonnées.
-    expect(texte(conteneur)).toContain(C.formulaire.telephoneAide);
-    await saisir(conteneur, "nom", "Camille Renard");
-    await saisir(conteneur, "email", "camille@exemple.fr");
-    await continuer(conteneur);
-    expect(titre(conteneur)).toBe(C.etapes.coordonnees);
-    await donnerCoordonnees(conteneur);
-
-    // Le créneau vient en dernier : la confirmation attend une heure.
-    expect(texte(conteneur)).toContain(C.formulaire.choisirHeure);
-    expect(() => bouton(conteneur, C.formulaire.envoyer)).toThrow();
     await cliquer(bouton(conteneur, "15:00"));
-    expect(texte(conteneur)).toMatch(/mardi 3 novembre à 15:00\s·\s45\smin/u);
-    expect(titre(conteneur)).toBe(C.etapes.creneau);
+    expect(texte(conteneur)).toContain("mardi 3 novembre à 15:00");
+    await donnerCoordonnees(conteneur);
+    await saisir(conteneur, "message", "Refaire le site de mon cabinet.");
     await soumettre(conteneur);
 
     expect(envois).toHaveLength(1);
     expect(envois[0]).toMatchObject({
-      type: "decouverte",
+      type: "site",
       debut: "2026-11-03T14:00:00.000Z",
+      nom: "Camille Renard",
+      email: "camille@exemple.fr",
       telephone: "06 12 34 56 78",
-      budget: TRANCHE,
-      objectif: "tache",
-      echeance: "trimestre",
-      entreprise: "Transports Martin",
-      activite: "Transport frigorifique",
-      taille: "6-20",
-      decision: "plusieurs",
-      coince: "On ressaisit chaque commande dans trois fichiers.",
-      cout: "2-5h",
-      essaye: "tableur",
+      message: "Refaire le site de mon cabinet.",
     });
-    expect(envois[0]).not.toHaveProperty("outil");
+    for (const ancien of ["budget", "objectif", "echeance", "entreprise", "coince", "projet", "duree"]) {
+      expect(envois[0]).not.toHaveProperty(ancien);
+    }
     expect(texte(conteneur)).toContain(C.succes.titre);
-    expect(texte(conteneur)).toContain(C.succes.texteCadrage);
-
-    // « Prendre un autre rendez-vous » repart du choix du sujet.
-    await cliquer(bouton(conteneur, C.succes.autre));
-    expect(texte(conteneur)).toContain(C.etapes.sujet);
+    expect(texte(conteneur)).toContain(C.succes.texte);
   });
 
-  it("logiciel : chaque refus du serveur renvoie à l'écran de sa question", async () => {
+  it("changer de sujet recharge les créneaux et efface l'heure retenue", async () => {
     contexte = installerDom();
-    const envois = simulerServeur([
-      { status: 400, corps: { message: "Décrivez ce qui coince.", champ: "coince" } },
-      { status: 400, corps: { message: "Indiquez un numéro.", champ: "telephone" } },
-      { status: 409, corps: { message: "Ce créneau vient d’être pris.", champ: "creneau" } },
-      { status: 200, corps: { ok: true } },
-    ]);
+    const demandes = [];
+    const base = globalThis.fetch;
+    simulerServeur([]);
+    const intercepte = globalThis.fetch;
+    globalThis.fetch = async (url, options) => {
+      demandes.push(String(url));
+      return intercepte(url, options);
+    };
     montage = await monter("logiciel");
     const { conteneur } = montage;
     await act(async () => attendre(20));
-    await repondreAuCadrage(conteneur);
-    await donnerCoordonnees(conteneur);
     await cliquer(bouton(conteneur, "15:00"));
+    expect(texte(conteneur)).toContain(C.recapitulatif);
 
-    // Ce qui coince est refusé : retour au besoin, erreur sous la question.
-    await soumettre(conteneur);
-    expect(titre(conteneur)).toBe(C.etapes.besoin);
-    expect(texte(conteneur)).toContain(C.questionnaire.coince.erreur);
-    await saisir(conteneur, "coince", "Chaque commande est ressaisie à la main, deux fois.");
-    expect(texte(conteneur)).not.toContain(C.questionnaire.coince.erreur);
-
-    // Les réponses sont gardées : on revient au créneau sans rien ressaisir.
-    await continuer(conteneur);
-    await continuer(conteneur);
-    await continuer(conteneur);
-    expect(titre(conteneur)).toBe(C.etapes.creneau);
-    await soumettre(conteneur);
-    expect(titre(conteneur)).toBe(C.etapes.coordonnees);
-
-    // Créneau pris entre-temps : retour au calendrier, à rechoisir.
-    await continuer(conteneur);
-    await soumettre(conteneur);
-    expect(titre(conteneur)).toBe(C.etapes.creneau);
-    expect(texte(conteneur)).toContain(C.formulaire.choisirHeure);
-    await cliquer(bouton(conteneur, "15:00"));
-    await soumettre(conteneur);
-
-    expect(envois).toHaveLength(4);
-    expect(envois[3]).toMatchObject({
-      type: "logiciel",
-      budget: TRANCHE,
-      coince: "Chaque commande est ressaisie à la main, deux fois.",
-    });
-    expect(texte(conteneur)).toContain(C.succes.titre);
+    await choisir(conteneur, "sujet", "ia");
+    await act(async () => attendre(20));
+    expect(demandes.some((u) => u.includes("type=ia"))).toBe(true);
+    expect(texte(conteneur)).not.toContain(C.recapitulatif);
+    globalThis.fetch = base;
   });
 
-  it("démonstration : ce qu'on veut voir, sans budget ni échéance", async () => {
-    contexte = installerDom();
-    const envois = simulerServeur([{ status: 200, corps: { ok: true } }]);
-    montage = await monter();
-    const { conteneur } = montage;
-    await cliquer(bouton(conteneur, C.types.find((t) => t.id === "demonstration").nom));
-    await allerAuProjet(conteneur);
-
-    expect(texte(conteneur)).toContain(C.questionnaire.objectif.legendes.demonstration);
-    expect(texte(conteneur)).not.toContain(C.questionnaire.budget.legende);
-    expect(texte(conteneur)).not.toContain(C.questionnaire.echeance.legende);
-    expect(conteneur.querySelector('input[name="projet"]')).toBeNull();
-
-    await cliquer(bouton(conteneur, C.actions.continuer));
-    expect(texte(conteneur)).toContain(C.questionnaire.objectif.erreur);
-    expect(document.activeElement?.getAttribute("name")).toMatch(/-objectif$/u);
-
-    await choisir(conteneur, "objectif", "logiciel");
-    await allerAuxCoordonnees(conteneur);
-    await soumettre(conteneur);
-
-    expect(envois).toHaveLength(1);
-    expect(envois[0]).toMatchObject({
-      type: "demonstration",
-      objectif: "logiciel",
-      nom: "Camille Renard",
-      email: "camille@exemple.fr",
-    });
-    expect(envois[0]).not.toHaveProperty("budget");
-    expect(envois[0]).not.toHaveProperty("echeance");
-    expect(envois[0]).not.toHaveProperty("projet");
-  });
-
-  it("démonstration : sans téléphone ou avec un faux, l'envoi est bloqué et le champ nommé", async () => {
+  it("sans sujet, sans heure ou avec un faux téléphone, rien ne part et le champ est nommé", async () => {
     contexte = installerDom();
     const envois = simulerServeur([]);
     montage = await monter();
     const { conteneur } = montage;
-    await cliquer(bouton(conteneur, C.types.find((t) => t.id === "demonstration").nom));
-    await allerAuProjet(conteneur);
-    await choisir(conteneur, "objectif", "logiciel");
-    await allerAuxCoordonnees(conteneur);
 
+    await donnerCoordonnees(conteneur);
+    await soumettre(conteneur);
+    expect(envois).toHaveLength(0);
+    expect(texte(conteneur)).toContain(C.formulaire.choisirSujet);
+
+    await choisir(conteneur, "sujet", "logiciel");
+    await act(async () => attendre(20));
+    await soumettre(conteneur);
+    expect(envois).toHaveLength(0);
+    expect(texte(conteneur)).toContain(C.formulaire.choisirHeure);
+
+    await cliquer(bouton(conteneur, "15:00"));
     await saisir(conteneur, "telephone", "");
     await soumettre(conteneur);
     expect(envois).toHaveLength(0);
     expect(texte(conteneur)).toContain(C.formulaire.telephoneErreur);
-    expect(conteneur.querySelector('input[name="telephone"]').getAttribute("aria-invalid")).toBe(
-      "true",
-    );
+    expect(conteneur.querySelector('input[name="telephone"]').getAttribute("aria-invalid")).toBe("true");
 
     await saisir(conteneur, "telephone", "abc");
     await soumettre(conteneur);
@@ -444,107 +344,84 @@ describe("ReservationRendezVous — les questions suivent le sujet", () => {
     expect(texte(conteneur)).toContain("Ce numéro de téléphone ne semble pas valide.");
   });
 
-  it("point d'étape : le projet concerné puis ce qu'on veut trancher", async () => {
+  it("un créneau pris entre-temps vide l'heure et recharge l'agenda", async () => {
     contexte = installerDom();
     const envois = simulerServeur([
-      { status: 400, corps: { message: "Indiquez le projet.", champ: "projet" } },
-      { status: 200, corps: { ok: true } },
+      { status: 409, corps: { message: "Ce créneau vient d’être pris.", champ: "creneau" } },
     ]);
-    montage = await monter("point-d-etape");
-    const { conteneur } = montage;
-    await act(async () => attendre(20));
-    await allerAuProjet(conteneur);
-
-    expect(texte(conteneur)).toContain(C.questionnaire.projet.legende);
-    expect(texte(conteneur)).toContain(C.questionnaire.objectif.legendes["point-d-etape"]);
-    expect(texte(conteneur)).not.toContain(C.questionnaire.budget.legende);
-
-    // Rien de répondu : le projet, affiché en premier, est demandé le premier.
-    await cliquer(bouton(conteneur, C.actions.continuer));
-    expect(texte(conteneur)).toContain(C.questionnaire.projet.erreur);
-    expect(document.activeElement?.getAttribute("name")).toBe("projet");
-
-    await saisir(conteneur, "projet", "Cockpit");
-    expect(texte(conteneur)).not.toContain(C.questionnaire.projet.erreur);
-    await cliquer(bouton(conteneur, C.actions.continuer));
-    expect(document.activeElement?.getAttribute("name")).toMatch(/-objectif$/u);
-    await choisir(conteneur, "objectif", "priorites");
-    await allerAuxCoordonnees(conteneur);
-
-    // Le serveur refuse le projet : retour à la question, erreur affichée.
-    await soumettre(conteneur);
-    expect(texte(conteneur)).toContain(C.questionnaire.projet.erreur);
-    await saisir(conteneur, "projet", "Cockpit, module agenda");
-    expect(texte(conteneur)).not.toContain(C.questionnaire.projet.erreur);
-    await allerAuxCoordonnees(conteneur);
-    await soumettre(conteneur);
-
-    expect(envois).toHaveLength(2);
-    expect(envois[1]).toMatchObject({
-      type: "point-d-etape",
-      projet: "Cockpit, module agenda",
-      objectif: "priorites",
-    });
-    expect(envois[1]).not.toHaveProperty("budget");
-    expect(envois[1]).not.toHaveProperty("echeance");
-    expect(texte(conteneur)).toContain(C.succes.titre);
-  });
-
-  it("logiciel : sur l'écran du projet, la décision est demandée la première", async () => {
-    contexte = installerDom();
-    simulerServeur([]);
     montage = await monter("logiciel");
     const { conteneur } = montage;
     await act(async () => attendre(20));
-    await saisir(conteneur, "entreprise", "Transports Martin");
-    await saisir(conteneur, "activite", "Transport frigorifique");
-    await choisir(conteneur, "taille", "seul");
-    await continuer(conteneur);
-    await choisir(conteneur, "objectif", "tache");
-    await saisir(conteneur, "coince", "Une tâche refaite chaque soir à la main.");
-    await choisir(conteneur, "cout", "inconnu");
-    await choisir(conteneur, "essaye", "rien");
-    await continuer(conteneur);
+    await cliquer(bouton(conteneur, "15:00"));
+    await donnerCoordonnees(conteneur);
+    await soumettre(conteneur);
 
-    await continuer(conteneur);
-    expect(texte(conteneur)).toContain(C.questionnaire.decision.erreur);
-    expect(texte(conteneur)).toContain(C.questionnaire.budget.erreur);
-    expect(document.activeElement?.getAttribute("name")).toMatch(/-decision$/u);
+    expect(envois).toHaveLength(1);
+    expect(texte(conteneur)).toContain("Ce créneau vient d’être pris.");
+    expect(texte(conteneur)).not.toContain(C.recapitulatif);
+    expect(conteneur.querySelector('input[name="nom"]').value).toBe("Camille Renard");
+  });
+
+  it("un sujet de client seul : aucun bouton de sujet, un titre, téléphone facultatif", async () => {
+    contexte = installerDom();
+    const envois = simulerServeur([{ status: 200, corps: { ok: true } }]);
+    montage = await monter("demonstration");
+    const { conteneur } = montage;
+    await act(async () => attendre(20));
+
+    expect(sujets(conteneur)).toEqual([]);
+    expect(titre(conteneur)).toBe(C.types.find((t) => t.id === "demonstration").nom);
+    expect(texte(conteneur)).toContain(C.formulaire.telephoneLabelClient);
+    expect(conteneur.querySelector('input[name="telephone"]').required).toBe(false);
+    await cliquer(bouton(conteneur, "15:00"));
+    await saisir(conteneur, "nom", "Camille Renard");
+    await saisir(conteneur, "email", "camille@exemple.fr");
+    await soumettre(conteneur);
+
+    expect(envois).toHaveLength(1);
+    expect(envois[0]).toMatchObject({ type: "demonstration", nom: "Camille Renard", telephone: "" });
+    expect(envois[0]).not.toHaveProperty("projet");
+  });
+
+  it("la page client : quatre sujets, nom et e-mail suffisent, un faux numéro reste refusé", async () => {
+    contexte = installerDom();
+    const envois = simulerServeur([{ status: 200, corps: { ok: true } }]);
+    const conteneur = document.createElement("div");
+    document.body.appendChild(conteneur);
+    const racine = createRoot(conteneur);
+    montage = { conteneur, racine };
+    await act(async () => {
+      racine.render(
+        createElement(ReservationRendezVous, {
+          types: C.types.filter((t) => t.prive),
+          emailContact: "contact@exemple.fr",
+        }),
+      );
+      await attendre(20);
+    });
+    expect(sujets(conteneur)).toEqual(["point-rapide", "demonstration", "proposition", "point-d-etape"]);
+    expect(texte(conteneur)).toContain(C.formulaire.choisirSujet);
+
+    await choisir(conteneur, "sujet", "proposition");
+    await act(async () => attendre(20));
+    await cliquer(bouton(conteneur, "15:00"));
+    await saisir(conteneur, "nom", "Camille Renard");
+    await saisir(conteneur, "email", "camille@exemple.fr");
+    await saisir(conteneur, "telephone", "abc");
+    await soumettre(conteneur);
+    expect(envois).toHaveLength(0);
+    expect(texte(conteneur)).toContain("Ce numéro de téléphone ne semble pas valide.");
+
+    await saisir(conteneur, "telephone", "");
+    await saisir(conteneur, "message", "Relire le devis du module stock.");
+    await soumettre(conteneur);
+    expect(envois).toHaveLength(1);
+    expect(envois[0]).toMatchObject({ type: "proposition", message: "Relire le devis du module stock." });
+    expect(texte(conteneur)).toContain(C.succes.titre);
   });
 });
 
-describe("etapeDuChamp — un refus du serveur renvoie à l'écran de sa question", () => {
-  it.each([
-    ["creneau", true, "creneau"],
-    ["duree", false, "creneau"],
-    ["entreprise", true, "entreprise"],
-    ["activite", true, "entreprise"],
-    ["taille", true, "entreprise"],
-    ["coince", true, "besoin"],
-    ["cout", true, "besoin"],
-    ["essaye", true, "besoin"],
-    ["objectif", true, "besoin"],
-    ["objectif", false, "projet"],
-    ["decision", true, "cadre"],
-    ["budget", true, "cadre"],
-    ["echeance", true, "cadre"],
-    ["budget", false, "projet"],
-    ["projet", false, "projet"],
-    ["nom", true, "coordonnees"],
-    ["email", true, "coordonnees"],
-    ["telephone", true, "coordonnees"],
-    ["message", false, "coordonnees"],
-  ])("%s (cadrage : %s) → %s", (champ, cadrage, attendue) => {
-    expect(etapeDuChamp(champ, cadrage)).toBe(attendue);
-  });
-
-  it("un refus sans champ, ou d'un champ inconnu, laisse le visiteur où il est", () => {
-    expect(etapeDuChamp(undefined, true)).toBeUndefined();
-    expect(etapeDuChamp("jetonCaptcha", true)).toBeUndefined();
-  });
-});
-
-describe("ReservationRendezVous — navigation et états du créneau", () => {
+describe("ReservationRendezVous — états du créneau", () => {
   let contexte;
   let montage;
 
@@ -576,33 +453,8 @@ describe("ReservationRendezVous — navigation et états du créneau", () => {
     return envois;
   }
 
-  it("la barre et « Retour » ramènent aux étapes franchies, réponses gardées", async () => {
+  it("agenda non configuré, panne puis « Réessayer », mois vide", async () => {
     contexte = installerDom();
-    simulerServeur([]);
-    montage = await monter("logiciel");
-    const { conteneur } = montage;
-    await act(async () => attendre(20));
-    await saisir(conteneur, "entreprise", "Transports Martin");
-    await saisir(conteneur, "activite", "Transport frigorifique");
-    await choisir(conteneur, "taille", "seul");
-    await continuer(conteneur);
-    expect(titre(conteneur)).toBe(C.etapes.besoin);
-
-    await cliquer(bouton(conteneur, C.actions.retour));
-    expect(titre(conteneur)).toBe(C.etapes.entreprise);
-    expect(conteneur.querySelector('input[name="entreprise"]').value).toBe("Transports Martin");
-
-    await continuer(conteneur);
-    // Étape 01 franchie : un bouton qui ramène au choix du sujet.
-    await cliquer(bouton(conteneur, C.etapes.sujet));
-    expect(titre(conteneur)).toBe(C.etapes.sujet);
-  });
-
-  it("agenda non configuré, panne puis « Réessayer », mois vide, sans durées", async () => {
-    contexte = installerDom();
-    const sansDurees = { ...CRENEAUX, durees: undefined, duree: undefined };
-    delete sansDurees.durees;
-    delete sansDurees.duree;
     simulerCreneaux([{ status: 503, corps: {} }]);
     montage = await monter("demonstration");
     let { conteneur } = montage;
@@ -617,28 +469,24 @@ describe("ReservationRendezVous — navigation et états du créneau", () => {
     expect(texte(conteneur)).toContain(C.creneaux.erreur);
     await cliquer(bouton(conteneur, C.actions.reessayer), 40);
     expect(texte(conteneur)).toContain(C.creneaux.vide);
-    await act(async () => montage.racine.unmount());
+  });
 
-    // Sans durées au cockpit : la confirmation montre le créneau seul.
-    const envois = simulerCreneaux([{ status: 200, corps: sansDurees }], [{ status: 502, corps: { message: "Le rendez-vous n’a pas pu être enregistré." } }]);
+  it("moins de mouvement demandé, un refus sans champ garde le visiteur sur place avec son message", async () => {
+    contexte = installerDom();
+    const envois = simulerCreneaux(
+      [{ status: 200, corps: CRENEAUX }],
+      [{ status: 502, corps: { message: "Le rendez-vous n’a pas pu être enregistré." } }],
+    );
     montage = await monter("logiciel");
-    conteneur = montage.conteneur;
+    const { conteneur } = montage;
     await act(async () => attendre(20));
-    await repondreAuCadrage(conteneur);
-    await donnerCoordonnees(conteneur);
-    // Moins de mouvement demandé : la confirmation vient en vue sans glisser.
-    const defilements = [];
-    window.matchMedia = () => ({ matches: true, addEventListener() {}, removeEventListener() {} });
-    window.HTMLElement.prototype.scrollIntoView = (options) => defilements.push(options);
     await cliquer(bouton(conteneur, "15:00"));
-    expect(defilements).toEqual([{ block: "start", behavior: "auto" }]);
-    expect(texte(conteneur)).toContain("mardi 3 novembre à 15:00");
-    expect(texte(conteneur)).not.toMatch(/15:00\s·/u);
+    await donnerCoordonnees(conteneur);
 
-    // Refus sans champ nommé : le visiteur reste sur le créneau, le message s'affiche.
     await soumettre(conteneur);
     expect(envois).toHaveLength(1);
-    expect(titre(conteneur)).toBe(C.etapes.creneau);
     expect(texte(conteneur)).toContain("Le rendez-vous n’a pas pu être enregistré.");
+    expect(texte(conteneur)).toContain("mardi 3 novembre à 15:00");
+    expect(conteneur.querySelector("form")).not.toBeNull();
   });
 });

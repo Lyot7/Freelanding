@@ -26,6 +26,7 @@ import {
   pagesSecteur,
   type SectionSecteur,
 } from "./pages-secteur";
+import { lienRendezVous } from "./rendez-vous";
 
 const LOGICIEL = prestation("logiciel");
 const CHEMIN_PILIER = `/services/${LOGICIEL.slug}`;
@@ -240,7 +241,7 @@ export const pagePrixLogiciel: PagePrix = {
           },
           {
             libelle: "Réserver un appel",
-            href: "#rendez-vous",
+            href: lienRendezVous("logiciel"),
             description: "Choisissez un créneau en visio pour chiffrer votre projet.",
           },
         ],

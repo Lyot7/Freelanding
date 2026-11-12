@@ -102,15 +102,15 @@ const nextConfig: NextConfig = {
       { source: "/cgv", destination: "/legal/conditions-generales-de-vente", statusCode: 301 },
       /* Ancien site : la prise de rendez-vous est devenue la page contact. */
       { source: "/rendez-vous", destination: "/contact", statusCode: 301 },
-      /* LIENS DE PREMIER RENDEZ-VOUS envoyés en prospection et aux clients,
-         décision d'Eliott du 2026-11-02 : ils mènent au formulaire du pied de
-         l'accueil, qui recueille le projet, l'échéance et les coordonnées avant
-         de réserver le créneau au cockpit. Temporaires (307) : la destination peut
-         changer sans qu'un navigateur la garde en cache. */
-      { source: "/rdv", destination: "/?sujet=decouverte#rendez-vous", statusCode: 307 },
-      { source: "/rdv/logiciel", destination: "/?sujet=logiciel#rendez-vous", statusCode: 307 },
-      { source: "/rdv/demonstration", destination: "/?sujet=demonstration#rendez-vous", statusCode: 307 },
-      { source: "/rdv/point-d-etape", destination: "/?sujet=point-d-etape#rendez-vous", statusCode: 307 },
+      /* UN SEUL LIEN DE PREMIER RENDEZ-VOUS depuis le 2026-11-12 : `/rdv`, avec
+         `?sujet=logiciel|site|ia|autre`. L'ancien lien logiciel, envoyé dans des
+         centaines de mails de prospection, y renvoie définitivement (301). */
+      { source: "/rdv/logiciel", destination: "/rdv?sujet=logiciel", statusCode: 301 },
+      /* Les clients en cours gardent leurs liens, qui ouvrent `/rdv/client` (un
+         seul lien, formulaire réduit) sujet déjà choisi. Temporaires (307) : la
+         destination peut changer sans qu'un navigateur la garde en cache. */
+      { source: "/rdv/demonstration", destination: "/rdv/client?sujet=demonstration", statusCode: 307 },
+      { source: "/rdv/point-d-etape", destination: "/rdv/client?sujet=point-d-etape", statusCode: 307 },
       { source: "/agent", destination: "/", statusCode: 301 },
       /* Simulateur de prix, retiré le 2026-10-05. */
       { source: "/simulateur-prix", destination: "/#services", statusCode: 301 },
