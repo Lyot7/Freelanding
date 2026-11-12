@@ -53,6 +53,26 @@ l'identité, la seule prise de risque est sur les chiffres du résultat.
 - Aucun emoji, aucun dégradé, aucune lueur ; le seul symbole est la flèche du
   bouton de rendez-vous.
 
+## design-council (palier complet, trois lentilles aveugles, puis reprise)
+
+Premier passage sur les captures 06 à 09 : perception 19/30, craft FAIL,
+accessibilité 9 violations AA dont 2 bloquantes. Repris (captures 10 à 13) :
+
+- perception : bouton de rendez-vous remonté sous l'intro du résultat (il
+  arrivait après deux écrans, dans le vert de l'abonnement) et répété en bas en
+  contour ; « sans avance de trésorerie » démenti par la mise en route,
+  remplacé ; chapeau qui annonce les coordonnées ; case de consentement
+  remplacée par une mention sous le bouton ; une preuve réelle (Würth) au moment
+  où l'on demande le contact ; un seul avertissement.
+- craft : défilement vers l'étape active et vers les prix (il allait au bas de
+  page), erreurs serveur jamais perdues, plus de flou animé, échelle du site,
+  capitales réservées aux deux titres et au bouton, numéros décoratifs retirés.
+- accessibilité : région d'alerte toujours montée et reliée au champ fautif,
+  consignes visibles (20 caractères, champs obligatoires), plus de focus volé au
+  chargement, bascule 12/24 mois en boutons `aria-pressed`, statut « Calcul en
+  cours » annoncé, contrastes des bordures et du texte d'exemple relevés.
+- Refusé : téléphone facultatif (Eliott prospecte par téléphone et SMS).
+
 # Questionnaire de cadrage avant le créneau, 2026-11-10
 
 Prise de rendez-vous des prospects (`/rdv`, `/rdv/logiciel`) : sujet →

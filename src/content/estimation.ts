@@ -76,7 +76,7 @@ const MESSAGES_CHAMP: Readonly<Record<ChampEstimation, string>> = {
   societe: "Indiquez le nom de votre société.",
   email: "Cette adresse e-mail ne semble pas valide.",
   telephone: "Ce numéro de téléphone ne semble pas valide.",
-  consentement: "Cochez la case pour que je puisse vous recontacter.",
+  consentement: "Rechargez la page et réessayez.",
 };
 
 export const estimationContent = {
@@ -88,7 +88,7 @@ export const estimationContent = {
   eyebrow: "Estimation",
   titre: "Une fourchette de prix en deux minutes",
   chapeau:
-    "Quatre questions, quelques lignes sur votre projet, et vous savez dans quel ordre de prix vous êtes avant même de m’appeler.",
+    "Quatre questions, quelques lignes sur votre projet, vos coordonnées, et votre fourchette s’affiche aussitôt.",
   auteur: {
     nom: "Eliott Bouquerel",
     avatar: "/images/eliott-bouquerel-avatar.jpg",
@@ -103,6 +103,7 @@ export const estimationContent = {
       "Exemple : nos devis se font sur Excel et se perdent dans les mails. Je voudrais un outil où l’équipe crée le devis, le client le signe en ligne et la facture part toute seule.",
     compteur: (n: number, max: number) => `${n.toLocaleString("fr-FR")} / ${max.toLocaleString("fr-FR")}`,
     valider: "Continuer",
+    minimum: "20 caractères au moins",
   },
   contact: {
     question: "Dernière étape : à qui j’envoie le détail de l’estimation ?",
@@ -114,11 +115,15 @@ export const estimationContent = {
       telephone: "Téléphone",
     },
     consentement:
-      "J’accepte qu’Eliott Bouquerel utilise ces informations pour me recontacter au sujet de ce projet. Ma description est analysée automatiquement pour calculer l’estimation.",
+      "En envoyant, vous acceptez que je vous recontacte au sujet de ce projet. Votre description sert au calcul automatique de l’estimation.",
+    preuve: "Déjà livré : la création de compte B2B de Würth France, 92 % d’erreurs en moins au support.",
+    lienPreuve: "Voir la réalisation",
+    cheminPreuve: "/realisations/wurth-creation-de-compte",
     lienConfidentialite: "Politique de confidentialité",
     cheminConfidentialite: "/legal/politique-de-confidentialite",
     valider: "Voir mon estimation",
     envoi: "Calcul en cours",
+    obligatoires: "Tous les champs sont obligatoires.",
   },
   resultat: {
     intro: (prenom: string) => `Voici votre estimation, ${prenom}.`,
@@ -131,7 +136,7 @@ export const estimationContent = {
     },
     abonnement: {
       titre: "Abonnement",
-      sousTitre: "Vous étalez le paiement, sans avance de trésorerie.",
+      sousTitre: "Une part à la commande, le reste chaque mois, suivi compris.",
       engagement: (mois: number) => `${mois} mois`,
       choixDuree: "Durée d’engagement",
       miseEnRoute: "À la commande, mise en route",
@@ -144,12 +149,10 @@ export const estimationContent = {
     de: "de",
     des: "dès",
     aPartirDe: "À partir de",
-    grandProjet:
-      "Un projet de cette taille se construit avec vous. Le haut de la fourchette se fixe en rendez-vous.",
-    sourceBoutons:
-      "La fourchette est large parce que je n’ai que vos réponses aux questions : un rendez-vous la resserre vite.",
+    grandProjet: "Pour un projet de cette taille, le haut de la fourchette se fixe en rendez-vous.",
+    sourceBoutons: "Un rendez-vous de 30 minutes resserre la fourchette.",
     rendezVous: "En parler en rendez-vous",
-    rendezVousNote: "30 minutes en visio, gratuit, sans engagement.",
+    rendezVousNote: "30 minutes en visio.",
     recommencer: "Refaire une estimation",
   },
   erreurs: {
