@@ -31,6 +31,7 @@ const PAGES_FIXES = [
   "/a-propos",
   "/blog",
   "/realisations",
+  "/estimation",
   "/logiciel-sur-mesure-caen",
   "/logiciel-metier",
   "/services/logiciel-metier/prix",

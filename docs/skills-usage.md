@@ -1,3 +1,78 @@
+# Outil de chiffrage `/estimation`, 2026-11-12
+
+Nouvelle page publique, téléphone d'abord. Captures de chaque étape dans le
+rapport de session (00 avant : la route n'existait pas, 404 ; 01 à 07 première
+et deuxième passe ; 08 et 09 état final).
+
+Direction posée avant le code : une conversation avec Eliott, pas un
+formulaire. Scène : un dirigeant de TPE, sur son téléphone entre deux
+rendez-vous, veut savoir s'il est à 3 000 ou à 30 000 € avant d'appeler.
+Le site est déjà sombre, Geist, angles droits, accent volt : on garde
+l'identité, la seule prise de risque est sur les chiffres du résultat.
+
+## impeccable (registre marque, `brand.md` et `shape.md` lus en entier)
+
+- Stratégie de couleur « Committed » sur le seul résultat : l'abonnement, offre
+  qu'Eliott pousse, est un aplat volt plein ; l'achat direct reste sur la
+  surface sombre. Partout ailleurs, accent sous 10 %.
+- Typographie : les fourchettes sont l'élément-star, en Geist Black énorme
+  (`clamp(44px, 13vw, 64px)`). Passe `typeset` sur la capture 04 : « 8000 à
+  16000 € HT » débordait et perdait ses séparateurs de milliers (l'espace fine
+  disparaît dans l'approche serrée). Correction : fourchette empilée sur deux
+  lignes « de / à », espace insécable ordinaire, unité sous le chiffre (07).
+- Passe `layout` sur la capture 02 : « MODIFIER » en capitales sous chaque
+  réponse faisait de l'échafaudage répété (interdit `brand.md`). Devenu un lien
+  discret en casse normale à gauche de la bulle ; compteur de caractères qui
+  passait sur deux lignes mis en `nowrap` ; bouton « Continuer » qui prenait
+  toute la largeur ramené à sa taille.
+- Passe `clarify` sur la capture 05 : l'abonnement montrait la mensualité avant
+  la mise en route. Réordonné dans l'ordre où le client paie : à la commande,
+  puis chaque mois pendant 12 ou 24 mois, puis le suivi seul.
+- Formulaire : prénom et nom côte à côte dès le téléphone (06), case de
+  consentement avec une vraie coche dessinée (elle n'était qu'un carré plein).
+- Défaut trouvé sur le rendu réel (08) : rendu serveur, la première question
+  restait en opacité 0 jusqu'à l'hydratation, page vide plusieurs secondes.
+  Ce qui est rendu au premier passage n'est plus animé.
+
+## emil-design-eng
+
+- Entrée des lignes de conversation : 380 ms → 260 ms, courbe ease-out forte
+  `cubic-bezier(0.23, 1, 0.32, 1)`, `transform` complet plutôt que `y` (reste
+  sur le GPU). Mouvement réduit : fondu seul, plus de déplacement.
+- Changement 12 / 24 mois : le chiffre se transforme (fondu court avec flou de
+  3 px, 200 ms) au lieu d'être remplacé sec.
+- Boutons : `scale(0.98)` à l'appui, survol limité aux pointeurs fins
+  (variante `hover` de Tailwind 4).
+
+## taste-skill
+
+- État d'attente : la forme des deux panneaux se dessine pendant le calcul
+  (jusqu'à une dizaine de secondes avec l'IA) au lieu d'une roue.
+- Hiérarchie par opacité : 100 % question, 70 % libellés, 45 à 60 % aides.
+- Libellé au-dessus du champ, erreur reliée au champ (`aria-invalid`).
+- Aucun emoji, aucun dégradé, aucune lueur ; le seul symbole est la flèche du
+  bouton de rendez-vous.
+
+## design-council (palier complet, trois lentilles aveugles, puis reprise)
+
+Premier passage sur les captures 06 à 09 : perception 19/30, craft FAIL,
+accessibilité 9 violations AA dont 2 bloquantes. Repris (captures 10 à 13) :
+
+- perception : bouton de rendez-vous remonté sous l'intro du résultat (il
+  arrivait après deux écrans, dans le vert de l'abonnement) et répété en bas en
+  contour ; « sans avance de trésorerie » démenti par la mise en route,
+  remplacé ; chapeau qui annonce les coordonnées ; case de consentement
+  remplacée par une mention sous le bouton ; une preuve réelle (Würth) au moment
+  où l'on demande le contact ; un seul avertissement.
+- craft : défilement vers l'étape active et vers les prix (il allait au bas de
+  page), erreurs serveur jamais perdues, plus de flou animé, échelle du site,
+  capitales réservées aux deux titres et au bouton, numéros décoratifs retirés.
+- accessibilité : région d'alerte toujours montée et reliée au champ fautif,
+  consignes visibles (20 caractères, champs obligatoires), plus de focus volé au
+  chargement, bascule 12/24 mois en boutons `aria-pressed`, statut « Calcul en
+  cours » annoncé, contrastes des bordures et du texte d'exemple relevés.
+- Refusé : téléphone facultatif (Eliott prospecte par téléphone et SMS).
+
 # Un seul lien de rendez-vous, formulaire en un écran, 2026-11-12
 
 Pages `/rdv` (premier rendez-vous) et `/rdv/client` (clients en cours), même
