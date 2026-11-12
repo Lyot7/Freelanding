@@ -384,6 +384,27 @@ describe("ReservationRendezVous — un seul écran", () => {
     expect(texte(conteneur)).not.toContain(C.recapitulatif);
   });
 
+  it("un second appui pendant l'envoi ne réserve pas deux fois", async () => {
+    contexte = installerDom();
+    const envois = [];
+    globalThis.fetch = async (url, options) => {
+      if (String(url).startsWith("/api/rendez-vous/creneaux")) {
+        return { ok: true, status: 200, json: async () => CRENEAUX };
+      }
+      envois.push(JSON.parse(options.body));
+      return new Promise(() => {});
+    };
+    montage = await monter("logiciel");
+    const { conteneur } = montage;
+    await act(async () => attendre(20));
+    await cliquer(bouton(conteneur, "15:00"));
+    await donnerCoordonnees(conteneur);
+    await soumettre(conteneur);
+    expect(texte(conteneur)).toContain(C.formulaire.envoiEnCours);
+    await soumettre(conteneur);
+    expect(envois).toHaveLength(1);
+  });
+
   it("moins de mouvement demandé : les refus ramènent au bloc concerné sans glisser", async () => {
     contexte = installerDom();
     simulerServeur([]);
