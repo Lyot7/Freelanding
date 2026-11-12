@@ -26,6 +26,14 @@ describe("Footer", () => {
   });
 });
 
+describe("Footer sans formulaire (`/rdv`, `/rdv/client`)", () => {
+  it("ne monte aucun bloc de réservation ni formulaire de contact", async () => {
+    const element = await Footer({ sansFormulaire: true });
+    expect(listesDeTypes(element)).toEqual([]);
+    expect(trouveIconeSociale(element)).toBe(true);
+  });
+});
+
 describe("decouperAutour", () => {
   it("garde ce qui suit le fragment mis en avant", () => {
     expect(decouperAutour("Avant. Fort. Après.", "Fort.")).toEqual(["Avant. ", " Après."]);

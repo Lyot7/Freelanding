@@ -501,6 +501,8 @@ export function ReservationRendezVous({
   const [champEnErreur, setChampEnErreur] = useState<string | undefined>(undefined);
   const protection = useProtectionTurnstile();
 
+  /** Le créneau réservé, gardé pour l'écran de confirmation (le formulaire disparaît). */
+  const [resumeSucces, setResumeSucces] = useState("");
   const [nom, setNom] = useState("");
   const [email, setEmail] = useState("");
   const [telephone, setTelephone] = useState("");
@@ -739,8 +741,8 @@ export function ReservationRendezVous({
       return;
     }
 
-    const donneesFormulaire = new FormData(evenement.currentTarget);
-    const piege = donneesFormulaire.get(NOM_CHAMP_PIEGE);
+    // Le piège à robots : un champ que seul un robot remplit, relu tel quel.
+    const piege = new FormData(evenement.currentTarget).get(NOM_CHAMP_PIEGE);
 
     setEtatEnvoi("envoi");
     setMessageEnvoi("");
@@ -774,13 +776,14 @@ export function ReservationRendezVous({
           telephone,
           message,
           debutMs: refDebut.current,
-          [NOM_CHAMP_PIEGE]: typeof piege === "string" ? piege : "",
-          ...(jetonCaptcha ? { jetonCaptcha } : {}),
+          [NOM_CHAMP_PIEGE]: piege,
+          jetonCaptcha,
         }),
       });
       const charge: unknown = await reponse.json().catch(() => null);
 
       if (reponse.ok) {
+        setResumeSucces(creneau.resume);
         setEtatEnvoi("succes");
         setMessageEnvoi("");
         protection.reinitialiser();
@@ -837,11 +840,9 @@ export function ReservationRendezVous({
         >
           {contenu.succes.titre}
         </p>
-        {creneau ? (
-          <p className="m-0 text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground">
-            {creneau.resume}
-          </p>
-        ) : null}
+        <p className="m-0 text-[16px] font-medium leading-[1.2] tracking-[-0.01em] text-foreground">
+          {resumeSucces}
+        </p>
         <p className={`${CLASSE_TEXTE} m-0`}>{contenu.succes.texte}</p>
         <button
           type="button"

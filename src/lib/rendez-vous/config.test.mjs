@@ -2,9 +2,11 @@ import { describe, expect, it } from "bun:test";
 import {
   CLES_COCKPIT,
   estIdRendezVous,
+  estTypeClient,
   resoudreAcces,
   resoudreSujet,
   resoudreConfiguration,
+  typesClient,
   typesVisibles,
   URL_COCKPIT_PAR_DEFAUT,
 } from "./config.ts";
@@ -68,6 +70,23 @@ describe("resoudreConfiguration", () => {
   it("donne une clé cockpit à chaque type du contenu, identique à son identifiant", () => {
     for (const id of IDS_RENDEZ_VOUS) expect(CLES_COCKPIT[id]).toBe(id);
     expect(Object.keys(CLES_COCKPIT).sort()).toEqual([...IDS_RENDEZ_VOUS].sort());
+  });
+});
+
+describe("rendez-vous de clients", () => {
+  const types = rendezVousContent.types;
+  it("estTypeClient reconnaît exactement les quatre sujets de clients", () => {
+    for (const id of IDS_RENDEZ_VOUS) expect(estTypeClient(id), id).toBe(IDS_CLIENT.includes(id));
+    expect(estTypeClient(undefined)).toBe(false);
+  });
+
+  it("typesClient garde les quatre, dans l'ordre du contenu", () => {
+    expect(typesClient(types).map((type) => type.id)).toEqual([
+      "point-rapide",
+      "demonstration",
+      "proposition",
+      "point-d-etape",
+    ]);
   });
 });
 

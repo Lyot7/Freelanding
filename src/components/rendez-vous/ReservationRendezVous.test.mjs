@@ -1,3 +1,4 @@
+import * as testeur from "bun:test";
 import { afterEach, describe, expect, it } from "bun:test";
 import { JSDOM } from "jsdom";
 import { act, createElement } from "react";
@@ -362,6 +363,73 @@ describe("ReservationRendezVous — un seul écran", () => {
     expect(conteneur.querySelector('input[name="nom"]').value).toBe("Camille Renard");
   });
 
+  it("après une réservation, « Prendre un autre rendez-vous » rend le formulaire, coordonnées gardées", async () => {
+    contexte = installerDom();
+    simulerServeur([{ status: 200, corps: { ok: true } }]);
+    montage = await monter("logiciel");
+    const { conteneur } = montage;
+    await act(async () => attendre(20));
+    await cliquer(bouton(conteneur, "15:00"));
+    await donnerCoordonnees(conteneur);
+    await soumettre(conteneur);
+    expect(texte(conteneur)).toContain(C.succes.titre);
+    expect(texte(conteneur)).toContain("mardi 3 novembre à 15:00");
+
+    await cliquer(bouton(conteneur, C.succes.autre));
+    await act(async () => attendre(20));
+    expect(conteneur.querySelector("form")).not.toBeNull();
+    // Les coordonnées restent : le visiteur qui reprend un créneau ne les retape pas.
+    expect(conteneur.querySelector('input[name="nom"]').value).toBe("Camille Renard");
+    expect(conteneur.querySelector('input[name="message"]').value).toBe("");
+    expect(texte(conteneur)).not.toContain(C.recapitulatif);
+  });
+
+  it("moins de mouvement demandé : les refus ramènent au bloc concerné sans glisser", async () => {
+    contexte = installerDom();
+    simulerServeur([]);
+    window.matchMedia = () => ({ matches: true, addEventListener() {}, removeEventListener() {} });
+    const defilements = [];
+    window.HTMLElement.prototype.scrollIntoView = (options) => defilements.push(options);
+    montage = await monter();
+    const { conteneur } = montage;
+    await donnerCoordonnees(conteneur);
+    await soumettre(conteneur);
+    await choisir(conteneur, "sujet", "logiciel");
+    await act(async () => attendre(20));
+    await soumettre(conteneur);
+    expect(defilements).toEqual([
+      { block: "center", behavior: "auto" },
+      { block: "start", behavior: "auto" },
+    ]);
+  });
+
+  it("coupure réseau ou réponse illisible : le message dit quoi faire, le formulaire reste", async () => {
+    contexte = installerDom();
+    const reponses = [
+      () => {
+        throw new Error("reseau");
+      },
+      () => ({ ok: false, status: 500, json: async () => Promise.reject(new Error("pas du json")) }),
+    ];
+    globalThis.fetch = async (url) => {
+      if (String(url).startsWith("/api/rendez-vous/creneaux")) {
+        return { ok: true, status: 200, json: async () => CRENEAUX };
+      }
+      return reponses.shift()();
+    };
+    montage = await monter("logiciel");
+    const { conteneur } = montage;
+    await act(async () => attendre(20));
+    await cliquer(bouton(conteneur, "15:00"));
+    await donnerCoordonnees(conteneur);
+
+    await soumettre(conteneur);
+    expect(texte(conteneur)).toContain("La connexion a échoué.");
+    await soumettre(conteneur);
+    expect(texte(conteneur)).toContain("Écrivez-moi directement à contact@exemple.fr");
+    expect(conteneur.querySelector("form")).not.toBeNull();
+  });
+
   it("un sujet de client seul : aucun bouton de sujet, un titre, téléphone facultatif", async () => {
     contexte = installerDom();
     const envois = simulerServeur([{ status: 200, corps: { ok: true } }]);
@@ -488,5 +556,66 @@ describe("ReservationRendezVous — états du créneau", () => {
     expect(texte(conteneur)).toContain("Le rendez-vous n’a pas pu être enregistré.");
     expect(texte(conteneur)).toContain("mardi 3 novembre à 15:00");
     expect(conteneur.querySelector("form")).not.toBeNull();
+  });
+});
+
+describe("ReservationRendezVous — protection anti-robot non configurée", () => {
+  let contexte;
+  let montage;
+
+  afterEach(async () => {
+    if (montage) {
+      await act(async () => montage.racine.unmount());
+      montage = undefined;
+    }
+    if (contexte) {
+      await attendre(20);
+      contexte.restaurer();
+      contexte = undefined;
+    }
+  });
+
+  it("dit la vérité au lieu d'envoyer : message d'indisponibilité, rien ne part", async () => {
+    // `bun:test` expose `mock.module`, vitest (sous lequel tourne le gate) `vi.doMock`.
+    const chemin = "../forms/turnstile.ts";
+    // Une COPIE des exports : sous bun, `mock.module` réécrit le module en place, et
+    // l'espace de noms importé suivrait le faux au lieu de garder le vrai.
+    const reel = { ...(await import("../forms/turnstile.ts")) };
+    const faux = () => ({
+      ...reel,
+      useProtectionTurnstile: () => ({
+        configure: false,
+        refConteneur: { current: null },
+        activer() {},
+        obtenirJeton: async () => undefined,
+        reinitialiser() {},
+      }),
+    });
+    const poser = (module) =>
+      testeur.mock?.module ? testeur.mock.module(chemin, module) : testeur.vi.doMock(chemin, module);
+    poser(faux);
+    try {
+      const { ReservationRendezVous: SansCle } = await import("./ReservationRendezVous.tsx?sans-cle");
+      contexte = installerDom();
+      const envois = simulerServeur([]);
+      const conteneur = document.createElement("div");
+      document.body.appendChild(conteneur);
+      const racine = createRoot(conteneur);
+      montage = { conteneur, racine };
+      await act(async () => {
+        racine.render(createElement(SansCle, { types: PROSPECTS, emailContact: "contact@exemple.fr", typeInitial: "logiciel" }));
+        await attendre(20);
+      });
+      await act(async () => attendre(20));
+      await cliquer(bouton(conteneur, "15:00"));
+      await donnerCoordonnees(conteneur);
+      await soumettre(conteneur);
+
+      expect(envois).toHaveLength(0);
+      expect(texte(conteneur)).toContain("protection anti-robot non configurée");
+      expect(texte(conteneur)).toContain("contact@exemple.fr");
+    } finally {
+      poser(() => reel);
+    }
   });
 });

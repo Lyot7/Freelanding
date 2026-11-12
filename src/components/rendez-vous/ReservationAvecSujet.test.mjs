@@ -13,12 +13,12 @@ import { ReservationAvecSujet } from "./ReservationAvecSujet";
 const C = rendezVousContent;
 const nom = (id) => C.types.find((type) => type.id === id).nom;
 
-function rendre(recherche) {
+function rendre(recherche, client = false) {
   return renderToStaticMarkup(
     createElement(
       SearchParamsContext.Provider,
       { value: new URLSearchParams(recherche) },
-      createElement(ReservationAvecSujet, { types: C.types, emailContact: "contact@exemple.fr" }),
+      createElement(ReservationAvecSujet, { types: C.types, emailContact: "contact@exemple.fr", client }),
     ),
   );
 }
@@ -70,5 +70,21 @@ describe("ReservationAvecSujet : sujets proposés selon `?sujet`", () => {
     expect(html).toContain(nom("logiciel"));
     expect(html).not.toContain(nom("demonstration"));
     expect(html).not.toContain(nom("point-d-etape"));
+  });
+});
+
+describe("ReservationAvecSujet : la page client", () => {
+  it("propose les quatre sujets de clients, sans ceux du premier rendez-vous", () => {
+    const html = rendre("", true);
+    for (const id of ["point-rapide", "demonstration", "proposition", "point-d-etape"]) {
+      expect(html).toContain(nom(id));
+    }
+    for (const id of ["logiciel", "site", "ia", "decouverte"]) expect(html).not.toContain(`>${nom(id)}<`);
+    expect(html).toContain(C.formulaire.telephoneLabel);
+  });
+
+  it("`?sujet=proposition` présélectionne le bouton, un sujet de prospect est ignoré", () => {
+    expect(rendre("sujet=proposition", true)).toMatch(/value="proposition"[^>]*checked|checked[^>]*value="proposition"/u);
+    expect(rendre("sujet=logiciel", true)).not.toMatch(/checked/u);
   });
 });
