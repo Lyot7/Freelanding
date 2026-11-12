@@ -516,7 +516,8 @@ export function HeroSection({
               {hero.offerLink ? (
                 <a
                   href={hero.offerLink.href}
-                  className="text-[13px] font-semibold tracking-[-0.01em] text-foreground underline underline-offset-[3px]"
+                  data-part="hero-cta-secondaire"
+                  className="flex h-[48px] flex-none items-center justify-center border border-white/40 px-[20px] text-[13px] font-semibold uppercase leading-none tracking-[-0.01em] text-foreground no-underline transition-colors duration-200 hover:border-foreground hover:bg-white/10"
                 >
                   {hero.offerLink.label}
                 </a>
