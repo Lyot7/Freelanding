@@ -82,8 +82,10 @@ describe("chaque page secteur est cherchable", () => {
         const chemins = contentRoutes.map((r) => r.pathname);
         const hrefs = page.sections.flatMap((s) => s.liens?.items.map((l) => l.href) ?? []);
         for (const href of hrefs) {
-          if (href.startsWith("#")) {
-            expect(href).toBe("#rendez-vous");
+          if (href.startsWith("/rdv")) {
+            // Le premier rendez-vous : `/rdv`, sujet logiciel déjà choisi.
+            expect(href).toBe("/rdv?sujet=logiciel");
+            expect(chemins).toContain("/rdv");
             continue;
           }
           expect(chemins, `${href} n'est pas au sitemap`).toContain(href);
@@ -93,7 +95,7 @@ describe("chaque page secteur est cherchable", () => {
           `/services/${LOGICIEL.slug}`,
           "/realisations/wurth-creation-de-compte",
           "/blog/outil-sur-mesure-ou-abonnements-saas",
-          "#rendez-vous",
+          "/rdv?sujet=logiciel",
         ]) {
           expect(hrefs).toContain(attendu);
         }

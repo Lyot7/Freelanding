@@ -1,64 +1,35 @@
 import { describe, expect, it } from "bun:test";
-import { euros, prestation } from "../../content/offre.ts";
-import { IDS_RENDEZ_VOUS, rendezVousContent } from "../../content/rendez-vous.ts";
+import { euros } from "../../content/offre.ts";
+import { rendezVousContent } from "../../content/rendez-vous.ts";
 import { siteConfig } from "../../content/site.ts";
 import {
-  rattacherObjectif,
   BORNES_BUDGET,
   BUDGET_INCONNU,
   composerNotes,
-  LIBELLE_NOTE_TELEPHONE,
   LEGENDE_OBJECTIF,
-  LONGUEUR_PROJET_MAX,
-  offresDuRendezVous,
+  LIBELLE_NOTE_TELEPHONE,
+  libelleOption,
+  LONGUEUR_LIGNE_MAX,
+  OPTIONS_ECHEANCE,
   optionsObjectif,
-  questionsDuType,
+  rattacherObjectif,
   rattacherTranche,
   rendezVousDuTypeProjet,
-  retourBudget,
-  tranchesBudget,
   reponsesLisibles,
+  tranchesBudget,
 } from "./questionnaire.ts";
 
 /**
- * LES TRANCHES NE CITENT AUCUN PRIX D'ELIOTT, décision du 2026-11-01. Ces tests
- * figent la RÈGLE (quelle tranche donne quel retour, ce qui part dans les notes),
- * et l'absence de tout montant et de tout nom de forfait dans les textes.
+ * LA RÉSERVATION NE POSE PLUS DE QUESTIONNAIRE (2026-11-12). Ce module garde
+ * ce que le formulaire de contact partage encore (tranches de budget, objectif,
+ * échéance) et la mise en forme des notes et des réponses d'un rendez-vous :
+ * téléphone (facultatif pour un client), ligne libre.
+ *
+ * LES TRANCHES NE CITENT AUCUN PRIX D'ELIOTT, décision du 2026-11-01.
  */
 
-const logiciel = prestation("logiciel");
 const [A, B, C] = BORNES_BUDGET;
-const tranche = (rang) => tranchesBudget()[rang].id;
-const sansInsecable = (texte) => texte.replace(/[\u00a0\u202f]/gu, " ");
-
-describe("rattacherObjectif", () => {
-  it("range un objectif retiré sous « autre » et laisse les autres intacts", () => {
-    expect(rattacherObjectif("google")).toBe("autre");
-    expect(rattacherObjectif("equipe")).toBe("autre");
-    expect(rattacherObjectif("tache")).toBe("tache");
-  });
-});
-
-describe("offresDuRendezVous", () => {
-  it("relie « logiciel » à son offre, et « decouverte » à toutes les prestations", () => {
-    expect(offresDuRendezVous("logiciel")).toEqual([logiciel]);
-    expect(offresDuRendezVous("decouverte")).toEqual([logiciel]);
-  });
-});
-
-describe("le questionnaire est le même pour chaque sujet", () => {
-  it("pose toujours le budget, sans question d'outil ni légende propre à un sujet", () => {
-    // Depuis le 2026-10-31, plus de sujet sans budget (le CTO) ni de question
-    // « outil » (l'intégration IA) : ces deux offres n'existent plus.
-    const { objectif } = rendezVousContent.questionnaire;
-    expect(objectif).not.toHaveProperty("legendeParType");
-    expect(LEGENDE_OBJECTIF).toBe(objectif.legende);
-    expect(tranchesBudget().length).toBeGreaterThan(2);
-    for (const id of IDS_RENDEZ_VOUS) {
-      expect(optionsObjectif(id).length, id).toBeGreaterThan(2);
-    }
-  });
-});
+const TELEPHONE = "06 12 34 56 78";
 
 describe("tranchesBudget", () => {
   it("ne laisse deviner aucun prix d'Eliott : ni son ancien plancher, ni ses multiples", () => {
@@ -93,145 +64,13 @@ describe("tranchesBudget", () => {
     ]);
   });
 
-  it("donne des identifiants uniques à chaque sujet", () => {
+  it("donne des identifiants uniques", () => {
     const ids = tranchesBudget().map((t) => t.id);
     expect(new Set(ids).size).toBe(ids.length);
-    for (const id of IDS_RENDEZ_VOUS) {
-      const objectifs = optionsObjectif(id).map((o) => o.id);
-      expect(new Set(objectifs).size).toBe(objectifs.length);
-    }
   });
 });
 
-describe("retourBudget — ce que vous pouvez espérer", () => {
-  const { retour: R } = rendezVousContent;
-
-  it("sous le seuil interne, propose de cadrer ensemble, sans jamais nommer le seuil", () => {
-    expect(retourBudget(tranche(0))).toEqual({ type: "serre", texte: R.serre });
-  });
-
-  it("au-dessus du seuil, renvoie à l’appel et au devis", () => {
-    expect(retourBudget(tranche(1))).toEqual({ type: "aPortee", texte: R.aPortee });
-    expect(retourBudget(tranche(2))).toEqual({ type: "aPortee", texte: R.aPortee });
-  });
-
-  it("sur la tranche ouverte vers le haut, dit que le budget laisse de la place", () => {
-    expect(retourBudget(tranche(3))).toEqual({ type: "large", texte: R.large });
-  });
-
-  it("« je ne sais pas » renvoie à l’appel", () => {
-    expect(retourBudget(BUDGET_INCONNU)).toEqual({ type: "inconnu", texte: R.inconnu });
-  });
-
-  it("ne calcule rien pour une tranche inconnue", () => {
-    // Une tranche de l'ancien site vitrine, retirée le 2026-10-31.
-    expect(retourBudget("moins-3000")).toBe(undefined);
-    expect(retourBudget("3000-6000")).toBe(undefined);
-  });
-
-  it("aucun texte du retour ne porte un montant, un forfait ni un palier", () => {
-    for (const texte of [R.titre, R.serre, R.inconnu, R.aPortee, R.large]) {
-      expect(/forfait|palier|prix ferme|prix de départ|\d/iu.test(texte), texte).toBe(false);
-    }
-  });
-});
-
-describe("composerNotes — ce qu'Eliott lit dans son agenda", () => {
-  const { notes } = rendezVousContent;
-
-  it("pose une réponse par ligne, ce qui est à portée, puis le message", () => {
-    const texte = composerNotes({
-      type: "logiciel",
-      budget: `${A}-${B}`,
-      objectif: "tableur",
-      echeance: "trimestre",
-      message: "Sortir du tableur partagé.",
-    });
-    const lignes = texte.split("\n");
-    expect(lignes).toEqual([
-      sansInsecable(`${notes.budget} : ${tranchesBudget()[1].libelle}`),
-      sansInsecable(`${notes.forfait} : ${logiciel.nom}`),
-      sansInsecable(`${notes.objectif} : ${optionsObjectif("logiciel")[1].libelle}`),
-      sansInsecable(`${notes.echeance} : ${rendezVousContent.questionnaire.echeance.options[1].libelle}`),
-      "",
-      "Sortir du tableur partagé.",
-    ]);
-  });
-
-  it("n’écrit ni échéance ni ligne vide quand elles manquent", () => {
-    const texte = composerNotes({ type: "logiciel", budget: BUDGET_INCONNU, objectif: "tableur" });
-    expect(texte.split("\n")).toHaveLength(3);
-    expect(texte).toContain(sansInsecable(`${notes.forfait} : ${notes.aCaler}`));
-  });
-
-  it("signale à Eliott un budget sous le seuil interne", () => {
-    const texte = composerNotes({
-      type: "logiciel",
-      budget: tranche(0),
-      objectif: "autre",
-    });
-    expect(texte).toContain(sansInsecable(`${notes.forfait} : ${notes.aucunForfait}`));
-  });
-
-  it("n'écrit plus de ligne d'outil, même pour une ancienne réponse", () => {
-    const texte = composerNotes({
-      type: "decouverte",
-      budget: BUDGET_INCONNU,
-      objectif: "relier",
-      outil: "messagerie",
-    });
-    expect(texte.split("\n")).toEqual([
-      sansInsecable(`${notes.budget} : ${rendezVousContent.questionnaire.budget.inconnu}`),
-      sansInsecable(`${notes.forfait} : ${notes.aCaler}`),
-      sansInsecable(`${notes.objectif} : ${optionsObjectif("decouverte")[1].libelle}`),
-    ]);
-    expect(notes).not.toHaveProperty("outil");
-  });
-
-  it("met le téléphone en tête quand le visiteur l'a donné", () => {
-    const texte = composerNotes({
-      type: "logiciel",
-      budget: BUDGET_INCONNU,
-      objectif: "tableur",
-      telephone: "+33 6 32 21 37 11",
-    });
-    const lignes = texte.split("\n");
-    expect(lignes[0]).toBe(`${LIBELLE_NOTE_TELEPHONE} : +33 6 32 21 37 11`);
-    expect(lignes).toHaveLength(4);
-  });
-
-  it("n'écrit aucune ligne de téléphone sans numéro", () => {
-    const texte = composerNotes({ type: "logiciel", budget: BUDGET_INCONNU, objectif: "tableur" });
-    expect(texte).not.toContain(LIBELLE_NOTE_TELEPHONE);
-  });
-
-  it("ne laisse aucune espace insécable dans le texte brut", () => {
-    const texte = composerNotes({
-      type: "decouverte",
-      budget: `plus-${C}`,
-      objectif: "relier",
-    });
-    expect(texte).not.toMatch(/[\u00a0\u202f]/u);
-  });
-});
-
-describe("rendezVousDuTypeProjet", () => {
-  it("relie chaque type du formulaire de contact à un rendez-vous", () => {
-    const options = siteConfig.footerForm.selectOptions;
-    expect(options.map(rendezVousDuTypeProjet)).toEqual(
-      options.map((o) => (o === "Un logiciel métier" ? "logiciel" : "decouverte")),
-    );
-    expect(rendezVousDuTypeProjet("Un logiciel métier")).toBe("logiciel");
-    // Un onglet ouvert avant le 2026-10-31 envoie encore l'ancien libellé.
-    expect(rendezVousDuTypeProjet("Une solution métier")).toBe("logiciel");
-    expect(rendezVousDuTypeProjet("Je ne sais pas encore")).toBe("decouverte");
-    // Les types retirés (site, intégration IA, CTO) retombent sur la découverte.
-    expect(rendezVousDuTypeProjet("Un site internet")).toBe("decouverte");
-    expect(rendezVousDuTypeProjet("toString")).toBe("decouverte");
-  });
-});
-
-describe("rattacherTranche — les tranches retirées", () => {
+describe("rattacherTranche : les tranches retirées", () => {
   it("ramène chaque ancienne tranche à la tranche actuelle qui contient sa borne basse", () => {
     expect(rattacherTranche("moins-6000")).toBe(`moins-${A}`);
     expect(rattacherTranche("moins-3000")).toBe(`moins-${A}`);
@@ -251,115 +90,119 @@ describe("rattacherTranche — les tranches retirées", () => {
   });
 });
 
-describe("questionsDuType — démonstration et point d'étape sans budget ni échéance", () => {
-  const Q = rendezVousContent.questionnaire;
+describe("objectifs et échéances du formulaire de contact", () => {
+  it("rattacherObjectif range un objectif retiré sous « autre » et laisse les autres intacts", () => {
+    expect(rattacherObjectif("google")).toBe("autre");
+    expect(rattacherObjectif("equipe")).toBe("autre");
+    expect(rattacherObjectif("tache")).toBe("tache");
+  });
 
-  it("logiciel et découverte posent budget et échéance, sans projet", () => {
+  it("propose au moins deux objectifs par sujet, aux identifiants uniques", () => {
+    expect(LEGENDE_OBJECTIF).toBe(rendezVousContent.questionnaire.objectif.legende);
     for (const id of ["logiciel", "decouverte"]) {
-      expect(questionsDuType(id)).toEqual({
-        cadrage: true,
-        budget: true,
-        echeance: true,
-        projet: false,
-        legendeObjectif: LEGENDE_OBJECTIF,
-      });
+      const ids = optionsObjectif(id).map((o) => o.id);
+      expect(ids.length, id).toBeGreaterThan(2);
+      expect(new Set(ids).size, id).toBe(ids.length);
     }
   });
 
-  it("la démonstration demande seulement ce qu'on veut voir", () => {
-    expect(questionsDuType("demonstration")).toEqual({
-      cadrage: false,
-      budget: false,
-      echeance: false,
-      projet: false,
-      legendeObjectif: Q.objectif.legendes.demonstration,
-    });
+  it("libelleOption rend le libellé d'une réponse, ou undefined hors liste", () => {
+    expect(libelleOption(optionsObjectif("logiciel"), "tableur")).toBe("Sortir du tableur partagé");
+    expect(libelleOption(OPTIONS_ECHEANCE, "trimestre")).toBe("Dans les trois mois");
+    expect(libelleOption(OPTIONS_ECHEANCE, "demain")).toBeUndefined();
   });
 
-  it("le point d'étape demande le projet et ce qu'on veut trancher", () => {
-    expect(questionsDuType("point-d-etape")).toEqual({
-      cadrage: false,
-      budget: false,
-      echeance: false,
-      projet: true,
-      legendeObjectif: Q.objectif.legendes["point-d-etape"],
-    });
-    expect(LONGUEUR_PROJET_MAX).toBe(120);
-  });
-
-  it("sans sujet, aucune question", () => {
-    expect(questionsDuType(undefined)).toEqual({
-      cadrage: false,
-      budget: false,
-      echeance: false,
-      projet: false,
-      legendeObjectif: LEGENDE_OBJECTIF,
-    });
-  });
-
-  it("les notes d'un point d'étape portent le projet, sans ligne de budget", () => {
-    const texte = composerNotes({
-      type: "point-d-etape",
-      projet: "Cockpit",
-      objectif: "priorites",
-      telephone: "06 12 34 56 78",
-    });
-    expect(texte.split("\n")).toEqual([
-      `${LIBELLE_NOTE_TELEPHONE} : 06 12 34 56 78`,
-      `${rendezVousContent.notes.projet} : Cockpit`,
-      `${rendezVousContent.notes.objectif} : Les priorités de la suite`,
-    ]);
-  });
-
-  it("les notes d'une démonstration se limitent à ce qu'on veut voir", () => {
-    expect(composerNotes({ type: "demonstration", objectif: "ia" })).toBe(
-      `${rendezVousContent.notes.objectif} : L’IA au travail sur des documents`,
-    );
+  it("fixe la longueur maximale de la ligne libre", () => {
+    expect(LONGUEUR_LIGNE_MAX).toBe(1_500);
   });
 });
 
-describe("le cadrage — ce qu'Eliott lit avant l'appel", () => {
-  const cadrage = {
-    type: "logiciel",
-    budget: "5000-10000",
-    objectif: "tableur",
-    echeance: "trimestre",
-    telephone: "06 12 34 56 78",
-    entreprise: "Transports Martin",
-    activite: "Transport frigorifique",
-    taille: "6-20",
-    decision: "seul",
-    coince: "On ressaisit tout,\npuis on corrige.",
-    cout: "plus-5h",
-    essaye: "logiciel",
-  };
+describe("rendezVousDuTypeProjet", () => {
+  it("relie chaque type du formulaire de contact à un rendez-vous", () => {
+    const options = siteConfig.footerForm.selectOptions;
+    expect(options.map(rendezVousDuTypeProjet)).toEqual(
+      options.map((o) => (o === "Un logiciel métier" ? "logiciel" : "decouverte")),
+    );
+    expect(rendezVousDuTypeProjet("Un logiciel métier")).toBe("logiciel");
+    // Un onglet ouvert avant le 2026-10-31 envoie encore l'ancien libellé.
+    expect(rendezVousDuTypeProjet("Une solution métier")).toBe("logiciel");
+    expect(rendezVousDuTypeProjet("Je ne sais pas encore")).toBe("decouverte");
+    expect(rendezVousDuTypeProjet("Un site internet")).toBe("decouverte");
+    expect(rendezVousDuTypeProjet("toString")).toBe("decouverte");
+  });
+});
 
-  it("range le cadrage sous le téléphone, une réponse par ligne, en clair", () => {
-    const lignes = composerNotes(cadrage).split("\n");
-    expect(lignes.slice(0, 8)).toEqual([
-      "Téléphone : 06 12 34 56 78",
-      "Entreprise : Transports Martin",
-      "Activité : Transport frigorifique",
-      "Taille : 6 à 20",
-      "Ce qui coince : On ressaisit tout, puis on corrige.",
-      "Coût actuel : Plus de 5 h par semaine",
-      "Déjà essayé : Un logiciel du marché",
-      "Décision : Je décide seul",
+describe("composerNotes : ce qu'Eliott lit dans son agenda", () => {
+  it("met le téléphone seul sur une ligne quand il n'y a rien d'autre", () => {
+    expect(composerNotes({ type: "logiciel", telephone: TELEPHONE })).toBe(
+      `${LIBELLE_NOTE_TELEPHONE} : ${TELEPHONE}`,
+    );
+    expect(LIBELLE_NOTE_TELEPHONE).toBe("Téléphone");
+  });
+
+  it("pose le message après une ligne vide, sans changer son contenu", () => {
+    const texte = composerNotes({
+      type: "site",
+      telephone: TELEPHONE,
+      message: "Refaire notre site vitrine.",
+    });
+    expect(texte.split("\n")).toEqual([
+      `Téléphone : ${TELEPHONE}`,
+      "",
+      "Refaire notre site vitrine.",
     ]);
   });
 
-  it("donne au cockpit des libellés et non des identifiants", () => {
-    expect(reponsesLisibles(cadrage)).toMatchObject({
-      taille: "6 à 20",
-      cout: "Plus de 5 h par semaine",
-      objectif: "Sortir du tableur partagé",
-      echeance: "Dans les trois mois",
-      budget: "De 5 000 € à 10 000 €",
+  it("un client sans téléphone : seulement son mot, ou rien", () => {
+    expect(composerNotes({ type: "proposition", message: "Relire le devis." })).toBe("Relire le devis.");
+    expect(composerNotes({ type: "proposition" })).toBe("");
+  });
+
+  it("n'écrit aucune ligne de budget, d'objectif, d'échéance ni de cadrage", () => {
+    const texte = composerNotes({
+      type: "logiciel",
+      telephone: TELEPHONE,
+      message: "x",
+      // Un ancien appelant peut encore passer ces clés : elles ne sortent plus.
+      budget: "5000-10000",
+      objectif: "tableur",
+      echeance: "vite",
+      entreprise: "Transports Martin",
     });
-    // Sans cadrage (point d'étape) : aucune clé vide.
-    expect(reponsesLisibles({ type: "point-d-etape", objectif: "priorites", projet: "Cockpit" })).toEqual({
-      projet: "Cockpit",
-      objectif: "Les priorités de la suite",
+    expect(texte).not.toMatch(/budget|objectif|échéance|entreprise|forfait/iu);
+    expect(texte.split("\n")).toHaveLength(3);
+  });
+
+  it("ne laisse aucune espace insécable dans le texte brut", () => {
+    const texte = composerNotes({ type: "decouverte", telephone: "+33 6 12 34 56 78", message: "Bonjour : merci" });
+    expect(texte).not.toMatch(/[  ]/u);
+  });
+});
+
+describe("reponsesLisibles : ce que le cockpit reprend dans le mail", () => {
+  it("rend un objet vide quand il n'y a ni projet ni message", () => {
+    expect(reponsesLisibles({ type: "logiciel", telephone: TELEPHONE })).toEqual({});
+  });
+
+  it("range la ligne libre sous `coince`, ramenée sur une ligne", () => {
+    expect(
+      reponsesLisibles({
+        type: "ia",
+        telephone: TELEPHONE,
+        message: "On ressaisit tout,\n\npuis   on corrige.",
+      }),
+    ).toEqual({ coince: "On ressaisit tout, puis on corrige." });
+  });
+
+  it("ne renvoie jamais le téléphone ni une réponse d'ancien questionnaire", () => {
+    const lisibles = reponsesLisibles({
+      type: "logiciel",
+      telephone: TELEPHONE,
+      message: "Un mot.",
+      budget: "5000-10000",
+      objectif: "tableur",
+      entreprise: "Transports Martin",
     });
+    expect(Object.keys(lisibles)).toEqual(["coince"]);
   });
 });

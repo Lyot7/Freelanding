@@ -1,25 +1,23 @@
 /**
- * Questionnaire de la prise de rendez-vous : tranches de budget, retour « ce
- * que vous pouvez espérer à ce budget », et mise en forme des notes du rendez-vous.
+ * Ce que la prise de rendez-vous et le formulaire de contact se partagent : les
+ * tranches de budget, l'objectif et l'échéance du contact, et la mise en forme
+ * des notes d'un rendez-vous.
  *
- * POURQUOI CE MODULE. Eliott veut recevoir des demandes déjà cadrées, et le
- * visiteur doit savoir avant l'appel à quoi s'attendre. Depuis le 2026-11-01, le
- * site ne cite plus aucun prix d'Eliott : les tranches posent la question du
- * budget du visiteur sans laisser deviner un plancher, et aucun retour ne le
- * nomme. Le seuil de `BORNES_BUDGET` reste interne : il classe la demande dans
- * les notes qu'Eliott lit dans son agenda.
+ * LA RÉSERVATION NE POSE PLUS DE QUESTIONNAIRE depuis le 2026-11-12 : sujet,
+ * créneau, coordonnées, une ligne libre. Le cadrage en dix questions de
+ * 2026-11-10 est retiré, il décourageait la prise de rendez-vous.
  *
- * MODULE PUR, partagé par le navigateur (retour immédiat) et par le serveur
- * (validation en liste fermée, composition des notes). Ni réseau, ni horloge,
- * ni `process.env`.
+ * Aucun prix d'Eliott ici : les tranches posent la question du budget du
+ * visiteur sans laisser deviner un plancher.
+ *
+ * MODULE PUR, partagé par le navigateur et par le serveur. Ni réseau, ni
+ * horloge, ni `process.env`.
  */
-import { euros, prestations } from "@/content/offre";
-import type { Offre } from "@/content/offre";
-import { RDV_PAR_PRESTATION, rendezVousContent } from "@/content/rendez-vous";
-import type { IdRendezVous, OptionQuestion } from "@/content/rendez-vous";
+import { euros } from "@/content/offre";
+import { rendezVousContent } from "@/content/rendez-vous";
+import type { IdObjectif, IdRendezVous, OptionQuestion } from "@/content/rendez-vous";
 
 const questions = rendezVousContent.questionnaire;
-const retour = rendezVousContent.retour;
 
 /** Identifiant de la tranche « je ne sais pas encore », commun à tous les types. */
 export const BUDGET_INCONNU = "inconnu";
@@ -33,15 +31,6 @@ export const BUDGET_INCONNU = "inconnu";
 export interface TrancheBudget extends OptionQuestion {
   readonly bas?: number;
   readonly haut?: number;
-}
-
-/**
- * Offres concernées par un type de rendez-vous : un type vers lequel aucune
- * offre ne pointe (« decouverte ») couvre toutes les prestations.
- */
-export function offresDuRendezVous(id: IdRendezVous): readonly Offre[] {
-  const liees: Offre[] = prestations.filter((p) => RDV_PAR_PRESTATION[p.id] === id);
-  return liees.length > 0 ? liees : prestations;
 }
 
 /**
@@ -149,117 +138,25 @@ export function rattacherObjectif(valeur: string): string {
 }
 
 /** Objectifs proposés pour un type de rendez-vous. */
-export function optionsObjectif(id: IdRendezVous): readonly OptionQuestion[] {
+export function optionsObjectif(id: IdObjectif): readonly OptionQuestion[] {
   return questions.objectif.options[id];
 }
 
 /** Légende de la question d'objectif. */
 export const LEGENDE_OBJECTIF = questions.objectif.legende;
 
-/** Longueur maximale du nom de projet saisi par un client. */
-export const LONGUEUR_PROJET_MAX = 120;
+/** Longueur maximale de la ligne libre de la réservation. */
+export const LONGUEUR_LIGNE_MAX = 1_500;
 
-/**
- * Les questions qu'un type de rendez-vous pose, en plus de l'objectif.
- *
- * LA DÉMONSTRATION ET LE POINT D'ÉTAPE NE PARLENT NI DE BUDGET NI D'ÉCHÉANCE
- * (2026-11-02) : l'un montre ce qui existe, l'autre suit un projet déjà signé.
- * Le point d'étape demande en revanche quel projet, en texte libre : un client
- * peut en avoir plusieurs.
- */
-export interface QuestionsDuType {
-  /**
-   * LE CADRAGE (2026-11-10) : entreprise, activité, taille, ce qui coince, ce
-   * que ça coûte, ce qui a été essayé, qui décide. Posé AVANT le créneau, avec
-   * un téléphone obligatoire : Eliott arrive préparé, et le visiteur s'est
-   * engagé avant de réserver. Les sujets des clients en cours n'y passent pas.
-   */
-  readonly cadrage: boolean;
-  readonly budget: boolean;
-  readonly echeance: boolean;
-  readonly projet: boolean;
-  readonly legendeObjectif: string;
-}
-
-const SANS_BUDGET: readonly IdRendezVous[] = ["demonstration", "point-d-etape"];
-const AVEC_PROJET: readonly IdRendezVous[] = ["point-d-etape"];
-
-/** Sans sujet choisi, aucune question : le composant n'a encore rien à poser. */
-export function questionsDuType(id: IdRendezVous | undefined): QuestionsDuType {
-  if (!id) {
-    return { cadrage: false, budget: false, echeance: false, projet: false, legendeObjectif: LEGENDE_OBJECTIF };
-  }
-  const qualifie = !SANS_BUDGET.includes(id);
-  return {
-    cadrage: qualifie,
-    budget: qualifie,
-    echeance: qualifie,
-    projet: AVEC_PROJET.includes(id),
-    legendeObjectif: questions.objectif.legendes[id] ?? LEGENDE_OBJECTIF,
-  };
-}
-
-/** Échéances proposées, identiques pour tous les types. */
+/** Échéances proposées par le formulaire de contact. */
 export const OPTIONS_ECHEANCE: readonly OptionQuestion[] = questions.echeance.options;
 
-/** Les questions à choix du cadrage, dans l'ordre où le visiteur les voit. */
-export const OPTIONS_TAILLE: readonly OptionQuestion[] = questions.taille.options;
-export const OPTIONS_DECISION: readonly OptionQuestion[] = questions.decision.options;
-export const OPTIONS_COUT: readonly OptionQuestion[] = questions.cout.options;
-export const OPTIONS_ESSAYE: readonly OptionQuestion[] = questions.essaye.options;
-
-/** Bornes des réponses libres du cadrage, communes au navigateur et au serveur. */
-export const LONGUEUR_ENTREPRISE_MAX = 120;
-export const LONGUEUR_ACTIVITE_MAX = 160;
-/** « Ce qui coince » : une vraie phrase, pas un mot lâché pour passer. */
-export const LONGUEUR_COINCE_MIN = 15;
-export const LONGUEUR_COINCE_MAX = 1_000;
-
-/**
- * Le retour affiché sous la question du budget.
- *
- * `serre` : sous le seuil interne, jamais nommé au visiteur. `large` : la tranche
- * ouverte vers le haut. Aucun texte ne porte de montant : le prix se fixe au devis.
- */
-export interface RetourBudget {
-  readonly type: "inconnu" | "serre" | "aPortee" | "large";
-  readonly texte: string;
-}
-
-/**
- * Ce que le visiteur peut attendre avec la tranche choisie.
- *
- * `undefined` pour une tranche inconnue : le composant n'affiche rien plutôt
- * qu'un retour calculé sur une réponse périmée.
- */
-export function retourBudget(idTranche: string): RetourBudget | undefined {
-  const tranche = tranchesBudget().find((t) => t.id === idTranche);
-  if (!tranche) return undefined;
-  if (tranche.id === BUDGET_INCONNU) return { type: "inconnu", texte: retour.inconnu };
-  if (tranche.haut === undefined) return { type: "large", texte: retour.large };
-  if (tranche.haut <= BORNES_BUDGET[0]) return { type: "serre", texte: retour.serre };
-  return { type: "aPortee", texte: retour.aPortee };
-}
-
-/** Réponses validées au questionnaire, telles que le serveur les a acceptées. */
-export interface ReponsesQuestionnaire {
+/** Ce qu'une réservation transmet à Eliott, tel que le serveur l'a validé. */
+export interface ReponsesReservation {
   readonly type: IdRendezVous;
-  /** Absent pour un type qui ne pose pas la question (`questionsDuType`). */
-  readonly budget?: string;
-  /** Le projet concerné, saisi par un client (point d'étape). */
-  readonly projet?: string;
-  readonly objectif: string;
-  readonly echeance?: string;
-  /** Le cadrage, présent pour les sujets qui le posent (`questionsDuType().cadrage`). */
-  readonly entreprise?: string;
-  readonly activite?: string;
-  readonly taille?: string;
-  readonly decision?: string;
-  readonly coince?: string;
-  readonly cout?: string;
-  readonly essaye?: string;
-  /** Facultatif : le cockpit la reçoit aussi à part, mais elle reste en tête des notes. */
+  /** Absent pour un rendez-vous de client, qui n'a pas à le donner. */
   readonly telephone?: string;
+  /** La ligne libre : le projet en une phrase, facultative. */
   readonly message?: string;
 }
 
@@ -269,83 +166,29 @@ export interface ReponsesQuestionnaire {
  */
 export const LIBELLE_NOTE_TELEPHONE = "Téléphone";
 
-function libelle(options: readonly OptionQuestion[], id: string): string {
-  return options.find((option) => option.id === id)?.libelle ?? id;
-}
-
-type CleCadrage = "entreprise" | "activite" | "taille" | "decision" | "coince" | "cout" | "essaye";
-
-/** Ordre de lecture dans l'agenda : qui est en face, puis ce qui coince et ce que ça coûte. */
-const ORDRE_CADRAGE: readonly CleCadrage[] = ["entreprise", "activite", "taille", "coince", "cout", "essaye", "decision"];
-
-/** Réponses du cadrage en clair, dans l'ordre de lecture des notes ; les absentes sont omises. */
-function lignesCadrage(reponses: ReponsesQuestionnaire): Partial<Record<CleCadrage, string>> {
-  const lignes: Partial<Record<CleCadrage, string>> = {};
-  if (reponses.entreprise) lignes.entreprise = reponses.entreprise;
-  if (reponses.activite) lignes.activite = reponses.activite;
-  if (reponses.taille) lignes.taille = libelle(OPTIONS_TAILLE, reponses.taille);
-  if (reponses.coince) lignes.coince = reponses.coince.replace(/\s+/gu, " ");
-  if (reponses.cout) lignes.cout = libelle(OPTIONS_COUT, reponses.cout);
-  if (reponses.essaye) lignes.essaye = libelle(OPTIONS_ESSAYE, reponses.essaye);
-  if (reponses.decision) lignes.decision = libelle(OPTIONS_DECISION, reponses.decision);
-  return lignes;
-}
-
 /**
  * Réponses en clair pour le cockpit (`reponses` de la réservation).
  *
- * DES LIBELLÉS ET NON DES IDENTIFIANTS : le cockpit les stocke et en reprend deux
- * dans le mail de confirmation (`coince`, `objectif`, `src/lib/rdv/textes.ts` du
- * cockpit). Les clés sont ce contrat : ne pas les renommer d'un seul côté.
+ * `coince` est la clé que le cockpit reprend dans le mail de confirmation
+ * (`src/lib/rdv/textes.ts` du cockpit) : la ligne libre y porte. Ne pas la
+ * renommer d'un seul côté.
  */
-export function reponsesLisibles(reponses: ReponsesQuestionnaire): Record<string, string> {
-  const lisibles: Record<string, string> = { ...lignesCadrage(reponses) };
-  if (reponses.projet) lisibles.projet = reponses.projet;
-  lisibles.objectif = libelle(optionsObjectif(reponses.type), reponses.objectif);
-  if (reponses.budget) lisibles.budget = libelle(tranchesBudget(), reponses.budget).replace(/\u00a0|\u202f/gu, " ");
-  if (reponses.echeance) lisibles.echeance = libelle(OPTIONS_ECHEANCE, reponses.echeance);
+export function reponsesLisibles(reponses: ReponsesReservation): Record<string, string> {
+  const lisibles: Record<string, string> = {};
+  if (reponses.message) lisibles.coince = reponses.message.replace(/\s+/gu, " ");
   return lisibles;
 }
 
 /**
- * Texte déposé dans le champ `notes` de la réservation (cockpit, puis Google Agenda).
- *
- * LISIBLE D'UN COUP D'ŒIL DANS UN AGENDA : une réponse par ligne, ce qui est
- * à portée déjà calculé, puis le message libre après une ligne vide. Les
- * espaces insécables des montants sont ramenées à des espaces ordinaires :
- * certains clients de messagerie les affichent en `&nbsp;` dans le texte brut.
+ * Texte déposé dans le champ `notes` de la réservation (cockpit, puis Google
+ * Agenda) : le téléphone en tête, c'est la seule coordonnée que l'événement
+ * ne porte pas déjà, puis la ligne libre.
  */
-export function composerNotes(reponses: ReponsesQuestionnaire): string {
-  const { notes } = rendezVousContent;
+export function composerNotes(reponses: ReponsesReservation): string {
   const lignes: string[] = [];
-  // En tête : c'est la seule coordonnée que l'événement d'agenda ne porte pas déjà.
-  if (reponses.telephone) {
-    lignes.push(`${LIBELLE_NOTE_TELEPHONE} : ${reponses.telephone}`);
-  }
-  if (reponses.projet) lignes.push(`${notes.projet} : ${reponses.projet}`);
-  const cadrage = lignesCadrage(reponses);
-  for (const cle of ORDRE_CADRAGE) {
-    const valeur = cadrage[cle];
-    if (valeur) lignes.push(`${notes[cle]} : ${valeur}`);
-  }
-  if (reponses.budget) {
-    const retourCalcule = retourBudget(reponses.budget);
-    let forfait: string = offresDuRendezVous(reponses.type).map((p) => p.nom).join(" · ");
-    if (!retourCalcule || retourCalcule.type === "inconnu") forfait = notes.aCaler;
-    if (retourCalcule?.type === "serre") forfait = notes.aucunForfait;
-    lignes.push(
-      `${notes.budget} : ${libelle(tranchesBudget(), reponses.budget)}`,
-      `${notes.forfait} : ${forfait}`,
-    );
-  }
-  lignes.push(
-    `${notes.objectif} : ${libelle(optionsObjectif(reponses.type), reponses.objectif)}`,
-  );
-  if (reponses.echeance) {
-    lignes.push(`${notes.echeance} : ${libelle(OPTIONS_ECHEANCE, reponses.echeance)}`);
-  }
-  const texte = lignes.join("\n").replace(/\u00a0|\u202f/gu, " ");
-  return reponses.message ? `${texte}\n\n${reponses.message}` : texte;
+  if (reponses.telephone) lignes.push(`${LIBELLE_NOTE_TELEPHONE} : ${reponses.telephone}`);
+  if (reponses.message) lignes.push(...(lignes.length > 0 ? [""] : []), reponses.message);
+  return lignes.join("\n");
 }
 
 /**
@@ -357,13 +200,13 @@ export function composerNotes(reponses: ReponsesQuestionnaire): string {
  * toute valeur absente d'ici, retombent sur le rendez-vous « decouverte », qui
  * couvre toutes les prestations.
  */
-const RDV_PAR_TYPE_PROJET: Readonly<Record<string, IdRendezVous>> = {
+const RDV_PAR_TYPE_PROJET: Readonly<Record<string, IdObjectif>> = {
   "Un logiciel métier": "logiciel",
   /* Un onglet ouvert avant le 2026-10-31 envoie encore l'ancien libellé. */
   "Une solution métier": "logiciel",
 };
 
-export function rendezVousDuTypeProjet(typeProjet: string): IdRendezVous {
+export function rendezVousDuTypeProjet(typeProjet: string): IdObjectif {
   return Object.hasOwn(RDV_PAR_TYPE_PROJET, typeProjet)
     ? RDV_PAR_TYPE_PROJET[typeProjet]
     : "decouverte";

@@ -36,6 +36,7 @@
 import type { FaqItem } from "@/lib/content/types";
 import { euros, prestation } from "./offre";
 import type { LienLocal } from "./page-caen";
+import { lienRendezVous } from "./rendez-vous";
 
 const LOGICIEL = prestation("logiciel");
 
@@ -330,7 +331,7 @@ const pageBtp: PageSecteur = {
           },
           {
             libelle: "Réserver un appel",
-            href: "#rendez-vous",
+            href: lienRendezVous("logiciel"),
             description: "Choisissez un créneau en visio pour parler de vos chantiers.",
           },
         ],
@@ -598,7 +599,7 @@ const pageLocation: PageSecteur = {
           },
           {
             libelle: "Réserver un appel",
-            href: "#rendez-vous",
+            href: lienRendezVous("logiciel"),
             description: "Choisissez un créneau en visio pour parler de votre parc.",
           },
         ],
@@ -861,7 +862,7 @@ const pageNegoce: PageSecteur = {
           LIEN_PRIX,
           {
             libelle: "Réserver un appel",
-            href: "#rendez-vous",
+            href: lienRendezVous("logiciel"),
             description: "Choisissez un créneau en visio pour parler de votre comptoir.",
           },
         ],

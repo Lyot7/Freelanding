@@ -184,7 +184,7 @@ describe("documents légaux", () => {
     expect(texte).not.toMatch(/FR\s?\d{2}\s?\d{9}/);
   });
 
-  test("les CGV portent un barème de prix, sa méthode et l'escompte", () => {
+  test("les CGV écartent un barème unitaire, disent la méthode du devis et l'escompte", () => {
     // Art. L. 441-1 I C. com. : les CGV comprennent « les éléments de
     // détermination du prix tels que le barème des prix unitaires ». Le III
     // ouvre la voie de la méthode de calcul pour les services non chiffrables a

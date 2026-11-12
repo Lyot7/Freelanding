@@ -25,6 +25,7 @@ import type { LienLocal, PageLocale } from "@/content/page-caen";
 import type { PagePrix } from "@/content/page-prix-logiciel";
 import type { PageSecteur, SectionSecteur } from "@/content/pages-secteur";
 import { RDV_PAR_PRESTATION } from "@/content/rendez-vous";
+import { lienRendezVous } from "@/content/rendez-vous";
 
 /**
  * PAGE D'UNE PRESTATION — le détail des prix, là où il peut être expliqué.
@@ -507,9 +508,8 @@ export function ServicePage({
                 {servicePageLabels.reassurance}
               </p>
             </div>
-            {/* ANCRE LOCALE : la prise de rendez-vous est sur cette page,
-                avec le bon sujet déjà coché. */}
-            <OffreDetail offre={prestation} href="#rendez-vous" />
+            {/* UN SEUL LIEN de premier rendez-vous : `/rdv`, sujet déjà coché. */}
+            <OffreDetail offre={prestation} href={lienRendezVous("logiciel")} />
             {liensDeclinaisons?.map((lienLocal, index) => (
               <div
                 key={lienLocal.avant}
@@ -535,9 +535,9 @@ export function ServicePage({
 
         {/* SUR MESURE, SUR DEVIS. Même découpe que le contexte local des pages
             de ville : fond clair, deux moitiés, filet sur l'axe. À gauche ce
-            qui sort de l'offre, à droite les trois questions du
-            questionnaire de rendez-vous, pour que le visiteur arrive à
-            l'agenda en sachant ce qu'on va lui demander.
+            qui sort de l'offre, à droite les trois repères cadrés pendant
+            l'appel, pour que le visiteur arrive à l'agenda en sachant de
+            quoi on parlera.
 
             `id="devis"` : l'ancre est gardée, `lienDevis()` y mène toujours. */}
         <section
@@ -594,7 +594,7 @@ export function ServicePage({
                   à gauche, il se lisait avant elles. Plein, à l'accent, comme
                   le bouton de l'offre. */}
               <Link
-                href="#rendez-vous"
+                href={lienRendezVous("logiciel")}
                 className="flex h-[30px] w-fit flex-none items-center justify-center bg-accent px-[10px] text-[12px] font-semibold uppercase leading-[1.2] tracking-[-0.01em] text-background no-underline transition-opacity duration-200 hover:opacity-80 motion-reduce:transition-none"
               >
                 <span className="accent-room">{surMesureBloc.cta}</span>

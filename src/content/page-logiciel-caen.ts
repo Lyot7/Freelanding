@@ -32,6 +32,7 @@ import {
 } from "./offre";
 import { CHEMIN_PAGE_LOGICIEL_CAEN, type PageLocale } from "./page-caen";
 import { CHEMIN_PRIX_LOGICIEL, pagesSecteur } from "./pages-secteur";
+import { lienRendezVous } from "./rendez-vous";
 
 const LOGICIEL = prestation("logiciel");
 const CHEMIN_PILIER = `/services/${LOGICIEL.slug}`;
@@ -72,7 +73,7 @@ export const pageLogicielCaen: PageLocale = {
       },
       {
         libelle: "Réserver un appel",
-        href: "#rendez-vous",
+        href: lienRendezVous("logiciel"),
         description: "Choisissez un créneau en visio pour parler de votre projet.",
       },
     ],
