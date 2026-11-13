@@ -124,7 +124,7 @@ describe("accueil", () => {
   test("le titre du héros est une seule porte, vers les trois moyens", () => {
     const portes = homeContent.hero.doors ?? [];
     expect(portes.map((porte) => porte.href)).toEqual(["#logiciel"]);
-    expect(homeContent.hero.title).toBe("Un logiciel sur mesure et l’IA font vos saisies.");
+    expect(homeContent.hero.title).toBe("L’IA recopie, trie, relance. Votre équipe avance.");
     expect(homeContent.hero.titleLines?.join(" ")).toBe(homeContent.hero.title);
     expect(portes[0]?.price).toBe("Voir ce que vous y gagnez");
     expect(homeContent.about.title).not.toBe(homeContent.hero.title);
@@ -133,9 +133,9 @@ describe("accueil", () => {
 
   test("le haut de page dit quoi, pour qui et le gain", () => {
     const titre = homeContent.hero.title;
-    expect(titre).toMatch(/logiciel sur mesure/iu);
     expect(titre).toMatch(/IA/u);
-    expect(titre).toMatch(/saisies/iu);
+    expect(titre).toMatch(/recopie/iu);
+    expect(homeContent.hero.subtitle).toMatch(/je construis le logiciel/iu);
     expect(homeContent.hero.eyebrow).toMatch(/PME/u);
   });
 
