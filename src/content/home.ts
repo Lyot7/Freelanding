@@ -64,7 +64,7 @@ const POSITIONNEMENT = "Développeur à Caen, je fais gagner du temps aux PME.";
  */
 const PORTES = [
   {
-    lines: ["Un logiciel sur mesure", "et l’IA font vos saisies."],
+    lines: ["L’IA recopie, trie, relance.", "Votre équipe avance."],
     href: "#logiciel",
     price: "Voir ce que vous y gagnez",
   },
